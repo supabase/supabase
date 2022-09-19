@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { groupBy } from 'lodash'
-import { Modal } from 'common2'
+import { Modal } from 'ui'
 
 interface Props {
   visible: boolean

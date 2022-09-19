@@ -1,4 +1,4 @@
-import { IconArchive } from 'common2'
+import { IconArchive } from 'ui'
 import Panel from 'components/ui/Panel'
 
 const StoragePoliciesPlaceholder = ({ guiHeight }) => (

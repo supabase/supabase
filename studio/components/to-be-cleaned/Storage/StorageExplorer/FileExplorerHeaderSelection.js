@@ -1,4 +1,4 @@
-import { Button, IconDownload, IconTrash2, IconMove, IconX } from 'common2'
+import { Button, IconDownload, IconTrash2, IconMove, IconX } from 'ui'
 
 const FileExplorerHeaderSelection = ({
   selectedItems = [],

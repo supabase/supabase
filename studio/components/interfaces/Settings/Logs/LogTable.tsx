@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff } from 'common2'
+import { Alert, Button, IconEye, IconEyeOff } from 'ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'

@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconLoader, Toggle } from 'common2'
+import { Badge, IconLoader, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'

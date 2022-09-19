@@ -2,7 +2,7 @@ import useSWR from 'swr'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from 'common2'
+import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

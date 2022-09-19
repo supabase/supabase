@@ -15,7 +15,7 @@ import {
   IconRefreshCw,
   IconPenTool,
   IconAlertCircle,
-} from 'common2'
+} from 'ui'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,

@@ -1,12 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import {
-  Button,
-  Loading,
-  IconFileText,
-  IconDownload,
-  IconChevronLeft,
-  IconChevronRight,
-} from 'common2'
+import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'

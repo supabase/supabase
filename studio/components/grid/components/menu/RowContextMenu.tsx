@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
-import { IconTrash, IconClipboard, IconEdit } from 'common2'
+import { IconTrash, IconClipboard, IconEdit } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { formatClipboardValue, copyToClipboard } from '../../utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'

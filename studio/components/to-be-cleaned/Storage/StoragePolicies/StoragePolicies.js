@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconLoader } from 'common2'
+import { IconLoader } from 'ui'
 import { find, get, isEmpty, filter } from 'lodash'
 
 import { useStore } from 'hooks'

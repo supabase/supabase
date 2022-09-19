@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, IconLoader, IconCircle } from 'common2'
+import { Badge, IconLoader, IconCircle } from 'ui'
 import { Project } from 'types'
 
 interface Props {

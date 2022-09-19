@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { FC, useState } from 'react'
-import { Button, IconChevronRight, IconMaximize2, IconPlay } from 'common2'
+import { Button, IconChevronRight, IconMaximize2, IconPlay } from 'ui'
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import SqlSnippetCode from './Logs.SqlSnippetCode'

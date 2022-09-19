@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, IconPlus } from 'common2'
+import { Button, IconPlus } from 'ui'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 

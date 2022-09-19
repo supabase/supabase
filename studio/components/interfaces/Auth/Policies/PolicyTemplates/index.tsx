@@ -1,4 +1,4 @@
-import { Button } from 'common2'
+import { Button } from 'ui'
 import { FC, useState } from 'react'
 import { isEmpty } from 'lodash'
 

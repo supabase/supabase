@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Form, Input, Button, Listbox } from 'common2'
+import { Form, Input, Button, Listbox } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, useFlag } from 'hooks'

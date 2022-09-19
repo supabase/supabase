@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState } from 'react'
-import { IconMaximize2, IconMinimize2 } from 'common2'
+import { IconMaximize2, IconMinimize2 } from 'ui'
 
 interface Props {
   icon?: ReactNode

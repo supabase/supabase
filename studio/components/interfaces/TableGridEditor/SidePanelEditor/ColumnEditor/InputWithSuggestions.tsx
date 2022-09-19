@@ -6,7 +6,7 @@
 // the component over to the UI library
 
 import { FC, useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconList, Input } from 'common2'
+import { Button, Dropdown, IconList, Input } from 'ui'
 import { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3

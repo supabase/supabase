@@ -2,7 +2,7 @@ import { FC, useReducer, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
 import { Transition } from '@headlessui/react'
-import { Button, Form, Input, Modal, IconArrowLeft, Alert } from 'common2'
+import { Button, Form, Input, Modal, IconArrowLeft, Alert } from 'ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'

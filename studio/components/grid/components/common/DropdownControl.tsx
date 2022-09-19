@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Dropdown } from 'common2'
+import { Dropdown } from 'ui'
 
 interface DropdownControlProps {
   options: {

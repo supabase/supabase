@@ -5,7 +5,7 @@ import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from 'common2'
+import { Button, Dropdown, IconChevronDown } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'

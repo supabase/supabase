@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Input, Listbox } from 'common2'
+import { IconMoon, IconSun, Input, Listbox } from 'ui'
 
 import { useProfile, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'

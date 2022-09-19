@@ -7,7 +7,7 @@ import {
   IconList,
   IconSettings,
   IconUsers,
-} from 'common2'
+} from 'ui'
 import SVG from 'react-inlinesvg'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

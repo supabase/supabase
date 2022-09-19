@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { useFlag } from 'hooks'
-import { IconExternalLink } from 'common2'
+import { IconExternalLink } from 'ui'
 
 const AppBannerWrapper: FC = ({ children }) => {
   const ongoingIncident = useFlag('ongoingIncident')

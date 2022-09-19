@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { IconSave, Loading } from 'common2'
+import { IconSave, Loading } from 'ui'
 import { useStore } from 'hooks'
 import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
 import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'

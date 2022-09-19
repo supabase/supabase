@@ -1,4 +1,4 @@
-import { Alert } from 'common2'
+import { Alert } from 'ui'
 
 const AlphaPreview = () => {
   return (

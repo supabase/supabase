@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconCheckSquare, Loading } from 'common2'
+import { Button, IconCheckSquare, Loading } from 'ui'
 
 import { useProfile, useStore } from 'hooks'
 import { auth } from 'lib/gotrue'

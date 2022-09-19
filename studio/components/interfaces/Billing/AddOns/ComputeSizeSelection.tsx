@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Badge, Button, Radio } from 'common2'
+import { Badge, Button, Radio } from 'ui'
 
 import { useStore, useFlag } from 'hooks'
 import { getProductPrice } from '../Billing.utils'

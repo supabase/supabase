@@ -1,17 +1,7 @@
 import { FC, useEffect, useContext, createContext, FormEvent, useState } from 'react'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import {
-  Button,
-  Input,
-  Select,
-  SidePanel,
-  IconTrash,
-  Radio,
-  IconPlus,
-  Toggle,
-  Modal,
-} from 'common2'
+import { Button, Input, Select, SidePanel, IconTrash, Radio, IconPlus, Toggle, Modal } from 'ui'
 import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
 

@@ -1,6 +1,6 @@
 import React, { useState, PropsWithChildren, FC } from 'react'
 import { isEmpty } from 'lodash'
-import { Button, IconSearch, Input } from 'common2'
+import { Button, IconSearch, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'

@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconLoader, IconAlertCircle } from 'common2'
+import { IconLoader, IconAlertCircle } from 'ui'
 
 import { useProjectUsage } from 'hooks'
 import { ProjectUsage, NewProjectPanel } from 'components/interfaces/Home'

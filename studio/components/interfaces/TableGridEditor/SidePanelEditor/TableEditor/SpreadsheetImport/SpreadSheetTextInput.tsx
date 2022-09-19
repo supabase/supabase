@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Input } from 'common2'
+import { Input } from 'ui'
 
 interface Props {
   input: string

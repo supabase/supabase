@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Select } from 'common2'
+import { Select } from 'ui'
 import { CreateHookContext } from './'
 
 const SelectEnabledMode: FC = observer(({}) => {

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import SVG from 'react-inlinesvg'
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Listbox } from 'common2'
+import { Input, Listbox } from 'ui'
 
 import { CreateHookContext } from './'
 import { useStore } from 'hooks'

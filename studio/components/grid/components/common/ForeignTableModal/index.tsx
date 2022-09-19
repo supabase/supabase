@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Button, Modal, Menu, IconExternalLink, IconTrash } from 'common2'
+import { Button, Modal, Menu, IconExternalLink, IconTrash } from 'ui'
 
 import { RowItem } from './RowItem'
 import { FilterHeader } from './FilterHeader'

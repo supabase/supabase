@@ -2,7 +2,7 @@ import * as React from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
 import { useTrackedState } from '../../store'
 import { BlockKeys, MonacoEditor, NullValue, EmptyValue } from '../common'
-import { Popover } from 'common2'
+import { Popover } from 'ui'
 
 export function TextEditor<TRow, TSummaryRow = unknown>({
   row,

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconBarChart2 } from 'common2'
+import { IconBarChart2 } from 'ui'
 
 interface Props {
   title?: string

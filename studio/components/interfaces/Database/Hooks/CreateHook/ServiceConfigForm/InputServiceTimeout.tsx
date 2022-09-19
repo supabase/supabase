@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input } from 'common2'
+import { Input } from 'ui'
 import { CreateHookContext } from '../'
 
 // Not used currently

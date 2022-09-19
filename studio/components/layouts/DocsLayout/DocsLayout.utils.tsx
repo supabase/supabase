@@ -1,5 +1,5 @@
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { IconBook, IconBookOpen } from 'common2'
+import { IconBook, IconBookOpen } from 'ui'
 
 export const generateDocsMenu = (
   ref: string,

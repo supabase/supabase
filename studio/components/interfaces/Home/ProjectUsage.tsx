@@ -3,15 +3,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import {
-  Button,
-  Dropdown,
-  IconArchive,
-  IconChevronDown,
-  IconDatabase,
-  IconKey,
-  IconZap,
-} from 'common2'
+import { Button, Dropdown, IconArchive, IconChevronDown, IconDatabase, IconKey, IconZap } from 'ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { get } from 'lib/common/fetch'

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Input, Space } from 'common2'
+import { Modal, Button, Input, Space } from 'ui'
 
 const MoveItemsModal = ({
   bucketName = '',

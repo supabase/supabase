@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconChevronRight } from 'common2'
+import { IconChevronRight } from 'ui'
 import { isNull } from 'lodash'
 import { Dictionary } from 'components/grid'
 

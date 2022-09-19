@@ -1,7 +1,7 @@
 import SVG from 'react-inlinesvg'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconArrowLeft } from 'common2'
+import { Button, IconArrowLeft } from 'ui'
 
 import { withAuth, useFlag } from 'hooks'
 import Success from 'components/interfaces/Support/Success'

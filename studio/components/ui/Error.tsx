@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Button } from 'common2'
+import { Button } from 'ui'
 
 export default function EmptyPageState({ error }: any) {
   useEffect(() => {

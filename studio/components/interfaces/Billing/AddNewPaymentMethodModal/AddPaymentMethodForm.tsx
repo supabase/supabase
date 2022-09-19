@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Button, Modal } from 'common2'
+import { Button, Modal } from 'ui'
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import { useStore } from 'hooks'
 

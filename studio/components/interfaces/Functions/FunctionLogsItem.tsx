@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconClipboard, IconExternalLink, IconGlobe } from 'common2'
+import { Badge, IconClipboard, IconExternalLink, IconGlobe } from 'ui'
 import Table from 'components/to-be-cleaned/Table'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'

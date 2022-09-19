@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle } from 'common2'
+import { Button, IconAlertCircle } from 'ui'
 
 import { useStore } from 'hooks'
 import { getURL } from 'lib/helpers'

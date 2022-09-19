@@ -1,4 +1,4 @@
-import { IconDatabase } from 'common2'
+import { IconDatabase } from 'ui'
 import SVG from 'react-inlinesvg'
 
 export const vercelIcon = (
