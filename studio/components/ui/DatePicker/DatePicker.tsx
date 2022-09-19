@@ -12,7 +12,7 @@ import {
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'
 import dayjs from 'dayjs'
-import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
+import { ButtonProps } from 'ui/src/components/Button/Button'
 import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 
 export interface DatePickerProps {
