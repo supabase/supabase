@@ -4,7 +4,7 @@ import { IconLoader } from './../Icon/icons/IconLoader'
 
 import styleHandler from '../../lib/theme/styleHandler'
 
-interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   block?: boolean
   className?: string
   children?: React.ReactNode
