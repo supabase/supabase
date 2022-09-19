@@ -1,11 +1,12 @@
 const { withSentryConfig } = require('@sentry/nextjs')
 const withPlugins = require('next-compose-plugins')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: true, //process.env.ANALYZE === 'true',
+  openAnalyzer: true,
 })
 
 // this is required to use shared packages in the packages directory
-const withTM = require('next-transpile-modules')(['ui', 'common', 'common2'])
+const withTM = require('next-transpile-modules')(['ui', 'common'])
 
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
@@ -88,4 +89,4 @@ const sentryWebpackPluginOptions = {
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-    : nextConfig
+    : withPlugins([withTM()], nextConfig)
