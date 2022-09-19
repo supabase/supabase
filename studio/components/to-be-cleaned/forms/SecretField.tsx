@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IconEye, IconEyeOff } from 'common2'
+import { IconEye, IconEyeOff } from 'ui'
 import { connectField, filterDOMProps } from 'uniforms'
 
 const SecretField: React.FC = (props: any) => {

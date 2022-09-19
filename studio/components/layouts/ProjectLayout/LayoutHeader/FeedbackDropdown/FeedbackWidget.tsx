@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Input, Popover } from 'common2'
+import { Button, Input, Popover } from 'ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'

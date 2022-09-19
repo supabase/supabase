@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Button } from 'common2'
+import { Button } from 'ui'
 
 interface ActionBarProps {
   loading?: boolean

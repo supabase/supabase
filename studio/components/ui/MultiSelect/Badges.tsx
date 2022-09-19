@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconX } from 'common2'
+import { IconX } from 'ui'
 
 export const BadgeDisabled: FC<{ name: string }> = ({ name }) => (
   <div

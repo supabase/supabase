@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from 'common2'
+import { Button } from 'ui'
 
 import { Project } from 'types'
 

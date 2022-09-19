@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Form, Modal, Input } from 'common2'
+import { Button, Form, Modal, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'

@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { isUndefined } from 'lodash'
-import { Button, IconActivity, IconAlertCircle, IconBarChart, IconLoader } from 'common2'
+import { Button, IconActivity, IconAlertCircle, IconBarChart, IconLoader } from 'ui'
 import { Dictionary } from 'components/grid'
 
 import { API_URL } from 'lib/constants'

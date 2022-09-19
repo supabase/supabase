@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Radio, Badge } from 'common2'
+import { Radio, Badge } from 'ui'
 import { CreateHookContext } from '../'
 
 interface Props {

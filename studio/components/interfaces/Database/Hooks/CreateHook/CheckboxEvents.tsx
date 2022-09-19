@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Checkbox } from 'common2'
+import { Checkbox } from 'ui'
 import { union, without } from 'lodash'
 import { CreateHookContext } from './'
 

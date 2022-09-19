@@ -3,7 +3,7 @@ import { includes } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'common2'
+import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
 
 import { useStore, checkPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'

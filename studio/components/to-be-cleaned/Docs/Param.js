@@ -1,4 +1,4 @@
-import { Badge } from 'common2'
+import { Badge } from 'ui'
 import Description from './Description'
 
 const Param = ({

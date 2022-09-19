@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconChevronRight } from 'common2'
+import { IconChevronRight } from 'ui'
 import { useStore } from 'hooks'
 import Link from 'next/link'
 

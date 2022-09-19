@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Input, Modal, Form, Button } from 'common2'
+import { Input, Modal, Form, Button } from 'ui'
 
 import { useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'

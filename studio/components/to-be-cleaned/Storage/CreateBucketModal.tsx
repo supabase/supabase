@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Modal, Alert, Button, Input, Toggle } from 'common2'
+import { Modal, Alert, Button, Input, Toggle } from 'ui'
 
 interface Props {
   visible: boolean

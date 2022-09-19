@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Radio } from 'common2'
+import { Radio } from 'ui'
 
 interface Props {
   operation: string

@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { Button, Input, IconChevronDown, IconSearch } from 'common2'
+import { Button, Input, IconChevronDown, IconSearch } from 'ui'
 import { DropdownControl } from '../../common'
 import { FilterOperatorOptions } from '../../header/filter'
 import { Filter, FilterOperator } from '../../../types'

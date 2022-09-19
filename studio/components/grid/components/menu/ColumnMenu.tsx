@@ -8,7 +8,7 @@ import {
   IconTrash,
   IconLock,
   IconUnlock,
-} from 'common2'
+} from 'ui'
 import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
 

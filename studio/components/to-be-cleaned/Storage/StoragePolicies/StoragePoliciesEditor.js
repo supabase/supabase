@@ -1,4 +1,4 @@
-import { Badge, Button, Checkbox, Input, Modal } from 'common2'
+import { Badge, Button, Checkbox, Input, Modal } from 'ui'
 import { get } from 'lodash'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'

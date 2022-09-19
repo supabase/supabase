@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, IconLoader, IconPauseCircle } from 'common2'
+import { Badge, IconLoader, IconPauseCircle } from 'ui'
 
 import { Project } from 'types'
 import CardButton from 'components/ui/CardButton'

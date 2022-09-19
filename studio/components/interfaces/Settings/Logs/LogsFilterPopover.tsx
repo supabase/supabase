@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Popover } from 'common2'
+import { Button, Checkbox, Form, Popover } from 'ui'
 import React, { useState } from 'react'
 import { Filters, FilterSet } from '.'
 

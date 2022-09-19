@@ -3,16 +3,7 @@ import Link from 'next/link'
 import { FC, FormEvent, useState } from 'react'
 import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import {
-  IconSearch,
-  IconInfo,
-  Input,
-  Listbox,
-  Popover,
-  Button,
-  Modal,
-  IconAlertCircle,
-} from 'common2'
+import { IconSearch, IconInfo, Input, Listbox, Popover, Button, Modal, IconAlertCircle } from 'ui'
 
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'

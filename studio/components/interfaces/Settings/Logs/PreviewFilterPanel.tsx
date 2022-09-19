@@ -1,13 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import {
-  Button,
-  Input,
-  IconRefreshCw,
-  IconSearch,
-  IconExternalLink,
-  IconEye,
-  IconEyeOff,
-} from 'common2'
+import { Button, Input, IconRefreshCw, IconSearch, IconExternalLink, IconEye, IconEyeOff } from 'ui'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'

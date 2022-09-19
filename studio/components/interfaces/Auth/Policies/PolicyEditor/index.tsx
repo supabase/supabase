@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Modal } from 'common2'
+import { Modal } from 'ui'
 
 import PolicyName from './PolicyName'
 import PolicyDefinition from './PolicyDefinition'

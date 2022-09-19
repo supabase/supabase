@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IconClock } from 'common2'
+import { IconClock } from 'ui'
 
 import { format } from 'date-fns'
 

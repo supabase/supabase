@@ -1,4 +1,4 @@
-import { Loading } from 'common2'
+import { Loading } from 'ui'
 import React, { ReactNode } from 'react'
 
 interface Props {

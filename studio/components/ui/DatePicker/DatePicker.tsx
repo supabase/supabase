@@ -7,7 +7,7 @@ import {
   IconChevronRight,
   IconArrowRight,
   IconCalendar,
-} from 'common2'
+} from 'ui'
 
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'

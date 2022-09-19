@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { IconChevronRight, IconLoader } from 'common2'
+import { IconChevronRight, IconLoader } from 'ui'
 import { SQLTemplate } from '../SQLEditor.types'
 
 interface Props {

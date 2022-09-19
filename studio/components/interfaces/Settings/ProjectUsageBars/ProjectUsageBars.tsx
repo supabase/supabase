@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { Badge, IconAlertCircle, Loading } from 'common2'
+import { Badge, IconAlertCircle, Loading } from 'ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'

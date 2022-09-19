@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Radio } from 'common2'
+import { Radio } from 'ui'
 
 import { CreateHookContext } from '../'
 import RadioHookService from './RadioHookService'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Menu } from 'common2'
+import { Menu } from 'ui'
 import { Dictionary } from '../../../types'
 
 interface RowItemProps {

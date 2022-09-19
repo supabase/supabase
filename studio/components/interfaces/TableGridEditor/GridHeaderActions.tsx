@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Button, IconAlertCircle, IconLock } from 'common2'
+import { Button, IconAlertCircle, IconLock } from 'ui'
 import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'

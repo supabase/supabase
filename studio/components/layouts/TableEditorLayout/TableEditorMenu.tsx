@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
-// import { Button } from 'common2'
+// import { Button } from 'ui'
 import {
   Alert,
   Button,
@@ -18,7 +18,7 @@ import {
   Input,
   Listbox,
   Menu,
-} from 'common2'
+} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'

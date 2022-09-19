@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'common2'
+import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
 
 import { useStore, usePrevious } from 'hooks'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'

@@ -1,4 +1,4 @@
-import { IconAlertCircle } from 'common2'
+import { IconAlertCircle } from 'ui'
 import { FC } from 'react'
 
 interface Props {

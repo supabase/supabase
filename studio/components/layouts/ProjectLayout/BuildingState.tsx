@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconArrowRight, IconLoader, Button } from 'common2'
+import { Badge, IconArrowRight, IconLoader, Button } from 'ui'
 import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'

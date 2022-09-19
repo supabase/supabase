@@ -1,6 +1,6 @@
 import { useState, FC, useEffect } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { IconLoader, IconCheck } from 'common2'
+import { IconLoader, IconCheck } from 'ui'
 import { SupabaseGridQueue } from '../../constants'
 
 interface Props {}

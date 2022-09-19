@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Menu, IconLogOut, IconArrowUpRight } from 'common2'
+import { Menu, IconLogOut, IconArrowUpRight } from 'ui'
 
 interface Props {
   id: any

@@ -1,4 +1,4 @@
-import { Modal, IconChevronLeft } from 'common2'
+import { Modal, IconChevronLeft } from 'ui'
 import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
 

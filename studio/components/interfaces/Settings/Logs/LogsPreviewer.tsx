@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconAlertCircle, IconRewind, Button, Card, Input } from 'common2'
+import { IconAlertCircle, IconRewind, Button, Card, Input } from 'ui'
 
 import {
   LogTable,

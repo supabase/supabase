@@ -1,4 +1,4 @@
-import { Input } from 'common2'
+import { Input } from 'ui'
 import { LogQueryError } from '..'
 
 export interface ErrorRendererProps {

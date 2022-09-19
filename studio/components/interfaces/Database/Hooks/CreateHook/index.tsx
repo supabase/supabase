@@ -3,7 +3,7 @@ import { FC, useEffect, createContext } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Badge, Input, SidePanel } from 'common2'
+import { Badge, Input, SidePanel } from 'ui'
 import { useStore } from 'hooks'
 
 import InputName from './InputName'

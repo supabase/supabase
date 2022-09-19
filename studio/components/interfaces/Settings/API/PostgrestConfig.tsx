@@ -2,7 +2,7 @@ import { useContext, FC, useEffect } from 'react'
 import { indexOf } from 'lodash'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Input, Form, IconAlertCircle, InputNumber } from 'common2'
+import { Input, Form, IconAlertCircle, InputNumber } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, useProjectPostgrestConfig } from 'hooks'

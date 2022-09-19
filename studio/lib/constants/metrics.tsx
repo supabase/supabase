@@ -1,4 +1,4 @@
-import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from 'common2'
+import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from 'ui'
 
 export const METRIC_CATEGORIES = {
   API: {

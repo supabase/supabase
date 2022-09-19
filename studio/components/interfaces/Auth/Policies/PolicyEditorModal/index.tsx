@@ -1,4 +1,4 @@
-import { Modal } from 'common2'
+import { Modal } from 'ui'
 import { FC, useState, useEffect } from 'react'
 import { isEmpty } from 'lodash'
 import { PostgresRole } from '@supabase/postgres-meta'

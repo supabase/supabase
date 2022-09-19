@@ -4,7 +4,7 @@
  * for http response codes
  */
 
-import { IconAlertCircle, IconInfo } from 'common2'
+import { IconAlertCircle, IconInfo } from 'ui'
 import dayjs from 'dayjs'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
 

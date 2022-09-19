@@ -1,4 +1,4 @@
-import { IconArchive, IconDatabase, IconKey } from 'common2'
+import { IconArchive, IconDatabase, IconKey } from 'ui'
 
 export const usageBasedItems = [
   {

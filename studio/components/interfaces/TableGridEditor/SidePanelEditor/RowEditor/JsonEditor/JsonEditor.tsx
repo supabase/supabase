@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { SidePanel } from 'common2'
+import { SidePanel } from 'ui'
 
 import { useStore } from 'hooks'
 import JsonEditor from './JsonCodeEditor'

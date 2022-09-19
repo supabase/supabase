@@ -1,12 +1,4 @@
-import {
-  Badge,
-  Button,
-  IconArchive,
-  Dropdown,
-  IconEdit,
-  IconTrash,
-  IconMoreVertical,
-} from 'common2'
+import { Badge, Button, IconArchive, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
 import { isEmpty } from 'lodash'
 import Panel from 'components/ui/Panel'
 

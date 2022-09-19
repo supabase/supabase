@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Button, IconList, IconChevronDown, Popover } from 'common2'
+import { Button, IconList, IconChevronDown, Popover } from 'ui'
 
 import { useUrlState } from 'hooks'
 import SortRow from './SortRow'

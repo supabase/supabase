@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import { isUndefined } from 'lodash'
-import { Menu, IconArrowUpRight, Badge, IconLogOut } from 'common2'
+import { Menu, IconArrowUpRight, Badge, IconLogOut } from 'ui'
 import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'

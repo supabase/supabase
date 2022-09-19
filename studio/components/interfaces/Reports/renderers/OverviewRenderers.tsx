@@ -1,4 +1,4 @@
-import { Button, IconChevronRight } from 'common2'
+import { Button, IconChevronRight } from 'ui'
 import { jsonSyntaxHighlight } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import Table from 'components/to-be-cleaned/Table'

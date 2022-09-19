@@ -1,6 +1,6 @@
 import { FC, ReactNode, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'common2'
+import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
 
 import Table from '../../../to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'

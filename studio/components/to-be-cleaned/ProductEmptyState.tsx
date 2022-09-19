@@ -1,4 +1,4 @@
-import { Button } from 'common2'
+import { Button } from 'ui'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 

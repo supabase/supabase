@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable, runInAction } from 'mobx'
-import { Button, Select, IconPlusCircle, IconX, IconChevronRight, Listbox } from 'common2'
+import { Button, Select, IconPlusCircle, IconX, IconChevronRight, Listbox } from 'ui'
 import Divider from 'components/ui/Divider'
 
 import { Dictionary } from 'components/grid'

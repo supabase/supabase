@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { last } from 'lodash'
-import { IconHome, IconChevronRight } from 'common2'
+import { IconHome, IconChevronRight } from 'ui'
 
 interface Props {
   breadcrumbs: string[]

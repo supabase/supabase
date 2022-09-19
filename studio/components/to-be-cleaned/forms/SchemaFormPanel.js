@@ -1,6 +1,6 @@
 import SchemaForm from './SchemaForm'
 import React, { useState } from 'react'
-import { Button } from 'common2'
+import { Button } from 'ui'
 
 export default function SchemaFormPanel({
   schema,

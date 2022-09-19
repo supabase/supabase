@@ -1,4 +1,4 @@
-import { IconAlertCircle } from 'common2'
+import { IconAlertCircle } from 'ui'
 
 import { useFlag } from 'hooks'
 import InformationBox from 'components/ui/InformationBox'

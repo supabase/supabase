@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconPlus } from 'common2'
+import { Button, IconPlus } from 'ui'
 
 import { CreateHookContext } from '../'
 import InputServiceHeader from './InputServiceHeader'

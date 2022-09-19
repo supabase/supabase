@@ -1,4 +1,4 @@
-import { IconCheck, IconClipboard } from 'common2'
+import { IconCheck, IconClipboard } from 'ui'
 import { useState } from 'react'
 
 const CommandRender = ({ commands }: any) => {

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, IconPlus, IconFilter, Popover } from 'common2'
+import { Button, IconPlus, IconFilter, Popover } from 'ui'
 
 import { useUrlState } from 'hooks'
 import FilterRow from './FilterRow'

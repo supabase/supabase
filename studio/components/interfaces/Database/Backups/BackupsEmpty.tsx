@@ -1,4 +1,4 @@
-import { IconInfo } from 'common2'
+import { IconInfo } from 'ui'
 
 const BackupsEmpty = () => {
   return (

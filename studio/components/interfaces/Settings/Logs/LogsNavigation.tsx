@@ -1,4 +1,4 @@
-import { Tabs } from 'common2'
+import { Tabs } from 'ui'
 import { useFlag } from 'hooks'
 import { useRouter } from 'next/router'
 

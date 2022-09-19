@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
-import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from 'common2'
+import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'

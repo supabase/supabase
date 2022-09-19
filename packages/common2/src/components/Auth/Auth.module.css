@@ -1,7 +1,0 @@
-.sbui-auth {
-  width: 100%;
-}
-
-.sbui-auth-label {
-  @apply block text-sm text-gray-700 dark:text-gray-200 font-medium;
-}

@@ -1,4 +1,4 @@
-import { Button } from 'common2'
+import { Button } from 'ui'
 
 interface Props {
   form: React.HTMLProps<HTMLButtonElement>['form']

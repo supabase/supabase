@@ -1,4 +1,4 @@
-import { Button, IconClock } from 'common2'
+import { Button, IconClock } from 'ui'
 import Link from 'next/link'
 import { FC } from 'react'
 

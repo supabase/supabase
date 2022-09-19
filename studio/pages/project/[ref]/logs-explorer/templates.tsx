@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useStaticRendering } from 'mobx-react-lite'
-import { IconCode, Badge, Collapsible, Button, Popover } from 'common2'
+import { IconCode, Badge, Collapsible, Button, Popover } from 'ui'
 import { TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
 import CardButton from 'components/ui/CardButton'

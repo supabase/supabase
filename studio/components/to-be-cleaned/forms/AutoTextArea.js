@@ -1,4 +1,4 @@
-import { Input } from 'common2'
+import { Input } from 'ui'
 import React, { useState, useEffect, useRef } from 'react'
 
 const AutoTextArea = (props) => {

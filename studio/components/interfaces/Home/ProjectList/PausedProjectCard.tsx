@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, Button } from 'common2'
+import { Badge, Button } from 'ui'
 
 import { Project } from 'types'
 

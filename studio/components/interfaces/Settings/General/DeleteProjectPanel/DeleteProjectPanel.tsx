@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Alert } from 'common2'
+import { Alert } from 'ui'
 
 import { useStore } from 'hooks'
 import Panel from 'components/ui/Panel'

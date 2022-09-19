@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
-import { Button, IconX } from 'common2'
+import { Button, IconX } from 'ui'
 
 export function NullableBooleanEditor<TRow, TSummaryRow = unknown>({
   row,

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'common2'
+import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'ui'
 
 import { useStore, checkPermissions } from 'hooks'
 import {

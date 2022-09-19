@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react'
-import { Modal, Button, Input, Alert, Form } from 'common2'
+import { Modal, Button, Input, Alert, Form } from 'ui'
 
 interface Props {
   loading: boolean

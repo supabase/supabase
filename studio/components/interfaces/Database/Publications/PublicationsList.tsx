@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Input, Toggle, IconSearch, IconAlertCircle } from 'common2'
+import { Button, Input, Toggle, IconSearch, IconAlertCircle } from 'ui'
 
 import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'

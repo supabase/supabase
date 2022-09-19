@@ -1,6 +1,6 @@
 import { FC, Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconBell, Popover } from 'common2'
+import { Button, IconBell, Popover } from 'ui'
 import {
   Notification,
   NotificationStatus,

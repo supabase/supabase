@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Button, IconTerminal, IconMaximize2, IconMinimize2 } from 'common2'
+import { Button, IconTerminal, IconMaximize2, IconMinimize2 } from 'ui'
 import { useProjectSettings } from 'hooks'
 import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import { Commands } from './Functions.types'

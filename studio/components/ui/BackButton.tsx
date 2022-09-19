@@ -1,4 +1,4 @@
-import { Button, IconArrowLeft } from 'common2'
+import { Button, IconArrowLeft } from 'ui'
 
 export function BackButton({ onClick }: { onClick: () => void }) {
   return (

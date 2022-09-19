@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
-import { Button, IconX } from 'common2'
+import { Button, IconX } from 'ui'
 
 const PortalRootWithNoSSR = dynamic(
   // @ts-ignore

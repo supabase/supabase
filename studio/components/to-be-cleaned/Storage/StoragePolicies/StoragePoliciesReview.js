@@ -1,4 +1,4 @@
-import { Button, Modal } from 'common2'
+import { Button, Modal } from 'ui'
 import { useState } from 'react'
 import SqlEditor from 'components/ui/SqlEditor'
 

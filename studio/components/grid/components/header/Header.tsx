@@ -1,5 +1,5 @@
 import { FC, useState, ReactNode } from 'react'
-import { Button, IconDownload, IconPlus, IconX, IconTrash } from 'common2'
+import { Button, IconDownload, IconPlus, IconX, IconTrash } from 'ui'
 import { saveAs } from 'file-saver'
 
 import { useStore } from 'hooks'
