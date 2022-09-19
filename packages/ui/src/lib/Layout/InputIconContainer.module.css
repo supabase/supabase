@@ -1,6 +1,0 @@
-.sbui-input-icon-container {
-  @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none;
-  /* set the default color of the icon */
-  @apply text-gray-600;
-  @apply dark:text-white;
-}
