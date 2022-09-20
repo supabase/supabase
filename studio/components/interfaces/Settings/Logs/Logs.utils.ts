@@ -177,7 +177,7 @@ export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, str
   let extendValue = 60 * 6
   const minuteDiff = ite.diff(its, 'minute')
   const hourDiff = ite.diff(its, 'hour')
-  if (minuteDiff > (60 * 12)) {
+  if (minuteDiff > 60 * 12) {
     trunc = 'hour'
     extendValue = 24 * 5
   } else if (hourDiff > 24 * 3) {
@@ -198,7 +198,6 @@ export const genChartQuery = (
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
   const where = _genWhereStatement(table, filters)
-  console.log('where', where)
   return `
 SELECT
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
@@ -206,7 +205,11 @@ SELECT
 FROM
   ${table} t
   cross join unnest(t.metadata) as metadata
-  ${where ? where + ` and t.timestamp > '${startOffset.toISOString()}'` : `where t.timestamp > '${startOffset.toISOString()}'`}
+  ${
+    where
+      ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
+      : `where t.timestamp > '${startOffset.toISOString()}'`
+  }
 GROUP BY
 timestamp
 ORDER BY
@@ -214,18 +217,18 @@ ORDER BY
   `
 }
 
-
 type TsPair = [string | '', string | '']
-export const ensureNoTimestampConflict = ([initialStart, initialEnd]: TsPair, [nextStart, nextEnd]: TsPair): TsPair => {
+export const ensureNoTimestampConflict = (
+  [initialStart, initialEnd]: TsPair,
+  [nextStart, nextEnd]: TsPair
+): TsPair => {
   if (initialStart && initialEnd && nextEnd && !nextStart) {
     const resolvedDiff = dayjs(nextEnd).diff(dayjs(initialStart))
     let start = dayjs(initialStart)
 
     if (resolvedDiff <= 0) {
       // start ts is definitely before end ts
-      const currDiff = Math.abs(
-        dayjs(initialEnd).diff(start, 'minute')
-      )
+      const currDiff = Math.abs(dayjs(initialEnd).diff(start, 'minute'))
       // shift start ts backwards by the current ts difference
       start = dayjs(nextEnd).subtract(currDiff, 'minute')
     }
@@ -235,5 +238,4 @@ export const ensureNoTimestampConflict = ([initialStart, initialEnd]: TsPair, [n
   } else {
     return [nextStart, nextEnd]
   }
-
 }
