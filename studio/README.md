@@ -4,8 +4,6 @@ A dashboard for managing your self-hosted Supabase project, and used on our [hos
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind](https://tailwindcss.com/)
-- [Supabase UI](https://ui.supabase.com/)
-- [MobX](https://www.mobxjs.com/)
 
 ## Disclaimer
 
