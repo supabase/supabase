@@ -189,12 +189,12 @@ const sidebars = {
       label: 'Platform',
       collapsed: true,
       items: [
+        'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
-        'going-into-prod',
-        'guides/platform/disk-usage',
         'guides/platform/performance',
         'guides/platform/permissions',
+        'going-into-prod',
       ],
     },
     {
