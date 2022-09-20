@@ -102,7 +102,7 @@ function ChangelogPage(props: any) {
                   </div>
                   <div className="col-span-8 ml-8 lg:ml-0">
                     <article className="prose prose-docs max-w-none">
-                      <MDXRemote {...changelog.source} components={mdxComponents} />
+                      <MDXRemote {...changelog.source} components={mdxComponents()} />
                     </article>
                   </div>
                 </div>

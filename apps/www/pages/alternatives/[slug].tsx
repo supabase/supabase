@@ -65,7 +65,7 @@ function BlogPostPage(props: any) {
     )
   }
 
-  return <LayoutComparison components={mdxComponents} props={props} />
+  return <LayoutComparison components={mdxComponents()} props={props} />
 }
 
 export default BlogPostPage

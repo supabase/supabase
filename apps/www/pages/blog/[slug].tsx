@@ -236,7 +236,7 @@ function BlogPostPage(props: any) {
                     </div>
                   )}
                   <article className={['prose prose-docs'].join(' ')}>
-                    <MDXRemote {...content} components={mdxComponents} />
+                    <MDXRemote {...content} components={mdxComponents()} />
                   </article>
                   <div className="py-16">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
