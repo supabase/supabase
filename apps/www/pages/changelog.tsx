@@ -1,4 +1,7 @@
+import { IconGitCommit } from '@supabase/ui'
 import dayjs from 'dayjs'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Avatar from '~/components/Avatar'
@@ -7,8 +10,10 @@ import CTABanner from '~/components/CTABanner'
 import ImageGrid from '~/components/ImageGrid'
 import DefaultLayout from '~/components/Layouts/Default'
 import Quote from '~/components/Quote'
-import ReactMarkdown from 'react-markdown'
-import { IconCornerDownRight, IconGitCommit, IconPlus, IconPlusCircle } from '@supabase/ui'
+
+// plugins for next-mdx-remote
+const gfm = require('remark-gfm')
+const slug = require('rehype-slug')
 
 // import all components used in blog articles here
 
@@ -60,14 +65,34 @@ export async function getStaticProps() {
     }
   }
 
+  console.log(data[1].body)
+
+  const changelogRenderToString = await Promise.all(
+    data.map(async (item: any): Promise<any> => {
+      const mdxSource: MDXRemoteSerializeResult = await serialize(item.body, {
+        mdxOptions: {
+          remarkPlugins: [gfm],
+          rehypePlugins: [slug],
+        },
+      })
+
+      return {
+        ...item,
+        source: mdxSource,
+      }
+    })
+  )
+
   return {
     props: {
-      changelog: data,
+      changelog: changelogRenderToString,
     },
   }
 }
 
 function ChangelogPage(props: any) {
+  // console.log('props', props)
+
   return (
     <>
       <NextSeo
@@ -118,7 +143,7 @@ function ChangelogPage(props: any) {
                 "
                   >
                     <div className="flex w-full items-baseline gap-6">
-                      <div className="bg-scale-300 border-scale-400 text-scale-900 -ml-2.5 flex h-5 w-5 items-center justify-center rounded border">
+                      <div className="bg-scale-100 dark:bg-scale-500 border-scale-400 dark:border-scale-600 text-scale-900 -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">
@@ -133,7 +158,7 @@ function ChangelogPage(props: any) {
                   </div>
                   <div className="col-span-8 ml-8 lg:ml-0">
                     <article className="prose prose-docs max-w-none">
-                      <ReactMarkdown>{changelog.body}</ReactMarkdown>
+                      <MDXRemote {...changelog.source} components={components} />
                     </article>
                   </div>
                 </div>

@@ -28,7 +28,7 @@
     "markdown-toc": "^1.2.0",
     "marked": "^4.0.12",
     "next": "latest",
-    "next-mdx-remote": "^2.1.3",
+    "next-mdx-remote": "^4.1.0",
     "next-seo": "^4.20.0",
     "nodemailer": "^6.7.3",
     "parse-numeric-range": "^1.3.0",
