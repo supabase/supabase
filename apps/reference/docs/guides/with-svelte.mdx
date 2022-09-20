@@ -8,6 +8,12 @@ sidebar_label: Svelte
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+:::note
+
+This guide uses supabase-js v2.0.0 Release Candidate (RC).
+
+:::
+
 ## Intro
 
 This example provides the steps to build a simple user management app (from scratch!) using Supabase and Svelte. It includes:
@@ -24,7 +30,7 @@ By the end of this guide you'll have an app which allows users to login and upda
 
 ### GitHub
 
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/yustarandomname/svelte-supabase-quickstart).
+Whenever you get stuck at any point, take a look at [this repo](https://github.com/supabase/examples/tree/main/supabase-js-v2/user-management/svelte-user-management).
 
 ## Project set up
 
@@ -143,242 +149,190 @@ Let's start building the Svelte app from scratch.
 
 ### Initialize a Svelte app
 
-We can use the [Quickstart Svelte Template](https://svelte.dev/blog/the-easiest-way-to-get-started) to initialize
-an app called `supabase-svelte`:
+We can use the Vite Svelte TypeScript Template to initialize an app called `supabase-svelte`:
 
 ```bash
-npx degit sveltejs/template supabase-svelte
+npm create vite@latest supabase-svelte -- --template svelte-ts
 cd supabase-svelte
+npm install
 ```
 
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npm install @supabase/supabase-js
+npm install @supabase/supabase-js@rc
 ```
 
 And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
 ```bash title=".env"
-SVELTE_APP_SUPABASE_URL=YOUR_SUPABASE_URL
-SVELTE_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-```
-
-Our app is almost functional, to make svelte work with supabase and .env files we first need to change the `rollup.config.js` file a bit.
-Supabase imports `json` files, to convert .json files to ES6 modules we need the `@rollup/plugin-json` install it by running:
-
-```bash
-  npm install --save-dev @rollup/plugin-json
-```
-
-Furthermore, to use the .env with svelte we need another rollup plugin. Install:
-
-```bash
-  npm install --save-dev dotenv @rollup/plugin-replace
-```
-
-and add these plugins to the `rollup.config.js` file.
-
-```js title="rollup.config.js"
-import { config } from 'dotenv'
-import replace from '@rollup/plugin-replace'
-import json from '@rollup/plugin-json'
-
-export default {
-  plugins: [
-    replace({
-      __api: JSON.stringify({
-        env: {
-          isProd: production,
-          ...config().parsed, // attached the .env config
-        },
-      }),
-      delimiters: ['', ''],
-    }),
-    json(),
-    // ...
-  ],
-  // ...
-}
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title="src/supabaseClient.js"
+```js title="src/supabaseClient.ts"
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = __api.env.SVELTE_APP_SUPABASE_URL
-const supabaseAnonKey = __api.env.SVELTE_APP_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
-And one optional step is to update the CSS file `public/global.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
+And one optional step is to update the CSS file `src/app.css` to make the app look nice.
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/examples/main/supabase-js-v2/user-management/svelte-user-management/src/app.css).
 
 ### Set up a Login component
 
 Let's set up a Svelte component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```html title="/src/Auth.svelte"
-<script>
-  import { supabase } from './supabaseClient'
+```html title="src/lib/Auth.svelte"
+<script lang="ts">
+  import { supabase } from "src/supabaseClient";
 
   let loading = false
-  let email
+  let email = ''
 
   const handleLogin = async () => {
     try {
       loading = true
-      const { error } = await supabase.auth.signIn({ email })
+      const { error } = await supabase.auth.signInWithOtp({ email })
       if (error) throw error
-      alert('Check your email for the login link!')
+      alert('Check your email for login link!')
     } catch (error) {
-      alert(error.error_description || error.message)
+      if (error instanceof Error) {
+        alert(error.message)
+      }
     } finally {
       loading = false
     }
   }
 </script>
 
-<form class="row flex-center flex" on:submit|preventDefault="{handleLogin}">
-  <div class="col-6 form-widget">
+<div class="row flex-center flex">
+  <div class="col-6 form-widget" aria-live="polite">
     <h1 class="header">Supabase + Svelte</h1>
     <p class="description">Sign in via magic link with your email below</p>
-    <div>
-      <input
-        class="inputField"
-        type="email"
-        placeholder="Your email"
-        bind:value="{email}"
-      />
-    </div>
-    <div>
-      <input type="submit" class='button block' value={loading ? "Loading" :
-      "Send magic link"} disabled={loading} />
-    </div>
+    <form class="form-widget" on:submit|preventDefault={handleLogin}>
+      <div>
+        <label for="email">Email</label>
+        <input
+          id="email"
+          class="inputField"
+          type="email"
+          placeholder="Your email"
+          bind:value={email}
+        />
+      </div>
+      <div>
+        <button type="submit" class="button block" aria-live="polite" disabled={loading}>
+          <span>{loading ? 'Loading' : 'Send magic link'}</span>
+        </button>
+      </div>
+    </form>
   </div>
-</form>
-```
-
-### User store
-
-To access the user information in other places, we use a writable store. Create a new file called `sessionStore.js`
-
-```javascript title="src/sessionStore.js"
-import { writable } from 'svelte/store'
-
-export const user = writable(false)
+</div>
 ```
 
 ### Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
-Let's create a new component for that called `Profile.svelte`.
+Let's create a new component for that called `Account.svelte`.
 
-```html title="src/Profile.svelte"
-<script>
-  import { supabase } from './supabaseClient'
-  import { user } from './sessionStore'
+```html title="src/lib/Account.svelte"
+<script lang="ts">
+  import { onMount } from "svelte";
+  import type { AuthSession } from "@supabase/supabase-js";
+  import { supabase } from "../supabaseClient";
 
-  let loading = true
-  let username = null
-  let website = null
-  let avatar_url = null
+  export let session: AuthSession;
 
-  async function getProfile() {
+  let loading = false
+  let username: string | null = null
+  let website: string | null = null
+  let avatarUrl: string | null = null
+
+  onMount(() => {
+    getProfile()
+  })
+
+  const getProfile = async () => {
     try {
       loading = true
-      const user = supabase.auth.user()
-
-      let { data, error, status } = await supabase
+      const { user } = session
+      
+      const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
+        .select('username, website, avatar_url')
         .eq('id', user.id)
         .single()
-
+      
       if (error && status !== 406) throw error
 
       if (data) {
         username = data.username
         website = data.website
-        avatar_url = data.avatar_url
+        avatarUrl = data.avatar_url
       }
     } catch (error) {
-      alert(error.message)
+      if (error instanceof Error) {
+        alert(error.message)
+      }
     } finally {
       loading = false
     }
   }
 
-  async function updateProfile() {
+  const updateProfile = async () => {
     try {
       loading = true
-      const user = supabase.auth.user()
+      const { user } = session
 
       const updates = {
         id: user.id,
         username,
         website,
-        avatar_url,
-        updated_at: new Date(),
+        avatar_url: avatarUrl,
+        updated_at: new Date().toISOString(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      })
-
-      if (error) throw error
+      let { error } = await supabase.from('profiles').upsert(updates)
+      
+      if (error) {
+        throw error
+      }
     } catch (error) {
-      alert(error.message)
-    } finally {
-      loading = false
-    }
-  }
-
-  async function signOut() {
-    try {
-      loading = true
-      let { error } = await supabase.auth.signOut()
-      if (error) throw error
-    } catch (error) {
-      alert(error.message)
+      if (error instanceof Error) {
+        alert(error.message)
+      }
     } finally {
       loading = false
     }
   }
 </script>
 
-<form
-  use:getProfile
-  class="form-widget"
-  on:submit|preventDefault="{updateProfile}"
->
-  <div>
-    <label for="email">Email</label>
-    <input id="email" type="text" value="{$user.email}" disabled />
-  </div>
+<form on:submit|preventDefault={updateProfile} class="form-widget">
+  <div>Email: {session.user.email}</div>
   <div>
     <label for="username">Name</label>
-    <input id="username" type="text" bind:value="{username}" />
+    <input id="username" type="text" bind:value={username} />
   </div>
   <div>
     <label for="website">Website</label>
-    <input id="website" type="website" bind:value="{website}" />
+    <input id="website" type="text" bind:value={website} />
   </div>
-
   <div>
-    <input type="submit" class="button block primary" value={loading ? 'Loading
-    ...' : 'Update'} disabled={loading}/>
-  </div>
-
-  <div>
-    <button class="button block" on:click="{signOut}" disabled="{loading}">
-      Sign Out
+    <button type="submit" class="button primary block" disabled={loading}>
+      {loading ? 'Saving ...' : 'Update profile'}
     </button>
   </div>
+  <button type="button" class="button block" on:click={() => supabase.auth.signOut()}>
+    Sign Out
+  </button>
 </form>
 ```
 
@@ -387,24 +341,31 @@ Let's create a new component for that called `Profile.svelte`.
 Now that we have all the components in place, let's update `App.svelte`:
 
 ```html title="src/App.svelte"
-<script>
-  import { user } from './sessionStore'
-  import { supabase } from './supabaseClient'
-  import Auth from './Auth.svelte'
-  import Profile from './Profile.svelte'
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { supabase } from './supabaseClient';
+  import type { AuthSession } from '@supabase/supabase-js';
+  import Account from './lib/Account.svelte';
+  import Auth from './lib/Auth.svelte'
 
-  user.set(supabase.auth.user())
+  let session: AuthSession
 
-  supabase.auth.onAuthStateChange((state, session) => {
-    user.set(state === 'SIGNED_IN' && session.user)
+  onMount(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      session = data.session
+    })
+
+    supabase.auth.onAuthStateChange((_event, _session) => {
+      session = _session
+    })
   })
 </script>
 
-<div class="container" style="padding: 50px 0 100px 0;">
-  {#if $user}
-  <Profile />
+<div class="container" style="padding: 50px 0 100px 0">
+  {#if !session}
+    <Auth />
   {:else}
-  <Auth />
+    <Account {session} />
   {/if}
 </div>
 ```
@@ -415,9 +376,9 @@ Once that's done, run this in a terminal window:
 npm run dev
 ```
 
-And then open the browser to [localhost:5000](http://localhost:5000) and you should see the completed app.
+And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-> ⚠️ WARNING: Svelte uses by default `port 5000`, Supabase uses `port 3000`. To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:5000`
+> ⚠️ WARNING: Svelte uses Vite and the default port is `5173`, Supabase uses `port 3000`. To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:5173`
 
 ![Supabase Svelte](/img/supabase-svelte-demo.png)
 
@@ -429,34 +390,38 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
 
-```html title="src/Avatar.svelte"
-<script>
-  import { createEventDispatcher } from 'svelte'
-  import { supabase } from './supabaseClient'
+```html title="src/lib/Avatar.svelte"
+<script lang="ts">
+  import { createEventDispatcher } from "svelte";
+  import { supabase } from "../supabaseClient"
 
-  export let path
-  export let size = '10em'
-
+  export let size: number
+  export let url: string
+  
+  let avatarUrl: string = null
   let uploading = false
-  let src
-  let files
+  let files: FileList
 
   const dispatch = createEventDispatcher()
 
-  async function downloadImage() {
+  const downloadImage = async (path: string) => {
     try {
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .download(path)
-      if (error) throw error
+      const { data, error } = await supabase.storage.from('avatars').download(path)
 
-      src = URL.createObjectURL(data)
+      if (error) {
+        throw error
+      }
+
+      const url = URL.createObjectURL(data)
+      avatarUrl = url
     } catch (error) {
-      console.error('Error downloading image: ', error.message)
+      if (error instanceof Error) {
+        console.log('Error downloading image: ', error.message)
+      }
     }
   }
 
-  async function uploadAvatar() {
+  const uploadAvatar = async () => {
     try {
       uploading = true
 
@@ -466,51 +431,58 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
       const file = files[0]
       const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `${fileName}`
+      const filePath = `${Math.random()}.${fileExt}`
 
-      let { error: uploadError } = await supabase.storage
+      let { error } = await supabase.storage
         .from('avatars')
         .upload(filePath, file)
+      
+      if (error) {
+        throw error
+      }
 
-      if (uploadError) throw uploadError
-
-      path = filePath
+      url = filePath
       dispatch('upload')
     } catch (error) {
-      alert(error.message)
+      if (error instanceof Error) {
+        alert(error.message)
+      }
     } finally {
       uploading = false
     }
   }
+
+  $: if (url) downloadImage(url)
 </script>
 
-<div>
-  {#if path}
-  <img
-    use:downloadImage
-    {src}
-    alt="Avatar"
-    class="avatar image"
-    style="height: {size}; width: {size};"
-  />
-  {:else}
-  <div class="avatar no-image" style="height: {size}; width: {size};" />
-  {/if}
-
-  <div style="width: {size};">
-    <label class="button primary block" for="single">
-      {uploading ? 'Uploading ...' : 'Upload'}
-    </label>
-    <input
-      style="visibility: hidden; position:absolute;"
-      type="file"
-      id="single"
-      accept="image/*"
-      bind:files
-      on:change="{uploadAvatar}"
-      disabled="{uploading}"
+<div style="width: {size}px" aria-live="polite">
+  {#if avatarUrl}  
+    <img
+      src={avatarUrl}
+      alt={avatarUrl ? 'Avatar' : 'No image'}
+      class="avatar image"
+      style="height: {size}px, width: {size}px"
     />
+  {:else}
+    <div
+      class="avatar no-image"
+      style="height: {size}px, width: {size}px"
+    />
+  {/if}
+  <div style="width: {size}px">
+    <label class="button primary block" for="single">
+      {uploading ? 'Uploading ...' : 'Upload avatar'}
+    </label>
+    <span style="display:none">
+      <input
+        type="file"
+        id="single"
+        accept="image/*"
+        bind:files
+        on:change={uploadAvatar}
+        disabled={uploading}
+      />
+    </span>
   </div>
 </div>
 ```
@@ -519,19 +491,15 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 And then we can add the widget to the Account page:
 
-```html title="src/Profile.svelte"
-<script>
+```html title="src/lib/Account.svelte"
+<script lang="ts">
   // Import the new component
   import Avatar from './Avatar.svelte'
 </script>
 
-<form
-  use:getProfile
-  class="form-widget"
-  on:submit|preventDefault="{updateProfile}"
->
+<form on:submit|preventDefault={updateProfile} class="form-widget">
   <!-- Add to body -->
-  <Avatar bind:path="{avatar_url}" on:upload="{updateProfile}" />
+  <Avatar bind:url={avatarUrl} size={150} on:upload={updateProfile} />
 
   <!-- Other form elements -->
 </form>

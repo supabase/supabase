@@ -9,15 +9,8 @@ import Link from '@docusaurus/Link'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import providers from '@site/src/data/authProviders'
-
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/6ow_jW4epf8"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+import ButtonCard from '@site/src/components/ButtonCard'
+import useBaseUrl from '@docusaurus/useBaseUrl'
 
 ## Overview
 
@@ -28,6 +21,17 @@ There are two parts to every Auth system:
 
 Supabase Auth is designed to work either as a standalone product, or deeply integrated with the other Supabase products.
 Postgres is at the heart of everything we do, and the Auth system follows this principle. We leverage Postgres' built-in Auth functionality wherever possible.
+
+Here's a quick, 2 minute tour of the Auth features built-in to Supabase:
+
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/6ow_jW4epf8"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Authentication
 
@@ -40,14 +44,19 @@ You can authenticate your users in several ways:
 
 ### Providers
 
-We provide a suite of Providers and login methods.
+We provide a suite of Providers and login methods, as well as [Auth helpers](/docs/guides/auth/auth-helpers/auth-ui).
 
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
     {providers.map((x) => (
       <div key={x.name} class="col col--6">
-        <Link class="card" to={x.href}>
-          <div class="card__body">
+        <ButtonCard
+          class="card"
+          to={useBaseUrl(x.href)}
+          title={x.name}
+          style={{ height: '100%' }}
+        >
+          <div class="button-card__inner">
             <div
               class=""
               style={{
@@ -93,15 +102,15 @@ We provide a suite of Providers and login methods.
               </div>
             </div>
           </div>
-        </Link>
+        </ButtonCard>
       </div>
     ))}
   </div>
 </div>
 
-### Simple interface
+### Configure third-party providers
 
-You can enable third-providers with the click of a button by navigating to Authentication > Settings > External OAuth Providers and inputting your `Client ID` and `Secret` for each.
+You can enable third-party providers with the click of a button by navigating to Authentication > Settings > Auth Providers and inputting your `Client ID` and `Secret` for each.
 
 ![OAuth Logins.](/img/supabase-oauth-logins.png)
 

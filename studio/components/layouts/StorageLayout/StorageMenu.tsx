@@ -8,7 +8,6 @@ import {
   Button,
   Dropdown,
   Menu,
-  Typography,
   IconLoader,
   IconMoreVertical,
   Alert,
@@ -19,13 +18,19 @@ import {
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import Flag from 'components/ui/Flag/Flag'
 
 interface Props {}
 
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
   const { ref, bucketId } = router.query
-  const page = router.pathname.split('/')[4] as undefined | 'policies' | 'settings' | 'usage'
+  const page = router.pathname.split('/')[4] as
+    | undefined
+    | 'policies'
+    | 'settings'
+    | 'usage'
+    | 'logs'
 
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
@@ -96,19 +101,21 @@ const StorageMenu: FC<Props> = () => {
           <Menu.Group title="Configuration" />
           <Link href={`/project/${projectRef}/storage/settings`}>
             <Menu.Item rounded active={page === 'settings'}>
-              <Typography.Text className="truncate">Settings</Typography.Text>
+              <p className="truncate">Settings</p>
             </Menu.Item>
           </Link>
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
-              <Typography.Text className="truncate">Policies</Typography.Text>
+              <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
-          <Link href={`/project/${projectRef}/storage/usage`}>
-            <Menu.Item rounded active={page === 'usage'}>
-              <Typography.Text className="truncate">Usage</Typography.Text>
-            </Menu.Item>
-          </Link>
+          <Flag name="logsStorage">
+            <Link href={`/project/${projectRef}/storage/logs`}>
+              <Menu.Item rounded active={page === 'logs'}>
+                <p className="truncate">Logs</p>
+              </Menu.Item>
+            </Link>
+          </Flag>
         </div>
       </div>
     </Menu>
@@ -129,7 +136,7 @@ const BucketRow = ({
       key={bucket.id}
       name={
         <div className="flex items-center space-x-2">
-          <Typography.Text>{bucket.name}</Typography.Text>
+          <p>{bucket.name}</p>
           {bucket.public && <Badge color="yellow">Public</Badge>}
         </div>
       }
@@ -159,13 +166,11 @@ const BucketRow = ({
               </Dropdown.Item>,
             ]}
           >
-            <Typography.Text>
-              <IconMoreVertical
-                className="opacity-0 group-hover:opacity-100"
-                size="tiny"
-                strokeWidth={2}
-              />
-            </Typography.Text>
+            <IconMoreVertical
+              className="opacity-0 group-hover:opacity-100"
+              size="tiny"
+              strokeWidth={2}
+            />
           </Dropdown>
         ) : (
           <div />

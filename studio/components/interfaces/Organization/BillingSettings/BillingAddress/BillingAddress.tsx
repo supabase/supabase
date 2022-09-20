@@ -1,10 +1,10 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Form, Input, Button, Select } from '@supabase/ui'
+import { Form, Input, Button, Listbox } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useStore, useFlag } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
@@ -22,11 +22,11 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
   const orgSlug = ui.selectedOrganization?.slug ?? ''
   const { city, country, line1, line2, postal_code, state } = address
 
+  const enablePermissions = useFlag('enablePermissions')
   const canReadBillingAddress = checkPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingAddress = checkPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.customer'
-  )
+  const canUpdateBillingAddress = enablePermissions
+    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.customer')
+    : ui.selectedOrganization?.is_owner
 
   const [isDirty, setIsDirty] = useState(false)
   const initialValues = {
@@ -110,22 +110,26 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                       disabled={!canUpdateBillingAddress}
                     />
                     <div className="flex items-center space-x-2">
-                      <Select
+                      <Listbox
                         className="w-full"
                         id="country"
                         name="country"
                         placeholder="Country"
                         disabled={!canUpdateBillingAddress}
                       >
-                        <Select.Option key="empty" value="">
+                        <Listbox.Option label="---" key="empty" value="">
                           ---
-                        </Select.Option>
+                        </Listbox.Option>
                         {COUNTRIES.map((country) => (
-                          <Select.Option key={country.code} value={country.code}>
+                          <Listbox.Option
+                            label={country.name}
+                            key={country.code}
+                            value={country.code}
+                          >
                             {country.name}
-                          </Select.Option>
+                          </Listbox.Option>
                         ))}
-                      </Select>
+                      </Listbox>
                       <Input
                         className="w-full"
                         id="postal_code"
@@ -161,7 +165,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                     ) : (
                       <div />
                     )}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
                       <Button
                         type="default"
                         htmlType="reset"
@@ -179,7 +183,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                         loading={isSubmitting}
                         disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
                       >
-                        Save changes
+                        Save
                       </Button>
                     </div>
                   </Panel.Content>

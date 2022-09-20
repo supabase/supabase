@@ -34,13 +34,17 @@ supabase.auth.onAuthStateChange((event, session) => {
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+A callback function to be invoked when an auth event happens.
 
   </div>
   
 </li>
 
 </ul>
+
+## Notes
+
+- Types of auth events: `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `USER_DELETED`, `PASSWORD_RECOVERY`
 
 ## Examples
 

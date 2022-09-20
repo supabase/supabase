@@ -7,9 +7,10 @@ interface Metadata {
 export type DatePickerToFrom = { to: string | null; from: string | null }
 
 export type LogSearchCallback = (
+  event: 'search-input-change' | 'event-chart-bar-click' | 'datepicker-change',
   filters: {
-    query: string
-  } & DatePickerToFrom
+    query?: string
+  } & Partial<DatePickerToFrom>
 ) => void
 
 export interface LogsWarning {
@@ -48,6 +49,11 @@ export interface CountData {
   count: number
 }
 
+export interface EventChartData {
+  count: number
+  timestamp: string | number
+}
+
 type LFResponse<T> = {
   result: T[]
   error?: {
@@ -63,13 +69,21 @@ type LFResponse<T> = {
 }
 type ApiError = string
 
-export type LogQueryError = Omit<LFResponse<unknown>, "result"> | ApiError
+export type LogQueryError = Omit<LFResponse<unknown>, 'result'> | ApiError
 
 export type Count = LFResponse<CountData>
+export type EventChart = LFResponse<EventChartData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | 'auth' | 'realtime'
+export type QueryType =
+  | 'api'
+  | 'database'
+  | 'functions'
+  | 'fn_edge'
+  | 'auth'
+  | 'realtime'
+  | 'storage'
 
 export type Mode = 'simple' | 'custom'
 

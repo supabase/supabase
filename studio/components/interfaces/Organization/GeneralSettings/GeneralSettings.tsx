@@ -38,8 +38,6 @@ const GeneralSettings = observer(() => {
     ? checkPermissions(PermissionAction.UPDATE, 'organizations')
     : ui.selectedOrganization?.is_owner
 
-  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
-
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
@@ -88,40 +86,24 @@ const GeneralSettings = observer(() => {
           return (
             <FormPanel
               footer={
-                <div
-                  className={`flex py-4 px-8 ${
-                    canUpdateOrganization ? 'justify-end' : 'justify-between'
-                  }`}
-                >
-                  {!canUpdateOrganization && (
-                    <p className="text-sm text-scale-1000">
-                      You need additional permissions to manage this organization's settings
-                    </p>
-                  )}
+                <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
+                    helper={
+                      !canUpdateOrganization
+                        ? "You need additional permissions to manage this organization's settings"
+                        : undefined
+                    }
                   />
                 </div>
               }
             >
-              <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
+              <FormSection header={<FormSectionLabel>Organization name</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
-                  <Input
-                    id="name"
-                    size="small"
-                    label="Organization name"
-                    disabled={!canUpdateOrganization}
-                  />
-                  <Input
-                    id="billing_email"
-                    size="small"
-                    label="Billing email"
-                    type={canReadBillingEmail ? 'text' : 'password'}
-                    disabled={!canUpdateOrganization}
-                  />
+                  <Input id="name" size="small" disabled={!canUpdateOrganization} />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>

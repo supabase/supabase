@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Creates a new user.
 
 ```js
-const { user, session, error } = await supabase.auth.signUp({
+const { data, error } = await supabase.auth.signUp({
   email: 'example@email.com',
   password: 'example-password',
 })
@@ -24,18 +24,80 @@ const { user, session, error } = await supabase.auth.signUp({
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      __namedParameters
+      SignUpWithPasswordCredentials
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      <code>UserCredentials</code>
+      <code>reflection</code> | <code>reflection</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
 No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      <code>object</code>
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      phone
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's phone number.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      password
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's password.
 
   </div>
   
@@ -46,8 +108,8 @@ No description provided.
     <span className="method-list-item-label-name">
       options
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
       <code>object</code>
@@ -76,7 +138,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Verification token received when the user completes the captcha on the site.
 
   </div>
   
@@ -96,7 +158,58 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-Optional user metadata.
+A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
+
+The `data` should be a JSON object that includes user-specific info, such as their first and last name.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      <code>object</code>
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      password
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's password.
 
   </div>
   
@@ -105,7 +218,48 @@ Optional user metadata.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      redirectTo
+      email
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's email address.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      options
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      captchaToken
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -116,7 +270,49 @@ Optional user metadata.
   </h4>
   <div class="method-list-item-description">
 
-The redirect URL attached to the signup confirmation link. Does not redirect the user if it's a mobile signup.
+Verification token received when the user completes the captcha on the site.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      data
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
+
+The `data` should be a JSON object that includes user-specific info, such as their first and last name.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      emailRedirectTo
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The redirect url embedded in the email link
 
   </div>
   
@@ -128,62 +324,48 @@ The redirect URL attached to the signup confirmation link. Does not redirect the
 
 </ul>
 
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
 ## Notes
 
-- By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-- If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
-- If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
-- When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+- By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/settings).
+- **Confirm email** determines if users need to confirm their email address after signing up.
+  - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+  - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+- When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/settings).
 - If signUp() is called for an existing confirmed user:
-  - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
-  - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
-- To check if a user already exists, refer to getUser().
+  - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/settings), an obfuscated/fake user object is returned.
+  - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+- To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/next/auth-getuser).
 
 ## Examples
 
 ### Sign up.
 
 ```js
-const { user, session, error } = await supabase.auth.signUp({
+const { data, error } = await supabase.auth.signUp({
   email: 'example@email.com',
   password: 'example-password',
 })
 ```
 
-### Sign up with additional user meta data.
+### Sign up with additional user metadata.
 
 ```js
-const { user, session, error } = await supabase.auth.signUp(
-  {
-    email: 'example@email.com',
-    password: 'example-password',
-  },
-  {
+const { data, error } = await supabase.auth.signUp({
+  email: 'example@email.com',
+  password: 'example-password',
+  options: {
     data: {
       first_name: 'John',
       age: 27,
     },
-  }
-)
-```
-
-### Sign up with third-party providers.
-
-You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
-
-### Sign up with Phone.
-
-Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
-
-```js
-const { user, session, error } = await supabase.auth.signUp({
-  phone: '+13334445555',
-  password: 'some-password',
-})
-
-// After receiving an SMS with One Time Password.
-let { session, error } = await supabase.auth.verifyOTP({
-  phone: '+13334445555',
-  token: '123456',
+  },
 })
 ```

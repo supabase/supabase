@@ -90,6 +90,16 @@ const config = {
         breadcrumbs: false,
         editUrl:
           'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        lastVersion: 'v0',
+        versions: {
+          current: {
+            label: 'v1-dev',
+            path: '/next',
+          },
+          v0: {
+            label: 'v0',
+          },
+        },
       },
     ],
     [
@@ -102,13 +112,16 @@ const config = {
         breadcrumbs: false,
         editUrl:
           'https://github.com/supabase/supabase/edit/master/apps/reference/',
-        // lastVersion: 'current',
-        // versions: {
-        //   current: {
-        //     label: 'v2',
-        //     // path: 'v2',
-        //   },
-        // },
+        lastVersion: 'v1',
+        versions: {
+          current: {
+            label: 'v2 RC',
+            path: '/next',
+          },
+          v1: {
+            label: 'v1',
+          },
+        },
       },
     ],
     [
@@ -157,6 +170,8 @@ const config = {
         // title: 'Supabase Docs',
         logo: {
           alt: 'Supabase Docs',
+          href: 'https://supabase.com',
+          target: '_self',
           src: '/img/supabase-logo-wordmark--light.svg',
           srcDark: '/img/supabase-logo-wordmark--dark.svg',
         },
@@ -275,6 +290,7 @@ const config = {
         contextualSearch: true,
       },
     }),
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
 }
 
 module.exports = config

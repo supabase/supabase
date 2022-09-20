@@ -16,11 +16,11 @@ supabase.removeAllChannels()
 
 ## Notes
 
-- Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+- Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
 
 ## Examples
 
-### Removes all subscriptions
+### Remove all channels
 
 ```js
 supabase.removeAllChannels()

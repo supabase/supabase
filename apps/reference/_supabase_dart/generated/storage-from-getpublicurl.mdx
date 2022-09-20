@@ -11,12 +11,10 @@ import TabItem from '@theme/TabItem'
 Retrieve URLs for assets in public buckets
 
 ```dart
-final res = supabase
+final String publicUrl = supabase
   .storage
   .from('public-bucket')
   .getPublicUrl('avatar1.png');
-
-final publicURL = res.data;
 ```
 
 ## Notes
@@ -31,10 +29,8 @@ final publicURL = res.data;
 ### Returns the URL for an asset in a public bucket
 
 ```dart
-final res = supabase
+final String publicUrl = supabase
   .storage
   .from('public-bucket')
   .getPublicUrl('avatar1.png');
-
-final publicURL = res.data;
 ```

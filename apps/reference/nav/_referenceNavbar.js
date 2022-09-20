@@ -14,7 +14,7 @@ const buildNavbar = ({ baseUrl }) => {
       position: 'left',
       activeBaseRegex: `^/${trimmedBaseUrl}/reference$|^/${trimmedBaseUrl}/reference/$`, // exactly match "/${trimmedBaseUrl}/reference/" only
     },
-    { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
+    { href: 'https://app.supabase.com', label: 'Dashboard', position: 'right' },
     {
       href: 'https://github.com/supabase/supabase',
       className: 'navbar-item-github',
@@ -66,6 +66,12 @@ const buildNavbar = ({ baseUrl }) => {
     //   label: 'JavaScript Library',
     //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/javascript$|${trimmedBaseUrl}/reference/javascript/)`,
     // },
+    {
+      type: 'docsVersionDropdown',
+      position: 'left',
+      docsPluginId: '_supabase_dart',
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/dart$|${trimmedBaseUrl}/reference/dart/)`,
+    },
     {
       type: 'docsVersionDropdown',
       position: 'left',

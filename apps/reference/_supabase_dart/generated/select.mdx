@@ -11,13 +11,9 @@ import TabItem from '@theme/TabItem'
 Performs vertical filtering with SELECT.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
-  .select()
-  .execute();
-
-final data = res.data;
-final error = res.error;
+  .select();
 ```
 
 ## Notes
@@ -32,13 +28,9 @@ final error = res.error;
 ### Getting your data
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
-  .select()
-  .execute();
-
-final data = res.data;
-final error = res.error;
+  .select();
 ```
 
 ### Selecting specific columns
@@ -46,10 +38,9 @@ final error = res.error;
 You can select specific fields from your tables.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
-  .select('name')
-  .execute();
+  .select('name');
 ```
 
 ### Query foreign tables
@@ -57,15 +48,14 @@ final res = await supabase
 If your database has relationships, you can query related tables too.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .select('''
     name,
     cities (
       name
     )
-  ''')
-  .execute();
+  ''');
 ```
 
 ### Query the same foreign table multiple times
@@ -78,14 +68,13 @@ and we wanted to get the supplier and the purchaser at the same time
 (both in the users) table:
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('products')
   .select('''
     id,
     supplier:supplier_id ( name ),
     purchaser:purchaser_id ( name )
-  ''')
-  .execute();
+  ''');
 ```
 
 ### Filtering with inner joins
@@ -94,11 +83,10 @@ If you want to filter a table based on a child table's values you can use the `!
 to select all rows in a `message` table which belong to a user with the `username` "Jane":
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('messages')
   .select('*, users!inner(*)')
-  .eq('users.username', 'Jane')
-  .execute();
+  .eq('users.username', 'Jane');
 ```
 
 ### Querying with count option
@@ -107,7 +95,7 @@ You can get the number of rows by using the count option.
 Allowed values for count option are [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
 
 ```dart
-final res = await supabase
+final data = await supabase
     .from('cities')
     .select('name')
     .execute(count: CountOption.exact);
@@ -124,14 +112,13 @@ for querying JSON data. Also see
 [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('users')
   .select('''
     id, name,
     address->street
   ''')
-  .eq('address->postcode', 90210)
-  .execute();
+  .eq('address->postcode', 90210);
 ```
 
 ### Return data as CSV
@@ -139,9 +126,8 @@ final res = await supabase
 By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('users')
   .select()
-  .csv()
-  .execute();
+  .csv();
 ```

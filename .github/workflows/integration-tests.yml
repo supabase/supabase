@@ -48,9 +48,9 @@ jobs:
 
       - name: Run Test
         run: npm run test
-        continue-on-error: true
 
       - name: Stop infrastructure
+        if: always()
         run: npm run docker:down
 
       - name: Get Allure history

@@ -45,18 +45,39 @@ The folder path.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      options
+      SearchOptions
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      limit
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-      <code>SearchOptions</code>
+      <code>number</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-Search options, including `limit`, `offset`, `sortBy`, and `search`.
+The number of files you want to be returned.
 
   </div>
   
@@ -65,18 +86,58 @@ Search options, including `limit`, `offset`, `sortBy`, and `search`.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      parameters
+      offset
     </span>
     <span className="method-list-item-label-badge false">
       optional
     </span>
     <span className="method-list-item-validation">
-      <code>FetchParameters</code>
+      <code>number</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-Fetch parameters, currently only supports `signal`, which is an AbortController's signal
+The starting position.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      search
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The search string to filter files by.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      sortBy
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>SortBy</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to sort by. Can be any column inside a FileObject.
 
   </div>
   
@@ -84,11 +145,61 @@ Fetch parameters, currently only supports `signal`, which is an AbortController'
 
 </ul>
 
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      FetchParameters
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      signal
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>AbortSignal</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Pass in an AbortController's signal to cancel the request.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: none
-  - `objects` permissions: `select`
+- RLS policy permissions required:
+  - `buckets` table permissions: none
+  - `objects` table permissions: `select`
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 
 ## Examples
 

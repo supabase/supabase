@@ -8,20 +8,10 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Sets the session data from refresh_token and returns current Session and Error
+Sets the session data from refresh token and returns current session or an error if the refresh token is invalid.
 
 ```js
-function apiFunction(req, res) {
-  // Assuming the access token was sent as a header "X-Supabase-Auth"
-  const { access_token } = req.get('X-Supabase-Auth')
-
-  // You can now use it within a Supabase Client
-  const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
-  const { user, error } = supabase.auth.setAuth(access_token)
-
-  // This client will now send requests as this user
-  const { data } = await supabase.from('your_table').select()
-}
+const { data, error } = supabase.auth.setSession(refresh_token)
 ```
 
 ## Parameters
@@ -42,7 +32,7 @@ function apiFunction(req, res) {
   </h4>
   <div class="method-list-item-description">
 
-a JWT token
+A refresh token returned by supabase auth.
 
   </div>
   
@@ -50,61 +40,19 @@ a JWT token
 
 </ul>
 
+## Notes
+
+- `setSession()` takes in a refresh token and uses it to get a new session.
+- The refresh token can only be used once to obtain a new session.
+- Refresh token rotation (see [`REFRESH_TOKEN_ROTATION_ENABLED`](https://supabase.com/docs/reference/auth/config#refresh_token_rotation_enabled)) is enabled by default on all projects to guard against replay attacks.
+- You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+
 ## Examples
 
-### Basic example.
+### Refresh the session
 
-This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
-
-```js
-function apiFunction(req, res) {
-  // Assuming the access token was sent as a header "X-Supabase-Auth"
-  const { access_token } = req.get('X-Supabase-Auth')
-
-  // You can now use it within a Supabase Client
-  const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
-  const { user, error } = supabase.auth.setAuth(access_token)
-
-  // This client will now send requests as this user
-  const { data } = await supabase.from('your_table').select()
-}
-```
-
-### With Express.
+Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
 
 ```js
-/**
- * Make a request from the client to your server function
- */
-async function makeApiRequest() {
-  const token = newClient.session()?.access_token
-
-  await fetch('https://example.com/withAuth', {
-    method: 'GET',
-    withCredentials: true,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: bearer, // Your own auth
-      'X-Supabase-Auth': token, // Set the Supabase user
-    },
-  })
-}
-
-/**
- * Use the Auth token in your server-side function.
- */
-async function apiFunction(req, res) {
-  const { access_token } = req.get('X-Supabase-Auth')
-
-  // You can now use it within a Supabase Client
-  const supabase = createClient(
-    'https://xyzcompany.supabase.co',
-    'public-anon-key'
-  )
-  const { user, error } = supabase.auth.setAuth(access_token)
-
-  // This client will now send requests as this user
-  const { data } = await supabase.from('your_table').select()
-}
+const { data, error } = supabase.auth.setSession(refresh_token)
 ```

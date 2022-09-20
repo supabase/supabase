@@ -1,0 +1,51 @@
+---
+id: rpc
+title: 'Stored Procedures: rpc()'
+slug: /rpc
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+You can call stored procedures as a "Remote Procedure Call".
+
+That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
+It's especially useful when the logic rarely changes - like password resets and updates.
+
+```dart
+final res = await supabase
+  .rpc('hello_world')
+  .execute();
+```
+
+## Examples
+
+### Call a stored procedure
+
+This is an example invoking a stored procedure.
+
+```dart
+final res = await supabase
+  .rpc('hello_world')
+  .execute();
+```
+
+### With Parameters
+
+```dart
+final res = await supabase
+  .rpc('echo_city', params: { 'name': 'The Shire' })
+  .execute();
+```
+
+### With count option
+
+You can specify a count option to get the row count along with your data.
+Allowed values for count option are `exact`, `planned` and `estimated`.
+
+```dart
+final res = await supabase
+  .rpc('hello_world')
+  .execute(count: CountOption.exact);
+```

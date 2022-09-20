@@ -16,345 +16,218 @@ info:
       version: '0.0.1'
 
 pages:
+  Initializing:
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize a new Supabase client using the `createClient()` method.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - name: createClient()
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          ```
+      - name: With additional parameters
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const options = {
+            db: {
+              schema: 'public',
+            },
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true
+            },
+            global: {
+              headers: { 'x-my-custom-header': 'my-app-name' },
+            },
+          }
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+      - name: API schemas
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Provide a custom schema. Defaults to "public".
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            db: { schema: 'other_schema' }
+          })
+          ```
+
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - name: Custom `fetch` implementation
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            global: { fetch: fetch.bind(globalThis) }
+          })
+          ```
+
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
   auth.signUp():
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
-      - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
-      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/settings).
+      - **Confirm email** determines if users need to confirm their email address after signing up.
+        - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+        - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/settings).
       - If signUp() is called for an existing confirmed user:
-          - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
-          - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
-      - To check if a user already exists, refer to getUser().
+          - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/settings), an obfuscated/fake user object is returned.
+          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+      - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/next/auth-getuser).
     examples:
       - name: Sign up.
         isSpotlight: true
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signUp({
+          const { data, error } = await supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
           })
           ```
-      - name: Sign up with additional user meta data.
-        isSpotlight: true
+      - name: Sign up with additional user metadata.
+        isSpotlight: false
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signUp(
+          const { data, error } = await supabase.auth.signUp(
             {
               email: 'example@email.com',
               password: 'example-password',
-            },
-            {
-              data: { 
-                first_name: 'John', 
-                age: 27,
+              options: {
+                data: {
+                  first_name: 'John',
+                  age: 27,
+                }
               }
             }
           )
           ```
-      - name: Sign up with third-party providers.
-        hideCodeBlock: true
-        description: |
-          You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
-      - name: Sign up with Phone.
-        description: |
-          Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signUp({
-            phone: '+13334445555',
-            password: 'some-password',
-          })
-
-          // After receiving an SMS with One Time Password.
-          let { session, error } = await supabase.auth.verifyOTP({
-            phone: '+13334445555',
-            token: '123456',
-          })
-          ```
-
   auth.signInWithPassword():
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
-      - A user can sign up either via email or OAuth.
-      - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - Specifying a `provider` will open the browser to the relevant login page.
+      - Requires either an email and password or a phone number and password.
     examples:
-      - name: Sign in with email.
+      - name: Sign in with email and password
         isSpotlight: true
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithPassword({
             email: 'example@email.com',
             password: 'example-password',
           })
           ```
-      - name: Sign in with magic link.
-        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+      - name: Sign in with phone and password
+        isSpotlight: false
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            email: 'example@email.com'
-          })
-          ```
-      - name: Sign in using third-party providers.
-        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            // provider can be 'github', 'google', 'gitlab', and more
-            provider: 'github'
-          })
-          ```
-      - name: Sign in with Phone.
-        description: Supabase supports Phone Auth.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithPassword({
             phone: '+13334445555',
             password: 'some-password',
           })
-          ```
-      - name: Sign in with redirect.
-        description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
+
+          // After receiving a SMS with a OTP.
+          const { data, error } = await supabase.auth.verifyOtp({
+            phone: '+13334445555',
+            token: '123456',
           })
           ```
-      - name: Sign in with scopes.
-        description: |
-          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            scopes: 'repo gist notifications'
-          })
-          const oAuthToken = session.provider_token // use to access provider API
-          ```
-      - name: Sign in using a refresh token (e.g. in React Native).
-        description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-        js: |
-          ```js
-          // An example using Expo's `AuthSession`
-          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
-          const provider = 'google';
-
-          AuthSession.startAsync({
-            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-            returnUrl: redirectUri,
-          }).then(async (response: any) => {
-            if (!response) return;
-            const { user, session, error } = await supabase.auth.signIn({
-              refreshToken: response.params?.refresh_token,
-            });
-          });
-          ```
-
   auth.signInWithOtp():
     title: 'signInWithOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
-      - A user can sign up either via email or OAuth.
-      - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - Specifying a `provider` will open the browser to the relevant login page.
+      - Requires either an email or phone number.
+      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
     examples:
       - name: Sign in with email.
         isSpotlight: true
+        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithOtp({
             email: 'example@email.com',
-            password: 'example-password',
           })
           ```
-      - name: Sign in with magic link.
-        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+      - name: Sign in with SMS OTP.
+        isSpotlight: false
+        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            email: 'example@email.com'
-          })
-          ```
-      - name: Sign in using third-party providers.
-        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            // provider can be 'github', 'google', 'gitlab', and more
-            provider: 'github'
-          })
-          ```
-      - name: Sign in with Phone.
-        description: Supabase supports Phone Auth.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithOtp({
             phone: '+13334445555',
-            password: 'some-password',
           })
           ```
-      - name: Sign in with redirect.
-        description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
-          })
-          ```
-      - name: Sign in with scopes.
-        description: |
-          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            scopes: 'repo gist notifications'
-          })
-          const oAuthToken = session.provider_token // use to access provider API
-          ```
-      - name: Sign in using a refresh token (e.g. in React Native).
-        description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-        js: |
-          ```js
-          // An example using Expo's `AuthSession`
-          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
-          const provider = 'google';
-
-          AuthSession.startAsync({
-            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-            returnUrl: redirectUri,
-          }).then(async (response: any) => {
-            if (!response) return;
-            const { user, session, error } = await supabase.auth.signIn({
-              refreshToken: response.params?.refresh_token,
-            });
-          });
-          ```
-
   auth.signInWithOAuth():
     title: 'signInWithOAuth()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
-      - A user can sign up either via email or OAuth.
-      - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - Specifying a `provider` will open the browser to the relevant login page.
+      - This method is used for signing in using a third-party provider.
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
     examples:
-      - name: Sign in with email.
+      - name: Sign in using a third-party provider
         isSpotlight: true
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            email: 'example@email.com',
-            password: 'example-password',
-          })
-          ```
-      - name: Sign in with magic link.
-        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            email: 'example@email.com'
-          })
-          ```
-      - name: Sign in using third-party providers.
-        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            // provider can be 'github', 'google', 'gitlab', and more
+          const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'github'
           })
           ```
-      - name: Sign in with Phone.
-        description: Supabase supports Phone Auth.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            phone: '+13334445555',
-            password: 'some-password',
-          })
-          ```
-      - name: Sign in with redirect.
+      - name: Sign in using a third-party provider with redirect
+        isSpotlight: false
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
+          When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
-          })
+            options: {
+              redirectTo: 'https://example.com/welcome'
+            }
+          }
           ```
-      - name: Sign in with scopes.
+      - name: Sign in with scopes
+        isSpotlight: false
         description: |
           If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'github'
-          }, {
-            scopes: 'repo gist notifications'
+            options: {
+              scopes: 'repo gist notifications'
+            }
           })
-          const oAuthToken = session.provider_token // use to access provider API
+          const oAuthToken = data.session.provider_token // use to access provider API
           ```
-      - name: Sign in using a refresh token (e.g. in React Native).
-        description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-        js: |
-          ```js
-          // An example using Expo's `AuthSession`
-          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
-          const provider = 'google';
-
-          AuthSession.startAsync({
-            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-            returnUrl: redirectUri,
-          }).then(async (response: any) => {
-            if (!response) return;
-            const { user, session, error } = await supabase.auth.signIn({
-              refreshToken: response.params?.refresh_token,
-            });
-          });
-          ```
-
   auth.signOut():
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
+    notes: |
+      - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
       - name: Sign out
         isSpotlight: true
@@ -362,7 +235,25 @@ pages:
           ```js
           const { error } = await supabase.auth.signOut()
           ```
-
+  auth.verifyOtp():
+    title: 'verifyOtp()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
+    notes: |
+      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+    examples:
+      - name: Verify Sms One-Time Password (OTP)
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
+          ```
+      - name: Verify Signup One-Time Password (OTP)
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
+          ```
   auth.getSession():
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
@@ -371,117 +262,77 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const session = supabase.auth.session()
+          const { data, error } = await supabase.auth.getSession()
           ```
-
   auth.getUser():
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
-      This method gets the user object from memory.
+      - This method gets the user object from the current session.
+      - Fetches the user object from the database instead of local session.
     examples:
-      - name: Get the logged in user
+      - name: Get the logged in user with the current existing session
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.user()
+          const { data: { user } } = await supabase.auth.getUser()
           ```
-
-  auth.update():
-    title: 'update()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.update'
+      - name: Get the logged in user with a custom access token jwt.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: { user } } = await supabase.auth.getUser(jwt)
+          ```
+  auth.updateUser():
+    title: 'updateUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
-      User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
-      To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
-
-
-      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
-      Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+      - In order to use the `updateUser()` method, the user needs to be signed in first.
+      - Email updates will send an email to both the user's current and new email with a confirmation link by default.
+      To only send a single confirmation link to the user's new email, you can toggle the "Secure email change" setting in [your project](https://app.supabase.com/project/_/auth/settings).
     examples:
-      - name: Update email for authenticated user.
+      - name: Update the email of an authenticated user
         description: Sends a "Confirm Email Change" email to the new email address.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+          const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
-      - name: Update password for authenticated user.
-        isSpotlight: true
+      - name: Update the password of an authenticated user
+        isSpotlight: false
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({password: 'new password'})
+          const { data, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
-      - name: Update a user's metadata.
+      - name: Update the user's metadata.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({ 
-            data: { hello: 'world' } 
+          const { data, error } = await supabase.auth.updateUser({
+            data: { hello: 'world' }
           })
           ```
-
   auth.setSession():
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
+    notes: |
+      - `setSession()` takes in a refresh token and uses it to get a new session.
+      - The refresh token can only be used once to obtain a new session.
+      - Refresh token rotation (see [`REFRESH_TOKEN_ROTATION_ENABLED`](https://supabase.com/docs/reference/auth/config#refresh_token_rotation_enabled)) is enabled by default on all projects to guard against replay attacks. 
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
-      - name: Basic example.
-        description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
+      - name: Refresh the session
+        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
         isSpotlight: true
         js: |
           ```js
-          function apiFunction(req, res) {
-            // Assuming the access token was sent as a header "X-Supabase-Auth"
-            const { access_token } = req.get('X-Supabase-Auth') 
-
-            // You can now use it within a Supabase Client 
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
-            const { user, error } = supabase.auth.setAuth(access_token)
-
-            // This client will now send requests as this user
-            const { data } = await supabase.from('your_table').select()
-          }
+            const { data, error } = supabase.auth.setSession(refresh_token)
           ```
-      - name: With Express.
-        isSpotlight: true
-        js: |
-          ```js
-
-          /**
-          * Make a request from the client to your server function
-          */
-          async function makeApiRequest() {
-            const token = newClient.session()?.access_token
-
-            await fetch('https://example.com/withAuth', {
-               method: 'GET',
-               withCredentials: true,
-               credentials: 'include',
-               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': bearer, // Your own auth
-                'X-Supabase-Auth': token, // Set the Supabase user
-               }
-            })
-          }
-
-          /**
-          * Use the Auth token in your server-side function.
-          */
-          async function apiFunction(req, res) {
-            const { access_token } = req.get('X-Supabase-Auth') 
-
-            // You can now use it within a Supabase Client 
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
-            const { user, error } = supabase.auth.setAuth(access_token)
-
-            // This client will now send requests as this user
-            const { data } = await supabase.from('your_table').select()
-          }
-          ```
-
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
+    notes: |
+      - Types of auth events: `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `USER_DELETED`, `PASSWORD_RECOVERY`
     examples:
       - name: Listen to auth changes
         isSpotlight: true
@@ -533,187 +384,217 @@ pages:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  auth.api.getUser():
-    title: 'getUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
+  Supabase Auth Admin Api:
+    title: 'Overview'
     notes: |
-      - Fetches the user object from the database instead of local storage.
-      - Note that user() fetches the user object from local storage which might not be the most updated.
-      - Requires the user's access_token.
+      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+
+  auth.admin.getUserById():
+    title: 'getUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
+    notes: |
+      - Fetches the user object from the database based on the user's id.
+      - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
     examples:
       - name: Fetch the user object using the access_token jwt.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.api.getUser(
-            'ACCESS_TOKEN_JWT',
-          )
+          const { data, error } = await supabase.auth.admin.getUserById(1)
           ```
 
-  auth.api.listUsers():
+  auth.admin.listUsers():
     title: 'listUsers()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.listUsers'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should be called on a server. Never expose your `service_role` key in the browser.
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     examples:
       - name: Get a full list of users.
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.listUsers()
+          const { data: { users }, error } = await supabase.auth.admin.listUsers()
           ```
-
-  auth.api.createUser():
+  auth.admin.createUser():
     title: 'createUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
-      - Requires a `service_role` key.
-      - This function should be called on a server. Never expose your `service_role` key in the browser.
-      - If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false.
+      - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
     examples:
-      - name: Create a new user.
+      - name: Create a new user with custom user metadata
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.createUser({
+          const { data, error } = await supabase.auth.admin.createUser({
             email: 'user@email.com',
             password: 'password',
             user_metadata: { name: 'Yoda' }
           })
           ```
-      - name: Auto-confirm email.
-        isSpotlight: true
+      - name: Auto-confirm the user's email
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.createUser({
+          const { data, error } = await supabase.auth.admin.createUser({
             email: 'user@email.com',
             email_confirm: true
           })
           ```
-      - name: Auto-confirm phone.
-        isSpotlight: true
+      - name: Auto-confirm the user's phone number
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.createUser({
+          const { data, error } = await supabase.auth.admin.createUser({
             phone: '1234567890',
             phone_confirm: true
           })
           ```
-
-  auth.api.deleteUser():
+  auth.admin.deleteUser():
     title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.deleteUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
-      - Requires a `service_role` key.
-      - This function should be called on a server. Never expose your `service_role` key in the browser.
+      - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
     examples:
-      - name: Remove a user completely.
+      - name: Removes a user
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.deleteUser(
+          const { data, error } = await supabase.auth.admin.deleteUser(
             '715ed5db-f090-4b8c-a067-640ecee36aa0'
           )
           ```
 
-  auth.api.inviteUserByEmail():
+  auth.admin.inviteUserByEmail():
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.inviteUserByEmail'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+      - Sends an invite link to the user's email address.
     examples:
-      - name: Basic example.
-        isSpotlight: false
+      - name: Invite a user
+        isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .inviteUserByEmail('email@example.com')
+          const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
           ```
 
-  auth.api.sendMobileOTP():
-    title: 'sendMobileOTP()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.sendMobileOTP'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
-    examples:
-      - name: Basic example.
-        isSpotlight: false
-        js: |
-          ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .sendMobileOTP('12345879')
-          ```
-
-  auth.api.resetPasswordForEmail():
+  auth.resetPasswordForEmail():
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
-      Sends a reset request to an email address.
-
-      When the user clicks the reset link in the email they will be forwarded to:
-
-      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
-
-      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
-
-      You should then use the access_token in the url and new password to update the user as follows:
-
+      Sends a password reset request to an email address.
+      When the user clicks the reset link in the email they are redirected back to your application.
+      Prompt the user for a new password and call `auth.updateUser()`:
       ```js
-      const { error, data } = await supabase.auth.api
-            .updateUser(access_token, { password : new_password })
+      const { data, error } = await supabase.auth
+        .updateUser({ password: new_password })
       ```
     examples:
       - name: Reset password
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = await supabase.auth.api
-            .resetPasswordForEmail('user@email.com')
+          const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: 'https://example.com/update-password',
+          })
           ```
-
-  auth.api.generateLink():
-    title: 'generateLink()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.generateLink'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
-    examples:
-      - name: Generate invite link.
-        isSpotlight: false
-        js: |
-          ```js
-          const { data: user, error } = await supabase.auth.api.generateLink(
-            'invite',
-            'email@example.com'
-          )
-          ```
-
-  auth.api.updateUserById():
-    title: 'updateUserById()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.updateUserById'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
-    examples:
-      - name: Updates a user's email.
+      - name: Reset password (React)
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          /**
+           * Step 1: Send the user an email to get a password reset token.
+           * This email contains a link which sends the user back to your application.
+           */
+          const { data, error } = await supabase.auth
+            .resetPasswordForEmail('user@email.com')
+            
+          /**
+           * Step 2: Once the user is redirected back to your application, 
+           * ask the user to reset their password.
+           */
+           useEffect(() => {
+             supabase.auth.onAuthStateChange(async (event, session) => {
+               if (event == "PASSWORD_RECOVERY") {
+                 const newPassword = prompt("What would you like your new password to be?");
+                 const { data, error } = await supabase.auth
+                   .updateUser({ password: newPassword })
+                   
+                 if (data) alert("Password updated successfully!")
+                 if (error) alert("There was an error updating your password.")
+               } 
+             })
+           }, [])
+          ```
+
+  auth.admin.generateLink():
+    title: 'generateLink()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
+    examples:
+      - name: Generate a signup link
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'signup',
+            email: 'email@example.com',
+            options: {
+              'password': 'secret'
+            }
+          })
+          ```
+      - name: Generate an invite link
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'invite',
+            email: 'email@example.com'
+          })
+          ```
+      - name: Generate a magic link
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'magiclink',
+            email: 'email@example.com'
+          })
+          ```
+      - name: Generate a recovery link
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'recovery',
+            email: 'email@example.com'
+          })
+          ``` 
+      - name: Generate a link to change email addresses
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'email_change_current',
+            email: 'old.email@example.com',
+            newEmail: 'new.email@example.com'
+          })
+          ```           
+
+  auth.admin.updateUserById():
+    title: 'updateUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
+    examples:
+      - name: Updates a user's email.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { email: 'new@email.com' }
           )
           ```
       - name: Updates a user's password.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { password: 'new_password' }
           )
@@ -722,34 +603,34 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { user_metadata: { hello: 'world' } }
           )
           ```
       - name: Updates a user's app_metadata.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { app_metadata: { plan: 'trial' } }
           )
           ```
       - name: Confirms a user's email address.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { email_confirm: true }
           )
           ```
       - name: Confirms a user's phone number.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { phone_confirm: true }
           )
@@ -762,37 +643,52 @@ pages:
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
     examples:
       - name: Basic invocation.
+        description:
         isSpotlight: true
         js: |
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            body: JSON.stringify({ foo: 'bar' })
+            body: { foo: 'bar' }
           })
           ```
-      - name: Specifying response type.
+      - name: Error handling.
         description: |
-          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
         isSpotlight: true
         js: |
           ```js
+          import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            responseType: 'text',
-            body: JSON.stringify({ foo: 'bar' })
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            body: { foo: 'bar' }
           })
+
+          if (error instanceof FunctionsHttpError) {
+            console.log('Function returned an error', error.message)
+          } else if (error instanceof FunctionsRelayError) {
+            console.log('Relay error:', error.message)
+          } else if (error instanceof FunctionsFetchError) {
+            console.log('Fetch error:', error.message)
+          }
           ```
-      - name: Parsing custom headers.
+      - name: Passing custom headers.
         description: |
           You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
         isSpotlight: true
         js: |
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            headers: { 
-              "my-custom-header": 'my-custom-header-value' 
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
             },
-            body: JSON.stringify({ foo: 'bar' })
+            body: { foo: 'bar' }
           })
           ```
 
@@ -841,11 +737,11 @@ pages:
           For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
       - name: Query the same foreign table multiple times
         description: |
-          Sometimes you will need to query the same foreign table twice. 
-          In this case, you can use the name of the joined column to identify 
-          which join you intend to use. For convenience, you can also give an 
-          alias for each column. For example, if we had a shop of products, 
-          and we wanted to get the supplier and the purchaser at the same time 
+          Sometimes you will need to query the same foreign table twice.
+          In this case, you can use the name of the joined column to identify
+          which join you intend to use. For convenience, you can also give an
+          alias for each column. For example, if we had a shop of products,
+          and we wanted to get the supplier and the purchaser at the same time
           (both in the users) table:
         js: |
           ```js
@@ -859,7 +755,7 @@ pages:
           ```
       - name: Filtering with inner joins
         description: |
-          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
+          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
         js: |
           ```js
@@ -880,10 +776,10 @@ pages:
           ```
       - name: Querying JSON data
         description: |
-          If you have data inside of a JSONB column, you can apply select 
-          and query filters to the data values. Postgres offers a 
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
-          for querying JSON data. Also see 
+          If you have data inside of a JSONB column, you can apply select
+          and query filters to the data values. Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for querying JSON data. Also see
           [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         js: |
           ```js
@@ -935,10 +831,6 @@ pages:
   insert():
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
-    notes: |
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
-      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - name: Create a record
         isSpotlight: true
@@ -950,9 +842,19 @@ pages:
               { name: 'The Shire', country_id: 554 }
             ])
           ```
+      - name: Create a record and return it
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 }
+            ])
+            .select()
+          ```
       - name: Bulk create
         description: |
-          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
+          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are
           rolled back.
         js: |
           ```js
@@ -962,25 +864,6 @@ pages:
               { name: 'The Shire', country_id: 554 },
               { name: 'Rohan', country_id: 555 },
             ])
-          ```
-      - name: Upsert
-        description: |
-          For upsert, if set to true, primary key columns would need to be included 
-          in the data parameter in order for an update to properly happen. Also, primary keys 
-          used must be natural, not surrogate. There are however, 
-          [workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
-          for surrogate primary keys.
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .insert(
-              [
-                { name: 'The Shire', country_id: 554 },
-                { name: 'Rohan', country_id: 555 },
-                { name: 'City by the Bay', country_id:840}
-              ],
-              { upsert: true })
           ```
 
   update():
@@ -1000,16 +883,16 @@ pages:
           ```
       - name: Updating JSON data
         description: |
-          Postgres offers a 
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
-          for working with JSON data. Right now it is only possible to update an entire JSON document, 
-          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
+          Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for working with JSON data. Right now it is only possible to update an entire JSON document,
+          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. For example:
         js: |
           ```js
           const { data, error } = await supabase
             .from('users')
             .update(`
-              address: { 
+              address: {
                 street: 'Melrose Place',
                 postcode: 90210
               }
@@ -1021,7 +904,7 @@ pages:
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
-      - Primary keys should be included in the data payload in order for an update to work correctly. 
+      - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
     examples:
       - name: Upsert your data
@@ -1045,8 +928,8 @@ pages:
           ```
       - name: Upserting into tables with constraints
         description: |
-          Running the following will cause supabase to upsert data into the `users` table. 
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row 
+          Running the following will cause supabase to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
           based on the column passed into `onConflict`.
         isSpotlight: true
         js: |
@@ -1061,11 +944,11 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .from('users')
-            .upsert({ 
-                id: 3, message: 'foo', 
-                username: 'supabot' 
-            }, { 
-              count: 'exact' 
+            .upsert({
+                id: 3, message: 'foo',
+                username: 'supabot'
+            }, {
+              count: 'exact'
             })
           ```
 
@@ -1129,7 +1012,7 @@ pages:
       - name: With filters
         description: |
           Postgres functions that return tables can also be combined with
-          [Modifiers](/docs/reference/javascript/using-modifiers) and 
+          [Modifiers](/docs/reference/javascript/using-modifiers) and
           [Filters](/docs/reference/javascript/using-filters).
         js: |
           ```js
@@ -1153,15 +1036,18 @@ pages:
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+      - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
+      - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
     examples:
       - name: Listen to all database changes
         isSpotlight: true
         js: |
           ```js
-          const mySubscription = supabase
-            .from('*')
-            .on('*', payload => {
+          supabase
+            .channel('*')
+            .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
@@ -1169,9 +1055,9 @@ pages:
       - name: Listening to a specific table
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('*', payload => {
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
@@ -1179,43 +1065,43 @@ pages:
       - name: Listening to inserts
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('INSERT', payload => {
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
       - name: Listening to updates
         description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can 
-          enable full replication for the table you are listening too: 
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening to:
 
           ```sql
           alter table "your_table" replica identity full;
           ```
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('UPDATE', payload => {
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
       - name: Listening to deletes
         description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can 
-          enable full replication for the table you are listening too: 
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
 
           ```sql
           alter table "your_table" replica identity full;
           ```
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('DELETE', payload => {
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
@@ -1224,10 +1110,10 @@ pages:
         description: You can chain listeners if you want to listen to multiple events for each table.
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('INSERT', handleRecordInserted)
-            .on('DELETE', handleRecordDeleted)
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
             .subscribe()
           ```
       - name: Listening to row level changes
@@ -1236,9 +1122,9 @@ pages:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries:id=eq.200')
-            .on('UPDATE', handleRecordUpdated)
+          supabase
+            .channel('public:countries:id=eq.200')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```
 
@@ -1246,22 +1132,22 @@ pages:
     title: 'removeChannel()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
-      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Remove a subscription
+      - name: Removes a channel
         isSpotlight: true
         js: |
           ```js
-          supabase.removeChannel(mySubscription)
+          supabase.removeChannel(myChannel)
           ```
 
   removeAllChannels():
     title: 'removeAllChannels()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
-      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Removes all subscriptions
+      - name: Remove all channels
         isSpotlight: true
         js: |
           ```js
@@ -1272,20 +1158,21 @@ pages:
     title: 'getChannels()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
-      - name: Get all subscriptions
+      - name: Get all channels
         isSpotlight: true
         js: |
           ```js
-          const subscriptions = supabase.getChannels()
+          const channels = supabase.getChannels()
           ```
 
   storage.listBuckets():
     title: 'listBuckets()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select` 
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: List buckets
         isSpotlight: true
@@ -1300,9 +1187,10 @@ pages:
     title: 'getBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select` 
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Get bucket
         isSpotlight: true
@@ -1317,9 +1205,10 @@ pages:
     title: 'createBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `insert` 
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `insert`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create bucket
         isSpotlight: true
@@ -1334,9 +1223,10 @@ pages:
     title: 'emptyBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select` 
-        - `objects` permissions: `select` and `delete`
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: `select` and `delete`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Empty bucket
         isSpotlight: true
@@ -1350,9 +1240,10 @@ pages:
     title: 'updateBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `update`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Update bucket
         isSpotlight: true
@@ -1367,9 +1258,10 @@ pages:
     title: 'deleteBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select` and `delete`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `delete`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Delete bucket
         isSpotlight: true
@@ -1384,9 +1276,10 @@ pages:
     title: 'from.upload()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `insert`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Upload file
@@ -1419,9 +1312,10 @@ pages:
     title: 'from.update()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Update file
@@ -1454,9 +1348,10 @@ pages:
     title: 'from.move()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Move file
         isSpotlight: true
@@ -1472,9 +1367,10 @@ pages:
     title: 'from.copy()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Copy file
         isSpotlight: true
@@ -1490,15 +1386,16 @@ pages:
     title: 'from.createSignedUrl()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create Signed URL
         isSpotlight: true
         js: |
           ```js
-          const { signedURL, error } = await supabase
+          const { data, error } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60)
@@ -1508,9 +1405,10 @@ pages:
     title: 'from.createSignedUrls()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create Signed URLs
         isSpotlight: true
@@ -1527,15 +1425,16 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Returns the URL for an asset in a public bucket
         isSpotlight: true
         js: |
           ```js
-          const { publicURL, error } = supabase
+          const { data } = supabase
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
@@ -1545,9 +1444,10 @@ pages:
     title: 'from.download()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Download file
         isSpotlight: true
@@ -1563,9 +1463,10 @@ pages:
     title: 'from.remove()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `delete` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `delete` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Delete file
         isSpotlight: true
@@ -1581,9 +1482,10 @@ pages:
     title: 'from.list()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none 
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: List files in a bucket
         isSpotlight: true
@@ -1614,7 +1516,7 @@ pages:
 
   Using Modifiers:
     description: |
-      Modifiers can be used on `select()` queries. 
+      Modifiers can be used on `select()` queries.
 
       If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
 
@@ -1705,7 +1607,7 @@ pages:
 
   Using Filters:
     description: |
-      Filters can be used on `select()`, `update()`, and `delete()` queries. 
+      Filters can be used on `select()`, `update()`, and `delete()` queries.
 
       If a Postgres function returns a table response, you can also apply filters.
 
@@ -1749,7 +1651,7 @@ pages:
       let query = supabase
         .from('cities')
         .select('name, country_id')
-        
+
       if (filterByName)  { query = query.eq('name', filterByName) }
       if (filterPopLow)  { query = query.gte('population', filterPopLow) }
       if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
@@ -2583,8 +2485,8 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, { 
-              config: 'english' 
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              config: 'english'
             })
           ```
       - name: Basic normalization
@@ -2594,9 +2496,9 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, { 
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
               type: 'plain',
-              config: 'english' 
+              config: 'english'
             })
           ```
       - name: Full normalization
@@ -2606,15 +2508,15 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, { 
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
               type: 'phrase',
-              config: 'english' 
+              config: 'english'
             })
           ```
       - name: Websearch
         description: |
-          Uses PostgreSQL's `websearch_to_tsquery` function. 
-          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 
+          Uses PostgreSQL's `websearch_to_tsquery` function.
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
@@ -2627,7 +2529,7 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat or cat'`, { 
+            .textSearch('catchphrase', `'fat or cat'`, {
               type: 'websearch',
               config: 'english'
             })

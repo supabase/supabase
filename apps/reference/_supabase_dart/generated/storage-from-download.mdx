@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Downloads a file.
 
 ```dart
-final res = await supabase
+final Uint8List file = await supabase
   .storage
   .from('avatars')
   .download('avatar1.png');
@@ -28,7 +28,7 @@ final res = await supabase
 ### Download file
 
 ```dart
-final res = await supabase
+final Uint8List file = await supabase
   .storage
   .from('avatars')
   .download('avatar1.png');

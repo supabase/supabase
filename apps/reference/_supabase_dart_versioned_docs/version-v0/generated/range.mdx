@@ -1,0 +1,31 @@
+---
+id: range
+title: 'range()'
+slug: /range
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Limits the result to rows within the specified range, inclusive.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .range(0,3)
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .range(0,3)
+  .execute();
+```

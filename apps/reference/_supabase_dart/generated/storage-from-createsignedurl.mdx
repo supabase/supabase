@@ -11,12 +11,10 @@ import TabItem from '@theme/TabItem'
 Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
 
 ```dart
-final res = await supabase
+final String signedUrl = await supabase
   .storage
   .from('avatars')
   .createSignedUrl('avatar1.png', 60);
-
-final signedURL = res.data;
 ```
 
 ## Notes
@@ -30,10 +28,8 @@ final signedURL = res.data;
 ### Create Signed URL
 
 ```dart
-final res = await supabase
+final String signedUrl = await supabase
   .storage
   .from('avatars')
   .createSignedUrl('avatar1.png', 60);
-
-final signedURL = res.data;
 ```
