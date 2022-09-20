@@ -5,10 +5,6 @@ A dashboard for managing your self-hosted Supabase project, and used on our [hos
 - [Next.js](https://nextjs.org/)
 - [Tailwind](https://tailwindcss.com/)
 
-## Disclaimer
-
-Supabase Studio is under heavy development. Apologies for any confusing patterns used while we're refactoring the codebase. If you're planning to contribute, it is advised that you run `git pull` frequently to retrieve the latest updates.
-
 ## What's included
 
 Studio is designed to work with existing deployments - either the local hosted, docker setup, or our CLI. It is not intended for managing the deployment and administration of projects - that's out of scope.
@@ -33,6 +29,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
     - The branch name is arbitrary — just make sure it summarizes the work.
 - When you send a PR to `master`, it will automatically tag members of the frontend team for review.
 - Review the [contributing checklists](contributing/contributing-checklists.md) to help test your feature before sending a PR.
+- The Dashboard is under active development. You should run `git pull` frequently to make sure you're up to date.
 
 ### Developer Quickstart
 
