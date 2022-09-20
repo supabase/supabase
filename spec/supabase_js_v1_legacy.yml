@@ -645,7 +645,7 @@ pages:
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
-      - name: Generate invite link.
+      - name: Generate an invite link
         isSpotlight: false
         js: |
           ```js
