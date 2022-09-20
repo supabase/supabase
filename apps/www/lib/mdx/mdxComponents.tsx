@@ -9,33 +9,41 @@ import Quote from '~/components/Quote'
 
 const ignoreClass = 'ignore-on-export'
 
-export default {
-  CodeBlock,
-  Quote,
-  Avatar,
-  code: (props: any) => {
-    if (props.className !== ignoreClass) {
-      return <CodeBlock {...props} />
-    } else {
-      return <code {...props} />
-    }
-  },
-  ImageGrid,
-  img: (props: any) => {
-    if (props.className !== ignoreClass) {
-      return (
-        <div
-          className="
-            next-image--dynamic-fill 
-            to-scale-400  
-            from-scale-500 rounded-lg
-            border bg-gradient-to-r
-        "
-        >
-          <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
-        </div>
-      )
-    }
-    return <img {...props} />
-  },
+export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
+  const components = {
+    CodeBlock,
+    Quote,
+    Avatar,
+    code: (props: any) => {
+      if (props.className !== ignoreClass) {
+        return <CodeBlock {...props} />
+      } else {
+        return <code {...props} />
+      }
+    },
+    ImageGrid,
+    img: (props: any) => {
+      if (props.className !== ignoreClass) {
+        return (
+          <div
+            className={[
+              'next-image--dynamic-fill',
+              type === 'blog' && 'to-scale-400 from-scale-500 rounded-lg border bg-gradient-to-r',
+            ].join(' ')}
+          >
+            <Image
+              {...props}
+              className={['next-image--dynamic-fill', type === 'blog' && 'rounded-md border'].join(
+                ' '
+              )}
+              layout="fill"
+            />
+          </div>
+        )
+      }
+      return <img {...props} />
+    },
+  }
+
+  return components
 }
