@@ -1,12 +1,49 @@
 ---
 id: index
-title: Overview
-description: A collection of framework specific Auth utilities for working with Supabase.
+title: Auth Helpers
+description: A collection of framework-specific Auth utilities for working with Supabase.
+sidebar_label: Overview
 ---
 
-# Auth Helpers
+import useBaseUrl from '@docusaurus/useBaseUrl'
+import ButtonCard from '@site/src/components/ButtonCard'
 
-A collection of framework specific Auth utilities for working with Supabase.
+A collection of framework-specific Auth utilities for working with Supabase.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Auth UI */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/auth/auth-helpers/auth-ui')}
+        title={'Auth UI'}
+        description={'A pre-built React component for authenticating users.'}
+        style={{ height: '100%' }}
+      />
+    </div>    
+    {/* Next.js */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/auth/auth-helpers/nextjs')}
+        title={'Next.js'}
+        description={'Helpers for authenticating users in Next.js applications.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* SvelteKit */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/auth/auth-helpers/sveltekit')}
+        title={'SvelteKit'}
+        description={'Helpers for authenticating users in SvelteKit applications.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+  </div>
+</div>
 
 ## Status
 
