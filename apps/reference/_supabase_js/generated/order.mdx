@@ -8,7 +8,12 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Orders the result with the specified `column`.
+Order the query result by `column`.
+
+You can call this method multiple times to order by multiple columns.
+
+You can order foreign tables, but it doesn't affect the ordering of the
+current table.
 
 ```js
 const { data, error } = await supabase
@@ -35,7 +40,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The column to order on.
+The column to order by
 
   </div>
   
@@ -55,7 +60,7 @@ The column to order on.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Named parameters
 
   </div>
   
@@ -76,7 +81,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+If `true`, the result will be in ascending order
 
   </div>
   
@@ -96,7 +101,8 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Set this to order a foreign table by foreign
+columns
 
   </div>
   
@@ -116,7 +122,8 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+If `true`, `null`s appear first. If `false`,
+`null`s appear last.
 
   </div>
   

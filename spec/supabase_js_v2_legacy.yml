@@ -565,7 +565,7 @@ pages:
             type: 'recovery',
             email: 'email@example.com'
           })
-          ``` 
+          ```
       - name: Generate a link to change email addresses
         isSpotlight: false
         js: |
@@ -575,7 +575,7 @@ pages:
             email: 'old.email@example.com',
             newEmail: 'new.email@example.com'
           })
-          ```           
+          ```
 
   auth.admin.updateUserById():
     title: 'updateUserById()'

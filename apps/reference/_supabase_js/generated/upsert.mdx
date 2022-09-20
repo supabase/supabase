@@ -8,7 +8,14 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Performs an UPSERT into the table.
+Perform an UPSERT on the table or view. Depending on the column(s) passed
+to `onConflict`, `.upsert()` allows you to perform the equivalent of
+`.insert()` if a row with the corresponding `onConflict` columns doesn't
+exist, or if it does exist, perform an alternative action depending on
+`ignoreDuplicates`.
+
+By default, upserted rows are not returned. To return it, chain the call
+with `.select()`.
 
 ```js
 const { data, error } = await supabase
@@ -34,7 +41,8 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The values to insert.
+The values to upsert with. Pass an object to upsert a
+single row or an array to upsert multiple rows.
 
   </div>
   
@@ -88,7 +96,7 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      __namedParameters
+      options
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -99,7 +107,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Named parameters
 
   </div>
   
@@ -120,7 +128,16 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-Count algorithm to use to count rows in a table.
+Count algorithm to use to count upserted rows.
+
+`"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+hood.
+
+`"planned"`: Approximated but fast count algorithm. Uses the Postgres
+statistics under the hood.
+
+`"estimated"`: Uses exact count for low numbers and planned count for high
+numbers.
 
   </div>
   
@@ -205,7 +222,8 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-Specifies if duplicate rows should be ignored and not inserted.
+If `true`, duplicate rows are ignored. If
+`false`, duplicate rows are merged with existing rows.
 
   </div>
   
@@ -225,27 +243,9 @@ Specifies if duplicate rows should be ignored and not inserted.
   </h4>
   <div class="method-list-item-description">
 
-By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      rollback
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>boolean</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-Rollback the operation
+Comma-separated UNIQUE column(s) to specify how
+duplicate rows are determined. Two rows are duplicates if all the
+`onConflict` columns are equal.
 
   </div>
   

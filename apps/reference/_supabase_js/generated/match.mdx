@@ -8,7 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows whose columns match the specified `query` object.
+Match only rows where each column in `query` keys is equal to its
+associated value. Shorthand for multiple `.eq()`s.
 
 ```js
 const { data, error } = await supabase
@@ -36,7 +37,7 @@ const { data, error } = await supabase
   <div class="method-list-item-description">
 
 The object to filter with, with column names as keys mapped
-to their filter values.
+to their filter values
 
   </div>
   

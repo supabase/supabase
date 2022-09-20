@@ -8,8 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows whose value on the stated `column` doesn't match the
-specified `value`.
+Match only rows where `column` is not equal to `value`.
 
 ```js
 const { data, error } = await supabase
@@ -36,7 +35,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
+The column to filter on
 
   </div>
   
@@ -56,7 +55,7 @@ The column to filter on.
   </h4>
   <div class="method-list-item-description">
 
-The value to filter with.
+The value to filter with
 
   </div>
   

@@ -8,8 +8,13 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-A check for exact equality (null, true, false), finds all rows whose
-value on the stated `column` exactly match the specified `value`.
+Match only rows where `column` IS `value`.
+
+For non-boolean columns, this is only relevant for checking if the value of
+`column` is NULL by setting `value` to `null`.
+
+For boolean columns, you can also set `value` to `true` or `false` and it
+will behave the same way as `.eq()`.
 
 ```js
 const { data, error } = await supabase
@@ -36,7 +41,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
+The column to filter on
 
   </div>
   
@@ -56,7 +61,7 @@ The column to filter on.
   </h4>
   <div class="method-list-item-description">
 
-The value to filter with.
+The value to filter with
 
   </div>
   
