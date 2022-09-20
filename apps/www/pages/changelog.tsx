@@ -1,56 +1,11 @@
 import { IconGitCommit } from '@supabase/ui'
 import dayjs from 'dayjs'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-import Avatar from '~/components/Avatar'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import CTABanner from '~/components/CTABanner'
-import ImageGrid from '~/components/ImageGrid'
 import DefaultLayout from '~/components/Layouts/Default'
-import Quote from '~/components/Quote'
-
-// plugins for next-mdx-remote
-const gfm = require('remark-gfm')
-const slug = require('rehype-slug')
-
-// import all components used in blog articles here
-// to do: move this into a helper/utils, it is used elsewhere
-
-const components = {
-  CodeBlock,
-  Quote,
-  Avatar,
-  code: (props: any) => {
-    return <CodeBlock {...props} />
-  },
-  ImageGrid,
-  img: (props: any) => {
-    const classes = [
-      'next-image--dynamic-fill',
-      'from-brand-500 to-brand-500',
-      'rounded border bg-gradient-to-r via-blue-500',
-    ]
-
-    return (
-      <div
-        className="
-          next-image--dynamic-fill 
-            to-scale-400  
-            from-scale-500 rounded-md
-            border bg-gradient-to-r
-      "
-      >
-        <Image
-          {...props}
-          className="next-image--dynamic-fill to-brand-1000 from-brand-900 rounded-md border bg-gradient-to-r"
-          layout="fill"
-        />
-      </div>
-    )
-  },
-}
+import mdxComponents from '~/lib/mdx/mdxComponents'
+import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 
 export async function getStaticProps() {
   const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
@@ -64,17 +19,9 @@ export async function getStaticProps() {
     }
   }
 
-  console.log(data[1].body)
-
   const changelogRenderToString = await Promise.all(
     data.map(async (item: any): Promise<any> => {
-      const mdxSource: MDXRemoteSerializeResult = await serialize(item.body, {
-        mdxOptions: {
-          remarkPlugins: [gfm],
-          rehypePlugins: [slug],
-        },
-      })
-
+      const mdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
       return {
         ...item,
         source: mdxSource,
@@ -90,8 +37,6 @@ export async function getStaticProps() {
 }
 
 function ChangelogPage(props: any) {
-  // console.log('props', props)
-
   return (
     <>
       <NextSeo
@@ -136,7 +81,7 @@ function ChangelogPage(props: any) {
             {props.changelog.map((changelog: any, i: number) => {
               const date = changelog.published_at.split('T')
               return (
-                <div key={i} className="border-scale-400 grid border-l pb-10  lg:grid-cols-12">
+                <div key={i} className="border-scale-400 grid border-l pb-10 lg:grid-cols-12">
                   <div
                     className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
@@ -157,7 +102,7 @@ function ChangelogPage(props: any) {
                   </div>
                   <div className="col-span-8 ml-8 lg:ml-0">
                     <article className="prose prose-docs max-w-none">
-                      <MDXRemote {...changelog.source} components={components} />
+                      <MDXRemote {...changelog.source} components={mdxComponents} />
                     </article>
                   </div>
                 </div>

@@ -39,6 +39,7 @@ export const getSortedPosts = (
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)
 
+    // console.log('content', content)
     const readingTime = generateReadingTime(content)
 
     // construct url to link to blog posts
