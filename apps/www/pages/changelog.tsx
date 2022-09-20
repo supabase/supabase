@@ -16,7 +16,6 @@ const gfm = require('remark-gfm')
 const slug = require('rehype-slug')
 
 // import all components used in blog articles here
-
 // to do: move this into a helper/utils, it is used elsewhere
 
 const components = {
@@ -137,7 +136,7 @@ function ChangelogPage(props: any) {
             {props.changelog.map((changelog: any, i: number) => {
               const date = changelog.published_at.split('T')
               return (
-                <div key={i} className="grid border-l pb-10  lg:grid-cols-12">
+                <div key={i} className="border-scale-400 grid border-l pb-10  lg:grid-cols-12">
                   <div
                     className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
