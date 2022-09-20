@@ -217,6 +217,7 @@ const sidebars = {
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
         'guides/integrations/prisma',
+        'guides/integrations/sequin',
         'guides/integrations/snaplet',
         'guides/integrations/stytch',
         'guides/integrations/supertokens',
