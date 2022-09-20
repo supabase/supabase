@@ -288,23 +288,23 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
-      - Email updates will send an email to both the user's current and new email with a confirmation link by default.
-      To only send a single confirmation link to the user's new email, you can toggle the "Secure email change" setting in [your project](https://app.supabase.com/project/_/auth/settings).
+      - By Default, email updates sends a confirmation link to both the user's current and new email.
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/settings).
     examples:
-      - name: Update the email of an authenticated user
+      - name: Update the email for an authenticated user
         description: Sends a "Confirm Email Change" email to the new email address.
         isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
-      - name: Update the password of an authenticated user
+      - name: Update the password for an authenticated user
         isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
-      - name: Update the user's metadata.
+      - name: Update the user's metadata
         isSpotlight: true
         js: |
           ```js
