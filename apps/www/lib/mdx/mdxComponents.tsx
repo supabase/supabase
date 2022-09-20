@@ -14,9 +14,9 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     CodeBlock,
     Quote,
     Avatar,
-    code: (props: any) => {
+    pre: (props: any) => {
       if (props.className !== ignoreClass) {
-        return <CodeBlock {...props} />
+        return <CodeBlock {...props.children.props} />
       } else {
         return <code {...props} />
       }

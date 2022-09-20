@@ -14,7 +14,7 @@ function getComponents(type: any) {
     CodeBlock,
     Quote,
     Avatar,
-    code: (props: any) => {
+    pre: (props: any) => {
       if (props.className !== ignoreClass) {
         return <CodeBlock {...props} />
       } else {
