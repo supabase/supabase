@@ -37,7 +37,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
 # You'll need to be on Node v14
 # in /studio
 
-npm i # install deps
+npm i # install dependencies
 npm run dev # start dev server
 npm run test # run tests
 npm run -- --watch # run tests in watch mode
@@ -45,7 +45,7 @@ npm run -- --watch # run tests in watch mode
 
 ## Running within a self-hosted environment
 
-Firstly, follow the guide [here](https://supabase.com/docs/guides/hosting/docker) to get started with self-hosted Supabase.
+Follow the guide [here](https://supabase.com/docs/guides/hosting/docker) to get started with self-hosted Supabase.
 
 ```
 cd ..
@@ -66,20 +66,4 @@ Then run the following commands to install dependencies and start the dashboard.
 ```
 npm install
 npm run dev
-```
-
-## UI Testing Notes
-
-### `<Popover>` vs `<Dropdown>`
-
-When simulating clicks on these components, do the following:
-
-```js
-// for Popovers
-import userEvent from '@testing-library/user-event'
-userEvent.click('Hello world')
-
-// for Dropdowns
-import clickDropdown from 'tests/helpers'
-clickDropdown('Hello world')
 ```
