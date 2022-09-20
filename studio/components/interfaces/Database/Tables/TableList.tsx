@@ -13,6 +13,7 @@ import {
 import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import { HIDDEN_SCHEMAS_DATABASE_VIEW } from 'lib/constants'
 
 const Header: FC<{
   filterString: string
@@ -60,7 +61,7 @@ const TableList: FC<{
     const [filterString, setFilterString] = useState<string>('')
     const tables =
       filterString.length === 0
-        ? meta.tables.list((table: any) => table.schema === 'public')
+        ? meta.tables.list((table: any) => !HIDDEN_SCHEMAS_DATABASE_VIEW.includes(table.schema))
         : meta.tables.list(
             (table: any) => table.schema === 'public' && table.name.includes(filterString)
           )
