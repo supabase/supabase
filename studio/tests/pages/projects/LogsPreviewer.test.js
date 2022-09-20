@@ -350,9 +350,30 @@ test('filters alter generated query', async () => {
   userEvent.click(await screen.findByText(/Save/))
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('599'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+  })
+
+  // should be able to clear the filters
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByRole('button', { name: 'Clear' }))
+  get.mockClear()
+
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByText(/400 codes/))
+  userEvent.click(await screen.findByText(/Save/))
+
+  await waitFor(() => {
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('400'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('499'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
   })
