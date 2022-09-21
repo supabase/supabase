@@ -2215,7 +2215,7 @@
                         "isExternal": true
                       },
                       "comment": {
-                        "shortText": "Generates authentication links to send via email."
+                        "shortText": "Generates links to be sent via email or other."
                       },
                       "parameters": [
                         {
@@ -3851,7 +3851,7 @@
                         "isExternal": true
                       },
                       "comment": {
-                        "shortText": "Sends a password reset request to an email address."
+                        "shortText": "Sends a reset request to an email address."
                       },
                       "parameters": [
                         {
