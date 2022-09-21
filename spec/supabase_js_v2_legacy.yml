@@ -1964,6 +1964,10 @@ pages:
 
       If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
 
+  db.modifiers.select():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+    title: select()
+
   order():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
     examples:
@@ -2021,6 +2025,10 @@ pages:
             .range(0,3)
           ```
 
+  db.abortSignal():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
+    title: abortSignal()
+
   single():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
     examples:
@@ -2048,6 +2056,22 @@ pages:
             .eq('name', 'Singapore')
             .maybeSingle()
           ```
+
+  db.csv():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
+    title: csv()
+
+  db.geojson():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
+    title: geojson()
+
+  db.explain():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+    title: explain()
+
+  db.rollback():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
+    title: rollback()
 
   invoke():
     title: 'invoke()'
