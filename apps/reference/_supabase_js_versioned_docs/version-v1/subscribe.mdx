@@ -1,25 +1,27 @@
 ---
 id: subscribe
-title: 'on().subscribe()'
+title: "on().subscribe()"
 slug: subscribe
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Subscribe to realtime changes in your database.
 
 ```js
 const mySubscription = supabase
   .from('*')
-  .on('*', (payload) => {
+  .on('*', payload => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
 
+
 ## Parameters
+
 
 <ul className="method-list-group">
   
@@ -43,6 +45,7 @@ The database event which you would like to receive updates for, or you can use t
   
 </li>
 
+
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -65,19 +68,31 @@ A callback that will handle the payload that is sent whenever your database chan
 
 </ul>
 
+
 ## Notes
 
 - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
 - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
+
+
+
+
+
+
+
+
+
 ## Examples
 
 ### Listen to all database changes
 
+
+
 ```js
 const mySubscription = supabase
   .from('*')
-  .on('*', (payload) => {
+  .on('*', payload => {
     console.log('Change received!', payload)
   })
   .subscribe()
@@ -85,10 +100,12 @@ const mySubscription = supabase
 
 ### Listening to a specific table
 
+
+
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('*', (payload) => {
+  .on('*', payload => {
     console.log('Change received!', payload)
   })
   .subscribe()
@@ -96,10 +113,12 @@ const mySubscription = supabase
 
 ### Listening to inserts
 
+
+
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('INSERT', (payload) => {
+  .on('INSERT', payload => {
     console.log('Change received!', payload)
   })
   .subscribe()
@@ -114,10 +133,11 @@ enable full replication for the table you are listening too:
 alter table "your_table" replica identity full;
 ```
 
+
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('UPDATE', (payload) => {
+  .on('UPDATE', payload => {
     console.log('Change received!', payload)
   })
   .subscribe()
@@ -132,10 +152,11 @@ enable full replication for the table you are listening too:
 alter table "your_table" replica identity full;
 ```
 
+
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('DELETE', (payload) => {
+  .on('DELETE', payload => {
     console.log('Change received!', payload)
   })
   .subscribe()

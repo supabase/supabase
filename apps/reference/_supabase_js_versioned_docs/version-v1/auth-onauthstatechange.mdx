@@ -1,12 +1,12 @@
 ---
 id: auth-onauthstatechange
-title: 'onAuthStateChange()'
+title: "onAuthStateChange()"
 slug: auth-onauthstatechange
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Receive a notification every time an auth event happens.
 
@@ -16,7 +16,9 @@ supabase.auth.onAuthStateChange((event, session) => {
 })
 ```
 
+
 ## Parameters
+
 
 <ul className="method-list-group">
   
@@ -34,7 +36,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+A callback function to be invoked when an auth event happens.
 
   </div>
   
@@ -42,9 +44,24 @@ No description provided.
 
 </ul>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Examples
 
 ### Listen to auth changes
+
+
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -54,6 +71,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 ### Listen to sign in
 
+
+
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
   if (event == 'SIGNED_IN') console.log('SIGNED_IN', session)
@@ -61,6 +80,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 ```
 
 ### Listen to sign out
+
+
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -70,6 +91,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 ### Listen to token refresh
 
+
+
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
   if (event == 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
@@ -77,6 +100,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 ```
 
 ### Listen to user updates
+
+
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -86,6 +111,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 ### Listen to user deleted
 
+
+
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
   if (event == 'USER_DELETED') console.log('USER_DELETED', session)
@@ -93,6 +120,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 ```
 
 ### Listen to password recovery events
+
+
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {

@@ -1,26 +1,29 @@
 ---
 id: storage-from-update
-title: 'from.update()'
+title: "from.update()"
 slug: storage-from-update
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Replaces an existing file at the specified path with a new one.
 
 ```js
 const avatarFile = event.target.files[0]
-const { data, error } = await supabase.storage
+const { data, error } = await supabase
+  .storage
   .from('avatars')
   .update('public/avatar1.png', avatarFile, {
     cacheControl: '3600',
-    upsert: false,
+    upsert: false
   })
 ```
 
+
 ## Parameters
+
 
 <ul className="method-list-group">
   
@@ -44,6 +47,7 @@ The relative file path. Should be of the format `folder/subfolder/filename.png`.
   
 </li>
 
+
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -62,7 +66,222 @@ The body of the file to be stored in the bucket.
 
   </div>
   
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      URLSearchParams
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
 </li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      string
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      ReadableStream
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      ReadableStream
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      FormData
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      File
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      Buffer
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      Blob
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      ArrayBufferView
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      ArrayBuffer
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided. 
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -89,6 +308,7 @@ HTTP headers.
 
 </ul>
 
+
 ## Notes
 
 - Policy permissions required:
@@ -96,28 +316,43 @@ HTTP headers.
   - `objects` permissions: `update` and `select`
 - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
 
+
+
+
+
+
+
+
+
+
 ## Examples
 
 ### Update file
 
+
+
 ```js
 const avatarFile = event.target.files[0]
-const { data, error } = await supabase.storage
+const { data, error } = await supabase
+  .storage
   .from('avatars')
   .update('public/avatar1.png', avatarFile, {
     cacheControl: '3600',
-    upsert: false,
+    upsert: false
   })
 ```
 
 ### Update file using `ArrayBuffer` from base64 file data
 
-```js
-import { decode } from 'base64-arraybuffer'
 
-const { data, error } = await supabase.storage
+
+```js
+import {decode} from 'base64-arraybuffer'
+
+const { data, error } = await supabase
+  .storage
   .from('avatars')
   .update('public/avatar1.png', decode('base64FileData'), {
-    contentType: 'image/png',
+    contentType: 'image/png'
   })
 ```

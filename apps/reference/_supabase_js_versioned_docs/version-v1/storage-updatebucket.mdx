@@ -1,22 +1,24 @@
 ---
 id: storage-updatebucket
-title: 'updateBucket()'
+title: "updateBucket()"
 slug: storage-updatebucket
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Updates a new Storage bucket
 
 ```js
-const { data, error } = await supabase.storage.updateBucket('avatars', {
-  public: false,
-})
+const { data, error } = await supabase
+  .storage
+  .updateBucket('avatars', { public: false })
 ```
 
+
 ## Parameters
+
 
 <ul className="method-list-group">
   
@@ -40,6 +42,7 @@ A unique identifier for the bucket you are updating.
   
 </li>
 
+
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -54,7 +57,7 @@ A unique identifier for the bucket you are updating.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+No description provided. 
 
   </div>
   
@@ -75,7 +78,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+No description provided. 
 
   </div>
   
@@ -87,18 +90,30 @@ No description provided.
 
 </ul>
 
+
 ## Notes
 
 - Policy permissions required:
   - `buckets` permissions: `update`
   - `objects` permissions: none
 
+
+
+
+
+
+
+
+
+
 ## Examples
 
 ### Update bucket
 
+
+
 ```js
-const { data, error } = await supabase.storage.updateBucket('avatars', {
-  public: false,
-})
+const { data, error } = await supabase
+  .storage
+  .updateBucket('avatars', { public: false })
 ```
