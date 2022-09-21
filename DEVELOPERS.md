@@ -52,126 +52,11 @@ To contribute code to Supabase, you must fork the [Supabase Repository](https://
    cd supabase
    ```
 
-### Choose a directory
-
-Choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs), or [Supabase Studio](https://app.supabase.com).
-
-1. Go to the [Supabase Website](https://supabase.com) directory
-
-   ```sh
-   cd apps/www
-   ```
-
-   Go to the [Supabase Docs](https://supabase.com/docs) directory
-
-   ```sh
-   cd apps/reference
-   ```
-
-   Go to the [Supabase Studio](https://app.supabase.com) directory
-
-   ```sh
-   cd studio
-   ```
-
-1. Install npm/yarn dependencies:
-
-   npm
-
-   ```sh
-   npm install
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn install
-   ```
-
-## Start a development server
-
-To debug code and to see your changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
-
-- [Supabase Website](#supabase-website)
-- [Supabase Docs](#supabase-docs)
-- [Supabase Studio](#supabase-studio)
-
-### Supabase Website
-
-The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) section below.
-
-### Supabase Docs
-
-1. Build development server
-
-   npm
-
-   ```sh
-   npm run build
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn build
-   ```
-
-1. Start development server
-
-   npm
-
-   ```sh
-   npm run start
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn start
-   ```
-
-1. Access the local server in your web browser at http://localhost:3010/docs.
-
-### Supabase Studio
-
-1. Start development server
-
-   npm
-
-   ```sh
-   npm run dev
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn dev
-   ```
-
-1. Access the local server in your web browser at http://localhost:8082/.
-See the [Supabase Studio readme](./studio/README.md) for more information.
-
-## Create a pull request
-
-After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
-
-Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
-
----
-
-## Common tasks
-
-### Add a redirect
-
-Create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
-
-## Monorepo
+## Getting started
 
 We are in the process of migrating this repository to monorepo, using Turborepo.
 Eventually, the docs and the Studio will be run using Turborepo, which will significantly improve the developer workflow.
 You must be using NPM 7 or higher.
-
-### Getting started
 
 ```sh
 npm install # install dependencies
@@ -180,12 +65,19 @@ npm run dev # start all the applications
 
 Then edit and visit any of the following sites:
 
-Site | Directory | Description | Local development server
----- | --------- | ----------- | ------------------------
-[supabase.com](https://supabase.com) | `/apps/www` | The main website | http://localhost:3000
-[supabase.com/docs](https://supabase.com/docs) | `apps/reference` | Guides and Reference documentaion | http://localhost:3010/docs
-[POC] Community forum | `/apps/temp-community-forum` | GitHub Discussions in a Next.js site | http://localhost:3002
-[POC] DEV articles site | `/apps/temp-community-tutorials` | A Next.js site for our DEV articles (which community members can write) | http://localhost:3003
+Site | Directory | Scope name | Description | Local development server
+---- | --------- | ---------- | ----------- | ------------------------
+[supabase.com](https://supabase.com) | `/apps/www` | www | The main website | http://localhost:3000
+[app.supabase.com](https://app.supabase.com) | `/studio` | studio | Studio dashboard | http://localhost:8082
+[POC] Next.js based Docs site | `/apps/temp-docs` | temp-docs | Temp Docs Site (Next.js) | http://localhost:3001  
+[POC] Community forum | `/apps/temp-community-forum` | forum | GitHub Discussions in a Next.js site | http://localhost:3002
+[POC] DEV articles site | `/apps/temp-community-tutorials` | tutorials | A Next.js site for our DEV articles (which community members can write) | http://localhost:3003
+
+The following sites are not using turbo repo, and must be run independently.
+
+Site | Directory | Scope name | Description | Local development server
+---- | --------- | ---------- | ----------- | ------------------------ 
+[supabase.com/docs](https://supabase.com/docs) | `/apps/reference` | N/A | Guides and Reference (Currently not in Turborepo) | http://localhost:3010/docs
 
 ### Shared components
 
@@ -206,12 +98,32 @@ For example:
 
 - `npm install @supabase/ui -w common`: installs into `./packages/common`
 - `npm install @supabase/ui -w www`: installs into `./apps/www`
+- `npm install @supabase/ui -w studio`: installs into `./studio`
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
 ### Development
 
-`npm run dev`
+In the root of the repo, run:
+
+```bash
+npm run dev
+```
+
+## Create a pull request
+
+After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
+
+Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
+
+
+---
+
+## Common tasks
+
+### Add a redirect
+
+Create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
 
 ---
 
