@@ -8,7 +8,7 @@ run: download transform format
 ###############################################################################
 
 init: 
-	cd $(REPO_DIR)/generator && npm install
+	cd $(REPO_DIR)/parser && npm install
 
 
 ###############################################################################
@@ -51,12 +51,12 @@ dereference.storage.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
 dereference.tsdoc.v2:
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:functions
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:gotrue
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:postgrest
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:realtime
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:storage
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:supabase
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:functions
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:gotrue
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:postgrest
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:realtime
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:storage
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:supabase
 
 combine.tsdoc.v1:
 	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4], .[5]] }' \
