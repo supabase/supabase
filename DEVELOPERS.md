@@ -32,7 +32,10 @@ You need to install and configure the following dependencies on your machine to 
 ## Getting started
 
 We are in the process of migrating this repository to monorepo, using Turborepo.
-Eventually, the docs and the Studio will be run using Turborepo, which will significantly improve the developer workflow.
+Eventually, all the apps will be run using Turborepo, which will significantly improve the developer workflow.
+
+If you are working on the docs site ([supabase.com/docs](https://supabase.com/docs)), please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
+
 You must be using NPM 7 or higher.
 
 ### Fork the repository
