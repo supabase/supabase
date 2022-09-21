@@ -7,8 +7,6 @@
     - [Running docs](#running-docs)
 3. [Create a pull request](#create-a-pull-request)
 
-- [Common tasks](#common-tasks)
-  - [Add a redirect](#add-a-redirect)
 - [Monorepo](#monorepo)
 - [Community channels](#community-channels)
 
@@ -83,14 +81,6 @@ We'll be running the [Supabase Docs](https://supabase.com/docs)
 After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
 
 Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
-
----
-
-## Common tasks
-
-### Add a redirect
-
-Create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
 
 ---
 
