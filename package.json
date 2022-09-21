@@ -32,6 +32,8 @@
     "@babel/preset-typescript": "^7.16.0",
     "@supabase/supabase-js": "^1.35.3",
     "@types/jest": "^27.0.3",
+    "@types/json-stringify-safe": "^5.0.0",
+    "@types/lodash": "^4.14.185",
     "@types/node": "^14.14.14",
     "autoprefixer": "^10.4.4",
     "axios": "^0.24.0",
@@ -44,7 +46,7 @@
     "prettier-plugin-tailwindcss": "^0.1.8",
     "tailwindcss": "^3.0.24",
     "ts-jest": "^27.0.7",
-    "ts-node": "^9.1.1",
+    "ts-node": "^10.0.0",
     "turbo": "latest",
     "typescript": "^4.5.2"
   },
@@ -66,6 +68,7 @@
   ],
   "dependencies": {
     "@mdx-js/react": "^2.1.1",
+    "json-stringify-safe": "^5.0.1",
     "mini-svg-data-uri": "^1.4.4"
   }
 }
