@@ -6,6 +6,7 @@ import {
   Alert,
   Button,
   Dropdown,
+  IconBookOpen,
   IconChevronDown,
   IconCopy,
   IconEdit,
@@ -155,7 +156,6 @@ const TableEditorMenu: FC<Props> = ({
           </Listbox>
         )}
       </div>
-
       <div className="space-y-1">
         {!isLocked && (
           <div className="px-3">
@@ -216,7 +216,6 @@ const TableEditorMenu: FC<Props> = ({
           />
         </div>
       </div>
-
       {/* List of tables belonging to selected schema */}
       {schemaTables.length > 0 && (
         <Menu type="pills">
@@ -288,7 +287,6 @@ const TableEditorMenu: FC<Props> = ({
           </div>
         </Menu>
       )}
-
       {/* List of views belonging to selected schema */}
       {filteredSchemaViews.length > 0 && (
         <Menu type="pills">
@@ -318,7 +316,6 @@ const TableEditorMenu: FC<Props> = ({
           })}
         </Menu>
       )}
-
       {searchText.length > 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
         <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
           <p className="text-xs">No results found</p>
@@ -327,13 +324,19 @@ const TableEditorMenu: FC<Props> = ({
           </p>
         </div>
       )}
-
       {searchText.length === 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
         <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
           <p className="text-xs">No tables available</p>
           <p className="text-scale-1100 text-xs">This schema has no tables available yet</p>
         </div>
       )}
+      <div className="mx-3 mt-12">
+        <Link passHref href="https://supabase.com/docs/guides/database#table-view">
+          <Button as="a" type="default" iconRight={<IconBookOpen />}>
+            Table Editor Docs
+          </Button>
+        </Link>
+      </div>
     </div>
   )
 }
