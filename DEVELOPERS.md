@@ -20,6 +20,7 @@
   - [Development](#development)
 - [Community channels](#community-channels)
 
+
 ## Development setup
 
 Thanks for your interest in Supabase and for wanting to contribute! Before you begin, read the
