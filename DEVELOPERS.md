@@ -2,22 +2,16 @@
 
 1. [Development setup](#development-setup)
     - [Install dependencies](#install-dependencies)
-    - [Fork the repository](#fork-the-repository)
-1. [Build Supabase](#build-supabase)
-    - [Choose a directory](#choose-a-directory)
-1. [Start a development server](#start-a-development-server)
-    - [Supabase Website](#supabase-website)
-    - [Supabase Docs](#supabase-docs)
-    - [Supabase Studio](#supabase-studio)
-1. [Create a pull request](#create-a-pull-request)
+2. [Getting started](#getting-started)
+   - [Fork the repository](#fork-the-repository)
+   - [Clone the repo](#clone-the-repo)
+   - [Local development](#local-development)
+      - [Shared components](#shared-components)
+      - [Installing packages](#installing-packages)    
+3. [Create a pull request](#create-a-pull-request)
 
 - [Common tasks](#common-tasks)
   - [Add a redirect](#add-a-redirect)
-- [Monorepo](#monorepo)
-  - [Getting started](#getting-started)
-  - [Shared components](#shared-components)
-  - [Installing packages](#installing-packages)
-  - [Development](#development)
 - [Community channels](#community-channels)
 
 ## Development setup
@@ -35,11 +29,17 @@ You need to install and configure the following dependencies on your machine to 
 - [Node.js v16.x (LTS)](http://nodejs.org)
 - [npm](https://www.npmjs.com/) version 7+ or [Yarn](https://yarnpkg.com/)
 
+## Getting started
+
+We are in the process of migrating this repository to monorepo, using Turborepo.
+Eventually, the docs and the Studio will be run using Turborepo, which will significantly improve the developer workflow.
+You must be using NPM 7 or higher.
+
 ### Fork the repository
 
 To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase).
 
-## Build Supabase
+### Clone the repo
 
 1. Clone your GitHub forked repository:
 
@@ -52,11 +52,7 @@ To contribute code to Supabase, you must fork the [Supabase Repository](https://
    cd supabase
    ```
 
-## Getting started
-
-We are in the process of migrating this repository to monorepo, using Turborepo.
-Eventually, the docs and the Studio will be run using Turborepo, which will significantly improve the developer workflow.
-You must be using NPM 7 or higher.
+### Local development
 
 ```sh
 npm install # install dependencies
@@ -79,7 +75,7 @@ Site | Directory | Scope name | Description | Local development server
 ---- | --------- | ---------- | ----------- | ------------------------ 
 [supabase.com/docs](https://supabase.com/docs) | `/apps/reference` | N/A | Guides and Reference (Currently not in Turborepo) | http://localhost:3010/docs
 
-### Shared components
+#### Shared components
 
 The monorepo has a set of shared components under `/packages`:
 
@@ -88,7 +84,7 @@ The monorepo has a set of shared components under `/packages`:
 - `/packages/spec`: Generates documentation using spec files.
 - `/packages/tsconfig`: Shared Typescript settings
 
-### Installing packages
+#### Installing packages
 
 Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into.
 
@@ -102,13 +98,7 @@ For example:
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
-### Development
-
-In the root of the repo, run:
-
-```bash
-npm run dev
-```
+---
 
 ## Create a pull request
 
