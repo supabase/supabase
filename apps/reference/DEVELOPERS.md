@@ -76,6 +76,8 @@ We'll be running the [Supabase Docs](https://supabase.com/docs)
 
 1. Access the local server in your web browser at http://localhost:3010/docs.
 
+---
+
 ## Create a pull request
 
 After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
