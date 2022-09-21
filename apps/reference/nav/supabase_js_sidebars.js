@@ -40,9 +40,9 @@ const sidebars = {
         'generated/auth-signout',
         'generated/auth-verifyotp',
         'generated/auth-getsession',
+        'generated/auth-setsession',
         'generated/auth-getuser',
         'generated/auth-updateuser',
-        'generated/auth-setsession',
         'generated/auth-onauthstatechange',
         'generated/auth-resetpasswordforemail',
       ],
@@ -50,7 +50,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Auth (Server Only)',
+      label: 'Auth (Admin Server Only)',
       items: [
         'generated/supabase-auth-admin-api',
         'generated/auth-admin-listusers',
