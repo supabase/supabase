@@ -84,30 +84,3 @@ combine.tsdoc.v2:
 format:
 	npx prettier --write .
 
-###############################################################################
-# Generate the docs
-###############################################################################
-
-generate: generate.api generate.cli generate.storage generate.dart generate.js.v1 generate.js.v2
-
-generate.api: 
-	cd $(REPO_DIR)/generator && npm run api:gen
-
-generate.cli: 
-	cd $(REPO_DIR)/generator && npm run cli:gen
-
-generate.gotrue: 
-	cd $(REPO_DIR)/generator && npm run gotrue:gen
-
-generate.storage: 
-	cd $(REPO_DIR)/generator && npm run storage:gen
-
-generate.dart: 
-	cd $(REPO_DIR)/generator && npm run supabase-dart:v1
-
-generate.js.v1: 
-	cd $(REPO_DIR)/generator && npm run supabase-js:v1
-
-generate.js.v2: 
-	cd $(REPO_DIR)/generator && npm run supabase-js:v2
-

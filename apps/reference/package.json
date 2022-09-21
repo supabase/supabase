@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "npm run docusaurus",
+    "dev": "npm run generate:all && npm run docusaurus",
     "start": "npm run docusaurus",
     "docusaurus": "docusaurus start --port 3010",
     "swizzle": "docusaurus swizzle",

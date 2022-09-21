@@ -1,4 +1,4 @@
-import { writeToDisk } from './src/docs/helpers'
+import { writeToDisk } from './helpers'
 import stringify from 'json-stringify-safe'
 
 const fs = require('fs')
