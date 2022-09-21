@@ -2,10 +2,10 @@
 
 1. [Development setup](#development-setup)
     - [Install dependencies](#install-dependencies)
-2. [Getting started](#getting-started)
+2. [Local development](#local-development)
    - [Fork the repository](#fork-the-repository)
    - [Clone the repo](#clone-the-repo)
-   - [Local development](#local-development)
+   - [Running turborepo](#running-turborepo)
       - [Shared components](#shared-components)
       - [Installing packages](#installing-packages)    
 3. [Create a pull request](#create-a-pull-request)
@@ -14,31 +14,32 @@
   - [Add a redirect](#add-a-redirect)
 - [Community channels](#community-channels)
 
-## Development setup
+## Getting started
 
-Thanks for your interest in Supabase and for wanting to contribute! Before you begin, read the
+Thanks for your interest in [Supabase](https://supabase.com) and for wanting to contribute! Before you begin, read the
 [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the
 [existing issues](https://github.com/supabase/supabase/issues).
-This document describes how to set up your development environment to build and test Supabase.
+This document describes how to set up your development environment to build and test [Supabase](https://supabase.com).
 
 ### Install dependencies
 
-You need to install and configure the following dependencies on your machine to build Supabase:
+You need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
 - [Git](http://git-scm.com/)
 - [Node.js v16.x (LTS)](http://nodejs.org)
 - [npm](https://www.npmjs.com/) version 7+ or [Yarn](https://yarnpkg.com/)
 
-## Getting started
+## Local development
 
-We are in the process of migrating this repository to monorepo, using Turborepo.
-Eventually, all the apps will be run using Turborepo, which will significantly improve the developer workflow.
+We are in the process of migrating this repository to monorepo, using [Turborepo](https://turborepo.org/docs).
 
-If you are working on the docs site ([supabase.com/docs](https://supabase.com/docs)), please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
+Eventually, all the apps will be run using [Turborepo](https://turborepo.org/docs), which will significantly improve the developer workflow.
+
+If you are working on the ([docs site](https://supabase.com/docs)), please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
 
 ### Fork the repository
 
-To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase).
+To contribute code to [Supabase](https://supabase.com), you must fork the [Supabase Repository](https://github.com/supabase/supabase).
 
 ### Clone the repo
 
@@ -53,11 +54,18 @@ To contribute code to Supabase, you must fork the [Supabase Repository](https://
    cd supabase
    ```
 
-### Local development
+### Running turborepo
+
+[Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
+
+All of the apps can be run simultaneously with the following.
 
 ```sh
-npm install # install dependencies
-npm run dev # start all the applications
+# install dependencies
+npm install
+
+# start all the applications
+npm run dev
 ```
 
 Then edit and visit any of the following sites:
