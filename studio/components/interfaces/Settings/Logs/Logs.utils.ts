@@ -120,7 +120,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 
   switch (table) {
     case 'edge_logs':
-      return `select id, timestamp, event_message, request, response, request.method, request.path, response.status_code
+      return `select id, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
@@ -145,7 +145,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     `
 
     case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
   cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request

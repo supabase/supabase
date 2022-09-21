@@ -101,7 +101,12 @@ const sidebars = {
           type: 'category',
           label: 'Auth Helpers',
           collapsed: true,
-          items: ['guides/auth/auth-helpers/auth-ui'],
+          items: [
+            'guides/auth/auth-helpers/index',
+            'guides/auth/auth-helpers/auth-ui',
+            'guides/auth/auth-helpers/nextjs',
+            'guides/auth/auth-helpers/sveltekit',
+          ],
         },
         {
           type: 'category',
@@ -182,7 +187,7 @@ const sidebars = {
       type: 'category',
       label: 'Storage',
       collapsed: true,
-      items: ['guides/storage'],
+      items: ['guides/storage', 'guides/storage-caching'],
     },
     {
       type: 'category',
