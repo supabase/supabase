@@ -1,10 +1,10 @@
 # Developing Supabase Docs
 
 1. [Development setup](#development-setup)
-    - [Install dependencies](#install-dependencies)
-    - [Fork the repository](#fork-the-repository)
+   - [Install dependencies](#install-dependencies)
+   - [Fork the repository](#fork-the-repository)
 2. [Build Supabase](#build-supabase)
-    - [Running docs](#running-docs)
+   - [Running docs](#running-docs)
 3. [Create a pull request](#create-a-pull-request)
 
 - [Monorepo](#monorepo)
