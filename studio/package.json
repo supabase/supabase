@@ -47,6 +47,7 @@
     "mobx-react-lite": "^3.2.0",
     "next": "12.0.9",
     "next-compose-plugins": "^2.2.1",
+    "next-transpile-modules": "^9.0.0",
     "openapi-types": "^9.1.0",
     "p-queue": "^6.6.2",
     "papaparse": "^5.3.1",
@@ -83,6 +84,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "common": "*",
     "@storybook/addon-actions": "^6.4.19",
     "@storybook/addon-essentials": "^6.4.19",
     "@storybook/addon-interactions": "^6.4.19",
