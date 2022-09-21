@@ -36,8 +36,6 @@ Eventually, all the apps will be run using Turborepo, which will significantly i
 
 If you are working on the docs site ([supabase.com/docs](https://supabase.com/docs)), please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
 
-You must be using NPM 7 or higher.
-
 ### Fork the repository
 
 To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase).
