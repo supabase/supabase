@@ -30,6 +30,9 @@ jobs:
     - name: Install deps
       run: npm install
       working-directory: ./
+    - name: Install studio deps
+      run: npm install
+      working-directory: ./studio
     - name: Run tests
-      run: cd studio && npm run test
-      working-directory: ./
+      run: npm test
+      working-directory: ./studio
