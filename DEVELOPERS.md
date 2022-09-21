@@ -78,11 +78,13 @@ Site | Directory | Scope name | Description | Local development server
 [POC] Community forum | `/apps/temp-community-forum` | forum | GitHub Discussions | http://localhost:3002
 [POC] DEV articles site | `/apps/temp-community-tutorials` | tutorials | DEV articles (which community members can write) | http://localhost:3003
 
-The following sites are not using turbo repo, and must be run independently.
+The following sites are temporarily not run using turborepo, and must be run independently.
 
 Site | Directory | Scope name | Description | Local development server
 ---- | --------- | ---------- | ----------- | ------------------------ 
 [supabase.com/docs](https://supabase.com/docs) | `/apps/reference` | N/A | Guides and Reference (Currently not in Turborepo) | http://localhost:3010/docs
+
+For the docs website, please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
 
 #### Shared components
 
