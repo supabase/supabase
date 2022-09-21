@@ -1,4 +1,4 @@
-# Developing Supabase
+# Developing Supabase Docs
 
 1. [Development setup](#development-setup)
     - [Install dependencies](#install-dependencies)
