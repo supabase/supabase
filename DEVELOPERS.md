@@ -74,9 +74,9 @@ Site | Directory | Scope name | Description | Local development server
 ---- | --------- | ---------- | ----------- | ------------------------
 [supabase.com](https://supabase.com) | `/apps/www` | www | The main website | http://localhost:3000
 [app.supabase.com](https://app.supabase.com) | `/studio` | studio | Studio dashboard | http://localhost:8082
-[POC] Next.js based Docs site | `/apps/temp-docs` | temp-docs | Temp Docs Site (Next.js) | http://localhost:3001  
-[POC] Community forum | `/apps/temp-community-forum` | forum | GitHub Discussions in a Next.js site | http://localhost:3002
-[POC] DEV articles site | `/apps/temp-community-tutorials` | tutorials | A Next.js site for our DEV articles (which community members can write) | http://localhost:3003
+[POC] Next.js based Docs site | `/apps/temp-docs` | temp-docs | Guides and Reference (Next.js based) | http://localhost:3001  
+[POC] Community forum | `/apps/temp-community-forum` | forum | GitHub Discussions | http://localhost:3002
+[POC] DEV articles site | `/apps/temp-community-tutorials` | tutorials | DEV articles (which community members can write) | http://localhost:3003
 
 The following sites are not using turbo repo, and must be run independently.
 
