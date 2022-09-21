@@ -8,7 +8,10 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Performs a DELETE on the table.
+Perform a DELETE on the table or view.
+
+By default, deleted rows are not returned. To return it, chain the call
+with `.select()` after filters.
 
 ```js
 const { data, error } = await supabase
@@ -24,7 +27,7 @@ const { data, error } = await supabase
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      __namedParameters
+      options
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -35,7 +38,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Named parameters
 
   </div>
   
@@ -56,7 +59,16 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-Count algorithm to use to count rows in a table.
+Count algorithm to use to count deleted rows.
+
+`"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+hood.
+
+`"planned"`: Approximated but fast count algorithm. Uses the Postgres
+statistics under the hood.
+
+`"estimated"`: Uses exact count for low numbers and planned count for high
+numbers.
 
   </div>
   
@@ -125,26 +137,6 @@ No description provided.
 
 </ul>
 
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      rollback
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>boolean</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-Rollback the operation
-
-  </div>
-  
 </li>
 
 </ul>

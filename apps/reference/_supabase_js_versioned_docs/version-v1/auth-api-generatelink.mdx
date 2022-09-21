@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Generates links to be sent via email or other.
+Generates authentication links to send via email.
 
 ## Parameters
 
@@ -148,7 +148,7 @@ No description provided.
 
 ## Examples
 
-### Generate invite link.
+### Generate an invite link
 
 ```js
 const { data: user, error } = await supabase.auth.api.generateLink(

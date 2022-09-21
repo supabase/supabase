@@ -6615,7 +6615,7 @@
                     "isExternal": true
                   },
                   "comment": {
-                    "shortText": "Generates links to be sent via email or other."
+                    "shortText": "Generates authenticaion links to send via email."
                   },
                   "parameters": [
                     {
