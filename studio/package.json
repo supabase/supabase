@@ -70,7 +70,7 @@
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
     "react-window-infinite-loader": "^1.0.7",
-    "recharts": "^2.1.6",
+    "recharts": "2.1.6",
     "sass": "^1.43.4",
     "scheduler": "^0.20.2",
     "semver": "^6.3.0",
@@ -83,7 +83,6 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.5",
     "@storybook/addon-actions": "^6.4.19",
     "@storybook/addon-essentials": "^6.4.19",
     "@storybook/addon-interactions": "^6.4.19",
