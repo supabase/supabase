@@ -58,17 +58,17 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 [Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
 
-All of the apps can be run simultaneously with the following.
+1. Install the dependences in the root of the repo.
+   ```sh
+   npm install # install dependencies
+   ```
 
-```sh
-# install dependencies
-npm install
+2. You can then run the apps simultaneously with the following.
+   ```sh
+   npm run dev # start all the applications
+   ```
 
-# start all the applications
-npm run dev
-```
-
-Then edit and visit any of the following sites:
+Then visit, and edit, any of the following sites:
 
 Site | Directory | Scope name | Description | Local development server
 ---- | --------- | ---------- | ----------- | ------------------------
