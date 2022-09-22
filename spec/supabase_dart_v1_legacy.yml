@@ -576,32 +576,35 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final mySubscription = supabase
-            .from('countries')
-            .on(SupabaseEventTypes.all, (payload) {
-              // Handle realtime payload
-            })
-            .subscribe();
+          supabase.channel('*').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: '*', schema: '*'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
           ```
       - name: Listening to a specific table
         dart: |
           ```dart
-          final mySubscription = supabase
-            .from('countries')
-            .on(SupabaseEventTypes.all, (payload) {
-              // Handle realtime payload
-            })
-            .subscribe();
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: '*', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
           ```
       - name: Listening to inserts
         dart: |
           ```dart
-          final mySubscription = supabase
-            .from('countries')
-            .on(SupabaseEventTypes.insert, (payload) {
-              // Handle realtime payload
-            })
-            .subscribe();
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
           ```
       - name: Listening to updates
         description: |
@@ -613,12 +616,13 @@ pages:
           ```
         dart: |
           ```dart
-          final mySubscription = supabase
-            .from('countries')
-            .on(SupabaseEventTypes.update, (payload) {
-              // Handle realtime payload
-            })
-            .subscribe();
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: 'UPDATE', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
           ```
       - name: Listening to deletes
         description: |
@@ -630,57 +634,82 @@ pages:
           ```
         dart: |
           ```dart
-          final mySubscription = supabase
-            .from('countries')
-            .on(SupabaseEventTypes.delete, (payload) {
-              // Handle realtime payload
-            })
-            .subscribe();
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
           ```
       - name: Listening to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         dart: |
           ```dart
-          final mySubscription = supabase
-            .from('countries')
-            .on(SupabaseEventTypes.insert, handleInsert)
-            .on(SupabaseEventTypes.delete, handleDelete)
-            .subscribe();
+          supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
+              ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
+              (payload, [ref]) {
+            print('Change received: ${payload.toString()}');
+          }).on(RealtimeListenTypes.postgresChanges,
+              ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
+              (payload, [ref]) {
+            print('Change received: ${payload.toString()}');
+          }).subscribe();
           ```
       - name: Listening to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         dart: |
           ```dart
-          final mySubscription = supabase
-            .from('countries:id=eq.200')
-            .on(SupabaseEventTypes.update, handleRecordUpdated)
-            .subscribe();
+          supabase.channel('public:countries:id=eq.200').on(
+              RealtimeListenTypes.postgresChanges,
+              ChannelFilter(
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'countries',
+                filter: 'id=eq.200',
+              ), (payload, [ref]) {
+            print('Change received: ${payload.toString()}');
+          }).subscribe();
           ```
 
-  removeSubscription():
+  removeChannel():
     description: |
-      Removes an active subscription and returns the number of open connections.
-    title: 'removeSubscription()'
+      Unsubscribes and removes Realtime channel from Realtime client.
+    title: 'removeChannel()'
     notes: |
-      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Remove a subscription
+      - name: Remove a channel
         isSpotlight: true
         dart: |
           ```dart
-          supabase.removeSubscription(mySubscription);
+          final status = await supabase.removeChannel(channel);
           ```
 
-  getSubscriptions():
+  removeAllChannels():
     description: |
-      Returns an array of all your subscriptions.
-    title: 'getSubscriptions()'
+      Unsubscribes and removes all Realtime channels from Realtime client.
+    title: 'removeAllChannels()'
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Get all subscriptions
+      - name: Remove all channels
         isSpotlight: true
         dart: |
           ```dart
-          final subscriptions = supabase.getSubscriptions();
+          final statuses = await supabase.removeAllChannels();
+          ```
+
+  getChannels():
+    description: |
+      Returns all Realtime channels.
+    title: 'getChannels()'
+    examples:
+      - name: Get all channels
+        isSpotlight: true
+        dart: |
+          ```dart
+          final channels = supabase.getChannels();
           ```
 
   stream():
@@ -695,10 +724,11 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          supabase
-            .from('countries')
+          supabase.from('countries')
             .stream(['id'])
-            .execute();
+            .listen((List<Map<String, dynamic>> data) {
+            // Do something awesome with the data
+          });
           ```
       - name: Listening to a specific rows within a table
         description: |
@@ -706,29 +736,62 @@ pages:
           This syntax is the as how you can filter data in Realtime
         dart: |
           ```dart
-          supabase
-            .from('countries:id=eq.120')
+          supabase.from('countries')
             .stream(['id'])
-            .execute();
+            .eq('id', '120')
+            .listen((List<Map<String, dynamic>> data) {
+            // Do something awesome with the data
+          });
           ```
       - name: With `order()`
         dart: |
           ```dart
-          supabase
-            .from('countries')
+          supabase.from('countries')
             .stream(['id'])
-            .order('name', ascending: false)
-            .execute();
+            .order('name', ascending: true)
+            .listen((List<Map<String, dynamic>> data) {
+            // Do something awesome with the data
+          });
           ```
       - name: With `limit()`
         dart: |
           ```dart
-          supabase
-            .from('countries')
+          supabase.from('countries')
             .stream(['id'])
-            .order('name', ascending: false)
+            .order('name', ascending: true)
             .limit(10)
-            .execute();
+            .listen((List<Map<String, dynamic>> data) {
+            // Do something awesome with the data
+          });
+          ```
+      - name: Using `stream()` with `StreamBuilder`
+        description: |
+          When using `stream()` with a `StreamBuilder` within your Flutter application, make sure to store your stream in a variable to prevent refetching upon rebuilding.
+        dart: |
+          ```dart
+          final supabase = Supabase.instance.client;
+
+          class MyWidget extends StatefulWidget {
+            const MyWidget({Key? key}) : super(key: key);
+
+            @override
+            State<MyWidget> createState() => _MyWidgetState();
+          }
+
+          class _MyWidgetState extends State<MyWidget> {
+            // Persist the stream in a local variable to prevent refetching upon rebuilds
+            final _stream = supabase.from('countries').stream(['id']);
+
+            @override
+            Widget build(BuildContext context) {
+              return StreamBuilder(
+                stream: _stream,
+                builder: (context, snapshot) {
+                  // Return your widget with the data from the snapshot
+                },
+              );
+            }
+          }
           ```
 
   storage.listBuckets():
