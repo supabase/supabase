@@ -14,7 +14,6 @@
     "prettier:write": "prettier --write ."
   },
   "dependencies": {
-    "config": "*",
     "@headlessui/react": "^1.4.1",
     "@monaco-editor/react": "^4.3.1",
     "@next/bundle-analyzer": "^12.0.4",
@@ -48,7 +47,6 @@
     "mobx-react-lite": "^3.2.0",
     "next": "12.0.9",
     "next-compose-plugins": "^2.2.1",
-    "next-transpile-modules": "^9.0.0",
     "openapi-types": "^9.1.0",
     "p-queue": "^6.6.2",
     "papaparse": "^5.3.1",
@@ -64,7 +62,7 @@
     "react-dnd-html5-backend": "^14.0.1",
     "react-dom": "^17.0.2",
     "react-grid-layout": "^1.3.0",
-    "react-hot-toast": "2.3.0",
+    "react-hot-toast": "^2.1.1",
     "react-inlinesvg": "^2.3.0",
     "react-markdown": "^8.0.3",
     "react-split": "^2.0.13",
@@ -72,7 +70,7 @@
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
     "react-window-infinite-loader": "^1.0.7",
-    "recharts": "2.1.6",
+    "recharts": "^2.1.6",
     "sass": "^1.43.4",
     "scheduler": "^0.20.2",
     "semver": "^6.3.0",
@@ -85,8 +83,6 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "common": "*",
-    "config": "*",
     "@babel/core": "^7.17.5",
     "@storybook/addon-actions": "^6.4.19",
     "@storybook/addon-essentials": "^6.4.19",
@@ -117,7 +113,7 @@
     "@types/sqlstring": "^2.3.0",
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
-    "autoprefixer": "10.4.2",
+    "autoprefixer": "^10.4.2",
     "babel-loader": "^8.2.3",
     "jest": "^27.4.0",
     "jest-canvas-mock": "^2.3.1",
