@@ -68,7 +68,9 @@ const nextConfig = {
 }
 
 // Export all config
-const moduleExports = withPlugins([[withBundleAnalyzer({})], withTM()], nextConfig)
+const plugins = [[withBundleAnalyzer({})], withTM()]
+
+const moduleExports = withPlugins(plugins, nextConfig)
 
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
