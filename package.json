@@ -10,7 +10,6 @@
     "apps/temp-community-tutorials",
     "apps/temp-docs",
     "apps/www",
-    "studio",
     "packages/*"
   ],
   "scripts": {
@@ -28,10 +27,26 @@
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-custom": "*",
-    "prettier": "^2.5.1",
-    "turbo": "1.4.7"
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-typescript": "^7.16.0",
+    "@supabase/supabase-js": "^1.35.3",
+    "@types/jest": "^27.0.3",
+    "@types/node": "^14.14.14",
+    "autoprefixer": "^10.4.4",
+    "axios": "^0.24.0",
+    "babel-jest": "^27.3.1",
+    "dotenv": "^10.0.0",
+    "faker": "^5.5.3",
+    "jest": "^27.3.1",
+    "postcss": "^8.4.12",
+    "prettier": "^2.6.2",
+    "prettier-plugin-tailwindcss": "^0.1.8",
+    "tailwindcss": "^3.0.24",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^9.1.1",
+    "turbo": "latest",
+    "typescript": "^4.5.2"
   },
   "repository": {
     "type": "git",
