@@ -18,16 +18,6 @@ info:
 pages:
   Installing:
     description: |
-      ## Dart
-
-      Dart libraries are built and supported by the community. 
-
-      ```bash
-      dart pub add supabase
-      ```
-
-      Find the source code on [GitHub](https://github.com/supabase/supabase-dart).
-
       ## Flutter 
 
       For Flutter project, you can use [supabase_flutter](https://github.com/supabase/supabase-flutter).
@@ -36,30 +26,27 @@ pages:
       flutter pub add supabase_flutter
       ```
 
-      `supabase_flutter` plugin uses `supabase` plugin internally, and it adds some Flutter specific functionality such as handling deeplinks coming back from magic link verifications.
-      If you are creating a Flutter application, we recommend using `supabase_flutter` instead of `supabase`. 
+      ## Dart
 
-      For the most part `supabase_flutter` shares the same API as `supabase` with few exceptions such as initialization or OAuth sign in.
+      If you want to use Supabase in Dart environment other than Flutter, you can use the [supabase](https://github.com/supabase/supabase-dart) package.
+
+      ```bash
+      dart pub add supabase
+      ```
 
   Initializing:
     description: |
+      ## Flutter
+
+      For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
+
       ## Dart
       You can initialize a new Supabase client using the `SupabaseClient()` method.
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
-
-      ## Flutter
-
-      For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
-
     examples:
-      - name: Dart SupabaseClient()
-        dart: |
-          ```dart
-          final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
-          ```
       - name: Flutter initialize()
         dart: |
           ```dart title="main.dart"
@@ -67,6 +54,14 @@ pages:
             await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
             runApp(MyApp());
           }
+          ...
+          // Anywhere your app
+          final supabase = Supabase.instance.client;
+          ```
+      - name: Dart SupabaseClient()
+        dart: |
+          ```dart
+          final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
           ```
 
   auth.signUp():
@@ -82,10 +77,9 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase.auth.signUp('example@email.com',　'example-password');
+          final GotrueSessionResponse res = await supabase.auth.signUp('example@email.com', 'example-password');
 
-          final user = res.data?.user;
-          final error = res.error;
+          final User? user = res.user;
           ```
       - name: Sign up with third-party providers.
         hideCodeBlock: true
@@ -99,25 +93,27 @@ pages:
       - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password. 
+      - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password.
       - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
     examples:
       - name: Sign in with email.
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
+          final GotrueSessionResponse res = await supabase.auth.signIn(
+            email: 'example@email.com',
+            password: 'example-password',
+          );
 
-          final user = res.data?.user;
-          final error = res.error;
+          final User? user = res.user;
           ```
       - name: Sign in with magic link.
         description: If email is provided, but no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
         dart: |
           ```dart
-          final res = await supabase.auth.signIn(email: 'example@email.com');
-
-          final error = res.error;
+          final GotrueSessionResponse res = await supabase.auth.signIn(
+            email: 'example@email.com',
+          );
           ```
       - name: Get OAuth sign in URL.
         description: |
@@ -125,10 +121,11 @@ pages:
           If you are looking to sign in a user via OAuth on Flutter app, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
         dart: |
           ```dart
-          final res = await supabase.auth.signIn(provider: Provider.github);
+          final GotrueSessionResponse res = await supabase.auth.signIn(
+            provider: Provider.github,
+          );
 
-          final url = res.data?.url;
-          final error = res.error;
+          final User? user = res.user;
           ```
   auth.signInWithProvider():
     description: |
@@ -141,9 +138,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase.auth.signInWithProvider(Provider.github);
-
-          final error = res.error;
+          await supabase.auth.signInWithProvider(Provider.github);
           ```
       - name: With `redirectTo`
         description: |
@@ -151,15 +146,12 @@ pages:
           Note that `redirectTo` should be null for Flutter Web.
         dart: |
           ```dart
-          final res = await supabase.auth.signInWithProvider(
+          await supabase.auth.signInWithProvider(
             Provider.github,
-            options: AuthOptions(
-                redirectTo: kIsWeb
-                    ? null
-                    : 'io.supabase.flutter://reset-callback/'),
+            options: const AuthOptions(
+              redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
+            ),
           );
-
-          final error = res.error;
           ```
       - name: With scopes
         description: |
@@ -167,12 +159,13 @@ pages:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
         dart: |
           ```dart
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            scopes: 'repo gist notifications'
-          })
-          const oAuthToken = session.provider_token // use to access provider API
+          await supabase.auth.signInWithProvider(Provider.github,
+              options: const AuthOptions(scopes: 'repo gist notifications'));
+          ...
+          // after user comes back from signin flow
+
+          final Session? session = supabase.auth.currentSession;
+          final String? oAuthToken = session?.providerToken;
           ```
   auth.signOut():
     description: |
@@ -182,12 +175,10 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase.auth.signOut();
-
-          final error = res.error;
+          await supabase.auth.signOut();
           ```
 
-  auth.session():
+  auth.currentSession:
     description: |
       Returns the session data, if there is an active session.
     examples:
@@ -195,10 +186,10 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final session = supabase.auth.session();
+          final Session? session = supabase.auth.currentSession;
           ```
 
-  auth.user():
+  auth.currentUser:
     description: |
       Returns the user data, if there is a logged in user.
     examples:
@@ -206,7 +197,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final user = supabase.auth.user();
+          final User? user = supabase.auth.currentUser;
           ```
 
   auth.update():
@@ -220,11 +211,9 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase.auth.update(
-            UserAttributes(data: {'hello': 'world'})
+          final GotrueUserResponse res = await supabase.auth.update(
+            UserAttributes(data: {'hello': 'world'}),
           );
-
-          final error = res.error;
           ```
 
   auth.onAuthStateChange():
@@ -235,10 +224,12 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final subscription = supabase.auth.onAuthStateChange((event, session) {
-            print(session?.user?.id);
-            // handle auth state change
-          });
+          final subscription = supabase.auth.onAuthStateChange(
+            (event, session) {
+              print(session?.user?.id);
+              // handle auth state change
+            },
+          );
           ```
 
   Reset Password (Email):
@@ -262,14 +253,6 @@ pages:
       );
       ```
     examples:
-      - name: Reset password
-        isSpotlight: true
-        dart: |
-          ```dart
-          final res = await supabase.auth.api.resetPasswordForEmail('user@example.com');
-
-          final error = res.error;
-          ```
       - name: Reset password for Flutter
         isSpotlight: true
         dart: |
@@ -281,8 +264,12 @@ pages:
                 ? null
                 : 'io.supabase.flutter://reset-callback/'),
           );
-
-          final error = res.error;
+          ```
+      - name: Reset password
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabase.auth.api.resetPasswordForEmail('user@example.com');
           ```
   invoke():
     title: 'invoke()'
@@ -296,9 +283,8 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabaseClient.functions.invoke('hello', body: {'foo': 'baa'});
+          final res = await supabase.functions.invoke('hello', body: {'foo': 'baa'});
           final data = res.data;
-          final error = res.error;
           ```
       - name: Specifying response type.
         description: |
@@ -306,13 +292,12 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabaseClient.functions.invoke(
+          final res = await supabase.functions.invoke(
             'hello',
             body: {'foo': 'baa'},
             responseType: ResponseType.text,
           );
           final data = res.data;
-          final error = res.error;
           ```
       - name: Parsing custom headers.
         description: |
@@ -320,11 +305,11 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabaseClient.functions.invoke(
+          final res = await supabase.functions.invoke(
             'hello',
             body: {'foo': 'baa'},
             headers: {
-              'Authorization': 'Bearer ${supabase.auth.session()?.access_token}'
+              'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}'
             },
           );
           ```
