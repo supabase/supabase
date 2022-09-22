@@ -52,6 +52,37 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     handleEmailVerificationError()
   }, [])
 
+  const getSavingState = () => rootStore.content.savingState
+
+  // prompt the user if they try and leave with unsaved content store changes
+  useEffect(() => {
+    const warningText = 'You have unsaved changes - are you sure you wish to leave this page?'
+
+    const handleWindowClose = (e: BeforeUnloadEvent) => {
+      const savingState = getSavingState()
+
+      const unsavedChanges =
+        savingState === 'UPDATING_REQUIRED' ||
+        savingState === 'UPDATING' ||
+        savingState === 'UPDATING_FAILED'
+
+      if (!unsavedChanges) {
+        return
+      }
+
+      e.preventDefault()
+
+      return (e.returnValue = warningText)
+    }
+
+    window.addEventListener('beforeunload', handleWindowClose)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleWindowClose)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const getLayout = Component.getLayout ?? ((page) => page)
 
   return (
