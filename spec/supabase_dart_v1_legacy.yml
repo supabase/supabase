@@ -16,54 +16,6 @@ info:
       version: '0.0.1'
 
 pages:
-  Installing:
-    description: |
-      ## Flutter 
-
-      For Flutter project, you can use [supabase_flutter](https://github.com/supabase/supabase-flutter).
-
-      ```bash
-      flutter pub add supabase_flutter
-      ```
-
-      ## Dart
-
-      If you want to use Supabase in Dart environment other than Flutter, you can use the [supabase](https://github.com/supabase/supabase-dart) package.
-
-      ```bash
-      dart pub add supabase
-      ```
-
-  Initializing:
-    description: |
-      ## Flutter
-
-      For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
-
-      ## Dart
-      You can initialize a new Supabase client using the `SupabaseClient()` method.
-
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
-    examples:
-      - name: Flutter initialize()
-        dart: |
-          ```dart title="main.dart"
-          Future<void> main() async {
-            await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
-            runApp(MyApp());
-          }
-          ...
-          // Anywhere your app
-          final supabase = Supabase.instance.client;
-          ```
-      - name: Dart SupabaseClient()
-        dart: |
-          ```dart
-          final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
-          ```
-
   auth.signUp():
     description: |
       Creates a new user.

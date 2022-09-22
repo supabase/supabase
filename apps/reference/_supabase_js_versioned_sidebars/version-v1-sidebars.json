@@ -40,7 +40,7 @@
     {
       "type": "category",
       "label": "Functions",
-      "items": ["invoke"],
+      "items": ["generated/invoke"],
       "collapsed": true
     },
     {
