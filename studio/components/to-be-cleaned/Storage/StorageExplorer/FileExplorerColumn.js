@@ -232,8 +232,8 @@ const FileExplorerColumn = ({
 
       {/* Drag drop upload CTA for when column is empty */}
       {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
-        <div className="flex h-full w-full flex-col items-center justify-center">
-          <img src="/img/storage-placeholder.svg" className="opacity-75" />
+        <div className="h-full w-full flex flex-col items-center justify-center">
+          <img src="/img/storage-placeholder.svg" className="opacity-75 pointer-events-none" />
           <p className="my-3 opacity-75">Drop your files here</p>
           <p className="w-40 text-center text-sm text-scale-1100">
             Or upload them via the "Upload file" button above

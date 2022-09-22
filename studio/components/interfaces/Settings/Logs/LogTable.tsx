@@ -14,6 +14,7 @@ import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceed
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
+import Divider from 'components/ui/Divider'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -151,6 +152,33 @@ const LogTable = ({
     }
   }, [stringData])
 
+  const LogsExplorerTableHeader = () => (
+    <div className="w-full bg-scale-100 dark:bg-scale-300 rounded-tl rounded-tr border-t border-l border-r flex items-center justify-between px-5 py-2">
+      <div className="flex items-center gap-2">
+        {data && data.length ? (
+          <>
+            <span className="text-sm text-scale-1200">Query results</span>
+            <span className="text-sm text-scale-1100">{data && data.length}</span>
+          </>
+        ) : (
+          <span className="text-xs text-scale-1200">Results will be shown below</span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {onHistogramToggle && (
+          <Button
+            type="default"
+            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+            onClick={onHistogramToggle}
+          >
+            Histogram
+          </Button>
+        )}
+        <CSVButton data={data}>Download</CSVButton>
+      </div>
+    </div>
+  )
+
   const renderErrorAlert = () => {
     if (!error) return null
     const childProps = {
@@ -166,18 +194,43 @@ const LogTable = ({
     }
 
     return (
-      <div className="flex justify-center px-5">
-        <Alert
-          variant="danger"
-          title="Sorry! An error occured when fetching data."
-          withIcon
-          className="w-1/2"
-        >
+      <div className="flex justify-center px-5 w-1/2">
+        <Alert variant="danger" title="Sorry! An error occured when fetching data." withIcon>
           <Renderer {...childProps} />
         </Alert>
       </div>
     )
   }
+
+  const renderNoResultAlert = () => (
+    <div className="flex flex-col items-center gap-6 text-center mt-16 opacity-100 scale-100 justify-center">
+      <div className="flex flex-col gap-1">
+        <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center"></div>
+        <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center">
+          <div className="absolute right-1 -bottom-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-1 px-5">
+        <h3 className="text-lg text-scale-1200">No results</h3>
+        <p className="text-sm text-scale-900">Try another search, or adjusting the filters</p>
+      </div>
+    </div>
+  )
 
   return (
     <>
@@ -185,45 +238,8 @@ const LogTable = ({
         className={'flex w-full flex-col ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
-        {!queryType && (
-          <div>
-            <div
-              className="
-            flex w-full items-center 
-            justify-between rounded-tl
-            rounded-tr
-            border-t
-            border-l
-            border-r bg-scale-100 px-5
-            py-2 dark:bg-scale-300
-      "
-            >
-              <div className="flex items-center gap-2">
-                {data && data.length ? (
-                  <>
-                    <span className="text-sm text-scale-1200">Query results</span>
-                    <span className="text-sm text-scale-1100">{data && data.length}</span>
-                  </>
-                ) : (
-                  <span className="text-xs text-scale-1200">Results will be shown below</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {onHistogramToggle && (
-                  <Button
-                    type="default"
-                    icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
-                    onClick={onHistogramToggle}
-                  >
-                    Histogram
-                  </Button>
-                )}
-                {showDownload && <CSVButton data={data}>Download</CSVButton>}
-              </div>
-            </div>
-          </div>
-        )}
-        <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
+        {!queryType && <LogsExplorerTableHeader />}
+        <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
@@ -238,76 +254,16 @@ const LogTable = ({
             }}
             noRowsFallback={
               !isLoading ? (
-                <>
-                  <div className="h-full w-full flex-col space-y-12 py-4">
-                    {!error && (
-                      <div
-                        className={`mt-16
-                      flex
-                      scale-100
-                      
-                      flex-col
-                      items-center
-                      justify-center
-                  
-                      gap-6
-                      text-center
-                      opacity-100
-                      transition-all 
-                      delay-200
-                      
-                      duration-500
-                    `}
-                      >
-                        <>
-                          <div className="flex flex-col gap-1">
-                            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
-                            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
-                              <div className="absolute right-1 -bottom-4">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-col gap-1 px-5">
-                            <h3 className="text-lg text-scale-1200">No results</h3>
-                            <p className="text-sm text-scale-900">
-                              Try another search, or adjusting the filters
-                            </p>
-                          </div>
-                        </>
-                      </div>
-                    )}
-                    {error && renderErrorAlert()}
-                  </div>
-                </>
+                <div className="transition-all duration-500 delay-200 py-4 flex w-full h-full justify-center items-center mx-auto space-y-12">
+                  {!error && renderNoResultAlert()}
+                  {error && renderErrorAlert()}
+                </div>
               ) : null
             }
             columns={columns as any}
-            rowClass={(r) => {
-              const row = r as LogData
-
-              let classes = []
-              classes.push(
-                `${
-                  row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focussed' : 'cursor-pointer'
-                }`
-              )
-
-              return classes.join(' ')
-            }}
+            rowClass={(row: LogData) =>
+              row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focused' : 'cursor-pointer'
+            }
             rows={logDataRows}
             rowKeyGetter={(r) => {
               if (!hasId) return Object.keys(r)[0]

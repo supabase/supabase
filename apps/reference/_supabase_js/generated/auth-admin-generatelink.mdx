@@ -8,16 +8,16 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Generates email links and OTPs to be sent via a custom email provider.
+Generates email links and OTPs to send via a custom email provider.
 
 ```js
-const { data, error } = await supabase.auth.admin.generateLink(
-  'email@example.com'
-  'signup',
-  {
-    'password': 'secret'
-  }
-)
+const { data, error } = await supabase.auth.admin.generateLink({
+  type: 'signup',
+  email: 'email@example.com',
+  options: {
+    password: 'secret',
+  },
+})
 ```
 
 ## Parameters
@@ -133,23 +133,51 @@ No description provided.
 
 ## Examples
 
-### Generate a signup link.
+### Generate a signup link
 
 ```js
-const { data, error } = await supabase.auth.admin.generateLink(
-  'email@example.com'
-  'signup',
-  {
-    'password': 'secret'
-  }
-)
+const { data, error } = await supabase.auth.admin.generateLink({
+  type: 'signup',
+  email: 'email@example.com',
+  options: {
+    password: 'secret',
+  },
+})
 ```
 
-### Generate an invite link.
+### Generate an invite link
 
 ```js
-const { data, error } = await supabase.auth.admin.generateLink(
-  'email@example.com'
-  'invite',
-)
+const { data, error } = await supabase.auth.admin.generateLink({
+  type: 'invite',
+  email: 'email@example.com',
+})
+```
+
+### Generate a magic link
+
+```js
+const { data, error } = await supabase.auth.admin.generateLink({
+  type: 'magiclink',
+  email: 'email@example.com',
+})
+```
+
+### Generate a recovery link
+
+```js
+const { data, error } = await supabase.auth.admin.generateLink({
+  type: 'recovery',
+  email: 'email@example.com',
+})
+```
+
+### Generate a link to change email addresses
+
+```js
+const { data, error } = await supabase.auth.admin.generateLink({
+  type: 'email_change_current',
+  email: 'old.email@example.com',
+  newEmail: 'new.email@example.com',
+})
 ```
