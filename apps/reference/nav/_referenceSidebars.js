@@ -138,6 +138,7 @@ const sidebars = {
         'guides/database/tables',
         'guides/database/functions',
         'guides/database/full-text-search',
+        'guides/database/migrating-between-projects',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
