@@ -7,7 +7,7 @@
     "start": "npm run docusaurus",
     "docusaurus": "docusaurus start --port 3010",
     "swizzle": "docusaurus swizzle",
-    "build": "docusaurus build",
+    "build": "npm run generate:all && docusaurus build",
     "build:vercel": "npm run clear && docusaurus build --out-dir build/docs",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
