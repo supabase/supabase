@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Limits the result to rows within the specified range, inclusive.
+Limit the query result by `from` and `to` inclusively.
 
 ```js
 const { data, error } = await supabase
@@ -35,7 +35,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The starting index from which to limit the result, inclusive.
+The starting index from which to limit the result
 
   </div>
   
@@ -55,7 +55,7 @@ The starting index from which to limit the result, inclusive.
   </h4>
   <div class="method-list-item-description">
 
-The last index to which to limit the result, inclusive.
+The last index to which to limit the result
 
   </div>
   
@@ -64,7 +64,7 @@ The last index to which to limit the result, inclusive.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      foreignTable
+      options
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -75,7 +75,7 @@ The last index to which to limit the result, inclusive.
   </h4>
   <div class="method-list-item-description">
 
-The foreign table to use (for foreign columns).
+Named parameters
 
   </div>
   
@@ -96,7 +96,8 @@ The foreign table to use (for foreign columns).
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Set this to limit rows of foreign tables
+instead of the current table
 
   </div>
   

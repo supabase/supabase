@@ -83,7 +83,7 @@ const PresetReport: React.FC<Props> = ({ projectRef, preset }) => {
           params={statusCodes.params}
           className="col-span-4 col-start-1"
           title="API Status Codes"
-          description="Distrubution of API reponses by status codes."
+          description="Distribution of API responses by status codes."
           data={statusCodes.logData}
           renderer={renderStatusCodesChart}
         />

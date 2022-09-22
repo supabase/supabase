@@ -311,7 +311,7 @@ const Wizard: NextPageWithLayout = () => {
                     value={dbRegion}
                     // @ts-ignore
                     onChange={(value: string) => onDbRegionChange(value)}
-                    descriptionText="Select a region close to you for the best performance."
+                    descriptionText="Select a region close to your users for the best performance."
                   >
                     {Object.keys(availableRegions).map((option: string, i) => {
                       const label = Object.values(availableRegions)[i] as string

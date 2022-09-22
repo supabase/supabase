@@ -190,6 +190,7 @@ export const LogsPreviewer: React.FC<Props> = ({
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
             params={params}
+            error={error}
           />
         </LoadingOpacity>
         {!error && (
@@ -198,22 +199,6 @@ export const LogsPreviewer: React.FC<Props> = ({
               Load older
             </Button>
             <UpgradePrompt projectRef={projectRef} from={params.iso_timestamp_start || ''} />
-          </div>
-        )}
-        {error && (
-          <div className="mx-auto flex h-full w-full items-center justify-center">
-            <Card className="flex w-2/5 flex-col  gap-y-2 bg-scale-400">
-              <div className="flex flex-row gap-x-2 py-2">
-                <IconAlertCircle size={16} />
-                <p className="text-scale-1000">Sorry! An error occured when fetching data.</p>
-              </div>
-              <Input.TextArea
-                label="Error Messages"
-                value={JSON.stringify(error, null, 2)}
-                borderless
-                className=" border-t-2 border-scale-800 pt-2 font-mono"
-              />
-            </Card>
           </div>
         )}
       </div>
