@@ -44,8 +44,8 @@ export const formatNotificationText = (project: Project, notification: Notificat
   } else if (notification.data.name === NotificationName.ProjectUpdateCompleted) {
     const { upgrades } = notification.data
     const upgradesText = upgrades
-      .map((upgrade: ServiceUpgrade) => upgrade.name)
-      .reduce((a: string, b: string) => `${a}, ${b}`)
+      .map((upgrade: ServiceUpgrade) => `${upgrade.name}: ${upgrade.version_to} ${upgrade.changelog_link}`)
+      .reduce((a: string, b: string) => `${a}\n${b}`)
     return `The following services have been successfully updated for project "${projectName}": ${upgradesText}.`
   } else if (notification.data.name === NotificationName.ProjectInformational) {
     return notification.data.message
