@@ -1074,21 +1074,19 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .limit(1)
-            .execute();
+            .limit(1);
           ```
       - name: With embedded resources
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, cities(name)')
             .eq('name', 'United States')
-            .limit(1,  foreignTable: 'cities' )
-            .execute();
+            .limit(1,  foreignTable: 'cities' );
           ```
 
   order():
@@ -1099,21 +1097,19 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .order('id',  ascending: false )
-            .execute();
+            .order('id',  ascending: false );
           ```
       - name: With embedded resources
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, cities(name)')
             .eq('name', 'United States')
-            .order('name', foreignTable: 'cities')
-            .execute();
+            .order('name', foreignTable: 'cities');
           ```
 
   range():
@@ -1124,11 +1120,10 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .range(0,3)
-            .execute();
+            .range(0,3);
           ```
 
   single():
@@ -1139,11 +1134,10 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .single()
-            .execute();
+            .single();
           ```
 
   Using Filters:
@@ -1157,17 +1151,15 @@ pages:
       You must apply your filters to the end of your query. For example:
 
       ```dart
-      final res = await supabase
+      final data = await supabase
         .from('cities')
         .select('name, country_id')
-        .eq('name', 'The Shire')    // Correct
-        .execute();
+        .eq('name', 'The Shire');    // Correct
 
-      final res = await supabase
+      final data = await supabase
         .from('cities')
         .eq('name', 'The Shire')    // Incorrect
-        .select('name, country_id')
-        .execute();
+        .select('name, country_id');
       ```
 
       ### Chaining
@@ -1175,12 +1167,11 @@ pages:
       Filters can be chained together to produce advanced queries. For example:
 
       ```dart
-      final res = await supabase
+      final data = await supabase
         .from('cities')
         .select('name, country_id')
         .gte('population', 1000)
-        .lt('population', 10000)
-        .execute();
+        .lt('population', 10000);
       ```
 
   .or():
@@ -1199,21 +1190,18 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .or('id.eq.20,id.eq.30')
-            .execute();
+            .or('id.eq.20,id.eq.30');
           ```
       - name: Use `or` with `and`
-        isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
-            .execute();
+            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
           ```
       # TODO Not available at the moment, so would have to fix the bug on postgrest-dart first
       # - name: Use `or` on foreign tables
@@ -1244,38 +1232,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .not('name', 'eq', 'Paris')
-            .execute();
+            .not('name', 'eq', 'Paris');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .not('name', 'eq', 'Paris')
-            .execute();
+            .not('name', 'eq', 'Paris');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .not('name', 'eq', 'Paris')
-            .execute();
+            .not('name', 'eq', 'Paris');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities)
-            .not('name', 'eq', 'Paris')
-            .execute();
+            .not('name', 'eq', 'Paris');
           ```
 
   .match():
@@ -1286,38 +1270,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .match({'name': 'Beijing', 'country_id': 156})
-            .execute();
+            .match({'name': 'Beijing', 'country_id': 156});
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .match({'name': 'Beijing', 'country_id': 156})
-            .execute();
+            .match({'name': 'Beijing', 'country_id': 156});
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .match({'name': 'Beijing', 'country_id': 156})
-            .execute();
+            .match({'name': 'Beijing', 'country_id': 156});
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .match({'name': 'Beijing', 'country_id': 156})
-            .execute();
+            .match({'name': 'Beijing', 'country_id': 156});
           ```
 
   .eq():
@@ -1328,38 +1308,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .eq('name', 'The shire')
-            .execute();
+            .eq('name', 'The shire');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .eq('name', 'San Francisco')
-            .execute();
+            .eq('name', 'San Francisco');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .eq('name', 'Mordor')
-            .execute();
+            .eq('name', 'Mordor');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .eq('name', 'San Francisco')
-            .execute();
+            .eq('name', 'San Francisco');
           ```
 
   .neq():
@@ -1370,38 +1346,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .neq('name', 'The shire')
-            .execute();
+            .neq('name', 'The shire');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .neq('name', 'San Francisco')
-            .execute();
+            .neq('name', 'San Francisco');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .neq('name', 'Mordor')
-            .execute();
+            .neq('name', 'Mordor');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .neq('name', 'Lagos')
-            .execute();
+            .neq('name', 'Lagos');
           ```
 
   .gt():
@@ -1412,38 +1384,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .gt('country_id', 250)
-            .execute();
+            .gt('country_id', 250);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .gt('country_id', 250)
-            .execute();
+            .gt('country_id', 250);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .gt('country_id', 250)
-            .execute();
+            .gt('country_id', 250);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .gt('country_id', 250)
-            .execute();
+            .gt('country_id', 250);
           ```
 
   .gte():
@@ -1454,38 +1422,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .gte('country_id', 250)
-            .execute();
+            .gte('country_id', 250);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .gte('country_id', 250)
-            .execute();
+            .gte('country_id', 250);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .gte('country_id', 250)
-            .execute();
+            .gte('country_id', 250);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .gte('country_id', 250)
-            .execute();
+            .gte('country_id', 250);
           ```
 
   .lt():
@@ -1496,38 +1460,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .lt('country_id', 250)
-            .execute();
+            .lt('country_id', 250);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .lt('country_id', 250)
-            .execute();
+            .lt('country_id', 250);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .lt('country_id', 250)
-            .execute();
+            .lt('country_id', 250);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .lt('country_id', 250)
-            .execute();
+            .lt('country_id', 250);
           ```
 
   .lte():
@@ -1539,38 +1499,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .lte('country_id', 250)
-            .execute();
+            .lte('country_id', 250);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .lte('country_id', 250)
-            .execute();
+            .lte('country_id', 250);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .lte('country_id', 250)
-            .execute();
+            .lte('country_id', 250);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .lte('country_id', 250)
-            .execute();
+            .lte('country_id', 250);
           ```
 
   .like():
@@ -1582,38 +1538,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .like('name', '%la%')
-            .execute();
+            .like('name', '%la%');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .like('name', '%la%')
-            .execute();
+            .like('name', '%la%');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .like('name', '%la%')
-            .execute();
+            .like('name', '%la%');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .like('name', '%la%')
-            .execute();
+            .like('name', '%la%');
           ```
 
   .ilike():
@@ -1624,38 +1576,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .ilike('name', '%la%')
-            .execute();
+            .ilike('name', '%la%');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .ilike('name', '%la%')
-            .execute();
+            .ilike('name', '%la%');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .ilike('name', '%la%')
-            .execute();
+            .ilike('name', '%la%');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .ilike('name', '%la%')
-            .execute();
+            .ilike('name', '%la%');
           ```
 
   .is_():
@@ -1668,38 +1616,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .is_('name', null)
-            .execute();
+            .is_('name', null);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .is_('name', null)
-            .execute();
+            .is_('name', null);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .is_('name', null)
-            .execute();
+            .is_('name', null);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .is_('name', null)
-            .execute();
+            .is_('name', null);
           ```
 
   .in_():
@@ -1712,38 +1656,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .in_('name', ['Rio de Janeiro', 'San Francisco'])
-            .execute();
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .in_('name', ['Rio de Janeiro', 'San Francisco'])
-            .execute();
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .in_('name', ['Rio de Janeiro', 'San Francisco'])
-            .execute();
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .in_('name', ['Rio de Janeiro', 'San Francisco'])
-            .execute();
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
 
   .contains():
@@ -1752,38 +1692,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, main_exports')
-            .contains('main_exports', ['oil'])
-            .execute();
+            .contains('main_exports', ['oil']);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .contains('main_exports', ['oil'])
-            .execute();
+            .contains('main_exports', ['oil']);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .contains('main_exports', ['oil'])
-            .execute();
+            .contains('main_exports', ['oil']);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .contains('main_exports', ['oil'])
-            .execute();
+            .contains('main_exports', ['oil']);
           ```
 
   .containedBy():
@@ -1792,38 +1728,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, main_exports')
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
-            .execute();
+            .containedBy('main_exports', ['cars', 'food', 'machine']);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
-            .execute();
+            .containedBy('main_exports', ['orks', 'surveillance', 'evil']);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
-            .execute();
+            .containedBy('main_exports', ['cars', 'food', 'machine']);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
-            .execute();
+            .containedBy('main_exports', ['cars', 'food', 'machine']);
           ```
 
   .rangeLt():
@@ -1832,38 +1764,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeLt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeLt('population_range_millions', '[150, 250]');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .rangeLt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeLt('population_range_millions', '[150, 250]');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .rangeLt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeLt('population_range_millions', '[150, 250]');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .rangeLt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeLt('population_range_millions', '[150, 250]');
           ```
 
   .rangeGt():
@@ -1872,38 +1800,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeGt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGt('population_range_millions', '[150, 250]');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .rangeGt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGt('population_range_millions', '[150, 250]');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .rangeGt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGt('population_range_millions', '[150, 250]');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .rangeGt('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGt('population_range_millions', '[150, 250]');
           ```
 
   .rangeGte():
@@ -1912,38 +1836,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeGte('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGte('population_range_millions', '[150, 250]');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .rangeGte('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGte('population_range_millions', '[150, 250]');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .rangeGte('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGte('population_range_millions', '[150, 250]');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .rangeGte('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeGte('population_range_millions', '[150, 250]');
           ```
 
   .rangeLte():
@@ -1953,38 +1873,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeLte('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeLte('population_range_millions', '[150, 250]');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .rangeLte('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeLte('population_range_millions', '[150, 250]');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .rangeLte('population_range_millions', '[150, 250]')
-            .execute();
+            .rangeLte('population_range_millions', '[150, 250]');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .rangeLte('population_range_millions', [150, 250])
-            .execute();
+            .rangeLte('population_range_millions', [150, 250]);
           ```
 
   .rangeAdjacent():
@@ -1993,38 +1909,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, population_range_millions')
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-            .execute();
+            .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-            .execute();
+            .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-            .execute();
+            .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-            .execute();
+            .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
 
   .overlaps():
@@ -2033,38 +1945,34 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .select('name, id, main_exports')
-            .overlaps('main_exports', ['computers', 'minerals'])
-            .execute();
+            .overlaps('main_exports', ['computers', 'minerals']);
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .update({ 'name': 'Mordor' })
-            .overlaps('main_exports', ['computers', 'minerals'])
-            .execute();
+            .overlaps('main_exports', ['computers', 'minerals']);
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('countries')
             .delete()
-            .overlaps('main_exports', ['computers', 'minerals'])
-            .execute();
+            .overlaps('main_exports', ['computers', 'minerals']);
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_countries')
-            .overlaps('main_exports', ['computers', 'minerals'])
-            .execute();
+            .overlaps('main_exports', ['computers', 'minerals']);
           ```
 
   .textSearch():
@@ -2074,39 +1982,36 @@ pages:
       - name: Text search
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('quotes')
             .select('catchphrase')
             .textSearch('catchphrase', "'fat' & 'cat'", 
               config: 'english' 
-            )
-            .execute();
+            );
           ```
       - name: Basic normalization
         description: Uses PostgreSQL's `plainto_tsquery` function.
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('quotes')
             .select('catchphrase')
             .textSearch('catchphrase', "'fat' & 'cat'",  
               type: TextSearchType.plain,
               config: 'english' 
-            )
-            .execute();
+            );
           ```
       - name: Full normalization
         description: Uses PostgreSQL's `phraseto_tsquery` function.
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('quotes')
             .select('catchphrase')
             .textSearch('catchphrase', "'fat' & 'cat'",  
               type: TextSearchType.phrase,
               config: 'english' 
-            )
-            .execute();
+            );
           ```
       - name: Full normalization
         description: |
@@ -2121,14 +2026,13 @@ pages:
 
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('quotes')
             .select('catchphrase')
             .textSearch('catchphrase', "'fat or cat'",  
               type: TextSearchType.websearch,
               config: 'english'
-            )
-            .execute();
+            );
           ```
 
   .filter():
@@ -2147,44 +2051,40 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")')
-            .execute();
+            .filter('name', 'in', '("Paris","Tokyo")');
           ```
       - name: With `update()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")')
-            .execute();
+            .filter('name', 'in', '("Paris","Tokyo")');
           ```
       - name: With `delete()`
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .delete()
-            .filter('name', 'in', '("Paris","Tokyo")')
-            .execute();
+            .filter('name', 'in', '("Paris","Tokyo")');
           ```
       - name: With `rpc()`
         dart: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
-          final res = await supabase
+          final data = await supabase
             .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .filter('name', 'in', '("Paris","Tokyo")');
           ```
       - name: Filter embedded resources
         dart: |
           ```dart
-          final res = await supabase
+          final data = await supabase
             .from('cities')
             .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")')
-            .execute();
+            .filter('countries.name', 'in', '("France","Japan")');
           ```
