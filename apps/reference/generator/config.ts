@@ -4,7 +4,7 @@ import type { ConfigSpec } from './types/ConfigSpec'
 import * as fs from 'fs'
 import * as ejs from 'ejs'
 import * as yaml from 'js-yaml'
-import { writeToDisk } from './Helpers'
+import { writeToDisk } from './helpers'
 
 type Section = {
   id: string

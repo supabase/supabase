@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as ejs from 'ejs'
 import * as yaml from 'js-yaml'
 import template from './templates/SdkTemplate'
-import { writeToDisk } from './Helpers'
+import { writeToDisk } from './helpers'
 import type { SdkSpec } from './types/SdkSpec'
 
 export default async function gen(inputFileName: string, outputDir: string) {
