@@ -87,13 +87,14 @@ test.each([
   {
     queryType: 'api',
     tableName: undefined,
-    allLog: logDataFixture({
+    tableLog: logDataFixture({
       id: 'some-id',
-      request: { path: 'some-path', method: 'POST' },
+      path: 'some-path',
+      method: 'POST',
       status_code: '400',
       metadata: undefined,
     }),
-    singleLog: {
+    selectionLog: {
       id: 'some-id',
       metadata: [{ request: [{ method: 'POST' }] }],
     },
@@ -103,7 +104,7 @@ test.each([
   // TODO: add more tests for each type of ui
 ])(
   'selection $queryType $tableName , can display log data and metadata',
-  async ({ queryType, tableName, allLog, singleLog, tableTexts, selectionTexts }) => {
+  async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
     get.mockImplementation((url) => {
       // counts
       if (url.includes('count')) {
@@ -111,10 +112,10 @@ test.each([
       }
       // single
       if (url.includes('where+id')) {
-        return { result: [singleLog] }
+        return { result: [selectionLog] }
       }
-      // all
-      return { result: [allLog] }
+      // table
+      return { result: [tableLog] }
     })
     render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 

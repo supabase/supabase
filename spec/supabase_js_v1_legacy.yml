@@ -329,27 +329,26 @@ pages:
     title: 'update()'
     $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
-      User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
-      To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
+      User email: By Default, email updates sends a confirmation link to both the user's current and new email.
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/settings).
 
-
-      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
+      User metadata: It's generally better to store user data in a table within your public schema (i.e., `public.users`).
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
-      - name: Update email for authenticated user.
+      - name: Update the email for an authenticated user
         description: Sends a "Confirm Email Change" email to the new email address.
         isSpotlight: true
         js: |
           ```js
           const { user, error } = await supabase.auth.update({email: 'new@email.com'})
           ```
-      - name: Update password for authenticated user.
+      - name: Update the password for an authenticated user
         isSpotlight: true
         js: |
           ```js
           const { user, error } = await supabase.auth.update({password: 'new password'})
           ```
-      - name: Update a user's metadata.
+      - name: Update the user's metadata
         isSpotlight: true
         js: |
           ```js
@@ -646,7 +645,7 @@ pages:
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
-      - name: Generate invite link.
+      - name: Generate an invite link
         isSpotlight: false
         js: |
           ```js

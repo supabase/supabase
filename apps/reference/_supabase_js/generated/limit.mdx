@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Limits the result with the specified `count`.
+Limit the query result by `count`.
 
 ```js
 const { data, error } = await supabase
@@ -35,7 +35,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The maximum no. of rows to limit to.
+The maximum number of rows to return
 
   </div>
   
@@ -44,7 +44,7 @@ The maximum no. of rows to limit to.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      foreignTable
+      options
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -55,7 +55,7 @@ The maximum no. of rows to limit to.
   </h4>
   <div class="method-list-item-description">
 
-The foreign table to use (for foreign columns).
+Named parameters
 
   </div>
   
@@ -76,7 +76,8 @@ The foreign table to use (for foreign columns).
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Set this to limit rows of foreign tables
+instead of the current table
 
   </div>
   

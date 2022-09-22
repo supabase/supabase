@@ -288,23 +288,23 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
-      - Email updates will send an email to both the user's current and new email with a confirmation link by default.
-      To only send a single confirmation link to the user's new email, you can toggle the "Secure email change" setting in [your project](https://app.supabase.com/project/_/auth/settings).
+      - By Default, email updates sends a confirmation link to both the user's current and new email.
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/settings).
     examples:
-      - name: Update the email of an authenticated user
+      - name: Update the email for an authenticated user
         description: Sends a "Confirm Email Change" email to the new email address.
         isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
-      - name: Update the password of an authenticated user
+      - name: Update the password for an authenticated user
         isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
-      - name: Update the user's metadata.
+      - name: Update the user's metadata
         isSpotlight: true
         js: |
           ```js
@@ -565,7 +565,7 @@ pages:
             type: 'recovery',
             email: 'email@example.com'
           })
-          ``` 
+          ```
       - name: Generate a link to change email addresses
         isSpotlight: false
         js: |
@@ -575,7 +575,7 @@ pages:
             email: 'old.email@example.com',
             newEmail: 'new.email@example.com'
           })
-          ```           
+          ```
 
   auth.admin.updateUserById():
     title: 'updateUserById()'
@@ -634,62 +634,6 @@ pages:
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { phone_confirm: true }
           )
-          ```
-  invoke():
-    title: 'invoke()'
-    description: |
-      Invokes a Supabase Function.
-    $ref: '@supabase/functions-js.index.FunctionsClient.invoke'
-    notes: |
-      - Requires an Authorization header.
-      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
-      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
-      - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
-    examples:
-      - name: Basic invocation.
-        description:
-        isSpotlight: true
-        js: |
-          ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
-            body: { foo: 'bar' }
-          })
-          ```
-      - name: Error handling.
-        description: |
-          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
-        isSpotlight: true
-        js: |
-          ```js
-          import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
-
-          const { data: user, error } = await supabase.functions.invoke('hello', {
-            headers: {
-              "my-custom-header": 'my-custom-header-value'
-            },
-            body: { foo: 'bar' }
-          })
-
-          if (error instanceof FunctionsHttpError) {
-            console.log('Function returned an error', error.message)
-          } else if (error instanceof FunctionsRelayError) {
-            console.log('Relay error:', error.message)
-          } else if (error instanceof FunctionsFetchError) {
-            console.log('Fetch error:', error.message)
-          }
-          ```
-      - name: Passing custom headers.
-        description: |
-          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
-        isSpotlight: true
-        js: |
-          ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
-            headers: {
-              "my-custom-header": 'my-custom-header-value'
-            },
-            body: { foo: 'bar' }
-          })
           ```
 
   select():
@@ -1031,6 +975,1161 @@ pages:
             .rpc('hello_world', {}, { count: 'exact' })
           ```
 
+  Using Filters:
+    description: |
+      Filters can be used on `select()`, `update()`, and `delete()` queries.
+
+      If a Postgres function returns a table response, you can also apply filters.
+
+      ### Applying Filters
+
+      You must apply your filters to the end of your query. For example:
+
+      ```js
+      const { data, error } = await supabase
+        .from('cities')
+        .select('name, country_id')
+        .eq('name', 'The Shire')    // Correct
+
+      const { data, error } = await supabase
+        .from('cities')
+        .eq('name', 'The Shire')    // Incorrect
+        .select('name, country_id')
+      ```
+
+      ### Chaining
+
+      Filters can be chained together to produce advanced queries. For example:
+
+      ```js
+      const { data, error } = await supabase
+        .from('cities')
+        .select('name, country_id')
+        .gte('population', 1000)
+        .lt('population', 10000)
+      ```
+
+      ### Conditional Chaining
+
+      Filters can be built up one step at a time and then executed. For example:
+
+      ```js
+      const filterByName = null
+      const filterPopLow = 1000
+      const filterPopHigh = 10000
+
+      let query = supabase
+        .from('cities')
+        .select('name, country_id')
+
+      if (filterByName)  { query = query.eq('name', filterByName) }
+      if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+      if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+
+      const { data, error } = await query
+      ```
+
+  eq():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The shire')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .eq('name', 'San Francisco')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .eq('name', 'Mordor')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .eq('name', 'San Francisco')
+          ```
+
+  neq():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .neq('name', 'The shire')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .neq('name', 'San Francisco')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .neq('name', 'Mordor')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .neq('name', 'Lagos')
+          ```
+
+  gt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gt('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .gt('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .gt('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .gt('country_id', 250)
+          ```
+
+  gte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .gte('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .gte('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .gte('country_id', 250)
+          ```
+
+  lt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lt('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .lt('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .lt('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .lt('country_id', 250)
+          ```
+
+  lte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lte('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .lte('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .lte('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .lte('country_id', 250)
+          ```
+
+  like():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .like('name', '%la%')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .like('name', '%la%')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .like('name', '%la%')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .like('name', '%la%')
+          ```
+
+  ilike():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .ilike('name', '%la%')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .ilike('name', '%la%')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .ilike('name', '%la%')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .ilike('name', '%la%')
+          ```
+
+  is():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .is('name', null)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .is('name', null)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .is('name', null)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .is('name', null)
+          ```
+
+  in():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+
+  contains():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
+    notes: |
+      - `.contains()` can work on array columns or range columns.
+        It is very useful for finding rows where a tag array contains all the values in the filter array.
+
+        ```js
+        .contains('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .contains('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .contains('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .contains('rangecol',`(${arr}]`) // You can insert an array into a string.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .contains('main_exports', ['oil'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .contains('main_exports', ['oil'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .contains('main_exports', ['oil'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .contains('main_exports', ['oil'])
+          ```
+
+  containedBy():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
+    notes: |
+      - `.containedBy()` can work on array columns or range columns.
+
+        ```js
+        .containedBy('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .containedBy('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .containedBy('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+          ```
+
+  rangeGt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+
+  rangeGte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+
+  rangeLt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+
+  rangeLte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+
+  rangeAdjacent():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+
+  overlaps():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
+    notes: |
+      - `.overlaps()` can work on array columns or range columns.
+
+        ```js
+        .overlaps('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .overlaps('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .overlaps('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .overlaps('rangecol',`(${arr}]`)  // You can insert an array into a string.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          let countries = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+
+  textSearch():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
+    examples:
+      - name: Text search
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              config: 'english'
+            })
+          ```
+      - name: Basic normalization
+        description: Uses PostgreSQL's `plainto_tsquery` function.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              type: 'plain',
+              config: 'english'
+            })
+          ```
+      - name: Full normalization
+        description: Uses PostgreSQL's `phraseto_tsquery` function.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              type: 'phrase',
+              config: 'english'
+            })
+          ```
+      - name: Websearch
+        description: |
+          Uses PostgreSQL's `websearch_to_tsquery` function.
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
+          with advanced operators.
+
+          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `OR`: the word “or” will be converted to the | operator.
+          - `-`: a dash will be converted to the ! operator.
+
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat or cat'`, {
+              type: 'websearch',
+              config: 'english'
+            })
+          ```
+
+  match():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .match({name: 'Beijing', country_id: 156})
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .match({name: 'Beijing', country_id: 156})
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .match({name: 'Beijing', country_id: 156})
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .match({name: 'Beijing', country_id: 156})
+          ```
+
+  not():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
+    notes: |
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```js
+          .not('name','eq','Paris')
+          .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+          .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .not('id','in','(6,7)')  // Use Postgres list () for in filter.
+          .not('id','in',`(${arr})`)  // You can insert a javascript array.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .not('name', 'eq', 'Paris')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .not('name', 'eq', 'Paris')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .not('name', 'eq', 'Paris')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .not('name', 'eq', 'Paris')
+          ```
+
+  or():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
+    notes: |
+      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```js
+        .or('id.in.(6,7), arraycol.cs.{"a","b"}')  // Use Postgres list () for in filter. Array {} for array column and 'cs' for contains.
+        .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a javascipt array for list or array on array column.
+        .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.eq.20,id.eq.30')
+          ```
+      - name: Use `or` with `and`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+          ```
+      - name: Use `or` on foreign tables
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('id, cities(*)')
+            .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+          ```
+
+  filter():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
+    notes: |
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+        ```js
+          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .filter('id','in','(6,7)')  // Use Postgres list () for in filter.
+          .filter('id','in',`(${arr})`)  // You can insert a javascript array.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: Filter embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries ( name )')
+            .filter('countries.name', 'in', '("France","Japan")')
+          ```
+
+  Using Modifiers:
+    description: |
+      Modifiers can be used on `select()` queries.
+
+      If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
+
+  db.modifiers.select():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+    title: select()
+
+  order():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name', 'country_id')
+            .order('id', { ascending: false })
+          ```
+      - name: With embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .order('name', {foreignTable: 'cities'})
+          ```
+
+  limit():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .limit(1)
+          ```
+      - name: With embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .limit(1, { foreignTable: 'cities' })
+          ```
+
+  range():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.range'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .range(0,3)
+          ```
+
+  db.abortSignal():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
+    title: abortSignal()
+
+  single():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .limit(1)
+            .single()
+          ```
+
+  maybeSingle():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'Singapore')
+            .maybeSingle()
+          ```
+
+  db.csv():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
+    title: csv()
+
+  db.geojson():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
+    title: geojson()
+
+  db.explain():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+    title: explain()
+
+  db.rollback():
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
+    title: rollback()
+
+  invoke():
+    title: 'invoke()'
+    description: |
+      Invoke a Supabase Function.
+    $ref: '@supabase/functions-js.index.FunctionsClient.invoke'
+    notes: |
+      - Requires an Authorization header.
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
+    examples:
+      - name: Basic invocation.
+        description:
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            body: { foo: 'bar' }
+          })
+          ```
+      - name: Error handling.
+        description: |
+          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
+        isSpotlight: true
+        js: |
+          ```js
+          import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            body: { foo: 'bar' }
+          })
+
+          if (error instanceof FunctionsHttpError) {
+            console.log('Function returned an error', error.message)
+          } else if (error instanceof FunctionsRelayError) {
+            console.log('Relay error:', error.message)
+          } else if (error instanceof FunctionsFetchError) {
+            console.log('Fetch error:', error.message)
+          }
+          ```
+      - name: Passing custom headers.
+        description: |
+          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            body: { foo: 'bar' }
+          })
+          ```
+
   subscribe():
     title: 'on().subscribe()'
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
@@ -1128,6 +2227,17 @@ pages:
             .subscribe()
           ```
 
+  getChannels():
+    title: 'getChannels()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
+    examples:
+      - name: Get all channels
+        isSpotlight: true
+        js: |
+          ```js
+          const channels = supabase.getChannels()
+          ```
+
   removeChannel():
     title: 'removeChannel()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
@@ -1152,17 +2262,6 @@ pages:
         js: |
           ```js
           supabase.removeAllChannels()
-          ```
-
-  getChannels():
-    title: 'getChannels()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
-    examples:
-      - name: Get all channels
-        isSpotlight: true
-        js: |
-          ```js
-          const channels = supabase.getChannels()
           ```
 
   storage.listBuckets():
@@ -1512,1078 +2611,4 @@ pages:
               sortBy: { column: 'name', order: 'asc' },
               search: 'jon'
             })
-          ```
-
-  Using Modifiers:
-    description: |
-      Modifiers can be used on `select()` queries.
-
-      If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
-
-  limit():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.limit'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .limit(1)
-          ```
-      - name: With embedded resources
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
-            .limit(1, { foreignTable: 'cities' })
-          ```
-
-  order():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.order'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name', 'country_id')
-            .order('id', { ascending: false })
-          ```
-      - name: With embedded resources
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
-            .order('name', {foreignTable: 'cities'})
-          ```
-
-  range():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.range'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .range(0,3)
-          ```
-
-  single():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.single'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .limit(1)
-            .single()
-          ```
-
-  maybeSingle():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.maybeSingle'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'Singapore')
-            .maybeSingle()
-          ```
-
-  Using Filters:
-    description: |
-      Filters can be used on `select()`, `update()`, and `delete()` queries.
-
-      If a Postgres function returns a table response, you can also apply filters.
-
-      ### Applying Filters
-
-      You must apply your filters to the end of your query. For example:
-
-      ```js
-      const { data, error } = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .eq('name', 'The Shire')    // Correct
-
-      const { data, error } = await supabase
-        .from('cities')
-        .eq('name', 'The Shire')    // Incorrect
-        .select('name, country_id')
-      ```
-
-      ### Chaining
-
-      Filters can be chained together to produce advanced queries. For example:
-
-      ```js
-      const { data, error } = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .gte('population', 1000)
-        .lt('population', 10000)
-      ```
-
-      ### Conditional Chaining
-
-      Filters can be built up one step at a time and then executed. For example:
-
-      ```js
-      const filterByName = null
-      const filterPopLow = 1000
-      const filterPopHigh = 10000
-
-      let query = supabase
-        .from('cities')
-        .select('name, country_id')
-
-      if (filterByName)  { query = query.eq('name', filterByName) }
-      if (filterPopLow)  { query = query.gte('population', filterPopLow) }
-      if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
-
-      const { data, error } = await query
-      ```
-
-  .or():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
-    notes: |
-      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```js
-        .or('id.in.(6,7), arraycol.cs.{"a","b"}')  // Use Postgres list () for in filter. Array {} for array column and 'cs' for contains.
-        .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a javascipt array for list or array on array column.
-        .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
-        ```
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.eq.20,id.eq.30')
-          ```
-      - name: Use `or` with `and`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
-          ```
-      - name: Use `or` on foreign tables
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('id, cities(*)')
-            .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
-          ```
-
-  .not():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
-    notes: |
-      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```js
-          .not('name','eq','Paris')
-          .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
-          .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-          .not('id','in','(6,7)')  // Use Postgres list () for in filter.
-          .not('id','in',`(${arr})`)  // You can insert a javascript array.
-        ```
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .not('name', 'eq', 'Paris')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .not('name', 'eq', 'Paris')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .not('name', 'eq', 'Paris')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .not('name', 'eq', 'Paris')
-          ```
-
-  .match():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .match({name: 'Beijing', country_id: 156})
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .match({name: 'Beijing', country_id: 156})
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .match({name: 'Beijing', country_id: 156})
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .match({name: 'Beijing', country_id: 156})
-          ```
-
-  .eq():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The shire')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .eq('name', 'San Francisco')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .eq('name', 'Mordor')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .eq('name', 'San Francisco')
-          ```
-
-  .neq():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .neq('name', 'The shire')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .neq('name', 'San Francisco')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .neq('name', 'Mordor')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .neq('name', 'Lagos')
-          ```
-
-  .gt():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gt('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .gt('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .gt('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .gt('country_id', 250)
-          ```
-
-  .gte():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gte('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .gte('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .gte('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .gte('country_id', 250)
-          ```
-
-  .lt():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lt('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .lt('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .lt('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .lt('country_id', 250)
-          ```
-
-  .lte():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lte('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .lte('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .lte('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .lte('country_id', 250)
-          ```
-
-  .like():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .like('name', '%la%')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .like('name', '%la%')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .like('name', '%la%')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .like('name', '%la%')
-          ```
-
-  .ilike():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .ilike('name', '%la%')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .ilike('name', '%la%')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .ilike('name', '%la%')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .ilike('name', '%la%')
-          ```
-
-  .is():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .is('name', null)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .is('name', null)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .is('name', null)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .is('name', null)
-          ```
-
-  .in():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-
-  .contains():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
-    notes: |
-      - `.contains()` can work on array columns or range columns.
-        It is very useful for finding rows where a tag array contains all the values in the filter array.
-
-        ```js
-        .contains('arraycol',["a","b"]) // You can use a javascript array for an array column
-        .contains('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
-        .contains('rangecol','(1,2]') // Use Postgres range syntax for range column.
-        .contains('rangecol',`(${arr}]`) // You can insert an array into a string.
-        ```
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .contains('main_exports', ['oil'])
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .contains('main_exports', ['oil'])
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .contains('main_exports', ['oil'])
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .contains('main_exports', ['oil'])
-          ```
-
-  .containedBy():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
-    notes: |
-      - `.containedBy()` can work on array columns or range columns.
-
-        ```js
-        .containedBy('arraycol',["a","b"]) // You can use a javascript array for an array column
-        .containedBy('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
-        .containedBy('rangecol','(1,2]') // Use Postgres range syntax for range column.
-        .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
-        ```
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
-          ```
-
-  .rangeLt():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeLt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeLt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeLt('population_range_millions', '[150, 250]')
-          ```
-
-  .rangeGt():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeGt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeGt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeGt('population_range_millions', '[150, 250]')
-          ```
-
-  .rangeGte():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeGte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeGte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeGte('population_range_millions', '[150, 250]')
-          ```
-
-  .rangeLte():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeLte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeLte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeLte('population_range_millions', '[150, 250]')
-          ```
-
-  .rangeAdjacent():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-          ```
-
-  .overlaps():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
-    notes: |
-      - `.overlaps()` can work on array columns or range columns.
-
-        ```js
-        .overlaps('arraycol',["a","b"]) // You can use a javascript array for an array column
-        .overlaps('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
-        .overlaps('rangecol','(1,2]') // Use Postgres range syntax for range column.
-        .overlaps('rangecol',`(${arr}]`)  // You can insert an array into a string.
-        ```
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .overlaps('main_exports', ['computers', 'minerals'])
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          let countries = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .overlaps('main_exports', ['computers', 'minerals'])
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .overlaps('main_exports', ['computers', 'minerals'])
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .overlaps('main_exports', ['computers', 'minerals'])
-          ```
-
-  .textSearch():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
-    examples:
-      - name: Text search
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, {
-              config: 'english'
-            })
-          ```
-      - name: Basic normalization
-        description: Uses PostgreSQL's `plainto_tsquery` function.
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, {
-              type: 'plain',
-              config: 'english'
-            })
-          ```
-      - name: Full normalization
-        description: Uses PostgreSQL's `phraseto_tsquery` function.
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, {
-              type: 'phrase',
-              config: 'english'
-            })
-          ```
-      - name: Websearch
-        description: |
-          Uses PostgreSQL's `websearch_to_tsquery` function.
-          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
-          with advanced operators.
-
-          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
-          - `OR`: the word “or” will be converted to the | operator.
-          - `-`: a dash will be converted to the ! operator.
-
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', `'fat or cat'`, {
-              type: 'websearch',
-              config: 'english'
-            })
-          ```
-
-  .filter():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
-    notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
-        ```js
-          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
-          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-          .filter('id','in','(6,7)')  // Use Postgres list () for in filter.
-          .filter('id','in',`(${arr})`)  // You can insert a javascript array.
-        ```
-    examples:
-      - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .filter('name', 'in', '("Paris","Tokyo")')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")')
-          ```
-      - name: Filter embedded resources
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")')
           ```
