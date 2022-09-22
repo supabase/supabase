@@ -230,20 +230,6 @@ const sidebars = {
         'guides/integrations/vercel',
       ],
     },
-    {
-      type: 'category',
-      label: 'See Also',
-      collapsed: true,
-      items: [
-        'faq',
-        'handbook/contributing',
-        'handbook/supasquad',
-        'company/terms',
-        'company/privacy',
-        'company/aup',
-        'company/sla',
-      ],
-    },
   ],
   reference: [
     {
