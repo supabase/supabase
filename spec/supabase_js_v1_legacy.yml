@@ -195,11 +195,11 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
       - `setSession()` takes in a refresh token and uses it to refresh the session.
-      - Typically a refresh token can be used only once to obtain a new access token, however in practice each refresh token can be used multiple times within a time window that can be configured via the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) configuration variable. You can disable this by configuring [`REFRESH_TOKEN_ROTATION_ENABLED`](/docs/reference/auth/config#refresh_token_rotation_enabled)).
-      - When used in a server-side rendering context this method will generate a new refresh and access token on the server which will not match new ones issued in the browser. It is thus important that the `REFRESH_TOKEN_REUSE_INTERVAL` is sufficiently long to allow the browser to successfully reuse a refresh token in the browser context too.
+      - Typically, a refresh token can only be used once to obtain a new access token. However, each refresh token can be used multiple times within a time interval that can be configured with the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) variable. You can disable this by configuring [`REFRESH_TOKEN_ROTATION_ENABLED`](/docs/reference/auth/config#refresh_token_rotation_enabled)).
+      - When used in a server-side rendering context, this method generates a new refresh and access token on the server which will not match new ones issued in the browser. The `REFRESH_TOKEN_REUSE_INTERVAL` must be sufficiently long to allow the browser to successfully reuse a refresh token in the browser context.
     examples:
       - name: Refresh the session
-        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+        description: Sets the session data from refresh_token and returns the current session or an error if the refresh_token is invalid.
         isSpotlight: true
         js: |
           ```js
