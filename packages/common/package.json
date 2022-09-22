@@ -5,11 +5,11 @@
   "types": "./index.tsx",
   "license": "MIT",
   "dependencies": {
-    "@headlessui/react": "^1.5.0",
-    "@supabase/ui": "^0.37.0-alpha.50"
+    "@headlessui/react": "^1.4.1",
+    "@supabase/ui": "0.37.0-alpha.80"
   },
   "devDependencies": {
-    "@types/react": "^17.0.37",
+    "@types/react": "17.0.11",
     "@types/react-dom": "^17.0.11",
     "config": "*",
     "tsconfig": "*",
