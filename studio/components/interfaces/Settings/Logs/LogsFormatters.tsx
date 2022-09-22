@@ -6,7 +6,17 @@
 
 import { IconAlertCircle, IconInfo } from '@supabase/ui'
 import dayjs from 'dayjs'
+import React from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+
+export const RowLayout: React.FC = ({ children }) => (
+  <div className="flex h-full w-full items-center gap-4">{children}</div>
+)
+
+export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
+  value,
+  className,
+}) => <span className={'font-mono text-xs truncate ' + className}>{value}</span>
 
 export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
@@ -109,6 +119,9 @@ export const SeverityFormatter = ({
 
   const uppercasedValue = value.toUpperCase()
   const text = uppercase ? uppercasedValue : value
+  const Layout: React.FC<{ className?: string }> = ({ className, children }) => (
+    <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
+  )
 
   switch (uppercasedValue) {
     case 'UNCAUGHTEXCEPTION':
@@ -116,12 +129,12 @@ export const SeverityFormatter = ({
     case 'FATAL':
     case 'ERROR':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-red-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-red-900 !block titlecase">{text}</span>
-        </div>
+        </Layout>
       )
       break
 
@@ -129,45 +142,45 @@ export const SeverityFormatter = ({
 
     case 'DEBUG':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
-        </div>
+        </Layout>
       )
       break
 
     case 'LOG':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
             <IconInfo size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
-        </div>
+        </Layout>
       )
       break
 
     case 'WARNING':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-amber-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-amber-900 !block titlecase">{text}</span>
-        </div>
+        </Layout>
       )
       break
 
     // All other responses
     default:
       return (
-        <div className="flex items-center h-full">
+        <Layout>
           <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
             <label className="block font-mono text-sm text-scale-900">{text}</label>
           </div>
-        </div>
+        </Layout>
       )
       break
   }
