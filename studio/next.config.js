@@ -1,3 +1,6 @@
+// this is required to use shared packages in the packages directory
+const withTM = require('next-transpile-modules')(['common'])
+
 const { withSentryConfig } = require('@sentry/nextjs')
 const withPlugins = require('next-compose-plugins')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -65,7 +68,9 @@ const nextConfig = {
 }
 
 // Export all config
-const moduleExports = withPlugins([[withBundleAnalyzer({})]], nextConfig)
+const plugins = [[withBundleAnalyzer({})], withTM()]
+
+const moduleExports = withPlugins(plugins, nextConfig)
 
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
@@ -85,4 +90,4 @@ const sentryWebpackPluginOptions = {
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-    : nextConfig
+    : withPlugins([withTM()], nextConfig)
