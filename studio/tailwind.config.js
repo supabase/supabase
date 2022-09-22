@@ -1,28 +1,4 @@
-const ui = require('@supabase/ui/dist/config/ui.config.js')
-
-// const gray = {
-//   100: '#eeeeee',
-//   200: '#e0e0e0',
-//   300: '#bbbbbb',
-//   400: '#666666',
-//   500: '#444444',
-//   650: '#333',
-//   600: '#2a2a2a',
-//   700: '#1f1f1f',
-//   800: '#181818',
-//   900: '#0f0f0f',
-// }
-// const green = {
-//   100: '#c5f1dd',
-//   200: '#c5f1dd',
-//   300: '#9fe7c7',
-//   400: '#65d9a5',
-//   500: '#24b47e',
-//   600: '#38bc81',
-//   700: '#1c8656',
-//   800: '#10633e',
-//   900: '#10633e',
-// }
+const ui = require('./../packages/config/ui.config.js')
 
 const blueGray = {
   50: '#F8FAFC',
@@ -60,10 +36,10 @@ module.exports = ui({
     './lib/**/*.{js,ts,jsx,tsx}',
     './lib/**/**/*.{js,ts,jsx,tsx}',
     // purge styles from supabase ui theme
-    './node_modules/@supabase/ui/dist/config/default-theme.js',
+    './../node_modules/@supabase/ui/dist/config/default-theme.js',
     // purge styles from grid library
-    './node_modules/@supabase/grid/src/components/**/*.{js,ts,jsx,tsx}',
-    './node_modules/@supabase/grid/src/components/**/**/*.{js,ts,jsx,tsx}',
+    './../node_modules/@supabase/grid/src/components/**/*.{js,ts,jsx,tsx}',
+    './../node_modules/@supabase/grid/src/components/**/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     // maxHeight: {
