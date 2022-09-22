@@ -808,9 +808,9 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final List<Bucket> buckets = await supabase
             .storage
-            .listBuckets()
+            .listBuckets();
           ```
 
   storage.getBucket():
@@ -827,9 +827,9 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final Bucket bucket = await supabase
             .storage
-            .getBucket('avatars')
+            .getBucket('avatars');
           ```
 
   storage.createBucket():
@@ -845,7 +845,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final String bucketId = await supabase
             .storage
             .createBucket('avatars');
           ```
@@ -863,7 +863,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final String result = await supabase
             .storage
             .emptyBucket('avatars');
           ```
@@ -882,7 +882,7 @@ pages:
           ```dart
           final res = await supabase
             .storage
-            .updateBucket('avatars', { public: false });
+            .updateBucket('avatars', const BucketOptions(public: false));
           ```
 
   storage.deleteBucket():
@@ -898,7 +898,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final String result = await supabase
             .storage
             .deleteBucket('avatars');
           ```
@@ -918,13 +918,11 @@ pages:
         dart: |
           ```dart
           final avatarFile = File('path/to/file');
-          final res = await supabase
-            .storage
-            .from('avatars')
-            .upload('public/avatar1.png', avatarFile, fileOptions: FileOptions(
-              cacheControl: '3600',
-              upsert: false
-            ));
+          final String path = await supabase.storage.from('avatars').upload(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
           ```
 
   storage.from.update():
@@ -940,14 +938,12 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final avatarFile = File('path/to/file');
-          final res = await supabase
-            .storage
-            .from('avatars')
-            .update('public/avatar1.png', avatarFile, fileOptions: FileOptions(
-              cacheControl: '3600',
-              upsert: false
-            ));
+          final avatarFile = File('path/to/local/file');
+          final String path = await supabase.storage.from('avatars').update(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
           ```
 
   storage.from.move():
@@ -963,7 +959,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final String result = await supabase
             .storage
             .from('avatars')
             .move('public/avatar1.png', 'private/avatar2.png');
@@ -982,12 +978,10 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUrl('avatar1.png', 60);
-
-          final signedURL = res.data;
+            final String signedUrl = await supabase
+              .storage
+              .from('avatars')
+              .createSignedUrl('avatar1.png', 60);
           ```
 
   storage.from.getPublicUrl():
@@ -1004,12 +998,10 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = supabase
-            .storage
-            .from('public-bucket')
-            .getPublicUrl('avatar1.png');
-
-          final publicURL = res.data;
+            final String publicUrl = supabase
+              .storage
+              .from('public-bucket')
+              .getPublicUrl('avatar1.png');
           ```
 
   storage.from.download():
@@ -1025,7 +1017,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final Uint8List file = await supabase
             .storage
             .from('avatars')
             .download('avatar1.png');
@@ -1044,7 +1036,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final List<FileObject> objects = await supabase
             .storage
             .from('avatars')
             .remove(['avatar1.png']);
@@ -1063,7 +1055,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final res = await supabase
+          final List<FileObject> objects = await supabase
             .storage
             .from('avatars')
             .list();
