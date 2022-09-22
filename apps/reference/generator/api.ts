@@ -1,10 +1,8 @@
 import template from './templates/ApiTemplate'
-import { slugify, toArrayWithKey, toTitle } from './helpers'
+import { slugify, toArrayWithKey, toTitle, writeToDisk } from './helpers'
 import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
-const fs = require('fs')
-const ejs = require('ejs')
-const Helpers = require('./Helpers')
-const { writeToDisk } = Helpers
+import * as fs from 'fs'
+import * as ejs from 'ejs'
 
 export default async function gen(
   inputFileName: string,
