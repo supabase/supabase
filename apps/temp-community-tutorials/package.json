@@ -9,19 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "colorette": "^1.4.0",
-    "common": "*",
     "next": "12.0.8",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "common": "*"
   },
   "devDependencies": {
-    "@types/node": "^17.0.12",
-    "@types/react": "17.0.37",
     "config": "*",
     "eslint": "7.32.0",
     "next-transpile-modules": "9.0.0",
     "tsconfig": "*",
+    "@types/node": "^17.0.12",
+    "@types/react": "17.0.37",
     "typescript": "^4.5.3"
   }
 }
