@@ -1,9 +1,8 @@
-<p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
-</p>
+![main image](https://user-images.githubusercontent.com/8291514/191737114-3b8e4985-7b91-4fc9-92ce-3106915e0a06.png)
 
 ---
+
+
 
 # Supabase
 
@@ -58,7 +57,7 @@ Supabase is a combination of open source tools. We’re building the features of
 Supabase is a [hosted platform](https://app.supabase.com). You can sign up and start using Supabase without installing anything.
 You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
-![Architecture diagram](https://user-images.githubusercontent.com/8291514/191536900-c4c2f455-093a-4bc2-a1ea-5d1674dc1afa.png)
+![diagram (1)](https://user-images.githubusercontent.com/8291514/191737181-22e6a111-817d-403b-8c3f-489279a2a7da.png)
 
 ![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
