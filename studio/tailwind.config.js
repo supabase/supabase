@@ -60,10 +60,10 @@ module.exports = ui({
     './lib/**/*.{js,ts,jsx,tsx}',
     './lib/**/**/*.{js,ts,jsx,tsx}',
     // purge styles from supabase ui theme
-    './node_modules/@supabase/ui/dist/config/default-theme.js',
+    './../node_modules/@supabase/ui/dist/config/default-theme.js',
     // purge styles from grid library
-    './node_modules/@supabase/grid/src/components/**/*.{js,ts,jsx,tsx}',
-    './node_modules/@supabase/grid/src/components/**/**/*.{js,ts,jsx,tsx}',
+    './../node_modules/@supabase/grid/src/components/**/*.{js,ts,jsx,tsx}',
+    './../node_modules/@supabase/grid/src/components/**/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     // maxHeight: {
