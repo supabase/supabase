@@ -176,7 +176,7 @@
         ]
       },
       "post": {
-        "operationId": "createOrganization_",
+        "operationId": "createOrganization",
         "summary": "Create an organization",
         "parameters": [],
         "requestBody": {
