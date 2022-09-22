@@ -11,17 +11,28 @@ const GetStartedPanel: FC<Props> = ({}) => {
   const { ref } = router.query
   return (
     <>
-      <div className="flex flex-col space-y-6">
-        <div>
-          <div className="flex flex-col justify-between h-full space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-xl text-scale-1200">Welcome to your new project</h3>
-              <p className="lg:max-w-lg text-base text-scale-1000">
-                Your project has been deployed on its own instance, with its own url and API all set
-                up and ready to use.
-              </p>
-            </div>
+      <div className="flex flex-col space-y-20">
+        <div className="flex flex-col justify-between h-full space-y-6">
+          <div className="space-y-2">
+            <h3 className="text-xl text-scale-1200">Welcome to your new project</h3>
+            <p className="text-base text-scale-1000">
+              Your project has been deployed on its own instance, with its own API all set up and
+              ready to use.
+            </p>
           </div>
+        </div>
+
+        <div className="grid grid-cols-12 flex">
+          <div className="col-span-7 space-y-2">
+            <h4 className="text-lg text-scale-1200">Get started by building out your database</h4>
+            <p className="text-base text-scale-1000">
+              Start building your app by creating tables and inserting some data. Our table editor
+              makes Postgres as easy to use as a spreadsheet, but there's also our SQL editor if you
+              need something more.
+            </p>
+          </div>
+          <div className="col-span-1" />
+          <div className="col-span-4">Hello</div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
