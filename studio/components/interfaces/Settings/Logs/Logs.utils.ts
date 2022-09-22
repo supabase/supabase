@@ -186,6 +186,8 @@ export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, str
     trunc = 'day'
     extendValue = 7
   }
+  //
+  // @ts-ignore
   return [its.add(-extendValue, trunc), trunc]
 }
 
