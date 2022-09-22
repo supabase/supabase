@@ -1,6 +1,5 @@
 // this is required to use shared packages in the packages directory
 const withTM = require('next-transpile-modules')(['common'])
-
 const { withSentryConfig } = require('@sentry/nextjs')
 const withPlugins = require('next-compose-plugins')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
