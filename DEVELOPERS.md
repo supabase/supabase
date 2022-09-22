@@ -103,9 +103,9 @@ The format is: `npm install <package name> -w=<workspace to install in>`.
 
 For example:
 
-- `npm install @supabase/ui -w common`: installs into `./packages/common`
-- `npm install @supabase/ui -w www`: installs into `./apps/www`
-- `npm install @supabase/ui -w studio`: installs into `./studio`
+- `npm install react -w common`: installs into `./packages/common`
+- `npm install react -w www`: installs into `./apps/www`
+- `npm install react -w studio`: installs into `./studio`
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
