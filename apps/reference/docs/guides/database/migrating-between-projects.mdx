@@ -8,24 +8,27 @@ Migrating projects can be achieved using standard PostgreSQL tooling. This is pa
 
 ## Before you begin
 
-- Make sure [Postgres](https://www.postgresql.org/download/) is installed so you can run `psql` and `pg_dump`.
-- Create a new Supabase project.
-- If you enabled Database Webhooks on your old project, enable it on your new project.
+- Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
+- Create a new [Supabase project](https://app.supabase.com).
+- Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) in your new project if you enabled them in your old project.
 - Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
 
 ## Migrate the database
 
-1. Run `ALTER ROLE postgres SUPERUSER` in the _old_ project's SQL editor
-2. Run `pg_dump --clean --if-exists --quote-all-identifiers -h $OLD_DB_URL -U postgres > dump.sql` from your terminal
-3. Run `ALTER ROLE postgres NOSUPERUSER` in the _old_ project's SQL editor
-4. Run `ALTER ROLE postgres SUPERUSER` in the _new_ project's SQL editor
-5. Run `psql -h $NEW_DB_URL -U postgres -f dump.sql` from your terminal
-6. Run `TRUNCATE storage.objects` in the _new_ project's SQL editor
-7. Run `ALTER ROLE postgres NOSUPERUSER` in the _new_ project's SQL editor
+In your old project:
+1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+1. Run `pg_dump --clean --if-exists --quote-all-identifiers -h $OLD_DB_URL -U postgres > dump.sql` from your terminal.
+1. Run `ALTER ROLE postgres NOSUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+
+In your new project:
+1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+1. Run `psql -h $NEW_DB_URL -U postgres -f dump.sql` from your terminal.
+1. Run `TRUNCATE storage.objects` in the [SQL editor](https://app.supabase.com/project/_/sql).
+1. Run `ALTER ROLE postgres NOSUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
 
 ## Migrate storage objects
 
-This script moves storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.io](mailto:support@supabase.io).
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.io](mailto:support@supabase.io).
 
 ```js
 const { createClient } = require('@supabase/supabase-js')
@@ -92,6 +95,3 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 })()
 ```
 
-## Caveats
-
-- The new project will have the old project's Storage buckets, but not the objects. You will need to migrate Storage objects manually.
