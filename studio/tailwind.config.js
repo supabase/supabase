@@ -1,4 +1,4 @@
-const ui = require('@supabase/ui/dist/config/ui.config.js')
+const ui = require('./../node_modules/@supabase/ui/dist/config/ui.config.js')
 
 // const gray = {
 //   100: '#eeeeee',
