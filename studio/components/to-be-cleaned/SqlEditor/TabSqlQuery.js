@@ -78,6 +78,7 @@ const TabSqlQuery = observer(() => {
         <MonacoEditor
           error={sqlEditorStore.activeTab.sqlQueryError}
           updateSqlSnippet={updateSqlSnippet}
+          setUpdatingRequired={contentStore.setUpdatingRequired.bind(contentStore)}
         />
         <div>
           <UtilityPanel updateSqlSnippet={updateSqlSnippet} />
@@ -88,7 +89,7 @@ const TabSqlQuery = observer(() => {
 })
 export default TabSqlQuery
 
-const MonacoEditor = ({ error, updateSqlSnippet }) => {
+const MonacoEditor = ({ error, updateSqlSnippet, setUpdatingRequired }) => {
   const sqlEditorStore = useSqlStore()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
@@ -172,6 +173,10 @@ const MonacoEditor = ({ error, updateSqlSnippet }) => {
     // update sqlEditorStore with new value immediately
     // this is so any SQL run will be whatever is currently in monaco editor
     sqlEditorStore.activeTab.setQuery(value)
+
+    // inform the content store that the SQL has changed and needs to be persisted
+    // this is so we can block the tab being closed if an update is required
+    setUpdatingRequired?.()
 
     // debounce changes
     debounceUpdateSqlSnippet(value)
