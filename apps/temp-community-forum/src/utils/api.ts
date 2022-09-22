@@ -35,6 +35,7 @@ const query = `
 }
 `
 export async function fetchDiscussions() {
+  // @ts-ignore
   const { repository } = await graphql(query, {
     headers: {
       authorization: `token ${process.env.NEXT_PUBLIC_DISCUSSIONS_TOKEN}`,
