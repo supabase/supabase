@@ -10,6 +10,7 @@ import {
   ViolatedLimit,
 } from '@supabase/shared-types/out/notifications'
 import { IconArrowRight, IconExternalLink } from '@supabase/ui'
+import Link from 'next/link'
 
 export const formatNotificationText = (project: Project, notification: Notification) => {
   const projectName = project.name
@@ -85,13 +86,19 @@ export const formatNotificationText = (project: Project, notification: Notificat
                 <p className="text-sm">{upgrade.name}</p>
                 <IconArrowRight size={12} strokeWidth={2} />
                 <p className="text-sm">{upgrade.version_to}</p>
-                <div className="!ml-4">
-                  <IconExternalLink
-                    className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
-                    size={12}
-                    strokeWidth={2}
-                  />
-                </div>
+                {upgrade.changelog_link && (
+                  <div className="!ml-4">
+                    <Link href={upgrade.changelog_link}>
+                      <a>
+                        <IconExternalLink
+                          className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
+                          size={12}
+                          strokeWidth={2}
+                        />
+                      </a>
+                    </Link>
+                  </div>
+                )}
               </div>
             </li>
           ))}
