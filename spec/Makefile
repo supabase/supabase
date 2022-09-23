@@ -8,7 +8,7 @@ run: download transform format
 ###############################################################################
 
 init: 
-	cd $(REPO_DIR)/generator && npm install
+	cd $(REPO_DIR)/parser && npm install
 
 
 ###############################################################################
@@ -23,12 +23,12 @@ download.storage.v1:
 	curl -sS https://supabase.github.io/storage-api/api.json > $(REPO_DIR)/storage_v0_openapi.json
 
 download.tsdoc.v1:
-	curl -sS https://supabase.github.io/supabase-js/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/supabase.json
-	curl -sS https://supabase.github.io/gotrue-js/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/gotrue.json
-	curl -sS https://supabase.github.io/postgrest-js/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/postgrest.json
-	curl -sS https://supabase.github.io/realtime-js/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/realtime.json
-	curl -sS https://supabase.github.io/storage-js/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/storage.json
-	curl -sS https://supabase.github.io/functions-js/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/functions.json
+	curl -sS https://supabase.github.io/supabase-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/supabase.json
+	curl -sS https://supabase.github.io/gotrue-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/gotrue.json
+	curl -sS https://supabase.github.io/postgrest-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/postgrest.json
+	curl -sS https://supabase.github.io/realtime-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/realtime.json
+	curl -sS https://supabase.github.io/storage-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/storage.json
+	curl -sS https://supabase.github.io/functions-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/functions.json
 
 
 download.tsdoc.v2:
@@ -51,12 +51,12 @@ dereference.storage.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
 dereference.tsdoc.v2:
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:functions
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:gotrue
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:postgrest
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:realtime
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:storage
-	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:supabase
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:functions
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:gotrue
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:postgrest
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:realtime
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:storage
+	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:supabase
 
 combine.tsdoc.v1:
 	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4], .[5]] }' \
@@ -83,31 +83,4 @@ combine.tsdoc.v2:
 ###############################################################################
 format:
 	npx prettier --write .
-
-###############################################################################
-# Generate the docs
-###############################################################################
-
-generate: generate.api generate.cli generate.storage generate.dart generate.js.v1 generate.js.v2
-
-generate.api: 
-	cd $(REPO_DIR)/generator && npm run api:gen
-
-generate.cli: 
-	cd $(REPO_DIR)/generator && npm run cli:gen
-
-generate.gotrue: 
-	cd $(REPO_DIR)/generator && npm run gotrue:gen
-
-generate.storage: 
-	cd $(REPO_DIR)/generator && npm run storage:gen
-
-generate.dart: 
-	cd $(REPO_DIR)/generator && npm run supabase-dart:v1
-
-generate.js.v1: 
-	cd $(REPO_DIR)/generator && npm run supabase-js:v1
-
-generate.js.v2: 
-	cd $(REPO_DIR)/generator && npm run supabase-js:v2
 
