@@ -78,6 +78,14 @@ We'll be running the [Supabase Docs](https://supabase.com/docs)
 
 ---
 
+### Which files to edit?
+
+Our docs site are comprised of guides, tutorials, quickstarts as well as reference docs. It's important to note that these reference docs (located at https://supabase.com/docs/reference) are generated from spec files.
+
+If you go to any page in the [https://supabase.com/docs](Supabase Docs), you'll see an `Edit this page` link at the bottom. This link will indicate which file you need to edit.
+
+The [https://supabase.com/docs/guides/with-nextjs](NextJS Quickstart), for example, is a markdown file that you can edit directly. This [https://supabase.com/docs/reference/javascript/auth-signup](supabase-js reference doc), however, is generated from a [https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml](spec file).
+
 ## Create a pull request
 
 After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
