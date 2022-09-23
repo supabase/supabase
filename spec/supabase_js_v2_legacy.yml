@@ -1440,7 +1440,7 @@ pages:
             insert into
               users (id, name, address)
             values
-              (1, 'Thekla', '{ "postcode": 90210 }');
+              (1, 'Michael', '{ "postcode": 90210 }');
             ```
           </details>
 
@@ -1465,7 +1465,7 @@ pages:
               "data": [
                 {
                   "id": 1,
-                  "name": "Thekla",
+                  "name": "Michael",
                   "address": {
                     "street": "Melrose Place",
                     "postcode": 90210
@@ -1898,20 +1898,21 @@ pages:
           </details>
         hideCodeBlock: true
 
-  # TODO: filter inside json column
-  # TODO: filter embedded resources
-  # TODO: explain what filters do
   Using Filters:
     description: |
-      Filters can be used on `select()`, `update()`, and `delete()` queries.
+      Filters allow you to only return rows that match certain conditions.
+
+      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
 
       If a Postgres function returns a table response, you can also apply filters.
 
       ### Applying Filters
 
-      You must apply your filters to the end of your query. For example:
+      Filters must be applied after any of `select()`, `update()`, `upsert()`,
+      `delete()`, and `rpc()` and before
+      [modifiers](/docs/reference/javascript/next/using-modifiers). For example:
 
-      ```js
+      ```ts
       const { data, error } = await supabase
         .from('cities')
         .select('name, country_id')
@@ -1925,9 +1926,10 @@ pages:
 
       ### Chaining
 
-      Filters can be chained together to produce advanced queries. For example:
+      Filters can be chained together to produce advanced queries. For example,
+      to query cities with population between 1,000 and 10,000:
 
-      ```js
+      ```ts
       const { data, error } = await supabase
         .from('cities')
         .select('name, country_id')
@@ -1939,7 +1941,7 @@ pages:
 
       Filters can be built up one step at a time and then executed. For example:
 
-      ```js
+      ```ts
       const filterByName = null
       const filterPopLow = 1000
       const filterPopHigh = 10000
@@ -1955,336 +1957,642 @@ pages:
       const { data, error } = await query
       ```
 
+      ### Filtering by Fields of a JSON column
+
+      You can filter by values inside a JSON column:
+
+      <details>
+        <summary>Schema</summary>
+
+        ```sql
+        create table
+          users (
+            id int8 primary key,
+            name text,
+            address jsonb
+          );
+
+        insert into
+          users (id, name, address)
+        values
+          (1, 'Michael', '{ "postcode": 90210 }'),
+          (2, 'Jane', null);
+        ```
+      </details>
+
+      ```ts
+      const { data, error } = await supabase
+        .from('users')
+        .select()
+        .eq('address->postcode', 90210)
+      ```
+
+      <details>
+        <summary>Result</summary>
+
+        ```json
+        {
+          "data": [
+            {
+              "id": 1,
+              "name": "Michael",
+              "address": {
+                "postcode": 90210
+              }
+            }
+          ],
+          "status": 200,
+          "statusText": "OK"
+        }
+        ```
+      </details>
+
+      ### Filtering Foreign Tables
+
+      If you have foreign tables in your `select()` query, you can filter on
+      these with a dot notation:
+
+      <details>
+        <summary>Schema</summary>
+
+        ```sql
+        create table
+          countries (id int8 primary key, name text);
+        create table
+          cities (
+            id int8 primary key,
+            country_id int8 not null references countries,
+            name text
+          );
+
+        insert into
+          countries (id, name)
+        values
+          (1, 'Germany'),
+          (2, 'Indonesia');
+        insert into
+          cities (id, country_id, name)
+        values
+          (1, 2, 'Bali'),
+          (2, 1, 'Munich');
+        ```
+      </details>
+
+      ```ts
+      const { data, error } = await supabase
+        .from('countries')
+        .select(`
+          name,
+          cities!inner (
+            name
+          )
+        `)
+        .eq('cities.name', 'Bali')
+      ```
+
+      <details>
+        <summary>Result</summary>
+
+        ```json
+        {
+          "data": [
+            {
+              "name": "Indonesia",
+              "cities": [
+                {
+                  "name": "Bali"
+                }
+              ]
+            }
+          ],
+          "status": 200,
+          "statusText": "OK"
+        }
+        ```
+      </details>
+
   eq():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Albania')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "name": "Albania"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The shire')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .eq('name', 'San Francisco')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .eq('name', 'Mordor')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .eq('name', 'San Francisco')
+            .from('countries')
+            .select()
+            .eq('name', 'Albania')
           ```
 
   neq():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .neq('name', 'Albania')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "name": "Afghanistan"
+                },
+                {
+                  "id": 3,
+                  "name": "Algeria"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .neq('name', 'The shire')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .neq('name', 'San Francisco')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .neq('name', 'Mordor')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .neq('name', 'Lagos')
+            .from('countries')
+            .select()
+            .neq('name', 'Albania')
           ```
 
   gt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .gt('id', 2)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 3,
+                  "name": "Algeria"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gt('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .gt('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .gt('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .gt('country_id', 250)
+            .from('countries')
+            .select()
+            .gt('id', 2)
           ```
 
   gte():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .gte('id', 2)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "name": "Albania"
+                },
+                {
+                  "id": 3,
+                  "name": "Algeria"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gte('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .gte('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .gte('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .gte('country_id', 250)
+            .from('countries')
+            .select()
+            .gte('id', 2)
           ```
 
   lt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .lt('id', 2)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "name": "Afghanistan"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lt('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .lt('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .lt('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .lt('country_id', 250)
+            .from('countries')
+            .select()
+            .lt('id', 2)
           ```
 
   lte():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .lte('id', 2)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "name": "Afghanistan"
+                },
+                {
+                  "id": 2,
+                  "name": "Albania"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lte('country_id', 250)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .lte('country_id', 250)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .lte('country_id', 250)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .lte('country_id', 250)
+            .from('countries')
+            .select()
+            .lte('id', 2)
           ```
 
   like():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .like('name', '%Alba%')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "name": "Albania"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .like('name', '%la%')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .like('name', '%la%')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .like('name', '%la%')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .like('name', '%la%')
+            .from('countries')
+            .select()
+            .like('name', '%Alba%')
           ```
 
   ilike():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .like('name', '%alba%')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "name": "Albania"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .ilike('name', '%la%')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .ilike('name', '%la%')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .ilike('name', '%la%')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .ilike('name', '%la%')
+            .from('countries')
+            .select()
+            .like('name', '%alba%')
           ```
 
   is():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
     examples:
-      - name: With `select()`
+      - name: Checking nullness
+        description: |
+          Using the `eq()` filter doesn't work when filtering for `null`:
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'null'),
+              (2, null);
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .eq('name', null)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "name": "null"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+
+          Instead, you need to use `is()`:
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .is('name', null)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "name": null
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .is('name', null)
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .is('name', null)
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .is('name', null)
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
+            .from('countries')
+            .select()
             .is('name', null)
           ```
 
@@ -2292,369 +2600,793 @@ pages:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .in('name', ['Albania', 'Algeria'])
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "name": "Albania"
+                },
+                {
+                  "id": 3,
+                  "name": "Algeria"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .from('countries')
+            .select()
+            .in('name', ['Albania', 'Algeria'])
           ```
 
   contains():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
-    notes: |
-      - `.contains()` can work on array columns or range columns.
-        It is very useful for finding rows where a tag array contains all the values in the filter array.
-
-        ```js
-        .contains('arraycol',["a","b"]) // You can use a javascript array for an array column
-        .contains('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
-        .contains('rangecol','(1,2]') // Use Postgres range syntax for range column.
-        .contains('rangecol',`(${arr}]`) // You can insert an array into a string.
-        ```
     examples:
-      - name: With `select()`
+      - name: On array columns
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              issues (
+                id int8 primary key,
+                title text,
+                tags text[]
+              );
+
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('issues')
+            .select('title')
+            .contains('tags', ['is:open', 'severity:high'])
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "title": "Cache invalidation is not working"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .contains('main_exports', ['oil'])
+            .from('users')
+            .select()
+            .contains('name', ['is:online', 'faction:red'])
           ```
-      - name: With `update()`
-        js: |
-          ```js
+      - name: On range columns
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .contains('main_exports', ['oil'])
+            .from('reservations')
+            .select()
+            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
           ```
-      - name: With `delete()`
-        js: |
-          ```js
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+      - name: On `jsonb` columns
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{}');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .contains('main_exports', ['oil'])
+            .from('users')
+            .select('name')
+            .contains('address', { postcode: 90210 })
           ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .contains('main_exports', ['oil'])
-          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Michael"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
 
   containedBy():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
-    notes: |
-      - `.containedBy()` can work on array columns or range columns.
-
-        ```js
-        .containedBy('arraycol',["a","b"]) // You can use a javascript array for an array column
-        .containedBy('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
-        .containedBy('rangecol','(1,2]') // Use Postgres range syntax for range column.
-        .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
-        ```
     examples:
-      - name: With `select()`
+      - name: On array columns
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              classes (
+                id int8 primary key,
+                name text,
+                days text[]
+              );
+
+            insert into
+              classes (id, name, days)
+            values
+              (1, 'Chemistry', array['monday', 'friday']),
+              (2, 'History', array['monday', 'wednesday', 'thursday']);
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('classes')
+            .select('name')
+            .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Chemistry"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
+            .from('classes')
+            .select('name')
+            .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
           ```
-      - name: With `update()`
-        js: |
-          ```js
+      - name: On range columns
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
+            .from('reservations')
+            .select()
+            .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
           ```
-      - name: With `delete()`
-        js: |
-          ```js
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+      - name: On `jsonb` columns
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{}');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
+            .from('users')
+            .select('name')
+            .containedBy('address', {})
           ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .containedBy('main_exports', ['cars', 'food', 'machine'])
-          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Jane"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
 
   rangeGt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
     examples:
       - name: With `select()`
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeGt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeGt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeGt('population_range_millions', '[150, 250]')
+            .from('reservations')
+            .select()
+            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
           ```
 
   rangeGte():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
     examples:
       - name: With `select()`
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeGte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeGte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeGte('population_range_millions', '[150, 250]')
+            .from('reservations')
+            .select()
+            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
           ```
 
   rangeLt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
     examples:
       - name: With `select()`
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeLt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeLt('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeLt('population_range_millions', '[150, 250]')
+            .from('reservations')
+            .select()
+            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
           ```
 
   rangeLte():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - name: With `select()`
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeLte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeLte('population_range_millions', '[150, 250]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeLte('population_range_millions', '[150, 250]')
+            .from('reservations')
+            .select()
+            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
           ```
 
   rangeAdjacent():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
     examples:
       - name: With `select()`
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .rangeAdjacent('population_range_millions', '[70, 185]')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .rangeAdjacent('population_range_millions', '[70, 185]')
+            .from('reservations')
+            .select()
+            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
           ```
 
   overlaps():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
-    notes: |
-      - `.overlaps()` can work on array columns or range columns.
-
-        ```js
-        .overlaps('arraycol',["a","b"]) // You can use a javascript array for an array column
-        .overlaps('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
-        .overlaps('rangecol','(1,2]') // Use Postgres range syntax for range column.
-        .overlaps('rangecol',`(${arr}]`)  // You can insert an array into a string.
-        ```
     examples:
-      - name: With `select()`
+      - name: On array columns
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              issues (
+                id int8 primary key,
+                title text,
+                tags text[]
+              );
+
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('issues')
+            .select('title')
+            .overlaps('tags', ['is:closed', 'severity:high'])
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "title": "Cache invalidation is not working"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .overlaps('main_exports', ['computers', 'minerals'])
+            .from('issues')
+            .select('title')
+            .overlaps('tags', ['is:closed', 'severity:high'])
           ```
-      - name: With `update()`
-        js: |
-          ```js
-          let countries = await supabase
-            .from('countries')
-            .update({ name: 'Mordor' })
-            .overlaps('main_exports', ['computers', 'minerals'])
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
+      - name: On range columns
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .delete()
-            .overlaps('main_exports', ['computers', 'minerals'])
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_countries')
-            .overlaps('main_exports', ['computers', 'minerals'])
+            .from('reservations')
+            .select()
+            .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
           ```
 
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+
+  # TODO: schema & result
   textSearch():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
+    notes:
+      - For more information on Postgres full text search, refer to the [guide](/docs/guides/database/full-text-search).
     examples:
       - name: Text search
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
@@ -2665,7 +3397,7 @@ pages:
       - name: Basic normalization
         description: Uses PostgreSQL's `plainto_tsquery` function.
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
@@ -2677,7 +3409,7 @@ pages:
       - name: Full normalization
         description: Uses PostgreSQL's `phraseto_tsquery` function.
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
@@ -2698,7 +3430,7 @@ pages:
           - `-`: a dash will be converted to the ! operator.
 
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
@@ -2712,244 +3444,776 @@ pages:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .match({ id: 2, name: 'Albania' })
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Albania"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .match({name: 'Beijing', country_id: 156})
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .match({name: 'Beijing', country_id: 156})
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .match({name: 'Beijing', country_id: 156})
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .match({name: 'Beijing', country_id: 156})
+            .from('countries')
+            .select('name')
+            .match({ id: 2, name: 'Albania' })
           ```
 
   not():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
-    notes: |
-      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```js
-          .not('name','eq','Paris')
-          .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
-          .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-          .not('id','in','(6,7)')  // Use Postgres list () for in filter.
-          .not('id','in',`(${arr})`)  // You can insert a javascript array.
-        ```
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'null'),
+              (2, null);
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .not('name', 'is', null)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "name": "null"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .not('name', 'eq', 'Paris')
-          ```
-      - name: With `update()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .not('name', 'eq', 'Paris')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .not('name', 'eq', 'Paris')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .not('name', 'eq', 'Paris')
+            .from('countries')
+            .select()
+            .not('name', 'is', null)
           ```
 
   or():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
-    notes: |
-      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```js
-        .or('id.in.(6,7), arraycol.cs.{"a","b"}')  // Use Postgres list () for in filter. Array {} for array column and 'cs' for contains.
-        .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a javascipt array for list or array on array column.
-        .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
-        ```
     examples:
       - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.eq.20,id.eq.30')
-          ```
-      - name: Use `or` with `and`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
-          ```
-      - name: Use `or` on foreign tables
-        isSpotlight: true
-        js: |
-          ```js
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
             .from('countries')
-            .select('id, cities(*)')
-            .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+            .select('name')
+            .or('id.eq.2,name.eq.Algeria')
           ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Albania"
+                },
+                {
+                  "name": "Algeria"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+        isSpotlight: true
+        js: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .or('id.eq.2,name.eq.Algeria')
+          ```
+      - name: Use `or` with `and`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Afghanistan"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+      - name: Use `or` on foreign tables
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities!inner (
+                name
+              )
+            `)
+            .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Germany",
+                  "cities": [
+                    {
+                      "name": "Munich"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
 
   filter():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
-    notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
-        ```js
-          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
-          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-          .filter('id','in','(6,7)')  // Use Postgres list () for in filter.
-          .filter('id','in',`(${arr})`)  // You can insert a javascript array.
-        ```
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .filter('name', 'in', '("Algeria","Japan")')
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 3,
+                  "name": "Algeria"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .from('countries')
+            .select()
+            .filter('name', 'in', '("Algeria","Japan")')
           ```
-      - name: With `update()`
-        js: |
-          ```js
+      - name: On a foreign table
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")')
-          ```
-      - name: With `delete()`
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .delete()
-            .filter('name', 'in', '("Paris","Tokyo")')
-          ```
-      - name: With `rpc()`
-        js: |
-          ```js
-          // Only valid if the Postgres function returns a table type.
-          const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")')
-          ```
-      - name: Filter embedded resources
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")')
+            .from('countries')
+            .select(`
+              name,
+              cities!inner (
+                name
+              )
+            `)
+            .filter('cities.name', 'eq', 'Bali')
           ```
 
-  # TODO: explain what modifiers do, and how they differ from filters
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Indonesia",
+                  "cities": [
+                    {
+                      "name": "Bali"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+        js: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities!inner (
+                name
+              )
+            `)
+            .filter('cities.name', 'eq', 'Bali')
+          ```
+
   Using Modifiers:
     description: |
-      Modifiers can be used on `select()` queries.
+      Filters work on the row level - they allows you to return only rows that
+      match certain conditions, but they doesn't change the shape of the rows.
+      Modifiers are everything that doesn't fit that definition, mostly by
+      allowing you to change the format of the response (e.g. returning a CSV
+      string).
 
-      If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
+      Modifiers must be specified after filters.
+
+      Some modifiers only apply for queries that return rows (e.g. `select()` or
+      `rpc()` on a function that returns a table response).
 
   db.modifiers.select():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
     title: select()
+    examples:
+      - name: With `upsert()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Albania' })
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "status": 201,
+              "statusText": "Created"
+            }
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Algeria' })
+            .select()
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "name": "Algeria"
+                }
+              ],
+              "status": 201,
+              "statusText": "Created"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+        isSpotlight: true
+        js: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Algeria' })
+            .select()
+          ```
 
   order():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .order('name', { ascending: false })
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "id": 3,
+                  "name": "Algeria"
+                },
+                {
+                  "id": 2,
+                  "name": "Albania"
+                },
+                {
+                  "id": 1,
+                  "name": "Afghanistan"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .from('cities')
             .select('name', 'country_id')
             .order('id', { ascending: false })
           ```
-      - name: With embedded resources
-        js: |
-          ```js
+      - name: On a foreign table
+        description: |
+          You can order on foreign tables, but it doesn't affect the ordering of
+          the parent table.
+
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States'),
+              (2, 'Vanuatu');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
             .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
-            .order('name', {foreignTable: 'cities'})
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+            .order('name', { foreignTable: 'cities', ascending: false })
           ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "United States",
+                  "cities": [
+                    {
+                      "name": "New York City"
+                    },
+                    {
+                      "name": "Atlanta"
+                    }
+                  ]
+                },
+                {
+                  "name": "Vanuatu",
+                  "cities": []
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
 
   limit():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
     examples:
       - name: With `select()`
-        isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .limit(1)
-          ```
-      - name: With embedded resources
-        js: |
-          ```js
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
           const { data, error } = await supabase
             .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
+            .select('name')
+            .limit(1)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Afghanistan"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
+        isSpotlight: true
+        js: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .limit(1)
+          ```
+      - name: On a foreign table
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
             .limit(1, { foreignTable: 'cities' })
           ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "United States",
+                  "cities": [
+                    {
+                      "name": "Atlanta"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
 
   range():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.range'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .range(0, 1)
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Afghanistan"
+                },
+                {
+                  "name": "Albania"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .range(0,3)
+            .from('countries')
+            .select('name')
+            .range(0, 1)
           ```
 
   db.abortSignal():
@@ -3001,12 +4265,51 @@ pages:
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .limit(1)
+            .single()
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "data": {
+                "name": "Afghanistan"
+              },
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
+            .from('countries')
+            .select('name')
             .limit(1)
             .single()
           ```
@@ -3015,12 +4318,48 @@ pages:
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
     examples:
       - name: With `select()`
+        description: |
+          <details>
+            <summary>Schema</summary>
+
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          </details>
+
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Singapore')
+            .maybeSingle()
+          ```
+
+          <details>
+            <summary>Result</summary>
+
+            ```json
+            {
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+          </details>
+        hideCodeBlock: true
         isSpotlight: true
         js: |
-          ```js
+          ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
+            .from('countries')
+            .select()
             .eq('name', 'Singapore')
             .maybeSingle()
           ```
@@ -3077,17 +4416,87 @@ pages:
             .csv()
           ```
 
-  db.geojson():
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
-    title: geojson()
+  # NOTE: Not available on currently deployed PostgREST
+  # db.geojson():
+  #   $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
+  #   title: geojson()
 
-  db.explain():
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
-    title: explain()
+  # NOTE: Not available on currently deployed PostgREST
+  # db.explain():
+  #   $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+  #   title: explain()
 
-  db.rollback():
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
-    title: rollback()
+  # NOTE: Not available on currently deployed PostgREST
+  # db.rollback():
+  #   $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
+  #   title: rollback()
+  #   examples:
+  #     - name: With `delete()`
+  #       description: |
+  #         <details>
+  #           <summary>Schema</summary>
+
+  #           ```sql
+  #           create table
+  #             countries (id int8 primary key, name text);
+
+  #           insert into
+  #             countries (id, name)
+  #           values
+  #             (1, 'Spain');
+  #           ```
+  #         </details>
+
+  #         ```ts
+  #         const { error } = await supabase
+  #           .from('countries')
+  #           .delete()
+  #           .eq('id', 1)
+  #           .rollback()
+  #         ```
+
+  #         <details>
+  #           <summary>Result</summary>
+
+  #           ```json
+  #           {
+  #             "status": 204,
+  #             "statusText": "No Content"
+  #           }
+  #           ```
+  #         </details>
+
+  #         ```ts
+  #         const { data, error } = await supabase
+  #           .from('countries')
+  #           .select()
+  #         ```
+
+  #         <details>
+  #           <summary>Result</summary>
+
+  #           ```json
+  #           {
+  #             "data": [
+  #               {
+  #                 "id": 1,
+  #                 "name": "Spain"
+  #               }
+  #             ],
+  #             "status": 200,
+  #             "statusText": "OK"
+  #           }
+  #           ```
+  #         </details>
+  #       hideCodeBlock: true
+  #       isSpotlight: true
+  #       js: |
+  #         ```ts
+  #         const { error } = await supabase
+  #           .from('countries')
+  #           .delete()
+  #           .eq('id', 1)
+  #         ```
 
   invoke():
     title: 'invoke()'
