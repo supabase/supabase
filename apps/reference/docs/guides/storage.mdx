@@ -24,7 +24,7 @@ organize your files. You can store them in whichever folder structure suits your
 
 Buckets are distinct containers for files and folders. You can think of them like "super folders".
 Generally you would create distinct buckets for different Security and Access Rules. For example, you might
-keep all public files in a "public" bucket, and other files that require logged-in access in a "restricted" bucket.
+keep all video files in a "video" bucket, and profile pictures in an "avatar" bucket.
 
 <div class="video-container">
   <iframe
@@ -241,14 +241,18 @@ create policy "Public Access"
 </TabItem>
 </Tabs>
 
-## Accessing objects
+## Public and Private Buckets
+
+Storage buckets are private by default.
 
 For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint.
 Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method
 which calls the `/object/sign/` API.
 
 For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl)
-helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally.
+helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally. While no authorization is required for accessing objects in a public bucket, proper [access control](#access-control) is required for other operations like uploading, deleting objects from public buckets as well.
+
+Public buckets also tend to have [better performance](/docs/guides/storage-cdn#public-vs-private-buckets).
 
 <details>
 <summary>Advanced: reverse proxy</summary>
