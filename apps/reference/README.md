@@ -63,7 +63,7 @@ To run the docs locally, you need to:
 
 ### Which files to edit?
 
-Our docs site are comprised of guides, tutorials, quickstarts as well as reference docs. It's important to note that these reference docs (located at https://supabase.com/docs/reference) are generated from spec files. As the DocSpec section above notes, we use documentation specs to generate human-readable docs.
+Our docs site are comprised of guides, tutorials, quickstarts, and reference docs. It's important to note that the [reference docs](https://supabase.com/docs/reference) are generated from spec files. As the DocSpec section above notes, we use documentation specs to generate human-readable docs.
 
 Two quick examples to help clarify this:
 
