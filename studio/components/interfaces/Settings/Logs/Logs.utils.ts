@@ -121,7 +121,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 
   switch (table) {
     case 'edge_logs':
-      return `select id, timestamp, event_message, request, response, request.method, request.path, response.status_code
+      return `select id, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
@@ -146,7 +146,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     `
 
     case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request
@@ -192,11 +192,13 @@ export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, str
   const hourDiff = ite.diff(its, 'hour')
   if (minuteDiff > 60 * 12) {
     trunc = 'hour'
-    extendValue = 24 * 3
-  } else if (hourDiff > 24 * 5) {
+    extendValue = 24 * 5
+  } else if (hourDiff > 24 * 3) {
     trunc = 'day'
     extendValue = 7
   }
+  //
+  // @ts-ignore
   return [its.add(-extendValue, trunc), trunc]
 }
 
@@ -214,10 +216,15 @@ export const genChartQuery = (
   return `
 SELECT
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
-  count(timestamp) as count
+  count(t.timestamp) as count
 FROM
   ${table} t
-${where ? where + ` and t.timestamp > '${startOffset.toISOString()}'` : ''}
+  cross join unnest(t.metadata) as metadata
+  ${
+    where
+      ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
+      : `where t.timestamp > '${startOffset.toISOString()}'`
+  }
 GROUP BY
 timestamp
 ORDER BY

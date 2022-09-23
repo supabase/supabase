@@ -60,10 +60,12 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 
 - Supabase extends Postgres with realtime functionality using our [Realtime Server](https://github.com/supabase/realtime).
 - Every project is a full Postgres database, with `postgres` level access.
-- Managed backups - Supabase handles all your database backups.[^backups]
-- Data imports - import directly from a CSV or excel spreadsheet.
+- Supabase manages your database backups.
+- Import data directly from a CSV or excel spreadsheet.
 
-[^backups] Database backups do _NOT_ include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup will not restore objects that have been deleted since then.
+:::info
+Database backups **do not** include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.
+:::
 
 ### Extensions
 
@@ -120,120 +122,7 @@ you can update the replica identity of your tables, setting it to `full`:
 alter table your_table replica identity full;
 ```
 
-### Migrating between projects
-
-Migrating projects can be achieved using standard PostgreSQL tooling. This is particularly useful for older projects (e.g. to use a newer Postgres version).
-
-#### Before you begin
-
-- Make sure [Postgres](https://www.postgresql.org/download/) is installed so you can run `psql` and `pg_dump`.
-- Create a new Supabase project.
-- If you enabled Database Webhooks on your old project, enable it on your new project.
-- Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
-
-#### Migrate the database
-
-1. Run `ALTER ROLE postgres SUPERUSER` in the _old_ project's SQL editor
-2. Run `pg_dump --clean --if-exists --quote-all-identifiers -h $OLD_DB_URL -U postgres > dump.sql` from your terminal
-3. Run `ALTER ROLE postgres NOSUPERUSER` in the _old_ project's SQL editor
-4. Run `ALTER ROLE postgres SUPERUSER` in the _new_ project's SQL editor
-5. Run `psql -h $NEW_DB_URL -U postgres -f dump.sql` from your terminal
-6. Run `TRUNCATE storage.objects` in the _new_ project's SQL editor
-7. Run `ALTER ROLE postgres NOSUPERUSER` in the _new_ project's SQL editor
-
-#### Migrate storage objects
-
-This script moves storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.io](mailto:support@supabase.io).
-
-```js
-const { createClient } = require('@supabase/supabase-js')
-
-const OLD_PROJECT_URL = 'https://xxx.supabase.co'
-const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
-
-const NEW_PROJECT_URL = 'https://yyy.supabase.co'
-const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
-
-;(async () => {
-  const oldSupabaseRestClient = createClient(
-    OLD_PROJECT_URL,
-    OLD_PROJECT_SERVICE_KEY,
-    {
-      schema: 'storage',
-    }
-  )
-  const oldSupabaseClient = createClient(
-    OLD_PROJECT_URL,
-    OLD_PROJECT_SERVICE_KEY
-  )
-  const newSupabaseClient = createClient(
-    NEW_PROJECT_URL,
-    NEW_PROJECT_SERVICE_KEY
-  )
-
-  // make sure you update max_rows in postgrest settings if you have a lot of objects
-  // or paginate here
-  const { data: oldObjects, error } = await oldSupabaseRestClient
-    .from('objects')
-    .select()
-  if (error) {
-    console.log('error getting objects from old bucket')
-    throw error
-  }
-
-  for (const objectData of oldObjects) {
-    console.log(`moving ${objectData.id}`)
-    try {
-      const { data, error: downloadObjectError } =
-        await oldSupabaseClient.storage
-          .from(objectData.bucket_id)
-          .download(objectData.name)
-      if (downloadObjectError) {
-        throw downloadObjectError
-      }
-
-      const { _, error: uploadObjectError } = await newSupabaseClient.storage
-        .from(objectData.bucket_id)
-        .upload(objectData.name, data, {
-          upsert: true,
-          contentType: objectData.metadata.mimetype,
-          cacheControl: objectData.metadata.cacheControl,
-        })
-      if (uploadObjectError) {
-        throw uploadObjectError
-      }
-    } catch (err) {
-      console.log('error moving ', objectData)
-      console.log(err)
-    }
-  }
-})()
-```
-
-#### Caveats
-
-- The new project will have the old project's Storage buckets, but not the objects. You will need to migrate Storage objects manually.
-
-### Resetting your project password
-
-When you create a new project in Supabase we ask for a password. You can use this password to connect directly to your Postgres database.
-
-If you forget your password, you can reset it from the Dashboard under the database settings page.
-
-Read more in [Database Configuration](/docs/guides/database/managing-passwords).
-
-### Changing the timezone of your server.
-
-Your database is initialized with the UTC timezone. We recommend keeping it this way, as it is helpful for time calculations.
-If, however, you want to update the timezone, you can do so using any of the [database timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-
-For example:
-
-```sql
-alter database postgres set timezone to 'America/New_York';
-```
-
-Read more in [Database Configuration](/docs/guides/database/managing-timezones).
+Read about resetting your database password [here](/docs/guides/database/managing-passwords) and changing the timezone of your server [here](/docs/guides/database/managing-timezones).
 
 ## Next steps
 

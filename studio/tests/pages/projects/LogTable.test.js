@@ -94,6 +94,21 @@ test.each([
     includes: [/uncaughtException/],
     excludes: [/ERROR/],
   },
+  {
+    queryType: 'api',
+    data: [
+      {
+        event_message: 'This is a uncaughtException\n',
+        path: 'this-is-some-path',
+        method: 'POST',
+        status_code: 500,
+        timestamp: 1659545029083869,
+        id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+      },
+    ],
+    includes: [/POST/, 'this-is-some-path'],
+    excludes: [],
+  },
 ])('table col renderer for $queryType', async ({ queryType, data, includes, excludes }) => {
   render(<LogTable queryType={queryType} data={data} />)
 
@@ -130,6 +145,12 @@ test('error message handling', async () => {
   await screen.findByText(/some/)
   await screen.findByText(/string/)
   await screen.findByText(/my_error/)
+})
+
+test('no results message handling', async () => {
+  render(<LogTable data={[]} />)
+  await screen.findByText(/No results/)
+  await screen.findByText(/Try another search/)
 })
 
 test('custom error message: Resources exceeded during query execution', async () => {
