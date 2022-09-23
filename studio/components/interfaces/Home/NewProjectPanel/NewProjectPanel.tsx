@@ -7,7 +7,6 @@ import { Button, IconKey, IconArchive, IconExternalLink, IconCode } from '@supab
 import Panel from 'components/ui/Panel'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
-import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 
 interface Props {}
 
@@ -210,7 +209,11 @@ const NewProjectPanel: FC<Props> = ({}) => {
           <div className="space-y-2">
             <h3 className="text-xl text-scale-1200">Connecting to your new project</h3>
             <p className="lg:max-w-sm text-scale-1100">
-              Interact with your database through the Supabase client libraries with your API keys.
+              Interact with your database through the{' '}
+              <Link href="https://supabase.com/docs/reference">
+                <a className="text-brand-900">Supabase client libraries</a>
+              </Link>{' '}
+              with your API keys.
             </p>
             <p className="lg:max-w-sm text-scale-1100">
               More information about your project's keys can be found in your project's API
@@ -235,8 +238,6 @@ const NewProjectPanel: FC<Props> = ({}) => {
       </div>
       <div className="col-span-8">
         <APIKeys />
-        <DisplayApiSettings />
-        <DisplayConfigSettings />
       </div>
     </div>
   )
