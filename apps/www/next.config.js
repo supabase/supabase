@@ -132,6 +132,11 @@ module.exports = withMDX({
       },
       {
         permanent: true,
+        source: '/docs/guides/storage-caching',
+        destination: '/docs/guides/storage-cdn',
+      },
+      {
+        permanent: true,
         source: '/database/Database',
         destination: '/database',
       },
