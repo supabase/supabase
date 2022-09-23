@@ -9,10 +9,8 @@ import {
   IconUsers,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { ProjectBase } from 'types'
-import { checkPermissions } from 'hooks'
 import { Route } from 'components/ui/ui.types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
