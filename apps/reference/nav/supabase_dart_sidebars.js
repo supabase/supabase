@@ -17,8 +17,6 @@ const sidebars = {
         'generated/auth-signin',
         'generated/auth-signinwithprovider',
         'generated/auth-signout',
-        'generated/auth-session',
-        'generated/auth-user',
         'generated/auth-update',
         'generated/auth-onauthstatechange',
         'generated/reset-password-email',

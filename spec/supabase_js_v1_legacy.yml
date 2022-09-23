@@ -9,135 +9,13 @@ info:
 
   definition: ../../spec/enrichments/tsdoc_v1/combined.json
   specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
-  slugPrefix: ''
+  slugPrefix: '/'
   libraries:
     - name: 'JavaScript'
       id: 'js'
       version: '0.0.1'
 
 pages:
-  Installing:
-    description: |
-      All JavaScript libraries are built directly by the Supabase team.
-
-      Other languages are built by the community and supported by Supabase.
-
-      ## JavaScript
-
-      Via NPM
-      ```bash
-      npm install @supabase/supabase-js
-      ```
-
-      Via Yarn
-      ```bash
-      yarn add @supabase/supabase-js
-      ```
-
-      Find the source code on [GitHub](https://github.com/supabase/supabase-js).
-
-      Or via CDN
-      ```js
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-      //or
-      <script src="https://unpkg.com/@supabase/supabase-js"></script>
-      ```
-
-  Initializing:
-    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
-    description: |
-      You can initialize a new Supabase client using the `createClient()` method.
-
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
-    examples:
-      - name: createClient()
-        js: |
-          ```js
-          import { createClient } from '@supabase/supabase-js'
-
-          // Create a single supabase client for interacting with your database
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-          ```
-      - name: With additional parameters
-        js: |
-          ```js
-          import { createClient } from '@supabase/supabase-js'
-
-          const options = {
-            schema: 'public',
-            headers: { 'x-my-custom-header': 'my-app-name' },
-            autoRefreshToken: true,
-            persistSession: true,
-            detectSessionInUrl: true
-          }
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
-          ```
-      - name: API schemas
-        js: |
-          ```js
-          import { createClient } from '@supabase/supabase-js'
-
-          // Provide a custom schema. Defaults to "public".
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
-            schema: 'other_schema'
-          })
-          ```
-
-          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
-
-          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
-      - name: Custom `fetch` implementation
-        js: |
-          ```js
-          import { createClient } from '@supabase/supabase-js'
-
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
-            fetch: fetch.bind(globalThis)
-          })
-          ```
-
-          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
-          but an alternative `fetch` implementation can be provided as an option.
-          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
-
-  Generating Types:
-    description: |
-      Supabase will soon release native type generators that dump your database types for various languages. For now, we support TypeScript [through third-party tools](/docs/guides/api/generating-types).
-
-      ## Usage with TypeScript
-
-      `supabase-js` ships with type definitions for usage with TypeScript and for convenient IntelliSense auto-complete and documentation in your editor.
-
-      When using TypeScript, you can pass the type of database row as a type parameter to the `from` method to get better auto-completion support down the chain.
-      If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
-
-      ```ts
-      type Message = {
-        id: number;
-        inserted_at: string;
-        message: string;
-        user_id: string;
-        channel_id: number;
-        author: { username: string };
-      }
-
-      const response = await supabase
-        .from<Message>('messages') // Message maps to the type of the row in your database.
-        .select('*, author:user_id(username)')
-        .match({ channel_id: 2 }) // Your IDE will be able to help with auto-completion.
-      response.data // Response data will be of type Array<Message>.
-
-      // If you don't provide a type for the row you need to explicitly pass `from<any>('tableName')`.
-      const response = await supabase
-        .from<any>('messages')
-        .select('*, author:user_id(username)')
-        .match({ channel_id: 2 })
-      response.data // Response data will be of type Array<any>.
-      ```
-
   auth.signUp():
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -760,7 +638,7 @@ pages:
 
   select():
     title: 'Fetch data: select()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
@@ -896,7 +774,7 @@ pages:
 
   insert():
     title: 'Create data: insert()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
     notes: |
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation.
@@ -947,7 +825,7 @@ pages:
 
   update():
     title: 'Modify data: update()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.update'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
     examples:
@@ -981,7 +859,7 @@ pages:
 
   upsert():
     title: 'Upsert data: upsert()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.upsert'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
@@ -1034,7 +912,7 @@ pages:
 
   delete():
     title: 'Delete data: delete()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.delete'
     notes: |
       - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
@@ -1066,7 +944,7 @@ pages:
         select 'Hello world';
       $$ language sql;
       ```
-    $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
+    $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - name: Call a Postgres function
         isSpotlight: true
@@ -1582,7 +1460,7 @@ pages:
       If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
 
   limit():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.limit'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1604,7 +1482,7 @@ pages:
           ```
 
   order():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.order'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.order'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1634,7 +1512,7 @@ pages:
             .order('name', { ascending: false })
           ```
   range():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.range'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.range'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1647,7 +1525,7 @@ pages:
           ```
 
   single():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.single'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.single'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1661,7 +1539,7 @@ pages:
           ```
 
   maybeSingle():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.maybeSingle'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.maybeSingle'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1729,7 +1607,7 @@ pages:
       ```
 
   .or():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.or'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
     notes: |
       - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
@@ -1768,7 +1646,7 @@ pages:
           ```
 
   .not():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.not'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
     notes: |
       - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
@@ -1815,7 +1693,7 @@ pages:
           ```
 
   .match():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.match'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1852,7 +1730,7 @@ pages:
           ```
 
   .eq():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.eq'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1889,7 +1767,7 @@ pages:
           ```
 
   .neq():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.neq'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1926,7 +1804,7 @@ pages:
           ```
 
   .gt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gt'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1963,7 +1841,7 @@ pages:
           ```
 
   .gte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gte'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2000,7 +1878,7 @@ pages:
           ```
 
   .lt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lt'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2037,7 +1915,7 @@ pages:
           ```
 
   .lte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2074,7 +1952,7 @@ pages:
           ```
 
   .like():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2111,7 +1989,7 @@ pages:
           ```
 
   .ilike():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ilike'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2148,7 +2026,7 @@ pages:
           ```
 
   .is():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.is'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2185,7 +2063,7 @@ pages:
           ```
 
   .in():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.in'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2222,7 +2100,7 @@ pages:
           ```
 
   .contains():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cs'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
     notes: |
       - `.contains()` can work on array columns or range columns.
         It is very useful for finding rows where a tag array contains all the values in the filter array.
@@ -2269,7 +2147,7 @@ pages:
           ```
 
   .containedBy():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
     notes: |
       - `.containedBy()` can work on array columns or range columns.
 
@@ -2315,7 +2193,7 @@ pages:
           ```
 
   .rangeLt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sl'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2352,7 +2230,7 @@ pages:
           ```
 
   .rangeGt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sr'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2389,7 +2267,7 @@ pages:
           ```
 
   .rangeGte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxl'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2426,7 +2304,7 @@ pages:
           ```
 
   .rangeLte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2463,7 +2341,7 @@ pages:
           ```
 
   .rangeAdjacent():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.adj'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2500,7 +2378,7 @@ pages:
           ```
 
   .overlaps():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
     notes: |
       - `.overlaps()` can work on array columns or range columns.
 
@@ -2546,7 +2424,7 @@ pages:
           ```
 
   .textSearch():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.fts'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
     examples:
       - name: Text search
         js: |
@@ -2605,7 +2483,7 @@ pages:
           ```
 
   .filter():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
     notes: |
       - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
         ```js
