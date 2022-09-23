@@ -172,7 +172,7 @@ const sidebars = {
       type: 'category',
       label: 'Storage',
       collapsed: true,
-      items: ['guides/storage', 'guides/storage-caching'],
+      items: ['guides/storage', 'guides/storage-cdn'],
     },
     {
       type: 'category',
