@@ -1,16 +1,13 @@
 import { PreviewLogData } from '..'
-import { TimestampLocalFormatter } from '../LogsFormatters'
+import { RowLayout, TextFormatter, TimestampLocalFormatter } from '../LogsFormatters'
 
-const DefaultPreviewColumnRenderer = [
+export default [
   {
-    formatter: (data: { row: PreviewLogData }) => {
-      return (
-        <div className="flex w-full justify-start items-center gap-4 h-full">
-          <TimestampLocalFormatter value={data.row.timestamp!} />
-          <span className="font-mono text-xs truncate">{data.row.event_message}</span>
-        </div>
-      )
-    },
+    formatter: (data: { row: PreviewLogData }) => (
+      <RowLayout>
+        <TimestampLocalFormatter value={data.row.timestamp!} />
+        <TextFormatter className="w-full" value={data.row.event_message} />
+      </RowLayout>
+    ),
   },
 ]
-export default DefaultPreviewColumnRenderer

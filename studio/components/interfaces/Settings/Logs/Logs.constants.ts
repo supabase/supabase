@@ -197,9 +197,9 @@ const _SQL_FILTER_COMMON = {
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadataParsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.noError': `metadataParsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.log': `metadataParsed.error_severity = 'LOG'`,
+    'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.log': `parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
@@ -237,6 +237,9 @@ export const SQL_FILTER_TEMPLATES: any = {
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  storage_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -246,6 +249,7 @@ export enum LogsTableName {
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
   REALTIME = 'realtime_logs',
+  STORAGE = 'storage_logs',
 }
 
 export const LOGS_TABLES = {
@@ -255,6 +259,7 @@ export const LOGS_TABLES = {
   fn_edge: LogsTableName.FN_EDGE,
   auth: LogsTableName.AUTH,
   realtime: LogsTableName.REALTIME,
+  storage: LogsTableName.STORAGE,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -264,6 +269,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
+  [LogsTableName.STORAGE]: 'Object storage logs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {
