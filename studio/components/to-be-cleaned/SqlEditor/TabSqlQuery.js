@@ -183,7 +183,7 @@ const MonacoEditor = ({ error, updateSqlSnippet, setUpdatingRequired }) => {
   }
 
   return (
-    <div className="dark:border-dark flex-grow overflow-y-auto border-b">
+    <div className="flex-grow overflow-y-auto border-b dark:border-dark">
       <Editor
         className="monaco-editor"
         theme={'supabase'}
@@ -289,7 +289,7 @@ const UtilityTabResults = observer(() => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 text-sm text-scale-1000">
-          Click <code>RUN</code> to execute your query.
+          Click <code>RUN</code> or hit <code>cmd/ctrl + return</code> to execute your query.
         </p>
       </div>
     )
