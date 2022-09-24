@@ -4,7 +4,8 @@
    - [Install dependencies](#install-dependencies)
    - [Fork the repository](#fork-the-repository)
 2. [Build Supabase](#build-supabase)
-   - [Running docs](#running-docs)
+   - [Run the docs locally](#run-the-docs-locally)
+   - [Editing files](#editing-files)
 3. [Create a pull request](#create-a-pull-request)
 
 - [Monorepo](#monorepo)
