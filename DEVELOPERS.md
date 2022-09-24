@@ -97,7 +97,7 @@ The monorepo has a set of shared components under `/packages`:
 
 #### Installing packages
 
-Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into.
+Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into. Do not install dependencies in their local folder, install them from the route using the `-w` flag.
 
 The format is: `npm install <package name> -w=<workspace to install in>`.
 
