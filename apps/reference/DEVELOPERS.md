@@ -42,11 +42,10 @@ To contribute code to Supabase, you must fork the [Supabase Repository](https://
    cd supabase
    ```
 
-### Running docs
+### Run the docs locally
 
-We'll be running the [Supabase Docs](https://supabase.com/docs)
 
-1. Build development server
+1. Build the development server
 
    npm
 
@@ -60,7 +59,7 @@ We'll be running the [Supabase Docs](https://supabase.com/docs)
    yarn build
    ```
 
-1. Start development server
+1. Start the development server
 
    npm
 
@@ -78,13 +77,13 @@ We'll be running the [Supabase Docs](https://supabase.com/docs)
 
 ---
 
-### Which files to edit?
+### Editing files
 
-Our docs site are comprised of guides, tutorials, quickstarts as well as reference docs. It's important to note that these reference docs (located at https://supabase.com/docs/reference) are generated from spec files.
+Our docs site are comprised of guides, tutorials, quickstarts, and reference docs. Note that the [reference docs](https://supabase.com/docs/reference) are generated from spec files.
 
-If you go to any page in the [https://supabase.com/docs](Supabase Docs), you'll see an `Edit this page` link at the bottom. This link will indicate which file you need to edit.
+If you go to any page in the [Supabase docs](https://supabase.com/docs), you'll see an **Edit this page** link at the bottom. This link indicates which file you need to edit.
 
-The [https://supabase.com/docs/guides/with-nextjs](NextJS Quickstart), for example, is a markdown file that you can edit directly. This [https://supabase.com/docs/reference/javascript/auth-signup](supabase-js reference doc), however, is generated from a [https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml](spec file).
+For example, the [NextJS Quickstart](https://supabase.com/docs/guides/with-nextjs) is a markdown file you can edit directly. However, this [signUp() reference doc](https://supabase.com/docs/reference/javascript/auth-signup) is generated from a [spec file](https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml).
 
 ## Create a pull request
 
