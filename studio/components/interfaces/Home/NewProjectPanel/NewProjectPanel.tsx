@@ -15,7 +15,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
   const { ref } = router.query
 
   return (
-    <div className="grid grid-cols-12 gap-20">
+    <div className="grid grid-cols-12 gap-4 lg:gap-20">
       <div className="col-span-12">
         <div className="flex flex-col space-y-20">
           <div className="flex flex-col justify-between h-full">
@@ -28,8 +28,8 @@ const NewProjectPanel: FC<Props> = ({}) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-12 flex gap-4">
-            <div className="col-span-7 space-y-8 flex flex-col justify-center">
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 lg:col-span-7 space-y-8 flex flex-col justify-center">
               <div className="space-y-2">
                 <h3 className="text-xl text-scale-1200">
                   Get started by building out your database
@@ -40,7 +40,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                   you need something more.
                 </p>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Link href={`/project/${ref}/editor`}>
                   <a>
                     <Button
@@ -86,11 +86,13 @@ const NewProjectPanel: FC<Props> = ({}) => {
                 </Link>
               </div>
             </div>
-            <GetStartedHero />
+            <div className="col-span-12 lg:col-span-5">
+              <GetStartedHero />
+            </div>
           </div>
 
           <div className="flex flex-col justify-between h-full space-y-6">
-            <div className="space-y-2">
+            <div className="max-w-2xl space-y-2">
               <h3 className="text-xl text-scale-1200">Explore our other products</h3>
               <p className="text-base text-scale-1100">
                 Supabase provides all the backend features you need to build a product. You can use
@@ -204,18 +206,19 @@ const NewProjectPanel: FC<Props> = ({}) => {
           </div>
         </div>
       </div>
-      <div className="col-span-4">
+
+      <div className="col-span-12 lg:col-span-4">
         <div className="space-y-6">
           <div className="space-y-2">
             <h3 className="text-xl text-scale-1200">Connecting to your new project</h3>
-            <p className="lg:max-w-sm text-scale-1100">
+            <p className="text-base lg:max-w-sm text-scale-1100">
               Interact with your database through the{' '}
               <Link href="https://supabase.com/docs/reference">
                 <a className="text-brand-900">Supabase client libraries</a>
               </Link>{' '}
               with your API keys.
             </p>
-            <p className="lg:max-w-sm text-scale-1100">
+            <p className="text-base lg:max-w-sm text-scale-1100">
               More information about your project's keys can be found in your project's API
               settings.
             </p>
@@ -236,7 +239,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
           </div>
         </div>
       </div>
-      <div className="col-span-8">
+      <div className="col-span-12 lg:col-span-8">
         <APIKeys />
       </div>
     </div>
