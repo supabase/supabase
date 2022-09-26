@@ -18,8 +18,10 @@ const appRegex =
 // Regex from https://stackoverflow.com/a/18696953/4807782
 const localhostRegex = /^(?:^|\s)((https?:\/\/)?(?:localhost|[\w-]+(?:\.[\w-]+)+)(:\d+)?(\/\S*)?)/i
 
+const chromeExtensionRegex = /chrome-extension:\/\/([a-zA-Z]*)/gm
+
 // combine the above regexes
 export const domainRegex = new RegExp(
-  `(${baseDomainRegex.source})|(${localhostRegex.source})|(${appRegex.source})`,
+  `(${baseDomainRegex.source})|(${localhostRegex.source})|(${appRegex.source})|(${chromeExtensionRegex.source})`,
   'i'
 )
