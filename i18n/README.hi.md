@@ -11,11 +11,11 @@
 
 - [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://supabase.com/docs/guides/database)
 - [x] प्रमाणीकरण और प्राधिकरण। [प्रलेखन](https://supabase.com/docs/guides/auth)
-- [x] उत्पन्न एपीआईस। 
+- [x] उत्पन्न एपीआईस।
   - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/api#rest-api)
   - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/api#realtime-api)
   - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://supabase.com/docs/guides/api#graphql-api)
-- [x] फ़ंक्शंस। 
+- [x] फ़ंक्शंस।
   - [x] डेटाबेस फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/database/functions)
   - [x] एज फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/functions)
 - [x] भंडारण। [प्रलेखन](https://supabase.com/docs/guides/storage)
@@ -27,14 +27,14 @@
 
 पूर्ण प्रलेखन के लिए, [supabase.com/docs](https://supabase.com/docs) पर जाएँ
 
-योगदान करने के लिए, [गेट्टिंग स्टार्टेड](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) पेज पर जाएँ 
+योगदान करने के लिए, [गेट्टिंग स्टार्टेड](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) पेज पर जाएँ
 
 ## सामुदायिक तथा सहयोग
 
 - [सामुदायिक मंच](https://github.com/supabase/supabase/discussions)। निर्माण में मदद और डेटाबेस की सर्वोत्तम प्रथाओं के बारे में चर्चा के लिए उचित है।
 - [गिटहब इश्यूस](https://github.com/supabase/supabase/issues)। सुपाबेस का उपयोग करते समय बगस और त्रुटियां के लिए उचित है।
-- [ई-मेल समर्थन](https://supabase.com/docs/support#business-support)। आपके डेटाबेस और इंफ़्रास्ट्रक्चर के साथ समस्याएं के लिए उचित है। 
-- [डिस्कॉर्ड](https://discord.supabase.com/)। अपने प्रोजेक्ट्स शेयर करने के लिए और हमारी सुपाबेस समुदाय के साथ बातचीत करने के लिए उचित है। 
+- [ई-मेल समर्थन](https://supabase.com/docs/support#business-support)। आपके डेटाबेस और इंफ़्रास्ट्रक्चर के साथ समस्याएं के लिए उचित है।
+- [डिस्कॉर्ड](https://discord.supabase.com/)। अपने प्रोजेक्ट्स शेयर करने के लिए और हमारी सुपाबेस समुदाय के साथ बातचीत करने के लिए उचित है।
 
 ## स्थिति
 
@@ -67,7 +67,7 @@
 - [GoTrue](https://github.com/netlify/gotrue) उपयोगकर्ताओं को प्रबंधित करने और SWT टोकन जारी करने के लिए एक SWT आधारित एपीआई है।
 - [Kong](https://github.com/Kong/kong) एक क्लाउड-नेटिव एपीआई गेटवे है।
 
-#### मुवक्किल लाइब्रेरीज़ 
+#### मुवक्किल लाइब्रेरीज़
 
 हमारी सारी क्लाइंट लिब्ररियाँ मॉड्यूलर है। प्रत्येक उप-पुस्तकालय एक बाहरी प्रणाली के लिए एक स्टैंडअलोन कार्यान्वयन है। यह उन तरीकों में से एक है जिससे हम मौजूदा सॉफ़्टवेयर उपकारों का समर्थन करते हैं।
 
