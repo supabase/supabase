@@ -4,11 +4,11 @@ title: Logging
 description: Getting started with Supabase Platform Log Browser
 ---
 
-The Supabase Platform provides a log explorer that allows log tracing and debugging. Currently, PostgreSQL and Cloudflare edge logs are available. The available logs are based on your plan's log retention, which can be found on the [pricing page](https://supabase.com/pricing).
+The Supabase Platform provides a log explorer that allows log tracing and debugging. The availability of logs are based on your plan's log retention, which can be found on the [pricing page](https://supabase.com/pricing).
 
 :::note
 
-The features discussed in this article are only available through the Supabase Platform and are not yet available on self-hosted.
+The features discussed in this article are only available through the **Supabase Platform** and are not yet available on self-hosted.
 
 :::
 
@@ -42,11 +42,43 @@ The Postgres Logs can be found under `Database > Postgres Logs`. These show all 
 ![Postgres Logs](/img/guides/platform/logs/logs-database.png)
 
   </TabItem>
+  <TabItem value="auth" label="Auth">
+
+The Auth Logs can be found under `Authentication > Logs`. These show all server logs for your [Auth system](../../guides/auth).
+
+![Auth Logs](/img/guides/platform/logs/logs-auth.png)
+
+  </TabItem>
+  <TabItem value="storage" label="Storage">
+
+The Storage Logs can be found under `Storage > Logs`. These show all server logs for your [Storage API](../../guides/storage).
+
+![Storage Logs](/img/guides/platform/logs/logs-storage.png)
+
+  </TabItem>
+  <TabItem value="realtime" label="Realtime">
+
+The Realtime Logs can be found under `Database > Realtime Logs`. These show all server logs for your [Realtime API](../../guides/realtime).
+
+![Realtime Logs](/img/guides/platform/logs/logs-realtime.png)
+
+  </TabItem>
+  <TabItem value="functions" label="Edge Functions">
+
+The Edge Functions Logs can be found under two tabs:
+- `Functions > Your Function > Invocations`: Edge logs of function calls.
+- `Functions > Your Function > Logs`: Logs emitted during function execution.
+
+![Function Edge Logs](/img/guides/platform/logs/logs-functions-edge.png)
+
+![Function Logs](/img/guides/platform/logs/logs-functions.png)
+
+  </TabItem>
 </Tabs>
 
 ## Logs Explorer
 
-![Sidebar navigation steps](/img/guides/platform/logs/sidebar-navigation.png)
+![Logs Explorer](/img/guides/platform/logs/logs-explorer.png)
 
 The log browser can be accessed in the sidebar under **Logs Explorer**. The **Logs Explorer** is for querying and aggregating project logs across products using SQL `SELECT` queries.
 
@@ -62,12 +94,12 @@ The following log sources are currently supported and can be viewed under the **
 - `function_logs`: Function internal logs, containing any `console` logging from within the edge function.
 
 
-### Querying with the Logs Explorer
+## Querying with the Logs Explorer
 
 The underlying SQL engine used for the Logs Explorer is BigQuery, hence you will be able to use any of the [available SQL functions and operators]((https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators)) supported by BigQuery.
 
 
-#### Timestamp Display and Behavior
+### Timestamp Display and Behavior
 
 Each log entry is stored with a `timestamp`. In order to utilize the `timestamp` field in a query, you can use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
 
@@ -79,7 +111,7 @@ To render the timestamps in a human-readable format, we recommend using the `DAT
 SELECT DATETIME(timestamp) FROM ....
 ```
 
-#### Unnesting Arrays
+### Unnesting Arrays
 
 To query nested data within log event, you will need to unnest the field and "join" the unnested data. Clicking on the log row shows that log metadata is stored as an array of objects.
 
@@ -97,11 +129,11 @@ CROSS JOIN UNNEST(r.headers) as h
 
 Here, the `metadata` key when rendered in the Logs Explorer shows an array. In order to drill down further, we perform the `CROSS JOIN UNNEST()` to select the nested key `request`. However, in order to query the headers, we have to go one step further and perform the join and unnest again in order to have access to the headers, under the alias `h`.
 
-#### LIMIT and Result Row Limitations
+### LIMIT and Result Row Limitations
 
 The Logs Explorer has a maximum of 1000 rows per run. To optimize your queries, you may wish to add in a `LIMIT` to your SQL query, to reduce the number of rows returned even further.
 
-#### Best Practices
+### Best Practices
 
 1. Have a WHERE statement filtering over **timestamp**
 
