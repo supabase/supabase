@@ -45,7 +45,7 @@ npm run -- --watch # run tests in watch mode
 
 ## Running within a self-hosted environment
 
-Follow the guide [here](https://supabase.com/docs/guides/hosting/docker) to get started with self-hosted Supabase.
+Follow the [self-hosting guide](https://supabase.com/docs/guides/hosting/docker) to get started.
 
 ```
 cd ..
