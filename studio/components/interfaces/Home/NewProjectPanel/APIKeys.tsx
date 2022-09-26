@@ -154,7 +154,7 @@ const APIKeys = () => {
                     key={language.key}
                     className={[
                       'px-3 py-1 text-sm cursor-pointer transition',
-                      `${!isSelected ? 'bg-scale-100 text-scale-1000' : 'bg-scale-300'}`,
+                      `${!isSelected ? 'bg-scale-200 text-scale-1000' : 'bg-scale-300'}`,
                     ].join(' ')}
                     onClick={() => setSelectedLanguage(language)}
                   >
