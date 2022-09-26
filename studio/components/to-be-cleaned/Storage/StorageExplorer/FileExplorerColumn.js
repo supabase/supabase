@@ -121,6 +121,7 @@ const FileExplorerColumn = ({
   const SelectAllCheckbox = () => (
     <Checkbox
       label=""
+      className="-mt-0.5"
       checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
       disabled={columnFiles.length === 0}
       onChange={() => onSelectAllItemsInColumn(index)}
@@ -151,7 +152,7 @@ const FileExplorerColumn = ({
       {/* Checkbox selection for select all */}
       {view === STORAGE_VIEWS.COLUMNS && (
         <div
-          className={`bg-table-header-light dark:bg-table-header-dark sticky top-0 z-10 flex items-center px-4 mb-0 ${
+          className={`bg-table-header-light dark:bg-table-header-dark sticky top-0 z-10 flex items-center px-2.5 mb-0 ${
             haveSelectedItems > 0 ? 'opacity-100 py-3 h-10' : 'opacity-0 py-0 h-0'
           } transition-all duration-200`}
           onClick={(event) => event.stopPropagation()}
@@ -172,27 +173,18 @@ const FileExplorerColumn = ({
         <div
           className="
           bg-panel-footer-light dark:bg-panel-footer-dark
-          px-4 py-2 flex items-center min-w-min sticky top-0 z-10
+          px-2.5 py-2 flex items-center min-w-min sticky top-0 z-10
           border-b border-panel-border-light dark:border-panel-border-dark
         "
         >
-          <SelectAllCheckbox />
-          <p className="text-sm" style={{ width: '30%', minWidth: '250px' }}>
-            Name
-          </p>
-          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
-            Size
-          </p>
-          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
-            Type
-          </p>
-          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
-            Created at
-          </p>
-          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
-            Last modified at
-          </p>
-          <div className="w-3" />
+          <div className="flex items-center w-[40%] min-w-[250px]">
+            <SelectAllCheckbox />
+            <p className="text-sm">Name</p>
+          </div>
+          <p className="text-sm w-[11%] min-w-[100px]">Size</p>
+          <p className="text-sm w-[14%] min-w-[100px]">Type</p>
+          <p className="text-sm w-[15%] min-w-[160px]">Created at</p>
+          <p className="text-sm w-[15%] min-w-[160px]">Last modified at</p>
         </div>
       )}
 
@@ -241,7 +233,7 @@ const FileExplorerColumn = ({
       {/* Drag drop upload CTA for when column is empty */}
       {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
         <div className="h-full w-full flex flex-col items-center justify-center">
-          <img src="/img/storage-placeholder.svg" className="opacity-75" />
+          <img src="/img/storage-placeholder.svg" className="opacity-75 pointer-events-none" />
           <p className="my-3 opacity-75">Drop your files here</p>
           <p className="text-sm text-center w-40 text-scale-1100">
             Or upload them via the "Upload file" button above
@@ -264,7 +256,7 @@ const FileExplorerColumn = ({
         <div
           className="
           bg-panel-footer-light dark:bg-panel-footer-dark
-          px-4 py-2 flex items-center min-w-min sticky bottom-0 z-10
+          px-2.5 py-2 flex items-center min-w-min sticky bottom-0 z-10
         "
         >
           <p className="text-sm">

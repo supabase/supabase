@@ -3,7 +3,6 @@ import { isUndefined } from 'lodash'
 import {
   Checkbox,
   Input,
-  Typography,
   IconX,
   IconMenu,
   Popover,
@@ -71,32 +70,32 @@ const Column: FC<Props> = ({
     <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
         <div className="cursor-drag" {...dragHandleProps}>
-          <Typography>
-            <IconMenu strokeWidth={1} size={15} />
-          </Typography>
+          <IconMenu strokeWidth={1} size={15} />
         </div>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[20%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
             value={column.name}
             size="small"
+            title={column.name}
             disabled={hasImportContent}
             placeholder="Column name"
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
-            actions={
-              <Button
-                type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
-                onClick={() => onEditRelation(column)}
-              >
-                <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
-              </Button>
-            }
             onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
           />
         </div>
+      </div>
+      <div className="w-[5%]  pl-0.5">
+        <Button
+          type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
+          onClick={() => onEditRelation(column)}
+          className="px-1 py-2"
+        >
+          <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
+        </Button>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
@@ -153,7 +152,7 @@ const Column: FC<Props> = ({
               className="pointer-events-auto"
               header={
                 <div className="flex items-center justify-center">
-                  <h5 className="text-scale-1200 text-sm">Extra options</h5>
+                  <h5 className="text-sm text-scale-1200">Extra options</h5>
                 </div>
               }
               overlay={[
@@ -218,11 +217,11 @@ const Column: FC<Props> = ({
             >
               <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="bg-scale-1200 dark:bg-scale-100 text-scale-100 dark:text-scale-1100 rounded-full py-0.5 px-2 text-xs">
+                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-scale-1100">
                     {settingsCount}
                   </div>
                 )}
-                <div className="text-scale-1100 group-hover:text-scale-1200 transition-colors">
+                <div className="text-scale-1100 transition-colors group-hover:text-scale-1200">
                   <IconSettings size={18} strokeWidth={1} />
                 </div>
               </div>
@@ -233,9 +232,7 @@ const Column: FC<Props> = ({
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
           <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
-            <Typography>
-              <IconX strokeWidth={1} />
-            </Typography>
+            <IconX strokeWidth={1} />
           </div>
         </div>
       )}

@@ -2,15 +2,15 @@ import { Loading } from '@supabase/ui'
 import React, { ReactNode } from 'react'
 
 interface Props {
-  bodyClassName?: string;
-  children?: ReactNode;
-  className?: string;
-  footer?: JSX.Element | false;
-  hideHeaderStyling?: boolean;
-  loading?: boolean;
-  noMargin?: boolean;
-  title?: JSX.Element | false;
-  wrapWithLoading?: boolean;
+  bodyClassName?: string
+  children?: ReactNode
+  className?: string
+  footer?: JSX.Element | false
+  hideHeaderStyling?: boolean
+  loading?: boolean
+  noMargin?: boolean
+  title?: JSX.Element | false
+  wrapWithLoading?: boolean
 }
 function Panel(props: Props) {
   let headerClasses: string[] = []
@@ -63,7 +63,7 @@ function Panel(props: Props) {
   return <Loading active={Boolean(props.loading)}>{content}</Loading>
 }
 
-function Content({children, className}: {children: ReactNode; className?: string | false}) {
+function Content({ children, className }: { children: ReactNode; className?: string | false }) {
   let classes = ['px-6 py-4']
   if (className) classes.push(className)
   return <div className={classes.join(' ')}>{children}</div>

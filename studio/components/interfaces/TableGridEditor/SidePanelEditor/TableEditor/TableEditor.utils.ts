@@ -30,12 +30,14 @@ export const generateTableField = (): TableField => {
     comment: '',
     columns: DEFAULT_COLUMNS,
     isRLSEnabled: false,
+    isRealtimeEnabled: false,
   }
 }
 
 export const generateTableFieldFromPostgresTable = (
   table: PostgresTable,
-  isDuplicating = false
+  isDuplicating = false,
+  isRealtimeEnabled = false
 ): TableField => {
   return {
     id: table.id,
@@ -46,6 +48,7 @@ export const generateTableFieldFromPostgresTable = (
       return generateColumnFieldFromPostgresColumn(column, table)
     }),
     isRLSEnabled: table.rls_enabled,
+    isRealtimeEnabled,
   }
 }
 

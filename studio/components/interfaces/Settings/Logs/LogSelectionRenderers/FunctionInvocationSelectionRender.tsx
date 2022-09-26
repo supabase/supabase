@@ -1,15 +1,18 @@
 import dayjs from 'dayjs'
 import { filterFunctionsRequestResponse } from 'lib/logs'
+import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import { jsonSyntaxHighlight, ResponseCodeFormatter } from '../LogsFormatters'
 
-const FunctionInvocationSelectionRender = ({ log }: any) => {
-  const request = log?.request
-  const response = log?.response
-  const method = log?.method
-  const status = log?.status_code
+const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => {
+  const metadata = log.metadata?.[0]
+  const request = metadata?.request?.[0]
+  const response = metadata?.response?.[0]
+  const method = request?.method
+  const status = response?.status_code
   const requestUrl = new URL(request?.url)
-  const executionTimeMs = log?.execution_time_ms
+  const executionTimeMs = metadata.execution_time_ms
+  const deploymentId = metadata.deployment_id
   const timestamp = dayjs(log.timestamp / 1000)
 
   const DetailedRow = ({
@@ -24,7 +27,11 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
     return (
       <div className="grid grid-cols-12">
         <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
-        <span className={`text-scale-1200 text-sm col-span-8 whitespace-pre-wrap ${code && 'text-xs font-mono'}`}>
+        <span
+          className={`text-scale-1200 text-sm col-span-8 whitespace-pre-wrap ${
+            code && 'text-xs font-mono'
+          }`}
+        >
           {value}
         </span>
       </div>
@@ -38,7 +45,7 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
         <DetailedRow label="Method" value={method} />
         <DetailedRow label="Timestamp" value={dayjs(timestamp).format('DD MMM, YYYY HH:mm')} />
         <DetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
-        <DetailedRow label="Deployment ID" value={log.deployment_id} />
+        <DetailedRow label="Deployment ID" value={deploymentId} />
         <DetailedRow label="Log ID" value={log.id} />
         <DetailedRow label="Request Path" value={requestUrl.pathname + requestUrl.search} />
       </div>

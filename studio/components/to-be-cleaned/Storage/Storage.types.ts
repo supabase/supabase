@@ -1,4 +1,4 @@
-import { PolicyFormField } from 'components/interfaces/Authentication/Policies/Policies.types'
+import { PolicyFormField } from 'components/interfaces/Auth/Policies/Policies.types'
 
 export interface StoragePolicyFormField extends PolicyFormField {
   allowedOperations: string[]

@@ -4,22 +4,25 @@ import { observer } from 'mobx-react-lite'
 import { IconSave, Loading } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
-import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
+import { LogsExplorerLayout } from 'components/layouts'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
-  const { content } = useStore()
+  const { content, ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
+
+  useEffect(() => {
+    content.load()
+  }, [ui.selectedProject])
 
   if (content.isLoading) {
     return <Loading active={true}>{null}</Loading>
   }
-  const saved = content.logSqlSnippets()
-
+  const saved = content.savedLogSqlSnippets()
   return (
     <>
       <div className="flex flex-col gap-3">
@@ -30,34 +33,29 @@ export const LogsSavedPage: NextPageWithLayout = () => {
               <>
                 <Table.th>Name</Table.th>
                 <Table.th>Description</Table.th>
-                <Table.th className="">Created</Table.th>
-                <Table.th className="">Last updated</Table.th>
-                <Table.th className=""></Table.th>
+                <Table.th>Created</Table.th>
+                <Table.th>Last updated</Table.th>
+                <Table.th></Table.th>
               </>
             }
-            body={
-              <>
-                {saved.length > 0 &&
-                  saved.map((item: any) => <LogsSavedQueriesItem key={item.id} item={item} />)}
-              </>
-            }
+            body={saved.map((item) => (
+              <LogsSavedQueriesItem key={item.id} item={item} />
+            ))}
           />
         )}
       </div>
       {saved.length === 0 && (
-        <>
-          <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
-            <IconSave className="animate-bounce" />
-            <h3 className="text-scale-1200 text-lg">No Saved Queries Yet</h3>
-            <p className="text-scale-900 text-sm">
-              Saved queries will appear here. Queries can be saved from the{' '}
-              <Link href={`/project/${ref}/logs-explorer`}>
-                <span className="cursor-pointer font-bold text-white underline">Query</span>
-              </Link>{' '}
-              tab.
-            </p>
-          </div>
-        </>
+        <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
+          <IconSave className="animate-bounce" />
+          <h3 className="text-scale-1200 text-lg">No Saved Queries Yet</h3>
+          <p className="text-scale-900 text-sm">
+            Saved queries will appear here. Queries can be saved from the{' '}
+            <Link href={`/project/${ref}/logs-explorer`}>
+              <span className="cursor-pointer font-bold underline">Query</span>
+            </Link>{' '}
+            tab.
+          </p>
+        </div>
       )}
     </>
   )

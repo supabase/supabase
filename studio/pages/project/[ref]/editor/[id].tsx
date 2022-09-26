@@ -3,16 +3,16 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Dictionary } from 'components/grid'
+import { Modal } from '@supabase/ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
 import { tryParseJson } from 'lib/helpers'
 import { useStore, withAuth } from 'hooks'
+import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { Modal } from '@supabase/ui'
 
 const TableEditorPage: NextPage = () => {
   const router = useRouter()
@@ -36,7 +36,9 @@ const TableEditorPage: NextPage = () => {
   const selectedTable = !isNaN(Number(id))
     ? // @ts-ignore
       tables.find((table) => table.id === Number(id))
-    : tryParseJson(Base64.decode(id))
+    : id !== undefined
+    ? tryParseJson(Base64.decode(id))
+    : undefined
 
   useEffect(() => {
     if (selectedTable && 'schema' in selectedTable) {
@@ -167,6 +169,7 @@ const TableEditorPage: NextPage = () => {
         onEditColumn={onEditColumn}
         onDeleteColumn={onDeleteColumn}
         onClosePanel={onClosePanel}
+        theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
       />
       <ConfirmationModal
         danger
@@ -187,7 +190,9 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={
+          <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
+        }
         children={
           <Modal.Content>
             <p className="text-scale-1100 py-4 text-sm">

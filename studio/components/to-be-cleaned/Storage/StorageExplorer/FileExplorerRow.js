@@ -9,8 +9,15 @@ import {
   IconMusic,
   IconFilm,
   IconFile,
+  IconAlertCircle,
+  IconDownload,
+  IconTrash,
+  IconCopy,
+  IconEdit,
+  IconMove,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useContextMenu } from 'react-contexify'
 import {
   STORAGE_VIEWS,
@@ -78,6 +85,7 @@ const FileExplorerRow = ({
   onSelectItemRename = () => {},
   onSelectItemMove = () => {},
 }) => {
+  const itemWithColumnIndex = { ...item, columnIndex }
   const isSelected = find(selectedItems, item) !== undefined
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
@@ -95,10 +103,11 @@ const FileExplorerRow = ({
 
     const onSetItemName = (event) => {
       event.preventDefault()
+      event.stopPropagation()
       if (item.type === STORAGE_ROW_TYPES.FILE) {
         onRenameFile(item, itemName, columnIndex)
       } else if (has(item, 'id')) {
-        onRenameFolder(item, itemName, columnIndex)
+        onRenameFolder(itemWithColumnIndex, itemName, columnIndex)
       } else {
         onCreateFolder(itemName, columnIndex)
       }
@@ -106,7 +115,7 @@ const FileExplorerRow = ({
 
     return (
       <div className="storage-row flex items-center justify-between rounded bg-gray-500">
-        <div className="flex flex-grow items-center h-full px-4">
+        <div className="flex flex-grow items-center h-full px-2.5">
           <div className="">
             <RowIcon
               view={view}
@@ -115,7 +124,7 @@ const FileExplorerRow = ({
               mimeType={item.metadata?.mimetype}
             />
           </div>
-          <form className="h-9">
+          <form className="h-9" onSubmit={onSetItemName}>
             <input
               autoFocus
               ref={inputRef}
@@ -132,7 +141,6 @@ const FileExplorerRow = ({
     )
   }
 
-  const itemWithColumnIndex = { ...item, columnIndex }
   const rowOptions =
     item.type === STORAGE_ROW_TYPES.BUCKET
       ? [{ name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) }]
@@ -142,11 +150,36 @@ const FileExplorerRow = ({
           { name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) },
         ]
       : [
-          { name: 'Copy URL', onClick: () => onCopyFileURL(itemWithColumnIndex) },
-          { name: 'Rename', onClick: () => onSelectItemRename(itemWithColumnIndex) },
-          { name: 'Move', onClick: () => onSelectItemMove(itemWithColumnIndex) },
-          { name: 'Download', onClick: () => onDownloadFile(itemWithColumnIndex) },
-          { name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) },
+          ...(!item.isCorrupted
+            ? [
+                {
+                  name: 'Copy URL',
+                  icon: <IconCopy size="tiny" />,
+                  onClick: () => onCopyFileURL(itemWithColumnIndex),
+                },
+                {
+                  name: 'Rename',
+                  icon: <IconEdit size="tiny" />,
+                  onClick: () => onSelectItemRename(itemWithColumnIndex),
+                },
+                {
+                  name: 'Move',
+                  icon: <IconMove size="tiny" />,
+                  onClick: () => onSelectItemMove(itemWithColumnIndex),
+                },
+                {
+                  name: 'Download',
+                  icon: <IconDownload size="tiny" />,
+                  onClick: () => onDownloadFile(itemWithColumnIndex),
+                },
+                { name: 'Separator' },
+              ]
+            : []),
+          {
+            name: 'Delete',
+            icon: <IconTrash size="tiny" />,
+            onClick: () => onSelectItemDelete(itemWithColumnIndex),
+          },
         ]
 
   const size = item.metadata ? formatBytes(item.metadata.size) : '-'
@@ -167,9 +200,16 @@ const FileExplorerRow = ({
     })
   }
 
+  const nameWidth =
+    view === STORAGE_VIEWS.LIST && item.isCorrupted
+      ? `calc(100% - 60px)`
+      : view === STORAGE_VIEWS.LIST && !item.isCorrupted
+      ? `calc(100% - 50px)`
+      : '100%'
+
   return (
     <div
-      className="border-b dark:border-dark"
+      className="border-b dark:border-dark h-full"
       onContextMenu={(event) => {
         event.stopPropagation()
         item.type === STORAGE_ROW_TYPES.FILE
@@ -178,21 +218,30 @@ const FileExplorerRow = ({
       }}
     >
       <div
-        className={`
-        storage-row px-4 flex items-center justify-between hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark
-        ${isOpened ? 'bg-scale-400' : ''} ${
-          isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''
-        } ${view === STORAGE_VIEWS.LIST ? 'min-w-min' : ''}
-        ${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}
-      `}
+        className={[
+          'storage-row px-2.5 flex items-center group h-full',
+          'hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark',
+          `${isOpened ? 'bg-scale-400' : ''}`,
+          `${isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''}`,
+          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
+        ].join(' ')}
+        onClick={(event) => {
+          event.stopPropagation()
+          event.preventDefault()
+          if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
+            item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
+              ? onSelectFolder(columnIndex, item)
+              : onSelectFile(columnIndex, item)
+          }
+        }}
       >
-        <div className="w-full flex flex-grow items-center">
-          {/* Row Checkbox / Row Icon */}
-          <div
-            className="relative group"
-            style={{ width: view === STORAGE_VIEWS.COLUMNS ? '15%' : 'auto' }}
-            onClick={(event) => event.stopPropagation()}
-          >
+        <div
+          className={[
+            'flex items-center',
+            view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]',
+          ].join(' ')}
+        >
+          <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
             {!isSelected && (
               <div
                 className={`absolute ${
@@ -214,37 +263,51 @@ const FileExplorerRow = ({
                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               checked={isSelected}
-              onChange={() => onCheckItem(itemWithColumnIndex)}
+              onChange={(event) => {
+                event.stopPropagation()
+                onCheckItem(itemWithColumnIndex)
+              }}
             />
           </div>
+          <p title={item.name} className="text-sm truncate" style={{ width: nameWidth }}>
+            {item.name}
+          </p>
+          {item.isCorrupted && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <IconAlertCircle size={18} strokeWidth={2} className="text-scale-1000" />
+              </Tooltip.Trigger>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                    'border-scale-200 border',
+                  ].join(' ')}
+                >
+                  <span className="text-scale-1200 text-xs">
+                    File is corrupted, please delete and reupload again.
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          )}
+        </div>
 
-          {/* Row Text */}
-          <div
-            className="flex items-center h-full py-2"
-            style={{ width: view === STORAGE_VIEWS.COLUMNS ? '80%' : '100%' }}
-            onClick={(event) => {
-              event.stopPropagation()
-              event.preventDefault()
-              if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-                item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
-                  ? onSelectFolder(columnIndex, item)
-                  : onSelectFile(columnIndex, item)
-              }
-            }}
-          >
-            {view === STORAGE_VIEWS.COLUMNS ? (
-              <p className="text-sm w-full truncate">{item.name}</p>
-            ) : (
-              <>
-                <p className="text-sm truncate w-[30%] min-w-[250px]">{item.name}</p>
-                <p className="text-sm truncate w-[15%] min-w-[100px]">{size}</p>
-                <p className="text-sm truncate w-[15%] min-w-[100px]">{mimeType}</p>
-                <p className="text-sm truncate w-[20%] min-w-[180px]">{createdAt}</p>
-                <p className="text-sm truncate w-[20%] min-w-[175px]">{updatedAt}</p>
-                {/* The 175px here is intentional due to the irregular width of the header checkbox and row icon */}
-              </>
-            )}
-          </div>
+        {view === STORAGE_VIEWS.LIST && (
+          <>
+            <p className="text-sm truncate w-[11%] min-w-[100px]">{size}</p>
+            <p className="text-sm truncate w-[14%] min-w-[100px]">{mimeType}</p>
+            <p className="text-sm truncate w-[15%] min-w-[160px]">{createdAt}</p>
+            <p className="text-sm truncate w-[15%] min-w-[160px]">{updatedAt}</p>
+          </>
+        )}
+
+        <div
+          className={`flex items-center justify-end ${
+            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+          }`}
+        >
           {item.status === STORAGE_ROW_STATUS.LOADING ? (
             <IconLoader
               className={`animate-spin ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
@@ -256,11 +319,21 @@ const FileExplorerRow = ({
               side="bottom"
               align="end"
               overlay={[
-                rowOptions.map((option) => (
-                  <Dropdown.Item key={option.name} onClick={option.onClick}>
-                    {option.name}
-                  </Dropdown.Item>
-                )),
+                rowOptions.map((option) => {
+                  if (option.name === 'Separator') {
+                    return <Dropdown.Seperator key="row-separator" />
+                  } else {
+                    return (
+                      <Dropdown.Item
+                        key={option.name}
+                        icon={option.icon || <></>}
+                        onClick={option.onClick}
+                      >
+                        {option.name}
+                      </Dropdown.Item>
+                    )
+                  }
+                }),
               ]}
             >
               <div className="storage-row-menu opacity-0">

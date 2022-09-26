@@ -1,23 +1,20 @@
 import {
-  IconUsers,
-  IconFileText,
   IconArchive,
-  IconSettings,
-  IconDatabase,
   IconBarChart,
-  IconList,
   IconCode,
+  IconDatabase,
+  IconFileText,
+  IconList,
+  IconSettings,
+  IconUsers,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { Route } from 'components/ui/ui.types'
-
-import { useFlag } from 'hooks'
 import { ProjectBase } from 'types'
+import { Route } from 'components/ui/ui.types'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 export const generateProductRoutes = (ref: string, project?: ProjectBase): Route[] => {
-  const functionsUi = useFlag('functionsUi')
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
@@ -68,11 +65,11 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
       icon: <IconDatabase size={18} strokeWidth={2} />,
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`,
     },
-    ...(IS_PLATFORM && functionsUi
+    ...(IS_PLATFORM
       ? [
           {
             key: 'functions',
-            label: 'Functions',
+            label: 'Edge Functions',
             icon: <IconCode size={18} strokeWidth={2} />,
             link: isProjectBuilding ? buildingUrl : `/project/${ref}/functions`,
           },
@@ -81,7 +78,7 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
   ]
 }
 
-export const generateOtherRoutes = (ref: string, project?: ProjectBase) => {
+export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 

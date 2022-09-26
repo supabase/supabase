@@ -4,11 +4,8 @@ import {
   IconArrowUpRight,
   IconBriefcase,
   IconEye,
-  IconKey,
   IconLink,
   IconShield,
-  IconX,
-  Space,
 } from '@supabase/ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
@@ -17,14 +14,13 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
+import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
 import FeatureColumn from '~/components/FeatureColumn'
 import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
@@ -218,7 +214,7 @@ function AuthPage() {
         </div>
 
         <SectionContainer>
-          <div className="grid grid-cols-12 lg:gap-16">
+          <div className="grid grid-cols-12 lg:mt-16 lg:gap-16">
             <div className="col-span-12 mb-8 lg:col-span-5">
               <h2 className="h3">User permissions without the middleware</h2>
 
@@ -246,62 +242,8 @@ function AuthPage() {
           </div>
         </SectionContainer>
 
-        {/* <SectionContainer>
-          <div className="grid grid-cols-12 lg:gap-16">
-            <div className="order-last col-span-12 lg:order-first lg:col-span-6 mt-8 lg:mt-0">
-              <AuthComponentExample />
-            </div>
-            <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
-              <div className="mb-4 flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex justify-center items-center">
-                  <ProductIcon icon={Solutions['authentication'].icon} />
-                </div>
-                <p className="m-0">
-                  <IconX />
-                </p>
-                <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
-              </div>
+        <AuthWidgetSection />
 
-              <h2 className="h3">React Auth</h2>
-
-              <p className="p text-base lg:text-lg">
-                Pre-built auth widgets to get started in minutes.
-              </p>
-              <p className="p">
-                Supabase provides React libraries which handle common scenarios, including logging
-                in, signing up, magic link and forgot password forms.
-              </p>
-
-              <Link
-                href="https://github.com/supabase/ui#using-supabase-ui-auth"
-                as="https://github.com/supabase/ui#using-supabase-ui-auth"
-              >
-                <a>
-                  <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
-
-              <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8">
-                <div className="col-span-12 lg:col-span-12 xl:col-span-4">
-                  <FeatureColumn
-                    icon={<IconBriefcase />}
-                    title="Social login support"
-                    text="Support for social logins are built in and the component "
-                  />
-                </div>
-                <div className="col-span-12 lg:col-span-12 xl:col-span-4">
-                  <FeatureColumn
-                    icon={<IconEye />}
-                    title="User context hooks"
-                    text="Access the auth status from any component."
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </SectionContainer> */}
         <CTABanner />
       </DefaultLayout>
     </>

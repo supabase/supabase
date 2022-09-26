@@ -2,17 +2,18 @@ import { FC, useState, useEffect } from 'react'
 import {
   Button,
   Loading,
-  Typography,
   IconFileText,
   IconDownload,
   IconChevronLeft,
   IconChevronRight,
 } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get, head } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
+import NoPermission from 'components/ui/NoPermission'
 
 const PAGE_LIMIT = 10
 
@@ -35,7 +36,11 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const { stripe_customer_id } = organization
   const offset = (page - 1) * PAGE_LIMIT
 
+  const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')
+
   useEffect(() => {
+    if (!canReadInvoices) return
+
     let cancel = false
     const page = 1
 
@@ -91,6 +96,10 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
     }
   }
 
+  if (!canReadInvoices) {
+    return <NoPermission resourceText="view invoices" />
+  }
+
   return (
     <div className="my-4 container max-w-4xl space-y-1">
       <Loading active={loading}>
@@ -106,9 +115,9 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
             invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={5} className="p-3 py-12 text-center">
-                  <Typography.Text type="secondary">
+                  <p className="text-scale-1000">
                     {loading ? 'Checking for invoices' : 'No invoices for this organization yet'}
-                  </Typography.Text>
+                  </p>
                 </Table.td>
               </Table.tr>
             ) : (
@@ -120,15 +129,13 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                         <IconFileText size="xxl" />
                       </Table.td>
                       <Table.td>
-                        <Typography.Text>
-                          {new Date(x.period_end * 1000).toLocaleString()}
-                        </Typography.Text>
+                        <p>{new Date(x.period_end * 1000).toLocaleString()}</p>
                       </Table.td>
                       <Table.td>
-                        <Typography.Text>${x.subtotal / 100}</Typography.Text>
+                        <p>${x.subtotal / 100}</p>
                       </Table.td>
                       <Table.td>
-                        <Typography.Text>{x.number}</Typography.Text>
+                        <p>{x.number}</p>
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center space-x-2 justify-end">

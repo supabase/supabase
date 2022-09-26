@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -9,13 +9,17 @@
 
 [Supabase](https://supabase.com)는 오픈 소스 Firebase 대체 제품입니다. 엔터프라이즈 급 오픈 소스 도구를 사용하여 Firebase 기능을 구축하고 있습니다.
 
-- [x] 호스팅 된 Postgres 데이터베이스
-- [x] 실시간 구독
-- [x] 인증・승인
-- [x] 자동 생성 API
-- [x] 대시 보드
-- [x] 스토리지
-- [x] 함수
+- [x] 호스팅 된 Postgres 데이터베이스. [Docs](https://supabase.com/docs/guides/database)
+- [x] 사용자 인증 및 권한 부여. [Docs](https://supabase.com/docs/guides/auth)
+- [x] 자동생성 API.
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
+  - [x] 실시간 구독. [Docs](https://supabase.com/docs/guides/api#realtime-api)
+  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
+- [x] 함수.
+  - [x] 데이터베이스 함수. [Docs](https://supabase.com/docs/guides/database/functions)
+  - [x] 엣지 함수 [Docs](https://supabase.com/docs/guides/functions)
+- [x] 파일 스토리지. [Docs](https://supabase.com/docs/guides/storage)
+- [x] 대시보드
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
@@ -25,9 +29,10 @@
 
 ## 커뮤니티 및 지원
 
-- [커뮤니티 포럼](https://github.com/supabase/supabase/discussions) 어떤 때 사용하는지：데이터베이스의 모범 사례를 구축하고 토론하는데 도움이 됩니다.
-- [GitHub Issue](https://github.com/supabase/supabase/issues) 어떤 때 사용하는지: Supabase에서 사용하면서 발생한 버그와 오류가 발생할 때.
-- [Email 지원](https://supabase.com/docs/support#business-support) 어떤 때 사용하는지: 데이터베이스 또는 인프라 문제
+- [커뮤니티 포럼](https://github.com/supabase/supabase/discussions). 데이터베이스의 모범 사례를 구축하고 토론할 때 가장 적합합니다.
+- [깃허브 이슈](https://github.com/supabase/supabase/issues). Supabase 사용 시 발생하는 버그 및 오류를 만났을 때 가장 적합합니다.
+- [이메일 지원](https://supabase.com/docs/support#business-support). 여러분의 데이터베이스나 개발 인프라에 문제가 생겼을 때 가장 적합합니다.
+- [디스코드](https://discord.supabase.com). 여러분들의 어플리케이션을 공유하거나, 커뮤니티와 함께 어울리고 싶을때 가장 적합합니다.
 
 ## 상태
 
