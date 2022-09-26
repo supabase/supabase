@@ -287,7 +287,15 @@ We recommend using hyphens to name functions because hyphens are the most URL-fr
 
 ### CORS (Cross-Origin Resource Sharing)
 
-We recommend adding a check to handle [CORS Preflight](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request) requests in your edge function. Otherwise you won't be able to invoke the function from browsers. Check this [code snippet for a example implemention](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts#L11-L14).
+We recommend adding a check to handle [CORS Preflight](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request) requests in your edge function to be able to invoke the function from browsers.
+
+```ts
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+  ...
+})
 
 ## Limitations
 
