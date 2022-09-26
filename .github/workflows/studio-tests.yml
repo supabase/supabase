@@ -6,6 +6,8 @@ name: Studio Unit Tests
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'studio/**'
   pull_request:
     branches: [ master ]
     paths:
