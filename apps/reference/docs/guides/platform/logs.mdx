@@ -8,74 +8,138 @@ The Supabase Platform provides a log explorer that allows log tracing and debugg
 
 :::note
 
-The features discussed in this article are only available through the Supabase Platform and are not available on self-hosted.
+The features discussed in this article are only available through the Supabase Platform and are not yet available on self-hosted.
 
 :::
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Product Logs
 
-As well as a Log Explorer, Supabase provides a logging interface specific to each product.
+Supabase provides a logging interface specific to each product.
 
-### API Logs
+Simple regex searching is available through the search bar to search the log event messsage for specific keywords.
 
-![API Logs](/img/guides/platform/logs/logs-api.png)
+You may also export and download the returned resultset after adjusting and filtering down your product logs.
+
+<Tabs>
+  <TabItem value="api" label="API" default>
 
 The API Logs can be found under `Database > API Logs`. These show all network requests for the REST and GraphQL [API](../../guides/api).
 
-### Postgres Logs
+![API Logs](/img/guides/platform/logs/logs-api.png)
 
-![Postgres Logs](/img/guides/platform/logs/logs-database.png)
+  </TabItem>
+  <TabItem value="postgres" label="Postgres">
 
 The Postgres Logs can be found under `Database > Postgres Logs`. These show all queries and activity for your [Database](../../guides/database).
 
-## Log Explorer
+![Postgres Logs](/img/guides/platform/logs/logs-database.png)
+
+  </TabItem>
+</Tabs>
+
+## Logs Explorer
 
 ![Sidebar navigation steps](/img/guides/platform/logs/sidebar-navigation.png)
 
 The log browser can be accessed in the sidebar under **Logs Explorer**. The **Logs Explorer** is for querying and aggregating project logs across products using SQL `SELECT` queries.
 
-### Example
+The Logs Explorer exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
+
+The following log sources are currently supported and can be viewed under the **Sources** dropdown:
+- `edge_logs`: Edge network logs, containing request and response metadata retrieved from Cloudflare.
+- `postgres_logs`: Postgres database logs, containing statements executed by connected applications.
+- `auth_logs`: GoTrue server logs, containing authentication/authorization activity.
+- `storage_logs`: Storage server logs, containing object upload and retrieval information.
+- `realtime_logs`: Realtime server logs, containing client connection information.
+- `function_edge_logs`: Edge network logs for only edge functions, containing network requests and response metadata for each execution.
+- `function_logs`: Function internal logs, containing any `console` logging from within the edge function.
+
+
+### Querying with the Logs Explorer
+
+The underlying SQL engine used for the Logs Explorer is BigQuery, hence you will be able to use any of the [available SQL functions and operators]((https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators)) supported by BigQuery.
+
+
+#### Timestamp Display and Behavior
+
+Each log entry is stored with a `timestamp`. In order to utilize the `timestamp` field in a query, you can use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
+
+Raw top-level timestamp values are rendered as unix microsecond timestamps. SQL queries, however, should always use the `TIMESTAMP` data type. If you are using a unix timestamp value in a query, cast the value to a `TIMESTAMP` data type.
+
+To render the timestamps in a human-readable format, we recommend using the `DATETIME()` function to convert the unix timestamp display into an ISO-8601 timestamp.
+
+```sql
+SELECT DATETIME(timestamp) FROM ....
+```
+
+#### Unnesting Arrays
+
+To query nested data within log event, you will need to unnest the field and "join" the unnested data. Clicking on the log row shows that log metadata is stored as an array of objects.
+
+In order to query any value that is an array, we would need to `UNNEST()` that field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
+
+For example, a log event's metadata is stored as a repeated `RECORD` within BigQuery, hence we would need to do the following in order to query across the nested fields:
+
+```sql
+SELECT timestamp, r.method, h.cf_ipcountry
+FROM edge_logs t
+CROSS JOIN UNNEST(t.metadata) as m
+CROSS JOIN UNNEST(m.request) as r
+CROSS JOIN UNNEST(r.headers) as h
+```
+
+Here, the `metadata` key when rendered in the Logs Explorer shows an array. In order to drill down further, we perform the `CROSS JOIN UNNEST()` to select the nested key `request`. However, in order to query the headers, we have to go one step further and perform the join and unnest again in order to have access to the headers, under the alias `h`.
+
+#### LIMIT and Result Row Limitations
+
+The Logs Explorer has a maximum of 1000 rows per run. To optimize your queries, you may wish to add in a `LIMIT` to your SQL query, to reduce the number of rows returned even further.
+
+#### Best Practices
+
+1. Have a WHERE statement filtering over **timestamp**
+
+  Querying across your entire log retention range might seem appealing, especially when you just need to get your query results fast. However, for **Enterprise** customers that have a large retention range, you would run the risk of your queries timing out due to the length cruch time required to scan and analyze across your large dataset. We recommend optimizing queries based on timestamp filtering, to ensure
+
+
+2. Avoid selecting large nested objects. Select individual values instead.
+
+  When querying large object, the columnar storage engine (in this case BigQuery) will select each column associated with each nested key, resulting in a large number of columns being selected. This inadvertently impacts the query speed and may result in timeouts or memory errors, especially for projects with large amount of logging activity. 
+
+  Instead, try to select only the values required, and where this is not possible, drill down to the minimally required object keys.
+
+  ```sql
+
+  -- ❌ edge_logs metadata contains many nested keys
+  SELECT timestamp, m as metadata
+  FROM edge_logs t
+  CROSS JOIN UNNEST(t.metadata) as m;
+  
+  -- ✅ select only the required values
+  SELECT timestamp, r.method
+  FROM edge_logs t
+  CROSS JOIN UNNEST(t.metadata) as m
+  CROSS JOIN UNNEST(m.request) as r
+  ```
+
+### Examples and Templates
 
 For example, you may enter the following into the SQL editor to query for each user's IP address:
 
 ```sql
-SELECT timestamp, h.x_real_ip
+SELECT DATETIME(timestamp), h.x_real_ip
 FROM edge_logs
   LEFT JOIN UNNEST(metadata) as m ON TRUE
   LEFT JOIN UNNEST(m.request) AS r ON TRUE
   LEFT JOIN UNNEST(r.headers) AS h ON TRUE
-WHERE h.x_real_ip IS NOT NULL
+WHERE h.x_real_ip IS NOT NULL AND r.method = "GET"
 ```
 
-![SELECT query example](/img/guides/platform/logs/select-query.png)
+Within the Logs Explorer, we have also included some templates to help you get started on each. Templates are available under the **Templates** tab, or under the **Templates** Dropdown in the **Query** tab.
 
-The list of supported product sources can be found under the **Sources** dropdown.
+## Limitations
 
-### Unnesting Arrays
-
-To query the metadata in the above example, you can unnest the field and "join" the unnested data. Clicking on the log row shows that log metadata is stored as an array of objects.
-
-In order to query any value that is an array, we would need to `UNNEST()` that field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
-
-:::caution
-
-Large projects may run into a `Resources Exceeded` memory limit error when selecting large objects with many nested keys. To avoid this error, select individual keys separately or reduce the queried date range.
-:::
-
-### Functions
-
-You may have also noticed from the above examples that we are able to use certain SQL functions within our queries. The querying engine currently supported is BigQuery, hence you may use [any valid BigQuery function](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators) within your query.
-
-#### Timestamp Behavior
-
-Each log entry is stored with a `timestamp`. In order to utilize the `timestamp` field in a query, you can use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
-
-:::note
-
-In the Log Explorer, timestamps are rendered as unix microsecond timestamps. SQL queries, however, should always use the `TIMESTAMP` data type. If you are using a unix timestamp value in a query, cast the value to a `TIMESTAMP` data type.
-
-:::
-
-## Templates
-
-Templates are available to help craft you log queries. Templates are available under the **Templates** tab, or under the **Templates** Dropdown in the **Query** tab.
+- Logging UI is currently not available for self-hosted and local development. This is currently on the roadmap and you can follow the progress in the [Logflare repository](https://github.com/Logflare/logflare).
+- Unoptimized queries for projects with high logging activity may lead to memory errors or timeouts. Please refer to the [best practices](#best-practices) when crafting your queries.
