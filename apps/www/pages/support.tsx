@@ -122,8 +122,8 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    dark:bg-scale-400 justify-space-evenly
-                    flex flex-row gap-2 rounded rounded-t-none border-b
+                    dark:bg-scale-400 lg:justify-evenly gap-2
+                    flex flex-row rounded rounded-t-none border-b
                     border-r border-l
                     border-gray-100 bg-white p-5
                     pt-14 dark:border-gray-600"
@@ -134,7 +134,7 @@ const Index = ({}: Props) => {
                     >
                       <a target="_blank">
                         <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
-                          Join The Discussion
+                          Join the discussion
                         </Button>
                       </a>
                     </Link>
