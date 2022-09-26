@@ -5,11 +5,10 @@
 //  "www.vercel.com"
 //  "uptime-monitor-fe.vercel.app"
 //  "https://uptime-monitor-fe.vercel.app/"
-//  "chrome-extension://<extension-id>"
 
 // Supports wildcards, port numbers at the end, paths at the end and query params
 const baseDomainRegex =
-  /^((ftp|http|https|chrome-extension):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_*-]+(\.[a-zA-Z0-9_*-]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)+(?:\.[a-z]+)*(?::\d+)?(?![^<]*(?:<\/\w+>|\/?>))(.*)?\/?(.)*?$/gm
+  /^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_*-]+(\.[a-zA-Z0-9_*-]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)+(?:\.[a-z]+)*(?::\d+)?(?![^<]*(?:<\/\w+>|\/?>))(.*)?\/?(.)*?$/gm
 
 // iOS deep linking scheme https://benoitpasquier.com/deep-linking-url-scheme-ios/
 const appRegex =
@@ -18,6 +17,7 @@ const appRegex =
 // Regex from https://stackoverflow.com/a/18696953/4807782
 const localhostRegex = /^(?:^|\s)((https?:\/\/)?(?:localhost|[\w-]+(?:\.[\w-]+)+)(:\d+)?(\/\S*)?)/i
 
+// "chrome-extension://<extension-id>"
 const chromeExtensionRegex = /chrome-extension:\/\/([a-zA-Z]*)/gm
 
 // combine the above regexes
