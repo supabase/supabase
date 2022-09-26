@@ -15,12 +15,12 @@ When a user authenticates with Supabase Auth, two pieces of information are
 issued by the server:
 
 1. **Access token** in the form of a JWT.
-2. **Refresh token** which is an opaque string.
+2. **Refresh token** which is a randomly generated string.
 
 Most Supabase projects have their auth server listening on
-`<project>.supabase.co/auth/v1`, thus the access token and refresh token are
+`<project-ref>.supabase.co/auth/v1`, thus the access token and refresh token are
 set as `sb-access-token` and `sb-refresh-token` cookies on the
-`<project>.supabase.co` domain.
+`<project-ref>.supabase.co` domain.
 
 :::note
 These cookie names are for internal Supabase use only and may change without
@@ -38,8 +38,8 @@ nor will these cookies be sent to your application's server.
 
 When you call one of the `signIn` methods, the client library running in the
 browser sends the request to the Supabase Auth server. The Auth server determines
-whether to redirect to a login provider (for example, a social login), to
-verify a phone number, email and password combination, a magic link, etc.
+whether to verify a phone number, email and password combination, a Magic Link,
+or use a social login (if you have any setup in your project).
 
 Upon successful verification of the identity of the user, the Supabase Auth
 server redirects the user back to your single-page app.
@@ -55,32 +55,36 @@ These redirect URLs have the following structure:
 https://yourapp.com/...#access_token=<...>&refresh_token=<...>&...
 ```
 
-The first access and refresh tokens after a successful
-verification are contained in the fragment (anything after the `#` sign) of the
-redirect URL. This is intentional and not configurable.
+The first access and refresh tokens after a successful verification are
+contained in the URL fragment (anything after the `#` sign) of the redirect
+location. This is intentional and not configurable.
 
 The client libraries are designed to listen for this type of URL, extract
-the relevant information from it, and persist it in local storage
-for further use by the library and your app.
+the access token, refresh token and some extra information from it, and finally
+persist it in local storage for further use by the library and your app.
 
 :::info
 Web browsers do not send the URL fragment to the server they're making the
 request to. Since you may not be hosting the single-page app on a server under
-your total control, we want to prevent hosting services from getting access to
-your user's authorization credentials by default. Even if the server is under
-your total control, `GET` requests and their full URLs are often logged. This
+your direct control (such as on GitHub Pages or other freemium hosting
+providers), we want to prevent hosting services from getting access to your
+user's authorization credentials by default. Even if the server is under your
+direct control, `GET` requests and their full URLs are often logged. This
 approach also avoids leaking credentials in request or access logs.
 :::
 
 ## Bringing it together
 
-As seen from the authentication flow, the first request made by the browser to
-your app's server after user login **does not contain any information about the
-user**.
+As seen from the authentication flow, the initial request after successful
+login made by the browser to your app's server after user login **does not
+contain any information about the user**. This is because first the client-side
+JavaScript library must run before it makes the access and refresh token
+available to your server.
 
-You need to make sure that the redirect route works without any server-side
-rendering. Other routes requiring authorization do not have the same
-limitation, provided you give your server the access and refresh tokens.
+It is very important to make sure that the redirect route right after login
+works without any server-side rendering. Other routes requiring authorization
+do not have the same limitation, provided you send the access and refresh
+tokens to your server.
 
 This is traditionally done by setting cookies. Here's an example you
 can add to the root of your application:
@@ -113,9 +117,13 @@ information:
 
 ```typescript
 const refreshToken = req.cookies['my-refresh-token'];
+const accessToken = req.cookies['my-access-token'];
 
-if (refreshToken) {
-  await supabase.auth.setSession(refreshToken);
+if (refreshToken && accessToken) {
+  await supabase.auth.setSession({
+    refresh_token: refreshToken,
+    access_token: accessToken 
+  });
 } else {
   // make sure you handle this case!
   throw new Error("User is not authenticated.")
@@ -125,19 +133,23 @@ if (refreshToken) {
 await supabase.auth.getUser();
 ```
 
-Use `setSession(refreshToken)` instead of `getUser(accessToken)` as refresh
-tokens are long-lived credentials that provide user information even if the user
-has not used your app in a long time.
+Use `setSession({ access_token, refresh_token })` instead of
+`setSession(refreshToken)` or `getUser(accessToken)` as refresh tokens or access tokens alone do not properly identify a user session. 
 
-Even though refresh tokens are long-lived, they is no guarantee that a user
+Access tokens are valid only for a short amount of time.
+
+Even though refresh tokens are long-lived, there is no guarantee that a user
 has an active session. They may have logged out and your application failed to
 remove the `my-refresh-token` cookie, or some other failure occurred that left
-a stale refresh token in the browser.
+a stale refresh token in the browser. Furthermore, a refresh token can only be
+used a few seconds after it was first used. Only use a refresh token if the
+access token is about to expire, which will avoid the introduction of difficult
+to diagnose logout bugs in your app.
 
-A good practice is to handle unauthorized errors by deferring to render the page
-in the browser instead of in the server. Some user information is contained in the
-access token though, so in certain cases, you may be able to use this potentially
-stale information to render a page.
+A good practice is to handle unauthorized errors by deferring rendering the
+page in the browser instead of in the server. Some user information is
+contained in the access token though, so in certain cases, you may be able to
+use this potentially stale information to render a page.
 
 ## Frequently Asked Questions
 
@@ -171,14 +183,14 @@ is to get the user's details with `getUser()`.
 
 ### What should I use for the `SameSite` property?
 
-Make sure you [understand the behavior of the parameter in different
-situations](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite),
-as your users can be experiencing a degraded user experience.
+Make sure you [understand the behavior of the property in different
+situations](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite)
+as some properties can degrade the user experience.
 
-A good default is to use `Lax` which will send cookies when users are
+A good default is to use `Lax` which sends cookies when users are
 navigating to your site. Cookies typically require the `Secure` attribute,
-which will only send them over HTTPS. However, this can sometimes be a problem
-when developing on `localhost`.
+which only sends them over HTTPS. However, this can be a problem when
+developing on `localhost`.
 
 ### Can I use server-side rendering with a CDN or cache?
 
