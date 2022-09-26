@@ -18,13 +18,19 @@ import {
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import Flag from 'components/ui/Flag/Flag'
 
 interface Props {}
 
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
   const { ref, bucketId } = router.query
-  const page = router.pathname.split('/')[4] as undefined | 'policies' | 'settings' | 'usage'
+  const page = router.pathname.split('/')[4] as
+    | undefined
+    | 'policies'
+    | 'settings'
+    | 'usage'
+    | 'logs'
 
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
@@ -103,11 +109,13 @@ const StorageMenu: FC<Props> = () => {
               <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
-          <Link href={`/project/${projectRef}/storage/usage`}>
-            <Menu.Item rounded active={page === 'usage'}>
-              <p className="truncate">Usage</p>
-            </Menu.Item>
-          </Link>
+          <Flag name="logsStorage">
+            <Link href={`/project/${projectRef}/storage/logs`}>
+              <Menu.Item rounded active={page === 'logs'}>
+                <p className="truncate">Logs</p>
+              </Menu.Item>
+            </Link>
+          </Flag>
         </div>
       </div>
     </Menu>

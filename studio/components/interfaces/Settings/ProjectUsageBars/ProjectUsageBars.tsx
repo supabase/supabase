@@ -132,11 +132,23 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                       }`}
                                       value={featureUsage.usage}
                                       max={featureUsage.limit}
-                                      labelBottom={formatBytes(featureUsage.usage)}
-                                      labelTop={formatBytes(featureUsage.limit)}
+                                      labelBottom={
+                                        feature.units === 'bytes'
+                                          ? formatBytes(featureUsage.usage)
+                                          : featureUsage.usage.toLocaleString()
+                                      }
+                                      labelTop={
+                                        feature.units === 'bytes'
+                                          ? formatBytes(featureUsage.limit)
+                                          : featureUsage.limit.toLocaleString()
+                                      }
                                     />
                                   ) : (
-                                    <span>{formatBytes(featureUsage.usage)}</span>
+                                    <span>
+                                      {feature.units === 'bytes'
+                                        ? formatBytes(featureUsage.usage)
+                                        : ''}
+                                    </span>
                                   )}
                                 </td>
                               </>

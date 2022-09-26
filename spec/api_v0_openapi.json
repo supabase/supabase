@@ -69,7 +69,7 @@
         "security": [{ "bearer": [] }]
       },
       "post": {
-        "operationId": "createOrganization_",
+        "operationId": "createOrganization",
         "summary": "Create an organization",
         "parameters": [],
         "requestBody": {
@@ -121,10 +121,11 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's functions" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "post": {
         "operationId": "createFunction",
@@ -152,10 +153,11 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to create project's function" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}": {
@@ -182,7 +184,7 @@
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": {}, "type": "string" }
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
           }
         ],
         "responses": {
@@ -194,10 +196,11 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve function with given slug" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "patch": {
         "operationId": "UpdateFunction",
@@ -216,7 +219,7 @@
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": {}, "type": "string" }
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
           }
         ],
         "requestBody": {
@@ -232,10 +235,11 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to update function with given slug" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "delete": {
         "operationId": "deleteFunction",
@@ -254,15 +258,16 @@
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": {}, "type": "string" }
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
           }
         ],
         "responses": {
           "200": { "description": "" },
+          "403": { "description": "" },
           "500": { "description": "Failed to delete function with given slug" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/secrets": {
@@ -291,10 +296,11 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's secrets" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "post": {
         "operationId": "createSecrets",
@@ -322,10 +328,11 @@
         },
         "responses": {
           "201": { "description": "" },
+          "403": { "description": "" },
           "500": { "description": "Failed to create project's secrets" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "delete": {
         "operationId": "deleteSecrets",
@@ -351,10 +358,11 @@
             "description": "",
             "content": { "application/json": { "schema": { "type": "object" } } }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to delete secrets with given names" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/pgsodium": {
@@ -457,7 +465,8 @@
               "ap-south-1",
               "sa-east-1"
             ]
-          }
+          },
+          "kps_enabled": { "type": "boolean" }
         },
         "required": ["db_pass", "name", "organization_id", "plan", "region"]
       },
@@ -488,7 +497,7 @@
       "CreateFunctionBody": {
         "type": "object",
         "properties": {
-          "slug": { "type": "string", "pattern": {} },
+          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
           "name": { "type": "string" },
           "body": { "type": "string" },
           "verify_jwt": { "type": "boolean" }
@@ -527,7 +536,7 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "value": { "type": "string", "pattern": {} }
+          "value": { "type": "string", "pattern": "/^(?!SUPABASE_).*/" }
         },
         "required": ["name", "value"]
       },

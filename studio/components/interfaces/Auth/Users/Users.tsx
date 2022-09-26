@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
@@ -26,6 +26,11 @@ const Users = () => {
     PageState.filterInputValue = e.target.value
   }
 
+  function onVerifiedFilterChange(e: any) {
+    PageState.filterVerified = e
+    onSearchUser()
+  }
+
   function onFilterKeyPress(e: any) {
     // enter key
     if (e.keyCode == 13) onSearchUser()
@@ -33,6 +38,7 @@ const Users = () => {
 
   function onSearchUser() {
     PageState.filterKeywords = PageState.filterInputValue
+    PageState.filterVerified = PageState.filterVerified
     PageState.fetchData(1)
   }
 
@@ -49,7 +55,7 @@ const Users = () => {
   return (
     <div className="">
       <div className="flex justify-between px-6 pt-6 pb-2">
-        <div className="relative flex space-x-1">
+        <div className="relative flex space-x-4">
           <Input
             size="small"
             value={PageState.filterInputValue}
@@ -70,6 +76,23 @@ const Users = () => {
               ),
             ]}
           />
+          <Listbox
+            size="small"
+            value={PageState.filterVerified}
+            onChange={onVerifiedFilterChange}
+            name="verified"
+            id="verified"
+          >
+            <Listbox.Option label="All Users" value="">
+              All Users
+            </Listbox.Option>
+            <Listbox.Option label="Verified Users" value="verified">
+              Verified Users
+            </Listbox.Option>
+            <Listbox.Option label="Un-Verified Users" value="unverified">
+              Un-Verified Users
+            </Listbox.Option>
+          </Listbox>
         </div>
         <div className="flex items-center">
           <Button

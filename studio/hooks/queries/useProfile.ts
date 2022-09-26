@@ -11,9 +11,7 @@ export function useProfile(returning?: 'minimal') {
     url = `${url}?${query}`
   }
 
-  const { data, error } = useSWR<any>(url, get, {
-    loadingTimeout: 10000,
-  })
+  const { data, error } = useSWR<any>(url, get, { loadingTimeout: 10000 })
   const anyError = data?.error || error
 
   function mutateProfile(updatedUser: User, revalidate?: boolean) {

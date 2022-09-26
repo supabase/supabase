@@ -87,13 +87,14 @@ test.each([
   {
     queryType: 'api',
     tableName: undefined,
-    allLog: logDataFixture({
+    tableLog: logDataFixture({
       id: 'some-id',
-      request: { path: 'some-path', method: 'POST' },
+      path: 'some-path',
+      method: 'POST',
       status_code: '400',
       metadata: undefined,
     }),
-    singleLog: {
+    selectionLog: {
       id: 'some-id',
       metadata: [{ request: [{ method: 'POST' }] }],
     },
@@ -103,7 +104,7 @@ test.each([
   // TODO: add more tests for each type of ui
 ])(
   'selection $queryType $tableName , can display log data and metadata',
-  async ({ queryType, tableName, allLog, singleLog, tableTexts, selectionTexts }) => {
+  async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
     get.mockImplementation((url) => {
       // counts
       if (url.includes('count')) {
@@ -111,10 +112,10 @@ test.each([
       }
       // single
       if (url.includes('where+id')) {
-        return { result: [singleLog] }
+        return { result: [selectionLog] }
       }
-      // all
-      return { result: [allLog] }
+      // table
+      return { result: [tableLog] }
     })
     render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 
@@ -350,9 +351,30 @@ test('filters alter generated query', async () => {
   userEvent.click(await screen.findByText(/Save/))
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('599'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+  })
+
+  // should be able to clear the filters
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByRole('button', { name: 'Clear' }))
+  get.mockClear()
+
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByText(/400 codes/))
+  userEvent.click(await screen.findByText(/Save/))
+
+  await waitFor(() => {
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('400'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('499'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
   })

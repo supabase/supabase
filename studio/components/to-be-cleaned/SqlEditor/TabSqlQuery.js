@@ -78,6 +78,7 @@ const TabSqlQuery = observer(() => {
         <MonacoEditor
           error={sqlEditorStore.activeTab.sqlQueryError}
           updateSqlSnippet={updateSqlSnippet}
+          setUpdatingRequired={contentStore.setUpdatingRequired.bind(contentStore)}
         />
         <div>
           <UtilityPanel updateSqlSnippet={updateSqlSnippet} />
@@ -88,7 +89,7 @@ const TabSqlQuery = observer(() => {
 })
 export default TabSqlQuery
 
-const MonacoEditor = ({ error, updateSqlSnippet }) => {
+const MonacoEditor = ({ error, updateSqlSnippet, setUpdatingRequired }) => {
   const sqlEditorStore = useSqlStore()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
@@ -173,12 +174,16 @@ const MonacoEditor = ({ error, updateSqlSnippet }) => {
     // this is so any SQL run will be whatever is currently in monaco editor
     sqlEditorStore.activeTab.setQuery(value)
 
+    // inform the content store that the SQL has changed and needs to be persisted
+    // this is so we can block the tab being closed if an update is required
+    setUpdatingRequired?.()
+
     // debounce changes
     debounceUpdateSqlSnippet(value)
   }
 
   return (
-    <div className="dark:border-dark flex-grow overflow-y-auto border-b">
+    <div className="flex-grow overflow-y-auto border-b dark:border-dark">
       <Editor
         className="monaco-editor"
         theme={'supabase'}
@@ -284,7 +289,9 @@ const UtilityTabResults = observer(() => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 text-sm text-scale-1000">
-          Click <code>RUN</code> to execute your query.
+          Click <code>RUN</code> or hit{' '}
+          <code>{window.navigator.platform.match(/^Mac/) ? 'cmd' : 'ctrl'} + ⏎</code> to execute
+          your query.
         </p>
       </div>
     )
