@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff } from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff, IconFrown } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'
@@ -203,29 +203,18 @@ const LogTable = ({
   }
 
   const renderNoResultAlert = () => (
-    <div className="flex flex-col items-center gap-6 text-center mt-16 opacity-100 scale-100 justify-center">
+    <div className="flex flex-col items-center gap-4 text-center mt-16 opacity-100 scale-100 justify-center">
       <div className="flex flex-col gap-1">
         <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center"></div>
-        <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center">
-          <div className="absolute right-1 -bottom-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
+        <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center text-scale-900">
+          x
         </div>
       </div>
       <div className="flex flex-col gap-1 px-5">
+        <div>
+          <IconFrown className="h-6 w-6 text-scale-900 text-center" strokeWidth={2}/>
+        </div>
+
         <h3 className="text-lg text-scale-1200">No results</h3>
         <p className="text-sm text-scale-900">Try another search, or adjusting the filters</p>
       </div>
