@@ -1449,6 +1449,11 @@ module.exports = withMDX({
         source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
         destination: '/docs/guides/auth/auth-helpers/auth-ui',
       },
+      {
+        permanent: true,
+        source: '/docs/guides/client-libraries',
+        destination: '/docs/reference',
+      },
 
       // V2 redirects
       // {

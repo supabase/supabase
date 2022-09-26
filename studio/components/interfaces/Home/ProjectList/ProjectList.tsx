@@ -36,12 +36,12 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
           <div className="space-y-3" key={makeRandomString(5)}>
             <h4 className="text-lg">{name}</h4>
             {isLoadingPermissions || isLoadingProjects ? (
-              <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
+              <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 <ShimmeringCard />
                 <ShimmeringCard />
               </ul>
             ) : (
-              <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
+              <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {!canReadProjects ? (
                   <div className="col-span-4 max-w-4xl space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
                     <div className="space-y-1">
