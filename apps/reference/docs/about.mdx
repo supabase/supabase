@@ -150,7 +150,7 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
 <div>
   <div class="row is-multiline">
     {frameworks.map((x) => (
-      <div key={x.name} class="col col--3">
+    <div key={x.name} class="col col--3">
         <ButtonCard
           layout="horizontal"
           icon={
@@ -158,11 +158,11 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
               <x.logo
                 width="20"
                 alt={x.name}
-                style={{ display: 'block', maxHeight: 20 }}
+                style={{ display: 'block', maxHeight: 20, minWidth: 20 }}
               />
             ) : (
               <ThemedImage
-                style={{ display: 'block', maxHeight: 20 }}
+                style={{ display: 'block', maxHeight: 20, minWidth: 20, margin: 0 }}
                 alt={x.name}
                 width="20"
                 sources={{

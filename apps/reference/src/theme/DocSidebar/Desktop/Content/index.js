@@ -25,7 +25,6 @@ const headerNames = {
   },
   auth: {
     name: 'Auth',
-    icon: 'javascript-icon',
   },
   storage: {
     name: 'Storage',

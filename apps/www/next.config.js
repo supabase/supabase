@@ -132,6 +132,11 @@ module.exports = withMDX({
       },
       {
         permanent: true,
+        source: '/docs/guides/storage-caching',
+        destination: '/docs/guides/storage-cdn',
+      },
+      {
+        permanent: true,
         source: '/database/Database',
         destination: '/database',
       },
@@ -1443,6 +1448,11 @@ module.exports = withMDX({
         permanent: true,
         source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
         destination: '/docs/guides/auth/auth-helpers/auth-ui',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides/client-libraries',
+        destination: '/docs/reference',
       },
 
       // V2 redirects

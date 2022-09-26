@@ -305,7 +305,7 @@ const CreateProject = observer(() => {
             type="select"
             value={dbRegion}
             onChange={onDbRegionChange}
-            descriptionText="Select a region close to you for the best performance."
+            descriptionText="Select a region close to your users for the best performance."
           >
             {Object.keys(REGIONS).map((option: string, i) => {
               const label = Object.values(REGIONS)[i]

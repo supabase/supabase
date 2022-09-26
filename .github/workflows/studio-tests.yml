@@ -6,6 +6,8 @@ name: Studio Unit Tests
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'studio/**'
   pull_request:
     branches: [ master ]
     paths:
@@ -17,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -28,8 +30,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Install deps
-      run: npm i
-      working-directory: ./studio
+      run: npm install
+      working-directory: ./
     - name: Run tests
       run: npm test
       working-directory: ./studio

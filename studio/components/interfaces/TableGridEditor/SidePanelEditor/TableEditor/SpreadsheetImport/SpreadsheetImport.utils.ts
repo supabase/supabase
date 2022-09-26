@@ -2,15 +2,17 @@ import dayjs from 'dayjs'
 import Papa from 'papaparse'
 import { has, includes } from 'lodash'
 import { tryParseJson } from 'lib/helpers'
+import { UPLOAD_FILE_EXTENSIONS } from './SpreadsheetImport.constants'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
 export const parseSpreadsheetText: any = (text: string) => {
   const columnTypeMap: any = {}
+  let previewRows: any[] = []
   return new Promise((resolve) => {
     Papa.parse(text, {
       header: true,
-      dynamicTyping: true,
+      dynamicTyping: false,
       skipEmptyLines: true,
       complete: (results) => {
         const headers = results.meta.fields || []
@@ -26,7 +28,8 @@ export const parseSpreadsheetText: any = (text: string) => {
           }
         })
 
-        resolve({ headers, rows, columnTypeMap, errors })
+        previewRows = results.data.slice(0, 20)
+        resolve({ headers, rows, previewRows, columnTypeMap, errors })
       },
     })
   })
@@ -44,6 +47,7 @@ export const parseSpreadsheet = (
   let headers: string[] = []
   let chunkNumber = 0
   let rowCount = 0
+  let previewRows: any[] = []
 
   const columnTypeMap: any = {}
   const errors: any[] = []
@@ -69,7 +73,7 @@ export const parseSpreadsheet = (
         })
 
         rowCount += results.data.length
-
+        previewRows = results.data.slice(0, 20)
         if (results.errors.length > 0) {
           const formattedErrors = results.errors.map((error) => {
             return { ...error, data: results.data[error.row] }
@@ -82,7 +86,7 @@ export const parseSpreadsheet = (
         onProgressUpdate(progress > 1 ? 100 : Number((progress * 100).toFixed(2)))
       },
       complete: () => {
-        const data = { headers, rowCount, columnTypeMap, errors }
+        const data = { headers, rowCount, previewRows, columnTypeMap, errors }
         resolve(data)
       },
     })
@@ -151,4 +155,9 @@ export const inferColumnType = (column: string, rows: object[]) => {
   }
 
   return 'text'
+}
+
+export const acceptedFileExtension = (file: any) => {
+  const ext = file?.name.split('.').pop().toLowerCase()
+  return UPLOAD_FILE_EXTENSIONS.includes(ext)
 }
