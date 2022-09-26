@@ -51,8 +51,9 @@ export const ErrorRenderers = () => (
           },
         }}
       />,
-    ].map((child) => (
+    ].map((child, i) => (
       <Alert
+        key={i}
         variant="danger"
         title="Sorry! An error occured when fetching data."
         withIcon
