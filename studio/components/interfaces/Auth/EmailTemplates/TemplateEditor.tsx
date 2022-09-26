@@ -73,9 +73,9 @@ const TemplateEditor: FC<Props> = ({ template }) => {
           setBodyValue(authConfig?.config?.[messageSlug])
         }, [authConfig.isLoaded])
 
+        const message = authConfig?.config?.[messageSlug]
         const hasChanges =
-          JSON.stringify(values) !== JSON.stringify(initialValues) ||
-          (authConfig?.config?.[messageSlug] && authConfig?.config?.[messageSlug] !== bodyValue)
+          JSON.stringify(values) !== JSON.stringify(initialValues) || message !== bodyValue
 
         return (
           <>

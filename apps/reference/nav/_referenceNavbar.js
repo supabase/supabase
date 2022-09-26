@@ -69,6 +69,12 @@ const buildNavbar = ({ baseUrl }) => {
     {
       type: 'docsVersionDropdown',
       position: 'left',
+      docsPluginId: '_supabase_dart',
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/dart$|${trimmedBaseUrl}/reference/dart/)`,
+    },
+    {
+      type: 'docsVersionDropdown',
+      position: 'left',
       docsPluginId: '_supabase_js',
       supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/javascript$|${trimmedBaseUrl}/reference/javascript/)`,
     },
