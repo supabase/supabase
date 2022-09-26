@@ -1,0 +1,87 @@
+.method-list-group {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.method-list-group li {
+  border-top: 1px solid var(--custom-border-color);
+  padding-top: 12px;
+}
+.method-list-group li:last-child {
+  border-bottom: 1px solid var(--custom-border-color);
+}
+
+.method-list-title-isChild {
+  font-family: var(--custom-font-size-xs);
+  & h5 {
+    font-weight: 200;
+  }
+}
+
+h4.method-list-item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+h4.method-list-item-label .method-list-item-label-name {
+  font-family: var(--ifm-font-family-monospace);
+  font-weight: 700;
+  font-size: var(--custom-font-size-sm);
+  color: var(--ifm-font-color-base);
+  padding: var(--ifm-code-padding-vertical) 0;
+}
+
+h4.method-list-item-label .method-list-item-label-badge {
+  overflow-wrap: anywhere;
+  font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-font-color-base);
+  font-size: var(--custom-font-size-xs);
+  padding: 0 5px;
+  font-weight: 300;
+  padding: var(--ifm-code-padding-vertical) var(--ifm-code-padding-horizontal);
+}
+h4.method-list-item-label .method-list-item-validation {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: var(--custom-font-size-xs);
+  font-weight: 300;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  code {
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: var(--custom-background-color-diff-1);
+    color: var(--ifm-font-color-base);
+  }
+}
+
+.method-list-item-description p {
+  color: var(--custom-content-color-light);
+  font-size: var(--custom-font-size-sm);
+}
+
+.method-list-group .method-list-group {
+  border: 1px solid var(--custom-border-color);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  max-width: 600px;
+}
+.method-list-group .method-list-group li {
+  padding: 12px;
+  border-bottom: none;
+}
+.method-list-title {
+  margin: 0;
+  padding: 6px 12px;
+}
+.method-list-group .method-list-group li div,
+.method-list-group .method-list-group li h4,
+.method-list-group .method-list-group li p {
+  padding: 0;
+  margin: 0;
+}
+.method-list-group .method-list-group li h4 {
+  margin-bottom: 4px;
+}

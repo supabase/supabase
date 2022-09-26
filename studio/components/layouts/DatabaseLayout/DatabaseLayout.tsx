@@ -14,7 +14,7 @@ interface Props {
 }
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, ui } = useStore()
+  const { meta, ui, backups } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const project = ui.selectedProject
 
@@ -33,9 +33,13 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       meta.triggers.load()
       meta.extensions.load()
       meta.publications.load()
+
+      backups.load()
     }
   }, [ui.selectedProject])
 
+  // Optimization required: load logic should be at the page level
+  // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data
   useEffect(() => {
     if (!isLoading && !loaded) {
       setLoaded(true)

@@ -13,7 +13,7 @@
     "@react-native-async-storage/async-storage": "^1.15.14",
     "@supabase/supabase-js": "^1.29.1",
     "react": "17.0.2",
-    "react-native": "0.66.4",
+    "react-native": "0.69.0",
     "react-native-dotenv": "^3.3.1",
     "react-native-elements": "^3.4.2",
     "react-native-url-polyfill": "^1.3.0"

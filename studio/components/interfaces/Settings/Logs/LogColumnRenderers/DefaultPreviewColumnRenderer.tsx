@@ -1,17 +1,13 @@
-import { isUnixMicro, PreviewLogData, unixMicroToIsoTimestamp } from '..'
+import { PreviewLogData } from '..'
+import { RowLayout, TextFormatter, TimestampLocalFormatter } from '../LogsFormatters'
 
-const DefaultPreviewColumnRenderer = [
+export default [
   {
     formatter: (data: { row: PreviewLogData }) => (
-      <div className="flex w-full items-center gap-4 h-full">
-        <span className="flex items-center text-xs pr-2">
-          {isUnixMicro(data?.row?.timestamp)
-            ? unixMicroToIsoTimestamp(data?.row?.timestamp)
-            : data?.row?.timestamp}
-        </span>
-        <span className="font-mono text-xs truncate">{data.row.event_message}</span>
-      </div>
+      <RowLayout>
+        <TimestampLocalFormatter value={data.row.timestamp!} />
+        <TextFormatter className="w-full" value={data.row.event_message} />
+      </RowLayout>
     ),
   },
 ]
-export default DefaultPreviewColumnRenderer

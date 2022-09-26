@@ -1,27 +1,29 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { partition } from 'lodash'
 import {
+  Alert,
   Button,
   Dropdown,
-  Typography,
-  Listbox,
-  Menu,
-  Input,
-  IconCopy,
   IconChevronDown,
+  IconCopy,
   IconEdit,
-  IconTrash,
-  IconSearch,
-  IconX,
   IconLoader,
   IconRefreshCw,
-  Alert,
+  IconSearch,
+  IconTrash,
+  IconX,
+  Input,
+  Listbox,
+  Menu,
 } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
@@ -47,6 +49,15 @@ const TableEditorMenu: FC<Props> = ({
   const { id } = router.query
 
   const projectRef = ui.selectedProject?.ref
+  const schemas: PostgresSchema[] = meta.schemas.list()
+  const tables: PostgresTable[] = meta.tables.list(
+    (table: PostgresTable) => table.schema === selectedSchema
+  )
+
+  // @ts-ignore
+  const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+
   const [searchText, setSearchText] = useState<string>('')
   const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
@@ -73,11 +84,6 @@ const TableEditorMenu: FC<Props> = ({
     setIsRefreshing(false)
   }
 
-  const schemas: PostgresSchema[] = meta.schemas.list()
-  const tables: PostgresTable[] = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
-  )
-
   const schemaTables =
     searchText.length === 0
       ? tables
@@ -89,14 +95,19 @@ const TableEditorMenu: FC<Props> = ({
       ? schemaViews
       : schemaViews.filter((view) => view.name.includes(searchText))
 
+  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
+    meta.excludedSchemas.includes(schema?.name ?? '')
+  )
+  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
   return (
-    <div className="my-6 mx-4 flex flex-col flex-grow space-y-6">
+    <div className="my-6 mx-4 flex flex-grow flex-col space-y-6">
       {/* Schema selection dropdown */}
       <div className="px-3">
         {meta.schemas.isLoading ? (
-          <div className="h-[30px] border border-gray-500 px-3 rounded flex items-center space-x-3">
+          <div className="flex h-[30px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
-            <span className="text-xs text-scale-900">Loading schemas...</span>
+            <span className="text-scale-900 text-xs">Loading schemas...</span>
           </div>
         ) : (
           <Listbox
@@ -109,19 +120,36 @@ const TableEditorMenu: FC<Props> = ({
               onSelectSchema(name)
             }}
           >
-            {schemas.map((schema) => (
+            <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
+              <p className="text-sm">Schemas</p>
+            </Listbox.Option>
+            {/* @ts-ignore */}
+            {openSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
                 value={schema.name}
-                // @ts-ignore
-                label={
-                  <>
-                    <span className="text-scale-900">schema</span> <span>{schema.name}</span>
-                  </>
-                }
+                label={schema.name}
+                addOnBefore={() => <span className="text-scale-900">schema</span>}
               >
-                <span className="text-sm text-scale-900">schema</span>{' '}
-                <span className="text-sm text-scale-1200">{schema.name}</span>
+                <span className="text-scale-1200 text-sm">{schema.name}</span>
+              </Listbox.Option>
+            ))}
+            <Listbox.Option
+              disabled
+              key="protected-schemas"
+              value="protected-schemas"
+              label="Protected schemas"
+            >
+              <p className="text-sm">Protected schemas</p>
+            </Listbox.Option>
+            {protectedSchemas.map((schema) => (
+              <Listbox.Option
+                key={schema.id}
+                value={schema.name}
+                label={schema.name}
+                addOnBefore={() => <span className="text-scale-900">schema</span>}
+              >
+                <span className="text-scale-1200 text-sm">{schema.name}</span>
               </Listbox.Option>
             ))}
           </Listbox>
@@ -129,35 +157,52 @@ const TableEditorMenu: FC<Props> = ({
       </div>
 
       <div className="space-y-1">
-        {selectedSchema === 'public' && (
+        {!isLocked && (
           <div className="px-3">
             {/* Add new table button */}
-            <Button
-              block
-              size="tiny"
-              icon={
-                <div className="text-scale-900">
-                  <IconEdit size={14} strokeWidth={1.5} />
-                </div>
-              }
-              type="default"
-              style={{ justifyContent: 'start' }}
-              onClick={onAddTable}
-            >
-              New table
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Button
+                  block
+                  as="span"
+                  disabled={!canCreateTables}
+                  size="tiny"
+                  icon={
+                    <div className="text-scale-900">
+                      <IconEdit size={14} strokeWidth={1.5} />
+                    </div>
+                  }
+                  type="default"
+                  style={{ justifyContent: 'start' }}
+                  onClick={onAddTable}
+                >
+                  New table
+                </Button>
+              </Tooltip.Trigger>
+              {!canCreateTables && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                      'border-scale-200 border',
+                    ].join(' ')}
+                  >
+                    <span className="text-scale-1200 text-xs">
+                      You need additional permissions to create tables
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         )}
         {/* Table search input */}
-        <div className="block mb-2 px-3">
+        <div className="mb-2 block px-3">
           <Input
-            className="border-none"
-            icon={
-              <div className="text-scale-900">
-                <IconSearch size={12} strokeWidth={1.5} />
-              </div>
-            }
-            placeholder="Filter tables"
+            className="border-none table-editor-search"
+            icon={<IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />}
+            placeholder="Search tables"
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             size="tiny"
@@ -179,7 +224,7 @@ const TableEditorMenu: FC<Props> = ({
             // @ts-ignore
             title={
               <>
-                <div className="w-full flex items-center justify-between">
+                <div className="flex w-full items-center justify-between">
                   <span>All tables</span>
                   <button className="cursor-pointer" onClick={refreshTables}>
                     <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} />
@@ -197,9 +242,11 @@ const TableEditorMenu: FC<Props> = ({
                   key={table.name}
                   url={`/project/${projectRef}/editor/${table.id}`}
                   name={table.name}
+                  hoverText={table.comment ? table.comment : table.name}
                   isActive={isActive}
                   action={
-                    isActive && (
+                    isActive &&
+                    !isLocked && (
                       <Dropdown
                         size="small"
                         side="bottom"
@@ -219,7 +266,7 @@ const TableEditorMenu: FC<Props> = ({
                           >
                             Duplicate Table
                           </Dropdown.Item>,
-                          <Dropdown.Seperator />,
+                          <Dropdown.Seperator key="separator" />,
                           <Dropdown.Item
                             key="delete-table"
                             icon={<IconTrash size="tiny" />}
@@ -229,7 +276,7 @@ const TableEditorMenu: FC<Props> = ({
                           </Dropdown.Item>,
                         ]}
                       >
-                        <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                        <div className="text-scale-900 hover:text-scale-1200 transition-colors">
                           <IconChevronDown size={14} strokeWidth={2} />
                         </div>
                       </Dropdown>
@@ -249,7 +296,7 @@ const TableEditorMenu: FC<Props> = ({
             // @ts-ignore
             title={
               <>
-                <div className="w-full flex items-center justify-between">
+                <div className="flex w-full items-center justify-between">
                   <span>All views</span>
                 </div>
               </>
@@ -263,7 +310,7 @@ const TableEditorMenu: FC<Props> = ({
               <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
                 <Menu.Item key={viewId} rounded active={isActive}>
                   <div className="flex justify-between">
-                    <Typography.Text className="truncate">{view.name}</Typography.Text>
+                    <p className="truncate">{view.name}</p>
                   </div>
                 </Menu.Item>
               </Link>
@@ -273,14 +320,18 @@ const TableEditorMenu: FC<Props> = ({
       )}
 
       {searchText.length > 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="px-3">
-          <Alert title="No tables or views found">This schema has no tables or views</Alert>
+        <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
+          <p className="text-xs">No results found</p>
+          <p className="text-scale-1100 text-xs">
+            There are no tables or views that match your search
+          </p>
         </div>
       )}
 
       {searchText.length === 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="px-3">
-          <Alert title="No tables available">There are no tables in this schema</Alert>
+        <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
+          <p className="text-xs">No tables available</p>
+          <p className="text-scale-1100 text-xs">This schema has no tables available yet</p>
         </div>
       )}
     </div>

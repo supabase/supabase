@@ -5,6 +5,18 @@
  */
 
 import { IconAlertCircle, IconInfo } from '@supabase/ui'
+import dayjs from 'dayjs'
+import React from 'react'
+import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+
+export const RowLayout: React.FC = ({ children }) => (
+  <div className="flex h-full w-full items-center gap-4">{children}</div>
+)
+
+export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
+  value,
+  className,
+}) => <span className={'font-mono text-xs truncate ' + className}>{value}</span>
 
 export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
@@ -17,8 +29,6 @@ export const ResponseCodeFormatter = ({ value }: any) => {
 
   const split = value.toString().split('')[0]
 
-  // console.log(split)
-
   switch (split) {
     // 2XX || 1XX responses
     case '1':
@@ -27,8 +37,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
         <div className="flex items-center h-full">
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-300 dark:bg-scale-600
-            
+            bg-scale-500 dark:bg-scale-400 border
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -43,7 +52,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-red-400
-            
+
             "
           >
             <label className="block font-mono text-sm text-red-1100">{value}</label>
@@ -59,7 +68,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-amber-400
-            
+
             "
           >
             <label className="block font-mono text-sm text-amber-1100 dark:text-amber-900">
@@ -76,7 +85,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-scale-300
-            
+
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -93,7 +102,13 @@ export const ResponseCodeFormatter = ({ value }: any) => {
  * for http response codes
  */
 
-export const SeverityFormatter = ({ value }: { value: string }) => {
+export const SeverityFormatter = ({
+  value,
+  uppercase = true,
+}: {
+  value: string
+  uppercase?: boolean
+}) => {
   if (!value) {
     return (
       <div>
@@ -102,19 +117,24 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
     )
   }
 
-  value = value.toUpperCase()
+  const uppercasedValue = value.toUpperCase()
+  const text = uppercase ? uppercasedValue : value
+  const Layout: React.FC<{ className?: string }> = ({ className, children }) => (
+    <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
+  )
 
-  switch (value) {
+  switch (uppercasedValue) {
+    case 'UNCAUGHTEXCEPTION':
     case 'PANIC':
     case 'FATAL':
     case 'ERROR':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-red-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-red-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-red-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
@@ -122,48 +142,66 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
 
     case 'DEBUG':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
     case 'LOG':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
             <IconInfo size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
     case 'WARNING':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-amber-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-amber-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-amber-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
     // All other responses
     default:
       return (
-        <div className="flex items-center h-full">
+        <Layout>
           <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
-            <label className="block font-mono text-sm text-scale-900">{value}</label>
+            <label className="block font-mono text-sm text-scale-900">{text}</label>
           </div>
-        </div>
+        </Layout>
       )
       break
   }
+}
+
+/**
+ * Formats a timestamp into a local timestamp display
+ *
+ * Accepts either unix microsecond or iso timestamp.
+ * For LogTable column rendering
+ */
+export const TimestampLocalFormatter = ({
+  value,
+  className,
+}: {
+  className?: string
+  value: string | number
+}) => {
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
+  const formattedTimestamp = dayjs(timestamp).format('DD MMM, HH:mm:ss')
+  return <span className={`text-xs ${className}`}>{formattedTimestamp}</span>
 }
 
 /*
@@ -186,7 +224,6 @@ export function jsonSyntaxHighlight(input: Object) {
   let json: string = JSON.stringify(input, null, 2)
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-  // console.log('json', json)
   const newJson = json.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
 

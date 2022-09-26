@@ -13,12 +13,15 @@ const FlagProvider: FC = ({ children }) => {
   const { profile } = ui
 
   useEffect(() => {
-    if (IS_PLATFORM && profile) getFlags(profile)
+    if (IS_PLATFORM) getFlags(profile)
   }, [profile])
 
-  const getFlags = async (user: User) => {
+  const getFlags = async (user?: User) => {
     const setFlagValues = async () => {
-      const flagValues = await client.getAllValuesAsync({ identifier: user.primary_email })
+      const flagValues =
+        user !== undefined
+          ? await client.getAllValuesAsync({ identifier: user.primary_email })
+          : await client.getAllValuesAsync()
       const flagStore: any = {}
 
       flagValues.forEach((item: any) => {

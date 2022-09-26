@@ -177,8 +177,11 @@ const nowDateTimeValue = (format: string) => {
 }
 
 const convertPostgresDatetimeToInputDatetime = (format: string, value: string) => {
-  if (!value || value.length == 0) return ''
+  if (value) {
+    value = value.includes('-') ? value.replaceAll('-', '/') : value
+  }
 
+  if (!value || value.length == 0) return ''
   if (TIMESTAMP_TYPES.includes(format)) {
     return dayjs(value).format('YYYY-MM-DDTHH:mm:ss')
   } else if (TIME_TYPES.includes(format)) {
@@ -283,8 +286,6 @@ export const generateRowObjectFromFields = (
           rowObject[field.name] = tryParseJson(value)
         }
       }
-    } else if (NUMERICAL_TYPES.includes(field.format) && value) {
-      rowObject[field.name] = Number(value)
     } else if (field.format === 'bool' && value) {
       rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {

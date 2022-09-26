@@ -1,48 +1,35 @@
-import React, { FC, useState, useEffect } from 'react'
+import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconInfo } from '@supabase/ui'
 
-import { useStore } from 'hooks'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import BackupItem from './BackupItem'
+import { useStore, checkPermissions } from 'hooks'
 import Loading from 'components/ui/Loading'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import Panel from 'components/ui/Panel'
 
+import BackupItem from './BackupItem'
+import BackupsError from './BackupsError'
+import BackupsEmpty from './BackupsEmpty'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import InformationBox from 'components/ui/InformationBox'
+import { IconAlertCircle } from '@supabase/ui'
+
 interface Props {}
 
 const BackupsList: FC<Props> = ({}) => {
-  const { ui, app } = useStore()
+  const { ui, backups } = useStore()
   const projectRef = ui.selectedProject?.ref || 'default'
+  const canTriggerScheduledBackups = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_job.restore.prepare'
+  )
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [projectData, setProjectData] = useState<any>([])
+  if (backups.isLoading) return <Loading />
+  if (backups.error) return <BackupsError />
 
-  useEffect(() => {
-    retrieveBackups()
-  }, [])
+  const { tierKey } = backups.configuration
+  const sortedBackups = backups.list()
 
-  const retrieveBackups = async () => {
-    setIsLoading(true)
-    const projectData = (await app.database.getBackups(projectRef)) as any
-    setProjectData(projectData)
-    setIsLoading(false)
-  }
-
-  if (isLoading) return <Loading />
-  if (projectData.error) {
-    return (
-      <div>
-        <Typography.Text type="secondary">Error loading backups</Typography.Text>
-      </div>
-    )
-  }
-
-  // Data Loaded
-  const { backups, tierId } = projectData
-  const sortedBackups = backups.sort((a: any, b: any) => b.id - a.id)
-
-  if (tierId === STRIPE_PRODUCT_IDS.FREE) {
+  if (tierKey === 'FREE') {
     return (
       <UpgradeToPro
         primaryText="Free Plan does not include project backups."
@@ -54,21 +41,22 @@ const BackupsList: FC<Props> = ({}) => {
 
   return (
     <div className="space-y-6">
-      {!sortedBackups?.length && tierId !== STRIPE_PRODUCT_IDS.FREE ? (
-        <div className="block w-full rounded border border-green-500 border-opacity-50 bg-green-500 bg-opacity-5 p-3">
-          <div className="flex space-x-3">
-            <div>
-              <IconInfo className="text-green-500" size="large" />
-            </div>
-            <p>No backups created yet. Check again tomorrow.</p>
-          </div>
-        </div>
+      {!sortedBackups?.length && tierKey !== 'FREE' ? (
+        <BackupsEmpty />
       ) : (
-        <Panel>
-          {sortedBackups?.map((x: any, i: number) => {
-            return <BackupItem key={x.id} projectRef={projectRef} backup={x} index={i} />
-          })}
-        </Panel>
+        <>
+          {!canTriggerScheduledBackups && (
+            <InformationBox
+              icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+              title="You need additional permissions to trigger a scheduled backup"
+            />
+          )}
+          <Panel>
+            {sortedBackups?.map((x: any, i: number) => {
+              return <BackupItem key={x.id} projectRef={projectRef} backup={x} index={i} />
+            })}
+          </Panel>
+        </>
       )}
     </div>
   )

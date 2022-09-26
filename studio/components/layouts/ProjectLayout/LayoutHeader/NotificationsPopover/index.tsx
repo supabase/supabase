@@ -1,7 +1,11 @@
 import { FC, Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Button, IconBell, Popover } from '@supabase/ui'
-import { Notification, NotificationStatus, ActionType } from '@supabase/shared-types/out/notifications'
+import {
+  Notification,
+  NotificationStatus,
+  ActionType,
+} from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
 import { useNotifications, useStore } from 'hooks'
@@ -48,7 +52,7 @@ const NotificationsPopover: FC<Props> = () => {
     const { id: projectId, ref, region } = projectToRestart
     const serviceNamesByActionName: Record<string, string> = {
       [ActionType.PgBouncerRestart]: 'pgbouncer',
-      [ActionType.SchedulePostgresRestart]: 'postgresql'
+      [ActionType.SchedulePostgresRestart]: 'postgresql',
     }
     const services: string[] = targetNotification.meta.actions_available
       .map((action) => action.action_type)
@@ -87,7 +91,7 @@ const NotificationsPopover: FC<Props> = () => {
         sideOffset={8}
         onOpenChange={onOpenChange}
         overlay={
-          <div className="w-[540px]">
+          <div className="w-[500px]">
             <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
               <p className="text-sm">Notifications</p>
               {/* Area for improvement: Paginate notifications and show in a side panel */}

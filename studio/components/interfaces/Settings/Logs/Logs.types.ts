@@ -1,15 +1,16 @@
-import React from "react"
+import React from 'react'
 
 interface Metadata {
-  [key: string]: string | number | Object | Object[]
+  [key: string]: string | number | Object | Object[] | any
 }
 
 export type DatePickerToFrom = { to: string | null; from: string | null }
 
 export type LogSearchCallback = (
+  event: 'search-input-change' | 'event-chart-bar-click' | 'datepicker-change',
   filters: {
-    query: string
-  } & DatePickerToFrom
+    query?: string
+  } & Partial<DatePickerToFrom>
 ) => void
 
 export interface LogsWarning {
@@ -32,7 +33,7 @@ export interface PreviewLogData extends CustomLogData {
   id: string
   timestamp: number
   event_message: string
-  metadata: Metadata
+  metadata?: Metadata
 }
 export type LogData = CustomLogData & PreviewLogData
 
@@ -48,18 +49,41 @@ export interface CountData {
   count: number
 }
 
+export interface EventChartData {
+  count: number
+  timestamp: string | number
+}
+
 type LFResponse<T> = {
   result: T[]
   error?: {
+    code: number
+    errors: {
+      domain: string
+      message: string
+      reason: string | 'resourcesExceeded'
+    }[]
     message: string
+    status: string
   }
 }
+type ApiError = string
+
+export type LogQueryError = Omit<LFResponse<unknown>, 'result'> | ApiError
 
 export type Count = LFResponse<CountData>
+export type EventChart = LFResponse<EventChartData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | "auth"
+export type QueryType =
+  | 'api'
+  | 'database'
+  | 'functions'
+  | 'fn_edge'
+  | 'auth'
+  | 'realtime'
+  | 'storage'
 
 export type Mode = 'simple' | 'custom'
 

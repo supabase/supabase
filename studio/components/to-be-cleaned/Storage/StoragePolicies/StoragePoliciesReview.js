@@ -1,11 +1,11 @@
-import { Button, Typography, Modal } from '@supabase/ui'
+import { Button, Modal } from '@supabase/ui'
 import { useState } from 'react'
 import SqlEditor from 'components/ui/SqlEditor'
 
 const ReviewEmptyState = () => {
   return (
     <div className="flex items-center justify-center my-10 opacity-50 space-x-2">
-      <Typography.Text>There are no changes made to this policy</Typography.Text>
+      <p>There are no changes made to this policy</p>
     </div>
   )
 }

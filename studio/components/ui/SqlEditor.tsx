@@ -1,15 +1,14 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { FC, useEffect, useRef } from 'react'
-import { Typography } from '@supabase/ui'
 import { useStore } from 'hooks'
 
 interface Props {
-  contextmenu?: boolean;
-  defaultValue?: string;
-  language?: string;
-  onInputChange?: OnChange;
-  queryId?: string;
-  readOnly?: boolean;
+  contextmenu?: boolean
+  defaultValue?: string
+  language?: string
+  onInputChange?: OnChange
+  queryId?: string
+  readOnly?: boolean
 }
 
 const SqlEditor: FC<Props> = ({
@@ -96,7 +95,7 @@ const SqlEditor: FC<Props> = ({
     })
   }
 
-  const Loading = () => <Typography.Title level={4}>Loading</Typography.Title>
+  const Loading = () => <h4 className="text-lg">Loading</h4>
 
   return (
     <Editor

@@ -1,4 +1,5 @@
-import { IconBarChart2, Loading } from '@supabase/ui'
+import dayjs from 'dayjs'
+import { Loading } from '@supabase/ui'
 import { useState } from 'react'
 import {
   BarChart as RechartBarChart,
@@ -8,13 +9,12 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ReferenceLine,
   Cell,
   ResponsiveContainer,
 } from 'recharts'
 
-import dayjs from 'dayjs'
 import { formatBytes } from 'lib/helpers'
+import EmptyState from 'components/ui/Charts/EmptyState'
 import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
 
 function dataCheck(data: any, attribute: any) {
@@ -127,37 +127,6 @@ const Header = ({
   )
 }
 
-const NoData = ({ title = 'No data to show', message = 'May take 24 hours for data to show' }) => (
-  <div
-    className="
-      border-scale-600 flex
-      h-full w-full flex-col
-      items-center justify-center space-y-2 border
-      border-dashed text-center
-    "
-  >
-    <IconBarChart2 className="text-scale-800" />
-    <div>
-      <p className="text-scale-1100 text-xs">{title}</p>
-      <p className="text-scale-900 text-xs">{message}</p>
-    </div>
-  </div>
-)
-const total = (data: any, format: any, attribute: any) => {
-  let total = 0
-  data?.map((item: any) => {
-    total = total + Number(item[attribute])
-  })
-  if (format === '%') {
-    return Number(total).toFixed(2)
-  }
-  return numberWithCommas(total)
-}
-
-function numberWithCommas(x: any) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
 export function BarChart({
   data,
   attribute,
@@ -256,6 +225,8 @@ export function BarChart({
                     fill={CHART_COLORS.GREEN_1}
                     // barSize={2}
                     animationDuration={300}
+                    // max bar size required for LogEventChart, prevents bars from expanding to max width.
+                    maxBarSize={48}
                   >
                     {data?.map((entry: any, index: any) => (
                       <Cell
@@ -291,7 +262,7 @@ export function BarChart({
               )}
             </>
           ) : (
-            <NoData title={noDataTitle} message={noDataMessage} />
+            <EmptyState title={noDataTitle} message={noDataMessage} />
           )}
         </div>
       </div>
@@ -413,7 +384,7 @@ export function AreaChart({
             )}
           </>
         ) : (
-          <NoData />
+          <EmptyState />
         )}
       </div>
     </Loading>

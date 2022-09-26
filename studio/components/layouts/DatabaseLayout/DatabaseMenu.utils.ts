@@ -1,9 +1,12 @@
 import { Project } from 'types'
 import { IS_PLATFORM } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import { useFlag } from 'hooks'
 
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
+  const logsRealtime = useFlag('logsRealtime')
+  const reportsOverview = useFlag('reportsOverview')
 
   const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
   const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
@@ -29,7 +32,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
         {
           name: 'Backups',
           key: 'backups',
-          url: `/project/${ref}/database/backups`,
+          url: `/project/${ref}/database/backups/scheduled`,
           items: [],
         },
       ],
@@ -37,7 +40,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
     ...(IS_PLATFORM
       ? [
         {
-          title: 'Logs',
+          title: 'Logs and Usage',
           items: [
             {
               name: 'API logs',
@@ -45,12 +48,32 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
               url: `/project/${ref}/database/api-logs`,
               items: [],
             },
+            ...(reportsOverview
+              ? [
+                {
+                  name: 'API usage',
+                  key: 'api-usage',
+                  url: `/project/${ref}/database/api-usage`,
+                  items: [],
+                },
+              ]
+              : []),
             {
               name: 'Postgres logs',
               key: 'postgres-logs',
               url: `/project/${ref}/database/postgres-logs`,
               items: [],
             },
+            ...(logsRealtime
+              ? [
+                {
+                  name: 'Realtime logs',
+                  key: 'realtime-logs',
+                  url: `/project/${ref}/database/realtime-logs`,
+                  items: [],
+                },
+              ]
+              : []),
           ],
         },
       ]
@@ -76,7 +99,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
             ...(showHooksRoute
               ? [
                 {
-                  name: 'Function Hooks',
+                  name: 'Database Webhooks',
                   key: 'hooks',
                   url: `/project/${ref}/database/hooks`,
                   items: [],

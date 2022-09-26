@@ -23,6 +23,7 @@ const RouteValidationWrapper: FC = ({ children }) => {
     // or prompt the user to create an organaization
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
+    '/join',
   ]
 
   /**

@@ -1,9 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import toast from 'react-hot-toast'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Input, Modal, Form, Button } from '@supabase/ui'
+
 import { useStore } from 'hooks'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { NextPageWithLayout, UserContent } from 'types'
+import { uuidv4 } from 'lib/helpers'
+import { LogsExplorerLayout } from 'components/layouts'
 import CodeEditor from 'components/ui/CodeEditor'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
 import {
   DatePickerToFrom,
   LogsQueryPanel,
@@ -14,14 +23,6 @@ import {
   LogTemplate,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
-import { uuidv4 } from 'lib/helpers'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { LogsExplorerLayout } from 'components/layouts'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import { NextPageWithLayout, UserContent } from 'types'
-import toast from 'react-hot-toast'
-import dayjs from 'dayjs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
@@ -35,8 +36,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(ref as string, {
-      iso_timestamp_start: its ? its as string : undefined,
-      iso_timestamp_end: ite ? ite as string : undefined,
+      iso_timestamp_start: its ? (its as string) : undefined,
+      iso_timestamp_end: ite ? (ite as string) : undefined,
     })
 
   useEffect(() => {
@@ -150,7 +151,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <div className="relative flex flex-grow flex-col">
           <LoadingOpacity active={isLoading}>
             <div className="flex h-full flex-grow">
-              <LogTable data={logData} error={error} />
+              <LogTable params={params} data={logData} error={error} projectRef={ref as string} />
             </div>
           </LoadingOpacity>
           <div className="mt-2 flex flex-row justify-end">
@@ -175,7 +176,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
             const payload: UserContent = {
               name: values.name,
-              description: values.name,
+              description: values.description || '',
               type: 'log_sql',
               content: {
                 content_id: editorId,
@@ -219,10 +220,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               <div className="bg-scale-300 border-t py-3">
                 <Modal.Content>
                   <div className="flex items-center justify-end gap-2">
-                    <Button size="tiny" type="default">
+                    <Button
+                      size="tiny"
+                      type="default"
+                      onClick={() => setSaveModalOpen(!saveModalOpen)}
+                    >
                       Cancel
                     </Button>
-                    <Button size="tiny" loading={isSubmitting}>
+                    <Button size="tiny" loading={isSubmitting} htmlType="submit">
                       Save
                     </Button>
                   </div>
