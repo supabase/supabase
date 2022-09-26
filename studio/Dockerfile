@@ -6,25 +6,38 @@
 #    docker build --target production --no-cache -t supabase/studio:latest .
 #    docker builder prune
 
-
-FROM node:14-slim as base
+FROM node:16-slim as base
 RUN apt-get update && apt-get install -y \
     python3 \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
+
+FROM base as builder
 WORKDIR /usr/src/app
-# Do `npm ci` separately so we can cache `node_modules`
-# https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
-COPY package*.json ./
-RUN npm clean-install && npm cache clean --force
-COPY . .
+# the following command is still unsupported for npm // https://github.com/vercel/turborepo/issues/1830
+# RUN npm i -g turbo
+COPY package*.json .
+COPY turbo.json .
+COPY packages packages
+COPY studio studio
+# the following command is still unsupported for npm // https://github.com/vercel/turborepo/issues/1830
+# RUN turbo prune --scope=studio --docker
+# RUN npm clean-install && npm cache clean --force
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-FROM base as dev
+FROM builder as dev
+COPY --from=builder /usr/src/app ./app
+WORKDIR ./app
+RUN npm clean-install && npm cache clean --force
 EXPOSE 8082
-CMD ["npm", "run", "dev"]
+# RUN npx turbo run dev --filter=studio
+CMD ["npx", "turbo", "run", "dev", "--filter=studio"]
 
-FROM base as production
-RUN npm run build && rm -rf .next/cache/webpack && npm prune --production
+FROM builder as production
+COPY --from=builder /usr/src/app ./app
+WORKDIR ./app
+RUN npm clean-install && npm cache clean --force
+RUN npx turbo run build --scope=studio --include-dependencies --no-deps
+WORKDIR ./studio
 EXPOSE 3000
 CMD ["npm", "run", "start"]
