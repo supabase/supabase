@@ -212,7 +212,7 @@ const LogTable = ({
       </div>
       <div className="flex flex-col gap-1 px-5">
         <div>
-          <IconFrown className="h-6 w-6 text-scale-900 text-center" strokeWidth={2}/>
+          <IconFrown className="h-6 w-6 text-scale-900 text-center" strokeWidth={2} />
         </div>
 
         <h3 className="text-lg text-scale-1200">No results</h3>
