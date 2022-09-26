@@ -14,7 +14,6 @@ import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceed
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
-import Divider from 'components/ui/Divider'
 
 interface Props {
   data?: Array<LogData | Object>
