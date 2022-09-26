@@ -64,7 +64,7 @@ Once the extension is enabled, you now have access to a `uuid` type.
 
 Creates a UUID value based on the combination of computer’s MAC address, current timestamp, and a random value.
 
-**Note**: UUIDs of this kind reveal the identity of the computer that created the identifier and the time at which it did so, which might make it unsuitable for certain security-sensitive applications.
+**Note**: UUIDv1 leaks identifiable details, which might make it unsuitable for certain security-sensitive applications.
 
 ### `uuid_generate_v4()` 
 
