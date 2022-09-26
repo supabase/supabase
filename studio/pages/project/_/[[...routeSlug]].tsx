@@ -48,15 +48,18 @@ const GenericProjectPage: NextPage = () => {
   }
 
   return (
-    <div>
+    <>
       <Header />
-      <div className="mx-auto w-full max-w-5xl py-8">
-        <h3 className="text-2xl">Select a project to continue</h3>
-        <div className="my-6 space-y-8">
+      <div className="flex flex-col mx-auto w-full max-w-5xl">
+        <h3 className="mt-8 text-2xl">Select a project to continue</h3>
+        <div
+          className="flex-grow py-6 space-y-8 overflow-y-auto"
+          style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
+        >
           <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} />
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
