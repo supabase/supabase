@@ -33,11 +33,17 @@ EXPOSE 8082
 # RUN npx turbo run dev --filter=studio
 CMD ["npx", "turbo", "run", "dev", "--filter=studio"]
 
-FROM builder as production
-COPY --from=builder /usr/src/app ./app
-WORKDIR ./app
-RUN npm clean-install && npm cache clean --force
-RUN npx turbo run build --scope=studio --include-dependencies --no-deps
+FROM builder as productionprep
+WORKDIR /app
+COPY --from=builder /usr/src/app ./
+RUN npm clean-install && npm cache clean --force && npx turbo run build --scope=studio --include-dependencies --no-deps && npm prune --production
+# WORKDIR ./studio
+# RUN npm prune --production
+# EXPOSE 3000
+# CMD ["npm", "run", "start"]
+
+FROM base as production
+COPY --from=productionprep /app/studio ./studio
 WORKDIR ./studio
 EXPOSE 3000
 CMD ["npm", "run", "start"]
