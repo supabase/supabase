@@ -14,13 +14,12 @@ RUN apt-get update && apt-get install -y \
 
 FROM base as builder
 WORKDIR /usr/src/app
-# the following command is still unsupported for npm // https://github.com/vercel/turborepo/issues/1830
-# RUN npm i -g turbo
 COPY package*.json .
 COPY turbo.json .
 COPY packages packages
 COPY studio studio
 # the following command is still unsupported for npm // https://github.com/vercel/turborepo/issues/1830
+# RUN npm i -g turbo
 # RUN turbo prune --scope=studio --docker
 # RUN npm clean-install && npm cache clean --force
 ENTRYPOINT ["docker-entrypoint.sh"]
@@ -30,20 +29,15 @@ COPY --from=builder /usr/src/app ./app
 WORKDIR ./app
 RUN npm clean-install && npm cache clean --force
 EXPOSE 8082
-# RUN npx turbo run dev --filter=studio
 CMD ["npx", "turbo", "run", "dev", "--filter=studio"]
 
 FROM builder as productionprep
 WORKDIR /app
 COPY --from=builder /usr/src/app ./
-RUN npm clean-install && npm cache clean --force && npx turbo run build --scope=studio --include-dependencies --no-deps && npm prune --production
-# WORKDIR ./studio
-# RUN npm prune --production
-# EXPOSE 3000
-# CMD ["npm", "run", "start"]
+RUN npm clean-install && npm cache clean --force && npx turbo run build --scope=studio --include-dependencies --no-deps && rm -rf ./studio/.next/cache/webpack &&npm prune --production
 
-FROM base as production
-COPY --from=productionprep /app/studio ./studio
+FROM node:16-slim as production
+COPY --from=productionprep /app ./
 WORKDIR ./studio
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["npm", "run","start"]
