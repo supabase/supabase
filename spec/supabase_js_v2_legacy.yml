@@ -3977,7 +3977,7 @@ pages:
           ```
       - name: On a foreign table
         description: |
-          You can order on foreign tables, but it doesn't affect the ordering of
+          Ordering on foreign tables doesn't affect the ordering of
           the parent table.
 
           <details>
