@@ -53,7 +53,7 @@ export default class OpenApiStore implements IOpenApiStore {
     const projectConfig = await get(this.url, { headers })
     if (projectConfig.error) throw projectConfig.error
 
-    const apiKey = projectConfig.autoApiService?.serviceApiKey
+    const apiKey = projectConfig.autoApiService?.defaultApiKey
     const restApiUrl = projectConfig.autoApiService?.restUrl
 
     const response = await get<OpenAPIV2.Document>(`${restApiUrl}?apikey=${apiKey}`, {

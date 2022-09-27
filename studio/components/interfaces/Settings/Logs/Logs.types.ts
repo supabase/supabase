@@ -7,10 +7,7 @@ interface Metadata {
 export type DatePickerToFrom = { to: string | null; from: string | null }
 
 export type LogSearchCallback = (
-  event:
-    | 'search-input-change'
-    | 'event-chart-bar-click'
-    | 'datepicker-change',
+  event: 'search-input-change' | 'event-chart-bar-click' | 'datepicker-change',
   filters: {
     query?: string
   } & Partial<DatePickerToFrom>
@@ -79,7 +76,14 @@ export type EventChart = LFResponse<EventChartData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | 'auth' | 'realtime'
+export type QueryType =
+  | 'api'
+  | 'database'
+  | 'functions'
+  | 'fn_edge'
+  | 'auth'
+  | 'realtime'
+  | 'storage'
 
 export type Mode = 'simple' | 'custom'
 

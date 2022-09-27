@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 
 export interface ProductMenuGroup {
-  title: string
+  title?: string
   isPreview?: boolean
   items: ProductMenuGroupItem[]
 }

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Typography, IconBookOpen, IconGitHub, Button, Badge } from '@supabase/ui'
+import { IconBookOpen, IconGitHub, Button, Badge } from '@supabase/ui'
 
 interface Props {
   language: string

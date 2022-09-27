@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isUndefined, includes } from 'lodash'
-import { Button, Select, Input, IconLink, Typography, IconArrowRight } from '@supabase/ui'
+import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from '@supabase/ui'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
@@ -56,15 +56,15 @@ const InputField: FC<Props> = ({
         // because descriptionText is a <p> element as a parent
         descriptionText={
           <div className="flex items-center space-x-1 opacity-50">
-            {field.comment && <Typography.Text small>{field.comment}</Typography.Text>}
-            <Typography.Text small>({field.name}</Typography.Text>
-            <Typography.Text small>
+            {field.comment && <p className="text-sm">{field.comment}</p>}
+            <p className="text-sm">({field.name}</p>
+            <p className="text-sm">
               <IconArrowRight size={14} strokeWidth={2} />
-            </Typography.Text>
-            <Typography.Text small>
+            </p>
+            <p className="text-sm">
               {field.foreignKey.target_table_schema}.{field.foreignKey.target_table_name}.
               {field.foreignKey.target_column_name})
-            </Typography.Text>
+            </p>
           </div>
         }
         labelOptional={field.format}
@@ -121,9 +121,9 @@ const InputField: FC<Props> = ({
             type="default"
             htmlType="button"
             onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
-            icon={<IconLink />}
+            icon={<IconEdit2 />}
           >
-            View JSON
+            Edit JSON
           </Button>
         }
       />

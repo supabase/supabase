@@ -1,5 +1,5 @@
 import { DragEvent, useRef, useState, FC } from 'react'
-import { Button, Typography, IconLoader, IconFileText } from '@supabase/ui'
+import { Button, IconLoader, IconFileText } from '@supabase/ui'
 import SparkBar from 'components/ui/SparkBar'
 
 interface Props {
@@ -56,9 +56,9 @@ const SpreadSheetFileUpload: FC<Props> = ({
           onDrop={onDrop}
           onClick={() => (uploadButtonRef.current as any)?.click()}
         >
-          <Typography.Text>
+          <p>
             Drag and drop, or <span className="text-green-1000">browse</span> your files
-          </Typography.Text>
+          </p>
         </div>
       ) : (
         <div className="flex h-32 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-500">

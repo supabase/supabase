@@ -9,10 +9,8 @@ import {
   IconUsers,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { ProjectBase } from 'types'
-import { checkPermissions } from 'hooks'
 import { Route } from 'components/ui/ui.types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
@@ -83,13 +81,6 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
 export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
-
-  const canReadStats = checkPermissions(PermissionAction.READ, 'stats_daily_projects', {
-    resource: { type: 'report' },
-  })
-  const canReadReport = checkPermissions(PermissionAction.READ, 'user_content', {
-    resource: { type: 'report' },
-  })
 
   return [
     ...(IS_PLATFORM

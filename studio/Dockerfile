@@ -18,6 +18,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm clean-install && npm cache clean --force
 COPY . .
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 FROM base as dev
 EXPOSE 8082

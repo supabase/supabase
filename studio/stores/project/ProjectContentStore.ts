@@ -15,7 +15,13 @@ export interface IProjectContentStore {
   isLoading: boolean
   isInitialized: boolean
   isLoaded: boolean
-  savingState: 'IDLE' | 'CREATING' | 'CREATING_FAILED' | 'UPDATING' | 'UPDATING_FAILED'
+  savingState:
+    | 'IDLE'
+    | 'CREATING'
+    | 'CREATING_FAILED'
+    | 'UPDATING_REQUIRED'
+    | 'UPDATING'
+    | 'UPDATING_FAILED'
   error: any
   recentLogSqlSnippets: LogSqlSnippets.Content[]
 
@@ -52,9 +58,36 @@ export interface IProjectContentStore {
         error: unknown
       }
   >
+  updateSql: (
+    id: any,
+    updates: any
+  ) => Promise<
+    | {
+        data: UserContent
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  >
+  updateReport: (
+    id: any,
+    updates: any
+  ) => Promise<
+    | {
+        data: UserContent
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  >
 
   del(id: any): Promise<{ data: boolean; error: unknown }>
   delOptimistically(id: string): { data: boolean; error: null }
+  setUpdatingRequired(): void
 }
 
 export default class ProjectContentStore implements IProjectContentStore {
@@ -76,7 +109,13 @@ export default class ProjectContentStore implements IProjectContentStore {
   recentLogSqlSnippets: LogSqlSnippets.Content[] = []
 
   state = this.STATES.INITIAL
-  savingState: 'IDLE' | 'CREATING' | 'CREATING_FAILED' | 'UPDATING' | 'UPDATING_FAILED'
+  savingState:
+    | 'IDLE'
+    | 'CREATING'
+    | 'CREATING_FAILED'
+    | 'UPDATING_REQUIRED'
+    | 'UPDATING'
+    | 'UPDATING_FAILED'
   error = null
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
@@ -326,6 +365,12 @@ export default class ProjectContentStore implements IProjectContentStore {
   delOptimistically(id: string) {
     delete this.data[id]
     return { data: true, error: null }
+  }
+
+  setUpdatingRequired() {
+    if (this.savingState === 'IDLE' || this.savingState === 'UPDATING_FAILED') {
+      this.savingState = 'UPDATING_REQUIRED'
+    }
   }
 
   setProjectRef(ref?: string) {

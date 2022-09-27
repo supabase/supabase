@@ -8,8 +8,6 @@ sidebar_label: Overview
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-## Overview
-
 Supabase Storage makes it simple to store and serve large files.
 
 ### Files
@@ -26,7 +24,16 @@ organize your files. You can store them in whichever folder structure suits your
 
 Buckets are distinct containers for files and folders. You can think of them like "super folders".
 Generally you would create distinct buckets for different Security and Access Rules. For example, you might
-keep all public files in a "public" bucket, and other files that require logged-in access in a "restricted" bucket.
+keep all video files in a "video" bucket, and profile pictures in an "avatar" bucket.
+
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/J9mTPY8rIXE"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Getting started
 
@@ -34,9 +41,11 @@ This is a quick guide that shows the basic functionality of Supabase Storage. Fi
 [example application in GitHub](https://github.com/supabase/examples/tree/main/supabase-js-v1/user-management/nextjs-ts-user-management),
 which you can deploy yourself.
 
-**Note before begin** : File, Folder, and Bucket names **must follow** [AWS Safe Characters naming guideline](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) and avoid use of any other characters
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
+:::note
+File, Folder, and Bucket names **must follow** [AWS object key naming guidelines](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) and avoid use of any other characters.
+:::
 
 ### Create a bucket
 
@@ -58,15 +67,6 @@ client libraries. Here we create a bucket called "avatars":
 1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
 2. Click **New Bucket** and enter a name for the bucket.
 3. Click **Create Bucket**.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/storage/create.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
 
 </TabItem>
 <TabItem value="sql">
@@ -126,15 +126,6 @@ You can upload a file from the Dashboard, or within a browser using our JS libra
 3. Click **Upload File**.
 4. Select the file you want to upload.
 
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/storage/upload.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
-
 </TabItem>
 <TabItem value="javascript">
 
@@ -186,20 +177,11 @@ You can download a file from the Dashboard, or within a browser using our JS lib
 3. Select the file that you want to download.
 4. Click **Download**.
 
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/storage/download.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
-
 </TabItem>
 <TabItem value="javascript">
 
 ```js
-// Use the JS library to create a bucket.
+// Use the JS library to download a file.
 
 const { data, error } = await supabase.storage
   .from('avatars')
@@ -245,15 +227,6 @@ To restrict access to your files you can use either the Dashboard or SQL.
 5. Give your policy a unique name.
 6. Write the policy using SQL.
 
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/storage/policies.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
-
 </TabItem>
 <TabItem value="sql">
 
@@ -268,14 +241,18 @@ create policy "Public Access"
 </TabItem>
 </Tabs>
 
-## Accessing objects
+## Public and Private Buckets
+
+Storage buckets are private by default.
 
 For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint.
 Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method
 which calls the `/object/sign/` API.
 
 For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl)
-helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally.
+helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally. While no authorization is required for accessing objects in a public bucket, proper [access control](#access-control) is required for other operations like uploading, deleting objects from public buckets as well.
+
+Public buckets also tend to have [better performance](/docs/guides/storage-cdn#public-vs-private-buckets).
 
 <details>
 <summary>Advanced: reverse proxy</summary>
@@ -291,7 +268,7 @@ You can access the storage API directly with the same endpoint. See the <a href=
 
 ---
 
-## Access Control
+## Access control
 
 Supabase Storage is integrated with your [Postgres Database](/docs/guides/database).
 This means that you can use the same [Row Level Security Policies](/docs/guides/auth#policies)
@@ -355,7 +332,7 @@ For example, if your file is stored in `public/subfolder/avatar.png` it would re
 
 ---
 
-## Policy Examples
+## Policy examples
 
 Here are some examples of storage policies.
 

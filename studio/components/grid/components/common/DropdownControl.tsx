@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { Dropdown, Typography } from '@supabase/ui'
+import { FC } from 'react'
+import { Dropdown } from '@supabase/ui'
 
-type DropdownControlProps = {
+interface DropdownControlProps {
   options: {
     value: string | number
     label: string
@@ -15,7 +15,7 @@ type DropdownControlProps = {
   isNested?: boolean
 }
 
-export const DropdownControl: React.FC<DropdownControlProps> = (p) => {
+export const DropdownControl: FC<DropdownControlProps> = (p) => {
   const { className, children, side, align, isNested } = p
   return (
     <Dropdown
@@ -30,12 +30,10 @@ export const DropdownControl: React.FC<DropdownControlProps> = (p) => {
   )
 }
 
-const DropdownItems: React.FC<DropdownControlProps> = ({ options, onSelect }) => {
+const DropdownItems: FC<DropdownControlProps> = ({ options, onSelect }) => {
   return (
     <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
-      {options.length == 0 && (
-        <Typography.Text className="dropdown-control__empty-text">No more items</Typography.Text>
-      )}
+      {options.length == 0 && <p className="dropdown-control__empty-text">No more items</p>}
       {options.map((x) => {
         return (
           <Dropdown.Item key={x.value} onClick={() => onSelect(x.value)}>

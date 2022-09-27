@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Typography, Listbox, IconHelpCircle } from '@supabase/ui'
+import { SidePanel, Listbox, IconHelpCircle } from '@supabase/ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
@@ -166,9 +166,7 @@ const ForeignKeySelector: FC<Props> = ({
               // @ts-ignore
               label={
                 <div>
-                  Select a column from{' '}
-                  <Typography.Text code>{selectedForeignKey?.table}</Typography.Text> to reference
-                  to
+                  Select a column from <code>{selectedForeignKey?.table}</code> to reference to
                 </div>
               }
               error={errors.column}

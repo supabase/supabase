@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
-import { Button, IconArrowRight, IconLink, Typography } from '@supabase/ui'
+import { Button, IconArrowRight, IconLink } from '@supabase/ui'
 
 import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
@@ -168,19 +168,17 @@ const ColumnForeignKeyRemoved: FC<{
       title={
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <Typography.Text>
+            <p>
               The following foreign key relation will be{' '}
               <span className="text-amber-900">removed</span> from this column:
-            </Typography.Text>
+            </p>
             <div className="flex items-center space-x-2">
-              <Typography.Text code small>
-                {columnName}
-              </Typography.Text>
+              <code className="text-sm">{columnName}</code>
               <IconArrowRight size={14} strokeWidth={2} />
-              <Typography.Text code small>
+              <code className="text-sm">
                 {originalForeignKey?.target_table_schema}.{originalForeignKey?.target_table_name}.
                 {originalForeignKey?.target_column_name}
-              </Typography.Text>
+              </code>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -214,26 +212,24 @@ const ColumnForeignKeyUpdated: FC<{
       title={
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <Typography.Text>
+            <p>
               The foreign key relation will be <span className="text-brand-900">updated</span> as
               such:
-            </Typography.Text>
+            </p>
             <div className="flex items-start space-x-2">
-              <Typography.Text code small>
-                {columnName}
-              </Typography.Text>
+              <code className="text-sm">{columnName}</code>
               <IconArrowRight className="mt-1" size={14} strokeWidth={2} />
               <div className="flex flex-col space-y-2">
                 <p className="line-through">
-                  <Typography.Text code small>
+                  <code className="text-sm">
                     {originalForeignKey?.target_table_schema}.
                     {originalForeignKey?.target_table_name}.{originalForeignKey?.target_column_name}
-                  </Typography.Text>
+                  </code>
                 </p>
-                <Typography.Text code small>
+                <code className="text-sm">
                   {updatedForeignKey?.target_table_schema}.{updatedForeignKey?.target_table_name}.
                   {updatedForeignKey?.target_column_name}
-                </Typography.Text>
+                </code>
               </div>
             </div>
           </div>

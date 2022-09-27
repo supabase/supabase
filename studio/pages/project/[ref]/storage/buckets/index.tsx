@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { API_URL } from 'lib/constants'
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { PROJECT_STATUS } from 'lib/constants'
 import { StorageLayout } from 'components/layouts'
@@ -24,9 +24,11 @@ const PageLayout: NextPageWithLayout = ({}) => {
   const storageStore = useStorageStore()
   const { openCreateBucketModal } = storageStore
 
+  const kpsEnabled = useFlag('initWithKps')
+
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
+      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
   }, [project])
 

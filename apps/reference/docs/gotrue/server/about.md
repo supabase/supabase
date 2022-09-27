@@ -673,6 +673,23 @@ Returns:
 }
 ```
 
+### **POST /admin/generate_link**
+
+Returns the corresponding email action link based on the type specified. The response also contains the query params of the action link as separate JSON fields for convenience (along with the email OTP from which the corresponding token is generated).
+
+Returns:
+
+```js
+{
+  "action_link": "http://localhost:9999/verify?token=TOKEN&type=TYPE&redirect_to=REDIRECT_URL",
+  "email_otp": "EMAIL_OTP",
+  "hashed_token": "TOKEN",
+  "verification_type": "TYPE",
+  "redirect_to": "REDIRECT_URL",
+  ...
+}
+```
+
 ### **DELETE /admin/users/{user_id}**
 
 Deletes a user. Requires your `service_role` API key and thus should only be

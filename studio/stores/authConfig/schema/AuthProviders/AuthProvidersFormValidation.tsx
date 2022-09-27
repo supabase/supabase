@@ -10,7 +10,7 @@ const PROVIDER_EMAIL = {
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
       title: 'Enable Email provider',
-      description: 'This will enable Email based login for your application',
+      description: 'This will enable Email based signup and login for your application',
       type: 'boolean',
     },
     MAILER_AUTOCONFIRM: {

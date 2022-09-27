@@ -3,13 +3,8 @@ const sidebars = {
     {
       type: 'category',
       label: 'Overview',
-      items: [
-        'about',
-        'architecture',
-        'guides/hosting/platform',
-        'guides/examples',
-      ],
       collapsed: true,
+      items: ['about', 'architecture', 'guides/examples'],
     },
     {
       type: 'category',
@@ -34,7 +29,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Supabase CLI',
+      label: 'CLI',
       collapsed: true,
       items: [
         'guides/cli',
@@ -90,7 +85,12 @@ const sidebars = {
           type: 'category',
           label: 'Auth Helpers',
           collapsed: true,
-          items: ['guides/auth/auth-helpers/auth-ui'],
+          items: [
+            'guides/auth/auth-helpers/index',
+            'guides/auth/auth-helpers/auth-ui',
+            'guides/auth/auth-helpers/nextjs',
+            'guides/auth/auth-helpers/sveltekit',
+          ],
         },
         {
           type: 'category',
@@ -122,6 +122,7 @@ const sidebars = {
         'guides/database/tables',
         'guides/database/functions',
         'guides/database/full-text-search',
+        'guides/database/migrating-between-projects',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
@@ -171,18 +172,20 @@ const sidebars = {
       type: 'category',
       label: 'Storage',
       collapsed: true,
-      items: ['guides/storage'],
+      items: ['guides/storage', 'guides/storage-cdn'],
     },
     {
       type: 'category',
       label: 'Platform',
       collapsed: true,
       items: [
+        'guides/hosting/platform',
+        'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
-        'going-into-prod',
         'guides/platform/performance',
         'guides/platform/permissions',
+        'going-into-prod',
       ],
     },
     {
@@ -190,6 +193,17 @@ const sidebars = {
       label: 'Self Hosting',
       collapsed: true,
       items: ['guides/hosting/overview', 'guides/hosting/docker'],
+    },
+    {
+      type: 'category',
+      label: 'Migrate to Supabase',
+      collapsed: true,
+      items: [
+        'guides/migrations/firebase-auth',
+        'guides/migrations/firestore-data',
+        'guides/migrations/firebase-storage',
+        'guides/migrations/heroku',
+      ],
     },
     {
       type: 'category',
@@ -206,24 +220,11 @@ const sidebars = {
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
         'guides/integrations/prisma',
+        'guides/integrations/sequin',
         'guides/integrations/snaplet',
         'guides/integrations/stytch',
         'guides/integrations/supertokens',
         'guides/integrations/vercel',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'See Also',
-      collapsed: true,
-      items: [
-        'faq',
-        'handbook/contributing',
-        'handbook/supasquad',
-        'company/terms',
-        'company/privacy',
-        'company/aup',
-        'company/sla',
       ],
     },
   ],
@@ -238,7 +239,7 @@ const sidebars = {
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
-          href: '/reference/javascript',
+          href: '/reference/javascript/',
         },
         {
           type: 'link',

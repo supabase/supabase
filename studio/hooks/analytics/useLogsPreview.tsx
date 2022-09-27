@@ -175,7 +175,7 @@ function useLogsPreview(
         return { ...resolved, ...filterOverride }
       })
     } else {
-      setFilters((prev) => ({ ...prev, ...newFilters, ...filterOverride }))
+      setFilters({ ...newFilters, ...filterOverride })
     }
   }
   return [

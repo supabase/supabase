@@ -17,7 +17,7 @@ UserAccessTokens.getLayout = (page) => (
     title="Supabase"
     breadcrumbs={[
       {
-        key: `supabase-account-tokens`,
+        key: 'supabase-account-tokens',
         label: 'Access Tokens',
       },
     ]}

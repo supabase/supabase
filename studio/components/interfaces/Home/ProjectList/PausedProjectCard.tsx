@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Typography, Badge, Button } from '@supabase/ui'
+import { Badge, Button } from '@supabase/ui'
 
 import { Project } from 'types'
 
@@ -28,9 +28,7 @@ const PausedProjectCard: FC<Props> = ({
           ].join(' ')}
         >
           <div className="flex items-center justify-between space-x-2">
-            <Typography.Title level={4} className="m-0 truncate">
-              {project.name}
-            </Typography.Title>
+            <h5 className="m-0 truncate">{project.name}</h5>
             <Badge color="yellow" dot>
               Paused
             </Badge>

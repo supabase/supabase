@@ -63,7 +63,7 @@ supabase.from<Database['Message']>('messages').select('*')
 ### New Auth methods
 
 We're removing the `signIn()` method in favor of more explicit method signatures:
-`signInWithPassword()`, `signInWithPasswordless()`, and `signInWithOtp()`.
+`signInWithPassword()`, and `signInWithOtp()`.
 
 ```ts
 // v2

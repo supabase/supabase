@@ -121,6 +121,7 @@ const FileExplorerColumn = ({
   const SelectAllCheckbox = () => (
     <Checkbox
       label=""
+      className="-mt-0.5"
       checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
       disabled={columnFiles.length === 0}
       onChange={() => onSelectAllItemsInColumn(index)}
@@ -176,23 +177,14 @@ const FileExplorerColumn = ({
           border-b border-panel-border-light dark:border-panel-border-dark
         "
         >
-          <SelectAllCheckbox />
-          <p className="text-sm" style={{ width: '30%', minWidth: '250px' }}>
-            Name
-          </p>
-          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
-            Size
-          </p>
-          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
-            Type
-          </p>
-          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
-            Created at
-          </p>
-          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
-            Last modified at
-          </p>
-          <div className="w-3" />
+          <div className="flex items-center w-[40%] min-w-[250px]">
+            <SelectAllCheckbox />
+            <p className="text-sm">Name</p>
+          </div>
+          <p className="text-sm w-[11%] min-w-[100px]">Size</p>
+          <p className="text-sm w-[14%] min-w-[100px]">Type</p>
+          <p className="text-sm w-[15%] min-w-[160px]">Created at</p>
+          <p className="text-sm w-[15%] min-w-[160px]">Last modified at</p>
         </div>
       )}
 
@@ -241,7 +233,7 @@ const FileExplorerColumn = ({
       {/* Drag drop upload CTA for when column is empty */}
       {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
         <div className="h-full w-full flex flex-col items-center justify-center">
-          <img src="/img/storage-placeholder.svg" className="opacity-75" />
+          <img src="/img/storage-placeholder.svg" className="opacity-75 pointer-events-none" />
           <p className="my-3 opacity-75">Drop your files here</p>
           <p className="text-sm text-center w-40 text-scale-1100">
             Or upload them via the "Upload file" button above

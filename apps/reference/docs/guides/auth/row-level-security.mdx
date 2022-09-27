@@ -238,7 +238,7 @@ alter table leaderboard
 create policy "Only Blizzard staff can update leaderboard"
   on leaderboard
   for update using (
-    right(auth.email(), 13) = '@blizzard.com'
+    right(auth.jwt() ->> 'email', 13) = '@blizzard.com'
   );
 ```
 

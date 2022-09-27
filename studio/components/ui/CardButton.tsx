@@ -83,11 +83,13 @@ const CardButton: FC<Props> = ({
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
         <h5 className="text-scale-1200">{title}</h5>
-        <div className="flex w-full flex-1 flex-col">
-          <p className="text-scale-1100 text-sm">{description}</p>
-          <div className="w-full">{children && children}</div>
-        </div>
-        <div className="w-full">{footer && footer}</div>
+        {(children || description) && (
+          <div className="flex w-full flex-1 flex-col">
+            <p className="text-scale-1100 text-sm">{description}</p>
+            <div className="w-full">{children && children}</div>
+          </div>
+        )}
+        {footer && <div className="w-full">{footer}</div>}
       </div>
       {isLink && (
         <div

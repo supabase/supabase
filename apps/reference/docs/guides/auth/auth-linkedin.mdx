@@ -14,7 +14,7 @@ To enable LinkedIn Auth for your project, you need to set up a LinkedIn OAuth ap
 Setting up LinkedIn logins for your application consists of 3 parts:
 
 - Create and configure a LinkedIn Project and App on the [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
-- Add your LinkedIn `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
+- Add your LinkedIn `client_id` and `client_secret` to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Steps
@@ -65,7 +65,7 @@ The next step requires a callback URL, which looks like this:
 - Click `Settings` from the list to go to the `Authentication Settings` page.
 - Enter the final (hosted) URL of your app under `Site URL` (this is important).
 - Under `External OAuth Providers` turn `LinkedIn Enabled` to ON.
-- Enter your `API Key` (`client_id`) and `API Secret Key` (`client_secret`) saved in the previous step.
+- Enter your `client_id` and `client_secret` saved in the previous step.
 - Click `Save`.
 
 ### Add login code to your client app

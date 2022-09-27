@@ -6,7 +6,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
-import { Users } from 'components/interfaces/Authentication'
+import { Users } from 'components/interfaces/Auth'
 import { NextPageWithLayout } from 'types'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import NoPermission from 'components/ui/NoPermission'
@@ -19,17 +19,20 @@ const PageLayout = ({ children }: PropsWithChildren<{}>) => {
     projectKpsVersion: undefined,
     filterInputValue: '',
     filterKeywords: '',
+    filterVerified: undefined,
     users: [],
     totalUsers: 0,
     usersLoading: true,
     page: 1,
     pageLimit: 10,
     get fetchQuery() {
-      return {
+      let queryObj = {
         limit: this.pageLimit,
         offset: (this.page - 1) * this.pageLimit,
         keywords: this.filterKeywords,
       }
+
+      return this.filterVerified ? { ...queryObj, verified: this.filterVerified } : queryObj
     },
     get fromRow() {
       const value = this.pageLimit * (this.page - 1) + 1
