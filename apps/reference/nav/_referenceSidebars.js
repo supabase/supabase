@@ -215,6 +215,7 @@ const sidebars = {
         'guides/integrations/authsignal',
         'guides/integrations/clerk',
         'guides/integrations/dashibase',
+        'guides/integrations/dhiwise',
         'guides/integrations/directus',
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
