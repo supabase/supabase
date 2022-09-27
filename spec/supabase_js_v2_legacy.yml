@@ -3839,10 +3839,9 @@ pages:
       allowing you to change the format of the response (e.g. returning a CSV
       string).
 
-      Modifiers must be specified after filters.
-
-      Some modifiers only apply for queries that return rows (e.g. `select()` or
-      `rpc()` on a function that returns a table response).
+      Modifiers must be specified after filters. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
 
   db.modifiers.select():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
