@@ -21,7 +21,10 @@ export const BlockKeys: React.FC<BlockKeysProps> = ({ onEscape, onEnter, value, 
           break
         case 'Enter':
           ev.stopPropagation()
-          if (!ev.shiftKey && onEnter) onEnter(value)
+          if (!ev.shiftKey && onEnter) {
+            ev.preventDefault()
+            onEnter(value)
+          }
           break
       }
     },
