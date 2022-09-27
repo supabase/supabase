@@ -68,3 +68,8 @@ export function isForeignKeyColumn(columnDef: SupaColumn) {
   const { targetTableSchema, targetTableName, targetColumnName } = columnDef
   return !!targetTableSchema && !!targetTableName && !!targetColumnName
 }
+
+const SEARCH_TYPES = ['tsvector']
+export function isSearchType(type: string) {
+  return SEARCH_TYPES.indexOf(type.toLowerCase()) > -1
+}

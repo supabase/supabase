@@ -12,6 +12,7 @@ import {
   isNumericalColumn,
   isTextColumn,
   isTimeColumn,
+  isSearchType,
 } from './types'
 import {
   BooleanEditor,
@@ -120,6 +121,9 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
     case 'text': {
       return TextEditor
     }
+    case 'tsvector': {
+      return
+    }
     default: {
       return undefined
     }
@@ -165,6 +169,8 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
     return 'boolean'
   } else if (isEnumColumn(columnDef.dataType)) {
     return 'enum'
+  } else if (isSearchType(columnDef.dataType)) {
+    return 'tsvector'
   } else return 'unknown'
 }
 

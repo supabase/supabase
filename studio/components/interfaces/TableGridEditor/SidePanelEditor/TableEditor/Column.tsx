@@ -122,7 +122,9 @@ const Column: FC<Props> = ({
             }
             size="small"
             value={column.defaultValue ?? ''}
-            disabled={column.format.includes('int') && column.isIdentity}
+            disabled={
+              (column.format.includes('int') && column.isIdentity) || column.format === 'tsvector'
+            }
             className={`rounded bg-white dark:bg-transparent lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}

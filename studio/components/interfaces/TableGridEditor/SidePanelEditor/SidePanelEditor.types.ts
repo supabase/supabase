@@ -78,7 +78,7 @@ export interface ColumnField {
 export interface PostgresDataTypeOption {
   name: string
   description: string
-  type: 'number' | 'text' | 'time' | 'json' | 'bool' | 'others'
+  type: 'number' | 'text' | 'time' | 'json' | 'bool' | 'tsvector' | 'others'
 }
 
 // export interface FormattedPostgresColumn extends PostgresColumn {

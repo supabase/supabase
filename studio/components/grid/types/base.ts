@@ -53,6 +53,7 @@ export type ColumnType =
   | 'primary_key'
   | 'text'
   | 'time'
+  | 'tsvector'
   | 'unknown'
 
 export interface ColumnHeaderProps<R> extends HeaderRendererProps<R> {
