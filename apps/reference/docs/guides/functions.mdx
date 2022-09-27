@@ -30,7 +30,7 @@ const examples = [
   },
 ]
 
-Edge Functions are server-side TypeScript functions, distributed globally at the edge - close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties, like Stripe.
+Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks).
 
 Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
 
@@ -284,6 +284,18 @@ We recommend developing “fat functions”. This means that you should develop 
 ### Naming Edge Functions
 
 We recommend using hyphens to name functions because hyphens are the most URL-friendly of all the naming conventions (snake_case, camelCase, PascalCase).
+
+### CORS (Cross-Origin Resource Sharing)
+
+We recommend adding a check to handle [CORS Preflight](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request) requests in your edge function to be able to invoke the function from browsers.
+
+```ts
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+  ...
+})
 
 ## Limitations
 
