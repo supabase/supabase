@@ -121,9 +121,7 @@ The rendering behaviour as unix microsecond will be removed in the future.
 
 ### Unnesting Arrays
 
-To query nested data within a log event, unnest the field and "join" the unnested data. Clicking on the log row shows that log metadata is stored as an array of objects.
-
-To query any value that is an array, we would need to `unnest()` that field and add it to the query as a join, allowing us to reference the nested fields within the array.
+Each log event stores metadata an array of objects with multiple levels, and can be seen by selecting single log events in the Logs Explorer. To query arrays, use `unnest()` on each array field and add it to the query as a join. This allows you to reference the nested objects with an alias and select their individual fields.
 
 For example, to query the edge logs without any joins:
 
