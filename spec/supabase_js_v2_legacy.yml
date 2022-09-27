@@ -4370,7 +4370,7 @@ pages:
     examples:
       - name: Return data as CSV
         description: |
-          By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
 
           <details>
             <summary>Schema</summary>
