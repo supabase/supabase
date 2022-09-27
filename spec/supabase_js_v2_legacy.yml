@@ -1249,9 +1249,8 @@ pages:
         hideCodeBlock: true
       - name: Bulk create
         description: |
-          When running a bulk create, the operation is handled in a single
-          transaction. If any of the inserts fail, none of the rows are
-          inserted.
+          A bulk create operation is handled in a single transaction.
+          If any of the inserts fail, none of the rows are inserted.
 
           <details>
             <summary>Schema</summary>
