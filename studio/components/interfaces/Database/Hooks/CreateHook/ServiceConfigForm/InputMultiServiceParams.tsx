@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, Button, IconPlus } from '@supabase/ui'
+import { Button, IconPlus } from '@supabase/ui'
 
 import { CreateHookContext } from '../'
 import InputServiceParam from './InputServiceParam'
@@ -19,7 +19,7 @@ const InputMultiServiceParams: FC = observer(({}) => {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <Typography.Text>HTTP Params</Typography.Text>
+        <h5>HTTP Params</h5>
       </div>
       <div className="space-y-2 pt-4">
         {_localState.formState.serviceParams.value.map(

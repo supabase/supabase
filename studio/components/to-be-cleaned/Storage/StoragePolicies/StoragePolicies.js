@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconLoader, Typography } from '@supabase/ui'
+import { IconLoader } from '@supabase/ui'
 import { find, get, isEmpty, filter } from 'lodash'
 
 import { useStore } from 'hooks'
@@ -11,7 +11,7 @@ import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-import { PolicyEditorModal } from 'components/interfaces/Authentication/Policies'
+import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
 
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
@@ -143,8 +143,8 @@ const StoragePolicies = () => {
 
   return (
     <div className="flex min-h-full w-full flex-col">
-      <h4 className="text-xl">Storage policies</h4>
-      <p className="text-scale-1100">
+      <h3 className="text-xl">Storage policies</h3>
+      <p className="text-scale-1100 text-sm mt-2">
         Safeguard your files with policies that define the operations allowed for your users at the
         bucket level.
       </p>
@@ -179,10 +179,10 @@ const StoragePolicies = () => {
           })}
 
           <div className="!mb-4 w-full border-b border-gray-600" />
-          <Typography.Text className="opacity-50">
+          <p className="text-scale-1000 text-sm">
             You may also write policies for the tables under the storage schema directly for greater
             control
-          </Typography.Text>
+          </p>
 
           {/* Section for policies under storage.objects that are not tied to any buckets */}
           <StoragePoliciesBucketRow

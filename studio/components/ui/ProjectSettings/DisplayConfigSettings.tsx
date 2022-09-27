@@ -1,9 +1,8 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Input } from '@supabase/ui'
+import { Input, IconAlertCircle, IconLoader } from '@supabase/ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
-import { SettingsLoadingState } from './SettingsLoadingState'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 
@@ -31,11 +30,22 @@ const DisplayConfigSettings = () => {
 
   return (
     <ConfigContentWrapper>
-      {isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <SettingsLoadingState
-          isError={isProjectSettingsError || isJwtSecretUpdateStatusError}
-          errorMessage="Failed to fetch project configuration"
-        />
+      {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+        <div className="py-8 flex items-center justify-center space-x-2">
+          <IconAlertCircle size={16} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1100">
+            {isProjectSettingsError
+              ? 'Failed to retrieve configuration'
+              : 'Failed to update JWT secret'}
+          </p>
+        </div>
+      ) : isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+        <div className="py-8 flex items-center justify-center space-x-2">
+          <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1100">
+            {isProjectSettingsLoading ? 'Retrieving API keys' : 'JWT secret is being updated'}
+          </p>
+        </div>
       ) : (
         <>
           <Panel.Content>

@@ -109,7 +109,7 @@ export const TAX_IDS: TaxId[] = [
   },
   {
     name: 'CY VAT',
-    code: 'cy_vat',
+    code: 'eu_vat',
     country: 'Cyprus',
     placeholder: 'CY12345678Z',
   },

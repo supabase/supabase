@@ -1,25 +1,29 @@
-import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Input } from '@supabase/ui'
+import { IconAlertCircle, IconLoader, Input } from '@supabase/ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
-import { SettingsLoadingState } from './SettingsLoadingState'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 
 const DisplayApiSettings = () => {
   const router = useRouter()
   const { ref } = router.query
+
   const {
     services,
-    isLoading: isProjectSettingsLoading,
+    error: projectSettingsError,
     isError: isProjectSettingsError,
+    isLoading: isProjectSettingsLoading,
   } = useProjectSettings(ref as string | undefined)
   const {
+    jwtSecretUpdateStatus,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-    jwtSecretUpdateStatus,
   }: any = useJwtSecretUpdateStatus(ref)
+
+  const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
@@ -27,15 +31,37 @@ const DisplayApiSettings = () => {
   const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
   const apiKeys = apiService?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
-  const isApikeysEmpty = apiKeys.length === 0
+  const isApiKeysEmpty = apiKeys.length === 0
 
   return (
-    <ApiContentWrapper>
-      {isProjectSettingsLoading || isJwtSecretUpdateStatusLoading || isApikeysEmpty ? (
-        <SettingsLoadingState
-          isError={isProjectSettingsError || isJwtSecretUpdateStatusError}
-          errorMessage="Failed to fetch API keys"
-        />
+    <Panel
+      title={
+        <div className="space-y-3">
+          <h5 className="text-base">Project API keys</h5>
+          <p className="text-sm text-scale-1000">
+            Your API is secured behind an API gateway which requires an API Key for every request.
+            <br />
+            You can use the keys below to use Supabase client libraries.
+          </p>
+        </div>
+      }
+    >
+      {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+        <div className="py-8 flex items-center justify-center space-x-2">
+          <IconAlertCircle size={16} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1100">
+            {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
+          </p>
+        </div>
+      ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+        <div className="py-8 flex items-center justify-center space-x-2">
+          <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1100">
+            {isProjectSettingsLoading || isApiKeysEmpty
+              ? 'Retrieving API keys'
+              : 'JWT secret is being updated'}
+          </p>
+        </div>
       ) : (
         apiKeys.map((x: any, i: number) => (
           <Panel.Content
@@ -46,7 +72,10 @@ const DisplayApiSettings = () => {
             }
           >
             <Input
+              readOnly
+              disabled
               layout="horizontal"
+              className="input-mono"
               // @ts-ignore
               label={
                 <>
@@ -63,13 +92,12 @@ const DisplayApiSettings = () => {
                   {x.tags === 'anon' && <code className="text-xs text-code">{'public'}</code>}
                 </>
               }
-              readOnly
-              copy={isNotUpdatingJwtSecret}
-              className="input-mono"
-              disabled
-              reveal={x.tags !== 'anon' && isNotUpdatingJwtSecret}
+              copy={canReadAPIKeys && isNotUpdatingJwtSecret}
+              reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
               value={
-                jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                !canReadAPIKeys
+                  ? 'You need additional permissions to view API keys'
+                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
                   ? 'JWT secret update failed, new API key may have issues'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                   ? 'Updating JWT secret...'
@@ -85,26 +113,7 @@ const DisplayApiSettings = () => {
           </Panel.Content>
         ))
       )}
-    </ApiContentWrapper>
-  )
-}
-export default DisplayApiSettings
-
-const ApiContentWrapper: FC = ({ children }) => {
-  return (
-    <Panel
-      title={
-        <div className="space-y-3">
-          <h5 className="text-base">Project API keys</h5>
-          <p className="text-sm text-scale-1000">
-            Your API is secured behind an API gateway which requires an API Key for every request.
-            <br />
-            You can use the keys below to use Supabase client libraries.
-          </p>
-        </div>
-      }
-    >
-      {children}
     </Panel>
   )
 }
+export default DisplayApiSettings

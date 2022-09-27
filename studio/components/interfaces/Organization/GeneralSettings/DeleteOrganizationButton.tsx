@@ -27,7 +27,7 @@ const DeleteOrganizationButton = observer(() => {
       errors.orgName = 'Enter the name of the organization.'
     }
     if (values.orgName !== orgSlug) {
-      errors.orgName = 'Value entered does not match name of the organization.'
+      errors.orgName = 'Value entered does not match the value above.'
     }
     return errors
   }

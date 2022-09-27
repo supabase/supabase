@@ -5,7 +5,7 @@ import { Button, Input, IconSearch } from '@supabase/ui'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import InviteMemberModal from './InviteMemberButton'
+import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -71,7 +71,7 @@ const TeamSettings = observer(() => {
           <div className="flex items-center space-x-4">
             {canAddMembers && (
               <div>
-                <InviteMemberModal
+                <InviteMemberButton
                   user={user}
                   members={members}
                   roles={roles}

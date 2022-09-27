@@ -1,6 +1,5 @@
 import React, { FC } from 'react'
 import dayjs from 'dayjs'
-import { Typography } from '@supabase/ui'
 
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { ChargeableProduct, PaygStats, ProductFeature } from './PAYGUsage.types'
@@ -39,16 +38,12 @@ const PAYGUsage: FC<Props> = ({ paygStats, dateRange }) => {
                     <div className="flex h-8 w-8 items-center justify-center rounded bg-white">
                       <img width={'16'} src={product.iconUrl} />
                     </div>
-                    <Typography.Title level={5} className="mb-0 font-medium">
-                      {product.title}
-                    </Typography.Title>
+                    <h5 className="mb-0 font-medium">{product.title}</h5>
                   </div>
                   {product.title !== 'Authentication' && (
                     <div className="flex items-center space-x-1">
-                      <Typography.Text className="opacity-50">$</Typography.Text>
-                      <Typography.Title className="m-0 font-medium" level={4}>
-                        {productCost.toFixed(3)}
-                      </Typography.Title>
+                      <p className="text-scale-1000">$</p>
+                      <h4 className="text-lg m-0 font-medium">{productCost.toFixed(3)}</h4>
                     </div>
                   )}
                 </div>

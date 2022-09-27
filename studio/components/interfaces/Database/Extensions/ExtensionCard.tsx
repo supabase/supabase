@@ -1,8 +1,9 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge, IconLoader, Toggle } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import EnableExtensionModal from './EnableExtensionModal'
 
@@ -16,6 +17,11 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   const isOn = extension.installed_version !== null
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
+
+  const canUpdateExtentions = checkPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
 
   async function enableExtension() {
     return setShowConfirmEnableModal(true)
@@ -78,6 +84,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
             <Toggle
               size="tiny"
               checked={isOn}
+              disabled={!canUpdateExtentions}
               onChange={() => (isOn ? disableExtension() : enableExtension())}
             />
           )}

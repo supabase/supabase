@@ -8,7 +8,7 @@ const FileExplorerHeaderSelection = ({
   onUnselectAllItems = () => {},
 }) => {
   return (
-    <div className="px-1 py-1 rounded-t-md bg-green-600 flex items-center shadow z-10 h-[40px]">
+    <div className="px-2 py-1 rounded-t-md bg-brand-700 dark:bg-brand-600 flex items-center shadow z-10 h-[40px]">
       <Button
         icon={<IconX size={16} strokeWidth={2} />}
         type="text"
@@ -16,7 +16,7 @@ const FileExplorerHeaderSelection = ({
         onClick={onUnselectAllItems}
       />
       <div className="flex items-center space-x-3 ml-4">
-        <p className="text-sm text-white mb-0">
+        <p className="text-sm text-scale-1200 mb-0">
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>{selectedItems.length}</span> items
           selected
         </p>

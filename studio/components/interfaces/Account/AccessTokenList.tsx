@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Typography, Button, Modal, IconTrash } from '@supabase/ui'
+import { Button, Modal, IconTrash } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -43,9 +43,9 @@ const AccessTokenList = observer(() => {
             tokens && tokens.length == 0 ? (
               <Table.tr>
                 <Table.td colSpan={5} className="p-3 py-12 text-center">
-                  <Typography.Text type="secondary">
-                    {isLoading ? 'Checking for tokens' : "You don't have any token"}
-                  </Typography.Text>
+                  <p className="text-scale-1000">
+                    {isLoading ? 'Checking for tokens' : 'You do not have any tokens created yet'}
+                  </p>
                 </Table.td>
               </Table.tr>
             ) : (
@@ -58,7 +58,7 @@ const AccessTokenList = observer(() => {
                       </Table.td>
                       <Table.td>{x.name}</Table.td>
                       <Table.td>
-                        <Typography.Text>{new Date(x.created_at).toLocaleString()}</Typography.Text>
+                        <p>{new Date(x.created_at).toLocaleString()}</p>
                       </Table.td>
                       <Table.td>
                         <Button

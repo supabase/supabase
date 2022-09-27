@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react'
-import { Modal, Alert, Button, Input, Space, Typography, Toggle } from '@supabase/ui'
+import { Modal, Alert, Button, Input, Toggle } from '@supabase/ui'
 
 interface Props {
-  visible : boolean
+  visible: boolean
   onSelectCancel: () => {}
   onSelectSave: () => {}
 }
@@ -73,9 +73,9 @@ const CreateBucketModal: FC<Props> = ({
               label="Name of bucket"
               labelOptional="Buckets cannot be renamed once created."
               descriptionText={
-                <Typography.Text type="secondary">
+                <p className="text-scale-1000">
                   Only lowercase letters, numbers, dots, and hyphens
-                </Typography.Text>
+                </p>
               }
               layout="vertical"
               error={error}

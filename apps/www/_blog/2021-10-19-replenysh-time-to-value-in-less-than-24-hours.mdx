@@ -34,11 +34,11 @@ Brands are adopting Replenysh to demonstrate their commitment to making a positi
 
 ## Refactoring code leads to a better way forward
 
-Historically the team created their own backend infrastructure, setting up APIs and Authentication to run their own OTP system with Twilio and passwords. Postgres is essential to their requirements because Replenysh uses Row Level Security for authorization. Before adopting Supabase, the team used a Haskell server with a different Postgres instance deployed on Heroku.
+Historically the team created their own backend infrastructure, setting up APIs and Authentication to run their own OTP system with Twilio and passwords. Postgres is essential to their requirements because Replenysh uses Row Level Security for authorization. Before adopting Supabase, the team used a Haskell server with a different Postgres instance deployed on [Heroku](https://supabase.com/alternatives/supabase-vs-heroku-postgres).
 
 The team decided to do a large refactor of their codebase and began investigating alternative hosting options to help speed up development time and reduce maintenance.
 
-Firebase seemed appealing due to its ability to get started quickly, but the team didn't want to migrate away from a relational database. Specifically, Postgres and RLS fit their requirements.
+[Firebase](https://supabase.com/alternatives/supabase-vs-firebase) seemed appealing due to its ability to get started quickly, but the team didn't want to migrate away from a relational database. Specifically, Postgres and RLS fit their requirements.
 
 When the team discovered Supabase on Hacker News they felt excitement. Supabase has a reputation for a smooth developer experience, providing Postgres and Row Level Security as a core feature.
 

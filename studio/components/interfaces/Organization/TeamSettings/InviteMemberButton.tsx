@@ -2,12 +2,14 @@ import { isNil } from 'lodash'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { object, string } from 'yup'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
 
 import { Member, User, Role } from 'types'
-import { useFlag, useOrganizationDetail, useStore } from 'hooks'
+import { checkPermissions, useFlag, useOrganizationDetail, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   user: User
@@ -25,6 +27,10 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
 
   const [isOpen, setIsOpen] = useState(false)
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
+
+  const canInviteMembers = roles.some(({ id: role_id }) =>
+    checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
+  )
 
   const initialValues = { email: '', role: '' }
 
@@ -51,11 +57,11 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
       }
     }
 
-    setSubmitting(true)
-
     const roleId = enablePermissions
       ? Number(values.role)
       : roles.find((role) => role.name === 'Developer')?.id ?? roles[0].id
+
+    setSubmitting(true)
 
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
@@ -91,7 +97,28 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>Invite</Button>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Button disabled={!canInviteMembers} onClick={() => setIsOpen(true)}>
+            Invite
+          </Button>
+        </Tooltip.Trigger>
+        {!canInviteMembers && (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">
+                You need additional permissions to invite a member to this organization
+              </span>
+            </div>
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
       <Modal
         hideFooter
         size="medium"

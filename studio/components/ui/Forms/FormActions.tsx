@@ -17,7 +17,7 @@ const FormActions = ({
   disabled = false,
   isSubmitting,
 }: Props) => {
-  const isDisabled = disabled || (!hasChanges && hasChanges !== undefined)
+  const isDisabled = isSubmitting || disabled || (!hasChanges && hasChanges !== undefined)
 
   return (
     <div

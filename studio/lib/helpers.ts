@@ -139,7 +139,7 @@ export const propsAreEqual = (prevProps: any, nextProps: any) => {
 export const formatBytes = (bytes: any, decimals = 2) => {
   if (bytes === 0 || bytes === undefined) return '0 bytes'
 
-  const k = 1000
+  const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
@@ -168,6 +168,10 @@ export async function passwordStrength(value: string) {
   let strength = 0
 
   if (value && value !== '') {
+    if(value.length > 99){
+      message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
+      warning = `Password should be less than 100 characters`
+    } else {
     const response = await post(`${API_URL}/profile/password-check`, { password: value })
     if (!response.error) {
       const { result } = response
@@ -188,6 +192,7 @@ export async function passwordStrength(value: string) {
       }
     }
   }
+}
 
   return {
     message,

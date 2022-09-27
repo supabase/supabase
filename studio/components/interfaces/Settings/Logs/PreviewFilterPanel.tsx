@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react'
 import {
   Button,
   Input,
-  Typography,
   IconRefreshCw,
   IconSearch,
   IconExternalLink,
@@ -79,9 +78,9 @@ const PreviewFilterPanel: FC<Props> = ({
               ].join(' ')}
             >
               <div className="absolute z-20">
-                <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
+                <p style={{ fontSize: '0.6rem' }} className="text-white">
                   {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                </Typography.Text>
+                </p>
               </div>
               <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
               <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
