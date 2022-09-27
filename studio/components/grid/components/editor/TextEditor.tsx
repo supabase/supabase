@@ -44,6 +44,10 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
             value={value ?? ''}
             onChange={onChange}
           />
+          <div className="flex items-center justify-end p-2 bg-scale-400 space-x-2">
+            <p className="text-xs text-scale-1100">Save changes</p>
+            <code className="text-xs">⏎</code>
+          </div>
         </BlockKeys>
       }
     >
