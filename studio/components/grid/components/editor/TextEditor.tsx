@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
 import { useTrackedState } from '../../store'
 import { BlockKeys, MonacoEditor, NullValue, EmptyValue } from '../common'
@@ -10,12 +10,17 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
   onRowChange,
 }: EditorProps<TRow, TSummaryRow>) {
   const state = useTrackedState()
-  const [isPopoverOpen, setIsPopoverOpen] = React.useState(true)
+  const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as unknown as string
-  const [value, setValue] = React.useState<string | null>(initialValue)
+  const [value, setValue] = useState<string | null>(initialValue)
 
-  const onEscape = React.useCallback((newValue: string | null) => {
+  const cancelChanges = useCallback(() => {
+    onRowChange(row, true)
+    setIsPopoverOpen(false)
+  }, [])
+
+  const saveChanges = useCallback((newValue: string | null) => {
     onRowChange({ ...row, [column.key]: newValue }, true)
     setIsPopoverOpen(false)
   }, [])
@@ -33,7 +38,7 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
       sideOffset={-35}
       className="rounded-none"
       overlay={
-        <BlockKeys value={value} onEscape={onEscape}>
+        <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
           <MonacoEditor
             width={`${gridColumn?.width || column.width}px`}
             value={value ?? ''}
