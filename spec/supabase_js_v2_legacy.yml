@@ -640,10 +640,10 @@ pages:
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in project [API settings](https://app.supabase.com/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://app.supabase.com/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Filters](/docs/reference/javascript/next/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/next/using-modifiers)
-      - If using the Supabase hosted platform, `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/hosting/platform) and should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - name: Getting your data
         description: |
@@ -979,9 +979,8 @@ pages:
         hideCodeBlock: true
       - name: Filtering through foreign tables
         description: |
-          Normally when you perform a filter on a foreign table's column, if the
-          filter is not satisfied, you would get either `[]` or `null` for the
-          foreign table, but the parent table is not filtered out.
+          If the filter on a foreign table's column is not satisfied, the foreign
+          table returns `[]` or `null` but the parent table is not filtered out. 
 
           <details>
             <summary>Schema</summary>
@@ -1037,7 +1036,7 @@ pages:
             ```
           </details>
 
-          If you want to filter out the parent table rows, you can use the `!inner` hint:
+          If you want to filter out the parent table rows, use the `!inner` hint:
 
           ```ts
           const { data, error } = await supabase
@@ -1424,7 +1423,7 @@ pages:
         description: |
           Postgres offers some
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
-          working with JSON data. For example:
+          working with JSON data.
 
           <details>
             <summary>Schema</summary>
@@ -1478,14 +1477,14 @@ pages:
             ```
           </details>
 
-          Right now it is only possible to update the entire JSON document.
+          Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
 
   upsert():
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
-      - Primary keys should be included in `values` in order for an upsert to work correctly.
+      - Primary keys must be included in `values` to use upsert.
     examples:
       - name: Upsert your data
         description: |
@@ -1584,11 +1583,10 @@ pages:
         hideCodeBlock: true
       - name: Upserting into tables with constraints
         description: |
-          In the following query, `upsert()` will implicitly use the `id`
+          In the following query, `upsert()` implicitly uses the `id`
           (primary key) column to determine conflicts. If there is no existing
-          row with the same `id`, `upsert()` will try to insert a new row, which
-          will fail in this case because there is already a row with `handle`
-          `"saoirse"`:
+          row with the same `id`, `upsert()` inserts a new row, which
+          will fail in this case as there is already a row with `handle` `"saoirse"`.
 
           <details>
             <summary>Schema</summary>
@@ -1753,9 +1751,8 @@ pages:
       ```
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
-      - name: Call a Postgres function
+      - name: Call a Postgres function without arguments
         description: |
-          This is an example of invoking a Postgres function with no parameters.
 
           <details>
             <summary>Schema</summary>
@@ -1788,7 +1785,7 @@ pages:
           ```ts
           const { data, error } = await supabase.rpc('hello_world')
           ```
-      - name: With arguments
+      - name: Call a Postgres function with arguments
         description: |
           <details>
             <summary>Schema</summary>
@@ -1850,7 +1847,7 @@ pages:
             ```
           </details>
         hideCodeBlock: true
-      - name: With filters
+      - name: Call a Postgres function with filters
         description: |
           Postgres functions that return tables can also be combined with
           [Filters](/docs/reference/javascript/next/using-filters) and
@@ -1910,7 +1907,7 @@ pages:
 
       Filters must be applied after any of `select()`, `update()`, `upsert()`,
       `delete()`, and `rpc()` and before
-      [modifiers](/docs/reference/javascript/next/using-modifiers). For example:
+      [modifiers](/docs/reference/javascript/next/using-modifiers).
 
       ```ts
       const { data, error } = await supabase
@@ -2007,10 +2004,10 @@ pages:
         ```
       </details>
 
-      ### Filtering Foreign Tables
+      ### Filter Foreign Tables
 
-      If you have foreign tables in your `select()` query, you can filter on
-      these with a dot notation:
+      You can filter on foreign tables in your `select()` query using dot
+      notation:
 
       <details>
         <summary>Schema</summary>
@@ -3382,7 +3379,7 @@ pages:
   textSearch():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
     notes:
-      - For more information on Postgres full text search, refer to the [guide](/docs/guides/database/full-text-search).
+      - For more information, see [Postgres full text search](/docs/guides/database/full-text-search).
     examples:
       - name: Text search
         js: |
@@ -3833,11 +3830,10 @@ pages:
 
   Using Modifiers:
     description: |
-      Filters work on the row level - they allows you to return only rows that
-      match certain conditions, but they doesn't change the shape of the rows.
-      Modifiers are everything that doesn't fit that definition, mostly by
-      allowing you to change the format of the response (e.g. returning a CSV
-      string).
+      Filters work on the row level—they allows you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to 
+      change the format of the response (e.g., returning a CSV string).
 
       Modifiers must be specified after filters. Some modifiers only apply for
       queries that return rows (e.g., `select()` or `rpc()` on a function that
