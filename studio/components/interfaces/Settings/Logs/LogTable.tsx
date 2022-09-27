@@ -210,7 +210,7 @@ const LogTable = ({
         </div>
       </div>
       <div className="flex flex-col gap-1 px-5">
-        <div>
+        <div className="flex justify-center">
           <IconFrown className="h-6 w-6 text-scale-900 text-center" strokeWidth={2} />
         </div>
 
