@@ -138,9 +138,9 @@ To query for a deeply nested value, we will have to add a join for each array le
 ```sql
 select timestamp, request.method, header.cf_ipcountry
 from edge_logs t
-cross join UNNEST(t.metadata) as metadata
-cross join UNNEST(metadata.request) as request
-cross join UNNEST(request.headers) as header
+cross join unnest(t.metadata) as metadata
+cross join unnest(metadata.request) as request
+cross join unnest(request.headers) as header
 ```
 
 Doing so surfaces the following columns available for selection:
