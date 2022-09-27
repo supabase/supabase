@@ -34,8 +34,10 @@ const PolicyRow: FC<Props> = ({
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-scale-1000 text-sm">Applied to:</p>
-          {policy.roles.map((role) => (
-            <code className="text-scale-1000 text-xs">{role}</code>
+          {policy.roles.map((role, i) => (
+            <code key={`policy-${role}-${i}`} className="text-scale-1000 text-xs">
+              {role}
+            </code>
           ))}
         </div>
       </div>

@@ -214,6 +214,15 @@ const ColumnEditor: FC<Props> = ({
             disabled={!isUndefined(columnFields?.foreignKey)}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
+
+          <div className="text-sm grid md:grid-cols-12 md:gap-x-4 ">
+            <p className='text-scale-1100 col-span-7 col-start-5 -mt-4'>
+              <a href="https://supabase.com/docs/guides/database/tables#data-types" target="_blank" className="underline inline-block gap-1 p-2 rounded-sm">
+                Learn more about data types
+              </a>
+            </p>
+          </div>
+
           {isUndefined(columnFields.foreignKey) && (
             <div className="grid grid-cols-12 gap-4">
               {columnFields.format.includes('int') && (

@@ -274,5 +274,5 @@ module.exports = ui({
   //     height: ['hover'],
   //   },
   // },
-  // plugins: [require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography')],
 })
