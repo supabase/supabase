@@ -25,10 +25,10 @@ const DatabaseTables: NextPageWithLayout = () => {
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       meta.types.load()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   const onAddTable = () => {
     setSidePanelKey('table')
