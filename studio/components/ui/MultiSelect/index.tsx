@@ -12,14 +12,15 @@ export interface MultiSelectOption {
 }
 
 interface Props {
-  options: MultiSelectOption[]
   value: string[]
+  options: MultiSelectOption[]
   label?: string
   placeholder?: string | ReactNode
   searchPlaceholder?: string
   descriptionText?: string | ReactNode
   emptyMessage?: string | ReactNode
   disabled?: boolean
+  allowDuplicateSelection?: boolean
   onChange?(x: string[]): void
 }
 
