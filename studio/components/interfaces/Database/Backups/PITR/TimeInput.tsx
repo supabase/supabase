@@ -84,7 +84,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
       <div
         className={[
           'flex items-center justify-between transition',
-          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[310px]',
+          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[350px]',
           `${
             isFocused
               ? 'border-scale-900'
