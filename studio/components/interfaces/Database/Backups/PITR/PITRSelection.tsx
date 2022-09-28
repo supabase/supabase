@@ -290,10 +290,10 @@ const PITRSelection = ({}) => {
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm text-scale-1100">Time of recovery</p>
-                    <div className="w-[310px]">
+                    <div className="w-[350px]">
                       <TimezoneSelection
                         hideLabel
-                        dropdownWidth="w-[350px]"
+                        dropdownWidth="w-[400px]"
                         selectedTimezone={selectedTimezone}
                         onSelectTimezone={setSelectedTimezone}
                       />

@@ -77,7 +77,7 @@ const RestoringState: FC<Props> = ({}) => {
         {isCompleted && (
           <div className="col-start-2 col-span-11">
             <Button disabled={loading} loading={loading} onClick={onConfirm}>
-              Confirm
+              Return to project
             </Button>
           </div>
         )}
