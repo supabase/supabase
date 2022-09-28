@@ -647,8 +647,8 @@ pages:
     examples:
       - name: Getting your data
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -661,16 +661,18 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -692,7 +694,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -705,8 +709,8 @@ pages:
         description: |
           You can select specific fields from your tables.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -719,16 +723,18 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select('name')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -747,14 +753,16 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Query foreign tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -777,21 +785,23 @@ pages:
               (1, 2, 'Bali'),
               (2, 1, 'Munich');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select(`
-              name,
-              cities (
-                name
-              )
-            `)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select(`
+                name,
+                cities (
+                  name
+                )
+              `)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -817,7 +827,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Query foreign tables through a join table
         description: |
@@ -826,8 +838,8 @@ pages:
           the `select()` method to query the related data. The join table needs
           to have the foreign keys as part of its composite primary key.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -866,21 +878,23 @@ pages:
               (1, 2),
               (2, 2);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('users')
-            .select(`
-              name,
-              teams (
-                name
-              )
-            `)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('users')
+              .select(`
+                name,
+                teams (
+                  name
+                )
+              `)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -909,17 +923,18 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Query the same foreign table multiple times
         description: |
-          Sometimes you will need to query the same foreign table twice.
-          In this case, you can use the name of the joined column to identify
-          which join you intend to use. For convenience, you can also give an
-          alias for each column.
+          If you need to query the same foreign table twice, use the name of the
+          joined column to identify which join to use. You can also give each
+          column an alias.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -943,20 +958,22 @@ pages:
             values
               (1, 2, '👋');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('messages')
-            .select(`
-              content,
-              from:sender_id(name),
-              to:receiver_id(name)
-            `)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('messages')
+              .select(`
+                content,
+                from:sender_id(name),
+                to:receiver_id(name)
+              `)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -975,15 +992,17 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Filtering through foreign tables
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
           table returns `[]` or `null` but the parent table is not filtered out. 
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1006,17 +1025,19 @@ pages:
               (1, 2, 'Bali'),
               (2, 1, 'Munich');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries(*)')
-            .eq('countries.name', 'Estonia')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('cities')
+              .select('name, countries(*)')
+              .eq('countries.name', 'Estonia')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1034,19 +1055,24 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
 
           If you want to filter out the parent table rows, use the `!inner` hint:
 
-          ```ts
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries!inner(*)')
-            .eq('countries.name', 'Estonia')
-          ```
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('cities')
+              .select('name, countries!inner(*)')
+              .eq('countries.name', 'Estonia')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1055,7 +1081,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Querying with count option
         description: |
@@ -1063,8 +1091,8 @@ pages:
           [count](/docs/reference/javascript/next/select#parameters) option. For
           example, to get the table count without returning all rows:
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1077,16 +1105,18 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { count, error } = await supabase
-            .from('countries')
-            .select('*', { count: 'exact', head: true })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { count, error } = await supabase
+              .from('countries')
+              .select('*', { count: 'exact', head: true })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1095,7 +1125,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Querying JSON data
         description: |
@@ -1104,8 +1136,8 @@ pages:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           querying JSON data.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1120,7 +1152,9 @@ pages:
             values
               (1, 'Avdotya', '{"city":"Saint Petersburg"}');
             ```
-          </details>
+
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
           ```ts
           const { data, error } = await supabase
@@ -1131,8 +1165,8 @@ pages:
             `)
           ```
 
-          <details>
-            <summary>Result</summary>
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1147,7 +1181,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   insert():
@@ -1156,23 +1192,25 @@ pages:
     examples:
       - name: Create a record
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
               countries (id int8 primary key, name text);
             ```
-          </details>
 
-          ```ts
-          const { error } = await supabase
-            .from('countries')
-            .insert({ id: 1, name: 'Denmark' })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { error } = await supabase
+              .from('countries')
+              .insert({ id: 1, name: 'Denmark' })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1180,16 +1218,20 @@ pages:
               "statusText": "Created"
             }
             ```
-          </details>
+          </TabItem>
+          </Tabs>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-          ```
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1203,7 +1245,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -1214,24 +1258,26 @@ pages:
           ```
       - name: Create a record and return it
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
               countries (id int8 primary key, name text);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .insert({ id: 1, name: 'Denmark' })
-            .select()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .insert({ id: 1, name: 'Denmark' })
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1245,33 +1291,37 @@ pages:
               "statusText": "Created"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Bulk create
         description: |
           A bulk create operation is handled in a single transaction.
           If any of the inserts fail, none of the rows are inserted.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
               countries (id int8 primary key, name text);
             ```
-          </details>
 
-          ```ts
-          const { error } = await supabase
-            .from('countries')
-            .insert([
-              { id: 1, name: 'Nepal' },
-              { id: 1, name: 'Vietnam' },
-            ])
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { error } = await supabase
+              .from('countries')
+              .insert([
+                { id: 1, name: 'Nepal' },
+                { id: 1, name: 'Vietnam' },
+              ])
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1285,16 +1335,21 @@ pages:
               "statusText": "Conflict"
             }
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-          ```
+          </TabItem>
+          </Tabs>
 
-          <details>
-            <summary>Result</summary>
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
+
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1303,7 +1358,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   update():
@@ -1314,8 +1371,8 @@ pages:
     examples:
       - name: Updating your data
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1326,17 +1383,19 @@ pages:
             values
               (1, 'Taiwan');
             ```
-          </details>
 
-          ```ts
-          const { error } = await supabase
-            .from('countries')
-            .update({ name: 'Australia' })
-            .eq('id', 1)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { error } = await supabase
+              .from('countries')
+              .update({ name: 'Australia' })
+              .eq('id', 1)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1344,16 +1403,21 @@ pages:
               "statusText": "No Content"
             }
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-          ```
+          </TabItem>
+          </Tabs>
 
-          <details>
-            <summary>Result</summary>
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
+
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1367,7 +1431,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -1379,8 +1445,8 @@ pages:
           ```
       - name: Update a record and return it
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1391,18 +1457,20 @@ pages:
             values
               (1, 'Taiwan');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Australia' })
-            .eq('id', 1)
-            .select()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .update({ name: 'Australia' })
+              .eq('id', 1)
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1416,7 +1484,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Updating JSON data
         description: |
@@ -1424,8 +1494,8 @@ pages:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           working with JSON data.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1440,23 +1510,25 @@ pages:
             values
               (1, 'Michael', '{ "postcode": 90210 }');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('users')
-            .update({
-              address: {
-                street: 'Melrose Place',
-                postcode: 90210
-              }
-            })
-            .eq('address->postcode', 90210)
-            .select()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('users')
+              .update({
+                address: {
+                  street: 'Melrose Place',
+                  postcode: 90210
+                }
+              })
+              .eq('address->postcode', 90210)
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1474,7 +1546,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
 
           Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
@@ -1487,8 +1561,8 @@ pages:
     examples:
       - name: Upsert your data
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1499,17 +1573,19 @@ pages:
             values
               (1, 'Afghanistan');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .upsert({ id: 1, name: 'Albania' })
-            .select()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .upsert({ id: 1, name: 'Albania' })
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1523,7 +1599,9 @@ pages:
               "statusText": "Created"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -1535,8 +1613,8 @@ pages:
           ```
       - name: Bulk Upsert your data
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1547,20 +1625,22 @@ pages:
             values
               (1, 'Afghanistan');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .upsert([
-              { id: 1, name: 'Albania' },
-              { id: 2, name: 'Algeria' },
-            ])
-            .select()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .upsert([
+                { id: 1, name: 'Albania' },
+                { id: 2, name: 'Algeria' },
+              ])
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1578,7 +1658,9 @@ pages:
               "statusText": "Created"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Upserting into tables with constraints
         description: |
@@ -1587,8 +1669,8 @@ pages:
           row with the same `id`, `upsert()` inserts a new row, which
           will fail in this case as there is already a row with `handle` `"saoirse"`.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1603,17 +1685,19 @@ pages:
             values
               (1, 'saoirse', null);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('users')
-            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' })
-            .select()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('users')
+              .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' })
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1627,25 +1711,30 @@ pages:
               "statusText": "Conflict"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
 
           Using the `onConflict` option, you can instruct `upsert()` to use
           another column with a unique constraint to determine conflicts:
 
-          ```ts
-          await supabase
-            .from('users')
-            .upsert(
-              { id: 42, handle: 'saoirse', display_name: 'Saoirse' },
-              { onConflict: 'handle' },
-            )
-          const { data, error } = await supabase
-            .from('users')
-            .select()
-          ```
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            await supabase
+              .from('users')
+              .upsert(
+                { id: 42, handle: 'saoirse', display_name: 'Saoirse' },
+                { onConflict: 'handle' },
+              )
+            const { data, error } = await supabase
+              .from('users')
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1660,7 +1749,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   delete():
@@ -1676,8 +1767,8 @@ pages:
     examples:
       - name: Delete records
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1688,17 +1779,19 @@ pages:
             values
               (1, 'Spain');
             ```
-          </details>
 
-          ```ts
-          const { error } = await supabase
-            .from('countries')
-            .delete()
-            .eq('id', 1)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { error } = await supabase
+              .from('countries')
+              .delete()
+              .eq('id', 1)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1706,16 +1799,21 @@ pages:
               "statusText": "No Content"
             }
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-          ```
+          </TabItem>
+          </Tabs>
 
-          <details>
-            <summary>Result</summary>
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
+
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1724,7 +1822,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -1752,23 +1852,24 @@ pages:
     examples:
       - name: Call a Postgres function without arguments
         description: |
-
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create function hello_world() returns text as $$
               select 'Hello world';
             $$ language sql;
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase.rpc('hello_world')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase.rpc('hello_world')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1777,7 +1878,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -1786,22 +1889,24 @@ pages:
           ```
       - name: Call a Postgres function with arguments
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create function echo(say text) returns text as $$
               select say;
             $$ language sql;
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase.rpc('echo', { say: '👋' })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase.rpc('echo', { say: '👋' })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1810,28 +1915,32 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Bulk processing
         description: |
-          You can process large payloads at once using array parameters:
+          You can process large payloads by passing in an array as an argument:
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create function add_one_each(arr int[]) returns int[] as $$
               select array_agg(n + 1) from unnest(arr) as n;
             $$ language sql;
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase.rpc('add_one_each', { arr: [1, 2, 3] })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase.rpc('add_one_each', { arr: [1, 2, 3] })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1844,7 +1953,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Call a Postgres function with filters
         description: |
@@ -1852,8 +1963,8 @@ pages:
           [Filters](/docs/reference/javascript/next/using-filters) and
           [Modifiers](/docs/reference/javascript/next/using-modifiers).
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -1869,17 +1980,19 @@ pages:
               select * from countries;
             $$ language sql;
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .rpc('list_stored_countries')
-            .eq('id', 1)
-            .single()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .rpc('list_stored_countries')
+              .eq('id', 1)
+              .single()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -1891,7 +2004,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   Using Filters:
@@ -1953,12 +2068,10 @@ pages:
       const { data, error } = await query
       ```
 
-      ### Filtering by Fields of a JSON column
+      ### Filter by values within a JSON column
 
-      You can filter by values inside a JSON column:
-
-      <details>
-        <summary>Schema</summary>
+      <Tabs>
+      <TabItem value="schema" label="Schema">
 
         ```sql
         create table
@@ -1974,17 +2087,19 @@ pages:
           (1, 'Michael', '{ "postcode": 90210 }'),
           (2, 'Jane', null);
         ```
-      </details>
 
-      ```ts
-      const { data, error } = await supabase
-        .from('users')
-        .select()
-        .eq('address->postcode', 90210)
-      ```
+      </TabItem>
+      <TabItem default value="js" label="JavaScript">
 
-      <details>
-        <summary>Result</summary>
+        ```ts
+        const { data, error } = await supabase
+          .from('users')
+          .select()
+          .eq('address->postcode', 90210)
+        ```
+
+      </TabItem>
+      <TabItem value="result" label="Result">
 
         ```json
         {
@@ -2001,15 +2116,17 @@ pages:
           "statusText": "OK"
         }
         ```
-      </details>
+
+      </TabItem>
+      </Tabs>
 
       ### Filter Foreign Tables
 
       You can filter on foreign tables in your `select()` query using dot
       notation:
 
-      <details>
-        <summary>Schema</summary>
+      <Tabs>
+      <TabItem value="schema" label="Schema">
 
         ```sql
         create table
@@ -2032,22 +2149,24 @@ pages:
           (1, 2, 'Bali'),
           (2, 1, 'Munich');
         ```
-      </details>
 
-      ```ts
-      const { data, error } = await supabase
-        .from('countries')
-        .select(`
-          name,
-          cities!inner (
-            name
-          )
-        `)
-        .eq('cities.name', 'Bali')
-      ```
+      </TabItem>
+      <TabItem default value="js" label="JavaScript">
 
-      <details>
-        <summary>Result</summary>
+        ```ts
+        const { data, error } = await supabase
+          .from('countries')
+          .select(`
+            name,
+            cities!inner (
+              name
+            )
+          `)
+          .eq('cities.name', 'Bali')
+        ```
+
+      </TabItem>
+      <TabItem value="result" label="Result">
 
         ```json
         {
@@ -2065,15 +2184,17 @@ pages:
           "statusText": "OK"
         }
         ```
-      </details>
+
+      </TabItem>
+      </Tabs>
 
   eq():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2086,17 +2207,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .eq('name', 'Albania')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .eq('name', 'Albania')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2110,7 +2233,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2126,8 +2251,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2140,17 +2265,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .neq('name', 'Albania')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .neq('name', 'Albania')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2168,7 +2295,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2184,8 +2313,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2198,17 +2327,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .gt('id', 2)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .gt('id', 2)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2222,7 +2353,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2238,8 +2371,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2252,17 +2385,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .gte('id', 2)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .gte('id', 2)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2280,7 +2415,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2296,8 +2433,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2310,17 +2447,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .lt('id', 2)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .lt('id', 2)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2334,7 +2473,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2350,8 +2491,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2364,17 +2505,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .lte('id', 2)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .lte('id', 2)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2392,7 +2535,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2408,8 +2553,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2422,17 +2567,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .like('name', '%Alba%')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .like('name', '%Alba%')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2446,7 +2593,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2462,8 +2611,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2476,17 +2625,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .like('name', '%alba%')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .like('name', '%alba%')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2500,7 +2651,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2518,8 +2671,8 @@ pages:
         description: |
           Using the `eq()` filter doesn't work when filtering for `null`:
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2531,17 +2684,19 @@ pages:
               (1, 'null'),
               (2, null);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .eq('name', null)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .eq('name', null)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2555,19 +2710,24 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
 
           Instead, you need to use `is()`:
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .is('name', null)
-          ```
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .is('name', null)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2581,7 +2741,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2597,8 +2759,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2611,17 +2773,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .in('name', ['Albania', 'Algeria'])
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .in('name', ['Albania', 'Algeria'])
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2639,7 +2803,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2655,8 +2821,8 @@ pages:
     examples:
       - name: On array columns
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2672,17 +2838,19 @@ pages:
               (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('issues')
-            .select('title')
-            .contains('tags', ['is:open', 'severity:high'])
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('issues')
+              .select('title')
+              .contains('tags', ['is:open', 'severity:high'])
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2695,7 +2863,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2712,8 +2882,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2729,17 +2899,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2754,12 +2926,14 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: On `jsonb` columns
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2775,17 +2949,19 @@ pages:
               (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
               (2, 'Jane', '{}');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('users')
-            .select('name')
-            .contains('address', { postcode: 90210 })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('users')
+              .select('name')
+              .contains('address', { postcode: 90210 })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2798,7 +2974,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   containedBy():
@@ -2806,8 +2984,8 @@ pages:
     examples:
       - name: On array columns
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2823,17 +3001,19 @@ pages:
               (1, 'Chemistry', array['monday', 'friday']),
               (2, 'History', array['monday', 'wednesday', 'thursday']);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('classes')
-            .select('name')
-            .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('classes')
+              .select('name')
+              .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2846,7 +3026,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -2863,8 +3045,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2880,17 +3062,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2905,12 +3089,14 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: On `jsonb` columns
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2926,17 +3112,19 @@ pages:
               (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
               (2, 'Jane', '{}');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('users')
-            .select('name')
-            .containedBy('address', {})
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('users')
+              .select('name')
+              .containedBy('address', {})
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -2949,7 +3137,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   rangeGt():
@@ -2962,8 +3152,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -2979,17 +3169,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3004,7 +3196,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3025,8 +3219,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3042,17 +3236,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3067,7 +3263,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3088,8 +3286,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3105,17 +3303,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3130,7 +3330,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3151,8 +3353,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3168,17 +3370,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3193,7 +3397,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3214,8 +3420,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3231,17 +3437,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3256,7 +3464,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3272,8 +3482,8 @@ pages:
     examples:
       - name: On array columns
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3289,17 +3499,19 @@ pages:
               (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('issues')
-            .select('title')
-            .overlaps('tags', ['is:closed', 'severity:high'])
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('issues')
+              .select('title')
+              .overlaps('tags', ['is:closed', 'severity:high'])
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3312,7 +3524,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3329,8 +3543,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3346,17 +3560,19 @@ pages:
               (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('reservations')
+              .select()
+              .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3371,7 +3587,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   # TODO: schema & result
@@ -3441,8 +3659,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3455,17 +3673,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .match({ id: 2, name: 'Albania' })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select('name')
+              .match({ id: 2, name: 'Albania' })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3478,7 +3698,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3494,8 +3716,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3507,17 +3729,19 @@ pages:
               (1, 'null'),
               (2, null);
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .not('name', 'is', null)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .not('name', 'is', null)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3531,7 +3755,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3547,8 +3773,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3561,17 +3787,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .or('id.eq.2,name.eq.Algeria')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select('name')
+              .or('id.eq.2,name.eq.Algeria')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3587,7 +3815,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3599,8 +3829,8 @@ pages:
           ```
       - name: Use `or` with `and`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3613,17 +3843,20 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select('name')
+              .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
+
 
             ```json
             {
@@ -3636,12 +3869,14 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
       - name: Use `or` on foreign tables
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3664,22 +3899,24 @@ pages:
               (1, 2, 'Bali'),
               (2, 1, 'Munich');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select(`
-              name,
-              cities!inner (
-                name
-              )
-            `)
-            .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select(`
+                name,
+                cities!inner (
+                  name
+                )
+              `)
+              .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3697,7 +3934,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   filter():
@@ -3705,8 +3944,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3719,17 +3958,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .filter('name', 'in', '("Algeria","Japan")')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .filter('name', 'in', '("Algeria","Japan")')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3743,7 +3984,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3755,8 +3998,8 @@ pages:
           ```
       - name: On a foreign table
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3779,22 +4022,24 @@ pages:
               (1, 2, 'Bali'),
               (2, 1, 'Munich');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select(`
-              name,
-              cities!inner (
-                name
-              )
-            `)
-            .filter('cities.name', 'eq', 'Bali')
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select(`
+                name,
+                cities!inner (
+                  name
+                )
+              `)
+              .filter('cities.name', 'eq', 'Bali')
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3812,7 +4057,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         js: |
           ```ts
@@ -3844,8 +4091,8 @@ pages:
     examples:
       - name: With `upsert()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3856,16 +4103,18 @@ pages:
             values
               (1, 'Afghanistan');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .upsert({ id: 1, name: 'Albania' })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .upsert({ id: 1, name: 'Albania' })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3873,17 +4122,22 @@ pages:
               "statusText": "Created"
             }
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .upsert({ id: 1, name: 'Algeria' })
-            .select()
-          ```
+          </TabItem>
+          </Tabs>
 
-          <details>
-            <summary>Result</summary>
+          <Tabs>
+          <TabItem default value="js" label="JavaScript">
+
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .upsert({ id: 1, name: 'Algeria' })
+              .select()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3897,7 +4151,9 @@ pages:
               "statusText": "Created"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3913,8 +4169,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3927,17 +4183,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .order('name', { ascending: false })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .order('name', { ascending: false })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -3959,7 +4217,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -3974,8 +4234,8 @@ pages:
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -3998,22 +4258,24 @@ pages:
               (1, 1, 'Atlanta'),
               (2, 1, 'New York City');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select(`
-              name,
-              cities (
-                name
-              )
-            `)
-            .order('name', { foreignTable: 'cities', ascending: false })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select(`
+                name,
+                cities (
+                  name
+                )
+              `)
+              .order('name', { foreignTable: 'cities', ascending: false })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4038,7 +4300,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   limit():
@@ -4046,8 +4310,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -4060,17 +4324,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .limit(1)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select('name')
+              .limit(1)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4083,7 +4349,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -4095,8 +4363,8 @@ pages:
           ```
       - name: On a foreign table
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -4118,22 +4386,24 @@ pages:
               (1, 1, 'Atlanta'),
               (2, 1, 'New York City');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select(`
-              name,
-              cities (
-                name
-              )
-            `)
-            .limit(1, { foreignTable: 'cities' })
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select(`
+                name,
+                cities (
+                  name
+                )
+              `)
+              .limit(1, { foreignTable: 'cities' })
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4151,7 +4421,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
 
   range():
@@ -4159,8 +4431,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -4173,17 +4445,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .range(0, 1)
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select('name')
+              .range(0, 1)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4199,7 +4473,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -4218,17 +4494,20 @@ pages:
         description: |
           You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
 
-          ```ts
-          const ac = new AbortController()
-          ac.abort()
-          const { data, error } = await supabase
-            .from('very_big_table')
-            .select()
-            .abortSignal(ac.signal)
-          ```
+          <Tabs>
+          <TabItem value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const ac = new AbortController()
+            ac.abort()
+            const { data, error } = await supabase
+              .from('very_big_table')
+              .select()
+              .abortSignal(ac.signal)
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4242,7 +4521,9 @@ pages:
               "statusText": "Bad Request"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -4260,8 +4541,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -4274,18 +4555,20 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .limit(1)
-            .single()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select('name')
+              .limit(1)
+              .single()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4296,7 +4579,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -4313,8 +4598,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -4327,18 +4612,20 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .eq('name', 'Singapore')
-            .maybeSingle()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .eq('name', 'Singapore')
+              .maybeSingle()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4346,7 +4633,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
@@ -4366,8 +4655,8 @@ pages:
         description: |
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
 
-          <details>
-            <summary>Schema</summary>
+          <Tabs>
+          <TabItem value="schema" label="Schema">
 
             ```sql
             create table
@@ -4380,17 +4669,19 @@ pages:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          </details>
 
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .csv()
-          ```
+          </TabItem>
+          <TabItem default value="js" label="JavaScript">
 
-          <details>
-            <summary>Result</summary>
+            ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select()
+              .csv()
+            ```
+
+          </TabItem>
+          <TabItem value="result" label="Result">
 
             ```json
             {
@@ -4399,7 +4690,9 @@ pages:
               "statusText": "OK"
             }
             ```
-          </details>
+
+          </TabItem>
+          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
         js: |
