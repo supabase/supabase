@@ -88,7 +88,8 @@
   @apply bg-scale-200;
 }
 
-.react-datepicker__day--selected {
+.react-datepicker__day--selected,
+.react-datepicker__day--selected.react-datepicker__day--highlighted {
   @apply bg-brand-800 text-white;
 }
 
@@ -98,4 +99,8 @@
 
 .react-datepicker__day--range-end {
   @apply bg-brand-900 text-white hover:text-scale-700 hover:bg-white;
+}
+
+.react-datepicker__day--highlighted {
+  @apply bg-brand-600 text-scale-1100;
 }

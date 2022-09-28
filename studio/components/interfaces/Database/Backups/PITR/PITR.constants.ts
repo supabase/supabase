@@ -463,14 +463,6 @@ export const ALL_TIMEZONES = [
     utc: ['America/Danmarkshavn', 'Etc/GMT'],
   },
   {
-    value: 'GMT Standard Time',
-    abbr: 'GMT',
-    offset: 0,
-    isdst: false,
-    text: '(UTC) Edinburgh, London',
-    utc: ['Europe/Isle_of_Man', 'Europe/Guernsey', 'Europe/Jersey', 'Europe/London'],
-  },
-  {
     value: 'British Summer Time',
     abbr: 'BST',
     offset: 1,
