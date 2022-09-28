@@ -8,7 +8,7 @@ export interface MultiSelectOption {
   id: string | number
   value: string
   name: string
-  disabled: boolean
+  disabled?: boolean
 }
 
 interface Props {
@@ -20,7 +20,6 @@ interface Props {
   descriptionText?: string | ReactNode
   emptyMessage?: string | ReactNode
   disabled?: boolean
-  allowDuplicateSelection?: boolean
   onChange?(x: string[]): void
 }
 
