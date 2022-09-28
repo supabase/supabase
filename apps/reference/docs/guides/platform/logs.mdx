@@ -6,6 +6,8 @@ description: Getting started with Supabase Platform Log Browser
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
 
@@ -126,9 +128,18 @@ The resulting `metadata` key is rendered as an array of objects in the Logs Expl
 
 <!-- 
 update read-only link each time there are edits to the diagram.
-https://excalidraw.com/#json=A3wWTdRuiZN3aX4JtLcLz,BDujvrHATYPG1rbqRQpd1w
+https://excalidraw.com/#json=6VO9SSg2tPoyjpKVn7xRZ,AJkKLH6aTABLqDhfMVslkw
 -->
-![Without Unnesting](/img/guides/platform/logs/unnesting-none.png)
+
+<ThemedImage
+  alt="Without Unnesting"
+  sources={{
+    light: useBaseUrl("/img/guides/platform/logs/unnesting-none.png"),
+    dark: useBaseUrl("/img/guides/platform/logs/unnesting-none-dark.png"),
+  }}
+  style={{maxHeight: 200}}
+/>
+
 
 Perform a `cross join unnest()` to work with the keys nested in the `metadata` key.
 
@@ -144,7 +155,14 @@ cross join unnest(request.headers) as header
 
 This surfaces the following columns available for selection:
 
-![With Two Level Unnesting](/img/guides/platform/logs/unnesting-2.png)
+<ThemedImage
+  alt="With Two Level Unnesting"
+  sources={{
+    light: useBaseUrl("/img/guides/platform/logs/unnesting-2.png"),
+    dark: useBaseUrl("/img/guides/platform/logs/unnesting-2-dark.png"),
+  }}
+  style={{maxHeight: 200}}
+/>
 
 This allows you to select the `method` and `cf_ipcountry` columns. In JS dot notation, the full paths for each selected column are:
 
