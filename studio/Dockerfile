@@ -7,7 +7,7 @@
 #    docker builder prune
 
 FROM node:16-slim as base
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
@@ -25,8 +25,7 @@ COPY studio studio
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 FROM builder as dev
-COPY --from=builder /usr/src/app ./app
-WORKDIR ./app
+COPY --from=builder /usr/src/app ./
 RUN npm clean-install && npm cache clean --force
 EXPOSE 8082
 CMD ["npx", "turbo", "run", "dev", "--filter=studio"]
@@ -34,10 +33,14 @@ CMD ["npx", "turbo", "run", "dev", "--filter=studio"]
 FROM builder as productionprep
 WORKDIR /app
 COPY --from=builder /usr/src/app ./
-RUN npm clean-install && npm cache clean --force && npx turbo run build --scope=studio --include-dependencies --no-deps && rm -rf ./studio/.next/cache/webpack &&npm prune --production
+RUN npm clean-install \
+    && npm cache clean --force \
+    && npx turbo run build --scope=studio --include-dependencies --no-deps \
+    && rm -rf ./studio/.next/cache/webpack \
+    && npm prune --production
 
 FROM node:16-slim as production
-COPY --from=productionprep /app ./
-WORKDIR ./studio
+COPY --from=productionprep /app /app
+WORKDIR /app/studio
 EXPOSE 3000
-CMD ["npm", "run","start"]
+CMD ["npm", "run", "start"]
