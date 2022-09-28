@@ -10,13 +10,13 @@ import TabItem from '@theme/TabItem'
 The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
 
 :::note
-These features are currently not available for self-hosted and local development.<br/>
-This is currently on the roadmap and you can follow the progress in the [Logflare repository](https://github.com/Logflare/logflare).
+These features are not currently available for self-hosting and local development.<br/>
+This is on the roadmap and you can follow the progress in the [Logflare repository](https://github.com/Logflare/logflare).
 :::
 
 ## Product Logs
 
-Supabase provides a logging interface specific to each product. Simple regex searching is available through the search bar to search the log event messsage for specific keywords and patterns. You may export and download the log events matching your query as a spreadsheet.
+Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
 
 <!--
 To update the screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example.
@@ -39,7 +39,7 @@ To update the screenshots, ensure that at least one log line is selected to disp
   </TabItem>
   <TabItem value="auth" label="Auth">
 
-[Auth logs](https://app.supabase.com/project/_/auth/logs) show all server logs for your [Auth uage](../../guides/auth).
+[Auth logs](https://app.supabase.com/project/_/auth/logs) show all server logs for your [Auth usage](../../guides/auth).
 
 ![Auth Logs](/img/guides/platform/logs/logs-auth.png)
 
@@ -113,10 +113,6 @@ select datetime(timestamp) from ....
 -- 2022-09-27T09:17:10.439Z
 ```
 
-:::info
-The rendering behaviour as unix microsecond will be removed in the future.
-:::
-
 ### Unnesting Arrays
 
 Each log event stores metadata an array of objects with multiple levels, and can be seen by selecting single log events in the Logs Explorer. To query arrays, use `unnest()` on each array field and add it to the query as a join. This allows you to reference the nested objects with an alias and select their individual fields.
@@ -126,7 +122,7 @@ For example, to query the edge logs without any joins:
 ```sql
 select timestamp, metadata from edge_logs t
 ```
-The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. This can be better visualized in this diagram, where each square in a column represents a nested array of objects:
+The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects:
 
 <!-- 
 update read-only link each time there are edits to the diagram.
@@ -134,9 +130,9 @@ https://excalidraw.com/#json=A3wWTdRuiZN3aX4JtLcLz,BDujvrHATYPG1rbqRQpd1w
 -->
 ![Without Unnesting](/img/guides/platform/logs/unnesting-none.png)
 
-We can perform a `cross join unnest()` to work with keys nested below the `metadata` key.
+Perform a `cross join unnest()` to work with the keys nested in the `metadata` key.
 
-To query for a deeply nested value, we will have to add a join for each array level:
+To query for a nested value, add a join for each array level:
 
 ```sql
 select timestamp, request.method, header.cf_ipcountry
@@ -146,11 +142,11 @@ cross join unnest(metadata.request) as request
 cross join unnest(request.headers) as header
 ```
 
-Doing so surfaces the following columns available for selection:
+This surfaces the following columns available for selection:
 
 ![With Two Level Unnesting](/img/guides/platform/logs/unnesting-2.png)
 
-This then allows us to select the `method` and `cf_ipcountry` columns. In JS dot notation, the full paths for each selected column are:
+This allows you to select the `method` and `cf_ipcountry` columns. In JS dot notation, the full paths for each selected column are:
 
 - `metadata[].request[].method`
 - `metadata[].request[].headers[].cf_ipcountry`
