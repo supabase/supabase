@@ -91,6 +91,8 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
     return
   }
 
+  console.log('getColumnEditor', columnType, columnDefinition)
+
   switch (columnType) {
     case 'boolean': {
       return columnDefinition.isNullable ? NullableBooleanEditor : BooleanEditor
@@ -108,7 +110,11 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
       const options = columnDefinition.enum!.map((x) => {
         return { label: x, value: x }
       })
-      return (p: any) => <SelectEditor {...p} options={options} />
+      if (columnDefinition.dataType === 'ARRAY') {
+        // MultiSelectEditor
+      } else {
+        return (p: any) => <SelectEditor {...p} options={options} />
+      }
     }
     case 'array':
     case 'json': {
