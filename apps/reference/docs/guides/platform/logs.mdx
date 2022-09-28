@@ -129,6 +129,10 @@ select timestamp, metadata from edge_logs t
 
 The resulting `metadata` key is rendered as an array of objects when rendered in the Logs Explorer. This can be better visualized in this diagram, where each square in a column represents a nested object:
 
+<!-- 
+update read-only link each time there are edits to the diagram.
+https://excalidraw.com/#json=A3wWTdRuiZN3aX4JtLcLz,BDujvrHATYPG1rbqRQpd1w
+-->
 ![Without Unnesting](/img/guides/platform/logs/unnesting-none.png)
 
 We can perform a `cross join unnest()` to work with keys nested below the `metadata` key.
