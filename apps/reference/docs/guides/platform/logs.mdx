@@ -126,8 +126,7 @@ For example, to query the edge logs without any joins:
 ```sql
 select timestamp, metadata from edge_logs t
 ```
-
-The resulting `metadata` key is rendered as an array of objects when rendered in the Logs Explorer. This can be better visualized in this diagram, where each square in a column represents a nested object:
+The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. This can be better visualized in this diagram, where each square in a column represents a nested array of objects:
 
 <!-- 
 update read-only link each time there are edits to the diagram.
