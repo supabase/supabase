@@ -53,6 +53,7 @@ const NotificationsPopover: FC<Props> = () => {
     const serviceNamesByActionName: Record<string, string> = {
       [ActionType.PgBouncerRestart]: 'pgbouncer',
       [ActionType.SchedulePostgresRestart]: 'postgresql',
+      [ActionType.MigratePostgresSchema]: 'postgresql',
     }
     const services: string[] = targetNotification.meta.actions_available
       .map((action) => action.action_type)

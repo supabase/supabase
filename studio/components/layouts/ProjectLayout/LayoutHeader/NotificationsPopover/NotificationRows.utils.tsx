@@ -44,6 +44,24 @@ export const formatNotificationText = (project: Project, notification: Notificat
           New version of "{name}" ({version_to}) is now available for project "{projectName}".
         </p>
       )
+    } else if (upgrade_type === 'schema-migration') {
+      const { name, version_to } = additional as ExtensionsUpgrade
+      return (
+        <div>
+          <p className="text-sm">
+            A new schema migration is available for your project "{projectName}".
+          </p>
+          <ol className="list-disc pl-6">
+            <li key={projectName}>
+              <div className="flex items-center space-x-1">
+                <p className="text-sm">{name}</p>
+                <IconArrowRight size={12} strokeWidth={2} />
+                <p className="text-sm">{version_to}</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      )
     }
     return ''
   } else if (notification.data.name === NotificationName.PostgresqlUpgradeCompleted) {
@@ -65,15 +83,17 @@ export const formatNotificationText = (project: Project, notification: Notificat
           {projectName}".
         </p>
       )
+    } else if (upgrade_type === 'schema-migration') {
+      const { name } = additional as ExtensionsUpgrade
+      return (
+        <p className="text-sm">
+          The schema migration for "{name}" has been successfully applied to your project "
+          {projectName}".
+        </p>
+      )
     }
   } else if (notification.data.name === NotificationName.ProjectUpdateCompleted) {
     const { upgrades } = notification.data
-    const upgradesText = upgrades
-      .map(
-        (upgrade: ServiceUpgrade) =>
-          `${upgrade.name}: ${upgrade.version_to} ${upgrade.changelog_link}`
-      )
-      .reduce((a: string, b: string) => `${a}\n${b}`)
     return (
       <div>
         <p className="text-sm">
@@ -119,15 +139,36 @@ export const formatNotificationText = (project: Project, notification: Notificat
 
 export const formatNotificationCTAText = (availableActions: Action[]) => {
   const [action] = availableActions
-  if (!action) return ''
+  if (!action) return <p className="text-sm"></p>
 
   switch (action.action_type) {
     case ActionType.SchedulePostgresRestart:
-      return 'Restart your project to get the latest updates.'
+      return <p className="text-sm">Restart your project to get the latest updates.</p>
     case ActionType.UpgradeProjectToPro:
-      return 'Upgrade your project to ensure continued availability.'
+      return <p className="text-sm">Upgrade your project to ensure continued availability.</p>
     case ActionType.PgBouncerRestart:
-      return 'Restart your connection pooler to get the latest updates.'
+      return <p className="text-sm">Restart your connection pooler to get the latest updates.</p>
+    case ActionType.MigratePostgresSchema:
+      return (
+        <p className="text-sm">
+          {action.deadline &&
+            `This patch will be automatically applied after ${new Date(
+              action.deadline
+            ).toLocaleDateString()} `}
+          {action.reason && (
+            <Link href={action.reason}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
+                style={{ display: 'inline-block' }}
+              >
+                <IconExternalLink size={12} strokeWidth={2} />
+              </a>
+            </Link>
+          )}
+        </p>
+      )
     default:
       return ''
   }

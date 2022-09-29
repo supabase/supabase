@@ -29,7 +29,7 @@ const NotificationRow: FC<Props> = ({ notification, onSelectRestartProject }) =>
       <div className="mr-8 flex items-center space-x-4">
         <div className="space-y-1">
           {formatNotificationText(project, notification)}
-          <p className="text-sm">{formatNotificationCTAText(availableActions)}</p>
+          {formatNotificationCTAText(availableActions)}
           <p className="text-scale-1100 text-sm !mt-2">{insertedAt}</p>
         </div>
         <div className="col-span-3 flex items-center justify-end">
