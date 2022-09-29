@@ -220,6 +220,11 @@ export const unescapeLiteral = (value: string) => {
     return `${splits[0].toLowerCase()}')`
   }
 
+  // Handle nextval
+  if (value.toLowerCase().includes('nextval')) {
+    return `${splits[0]}')`
+  }
+
   // Handle json
   if (value.toLowerCase().includes('json')) {
     return splits[0].slice(1)
