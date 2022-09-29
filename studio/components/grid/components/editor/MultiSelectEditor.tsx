@@ -3,24 +3,10 @@ import { Popover, IconX, IconPlus } from '@supabase/ui'
 import { EditorProps } from '@supabase/react-data-grid'
 
 import { useTrackedState } from 'components/grid/store'
-import { tryParseJson } from 'lib/helpers'
+import { convertPgArrayToJsArray, convertJsArraytoPgArray } from 'lib/helpers'
 
 interface Props<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
   options?: { label: string; value: string }[]
-}
-
-const convertPgArrayToJsArray = (value: string): string[] => {
-  const valueArray = value
-    .slice(1, value.length - 1)
-    .split(',')
-    .map((x) => `"${x}"`)
-  const formattedValue = `[${valueArray.join(',')}]`
-  return tryParseJson(formattedValue) ?? []
-}
-
-const convertJsArraytoPgArray = (value: string[]) => {
-  if (value.length === 0) return null
-  else return `{${value.join(',')}}`
 }
 
 // Mainly for arrays (specifically enums)
