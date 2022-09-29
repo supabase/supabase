@@ -41,24 +41,22 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
 
   const handleFormSubmit = async (values: any) => {
-    const { error } = await supabase.from<PartnerContact>('partner_contacts').insert(
-      [
-        {
-          type: values.type,
-          first: values.first,
-          last: values.last,
-          company: values.company,
-          size: Number(values.size),
-          title: values.title,
-          email: values.email,
-          website: values.email.split('@')[1],
-          phone: values.phone,
-          country: values.country,
-          details: values.details,
-        },
-      ],
-      { returning: 'minimal' }
-    )
+    // @ts-ignore
+    const { error } = await supabase.from<PartnerContact>('partner_contacts').insert([
+      {
+        type: values.type,
+        first: values.first,
+        last: values.last,
+        company: values.company,
+        size: Number(values.size),
+        title: values.title,
+        email: values.email,
+        website: values.email.split('@')[1],
+        phone: values.phone,
+        country: values.country,
+        details: values.details,
+      },
+    ])
 
     // TODO: handle error
     console.log('error:', error)
