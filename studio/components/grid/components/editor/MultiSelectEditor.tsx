@@ -21,7 +21,7 @@ export function MultiSelectEditor<TRow, TSummaryRow = unknown>({
   const state = useTrackedState()
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
 
-  const originalValue = row[column.key as keyof TRow] as string
+  const originalValue = row[column.key as keyof TRow] as unknown as string
   const [selectedValues, setSelectedValues] = useState(convertPgArrayToJsArray(originalValue))
 
   const onOpenChange = (open: boolean) => {
