@@ -18,7 +18,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
       <div className="col-span-12">
         <div className="flex flex-col space-y-20">
-          <div className="flex flex-col justify-between h-full">
+          <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
               <h3 className="text-xl text-scale-1200">Welcome to your new project</h3>
               <p className="text-base text-scale-1100">
@@ -29,7 +29,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
           </div>
 
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 lg:col-span-7 space-y-8 flex flex-col justify-center">
+            <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
               <div className="space-y-2">
                 <h3 className="text-xl text-scale-1200">
                   Get started by building out your database
@@ -40,7 +40,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                   you need something more.
                 </p>
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex flex-wrap items-center gap-2">
                 <Link href={`/project/${ref}/editor`}>
                   <a>
                     <Button
@@ -91,7 +91,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
             </div>
           </div>
 
-          <div className="flex flex-col justify-between h-full space-y-6">
+          <div className="flex h-full flex-col justify-between space-y-6">
             <div className="max-w-2xl space-y-2">
               <h3 className="text-xl text-scale-1200">Explore our other products</h3>
               <p className="text-base text-scale-1100">
@@ -99,21 +99,21 @@ const NewProjectPanel: FC<Props> = ({}) => {
                 it completely, or just the features you need.
               </p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
               <Panel>
                 <Panel.Content className="flex flex-col space-y-4 lg:h-40">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                       <IconKey strokeWidth={2} size={16} />
                     </div>
                     <h5>Authentication</h5>
                   </div>
                   <div className="flex flex-grow">
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-sm text-scale-1000">
                       A complete user management system that works without any additional tools.
                     </p>
                   </div>
-                  <div className="space-x-2 flex items-center">
+                  <div className="flex items-center space-x-2">
                     <Link href={`/project/${ref}/auth/users`}>
                       <a>
                         <Button type="default">Explore Auth</Button>
@@ -137,17 +137,17 @@ const NewProjectPanel: FC<Props> = ({}) => {
               <Panel>
                 <Panel.Content className="flex flex-col space-y-4 lg:h-40">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                       <IconArchive strokeWidth={2} size={16} />
                     </div>
                     <h5>Storage</h5>
                   </div>
                   <div className="flex flex-grow">
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-sm text-scale-1000">
                       Store, organize, and serve any file types of any size from multiple buckets.
                     </p>
                   </div>
-                  <div className="space-x-2 flex items-center">
+                  <div className="flex items-center space-x-2">
                     <Link href={`/project/${ref}/storage/buckets`}>
                       <a>
                         <Button type="default">Explore Storage</Button>
@@ -171,18 +171,54 @@ const NewProjectPanel: FC<Props> = ({}) => {
               <Panel>
                 <Panel.Content className="flex flex-col space-y-4 lg:h-40">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                       <IconCode strokeWidth={2} size={16} />
                     </div>
                     <h5>Edge Functions</h5>
                   </div>
                   <div className="flex flex-grow">
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-sm text-scale-1000">
                       Write custom code without deploying or scaling servers, with fast deploy times
                       and low latency.
                     </p>
                   </div>
-                  <div className="space-x-2 flex items-center">
+                  <div className="flex items-center space-x-2">
+                    <Link href={`/project/${ref}/functions`}>
+                      <a>
+                        <Button type="default">Explore Functions</Button>
+                      </a>
+                    </Link>
+                    <Link href="https://supabase.com/docs/guides/functions">
+                      <a>
+                        <Button
+                          className="translate-y-[1px]"
+                          icon={<IconExternalLink size={14} />}
+                          type="default"
+                        >
+                          About Functions
+                        </Button>
+                      </a>
+                    </Link>
+                  </div>
+                </Panel.Content>
+              </Panel>
+              <Panel>
+                <Panel.Content className="flex flex-col space-y-4 lg:h-40">
+                  <div className="flex items-center space-x-3">
+                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                      <IconCode strokeWidth={2} size={16} />
+                    </div>
+                    <h5>Realtime</h5>
+                  </div>
+                  <div className="flex flex-grow">
+                    <p className="text-sm text-scale-1000">
+                      A built-in Realtime API that you can use to broadcast messages between users
+                      manage shared state between users listen to database changes over websockets
+                      Write custom code without deploying or scaling servers, with fast deploy times
+                      and low latency.
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
                     <Link href={`/project/${ref}/functions`}>
                       <a>
                         <Button type="default">Explore Functions</Button>
@@ -211,14 +247,14 @@ const NewProjectPanel: FC<Props> = ({}) => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h3 className="text-xl text-scale-1200">Connecting to your new project</h3>
-            <p className="text-base lg:max-w-sm text-scale-1100">
+            <p className="text-base text-scale-1100 lg:max-w-sm">
               Interact with your database through the{' '}
               <Link href="https://supabase.com/docs/reference">
                 <a className="text-brand-900">Supabase client libraries</a>
               </Link>{' '}
               with your API keys.
             </p>
-            <p className="text-base lg:max-w-sm text-scale-1100">
+            <p className="text-base text-scale-1100 lg:max-w-sm">
               More information about your project's keys can be found in your project's API
               settings.
             </p>
