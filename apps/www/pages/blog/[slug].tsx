@@ -292,7 +292,6 @@ function BlogPostPage(props: any) {
                       />
                     </div>
                   )}
-                  {/* <article className={['prose prose-docs'].join(' ')}>{content}</article> */}
                   <article className={['prose prose-docs'].join(' ')}>
                     <MDXRemote {...content} components={mdxComponents()} />
                   </article>
