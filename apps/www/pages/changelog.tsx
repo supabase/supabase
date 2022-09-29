@@ -81,7 +81,10 @@ function ChangelogPage(props: any) {
             {props.changelog.map((changelog: any, i: number) => {
               const date = changelog.published_at.split('T')
               return (
-                <div key={i} className="border-scale-400 grid border-l pb-10 lg:grid-cols-12">
+                <div
+                  key={i}
+                  className="border-scale-400 grid border-l pb-10 lg:grid-cols-12 lg:gap-8"
+                >
                   <div
                     className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
@@ -102,7 +105,7 @@ function ChangelogPage(props: any) {
                   </div>
                   <div className="col-span-8 ml-8 lg:ml-0">
                     <article className="prose prose-docs max-w-none">
-                      <MDXRemote {...changelog.source} components={mdxComponents()} />
+                      <MDXRemote {...changelog.source} components={mdxComponents('blog')} />
                     </article>
                   </div>
                 </div>
