@@ -15,6 +15,7 @@ interface Props {
   value: string[]
   options: MultiSelectOption[]
   label?: string
+  error?: string
   placeholder?: string | ReactNode
   searchPlaceholder?: string
   descriptionText?: string | ReactNode
@@ -33,6 +34,7 @@ export default function MultiSelect({
   options,
   value,
   label,
+  error,
   descriptionText,
   placeholder,
   searchPlaceholder = 'Search for option',
@@ -116,6 +118,7 @@ export default function MultiSelect({
           'form-control form-control--multi-select',
           'bg-scaleA-200 border-scale-700 border',
           'multi-select relative block w-full w-full space-x-1 overflow-auto rounded',
+          `${error !== undefined ? 'border-red-800 bg-red-100' : ''}`,
         ].join(' ')}
         ref={ref}
       >
@@ -254,6 +257,7 @@ export default function MultiSelect({
       {descriptionText && (
         <span className="form-text text-muted text-sm mt-2">{descriptionText}</span>
       )}
+      {error && <span className="text-red-900 text-sm mt-2">{error}</span>}
     </div>
   )
 }
