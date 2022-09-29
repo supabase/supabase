@@ -191,6 +191,22 @@ const config = {
                 to: '/oss',
               },
               {
+                label: 'Terms of Service',
+                to: '/docs/company/terms',
+              },
+              {
+                label: 'Privacy Policy',
+                to: '/docs/company/privacy',
+              },
+              {
+                label: 'Acceptable Use Policy',
+                to: '/docs/company/aup',
+              },
+              {
+                label: 'Service Level Agreement',
+                to: '/docs/company/sla',
+              },
+              {
                 label: 'Humans.txt',
                 to: 'https://supabase.com/humans.txt',
               },
@@ -229,6 +245,14 @@ const config = {
             title: 'Community',
             items: [
               {
+                label: 'SupaSquad',
+                href: 'https://supabase.com/docs/handbook/supasquad',
+              },
+              {
+                label: 'Contributing',
+                href: 'https://supabase.com/docs/handbook/contributing',
+              },
+              {
                 label: 'GitHub',
                 href: 'https://github.com/supabase/supabase',
               },
@@ -247,15 +271,6 @@ const config = {
               {
                 label: 'Discord',
                 href: 'https://discord.supabase.com',
-              },
-            ],
-          },
-          {
-            title: 'Beta',
-            items: [
-              {
-                label: 'Join our beta',
-                href: 'https://app.supabase.com',
               },
             ],
           },

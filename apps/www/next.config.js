@@ -59,7 +59,7 @@ module.exports = {
     return [...rewrites]
   },
   async redirects() {
-   return [...redirects]
+    return [...redirects]
   },
 }
 // )

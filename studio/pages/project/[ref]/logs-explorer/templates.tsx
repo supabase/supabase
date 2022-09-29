@@ -14,10 +14,11 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
   return (
     <div>
       <div className="grid grid-cols-3 gap-6">
-        {TEMPLATES.filter((template) => template.mode === 'custom').map((template) => {
+        {TEMPLATES.filter((template) => template.mode === 'custom').map((template, i) => {
           const [showPreview, setShowPreview] = useState(false)
           return (
             <CardButton
+              key={i}
               title={template.label}
               icon={
                 <div

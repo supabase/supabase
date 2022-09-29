@@ -75,14 +75,6 @@ export const validateFields = (fields: RowField[]) => {
       }
     }
     if (field.isIdentity || field.defaultValue) return
-    if (
-      !field.isNullable &&
-      typeof field.value === 'string' &&
-      field.value.length === 0 &&
-      field.defaultValue === null
-    ) {
-      errors[field.name] = `Please assign a value for this field`
-    }
   })
   return errors
 }

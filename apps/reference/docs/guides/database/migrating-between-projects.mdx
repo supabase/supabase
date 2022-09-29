@@ -1,0 +1,97 @@
+---
+id: migrating-between-projects
+title: 'Migrating Between Projects'
+description: Migrate data from one project to another
+---
+
+Migrating projects can be achieved using standard PostgreSQL tooling. This is particularly useful for older projects (e.g. to use a newer Postgres version).
+
+## Before you begin
+
+- Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
+- Create a new [Supabase project](https://app.supabase.com).
+- Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) in your new project if you enabled them in your old project.
+- Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
+
+## Migrate the database
+
+In your old project:
+1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+1. Run `pg_dump --clean --if-exists --quote-all-identifiers -h $OLD_DB_URL -U postgres > dump.sql` from your terminal.
+1. Run `ALTER ROLE postgres NOSUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+
+In your new project:
+1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+1. Run `psql -h $NEW_DB_URL -U postgres -f dump.sql` from your terminal.
+1. Run `TRUNCATE storage.objects` in the [SQL editor](https://app.supabase.com/project/_/sql).
+1. Run `ALTER ROLE postgres NOSUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+
+## Migrate storage objects
+
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.io](mailto:support@supabase.io).
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const OLD_PROJECT_URL = 'https://xxx.supabase.co'
+const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
+
+const NEW_PROJECT_URL = 'https://yyy.supabase.co'
+const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
+
+;(async () => {
+  const oldSupabaseRestClient = createClient(
+    OLD_PROJECT_URL,
+    OLD_PROJECT_SERVICE_KEY,
+    {
+      schema: 'storage',
+    }
+  )
+  const oldSupabaseClient = createClient(
+    OLD_PROJECT_URL,
+    OLD_PROJECT_SERVICE_KEY
+  )
+  const newSupabaseClient = createClient(
+    NEW_PROJECT_URL,
+    NEW_PROJECT_SERVICE_KEY
+  )
+
+  // make sure you update max_rows in postgrest settings if you have a lot of objects
+  // or paginate here
+  const { data: oldObjects, error } = await oldSupabaseRestClient
+    .from('objects')
+    .select()
+  if (error) {
+    console.log('error getting objects from old bucket')
+    throw error
+  }
+
+  for (const objectData of oldObjects) {
+    console.log(`moving ${objectData.id}`)
+    try {
+      const { data, error: downloadObjectError } =
+        await oldSupabaseClient.storage
+          .from(objectData.bucket_id)
+          .download(objectData.name)
+      if (downloadObjectError) {
+        throw downloadObjectError
+      }
+
+      const { _, error: uploadObjectError } = await newSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .upload(objectData.name, data, {
+          upsert: true,
+          contentType: objectData.metadata.mimetype,
+          cacheControl: objectData.metadata.cacheControl,
+        })
+      if (uploadObjectError) {
+        throw uploadObjectError
+      }
+    } catch (err) {
+      console.log('error moving ', objectData)
+      console.log(err)
+    }
+  }
+})()
+```
+
