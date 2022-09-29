@@ -174,30 +174,30 @@ The Logs Explorer has a maximum of 1000 rows per run. Use `LIMIT` to optimize yo
 
 1. Include a filter over **timestamp**
 
-Querying your entire log history might seem appealing. For **Enterprise** customers that have a large retention range, you run the risk of timeouts due additional time required to scan the larger dataset.
+  Querying your entire log history might seem appealing. For **Enterprise** customers that have a large retention range, you run the risk of timeouts due additional time required to scan the larger dataset.
 
 2. Avoid selecting large nested objects. Select individual values instead.
 
-When querying large objects, the columnar storage engine selects each column associated with each nested key, resulting in a large number of columns being selected. This inadvertently impacts the query speed and may result in timeouts or memory errors, especially for projects with a lot of logs.
+  When querying large objects, the columnar storage engine selects each column associated with each nested key, resulting in a large number of columns being selected. This inadvertently impacts the query speed and may result in timeouts or memory errors, especially for projects with a lot of logs.
 
-Instead, select only the values required.
+  Instead, select only the values required.
 
-```sql
--- ❌ Avoid doing this
-select
+  ```sql
+  -- ❌ Avoid doing this
+  select
+    datetime(timestamp),
+    m as metadata  -- <- metadata contains many nested keys
+  from edge_logs t
+  cross join unnest(t.metadata) as m;
+
+  -- ✅ Do this
+  select
   datetime(timestamp),
-  m as metadata  -- <- metadata contains many nested keys
-from edge_logs t
-cross join unnest(t.metadata) as m;
-
--- ✅ Do this
-select
-datetime(timestamp),
-r.method   -- <- select only the required values
-from edge_logs t
-cross join unnest(t.metadata) as m
-cross join unnest(m.request) as r
-```
+  r.method   -- <- select only the required values
+  from edge_logs t
+  cross join unnest(t.metadata) as m
+  cross join unnest(m.request) as r
+  ```
 
 ### Examples and Templates
 
