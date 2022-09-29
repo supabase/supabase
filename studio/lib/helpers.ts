@@ -216,6 +216,8 @@ export const detectBrowser = () => {
 }
 
 export const convertPgArrayToJsArray = (value: string): string[] => {
+  if (!value) return []
+
   const valueArray = value
     .slice(1, value.length - 1)
     .split(',')

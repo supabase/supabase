@@ -60,18 +60,11 @@ export const generateRowFields = (
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {
-    if (field.format.startsWith('_') && field.value?.length > 0) {
-      try {
-        minifyJSON(field.value)
-      } catch {
-        errors[field.name] = 'Invalid array'
-      }
-    }
     if (field.format.includes('json') && field.value?.length > 0) {
       try {
         minifyJSON(field.value)
       } catch {
-        errors[field.name] = 'Invalid JSON'
+        errors[field.name] = 'Value is an invalid JSON'
       }
     }
     if (field.isIdentity || field.defaultValue) return
@@ -270,13 +263,11 @@ export const generateRowObjectFromFields = (
   const rowObject = {} as any
   fields.forEach((field) => {
     const value = (field?.value ?? '').length === 0 ? null : field.value
-    if (field.format.includes('json') || (field.format.startsWith('_') && value)) {
+    if (field.format.includes('json')) {
       if (typeof field.value === 'object') {
         rowObject[field.name] = value
-      } else {
-        if (isString(value)) {
-          rowObject[field.name] = tryParseJson(value)
-        }
+      } else if (isString(value)) {
+        rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
       rowObject[field.name] = value === 'true'
