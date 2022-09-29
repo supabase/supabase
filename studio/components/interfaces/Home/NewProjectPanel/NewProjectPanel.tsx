@@ -2,7 +2,14 @@ import Link from 'next/link'
 import { FC } from 'react'
 import SVG from 'react-inlinesvg'
 import { useRouter } from 'next/router'
-import { Button, IconKey, IconArchive, IconExternalLink, IconCode } from '@supabase/ui'
+import {
+  Button,
+  IconKey,
+  IconArchive,
+  IconExternalLink,
+  IconCode,
+  IconActivity,
+} from '@supabase/ui'
 
 import Panel from 'components/ui/Panel'
 import APIKeys from './APIKeys'
@@ -99,16 +106,16 @@ const NewProjectPanel: FC<Props> = ({}) => {
                 it completely, or just the features you need.
               </p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 md:gap-y-0 xl:grid-cols-4">
               <Panel>
-                <Panel.Content className="flex flex-col space-y-4 lg:h-40">
+                <Panel.Content className="flex flex-col space-y-4 md:px-3">
                   <div className="flex items-center space-x-3">
                     <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                       <IconKey strokeWidth={2} size={16} />
                     </div>
                     <h5>Authentication</h5>
                   </div>
-                  <div className="flex flex-grow">
+                  <div className="flex flex-grow md:min-h-[50px] xl:min-h-[75px]">
                     <p className="text-sm text-scale-1000">
                       A complete user management system that works without any additional tools.
                     </p>
@@ -135,14 +142,14 @@ const NewProjectPanel: FC<Props> = ({}) => {
               </Panel>
 
               <Panel>
-                <Panel.Content className="flex flex-col space-y-4 lg:h-40">
+                <Panel.Content className="flex flex-col space-y-4 md:px-3">
                   <div className="flex items-center space-x-3">
                     <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                       <IconArchive strokeWidth={2} size={16} />
                     </div>
                     <h5>Storage</h5>
                   </div>
-                  <div className="flex flex-grow">
+                  <div className="flex md:min-h-[50px] xl:min-h-[75px]">
                     <p className="text-sm text-scale-1000">
                       Store, organize, and serve any file types of any size from multiple buckets.
                     </p>
@@ -169,14 +176,14 @@ const NewProjectPanel: FC<Props> = ({}) => {
               </Panel>
 
               <Panel>
-                <Panel.Content className="flex flex-col space-y-4 lg:h-40">
+                <Panel.Content className="flex flex-col space-y-4 md:px-3">
                   <div className="flex items-center space-x-3">
                     <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                       <IconCode strokeWidth={2} size={16} />
                     </div>
                     <h5>Edge Functions</h5>
                   </div>
-                  <div className="flex flex-grow">
+                  <div className="flex md:min-h-[50px] xl:min-h-[75px]">
                     <p className="text-sm text-scale-1000">
                       Write custom code without deploying or scaling servers, with fast deploy times
                       and low latency.
@@ -203,35 +210,27 @@ const NewProjectPanel: FC<Props> = ({}) => {
                 </Panel.Content>
               </Panel>
               <Panel>
-                <Panel.Content className="flex flex-col space-y-4 lg:h-40">
-                  <div className="flex items-center space-x-3">
+                <Panel.Content className="flex flex-col space-y-4 md:px-3">
+                  <div className="flex items-center space-x-4">
                     <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
-                      <IconCode strokeWidth={2} size={16} />
+                      <IconActivity strokeWidth={2} size={16} />
                     </div>
                     <h5>Realtime</h5>
                   </div>
-                  <div className="flex flex-grow">
+                  <div className="flex md:min-h-[50px] xl:min-h-[75px]">
                     <p className="text-sm text-scale-1000">
-                      A built-in Realtime API that you can use to broadcast messages between users
-                      manage shared state between users listen to database changes over websockets
-                      Write custom code without deploying or scaling servers, with fast deploy times
-                      and low latency.
+                      Listen to your to PostgreSQL database in realtime via websockets.
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Link href={`/project/${ref}/functions`}>
-                      <a>
-                        <Button type="default">Explore Functions</Button>
-                      </a>
-                    </Link>
-                    <Link href="https://supabase.com/docs/guides/functions">
+                    <Link href="https://supabase.com/docs/guides/realtime">
                       <a>
                         <Button
                           className="translate-y-[1px]"
                           icon={<IconExternalLink size={14} />}
                           type="default"
                         >
-                          About Functions
+                          About Realtime
                         </Button>
                       </a>
                     </Link>
