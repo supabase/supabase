@@ -1,7 +1,8 @@
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
-import hydrate from 'next-mdx-remote/hydrate'
-import renderToString from 'next-mdx-remote/render-to-string'
+import { MDXRemote } from 'next-mdx-remote'
+// import hydrate from 'next-mdx-remote/hydrate'
+// import renderToString from 'next-mdx-remote/render-to-string'
 import React from 'react'
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -10,21 +11,24 @@ import Quote from '~/components/Quote'
 import LayoutComparison from '~/layouts/comparison'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
+import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import mdxComponents from '~/lib/mdx/mdxComponents'
+
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
-const components = {
-  CodeBlock,
-  Quote,
-  Avatar,
-  code: (props: any) => {
-    return <CodeBlock {...props} />
-  },
-  ImageGrid,
-}
+// const components = {
+//   CodeBlock,
+//   Quote,
+//   Avatar,
+//   code: (props: any) => {
+//     return <CodeBlock {...props} />
+//   },
+//   ImageGrid,
+// }
 
 // plugins for next-mdx-remote
-const gfm = require('remark-gfm')
-const slug = require('rehype-slug')
+// const gfm = require('remark-gfm')
+// const slug = require('rehype-slug')
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -42,14 +46,16 @@ export async function getStaticProps({ params }: any) {
   const postContent = await getPostdata(filePath, '_alternatives')
   const { data, content } = matter(postContent)
 
-  const mdxSource: any = await renderToString(content, {
-    components,
-    scope: data,
-    mdxOptions: {
-      remarkPlugins: [gfm],
-      rehypePlugins: [slug],
-    },
-  })
+  // const mdxSource: any = await renderToString(content, {
+  //   components,
+  //   scope: data,
+  //   mdxOptions: {
+  //     remarkPlugins: [gfm],
+  //     rehypePlugins: [slug],
+  //   },
+  // })
+
+  const mdxSource: any = await mdxSerialize(content)
 
   const relatedPosts = getSortedPosts('_alternatives', 5, mdxSource.scope.tags)
 
@@ -72,6 +78,7 @@ export async function getStaticProps({ params }: any) {
       blog: {
         slug: `${params.slug}`,
         content: mdxSource,
+        source: content,
         ...data,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
@@ -81,7 +88,8 @@ export async function getStaticProps({ params }: any) {
 
 function BlogPostPage(props: any) {
   // @ts-ignore
-  const content = hydrate(props.blog.content, { components })
+  // const content = hydrate(props.blog.content, { components })
+  // const content = props.blog.content
   const authorArray = props.blog.author.split(',')
 
   const author = []
@@ -95,7 +103,7 @@ function BlogPostPage(props: any) {
     )
   }
 
-  return <LayoutComparison components={components} props={props} gfm={gfm} slug={slug} />
+  return <LayoutComparison components={mdxComponents()} props={props} />
 }
 
 export default BlogPostPage
