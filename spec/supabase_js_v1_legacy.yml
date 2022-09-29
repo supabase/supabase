@@ -988,6 +988,20 @@ pages:
           const { data, error, count } = await supabase
             .rpc('hello_world', {}, { count: 'exact' })
           ```
+          
+       - name: Privileges
+        description: |
+          By default functions are executable by every role. If you wish to restrict this, you can do
+          sql: |
+            ```sql
+              ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+            ```
+          Then you can choose to which role you wish to grant execution on
+          sql: |
+            ```sql
+              GRANT EXECUTE ON FUNCTION hello TO authenticated;
+              GRANT EXECUTE ON FUNCTION hello TO service_role;
+            ```
 
   subscribe():
     title: 'on().subscribe()'
