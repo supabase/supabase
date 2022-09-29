@@ -5,6 +5,8 @@ import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from '@sup
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
 import { TEXT_TYPES, JSON_TYPES, DATETIME_TYPES } from '../SidePanelEditor.constants'
+import MultiSelect from 'components/ui/MultiSelect'
+import { convertPgArrayToJsArray, convertJsArraytoPgArray, uuidv4 } from 'lib/helpers'
 
 interface Props {
   field: RowField
@@ -23,27 +25,66 @@ const InputField: FC<Props> = ({
   onEditJson = () => {},
   onViewForeignKey = () => {},
 }) => {
-  if (field.enums.length > 0) {
+  // Hardcode for now
+  if (field.name === 'test') {
+    const formattedValue = convertPgArrayToJsArray(field.value)
+    const options = [
+      { id: uuidv4(), value: 'VALUE_0', name: 'VALUE_0', disabled: false },
+      { id: uuidv4(), value: 'VALUE_1', name: 'VALUE_1', disabled: false },
+      { id: uuidv4(), value: 'VALUE_2', name: 'VALUE_2', disabled: false },
+    ]
     return (
-      <Select
-        size="medium"
-        layout="horizontal"
-        value={field.value}
-        label={field.name}
-        labelOptional={field.format}
-        descriptionText={field.comment}
-        disabled={!isEditable}
-        error={errors[field.name]}
-        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-      >
-        <Select.Option value="">---</Select.Option>
-        {field.enums.map((value: string) => (
-          <Select.Option key={value} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
+      <div className="grid gap-x-2 md:grid-cols-12 md:gap-x-4">
+        <div className="col-span-4">
+          <label className="block text-scale-1100 text-sm break-all">{field.name}</label>
+          <span className="text-scale-900 text-sm" id="-optional">
+            {field.format}
+          </span>
+        </div>
+        <div className="col-span-8">
+          <MultiSelect
+            allowDuplicateSelection
+            options={options}
+            value={formattedValue}
+            searchPlaceholder="Search for a value"
+            placeholder="NULL"
+            onChange={(values) => {
+              const formattedValues = convertJsArraytoPgArray(values)
+              onUpdateField({ [field.name]: formattedValues })
+            }}
+          />
+        </div>
+      </div>
     )
+  }
+
+  if (field.enums.length > 0) {
+    const isArray = field.format[0] === '_'
+
+    if (isArray) {
+      console.log('Render')
+    } else {
+      return (
+        <Select
+          size="medium"
+          layout="horizontal"
+          value={field.value}
+          label={field.name}
+          labelOptional={field.format}
+          descriptionText={field.comment}
+          disabled={!isEditable}
+          error={errors[field.name]}
+          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+        >
+          <Select.Option value="">---</Select.Option>
+          {field.enums.map((value: string) => (
+            <Select.Option key={value} value={value}>
+              {value}
+            </Select.Option>
+          ))}
+        </Select>
+      )
+    }
   }
 
   if (!isUndefined(field.foreignKey)) {
