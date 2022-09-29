@@ -1,8 +1,9 @@
 import { Badge, Card, Divider, IconChevronLeft, IconFile, Space } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
-import hydrate from 'next-mdx-remote/hydrate'
-import renderToString from 'next-mdx-remote/render-to-string'
+// import hydrate from 'next-mdx-remote/hydrate'
+import { MDXRemote } from 'next-mdx-remote'
+// import renderToString from 'next-mdx-remote/render-to-string'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -18,43 +19,46 @@ import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
-const ignoreClass = 'ignore-on-export'
-// import all components used in blog articles here
-// for instance, if you use a button, you must add `Button` in the components object below.
-const components = {
-  CodeBlock,
-  Quote,
-  Avatar,
-  code: (props: any) => {
-    if (props.className !== ignoreClass) {
-      return <CodeBlock {...props} />
-    } else {
-      return <code {...props} />
-    }
-  },
-  ImageGrid,
-  img: (props: any) => {
-    if (props.className !== ignoreClass) {
-      return (
-        <div
-          className="
-          next-image--dynamic-fill 
-          to-scale-400  
-          from-scale-500 rounded-lg
-          border bg-gradient-to-r
-        "
-        >
-          <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
-        </div>
-      )
-    }
-    return <img {...props} />
-  },
-}
+import mdxComponents from '~/lib/mdx/mdxComponents'
+import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+
+// const ignoreClass = 'ignore-on-export'
+// // import all components used in blog articles here
+// // for instance, if you use a button, you must add `Button` in the components object below.
+// const components = {
+//   CodeBlock,
+//   Quote,
+//   Avatar,
+//   code: (props: any) => {
+//     if (props.className !== ignoreClass) {
+//       return <CodeBlock {...props} />
+//     } else {
+//       return <code {...props} />
+//     }
+//   },
+//   ImageGrid,
+//   img: (props: any) => {
+//     if (props.className !== ignoreClass) {
+//       return (
+//         <div
+//           className="
+//           next-image--dynamic-fill
+//           to-scale-400
+//           from-scale-500 rounded-lg
+//           border bg-gradient-to-r
+//         "
+//         >
+//           <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
+//         </div>
+//       )
+//     }
+//     return <img {...props} />
+//   },
+// }
 
 // plugins for next-mdx-remote
-const gfm = require('remark-gfm')
-const slug = require('rehype-slug')
+// const gfm = require('remark-gfm')
+// const slug = require('rehype-slug')
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -72,14 +76,16 @@ export async function getStaticProps({ params }: any) {
   const postContent = await getPostdata(filePath, '_blog')
   const { data, content } = matter(postContent)
 
-  const mdxSource: any = await renderToString(content, {
-    components,
-    scope: data,
-    mdxOptions: {
-      remarkPlugins: [gfm],
-      rehypePlugins: [slug],
-    },
-  })
+  // const mdxSource: any = await renderToString(content, {
+  //   components,
+  //   scope: data,
+  //   mdxOptions: {
+  //     remarkPlugins: [gfm],
+  //     rehypePlugins: [slug],
+  //   },
+  // })
+
+  const mdxSource: any = await mdxSerialize(content)
 
   const relatedPosts = getSortedPosts('_blog', 5, mdxSource.scope.tags)
 
@@ -102,6 +108,7 @@ export async function getStaticProps({ params }: any) {
       blog: {
         slug: `${params.slug}`,
         content: mdxSource,
+        source: content,
         ...data,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
@@ -111,7 +118,8 @@ export async function getStaticProps({ params }: any) {
 
 function BlogPostPage(props: any) {
   // @ts-ignore
-  const content = hydrate(props.blog.content, { components })
+  // const content = hydrate(props.blog.content, { components })
+  const content = props.blog.content
   const authorArray = props.blog.author.split(',')
 
   const author = []
@@ -166,7 +174,7 @@ function BlogPostPage(props: any) {
         <div>
           <p className="text-scale-1200 mb-4">On this page</p>
           <div className="prose-toc">
-            <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
+            <ReactMarkdown>{props.blog.toc.content}</ReactMarkdown>
           </div>
         </div>
       </div>
@@ -235,7 +243,7 @@ function BlogPostPage(props: any) {
                   <div className="text-scale-900 flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
-                    <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
+                    <p>{generateReadingTime(props.blog.source)}</p>
                   </div>
                   <div className="flex flex-col gap-3 pt-6 md:flex-row md:gap-0 lg:gap-3">
                     {author.map((author: any) => {
@@ -284,7 +292,10 @@ function BlogPostPage(props: any) {
                       />
                     </div>
                   )}
-                  <article className={['prose prose-docs'].join(' ')}>{content}</article>
+                  {/* <article className={['prose prose-docs'].join(' ')}>{content}</article> */}
+                  <article className={['prose prose-docs'].join(' ')}>
+                    <MDXRemote {...content} components={mdxComponents()} />
+                  </article>
                   <div className="py-16">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
                       Share this article
