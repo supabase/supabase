@@ -100,11 +100,12 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
 
       const newIds = await Promise.all(
         taxIdValues.map(async (taxId: any) => {
+          const sanitizedID = sanitizeTaxID(taxId)
           const result = await post(`${API_URL}/organizations/${slug}/tax-ids`, {
-            type: taxId.type,
-            value: taxId.value,
+            type: sanitizedID.type,
+            value: sanitizedID.value,
           })
-          return { id: taxId.id, result }
+          return { id: sanitizedID.id, result }
         })
       )
 
@@ -132,12 +133,33 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
     }
   }
 
+  /**
+   * Sanitize EU VAT ids so they get prepended with the country code
+   *
+   * Ex: Belgium's VAT ID should be BE0123456789 not 0123456789
+   * Only EU VAT ids are affected for now
+   */
+  const sanitizeTaxID = (taxId: any) => {
+    let newID = taxId
+
+    // The first 2 letters of the country name (ex: "BE" for Belgium)
+    const countryCodePrepend = taxId.name.slice(0, 2)
+
+    // if the value doesn't start with the country code, prepend them
+    if (taxId.type === 'eu_vat' && !taxId.value.startsWith(countryCodePrepend)) {
+      newID.value = `${countryCodePrepend}${taxId.value}`
+    }
+
+    return newID
+  }
+
   return (
     <div className="space-y-2">
       <div>
         <h4>Tax ID</h4>
         <p className="text-sm opacity-50">
-          If you would like to include specific tax ID(s) to your invoices
+          If you would like to include specific tax ID(s) to your invoices. <br />
+          Make sure the tax ID looks exactly like the placeholder text.
         </p>
       </div>
 
@@ -150,7 +172,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
           loading={loading}
           footer={
             !loading && (
-              <div className="flex justify-between w-full">
+              <div className="flex w-full justify-between">
                 {!canUpdateTaxIds ? (
                   <p className="text-sm text-scale-1000">
                     You need additional permissions to update this organization's tax IDs
@@ -183,16 +205,17 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
         >
           {loading && taxIdValues.length === 0 ? (
             <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-              <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
+              <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
             </div>
           ) : (
-            <Panel.Content className="w-3/5 space-y-4">
+            <Panel.Content className="w-8/12 space-y-4">
               {taxIdValues.length >= 1 ? (
                 <div className="w-full space-y-2">
                   {taxIdValues.map((taxId: any, idx: number) => {
                     const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
+                    //console.log('selectedTaxId', selectedTaxId?.code)
                     return (
                       <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
                         <Select
@@ -202,7 +225,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                         >
                           {TAX_IDS.map((option) => (
                             <Select.Option key={option.name} value={option.name}>
-                              {option.name}
+                              {option.country} - {option.name}
                             </Select.Option>
                           ))}
                         </Select>
@@ -230,7 +253,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
               )}
               {canUpdateTaxIds && (
                 <div
-                  className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition cursor-pointer"
+                  className="flex cursor-pointer items-center space-x-2 opacity-50 transition hover:opacity-100"
                   onClick={() => onAddNewTaxId()}
                 >
                   <IconPlus size={14} />
