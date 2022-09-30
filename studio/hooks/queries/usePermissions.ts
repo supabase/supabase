@@ -16,11 +16,13 @@ export function usePermissions(profile?: any, returning?: 'minimal') {
     data: data,
     error,
     mutate,
-  } = useSWR<any>(profile !== undefined ? url : null, get, { loadingTimeout: 10000 })
+  } = useSWR<any>(profile !== undefined && IS_PLATFORM ? url : null, get, {
+    loadingTimeout: 10000,
+  })
   const anyError = data?.error || error
 
   return {
-    permissions: anyError ? undefined : data,
+    permissions: IS_PLATFORM ? (anyError ? undefined : data) : [],
     isLoading: !anyError && !data,
     isError: !!anyError,
     mutate,
