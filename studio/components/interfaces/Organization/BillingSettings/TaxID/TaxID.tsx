@@ -230,11 +230,13 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                           onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e.target.value)}
                           disabled={!canUpdateTaxIds}
                         >
-                          {TAX_IDS.map((option) => (
-                            <Select.Option key={option.name} value={option.name}>
-                              {option.country} - {option.name}
-                            </Select.Option>
-                          ))}
+                          {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
+                            (option) => (
+                              <Select.Option key={option.name} value={option.name}>
+                                {option.country} - {option.name}
+                              </Select.Option>
+                            )
+                          )}
                         </Select>
                         <Input
                           value={taxId.value}
