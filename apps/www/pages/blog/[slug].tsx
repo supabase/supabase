@@ -1,64 +1,18 @@
-import { Badge, Card, Divider, IconChevronLeft, IconFile, Space } from '@supabase/ui'
+import { Badge, Divider, IconChevronLeft, IconFile } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
-// import hydrate from 'next-mdx-remote/hydrate'
 import { MDXRemote } from 'next-mdx-remote'
-// import renderToString from 'next-mdx-remote/render-to-string'
 import { NextSeo } from 'next-seo'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
 import ReactMarkdown from 'react-markdown'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import Quote from '~/components/Quote'
-import Avatar from '~/components/Avatar'
-import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-
-// const ignoreClass = 'ignore-on-export'
-// // import all components used in blog articles here
-// // for instance, if you use a button, you must add `Button` in the components object below.
-// const components = {
-//   CodeBlock,
-//   Quote,
-//   Avatar,
-//   code: (props: any) => {
-//     if (props.className !== ignoreClass) {
-//       return <CodeBlock {...props} />
-//     } else {
-//       return <code {...props} />
-//     }
-//   },
-//   ImageGrid,
-//   img: (props: any) => {
-//     if (props.className !== ignoreClass) {
-//       return (
-//         <div
-//           className="
-//           next-image--dynamic-fill
-//           to-scale-400
-//           from-scale-500 rounded-lg
-//           border bg-gradient-to-r
-//         "
-//         >
-//           <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
-//         </div>
-//       )
-//     }
-//     return <img {...props} />
-//   },
-// }
-
-// plugins for next-mdx-remote
-// const gfm = require('remark-gfm')
-// const slug = require('rehype-slug')
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -75,15 +29,6 @@ export async function getStaticProps({ params }: any) {
   const filePath = `${params.slug}`
   const postContent = await getPostdata(filePath, '_blog')
   const { data, content } = matter(postContent)
-
-  // const mdxSource: any = await renderToString(content, {
-  //   components,
-  //   scope: data,
-  //   mdxOptions: {
-  //     remarkPlugins: [gfm],
-  //     rehypePlugins: [slug],
-  //   },
-  // })
 
   const mdxSource: any = await mdxSerialize(content)
 
@@ -117,8 +62,6 @@ export async function getStaticProps({ params }: any) {
 }
 
 function BlogPostPage(props: any) {
-  // @ts-ignore
-  // const content = hydrate(props.blog.content, { components })
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
 
@@ -391,78 +334,10 @@ function BlogPostPage(props: any) {
           </div>
         </div>
 
-        {/* <div className="container px-8 sm:px-16 xl:px-20 py-16 mx-auto">
-          <div className="max-w-6xl mx-auto">
-            <div className="py-4 grid grid-cols-12 lg:gap-16">
-              <div className="col-span-12 lg:col-span-8">
-                {props.blog.thumb && (
-                  <img
-                    src={'/images/blog/' + props.blog.thumb}
-                    className="object-cover -mt-32 mb-8 border dark:border-gray-600"
-                    style={{ maxHeight: '520px', width: '100%' }}
-                  />
-                )}
-                <div className="lg:hidden">{toc}</div>
-                <article className={blogStyles['article']}>
-                  <Typography>{content}</Typography>
-                </article>
-              </div>
-              <div className="col-span-12 lg:col-span-4">
-                <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
-                  <div className="hidden lg:block">{toc}</div>
-                  <div>
-                    <h5 className="mb-4">
-                      Related articles
-                    </h5>
-                    <Space direction="vertical">
-                      {props.relatedPosts.map((post: any) => (
-                        <Link href={`${post.path}`} as={`${post.path}`}>
-                          <div>
-                            <p className="cursor-pointer">
-                              <Space>
-                                <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                <span className="hover:text-gray-900 dark:hover:text-white">
-                                  {post.title}
-                                </span>
-                              </Space>
-                            </p>
-                            <Divider light className="mt-2" />
-                          </div>
-                        </Link>
-                      ))}
-                      <Link href={`/blog`} as={`/blog`}>
-                        <div>
-                          <p>
-                            <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
-                              View all posts
-                            </span>
-                          </p>
-                        </div>
-                      </Link>
-                    </Space>
-                  </div>
-                </Space>
-              </div>
-            </div>
-            <div className="grid lg:grid-cols-2 gap-8 py-8">
-              <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
-              <div>
-                {props.nextPost && (
-                  <NextCard post={props.nextPost} label="Next post" className="text-right" />
-                )}
-              </div>
-            </div>
-          </div>
-        </div> */}
-
         <CTABanner />
       </DefaultLayout>
     </>
   )
 }
-
-// function BlogPostPage() {
-//   return <h1>blog post</h1>
-// }
 
 export default BlogPostPage
