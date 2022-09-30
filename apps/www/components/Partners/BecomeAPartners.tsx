@@ -1,8 +1,7 @@
-import { SupabaseClient } from '@supabase/supabase-js'
 import { Button, Form, Input, InputNumber, Select } from '@supabase/ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
-import { PartnerContact } from '~/types/partners'
+import { SupabaseClient } from '~/lib/supabase'
 
 const INITIAL_VALUES = {
   type: 'expert',
@@ -41,8 +40,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
 
   const handleFormSubmit = async (values: any) => {
-    // @ts-ignore
-    const { error } = await supabase.from<PartnerContact>('partner_contacts').insert([
+    const { error } = await supabase.from('partner_contacts').insert([
       {
         type: values.type,
         first: values.first,

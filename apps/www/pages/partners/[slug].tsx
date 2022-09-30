@@ -201,8 +201,7 @@ function Partner({ partner }: { partner: Partner }) {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  // @ts-ignore
-  const { data: slugs } = await supabase.from<Partner>('partners').select('slug')
+  const { data: slugs } = await supabase.from('partners').select('slug')
 
   const paths: {
     params: { slug: string }
@@ -223,8 +222,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 // This also gets called at build time
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   let { data: partner } = await supabase
-    // @ts-ignore
-    .from<Partner>('partners')
+    .from('partners')
     .select('*')
     .eq('slug', params!.slug as string)
     .single()
