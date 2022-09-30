@@ -163,6 +163,7 @@ limit 100
   },
   {
     label: 'Error Count by User',
+    description: 'Count of errors by users',
     mode: 'custom',
     searchString: `select
   count(t.timestamp) as count,
