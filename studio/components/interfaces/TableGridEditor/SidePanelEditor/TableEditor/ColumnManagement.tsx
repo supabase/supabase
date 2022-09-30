@@ -50,7 +50,7 @@ const ColumnManagement: FC<Props> = ({
   tables = [],
   columns = [],
   enumTypes = [],
-  importContent = {},
+  importContent,
   isNewRecord,
   onColumnsUpdated = () => {},
   onSelectImportData = () => {},
