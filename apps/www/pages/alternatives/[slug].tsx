@@ -1,34 +1,12 @@
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
-import { MDXRemote } from 'next-mdx-remote'
-// import hydrate from 'next-mdx-remote/hydrate'
-// import renderToString from 'next-mdx-remote/render-to-string'
-import React from 'react'
-import Avatar from '~/components/Avatar'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import ImageGrid from '~/components/ImageGrid'
-import Quote from '~/components/Quote'
 import LayoutComparison from '~/layouts/comparison'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-
-import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import mdxComponents from '~/lib/mdx/mdxComponents'
+import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
-// const components = {
-//   CodeBlock,
-//   Quote,
-//   Avatar,
-//   code: (props: any) => {
-//     return <CodeBlock {...props} />
-//   },
-//   ImageGrid,
-// }
-
-// plugins for next-mdx-remote
-// const gfm = require('remark-gfm')
-// const slug = require('rehype-slug')
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -45,15 +23,6 @@ export async function getStaticProps({ params }: any) {
   const filePath = `${params.slug}`
   const postContent = await getPostdata(filePath, '_alternatives')
   const { data, content } = matter(postContent)
-
-  // const mdxSource: any = await renderToString(content, {
-  //   components,
-  //   scope: data,
-  //   mdxOptions: {
-  //     remarkPlugins: [gfm],
-  //     rehypePlugins: [slug],
-  //   },
-  // })
 
   const mdxSource: any = await mdxSerialize(content)
 
