@@ -11,6 +11,14 @@ import Panel from 'components/ui/Panel'
 import { TAX_IDS } from './TaxID.constants'
 import NoPermission from 'components/ui/NoPermission'
 
+interface StripeTaxId {
+  id: string
+  type: string
+  value: string
+  name: string
+  country?: string
+}
+
 interface Props {
   loading: boolean
   taxIds: any[]
@@ -26,8 +34,8 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
 
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [taxIdValues, setTaxIdValues] = useState(taxIds)
-  const formattedTaxIds = taxIds.map((taxId: any) => {
+  const [taxIdValues, setTaxIdValues] = useState<StripeTaxId[]>(taxIds)
+  const formattedTaxIds: StripeTaxId[] = taxIds.map((taxId: StripeTaxId) => {
     return {
       id: taxId.id,
       type: taxId.type,
@@ -213,9 +221,8 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
             <Panel.Content className="w-8/12 space-y-4">
               {taxIdValues.length >= 1 ? (
                 <div className="w-full space-y-2">
-                  {taxIdValues.map((taxId: any, idx: number) => {
+                  {taxIdValues.map((taxId: StripeTaxId, idx: number) => {
                     const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
-                    //console.log('selectedTaxId', selectedTaxId?.code)
                     return (
                       <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
                         <Select
