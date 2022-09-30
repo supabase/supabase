@@ -187,7 +187,7 @@ export const TAX_IDS: TaxId[] = [
   },
   {
     name: 'HR VAT',
-    code: 'hr_vat',
+    code: 'eu_vat',
     country: 'Croatia',
     placeholder: 'HR12345678912',
   },
@@ -415,7 +415,7 @@ export const TAX_IDS: TaxId[] = [
   },
   {
     name: 'XI VAT',
-    code: 'xi_vat',
+    code: 'eu_vat',
     country: 'United Kingdom (Northern Ireland)',
     placeholder: 'XI123456789',
   },
