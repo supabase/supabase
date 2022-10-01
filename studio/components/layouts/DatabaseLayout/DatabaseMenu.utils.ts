@@ -81,7 +81,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
     ...(IS_PLATFORM
       ? [
           {
-            title: 'Postgres Functions UI',
+            title: 'Alpha Preview',
             items: [
               {
                 name: 'Database Triggers',
