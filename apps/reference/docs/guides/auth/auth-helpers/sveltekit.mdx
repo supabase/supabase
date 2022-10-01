@@ -5,25 +5,39 @@ description: Convenience helpers for implementing user authentication in SvelteK
 sidebar_label: SvelteKit
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 This submodule provides convenience helpers for implementing user authentication in [SvelteKit](https://kit.svelte.dev/) applications.
 
 ## Installation
 
-Using [npm](https://npmjs.org):
+This library supports Node.js `^16.15.0`.
+
+<Tabs
+  groupId="install"
+  defaultValue="npm"
+  values={[
+    {label: 'npm', value: 'npm'},
+    {label: 'Yarn', value: 'yarn'},
+  ]}>
+
+<TabItem value="npm">
 
 ```sh
 npm install @supabase/auth-helpers-sveltekit
 ```
 
-Using [yarn](https://yarnpkg.com/):
+</TabItem>
+
+<TabItem value="yarn">
 
 ```sh
 yarn add @supabase/auth-helpers-sveltekit
 ```
 
-This library supports the following tooling versions:
-
-- Node.js: `^16.15.0`
+</TabItem>
+</Tabs>
 
 ## Getting Started
 
@@ -37,12 +51,11 @@ PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### SupabaseClient setup
+### Set up the Supabase client
 
-We will start off by creating a `db.ts` file inside of our `src/lib` directory. Now lets instantiate our `supabaseClient`.
+Start off by creating a `db.ts` file inside of the `src/lib` directory and instantiate the `supabaseClient`.
 
-```ts
-// src/lib/db.ts
+```ts title="src/lib/db.ts"
 import { createClient } from '@supabase/supabase-js';
 import { setupSupabaseHelpers } from '@supabase/auth-helpers-sveltekit';
 import { dev } from '$app/environment';
@@ -65,12 +78,11 @@ setupSupabaseHelpers({
 
 ### Initialize the client
 
-Edit your `+layout.svelte` file and set up the client side.
+Edit your `+layout.svelte` file and set up the client-side.
 
-```html
-<!-- src/routes/+layout.svelte -->
+```html title="src/routes/+layout.svelte"
 <script lang="ts">
-  // we need to make sure the supabase instance is initialized on the client
+  // make sure the supabase instance is initialized on the client
   import '$lib/db';
   import { startSupabaseSessionSync } from '@supabase/auth-helpers-sveltekit';
   import { page } from '$app/stores';
@@ -86,14 +98,12 @@ Edit your `+layout.svelte` file and set up the client side.
 <slot />
 ```
 
-### Hooks setup
+### Set up hooks
 
-Our `hooks.ts` file is where the heavy lifting of this library happens:
+The `hooks.ts` file is where the heavy lifting of this library happens:
 
-```ts
-// src/hooks.server.ts
-
-// we need to make sure the supabase instance is initialized on the server
+```ts title="src/hooks.server.ts"
+// make sure the supabase instance is initialized on the server
 import '$lib/db';
 import { dev } from '$app/environment';
 import { auth } from '@supabase/auth-helpers-sveltekit/server';
@@ -109,18 +119,17 @@ export const handle = sequence(auth(), yourHandler);
 There are three handle methods available:
 
 - `callback()`:
-  This will create a handler for `/api/auth/callback`. The `client` forwards the session details here every time `onAuthStateChange` fires on the client side. This is needed to set up the cookies for your application so that SSR works seamlessly.
+  This creates a handler for `/api/auth/callback`. The `client` forwards the session details here every time `onAuthStateChange` fires on the client-side. This is needed to set up the cookies for your application so that SSR works seamlessly.
 - `session()`:
-  This will parse the session from the cookie and populate it in locals
+  This parses the session from the cookie and populate it in locals
 - `auth()`:
   a shorthand for `sequence(callback(), session())` that uses both handlers
 
 ### Send session to client
 
-In order to make the session available to the UI (pages, layouts) we need to pass the session in the root layout load function:
+In order to make the session available to the UI (e.g., pages and layouts), pass the session in the root layout load function:
 
-```ts
-// src/routes/+layout.server.ts
+```ts title="src/routes/+layout.server.ts"
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
@@ -132,10 +141,9 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
 ### Typings
 
-In order to get the most out of TypeScript and it´s intellisense, you should import our types into the `app.d.ts` type definition file that comes with your SvelteKit project.
+In order to get the most out of TypeScript and IntelliSense, import the types into the `app.d.ts` type definition file that comes with your SvelteKit project.
 
-```ts
-// src/app.d.ts
+```ts title="src/app.d.ts"
 /// <reference types="@sveltejs/kit" />
 
 // See https://kit.svelte.dev/docs/types#app
@@ -159,8 +167,7 @@ This library has provided a method to delete the session cookie.
 
 Create a server only page with an action to delete the cookie
 
-```ts
-// src/routes/logout/+page.server.ts
+```ts title="src/routes/logout/+page.server.ts"
 import { deleteSession } from '@supabase/auth-helpers-sveltekit/server';
 import { redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
@@ -184,12 +191,11 @@ Then make a **POST** request with a form to the server only page above.
 </form>
 ```
 
-### Basic Setup
+### Basic setup
 
 You can now determine if a user is authenticated on the client-side by checking that the `user` object in `$page.data.session` is defined.
 
-```html
-<!-- src/routes/+page.svelte -->
+```html title="src/routes/+page.svelte"
 <script>
   import { page } from '$app/stores';
 </script>
@@ -230,8 +236,7 @@ For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row
 
 ## Server-side data fetching with RLS
 
-```html
-<!-- src/routes/profile/+page.svelte -->
+```html title="src/routes/profile/+page.svelte"
 <script>
   /** @type {import('./$types').PageData} */
   export let data;
@@ -245,8 +250,7 @@ For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row
 
 For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work in a server environment, you need to use the `withAuth` helper to check if the user is authenticated. The helper extends the event with `session` and `getSupabaseClient()`:
 
-```ts
-// src/routes/profile/+page.ts
+```ts title="src/routes/profile/+page.ts"
 import type { PageLoad } from './$types';
 import { withAuth } from '@supabase/auth-helpers-sveltekit';
 import { redirect } from '@sveltejs/kit';
@@ -291,8 +295,7 @@ await getSupabaseClient().from('table2').select();
 
 Wrap an API Route to check that the user has a valid session. If they're not logged in the session is `null`.
 
-```ts
-// src/routes/api/protected-route/+server.ts
+```ts title="src/routes/api/protected-route/+server.ts"
 import type { RequestHandler } from './$types';
 import { withAuth } from '@supabase/auth-helpers-sveltekit';
 import { json, redirect } from '@sveltejs/kit';
@@ -318,10 +321,9 @@ If you visit `/api/protected-route` without a valid session cookie, you will get
 
 ## Protecting Actions
 
-Wrap an Action to check that the user has a valid session. If they're not logged in the session is `null`.
+Wrap an Action to check that the user has a valid session. If they're not logged in, the session is `null`.
 
-```ts
-// src/routes/posts/+page.server.ts
+```ts title="src/routes/posts/+page.server.ts"
 import type { Actions } from './$types';
 import { withAuth } from '@supabase/auth-helpers-sveltekit';
 import { error, invalid } from '@sveltejs/kit';
@@ -419,10 +421,9 @@ export const actions: Actions = {
 
 ## Custom session namespace
 
-If you wan´t to use something else than `locals.session` and `$page.data.session` you can do so by updating the types and creating three helper functions:
+If you want to use something other than `locals.session` and `$page.data.session`, update the types and create three helper functions:
 
-```ts
-// src/app.d.ts
+```ts title="src/app.d.ts"
 declare namespace App {
   interface Locals {
     mySupabaseSession: import('@supabase/auth-helpers-sveltekit').SupabaseSession;
@@ -431,8 +432,9 @@ declare namespace App {
     mySupabaseSession: import('@supabase/auth-helpers-sveltekit').SupabaseSession;
   }
 }
+```
 
-// src/hooks.server.ts
+```ts title="src/hooks.server.ts"
 setupSupabaseServer({
   supabaseClient,
   cookieOptions: {
@@ -442,8 +444,9 @@ setupSupabaseServer({
   getSessionFromLocals: (locals) => locals.mySupabaseSession,
   setSessionToLocals: (locals, session) => (locals.mySupabaseSession = session)
 });
+```
 
-// src/lib/db.ts
+```ts title="src/lib/db.ts"
 setupSupabaseClient({
   supabaseClient,
   // --- change location within pageData ---
@@ -451,23 +454,26 @@ setupSupabaseClient({
 });
 ```
 
-## Migration from 0.6.11 and below to 0.7.0
+## Migrate from 0.6.11 and below to 0.7.0 {#migration}
 
-There are quite a lot of breaking changes in the latest 0.7.0 version of this library.
+There are numerous breaking changes in the latest 0.7.0 version of this library.
 
-### Environment variable prefix has changed
+### Environment variable prefix
 
-0.6.11 and below: `VITE_`
+The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE_SUPABASE_URL` is now `PUBLIC_SUPABASE_URL`).
 
-0.7.0: `PUBLIC_`
+### Set up the Supabase client {#migration-set-up-supabase-client}
 
-e.g. `VITE_SUPABASE_URL` is now `PUBLIC_SUPABASE_URL`
+<Tabs
+  groupId="version"
+  values={[
+    {label: '0.6.11 and below', value: 'older'},
+    {label: '0.7.0', value: 'latest'},
+  ]}>
 
-### Setup Supabase client
+<TabItem value="older">
 
-0.6.11 and below:
-```js
-// src/lib/db.ts
+```js title="src/lib/db.ts"
 import { createSupabaseClient } from '@supabase/auth-helpers-sveltekit';
 
 const { supabaseClient } = createSupabaseClient(
@@ -478,9 +484,11 @@ const { supabaseClient } = createSupabaseClient(
 export { supabaseClient };
 ```
 
-0.7.0:
-```js
-// src/lib/db.ts
+</TabItem>
+
+<TabItem value="latest">
+
+```js title="src/lib/db.ts"
 import { createClient } from '@supabase/supabase-js';
 import { setupSupabaseHelpers } from '@supabase/auth-helpers-sveltekit';
 import { dev } from '$app/environment';
@@ -502,11 +510,21 @@ setupSupabaseHelpers({
 });
 ```
 
-### Initialize client side code
+</TabItem>
+</Tabs>
 
-0.6.11 and below:
-```html
-<!-- src/routes/__layout.svelte -->
+### Initialize the client {#migration-initialize-client}
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: '0.6.11 and below', value: 'older'},
+    {label: '0.7.0', value: 'latest'},
+  ]}>
+
+<TabItem value="older">
+
+```html title="src/routes/__layout.svelte"
 <script>
 import { session } from '$app/stores';
 import { supabaseClient } from '$lib/db';
@@ -518,11 +536,15 @@ import { SupaAuthHelper } from '@supabase/auth-helpers-svelte';
 </SupaAuthHelper>
 ```
 
-0.7.0:
-```html
-<!-- src/routes/+layout.svelte -->
+</TabItem>
+
+<TabItem value="latest">
+
+The `@supabase/auth-helpers-svelte` library is no longer required as the `@supabase/auth-helpers-sveltekit` library handles all the client-side code.
+
+```html title="src/routes/+layout.svelte"
 <script lang="ts">
-  // we need to make sure the supabase instance is initialized on the client
+  // make sure the supabase instance is initialized on the client
   import '$lib/db';
   import { startSupabaseSessionSync } from '@supabase/auth-helpers-sveltekit';
   import { page } from '$app/stores';
@@ -538,13 +560,21 @@ import { SupaAuthHelper } from '@supabase/auth-helpers-svelte';
 <slot />
 ```
 
-> We no longer require the @supabase/auth-helpers-svelte library as the @supabase/auth-helpers-sveltekit library handles all the client side code too
+</TabItem>
+</Tabs>
 
-### Hooks setup
+### Set up hooks {#migration-set-up-hooks}
 
-0.6.11 and below:
-```ts
-// src/hooks.ts
+<Tabs
+  groupId="version"
+  values={[
+    {label: '0.6.11 and below', value: 'older'},
+    {label: '0.7.0', value: 'latest'},
+  ]}>
+
+<TabItem value="older">
+
+```ts title="src/hooks.ts"
 import { handleAuth } from '@supabase/auth-helpers-sveltekit';
 import type { GetSession, Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
@@ -561,10 +591,12 @@ export const getSession: GetSession = async (event) => {
 }
 ```
 
-0.7.0:
-```ts
-// src/hooks.server.ts
-// we need to make sure the supabase instance is initialized on the server
+</TabItem>
+
+<TabItem value="latest">
+
+```ts title="src/hooks.server.ts"
+// make sure the supabase instance is initialized on the server
 import '$lib/db';
 import { dev } from '$app/environment';
 import { auth } from '@supabase/auth-helpers-sveltekit/server';
@@ -573,9 +605,9 @@ export const handle = auth();
 ```
 
 **Optional** *if using additional handle methods*
-```ts
-// src/hooks.server.ts
-// we need to make sure the supabase instance is initialized on the server
+
+```ts title="src/hooks.server.ts"
+// make sure the supabase instance is initialized on the server
 import '$lib/db';
 import { dev } from '$app/environment';
 import { auth } from '@supabase/auth-helpers-sveltekit/server';
@@ -584,10 +616,21 @@ import { sequence } from '@sveltejs/kit/hooks';
 export const handle = sequence(auth(), yourHandler);
 ```
 
-### Typings
-0.6.11 and below:
-```ts
-// src/app.d.ts
+</TabItem>
+</Tabs>
+
+### Typings {#migration-typings}
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: '0.6.11 and below', value: 'older'},
+    {label: '0.7.0', value: 'latest'},
+  ]}>
+
+<TabItem value="older">
+
+```ts title="src/app.d.ts"
 /// <reference types="@sveltejs/kit" />
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -608,9 +651,11 @@ declare namespace App {
 }
 ```
 
-0.7.0:
-```ts
-// src/app.d.ts
+</TabItem>
+
+<TabItem value="latest">
+
+```ts title="src/app.d.ts"
 /// <reference types="@sveltejs/kit" />
 
 // See https://kit.svelte.dev/docs/types#app
@@ -630,11 +675,21 @@ declare namespace App {
 }
 ```
 
-### Checking user on the client
+</TabItem>
+</Tabs>
 
-0.6.11 and below:
-```html
-<!-- src/routes/index.svelte -->
+### Check the user on the client
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: '0.6.11 and below', value: 'older'},
+    {label: '0.7.0', value: 'latest'},
+  ]}>
+
+<TabItem value="older">
+
+```html title="src/routes/index.svelte"
 <script>
   import { session } from '$app/stores';
 </script>
@@ -647,9 +702,11 @@ declare namespace App {
 {/if}
 ```
 
-0.7.0:
-```html
-<!-- src/routes/+page.svelte -->
+</TabItem>
+
+<TabItem value="latest">
+
+```html title="src/routes/+page.svelte"
 <script>
   import { page } from '$app/stores';
 </script>
@@ -662,11 +719,21 @@ declare namespace App {
 {/if}
 ```
 
+</TabItem>
+</Tabs>
+
 ### withPageAuth
 
-0.6.11 and below:
-```html
-<!-- // src/routes/protected-route.svelte -->
+<Tabs
+  groupId="version"
+  values={[
+    {label: '0.6.11 and below', value: 'older'},
+    {label: '0.7.0', value: 'latest'},
+  ]}>
+
+<TabItem value="older">
+
+```html title="src/routes/protected-route.svelte"
 <script lang="ts" context="module">
 import { supabaseServerClient, withPageAuth } from '@supabase/auth-helpers-sveltekit';
 import type { Load } from './__types/protected-page';
@@ -696,9 +763,11 @@ export let user;
 <pre>{JSON.stringify(user, null, 2)}</pre>
 ```
 
-0.7.0:
-```html
-<!-- src/routes/protected-route/+page.svelte -->
+</TabItem>
+
+<TabItem value="latest">
+
+```html title="src/routes/protected-route/+page.svelte"
 <script lang="ts">
   import type { PageData } from './$types';
 
@@ -714,8 +783,7 @@ export let user;
 <pre>{JSON.stringify(user, null, 2)}</pre>
 ```
 
-```ts
-// src/routes/protected-route/+page.ts
+```ts title="src/routes/protected-route/+page.ts"
 import { withAuth } from '@supabase/auth-helpers-sveltekit';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
@@ -730,11 +798,21 @@ export const load: PageLoad = withAuth(async ({ session, getSupabaseClient }) =>
 });
 ```
 
+</TabItem>
+</Tabs>
+
 ### withApiAuth
 
-0.6.11 and below:
-```ts
-// src/routes/api/protected-route.ts
+<Tabs
+  groupId="version"
+  values={[
+    {label: '0.6.11 and below', value: 'older'},
+    {label: '0.7.0', value: 'latest'},
+  ]}>
+
+<TabItem value="older">
+
+```ts title="src/routes/api/protected-route.ts"
 import { supabaseServerClient, withApiAuth } from "@supabase/auth-helpers-sveltekit";
 import type { RequestHandler } from "./__types/protected-route";
 
@@ -759,10 +837,11 @@ export const GET: RequestHandler<GetOutput> = async ({ locals, request }) =>
   });
 ```
 
+</TabItem>
 
-0.7.0:
-```ts
-// src/routes/api/protected-route/+server.ts
+<TabItem value="latest">
+
+```ts title="src/routes/api/protected-route/+server.ts"
 import type { RequestHandler } from './$types';
 import { withAuth } from '@supabase/auth-helpers-sveltekit';
 import { json, redirect } from '@sveltejs/kit';
@@ -784,6 +863,9 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
   return json({ data });
 );
 ```
+
+</TabItem>
+</Tabs>
 
 ## Additional Links
 
