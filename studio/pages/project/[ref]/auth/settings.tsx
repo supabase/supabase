@@ -6,7 +6,7 @@ import { NextPageWithLayout } from 'types'
 import { checkPermissions, useStore } from 'hooks'
 import { AuthProvidersForm } from 'components/interfaces'
 import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
-import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
+import RedirectUrls from 'components/interfaces/Auth/RedirectUrls/RedirectUrls'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
@@ -26,7 +26,7 @@ const PageLayout: NextPageWithLayout = () => {
     return (
       <FormsContainer>
         <AutoSchemaForm />
-        <RedirectDomains />
+        <RedirectUrls />
         <AuthProvidersForm />
       </FormsContainer>
     )

@@ -13,7 +13,7 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useStore, checkPermissions } from 'hooks'
-import { domainRegex } from './../Auth.constants'
+import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
@@ -55,7 +55,7 @@ const SmtpForm = () => {
       },
       then: (schema) =>
         schema
-          .matches(domainRegex, 'Must be a valid URL or IP address')
+          .matches(urlRegex, 'Must be a valid URL or IP address')
           .required('Host URL is required.'),
       otherwise: (schema) => schema,
     }),
