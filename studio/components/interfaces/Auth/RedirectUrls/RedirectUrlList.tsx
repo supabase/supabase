@@ -9,10 +9,10 @@ import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 
 interface Props {
   canUpdate: boolean
-  onSelectDomainToDelete: (domain: string) => void
+  onSelectUrlToDelete: (url: string) => void
 }
 
-const DomainList: FC<Props> = ({ canUpdate, onSelectDomainToDelete }) => {
+const RedirectUrlList: FC<Props> = ({ canUpdate, onSelectUrlToDelete }) => {
   const { authConfig } = useStore()
 
   const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
@@ -31,20 +31,20 @@ const DomainList: FC<Props> = ({ canUpdate, onSelectDomainToDelete }) => {
           </ValueContainer>
         </>
       ) : URI_ALLOW_LIST_ARRAY.length > 0 ? (
-        URI_ALLOW_LIST_ARRAY.map((domain: string) => {
+        URI_ALLOW_LIST_ARRAY.map((url: string) => {
           return (
-            <ValueContainer key={domain}>
+            <ValueContainer key={url}>
               <div className="flex items-center gap-4 font-mono">
                 <span className="text-scale-900">
                   <IconGlobe strokeWidth={2} size={14} />
                 </span>
-                <span className="text-sm">{domain}</span>
+                <span className="text-sm">{url}</span>
               </div>
               {canUpdate && (
                 <Button
                   type="default"
                   icon={<IconTrash />}
-                  onClick={() => onSelectDomainToDelete(domain)}
+                  onClick={() => onSelectUrlToDelete(url)}
                 >
                   Remove
                 </Button>
@@ -69,4 +69,4 @@ const DomainList: FC<Props> = ({ canUpdate, onSelectDomainToDelete }) => {
   )
 }
 
-export default observer(DomainList)
+export default observer(RedirectUrlList)

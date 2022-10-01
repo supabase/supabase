@@ -7,7 +7,7 @@
 //  "https://uptime-monitor-fe.vercel.app/"
 
 // Supports wildcards, port numbers at the end, paths at the end and query params
-const baseDomainRegex =
+const baseUrlRegex =
   /^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_*-]+(\.[a-zA-Z0-9_*-]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)+(?:\.[a-z]+)*(?::\d+)?(?![^<]*(?:<\/\w+>|\/?>))(.*)?\/?(.)*?$/gm
 
 // iOS deep linking scheme https://benoitpasquier.com/deep-linking-url-scheme-ios/
@@ -21,7 +21,7 @@ const localhostRegex = /^(?:^|\s)((https?:\/\/)?(?:localhost|[\w-]+(?:\.[\w-]+)+
 const chromeExtensionRegex = /chrome-extension:\/\/([a-zA-Z]*)/gm
 
 // combine the above regexes
-export const domainRegex = new RegExp(
-  `(${baseDomainRegex.source})|(${localhostRegex.source})|(${appRegex.source})|(${chromeExtensionRegex.source})`,
+export const urlRegex = new RegExp(
+  `(${baseUrlRegex.source})|(${localhostRegex.source})|(${appRegex.source})|(${chromeExtensionRegex.source})`,
   'i'
 )
