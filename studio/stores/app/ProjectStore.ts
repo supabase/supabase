@@ -3,7 +3,7 @@ import { Project } from 'types'
 import { IRootStore } from '../RootStore'
 import { constructHeaders } from 'lib/api/apiHelpers'
 import { get } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 
 import pingPostgrest from 'lib/pingPostgrest'
@@ -57,7 +57,9 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       this.data[project.id] = project
 
       // lazy fetches
-      this.fetchSubscriptionTier(project)
+      if (IS_PLATFORM) {
+        this.fetchSubscriptionTier(project)
+      }
     }
   }
 

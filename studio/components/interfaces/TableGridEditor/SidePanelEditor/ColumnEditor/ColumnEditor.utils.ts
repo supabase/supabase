@@ -103,8 +103,13 @@ export const generateCreateColumnPayload = (
 
 export const generateUpdateColumnPayload = (
   originalColumn: PostgresColumn,
+  table: PostgresTable,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
+  // @ts-ignore
+  const primaryKeyColumns = table.primary_keys.map((key) => key.name)
+  const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
+
   // Only append the properties which are getting updated
   const defaultValue = field.defaultValue
   const type = field.isArray ? `${field.format}[]` : field.format
@@ -135,6 +140,9 @@ export const generateUpdateColumnPayload = (
   }
   if (!isEqual(originalColumn.is_unique, field.isUnique)) {
     payload.isUnique = field.isUnique
+  }
+  if (!isEqual(isOriginallyPrimaryKey, field.isPrimaryKey)) {
+    payload.isPrimaryKey = field.isPrimaryKey
   }
 
   return payload
