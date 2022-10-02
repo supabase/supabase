@@ -3,11 +3,19 @@
 // Last updated as of 29th March 2022.
 // The code may not necessarily match with the name (ref SE_VAT)
 // https://stripe.com/docs/api/customer_tax_ids/create
-interface TaxId {
+export interface TaxId {
   name: string
   code: string
   country: string
   placeholder: string
+}
+
+export interface StripeTaxId {
+  id: string
+  type: string
+  value: string
+  name: string
+  country?: string
 }
 
 export const TAX_IDS: TaxId[] = [
