@@ -60,16 +60,16 @@ export const generateRowFields = (
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {
-    if (field.format.startsWith('_') && field.value?.length > 0) {
+    if (field.format.startsWith('_') && (field.value?.length ?? 0) > 0) {
       try {
-        minifyJSON(field.value)
+        minifyJSON(field.value ?? '')
       } catch {
         errors[field.name] = 'Invalid array'
       }
     }
-    if (field.format.includes('json') && field.value?.length > 0) {
+    if (field.format.includes('json') && (field.value?.length ?? 0) > 0) {
       try {
-        minifyJSON(field.value)
+        minifyJSON(field.value ?? '')
       } catch {
         errors[field.name] = 'Invalid JSON'
       }

@@ -122,7 +122,7 @@ const ColumnEditor: FC<Props> = ({
       if (isEmpty(errors)) {
         const payload = isNewRecord
           ? generateCreateColumnPayload(selectedTable.id, columnFields)
-          : generateUpdateColumnPayload(column!, columnFields)
+          : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const foreignKey = columnFields.foreignKey
           ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
           : undefined
@@ -177,6 +177,16 @@ const ColumnEditor: FC<Props> = ({
             value={columnFields?.comment ?? ''}
             onChange={(event: any) => onUpdateField({ comment: event.target.value })}
           />
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 md:col-span-8 md:col-start-5">
+              <Checkbox
+                label="Is Primary Key"
+                description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table."
+                checked={columnFields?.isPrimaryKey ?? false}
+                onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
+              />
+            </div>
+          </div>
         </div>
       </SidePanel.Content>
 
@@ -184,18 +194,6 @@ const ColumnEditor: FC<Props> = ({
 
       <SidePanel.Content>
         <div className="space-y-10 py-6">
-          {isNewRecord && !hasPrimaryKey && (
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-12 md:col-span-8 md:col-start-5">
-                <Checkbox
-                  label={hasPrimaryKey ? 'Add to composite primary key' : 'Is Primary Key'}
-                  description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table."
-                  checked={columnFields?.isPrimaryKey ?? false}
-                  onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
-                />
-              </div>
-            </div>
-          )}
           <ColumnForeignKey
             column={columnFields}
             originalForeignKey={originalForeignKey}
@@ -216,8 +214,12 @@ const ColumnEditor: FC<Props> = ({
           />
 
           <div className="text-sm grid md:grid-cols-12 md:gap-x-4 ">
-            <p className='text-scale-1100 col-span-7 col-start-5 -mt-4'>
-              <a href="https://supabase.com/docs/guides/database/tables#data-types" target="_blank" className="underline inline-block gap-1 p-2 rounded-sm">
+            <p className="text-scale-1100 col-span-7 col-start-5 -mt-4">
+              <a
+                href="https://supabase.com/docs/guides/database/tables#data-types"
+                target="_blank"
+                className="underline inline-block gap-1 p-2 rounded-sm"
+              >
                 Learn more about data types
               </a>
             </p>

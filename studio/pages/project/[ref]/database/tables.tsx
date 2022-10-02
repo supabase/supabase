@@ -16,8 +16,10 @@ const DatabaseTables: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedTable, setSelectedTable] = useState<any>()
   const [sidePanelKey, setSidePanelKey] = useState<'column' | 'table'>()
+
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
 
@@ -121,6 +123,8 @@ const DatabaseTables: NextPageWithLayout = () => {
       <div className="p-4">
         {isUndefined(selectedTable) ? (
           <TableList
+            selectedSchema={selectedSchema}
+            onSelectSchema={setSelectedSchema}
             onAddTable={onAddTable}
             onEditTable={onEditTable}
             onDeleteTable={onDeleteTable}
