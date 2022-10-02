@@ -8,16 +8,9 @@ import { uuidv4 } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import Panel from 'components/ui/Panel'
-import { TAX_IDS } from './TaxID.constants'
+import { StripeTaxId, TAX_IDS } from './TaxID.constants'
 import NoPermission from 'components/ui/NoPermission'
-
-interface StripeTaxId {
-  id: string
-  type: string
-  value: string
-  name: string
-  country?: string
-}
+import { sanitizeTaxID } from './TaxID.utils'
 
 interface Props {
   loading: boolean
@@ -86,7 +79,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   }
 
   const onRemoveTaxId = (id: string) => {
-    const updatedTaxIds = taxIdValues.filter((taxId: any) => {
+    const updatedTaxIds = taxIdValues.filter((taxId: StripeTaxId) => {
       return taxId.id !== id
     })
     setTaxIdValues(updatedTaxIds)
@@ -101,13 +94,13 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
     setIsSaving(true)
     try {
       const deletedIds = await Promise.all(
-        taxIds.map(async (taxId: any) => {
+        taxIds.map(async (taxId: StripeTaxId) => {
           return await delete_(`${API_URL}/organizations/${slug}/tax-ids`, { id: taxId.id })
         })
       )
 
       const newIds = await Promise.all(
-        taxIdValues.map(async (taxId: any) => {
+        taxIdValues.map(async (taxId: StripeTaxId) => {
           const sanitizedID = sanitizeTaxID(taxId)
           const result = await post(`${API_URL}/organizations/${slug}/tax-ids`, {
             type: sanitizedID.type,
@@ -116,7 +109,6 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
           return { id: sanitizedID.id, result }
         })
       )
-
       const taxIdsWithErrors = newIds.filter((taxId: any) => {
         if (taxId.result.error) return taxId
       })
@@ -139,26 +131,6 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
     } finally {
       setIsSaving(false)
     }
-  }
-
-  /**
-   * Sanitize EU VAT ids so they get prepended with the country code
-   *
-   * Ex: Belgium's VAT ID should be BE0123456789 not 0123456789
-   * Only EU VAT ids are affected for now
-   */
-  const sanitizeTaxID = (taxId: any) => {
-    let newID = taxId
-
-    // The first 2 letters of the country name (ex: "BE" for Belgium)
-    const countryCodePrepend = taxId.name.slice(0, 2)
-
-    // if the value doesn't start with the country code, prepend them
-    if (taxId.type === 'eu_vat' && !taxId.value.startsWith(countryCodePrepend)) {
-      newID.value = `${countryCodePrepend}${taxId.value}`
-    }
-
-    return newID
   }
 
   return (
