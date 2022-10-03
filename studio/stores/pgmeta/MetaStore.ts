@@ -120,6 +120,8 @@ export interface IMetaStore {
     columns: ColumnField[],
     isRealtimeEnabled: boolean
   ) => any
+
+  setProjectDetails: (details: { ref: string; connectionString?: string }) => void
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
@@ -140,6 +142,7 @@ export default class MetaStore implements IMetaStore {
   projectRef?: string
   connectionString?: string
   baseUrl: string
+  headers: { [prop: string]: any }
 
   // [Joshen] I'm going to treat this as a list of system schemas
   excludedSchemas = [
@@ -158,33 +161,45 @@ export default class MetaStore implements IMetaStore {
     'graphql_public',
   ]
 
-  constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
+  constructor(rootStore: IRootStore, options: { projectRef: string; connectionString?: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
     this.projectRef = projectRef
     this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
-    const headers: any = {}
+    this.headers = {}
     if (IS_PLATFORM && connectionString) {
       this.connectionString = connectionString
-      headers['x-connection-encrypted'] = connectionString
+      this.headers['x-connection-encrypted'] = connectionString
     }
 
-    this.openApi = new OpenApiStore(rootStore, `${API_URL}/props/project/${projectRef}/api`)
-    this.tables = new TableStore(rootStore, `${this.baseUrl}/tables`, headers)
-    this.columns = new ColumnStore(rootStore, `${this.baseUrl}/columns`, headers)
-    this.schemas = new SchemaStore(rootStore, `${this.baseUrl}/schemas`, headers)
+    this.openApi = new OpenApiStore(
+      this.rootStore,
+      `${API_URL}/props/project/${this.projectRef}/api`
+    )
+    this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
+    this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
+    this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
 
-    this.roles = new RolesStore(rootStore, `${this.baseUrl}/roles`, headers)
-    this.policies = new PoliciesStore(rootStore, `${this.baseUrl}/policies`, headers)
-    this.hooks = new HooksStore(rootStore, `${this.baseUrl}/triggers`, headers)
-    this.triggers = new TriggersStore(rootStore, `${this.baseUrl}/triggers`, headers)
-    this.functions = new FunctionsStore(rootStore, `${this.baseUrl}/functions`, headers)
-    this.extensions = new ExtensionsStore(rootStore, `${this.baseUrl}/extensions`, headers, {
-      identifier: 'name',
-    })
-    this.publications = new PublicationStore(rootStore, `${this.baseUrl}/publications`, headers)
-    this.types = new TypesStore(rootStore, `${this.baseUrl}/types`, headers)
+    this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
+    this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
+    this.hooks = new HooksStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
+    this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
+    this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
+    this.extensions = new ExtensionsStore(
+      this.rootStore,
+      `${this.baseUrl}/extensions`,
+      this.headers,
+      {
+        identifier: 'name',
+      }
+    )
+    this.publications = new PublicationStore(
+      this.rootStore,
+      `${this.baseUrl}/publications`,
+      this.headers
+    )
+    this.types = new TypesStore(this.rootStore, `${this.baseUrl}/types`, this.headers)
 
     makeObservable(this, {
       excludedSchemas: observable,
@@ -802,5 +817,50 @@ export default class MetaStore implements IMetaStore {
       }
       onProgressUpdate(insertProgress * 100)
     }
+  }
+
+  setProjectDetails({ ref, connectionString }: { ref: string; connectionString?: string }) {
+    this.projectRef = ref
+    this.baseUrl = `${API_URL}/pg-meta/${ref}`
+    if (IS_PLATFORM && connectionString) {
+      this.connectionString = connectionString
+      this.headers['x-connection-encrypted'] = connectionString
+    }
+
+    this.openApi.setUrl(`${API_URL}/props/project/${this.projectRef}/api`)
+    this.openApi.setHeaders(this.headers)
+
+    this.tables.setUrl(`${this.baseUrl}/tables`)
+    this.tables.setHeaders(this.headers)
+
+    this.columns.setUrl(`${this.baseUrl}/columns`)
+    this.columns.setHeaders(this.headers)
+
+    this.schemas.setUrl(`${this.baseUrl}/schemas`)
+    this.schemas.setHeaders(this.headers)
+
+    this.roles.setUrl(`${this.baseUrl}/roles`)
+    this.roles.setHeaders(this.headers)
+
+    this.policies.setUrl(`${this.baseUrl}/policies`)
+    this.policies.setHeaders(this.headers)
+
+    this.hooks.setUrl(`${this.baseUrl}/triggers`)
+    this.hooks.setHeaders(this.headers)
+
+    this.triggers.setUrl(`${this.baseUrl}/triggers`)
+    this.triggers.setHeaders(this.headers)
+
+    this.functions.setUrl(`${this.baseUrl}/functions`)
+    this.functions.setHeaders(this.headers)
+
+    this.extensions.setUrl(`${this.baseUrl}/extensions`)
+    this.extensions.setHeaders(this.headers)
+
+    this.publications.setUrl(`${this.baseUrl}/publications`)
+    this.publications.setHeaders(this.headers)
+
+    this.types.setUrl(`${this.baseUrl}/types`)
+    this.types.setHeaders(this.headers)
   }
 }
