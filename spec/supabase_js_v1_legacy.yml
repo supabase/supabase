@@ -496,9 +496,9 @@ pages:
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
             'user@email.com'
           )
-            
+
           /**
-           * Step 2: Once the user is redirected back to your application, 
+           * Step 2: Once the user is redirected back to your application,
            * ask the user to reset their password.
            */
           useEffect(() => {
@@ -508,10 +508,10 @@ pages:
                 const { data, error } = await supabase.auth.update({
                   password: newPassword,
                 })
-                  
+
                 if (data) alert("Password updated successfully!")
                 if (error) alert("There was an error updating your password.")
-              } 
+              }
             })
           }, [])
           ```
@@ -988,20 +988,20 @@ pages:
           const { data, error, count } = await supabase
             .rpc('hello_world', {}, { count: 'exact' })
           ```
-          
-       - name: Privileges
-        description: |
-          By default functions are executable by every role. If you wish to restrict this, you can do
-          sql: |
-            ```sql
-              ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
-            ```
-          Then you can choose to which role you wish to grant execution on
-          sql: |
-            ```sql
-              GRANT EXECUTE ON FUNCTION hello TO authenticated;
-              GRANT EXECUTE ON FUNCTION hello TO service_role;
-            ```
+
+    privileges:
+      description: |
+        By default functions are executable by every role. If you wish to restrict this, you can do
+        sql: |
+          ```sql
+            ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+          ```
+        Then you can choose to which role you wish to grant execution on
+        sql: |
+          ```sql
+            GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
+            GRANT EXECUTE ON FUNCTION hello_world TO service_role;
+          ```
 
   subscribe():
     title: 'on().subscribe()'
