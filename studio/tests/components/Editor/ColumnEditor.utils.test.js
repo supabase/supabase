@@ -2,6 +2,11 @@ import { unescapeLiteral } from 'components/interfaces/TableGridEditor/SidePanel
 
 describe('ColumnEditor.utils: unescapeLiteral', () => {
   test('should return varchar properly', () => {
+    const mockInput = `nextval('"Test_id_seq"'::regclass)`
+    const value = unescapeLiteral(mockInput)
+    expect(value).toStrictEqual(`nextval('"Test_id_seq"')`)
+  })
+  test('should return varchar properly', () => {
     const mockInput = "'potato'::character varying"
     const value = unescapeLiteral(mockInput)
     expect(value).toStrictEqual('potato')

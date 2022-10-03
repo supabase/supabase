@@ -20,10 +20,10 @@ const UsersList = ({}) => {
           <>
             <Table.th>Email</Table.th>
             <Table.th>Phone</Table.th>
-            <Table.th className="hidden 2xl:table-cell">Provider</Table.th>
-            <Table.th className="hidden 2xl:table-cell">Created</Table.th>
-            <Table.th className="hidden xl:table-cell">Last Sign In</Table.th>
-            <Table.th className="hidden lg:table-cell">User UID</Table.th>
+            <Table.th className="table-cell">Provider</Table.th>
+            <Table.th className="table-cell">Created</Table.th>
+            <Table.th className="table-cell">Last Sign In</Table.th>
+            <Table.th className="table-cell">User UID</Table.th>
             <Table.th></Table.th>
           </>
         }
@@ -34,7 +34,7 @@ const UsersList = ({}) => {
                 {/* @ts-ignore */}
                 <Table.td
                   colSpan={7}
-                  className="h-14 p-4 whitespace-nowrap border-t leading-5 text-gray-300 text-sm"
+                  className="h-14 whitespace-nowrap border-t p-4 text-sm leading-5 text-gray-300"
                 >
                   <div className="flex items-center space-x-3 opacity-75">
                     <IconAlertCircle size={16} strokeWidth={2} />
