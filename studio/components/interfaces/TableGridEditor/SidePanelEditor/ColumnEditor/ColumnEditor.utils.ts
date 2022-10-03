@@ -62,7 +62,7 @@ export const generateColumnFieldFromPostgresColumn = (
     name: column.name,
     comment: column?.comment ?? '',
     format: isArray ? column.format.slice(1) : column.format,
-    defaultValue: (column?.default_value ?? '') as string,
+    defaultValue: column?.default_value as string | null,
     isArray: isArray,
     isNullable: column.is_nullable,
     isIdentity: column.is_identity,

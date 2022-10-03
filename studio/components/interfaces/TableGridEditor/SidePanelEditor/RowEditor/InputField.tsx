@@ -100,9 +100,11 @@ const InputField: FC<Props> = ({
           rows={5}
           value={field.value ?? ''}
           placeholder={
-            typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+            field.defaultValue === null
+              ? ''
+              : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
               ? 'Default: Empty string'
-              : field.defaultValue
+              : `Default: ${field.defaultValue}`
           }
           onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         />
@@ -119,7 +121,7 @@ const InputField: FC<Props> = ({
         descriptionText={field.comment}
         labelOptional={field.format}
         disabled={!isEditable}
-        placeholder={field.defaultValue}
+        placeholder={field?.defaultValue ?? ''}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
@@ -156,7 +158,13 @@ const InputField: FC<Props> = ({
       labelOptional={field.format}
       error={errors[field.name]}
       value={field.value ?? ''}
-      placeholder={field.isIdentity ? 'Automatically generated as identity' : field.defaultValue}
+      placeholder={
+        field.isIdentity
+          ? 'Automatically generated as identity'
+          : field.defaultValue !== null
+          ? `Default: ${field.defaultValue}`
+          : ''
+      }
       disabled={!isEditable}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
     />
