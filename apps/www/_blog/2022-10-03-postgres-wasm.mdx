@@ -10,7 +10,7 @@ date: '2022-10-03'
 toc_depth: 3
 ---
 
-Today we're open sourcing `[postgres-wasm](https://github.com/snaplet/postgres-wasm)` with our friends at [Snaplet](https://www.snaplet.dev/).
+Today we're open sourcing [`postgres-wasm`](https://github.com/snaplet/postgres-wasm) with our friends at [Snaplet](https://www.snaplet.dev/).
 
 postgres-wasm is a PostgresQL server that can run inside a browser. It provides a full suite of features, including persisting state to browser,
 restoring from pg_dump, and logical replication from a remote database.
@@ -65,7 +65,7 @@ Our demo version has a few neat features!
 - Save & restore Postgres state to/from the browser storage (IndexedDB).
 - Quick start from a state file or fully reboot the emulator.
 - Memory configuration options from 128MB to 1024MB.
-- Adjust the font size for the terminal
+- Adjust the font size for the terminal.
 - Upload files to the emulator (including database dumps and CSVs).
 - Download files from the emulator.
 - Outgoing network connectivity from the emulator to the internet.
@@ -74,7 +74,7 @@ Our demo version has a few neat features!
 ## Why?
 
 That's a good question. `postgres-wasm` is currently about 30mb. So at this stage, running Postgres in the browser isn't great for general use-cases.
-Nonetheless it has a lot of potential. Some ideas we'll be playing with over the next few months:
+It has a lot of potential though. Some ideas we'll be playing with over the next few months:
 
 - **Documentation:** for tutorials and demos.
 - **Offline data:** running it in the browser for an offline cache, similar to [sql.js](https://sql.js.org/#/) or [absurd-sql](https://github.com/jlongster/absurd-sql).
@@ -117,10 +117,10 @@ There were a lot of hurdles that we discovered throughout the development of pos
 
 ### WASM
 
-The first thing to point out is that our implementation isn't _pure_ WASM. We attempted to directly compile Postgres for WASM directly from source,
+The first thing to point out is that our implementation isn't _pure_ WASM. We attempted to compile Postgres for WASM directly from source,
 but it was more complicated that we anticipated.
 
-Crunchy's HN post provided some hints about the approach they took, which was to virtualize a machine in the browser. We settled on v86,
+Crunchy's HN post provided some hints about the approach they took, which was to virtualize a machine in the browser. We pursued this strategy too, settling on v86
 which emulates an x86-compatible CPU and hardware in the browser.
 
 ### PostgreSQL 14 segfault errors
@@ -135,14 +135,14 @@ Eventually, Fabian, the creator of v86 suggested we turn off JIT compilation for
 He narrowed it down to a bug in v86 and is pushing an update that to fix it.
 Switching Postgres from sysv to posix memory management also solved the issue for the current release of V86.
 
-### Reducing boot time / startup time / image size
+### Optimizing startup time and image size
 
 With PG14 running in the emulator, we shifted our focus to performance. The image size for the emulator was too big for a browser-based tool.
 Even with our best efforts, a compressed snapshot was over 30mb - a fairly large payload to download before you can see any interaction.
 
 We solved this by booting only a minimal Linux image and then dynamically loading the rest of the VM over HTTPS after initialization.
 
-This is done by mounting a compressed [9P filesystem](<https://en.wikipedia.org/wiki/9P_(protocol)>) in the VM.
+We achieve this by mounting a compressed [9P filesystem](<https://en.wikipedia.org/wiki/9P_(protocol)>) in the VM.
 9P provides a [Python script](https://github.com/supabase-community/postgres-wasm/tree/main/packages/buildroot/tools) which takes a filesystem folder,
 renames every file an 8-character name and produces a `filesystem.json` file representing a nested structure with files, original file names, sizes, etc.
 We then [copy this compressed output](https://github.com/supabase-community/postgres-wasm/blob/main/packages/buildroot/config/board/pg-browser/post-image.sh) to the VM.
@@ -179,7 +179,8 @@ It turns those raw packets into TCP/IP packets and routes them between the Inter
 
 ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d1bf4831-1786-4c0b-9734-aa1bf491d011/Untitled.png)
 
-With our tunnel established, we could now send network traffic to the outside world. For example, try “starting” the network on the VM and then run `ping 1.1.1.1`.
+With our tunnel established, we could now send network traffic to the outside world. For example, try “starting” the network on the VM,
+"exiting" out of psql (`cmd`+`D`), and then run `ping 1.1.1.1`.
 
 ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/556324c1-1bdf-4178-a367-e202de034738/Untitled.png)
 
@@ -217,8 +218,8 @@ we `chmod +x` that file, execute it, then delete it. That allows us to run comma
 
 ## Just for fun
 
-In case you want to do something very cool, you can actually connect to another user's Postgres instance that they are running in a browser.
-Here are the steps
+If you want to do something very cool, you can connect to another user's Postgres instance that they are running in their browser.
+Here are the steps:
 
 1. Find a friend (sometimes the first step is the hardest)
 2. Tell them to go to [wasm.supabase.com](https://wasm.supabase.com/)
@@ -229,7 +230,7 @@ Here are the steps
 
 **Database Replication**
 
-Even more mind-blowing - it's possible to replicate data from an online PostgreSQL database (i.e. a Supabase project) to PostgreSQL running inside your browser,
+Even more mind-blowing - it's possible to replicate data from an online PostgreSQL database (for example, a Supabase project) to PostgreSQL running inside your browser,
 and vice-versa. You can set up logical replication, or create a pipeline from the command prompt of your emulator:
 
 ```jsx
