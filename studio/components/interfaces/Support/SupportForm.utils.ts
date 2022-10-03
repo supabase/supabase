@@ -57,15 +57,10 @@ export const uploadAttachments = async (ref: string, files: File[]) => {
 }
 
 export const formatMessage = (message: string, attachments: string[]) => {
-  const formattedMessage = message.replace(/\n/g, '<br/>')
   if (attachments.length > 0) {
-    const attachmentsImg = attachments.map(
-      (url) => `<img src=${url} width="200" style="margin-right:10px" />`
-    )
-    return `${formattedMessage}<br/><hr/><b>Uploaded attachments:</b><br/><div style="display:flex;align-items:center">${attachmentsImg.join(
-      ''
-    )}</div>`
+    const attachmentsImg = attachments.map((url) => `\n${url}`)
+    return `${message}\n${attachmentsImg.join('')}`
   } else {
-    return formattedMessage
+    return message
   }
 }
