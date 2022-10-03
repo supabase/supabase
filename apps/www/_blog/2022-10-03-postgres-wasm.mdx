@@ -177,12 +177,12 @@ The VM includes an emulated network card (`ne2k-pci`) and a `proxy_url` startup 
 running a websocket proxy (i.e. on the internet). The websocket proxy establishes connections via a websocket port, then accepts raw ethernet packets.
 It turns those raw packets into TCP/IP packets and routes them between the Internet and the VM.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d1bf4831-1786-4c0b-9734-aa1bf491d011/Untitled.png)
+![Postgres WASM to the proxy](/images/blog/postgres-wasm/pg-wasm-diagram1.jpg)
 
 With our tunnel established, we could now send network traffic to the outside world. For example, try “starting” the network on the VM,
 "exiting" out of psql (`cmd`+`D`), and then run `ping 1.1.1.1`.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/556324c1-1bdf-4178-a367-e202de034738/Untitled.png)
+![Postgres WASM to the internet](/images/blog/postgres-wasm/pg-wasm-diagram2.jpg)
 
 Most v86 VM's use an open proxy at `wss://relay.widgetry.org/` based on [websockproxy](https://github.com/benjamincburns/websockproxy).
 This proxy allows the VM to communicate with the outside world. It can handle all the basic use-cases like loading
@@ -193,14 +193,14 @@ For instance, you can't connect a local `PgAdmin4` to the PostgreSQL instance ru
 So we [forked](https://github.com/snaplet/postgres-wasm/tree/main/packages/websockproxy) the [proxy](https://github.com/benjamincburns/websockproxy) and
 added nginx to provide a reverse proxy.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d8a582a3-a76c-46cc-a658-4a9978654cd9/Untitled.png)
+![Postgres WASM with psql](/images/blog/postgres-wasm/pg-wasm-diagram3.jpg)
 
 The reverse proxy listens on a range of ports, mapping each port to the VM at a specific private address you want to reach.
 The simple solution was to take the last 2 segments of the private IP and map it to a port number. So if your private IP is 10.5.6.123,
 you connect to the proxy on port 6123 and that points you to PostgreSQL (running on port 5432) on private IP 10.5.6.123. Shortened addresses are padded,
 so 10.5.6.2 maps to port 6002 and 10.5.6.44 to port 6044.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/18f62aae-1d96-4be4-9e25-6f6945d543ad/Untitled.png)
+![Postgres WASM with remote logins](/images/blog/postgres-wasm/pg-wasm-diagram4.jpg)
 
 ### Sending commands to the emulator from the browser UI
 
