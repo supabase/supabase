@@ -172,8 +172,8 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                   name="country"
                   layout="vertical"
                 >
-                  {countries.map(({ code, name }) => (
-                    <Select.Option value={code}>{name}</Select.Option>
+                  {countries.map(({ code, name }: any, i: number) => (
+                    <Select.Option key={i} value={code}>{name}</Select.Option>
                   ))}
                 </Select>
               </div>
