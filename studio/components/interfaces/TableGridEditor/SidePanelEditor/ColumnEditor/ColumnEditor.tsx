@@ -55,7 +55,6 @@ const ColumnEditor: FC<Props> = ({
   updateEditorDirty = () => {},
 }) => {
   const isNewRecord = isUndefined(column)
-  const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
   const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
@@ -128,7 +127,6 @@ const ColumnEditor: FC<Props> = ({
           ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
           : undefined
         const configuration = { columnId: column?.id }
-        console.log('onSaveChanges', payload)
         saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
       } else {
         resolve()
