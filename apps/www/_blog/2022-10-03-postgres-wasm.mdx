@@ -132,7 +132,7 @@ We quickly had PostgreSQL 13.3 running using an outdated version of Buildroot. B
 - adjusting kernel parameters and environment settings such as the amount of memory allocated to the emulator, etc.
 
 Eventually, Fabian, the creator of v86 suggested we turn off JIT compilation for v86 and that solved the issue.
-He narrowed it down to a bug in v86 and is pushing an update that to fix it.
+He narrowed it down to a bug in v86 and is pushing an update that will fix it.
 Switching Postgres from sysv to posix memory management also solved the issue for the current release of V86.
 
 ### Optimizing startup time and image size
