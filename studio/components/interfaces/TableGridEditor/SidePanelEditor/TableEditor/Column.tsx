@@ -231,9 +231,9 @@ const Column: FC<Props> = ({
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
+          <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
             <IconX strokeWidth={1} />
-          </div>
+          </button>
         </div>
       )}
     </div>

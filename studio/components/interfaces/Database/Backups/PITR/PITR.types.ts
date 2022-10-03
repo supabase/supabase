@@ -6,3 +6,9 @@ export interface Timezone {
   text: string
   utc: string[]
 }
+
+export interface Time {
+  h: number
+  m: number
+  s: number
+}

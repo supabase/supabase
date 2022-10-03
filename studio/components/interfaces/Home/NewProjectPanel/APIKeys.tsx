@@ -17,7 +17,6 @@ const APIKeys = () => {
 
   const availableLanguages = [
     { name: 'Javascript', key: 'js' },
-    { name: 'Python', key: 'python' },
     { name: 'Dart', key: 'dart' },
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
