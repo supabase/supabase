@@ -991,7 +991,7 @@ pages:
 
     privileges:
       description: |
-        By default functions are executable by every role. If you wish to restrict this, you can do
+        By default, functions can be executed by any role. You can restrict this by
         sql: |
           ```sql
             ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
