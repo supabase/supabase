@@ -38,11 +38,7 @@ const PasswordStrengthBar = ({
           ></div>
         </div>
       )}
-      <p
-        className={
-          passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH ? 'text-green-600' : ''
-        }
-      >
+      <p>
         {passwordStrengthMessage
           ? passwordStrengthMessage
           : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}{' '}

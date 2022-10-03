@@ -79,6 +79,7 @@ const sidebars = {
           items: [
             'guides/auth/row-level-security',
             'guides/auth/managing-user-data',
+            'guides/auth/auth-captcha',
           ],
         },
         {
@@ -219,6 +220,7 @@ const sidebars = {
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
+        'guides/integrations/polyscale',
         'guides/integrations/prisma',
         'guides/integrations/sequin',
         'guides/integrations/snaplet',
