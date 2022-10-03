@@ -5,13 +5,7 @@ import { PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
-import {
-  JSON_TYPES,
-  NUMERICAL_TYPES,
-  DATETIME_TYPES,
-  TIME_TYPES,
-  TIMESTAMP_TYPES,
-} from '../SidePanelEditor.constants'
+import { DATETIME_TYPES, TIME_TYPES, TIMESTAMP_TYPES } from '../SidePanelEditor.constants'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -24,14 +18,13 @@ export const generateRowFields = (
 
   return table.columns.map((column) => {
     const defaultValue = column?.default_value as string | null
-    const value =
-      isNewRecord && defaultValue?.includes('now()')
-        ? nowDateTimeValue(column.format)
-        : isUndefined(row)
-        ? ''
-        : DATETIME_TYPES.includes(column.format)
-        ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
-        : parseValue(row[column.name], column.format, column.data_type)
+    const value = isUndefined(row)
+      ? ''
+      : isNewRecord && defaultValue?.includes('now()')
+      ? nowDateTimeValue(column.format)
+      : DATETIME_TYPES.includes(column.format)
+      ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
+      : parseValue(row[column.name], column.format, column.data_type)
 
     const foreignKey = find(relationships, (relationship) => {
       return (
@@ -49,7 +42,7 @@ export const generateRowFields = (
       comment: parseDescription(column.comment),
       format: column.format,
       enums: column.enums as any,
-      defaultValue: parseValue(column.default_value as string, column.format, column.data_type),
+      defaultValue: column?.default_value as string | null,
       isNullable: column.is_nullable,
       isIdentity: column.is_identity,
       isPrimaryKey: primaryKeyColumns.includes(column.name),
@@ -109,26 +102,6 @@ const parseValue = (originalValue: string, format: string, dataType: string) => 
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
       return (originalValue as any).toString()
-    } else if (includes(JSON_TYPES, format)) {
-      const value = _unescapeLiteral(dataType, originalValue, format)
-      return minifyJSON(value)
-    }
-
-    // escape literal format from postgres-meta
-    const value = _unescapeLiteral(dataType, originalValue, format)
-    if (dataType && dataType.toLowerCase() == 'array') {
-      if (originalValue && originalValue.includes("}'::") && originalValue.endsWith('[]')) {
-        // for array default value, we need to use this method to parse literal format
-        // TODO: should merge with above method... if we can
-        return _unescapeLiteralArray(originalValue)
-      } else if (typeof value === 'string') {
-        const parsedValue = JSON.parse(value)
-        return JSON.parse(parsedValue)
-      } else {
-        return JSON.stringify(value)
-      }
-    } else {
-      return value
     }
   } catch (error) {
     return originalValue
@@ -198,68 +171,6 @@ const convertInputDatetimeToPostgresDatetime = (format: string, value: string | 
       return dayjs(value, 'HH:mm:ss').format('HH:mm:ss')
     default:
       return value
-  }
-}
-
-/**
- * postgres-meta can return default value with format like
- * 'hello world'::character varying
- * '232.34'::double precision
- * 'USER'::"Role" user-defined type
- * this method will help convert them to valid default value
- */
-const _unescapeLiteral = (dataType: string, value: string, format: string): any => {
-  // unEscape format literal
-  let temp = `::${dataType}`
-  let tempWithQuotes = `::"${dataType}"`
-  // for user-defined type, need to use format instead
-  if (dataType?.toLowerCase() == 'user-defined') {
-    temp = `::${format}`
-    tempWithQuotes = `::"${format}"`
-  }
-
-  if (value && value.includes(temp)) {
-    value = value.replace(temp, '')
-    // remove quotes
-    value = value.slice(1, value.length - 1)
-  } else if (value && value.includes(tempWithQuotes)) {
-    value = value.replace(tempWithQuotes, '')
-    // remove quotes
-    value = value.slice(1, value.length - 1)
-  }
-  return value
-}
-
-/**
- * postgres-meta can return default value for array like
- * ex: '{apple,banana}'::text[] => ["apple","banana"]
- * ex: '{1,2,3,4,5,6}'::integer[] => [1,2,3,4,5,6]
- * ex: '{{meeting,lunch},{training,presentation}}'::character varying[]
- * this method will help convert them to valid default value
- */
-const _unescapeLiteralArray = (value: any) => {
-  const splits = value.split("'::")
-  if (splits.length < 1) return value
-
-  let temp = splits[0].replace("'{", '{')
-  if (value.endsWith('integer[]') || value.endsWith('real[]')) {
-    temp = temp.replaceAll('{', '[')
-    temp = temp.replaceAll('}', ']')
-    return temp
-  } else {
-    const matches = temp.match(/\{([^{}]+)\}/g)
-    if (matches) {
-      const array = [...matches]
-      array.forEach((x) => {
-        let _x = x.replaceAll('{', '{"')
-        _x = _x.replaceAll('}', '"}')
-        _x = _x.replaceAll(',', '","')
-        temp = temp.replace(x, _x)
-      })
-      temp = temp.replaceAll('{', '[')
-      temp = temp.replaceAll('}', ']')
-    }
-    return temp
   }
 }
 
