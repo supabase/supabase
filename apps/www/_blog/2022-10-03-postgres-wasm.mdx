@@ -226,7 +226,7 @@ Here are the steps:
 3. Tell them to “Start Network” and get their Network URL
 4. Have them set a password on their database `ALTER ROLE postgres WITH PASSWORD 'my_password';`
 5. On your own machine, open a terminal and run
-   `psql postgres://postgres:my_password@wasm.supabase.com:<PORT>`
+   `psql postgres://postgres:my_password@proxy.wasm.supabase.com:<PORT>`
 6. And you're in! You're now connecting to a remote Postgres instance, inside a VM, inside a browser, from a terminal on your own computer.
 
 **Database Replication**
