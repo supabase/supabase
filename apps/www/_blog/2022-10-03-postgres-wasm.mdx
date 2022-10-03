@@ -133,7 +133,7 @@ We quickly had PostgreSQL 13.3 running using an outdated version of Buildroot. B
 
 Eventually, Fabian, the creator of v86 suggested we turn off JIT compilation for v86 and that solved the issue.
 He narrowed it down to a bug in v86 and is pushing an update that will fix it.
-Switching Postgres from sysv to posix memory management also solved the issue for the current release of V86.
+Switching Postgres from posix to sysv memory management also solved the issue for the current release of V86.
 
 ### Optimizing startup time and image size
 
@@ -224,9 +224,10 @@ Here are the steps:
 1. Find a friend (sometimes the first step is the hardest)
 2. Tell them to go to [wasm.supabase.com](https://wasm.supabase.com/)
 3. Tell them to “Start Network” and get their Network URL
-4. On your own machine, open a terminal and run
-   `psql postgres://postgres:woohoo@wasm.supabase.com:<PORT>`
-5. And you're in! You're now connecting to a remote Postgres instance, inside a VM, inside a browser, from a terminal on your own computer.
+4. Have them set a password on their database `ALTER ROLE postgres WITH PASSWORD 'my_password';`
+5. On your own machine, open a terminal and run
+   `psql postgres://postgres:my_password@proxy.wasm.supabase.com:<PORT>`
+6. And you're in! You're now connecting to a remote Postgres instance, inside a VM, inside a browser, from a terminal on your own computer.
 
 **Database Replication**
 
