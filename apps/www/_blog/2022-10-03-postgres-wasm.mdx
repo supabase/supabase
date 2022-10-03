@@ -231,18 +231,7 @@ Here are the steps:
 **Database Replication**
 
 Even more mind-blowing - it's possible to replicate data from an online PostgreSQL database (for example, a Supabase project) to PostgreSQL running inside your browser,
-and vice-versa. You can set up logical replication, or create a pipeline from the command prompt of your emulator:
-
-```jsx
-pg_dump \
---clean \
---if-exists \
---quote-all-identifiers \
--h [HOST_DATABASE] \
--U postgres \
--t my_table \
-| psql -U postgres
-```
+and vice-versa using Postgres's logical replication. The steps are no different than any other Postgres database - just use the proxy URL as the target.
 
 ## What's next?
 
