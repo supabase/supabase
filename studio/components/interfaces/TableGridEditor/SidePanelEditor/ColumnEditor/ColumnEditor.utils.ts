@@ -11,6 +11,8 @@ import { uuidv4 } from 'lib/helpers'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 const isSQLExpression = (input: string) => {
+  if (['CURRENT_DATE'].includes(input)) return true
+
   if (input[0] === '(' && input[input.length - 1] === ')') {
     return true
   }
