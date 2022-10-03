@@ -128,6 +128,7 @@ const ColumnEditor: FC<Props> = ({
           ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
           : undefined
         const configuration = { columnId: column?.id }
+        console.log('onSaveChanges', payload)
         saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
       } else {
         resolve()
