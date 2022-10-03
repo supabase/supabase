@@ -996,7 +996,7 @@ pages:
           ```sql
             ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
           ```
-        Then you can choose to which role you wish to grant execution on
+        Then, you can choose which roles can execute functions
         sql: |
           ```sql
             GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
