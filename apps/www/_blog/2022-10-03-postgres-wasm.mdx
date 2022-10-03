@@ -213,7 +213,7 @@ To restart the network after restoring a state file, we need to run a short scri
 We could run this script by sending keystrokes to the emulator, but that's clumsy. What if the user is at a `psql` prompt? Then we'd send `\! script_command`.
 But if they're at an OS prompt, that won't work.
 
-We solved by creating a folder called `\inbox` and added a listener to the folder. When files arrive there, if the file ends in `.sh` (a shell script),
+We solved the issue by creating a folder called `\inbox` and added a listener to the folder. When files arrive there, if the file ends in `.sh` (a shell script),
 we `chmod +x` that file, execute it, then delete it. That allows us to run commands “in the background” without upsetting the UI.
 
 ## Just for fun
