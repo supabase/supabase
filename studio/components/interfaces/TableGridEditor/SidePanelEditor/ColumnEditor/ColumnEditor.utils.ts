@@ -11,6 +11,8 @@ import { uuidv4 } from 'lib/helpers'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 const isSQLExpression = (input: string) => {
+  if (['CURRENT_DATE'].includes(input)) return true
+
   if (input[0] === '(' && input[input.length - 1] === ')') {
     return true
   }
@@ -103,8 +105,13 @@ export const generateCreateColumnPayload = (
 
 export const generateUpdateColumnPayload = (
   originalColumn: PostgresColumn,
+  table: PostgresTable,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
+  // @ts-ignore
+  const primaryKeyColumns = table.primary_keys.map((key) => key.name)
+  const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
+
   // Only append the properties which are getting updated
   const defaultValue = field.defaultValue
   const type = field.isArray ? `${field.format}[]` : field.format
@@ -135,6 +142,9 @@ export const generateUpdateColumnPayload = (
   }
   if (!isEqual(originalColumn.is_unique, field.isUnique)) {
     payload.isUnique = field.isUnique
+  }
+  if (!isEqual(isOriginallyPrimaryKey, field.isPrimaryKey)) {
+    payload.isPrimaryKey = field.isPrimaryKey
   }
 
   return payload
@@ -218,6 +228,11 @@ export const unescapeLiteral = (value: string) => {
   // Handle timezones
   if (value.toLowerCase().includes('time zone')) {
     return `${splits[0].toLowerCase()}')`
+  }
+
+  // Handle nextval
+  if (value.toLowerCase().includes('nextval')) {
+    return `${splits[0]}')`
   }
 
   // Handle json

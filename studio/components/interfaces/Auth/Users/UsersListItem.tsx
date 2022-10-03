@@ -19,24 +19,24 @@ const UserListItem: FC<Props> = ({ user, canRemoveUser }) => {
   const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
 
   return (
-    <Table.tr key={user.id}>
+    <Table.tr className="relative" key={user.id}>
       <Table.td className="whitespace-nowrap">
         <div className="flex items-center gap-2">
-          <span className="text-scale-1200">{!user.email ? '-' : user.email}</span>
+          <span className="text-sm text-scale-1200">{!user.email ? '-' : user.email}</span>
         </div>
       </Table.td>
       <Table.td className="whitespace-nowrap">
         <span className="text-scale-1200">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
-      <Table.td className="hidden 2xl:table-cell">
-        <span className="text-scale-1200 capitalize">
+      <Table.td className="table-cell">
+        <span className="capitalize text-scale-1200">
           {user?.raw_app_meta_data?.provider || user?.app_metadata?.provider}
         </span>
       </Table.td>
-      <Table.td className="hidden 2xl:table-cell">
+      <Table.td className="table-cell">
         <span className="text-scale-1200">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
-      <Table.td className="hidden xl:table-cell">
+      <Table.td className="table-cell">
         {!isUserConfirmed ? (
           <Badge color="yellow">Waiting for verification..</Badge>
         ) : user.last_sign_in_at ? (
@@ -45,10 +45,13 @@ const UserListItem: FC<Props> = ({ user, canRemoveUser }) => {
           'Never'
         )}
       </Table.td>
-      <Table.td className="hidden lg:table-cell">
-        <SimpleCodeBlock metastring="" className="font-xs bash">
-          {user.id}
-        </SimpleCodeBlock>
+      <Table.td className="table-cell">
+        <div className="flex max-w-[72px] items-baseline">
+          <SimpleCodeBlock metastring="" className="font-xs bash">
+            {user.id}
+          </SimpleCodeBlock>
+          <div>...</div>
+        </div>
       </Table.td>
       <Table.td className="text-right">
         <UserDropdown user={user} canRemoveUser={canRemoveUser} />

@@ -84,12 +84,17 @@ export interface IMetaStore {
 
   /** The methods below involve several contexts due to the UI flow of the
    *  dashboard and hence do not sit within their own stores */
-  createColumn: (payload: CreateColumnPayload, foreignKey?: Partial<PostgresRelationship>) => any
+  createColumn: (
+    payload: CreateColumnPayload,
+    selectedTable: PostgresTable,
+    foreignKey?: Partial<PostgresRelationship>
+  ) => any
   updateColumn: (
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>
+    foreignKey?: Partial<PostgresRelationship>,
+    skipPKCreation?: boolean
   ) => any
   duplicateTable: (
     payload: any,
@@ -314,10 +319,33 @@ export default class MetaStore implements IMetaStore {
     }
   }
 
-  async createColumn(payload: CreateColumnPayload, foreignKey?: Partial<PostgresRelationship>) {
+  async createColumn(
+    payload: CreateColumnPayload,
+    selectedTable: PostgresTable,
+    foreignKey?: Partial<PostgresRelationship>
+  ) {
     try {
-      const column: any = await this.columns.create(payload)
+      // Once pg-meta supports composite keys, we can remove this logic
+      const { isPrimaryKey, ...formattedPayload } = payload
+
+      const column: any = await this.columns.create(formattedPayload)
       if (column.error) throw column.error
+
+      // Firing createColumn in createTable will bypass this block
+      if (isPrimaryKey) {
+        // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
+        // @ts-ignore
+        const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
+
+        if (existingPrimaryKeys.length > 0) {
+          const removePK = await this.removePrimaryKey(column.schema, column.table)
+          if (removePK.error) throw removePK.error
+        }
+
+        const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
+        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
+        if (addPK.error) throw addPK.error
+      }
 
       if (!isUndefined(foreignKey)) {
         const relation: any = await this.addForeignKey(foreignKey)
@@ -332,16 +360,33 @@ export default class MetaStore implements IMetaStore {
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>
+    foreignKey?: Partial<PostgresRelationship>,
+    skipPKCreation?: boolean
   ) {
     try {
-      const column: any = await this.columns.update(id, payload)
+      const { isPrimaryKey, ...formattedPayload } = payload
+      const column: any = await this.columns.update(id, formattedPayload)
       if (column.error) throw column.error
 
       const originalColumn = find(selectedTable.columns, { id })
       const existingForeignKey = find(selectedTable.relationships, {
         source_column_name: originalColumn!.name,
       })
+
+      if (!skipPKCreation && isPrimaryKey !== undefined) {
+        const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
+
+        // Primary key is getting updated for the column
+        if (existingPrimaryKeys.length > 0) {
+          const removePK = await this.removePrimaryKey(column.schema, column.table)
+          if (removePK.error) throw removePK.error
+        }
+        const primaryKeyColumns = isPrimaryKey
+          ? existingPrimaryKeys.concat([column.name])
+          : existingPrimaryKeys.filter((x) => x !== column.name)
+        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
+        if (addPK.error) throw addPK.error
+      }
 
       // For updating of foreign key relationship, we remove the original one by default
       // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
@@ -623,11 +668,11 @@ export default class MetaStore implements IMetaStore {
           ...column,
           isPrimaryKey: false,
         })
-        await this.createColumn(columnPayload, column.foreignKey)
+        await this.createColumn(columnPayload, updatedTable, column.foreignKey)
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
         if (originalColumn) {
-          const columnPayload = generateUpdateColumnPayload(originalColumn, column)
+          const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
           const originalForeignKey = find(table.relationships, {
             source_schema: originalColumn.schema,
             source_table_name: originalColumn.table,
@@ -640,11 +685,13 @@ export default class MetaStore implements IMetaStore {
               category: 'loading',
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
+            const skipPKCreation = true
             const res: any = await this.updateColumn(
               column.id,
               columnPayload,
               updatedTable,
-              column.foreignKey
+              column.foreignKey,
+              skipPKCreation
             )
             if (res?.error) {
               hasError = true
