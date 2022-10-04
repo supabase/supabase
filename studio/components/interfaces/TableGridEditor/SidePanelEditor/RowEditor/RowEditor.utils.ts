@@ -12,7 +12,6 @@ export const generateRowFields = (
   table: PostgresTable,
   isNewRecord?: boolean
 ): RowField[] => {
-  console.log('generateRowFields', row)
   const { relationships, primary_keys } = table
   // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
