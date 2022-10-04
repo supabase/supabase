@@ -19,10 +19,10 @@ const FunctionsPage: NextPageWithLayout = () => {
   const canReadFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       fetchFunctions()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   const fetchFunctions = async () => {
     meta.functions.load()
