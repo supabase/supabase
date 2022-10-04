@@ -16,8 +16,8 @@ fake.add_provider(internet)
 @allure.severity(allure.severity_level.BLOCKER)
 @allure.suite("authentication")
 @allure.feature("authentication")
-def test_new_users(db):
-    """When user sign up then he should not be logged in until he confirms his email"""
+def test_new_users_not_confirmed(db):
+    """When user sign up then he should not be able to log in until he is confirmed"""
     supabase = create_supabase_anonymous_client()
     fake_user = {
         'username': fake.user_name(),
@@ -30,18 +30,12 @@ def test_new_users(db):
     assert user is not None
     assert user.email == fake_user["email"].lower()
 
-    token = get_confirmation_token(db, user.id)
-    assert verify(token).ok is True
+    try:
+      session = sign_in_valid(
+          supabase, fake_user["email"], fake_user["password"])
+    except:
+      assert supabase.auth.session() is None
 
-    session = sign_in_valid(
-        supabase, fake_user["email"], fake_user["password"])
-    assert session is not None
-
-    data = insert_profile(supabase, fake_user["username"], user.id)
-    assert len(data.data) > 0
-
-    check_log_out(supabase)
-    assert supabase.auth.session() is None
 
 
 @allure.severity(allure.severity_level.BLOCKER)

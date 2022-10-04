@@ -1,6 +1,7 @@
 pytest
-allure
+allure-pytest
 requests
 faker
 supabase
 psycopg
+pytest-dotenv
