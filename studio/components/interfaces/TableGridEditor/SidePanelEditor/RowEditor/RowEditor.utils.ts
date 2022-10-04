@@ -12,6 +12,7 @@ export const generateRowFields = (
   table: PostgresTable,
   isNewRecord?: boolean
 ): RowField[] => {
+  console.log('generateRowFields', row)
   const { relationships, primary_keys } = table
   // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
@@ -24,7 +25,7 @@ export const generateRowFields = (
       ? nowDateTimeValue(column.format)
       : DATETIME_TYPES.includes(column.format)
       ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
-      : parseValue(row[column.name], column.format, column.data_type)
+      : parseValue(row[column.name], column.format)
 
     const foreignKey = find(relationships, (relationship) => {
       return (
@@ -92,7 +93,7 @@ export const generateRowFieldsWithoutColumnMeta = (row: any): RowField[] => {
   })
 }
 
-const parseValue = (originalValue: string, format: string, dataType: string) => {
+const parseValue = (originalValue: string, format: string) => {
   try {
     if (originalValue === null || originalValue.length === 0) {
       return originalValue
@@ -103,6 +104,7 @@ const parseValue = (originalValue: string, format: string, dataType: string) => 
     } else if (typeof originalValue === 'boolean') {
       return (originalValue as any).toString()
     }
+    return originalValue
   } catch (error) {
     return originalValue
   }
