@@ -105,7 +105,12 @@ const InputWithSuggestions: FC<Props> = ({
             >
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <Button as="span" type="default" icon={<IconList strokeWidth={1.5} />}></Button>
+                  <Button
+                    as="span"
+                    type="default"
+                    className="!px-1 mr-1"
+                    icon={<IconList strokeWidth={1.5} />}
+                  />
                 </Tooltip.Trigger>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
