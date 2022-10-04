@@ -30,7 +30,7 @@ const PolicyRow: FC<Props> = ({
       <div className="flex grow flex-col truncate space-y-1">
         <div className="flex items-center space-x-4">
           <p className="text-scale-1000 font-mono text-xs">{policy.command}</p>
-          <p className="text-scale-1200 max-w-xs truncate text-sm">{policy.name}</p>
+          <p className="text-scale-1200 max-w-xs text-sm">{policy.name}</p>
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-scale-1000 text-sm">Applied to:</p>
