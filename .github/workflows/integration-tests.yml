@@ -47,7 +47,7 @@ jobs:
           npm run docker:up
 
       - name: Run Test
-        run: npm run test
+        run: npm run test:local
 
       - name: Stop infrastructure
         if: always()
