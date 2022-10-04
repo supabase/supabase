@@ -220,6 +220,7 @@ const sidebars = {
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
+        'guides/integrations/polyscale',
         'guides/integrations/prisma',
         'guides/integrations/sequin',
         'guides/integrations/snaplet',
