@@ -128,7 +128,7 @@ const Column: FC<Props> = ({
             }`}
             suggestions={suggestions}
             suggestionsHeader="Suggested expressions"
-            suggestionsWidth={410}
+            suggestionsTooltip="Suggested expressions"
             onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
               onUpdateColumn({ defaultValue: suggestion.value })
