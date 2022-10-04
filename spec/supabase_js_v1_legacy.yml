@@ -496,9 +496,9 @@ pages:
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
             'user@email.com'
           )
-            
+
           /**
-           * Step 2: Once the user is redirected back to your application, 
+           * Step 2: Once the user is redirected back to your application,
            * ask the user to reset their password.
            */
           useEffect(() => {
@@ -508,10 +508,10 @@ pages:
                 const { data, error } = await supabase.auth.update({
                   password: newPassword,
                 })
-                  
+
                 if (data) alert("Password updated successfully!")
                 if (error) alert("There was an error updating your password.")
-              } 
+              }
             })
           }, [])
           ```
@@ -987,6 +987,20 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .rpc('hello_world', {}, { count: 'exact' })
+          ```
+
+    privileges:
+      description: |
+        By default, functions can be executed by any role. You can restrict this by
+        sql: |
+          ```sql
+            ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+          ```
+        Then, you can choose which roles can execute functions
+        sql: |
+          ```sql
+            GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
+            GRANT EXECUTE ON FUNCTION hello_world TO service_role;
           ```
 
   subscribe():
