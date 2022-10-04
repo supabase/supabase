@@ -108,6 +108,7 @@ module.exports = ui({
               backgroundColor: theme('colors.scale[400]'),
               border: '1px solid ' + theme('colors.scale[500]'),
               borderRadius: theme('borderRadius.lg'),
+              wordBreak: 'break-all',
             },
             a: {
               transition: 'box-shadow 0.1s ease-in-out',
