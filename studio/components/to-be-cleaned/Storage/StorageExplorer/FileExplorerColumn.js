@@ -25,6 +25,7 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }) => {
       leave="transition ease-in duration-75"
       leaveFrom="transform opacity-100"
       leaveTo="transform opacity-0"
+      className="h-full w-full absolute top-0"
     >
       <div
         onDragLeave={onDragLeave}
@@ -35,10 +36,10 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }) => {
         {!folderIsEmpty && (
           <div
             className="w-3/4 h-32 border-2 border-dashed border-gray-400 rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
-            style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
           >
             <IconUpload className="text-white pointer-events-none" size={20} strokeWidth={2} />
-            <p className="text-center text-sm mt-2 pointer-events-none">
+            <p className="text-center text-sm  text-white mt-2 pointer-events-none">
               Drop your files to upload to this folder
             </p>
           </div>
