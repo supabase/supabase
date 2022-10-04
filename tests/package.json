@@ -6,6 +6,8 @@
     "docker:up": "cd ../docker && ENABLE_EMAIL_AUTOCONFIRM=true docker-compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml up -d",
     "docker:down": "cd ../docker && docker-compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml down",
     "test": "jest",
+    "test:local": "jest --testNamePattern '^((?!\\[skip-local\\]).)*$'",
+    "test:prod": "jest --testNamePattern '^((?!\\[skip-prod\\]).)*$'",
     "allure:generate": "rm -rf allure-report && node_modules/allure-commandline/bin/allure generate",
     "allure:serve": "node_modules/allure-commandline/bin/allure serve",
     "test:report": "npm run allure:generate && npm run allure:serve",
@@ -15,7 +17,7 @@
   "license": "MIT",
   "devDependencies": {
     "@faker-js/faker": "^6.1.2",
-    "@supabase/supabase-js": "^1.35.6",
+    "@supabase/supabase-js": "^2.0.0-rc.10",
     "@testdeck/jest": "^0.2.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.24",

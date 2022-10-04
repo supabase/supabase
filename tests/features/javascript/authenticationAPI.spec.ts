@@ -1,8 +1,8 @@
-import { params, suite, test } from '@testdeck/jest'
+import { params, retries, suite, test } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
 
-import { Session, SupabaseClient, User, UserAttributes } from '@supabase/supabase-js'
+import { AdminUserAttributes, AuthError, SupabaseClient, UserResponse } from '@supabase/supabase-js'
 
 import { FEATURE } from '../templates/enums'
 import { description, feature, log, severity, step } from '../../.jest/jest-custom-reporter'
@@ -13,105 +13,141 @@ class AuthenticationAPI extends Hooks {
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.NORMAL)
   @description('When you create user then it has to be in auth db schema')
-  @test.skip
+  @test
   async 'create user'() {
-    // todo
+    const { user, error } = await this.createUserAsAdmin()
+    expect(error).toBeNull()
+    expect(user).not.toBeNull()
   }
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.NORMAL)
   @description('When you create user then he can sign in')
-  @test.skip
+  @test
   async 'create user can login'() {
-    // todo
+    const { user, error } = await this.createUserAsAdmin()
+    expect(error).toBeNull()
+    expect(user).not.toBeNull()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+
+    const {
+      data: { user: createdUser },
+      error: getErr,
+    } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: user.password,
+    })
+    expect(getErr).toBeNull()
+    expect(createdUser).not.toBeNull()
+    expect(createdUser.id).toBe(user.id)
   }
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.CRITICAL)
   @description('When you try to create user with anon key then you should get error')
-  @test.skip
+  @test
   async 'create user with anon key'() {
-    // todo
+    const fakeUser = {
+      email: faker.internet.exampleEmail(),
+      password: faker.internet.password(),
+      email_confirm: true,
+    }
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+
+    const {
+      error,
+      data: { user },
+    } = await supabase.auth.admin.createUser(fakeUser)
+    expect(user).toBeNull()
+    expect(error).not.toBeNull()
+  }
+
+  @feature(FEATURE.AUTHENTICATION)
+  @severity(Severity.CRITICAL)
+  @description('When you try to create user as logged in user then you should get error')
+  @test
+  async 'create user with logged in user'() {
+    const { user } = await this.createUserAsAdmin()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: user.password,
+    })
+    expect(signInError).toBeNull()
+
+    const fakeUser = {
+      email: faker.internet.exampleEmail(),
+      password: faker.internet.password(),
+    }
+    const {
+      error,
+      data: { user: newUser },
+    } = await supabase.auth.admin.createUser(fakeUser)
+    expect(newUser).toBeNull()
+    expect(error).not.toBeNull()
   }
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.NORMAL)
   @description('When you list users then you should get all users')
-  @test.skip
+  @test
   async 'list users'() {
-    // todo
+    const { user: user1 } = await this.createUserAsAdmin()
+    const { user: user2 } = await this.createUserAsAdmin()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const {
+      data: { users },
+      error,
+    } = await supabase.auth.admin.listUsers()
+
+    expect(error).toBeNull()
+    expect(users).not.toBeNull()
+    expect(users.length).toBeGreaterThanOrEqual(2)
+    expect(users.map((u) => u.id)).toEqual(expect.arrayContaining([user1.id, user2.id]))
   }
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.CRITICAL)
   @description('When you try to list user with anon key then you should get error')
-  @test.skip
+  @test
   async 'list users with anon key'() {
-    // todo
+    await this.createUserAsAdmin()
+    await this.createUserAsAdmin()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    const {
+      data: { users },
+      error,
+    } = await supabase.auth.admin.listUsers()
+
+    expect(error).not.toBeNull()
+    expect(users).toHaveLength(0)
   }
 
   @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you sign up user with email then he should be able to login')
-  @test.skip
-  async 'sign up with email'() {
-    // todo
-  }
+  @severity(Severity.CRITICAL)
+  @description('When you try to list user as logged in user then you should get error')
+  @test
+  async 'list users as logged in user'() {
+    const { user } = await this.createUserAsAdmin()
+    await this.createUserAsAdmin()
 
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you sign in user with email then he should be able to update his profile')
-  @test.skip
-  async 'sign in with email'() {
-    // todo
-  }
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: user.password,
+    })
+    expect(signInError).toBeNull()
 
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you sign up user with phone then he should be able to login')
-  @test.skip
-  async 'sign up with phone'() {
-    // todo
-  }
-
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you sign in user with phone then he should be able to update his profile')
-  @test.skip
-  async 'sign in with phone'() {
-    // todo
-  }
-
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you send magic link then email should be sent to user')
-  @test.skip
-  async 'send magic link'() {
-    // todo
-  }
-
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you send invite then corresponding email should be sent to user')
-  @test.skip
-  async 'send invite link'() {
-    // todo
-  }
-
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you send reset password then corresponding email should be sent to user')
-  @test.skip
-  async 'send reset password'() {
-    // todo
-  }
-
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you sign out user then current session has to be removed')
-  @test.skip
-  async 'sign out'() {
-    // todo
+    const {
+      data: { users },
+      error,
+    } = await supabase.auth.admin.listUsers()
+    expect(error).not.toBeNull()
+    expect(users).toHaveLength(0)
   }
 
   @feature(FEATURE.AUTHENTICATION)
@@ -131,78 +167,153 @@ class AuthenticationAPI extends Hooks {
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.NORMAL)
-  @description('When you get user then currently logined user date has to be returned')
-  @test.skip
+  @description('When you get user by id he has to be returned')
+  @test
   async 'get user'() {
-    // todo
+    const { user } = await this.createUserAsAdmin()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const {
+      data: { user: foundUser },
+      error,
+    } = await supabase.auth.admin.getUserById(user.id)
+
+    expect(error).toBeNull()
+    expect(foundUser).not.toBeNull()
+    expect(foundUser.id).toBe(user.id)
+    expect(foundUser.email).toBe(user.email)
   }
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.NORMAL)
-  @description('When you update user then currently logined user date has to be updated')
-  @test.skip
+  @description('When you update user then this user has to be updated')
+  @test
   async 'update user'() {
-    // todo
+    const { user } = await this.createUserAsAdmin()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+
+    const updatedUser = {
+      email: faker.internet.exampleEmail(),
+      phone: faker.phone.phoneNumber('!#!##!######'),
+    }
+    let {
+      data: { user: resultUser },
+      error,
+    } = await this.updateWithRetries(supabase, user.id, updatedUser)
+
+    expect(error).toBeNull()
+    expect(resultUser).not.toBeNull()
+    expect(resultUser.id).toBe(user.id)
+    expect(resultUser.email).toBe(updatedUser.email)
+    expect(resultUser.phone).toBe(updatedUser.phone)
   }
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.NORMAL)
-  @description('When you delete user then this user has to be deleted and unable to login')
-  @test.skip
+  @description('When you delete user then this user has to be removed')
+  @test
   async 'delete user'() {
-    // todo
+    const { user } = await this.createUserAsAdmin()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const {
+      data: { user: deletedUser },
+      error,
+    } = await supabase.auth.admin.deleteUser(user.id)
+    expect(error).toBeNull()
+
+    const {
+      data: { user: foundUser },
+      error: getError,
+    } = await supabase.auth.admin.getUserById(user.id)
+    expect(getError).not.toBeNull()
+    expect(foundUser).toBeNull()
   }
 
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.CRITICAL)
   @description('When you delete user with anon key you have to receive an error')
-  @test.skip
+  @test
   async 'delete user with anon key'() {
-    // todo
+    const { user } = await this.createUserAsAdmin()
+    const { user: villain } = await this.createUserAsAdmin()
+
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    await supabase.auth.signInWithPassword({
+      email: villain.email,
+      password: villain.password,
+    })
+
+    const {
+      data: { user: deletedUser },
+      error,
+    } = await supabase.auth.admin.deleteUser(user.id)
+
+    expect(error).not.toBeNull()
+    expect(deletedUser).toBeNull()
+
+    const sbAdmin = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
+    const {
+      data: { user: foundUser },
+      error: getError,
+    } = await sbAdmin.auth.admin.getUserById(user.id)
+    expect(getError).toBeNull()
+    expect(foundUser).not.toBeNull()
+    expect(foundUser.email).toBe(user.email)
   }
 
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you change auth cookie then all new requests should have new JWT')
-  @test.skip
-  async 'set auth cookie'() {
-    // todo
-  }
+  @step('Create a user as admin')
+  async createUserAsAdmin(data: AdminUserAttributes = undefined): Promise<{
+    user: {
+      email: string
+      password: string
+      username: string
+      id: string
+    }
+    error: AuthError
+  }> {
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
 
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you refreshes session then user and session have to be updated')
-  @test.skip
-  async 'refresh session'() {
-    // todo
-  }
+    let fakeUser: AdminUserAttributes
+    if (data) {
+      fakeUser = data
+    } else {
+      fakeUser = {
+        email: faker.internet.exampleEmail(),
+        password: faker.internet.password(),
+        email_confirm: true,
+      }
+    }
 
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you get user by cookie then the corresponding user data has to be returned')
-  @test.skip
-  async 'get user by cookie'() {
-    // todo
-  }
+    const {
+      error,
+      data: { user },
+    } = await supabase.auth.admin.createUser(fakeUser)
 
-  @feature(FEATURE.AUTHENTICATION)
-  @severity(Severity.NORMAL)
-  @description('When you generate link then the right link has to be returned')
-  @params.skip({ type: 'signup', options: {}, email: 'todo' })
-  @params.skip({
-    type: 'signup',
-    options: {
-      redirectTo: 'todo',
-      password: 'todo',
-      data: {
-        /* todo */
+    return {
+      error: error,
+      user: {
+        email: user?.email,
+        password: fakeUser.password,
+        username: faker.internet.userName(),
+        id: user?.id,
       },
-    },
-    email: 'todo',
-  })
-  @params.skip({ type: 'magiclink', options: {}, email: 'todo' })
-  // ...
-  async 'generate link'() {
-    // todo
+    }
+  }
+
+  @step('Update user with retries')
+  async updateWithRetries(supabase: SupabaseClient, uid: string, attributes: AdminUserAttributes) {
+    let result: UserResponse
+    for (let i = 1; i < 5; i++) {
+      result = await supabase.auth.admin.updateUserById(uid, attributes)
+
+      if (result.error && result.error.name === 'AuthRetryableFetchError') {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * i))
+      } else {
+        break
+      }
+    }
+    return result
   }
 }
