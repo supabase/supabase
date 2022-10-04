@@ -1838,10 +1838,8 @@ pages:
   rpc():
     title: 'Postgres functions: rpc()'
     description: |
-      You can call Postgres functions as a "Remote Procedure Call".
-
-      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
-      It's especially useful when the logic rarely changes - like password resets and updates.
+      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
+      Functions are useful when the logic rarely changes—like for password resets and updates.
 
       ```sql
       create or replace function hello_world() returns text as $$
@@ -1849,6 +1847,17 @@ pages:
       $$ language sql;
       ```
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
+    notes: |
+      By default, functions can be executed by any role.
+      You can restrict this by altering the default prvivileges and then choosing which roles can execute functions.
+
+      ```sql
+      ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+
+      -- Choose which roles can execute functions
+      GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
+      GRANT EXECUTE ON FUNCTION hello_world TO service_role;
+      ```
     examples:
       - name: Call a Postgres function without arguments
         description: |
