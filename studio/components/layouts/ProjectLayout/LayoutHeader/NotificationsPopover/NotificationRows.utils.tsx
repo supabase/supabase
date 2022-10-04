@@ -47,16 +47,14 @@ export const formatNotificationText = (project: Project, notification: Notificat
     } else if (upgrade_type === 'schema-migration') {
       const { name, version_to } = additional as ExtensionsUpgrade
       return (
-        <div>
-          <p className="text-sm">
-            A new schema migration is available for your project "{projectName}".
-          </p>
+        <div className="text-sm space-y-1">
+          <p>A new schema migration is available for your project "{projectName}".</p>
           <ol className="list-disc pl-6">
-            <li key={projectName}>
+            <li>
               <div className="flex items-center space-x-1">
-                <p className="text-sm">{name}</p>
+                <p>{name}</p>
                 <IconArrowRight size={12} strokeWidth={2} />
-                <p className="text-sm">{version_to}</p>
+                <p>{version_to}</p>
               </div>
             </li>
           </ol>
@@ -84,10 +82,10 @@ export const formatNotificationText = (project: Project, notification: Notificat
         </p>
       )
     } else if (upgrade_type === 'schema-migration') {
-      const { name } = additional as ExtensionsUpgrade
+      const { version_to } = additional
       return (
         <p className="text-sm">
-          The schema migration for "{name}" has been successfully applied to your project "
+          The schema migration to "{version_to}" has been successfully applied to your project "
           {projectName}".
         </p>
       )
@@ -155,7 +153,7 @@ export const formatNotificationCTAText = (availableActions: Action[]) => {
             `This patch will be automatically applied after ${new Date(
               action.deadline
             ).toLocaleDateString()} `}
-          {action.reason && (
+          {action.deadline && action.reason && (
             <Link href={action.reason}>
               <a
                 target="_blank"
