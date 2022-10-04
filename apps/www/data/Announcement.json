@@ -1,7 +1,7 @@
 {
-  "show": false,
-  "text": "Community Day & One More Thing!",
-  "cta": "Learn more",
+  "show": true,
+  "text": "Auth UI",
+  "cta": "Vote now",
   "link": "/launch-week",
-  "badge": "Day 5"
+  "badge": "🚀 Product Hunt Launch"
 }
