@@ -97,10 +97,7 @@ const NotificationsPopover: FC<Props> = () => {
 
   const onConfirmProjectApplyMigration = async () => {
     if (!projectToApplyMigration) return
-    const res = await post(
-      `${API_URL}/platform/database/${projectToApplyMigration.ref}/owner-reassign`,
-      {}
-    )
+    const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/owner-reassign`, {})
     if (!res.error) {
       app.projects.fetchDetail(projectToApplyMigration.ref)
       ui.setNotification({
@@ -120,7 +117,7 @@ const NotificationsPopover: FC<Props> = () => {
   const onConfirmProjectRollbackMigration = async () => {
     if (!projectToRollbackMigration) return
     const res = await delete_(
-      `${API_URL}/platform/database/${projectToRollbackMigration.ref}/owner-reassign`,
+      `${API_URL}/database/${projectToRollbackMigration.ref}/owner-reassign`,
       {}
     )
     if (!res.error) {
@@ -136,12 +133,13 @@ const NotificationsPopover: FC<Props> = () => {
         message: `Failed to roll back migration: ${res.error.message}`,
       })
     }
+    setProjectToRollbackMigration(undefined)
   }
 
   const onConfirmProjectFinalizeMigration = async () => {
     if (!projectToFinalizeMigration) return
     const res = await patch(
-      `${API_URL}/platform/database/${projectToFinalizeMigration.ref}/owner-reassign`,
+      `${API_URL}/database/${projectToFinalizeMigration.ref}/owner-reassign`,
       {}
     )
     if (!res.error) {
@@ -157,6 +155,7 @@ const NotificationsPopover: FC<Props> = () => {
         message: `Failed to finalize migration: ${res.error.message}`,
       })
     }
+    setProjectToFinalizeMigration(undefined)
   }
 
   return (
