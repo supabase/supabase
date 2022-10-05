@@ -53,7 +53,7 @@ const Filter: FC = () => {
       <div className="space-y-2">
         {formattedFilters.map((filter, index) => (
           <FilterRow
-            key={`filter-${(filters as string[])[index]}-${[index]}`}
+            key={`filter-${filter.column}-${[index]}`}
             filter={filter}
             filterIdx={index}
           />
