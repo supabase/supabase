@@ -943,17 +943,6 @@ pages:
       $$ language sql;
       ```
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
-    notes: |
-      By default, functions can be executed by any role.
-      You can restrict this by altering the default prvivileges and then choosing which roles can execute functions.
-
-      ```sql
-      ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
-
-      -- Choose which roles can execute functions
-      GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
-      GRANT EXECUTE ON FUNCTION hello_world TO service_role;
-      ```
     examples:
       - name: Call a Postgres function without arguments
         isSpotlight: true
