@@ -238,9 +238,9 @@ function BlogPostPage(props: any) {
                     <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
                   </div>
                   <div className="flex flex-col gap-3 pt-6 md:flex-row md:gap-0 lg:gap-3">
-                    {author.map((author: any) => {
+                    {author.map((author: any, i: number) => {
                       return (
-                        <div className="mr-4 w-max">
+                        <div className="mr-4 w-max" key={i}>
                           <Link href={author.author_url}>
                             <a className="cursor-pointer">
                               <div className="flex items-center gap-3">
@@ -348,8 +348,8 @@ function BlogPostPage(props: any) {
                         <p className="text-scale-1200 text-sm">Related articles</p>
                       </div>
                       <div className="space-y-3">
-                        {props.relatedPosts.map((post: any) => (
-                          <Link href={`${post.path}`} as={`${post.path}`}>
+                        {props.relatedPosts.map((post: any, i: number) => (
+                          <Link href={`${post.path}`} as={`${post.path}`} key={i}>
                             <div>
                               <p className="cursor-pointer">
                                 <div className="flex gap-2">

@@ -55,7 +55,6 @@ const ColumnEditor: FC<Props> = ({
   updateEditorDirty = () => {},
 }) => {
   const isNewRecord = isUndefined(column)
-  const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
   const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})

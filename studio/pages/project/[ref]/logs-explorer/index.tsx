@@ -207,13 +207,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                 <Modal.Content>
                   <div className="space-y-6">
                     <Input layout="horizontal" label="Name" id="name" />
-                    <Input.TextArea
-                      layout="horizontal"
-                      labelOptional="Optional"
-                      label="Description"
-                      id="description"
-                      rows={2}
-                    />
+                    <div className="text-area-text-sm">
+                      <Input.TextArea
+                        layout="horizontal"
+                        labelOptional="Optional"
+                        label="Description"
+                        id="description"
+                        rows={2}
+                      />
+                    </div>
                   </div>
                 </Modal.Content>
               </div>

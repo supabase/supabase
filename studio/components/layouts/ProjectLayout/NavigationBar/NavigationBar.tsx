@@ -14,8 +14,8 @@ interface Props {}
 
 const NavigationBar: FC<Props> = ({}) => {
   const router = useRouter()
-  const { ui } = useStore()
-  const projectRef = ui.selectedProjectRef as string
+  const { selectedProjectRef, ui } = useStore()
+  const projectRef = selectedProjectRef ?? '[ref]'
   const projectBaseInfo = ui.selectedProjectBaseInfo
 
   const ongoingIncident = useFlag('ongoingIncident')

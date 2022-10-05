@@ -23,10 +23,7 @@ const GeneralSettings = observer(() => {
   const PageState: any = useContext(PageContext)
 
   const formId = 'org-general-settings'
-  const initialValues = {
-    name: PageState.organization.name,
-    billing_email: PageState.organization?.billing_email ?? '',
-  }
+  const initialValues = { name: PageState.organization.name }
 
   const enablePermissions = useFlag('enablePermissions')
 
@@ -47,17 +44,22 @@ const GeneralSettings = observer(() => {
     }
 
     setSubmitting(true)
-    const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, values)
+
+    const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, {
+      ...values,
+      billing_email: PageState.organization?.billing_email ?? '',
+    })
+
     if (response.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update organization: ${response.error.message}`,
       })
     } else {
-      const { name, billing_email } = response
+      const { name } = response
       resetForm({
-        values: { name, billing_email },
-        initialValues: { name, billing_email },
+        values: { name },
+        initialValues: { name },
       })
 
       PageState.onOrgUpdated(response)
@@ -76,10 +78,7 @@ const GeneralSettings = observer(() => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
           useEffect(() => {
-            const values = {
-              name: PageState.organization.name,
-              billing_email: PageState.organization?.billing_email ?? '',
-            }
+            const values = { name: PageState.organization.name }
             resetForm({ values, initialValues: values })
           }, [PageState.organization.slug])
 
