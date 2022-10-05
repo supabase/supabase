@@ -1316,7 +1316,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/next/migration-guide',
-    destination: '/docs/reference/javascript/next/release-notes',
+    destination: '/docs/reference/javascript/release-notes',
   },
   {
     permanent: true,
