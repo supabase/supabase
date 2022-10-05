@@ -7,14 +7,6 @@ hide_table_of_contents: true
 
 # Supabase JavaScript Library
 
-:::note
-
-You're viewing the Supabase docs for the next version of our library which is not yet released.
-
-Refer to the `v1` docs for a stable release.
-
-:::
-
 This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`.
 
 You can use the `supabase-js` library to:
