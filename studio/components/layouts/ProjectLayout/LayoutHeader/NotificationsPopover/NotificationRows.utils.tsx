@@ -9,7 +9,7 @@ import {
   ServiceUpgrade,
   ViolatedLimit,
 } from '@supabase/shared-types/out/notifications'
-import { IconArrowRight, IconExternalLink } from '@supabase/ui'
+import { IconArrowRight, IconExternalLink } from 'ui'
 import Link from 'next/link'
 
 export const formatNotificationText = (project: Project, notification: Notification) => {
