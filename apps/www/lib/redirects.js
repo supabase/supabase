@@ -255,7 +255,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/auth-signin',
-    destination: '/docs/reference/javascript/auth-signin',
+    destination: '/docs/reference/javascript/v1/auth-signin',
   },
   {
     permanent: false,
