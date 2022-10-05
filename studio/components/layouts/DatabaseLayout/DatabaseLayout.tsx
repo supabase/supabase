@@ -24,7 +24,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       // Eventually should only load the required stores based on the pages
       meta.schemas.load()
       meta.tables.load()
@@ -36,7 +36,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
       backups.load()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   // Optimization required: load logic should be at the page level
   // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data

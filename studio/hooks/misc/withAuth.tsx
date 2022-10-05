@@ -64,7 +64,9 @@ export function withAuth<T>(
 
     useEffect(() => {
       if (!isLoading && router.isReady) {
-        rootStore.setProjectRef(ref ? String(ref) : undefined)
+        if (ref) {
+          rootStore.setProjectRef(Array.isArray(ref) ? ref[0] : ref)
+        }
         rootStore.setOrganizationSlug(slug ? String(slug) : undefined)
       }
     }, [isLoading, router.isReady, ref, slug])
