@@ -176,7 +176,7 @@ export const formatNotificationCTAText = (
           return (
             <p className="text-sm space-x-1">
               {action.deadline &&
-                `This patch has been applied on ${dayjs(
+                `This patch was applied on ${dayjs(
                   new Date(ownerReassignStatus?.migrated_at ?? 0)
                 ).format('DD MMM YYYY, HH:mma')}`}
             </p>
