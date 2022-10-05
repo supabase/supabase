@@ -17,9 +17,7 @@ Setting up Notion logins for your application consists of 3 parts:
 - Retrieve your OAuth client ID and OAuth client secret and add them to your [Supabase Project](https://app.supabase.com)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Steps
-
-### Create your notion integration
+## Create your notion integration
 
 - Go to [developers.notion.com](https://developers.notion.com/).
 - Click "View my integrations" and login.
@@ -33,7 +31,7 @@ Setting up Notion logins for your application consists of 3 parts:
 
 ![notion.so](/img/guides/auth-notion/notion-developer.png)
 
-### Add the redirect uri
+## Add the redirect URI
 
 - After selecting "Public integration", you should see an option to add "Redirect URIs".
 
@@ -58,7 +56,7 @@ Your redirect uri should look like the following: `https://<project-ref>.supabas
   />
 </video>
 
-### Add your Notion credentials into your Supabase Project
+## Add your Notion credentials into your Supabase Project
 
 - Once you've created your notion integration, you should be able to retrieve the "OAuth client ID" and "OAuth client secret" from the "OAuth Domain and URIs" tab.
 
@@ -71,27 +69,19 @@ Your redirect uri should look like the following: `https://<project-ref>.supabas
 - Enter the "OAuth client ID" and "OAuth client secret" obtained in the `client id` and `client secret` fields.
 - Click `Save`
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'notion',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `notion` as the `provider`:
 
 ```js
 async function signInWithNotion() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'notion',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {
