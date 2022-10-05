@@ -9,13 +9,14 @@ import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { generateOtherRoutes, generateProductRoutes } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import { useParams } from 'hooks/misc/useParams'
 
 interface Props {}
 
 const NavigationBar: FC<Props> = ({}) => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
   const { ui } = useStore()
-  const projectRef = ui.selectedProjectRef as string
   const projectBaseInfo = ui.selectedProjectBaseInfo
 
   const ongoingIncident = useFlag('ongoingIncident')

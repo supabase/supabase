@@ -120,7 +120,11 @@ const SidePanelEditor: FC<Props> = ({
     resolve: any
   ) => {
     const response = isNewRecord
-      ? await meta.createColumn(payload as CreateColumnPayload, foreignKey)
+      ? await meta.createColumn(
+          payload as CreateColumnPayload,
+          selectedTable as PostgresTable,
+          foreignKey
+        )
       : await meta.updateColumn(
           configuration.columnId as string,
           payload as UpdateColumnPayload,

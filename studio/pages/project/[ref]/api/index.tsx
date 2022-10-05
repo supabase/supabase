@@ -79,7 +79,6 @@ const DocView: FC<any> = observer(({}) => {
     PermissionAction.READ,
     'service_api_keys.service_role_key'
   )
-  console.log('canReadServiceKey', canReadServiceKey)
 
   if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
 

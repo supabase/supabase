@@ -20,10 +20,10 @@ const UsersList = ({}) => {
           <>
             <Table.th>Email</Table.th>
             <Table.th>Phone</Table.th>
-            <Table.th className="hidden 2xl:table-cell">Provider</Table.th>
-            <Table.th className="hidden 2xl:table-cell">Created</Table.th>
-            <Table.th className="hidden xl:table-cell">Last Sign In</Table.th>
-            <Table.th className="hidden lg:table-cell">User UID</Table.th>
+            <Table.th className="table-cell">Provider</Table.th>
+            <Table.th className="table-cell">Created</Table.th>
+            <Table.th className="table-cell">Last Sign In</Table.th>
+            <Table.th className="table-cell">User UID</Table.th>
             <Table.th></Table.th>
           </>
         }

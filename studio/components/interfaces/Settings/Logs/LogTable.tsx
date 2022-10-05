@@ -153,7 +153,7 @@ const LogTable = ({
   }, [stringData])
 
   const LogsExplorerTableHeader = () => (
-    <div className="w-full bg-scale-100 dark:bg-scale-300 rounded-tl rounded-tr border-t border-l border-r flex items-center justify-between px-5 py-2">
+    <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-scale-100 px-5 py-2 dark:bg-scale-300">
       <div className="flex items-center gap-2">
         {data && data.length ? (
           <>
@@ -194,7 +194,7 @@ const LogTable = ({
     }
 
     return (
-      <div className="flex justify-center px-5 w-1/2">
+      <div className="flex w-1/2 justify-center px-5">
         <Alert variant="danger" title="Sorry! An error occured when fetching data." withIcon>
           <Renderer {...childProps} />
         </Alert>
@@ -203,11 +203,11 @@ const LogTable = ({
   }
 
   const renderNoResultAlert = () => (
-    <div className="flex flex-col items-center gap-6 text-center mt-16 opacity-100 scale-100 justify-center">
+    <div className="mt-16 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
       <div className="flex flex-col gap-1">
-        <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center"></div>
-        <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center">
-          <div className="absolute right-1 -bottom-4">
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
+          <div className="absolute right-1 -bottom-4 text-scale-1100">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -239,12 +239,12 @@ const LogTable = ({
         style={{ maxHeight }}
       >
         {!queryType && <LogsExplorerTableHeader />}
-        <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
+        <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
             flex-1 flex-grow
-            ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'} 
+            ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'}
           `}
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
@@ -254,7 +254,7 @@ const LogTable = ({
             }}
             noRowsFallback={
               !isLoading ? (
-                <div className="transition-all duration-500 delay-200 py-4 flex w-full h-full justify-center items-center mx-auto space-y-12">
+                <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
                   {!error && renderNoResultAlert()}
                   {error && renderErrorAlert()}
                 </div>

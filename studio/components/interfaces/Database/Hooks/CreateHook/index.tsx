@@ -442,6 +442,10 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
                       )}
                     </div>
                   </div>
+                  <p className="mx-6 mt-12 text-sm text-scale-1100">
+                    <strong>Note:</strong> You can only edit a webhook's name and mode. To change
+                    other settings, you'll need to delete and recreate the webhook.
+                  </p>
                 </>
               )}
 
