@@ -252,27 +252,27 @@ Let's create a new component for that called `Profile.svelte`.
   let avatar_url = null
 
   function getProfile(node) {
-  try {
-    loading = true;
-    const user = supabase.auth.user();
+    try {
+      loading = true
+      const user = supabase.auth.user()
 
-    supabase
-      .from("profiles")
-      .select(`username, website, avatar_url`)
-      .eq("id", user?.id)
-      .single()
-      .then(({ data, error, status }) => {
-        if (data) {
-          username = data.username;
-          website = data.website;
-          avatar_url = data.avatar_url;
-        }
-        if (error && status !== 406) throw error;
-      });
+      supabase
+        .from('profiles')
+        .select(`username, website, avatar_url`)
+        .eq('id', user?.id)
+        .single()
+        .then(({ data, error, status }) => {
+          if (data) {
+            username = data.username
+            website = data.website
+            avatar_url = data.avatar_url
+          }
+          if (error && status !== 406) throw error
+        })
     } catch (error) {
-      alert(error.message);
+      alert(error.message)
     } finally {
-      loading = false;
+      loading = false
     }
   }
 
@@ -311,7 +311,6 @@ Let's create a new component for that called `Profile.svelte`.
     } finally {
       loading = false
     }
-
   }
 </script>
 
