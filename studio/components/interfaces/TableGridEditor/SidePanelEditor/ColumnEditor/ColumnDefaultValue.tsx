@@ -60,8 +60,9 @@ const ColumnDefaultValue: FC<Props> = ({
       }
       value={columnFields?.defaultValue ?? ''}
       format={columnFields?.format}
-      suggestionsHeader="Suggested expressions"
       suggestions={suggestions}
+      suggestionsHeader="Suggested expressions"
+      suggestionsTooltip="Suggested expressions"
       onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
       onSelectSuggestion={(suggestion: Suggestion) =>
         onUpdateField({ defaultValue: suggestion.value })

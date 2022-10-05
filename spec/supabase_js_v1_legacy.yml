@@ -934,10 +934,8 @@ pages:
   rpc():
     title: 'Postgres functions: rpc()'
     description: |
-      You can call Postgres functions as a "Remote Procedure Call".
-
-      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
-      It's especially useful when the logic rarely changes - like password resets and updates.
+      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
+      Functions are useful when the logic rarely changes—like for password resets and updates.
 
       ```sql
       create or replace function hello_world() returns text as $$
@@ -946,15 +944,14 @@ pages:
       ```
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
-      - name: Call a Postgres function
+      - name: Call a Postgres function without arguments
         isSpotlight: true
-        description: This is an example of invoking a Postgres function with no parameters.
         js: |
           ```js
           const { data, error } = await supabase
             .rpc('hello_world')
           ```
-      - name: With Parameters
+      - name: Call a Postgres function with arguments
         js: |
           ```js
           const { data, error } = await supabase
@@ -967,7 +964,7 @@ pages:
           const { data, error } = await postgrest
             .rpc('echo_cities', { names: ['The Shire', 'Mordor'] })
           ```
-      - name: With filters
+      - name: Call a Postgres function with filters
         description: |
           Postgres functions that return tables can also be combined with
           [Modifiers](/docs/reference/javascript/using-modifiers) and
@@ -979,7 +976,7 @@ pages:
             .select('name, population')
             .eq('name', 'The Shire')
           ```
-      - name: With count option
+      - name: Call a Postgres function with a count option
         description: |
           You can specify a count option to get the row count along with your data.
           Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
@@ -987,20 +984,6 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .rpc('hello_world', {}, { count: 'exact' })
-          ```
-
-    privileges:
-      description: |
-        By default, functions can be executed by any role. You can restrict this by
-        sql: |
-          ```sql
-            ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
-          ```
-        Then, you can choose which roles can execute functions
-        sql: |
-          ```sql
-            GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
-            GRANT EXECUTE ON FUNCTION hello_world TO service_role;
           ```
 
   subscribe():

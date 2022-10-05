@@ -217,7 +217,7 @@
       {
         "title": "Script size",
         "tiers": {
-          "free": "1 mb",
+          "free": "2 mb",
           "pro": "10 mb",
           "enterprise": "Unlimited"
         }
