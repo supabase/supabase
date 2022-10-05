@@ -117,9 +117,9 @@ const CodeExamples = () => {
       activeId={example}
       type="underlined"
     >
-      {Object.values(exampleList).map((x) => {
+      {Object.values(exampleList).map((x, i) => {
         return (
-          <Tabs.Panel id={x.id} label={x.name}>
+          <Tabs.Panel id={x.id} label={x.name} key={i}>
             <span></span>
           </Tabs.Panel>
         )
