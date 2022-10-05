@@ -43,12 +43,12 @@
         "products": [
           {
             "title": "Supabase.js v2 Docs",
-            "url": "/docs/reference/javascript/next/installing",
+            "url": "/docs/reference/javascript/installing",
             "description": "Updated documentation for supabase-js"
           },
           {
             "title": "Typescript support",
-            "url": "/docs/reference/javascript/next/typescript-support",
+            "url": "/docs/reference/javascript/typescript-support",
             "description": "Using types generated directly from your database."
           }
         ]
