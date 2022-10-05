@@ -26,8 +26,15 @@ Along our jurney we will:
 - implement **magic link sign in** and user authentication with Angular
 - make use of **the realtime capabilities**!
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/jmCiI_OSarA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> Watch the video version of the tutorial.
-
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube-nocookie.com/embed/jmCiI_OSarA"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe> Watch the video version of the tutorial.
 
 Since there are quite some code snippets we need I've put together the [full source code on Github](https://github.com/saimon24/supabase-trello-angular) so you can easily run the project yourself!
 
@@ -205,7 +212,7 @@ create policy "Users can edit cards if they are part of the board" on cards for
 
 Finally we need a **trigger** that reacts to changes in our database.
 
-In our case we want to listen to the creation of new boards, which will automatically create the board <-> user connection in the `user_boards` table.
+In our case we want to listen to the creation of new boards, which will automatically create the board < - > user connection in the `user_boards` table.
 
 Additionally we will also add every new authenticated user to our `users` table since you later don't have access to the internal auth table of Supabase!
 
