@@ -7,7 +7,11 @@ import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui
 
 import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { generateOtherRoutes, generateProductRoutes } from './NavigationBar.utils'
+import {
+  generateOtherRoutes,
+  generateProductRoutes,
+  generateToolRoutes,
+} from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 import { useParams } from 'hooks/misc/useParams'
 
@@ -22,6 +26,7 @@ const NavigationBar: FC<Props> = ({}) => {
   const ongoingIncident = useFlag('ongoingIncident')
 
   const activeRoute = router.pathname.split('/')[3]
+  const toolRoutes = generateToolRoutes(projectRef, projectBaseInfo)
   const productRoutes = generateProductRoutes(projectRef, projectBaseInfo)
   const otherRoutes = generateOtherRoutes(projectRef, projectBaseInfo)
 
@@ -53,6 +58,15 @@ const NavigationBar: FC<Props> = ({}) => {
           }}
         />
         <div className="bg-scale-500 h-px w-full"></div>
+        {toolRoutes.map((route) => (
+          <NavigationIconButton
+            key={route.key}
+            route={route}
+            isActive={activeRoute === route.key}
+          />
+        ))}
+        <div className="bg-scale-500 h-px w-full"></div>
+
         {productRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}

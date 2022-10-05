@@ -14,7 +14,7 @@ import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateProductRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
@@ -32,6 +32,31 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
     },
     {
+      key: 'sql',
+      label: 'SQL Editor',
+      icon: (
+        <SVG
+          src="/img/sql-editor.svg"
+          style={{ width: `${18}px`, height: `${18}px` }}
+          preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
+        />
+      ),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+    },
+  ]
+}
+export const generateProductRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+  const buildingUrl = `/project/${ref}/building`
+
+  return [
+    {
+      key: 'database',
+      label: 'Database',
+      icon: <IconDatabase size={18} strokeWidth={2} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`),
+    },
+    {
       key: 'auth',
       label: 'Authentication',
       icon: <IconUsers size={18} strokeWidth={2} />,
@@ -47,24 +72,7 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
           },
         ]
       : []),
-    {
-      key: 'sql',
-      label: 'SQL Editor',
-      icon: (
-        <SVG
-          src="/img/sql-editor.svg"
-          style={{ width: `${18}px`, height: `${18}px` }}
-          preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
-        />
-      ),
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
-    },
-    {
-      key: 'database',
-      label: 'Database',
-      icon: <IconDatabase size={18} strokeWidth={2} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`),
-    },
+
     ...(IS_PLATFORM
       ? [
           {
@@ -86,20 +94,20 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
     ...(IS_PLATFORM
       ? [
           {
-            key: 'logs-explorer',
-            label: 'Logs Explorer',
-            icon: <IconList size={18} strokeWidth={2} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs-explorer`),
+            key: 'reports',
+            label: 'Reports',
+            icon: <IconBarChart size={18} strokeWidth={2} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
           },
         ]
       : []),
     ...(IS_PLATFORM
       ? [
           {
-            key: 'reports',
-            label: 'Reports',
-            icon: <IconBarChart size={18} strokeWidth={2} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
+            key: 'logs-explorer',
+            label: 'Logs',
+            icon: <IconList size={18} strokeWidth={2} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs-explorer`),
           },
         ]
       : []),
@@ -113,7 +121,7 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
       ? [
           {
             key: 'settings',
-            label: 'Settings',
+            label: 'Project Settings',
             icon: <IconSettings size={18} strokeWidth={2} />,
             link: ref && `/project/${ref}/settings/general`,
           },
