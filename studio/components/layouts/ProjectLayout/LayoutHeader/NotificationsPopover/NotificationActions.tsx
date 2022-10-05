@@ -93,7 +93,7 @@ const NotificationActions: FC<Props> = ({ project, availableActions, onSelectRes
         danger
         visible={showModal}
         title={`Schema migration for "${project.name}"`}
-        description={`Are you sure you want to reassign entities owned by temporary role to postgres? This action is irreversible.`}
+        description={`Are you sure you want to finalize the current schema migration? This action is irreversible.`}
         buttonLabel="Finalize"
         buttonLoadingLabel="Finalizing"
         onSelectCancel={() => setShowModal(false)}

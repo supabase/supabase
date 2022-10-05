@@ -153,7 +153,7 @@ export const formatNotificationCTAText = (availableActions: Action[]) => {
             `This patch will be automatically applied after ${new Date(
               action.deadline
             ).toLocaleDateString()} `}
-          {action.deadline && action.reason && (
+          {action.reason?.startsWith('https://') && (
             <Link href={action.reason}>
               <a
                 target="_blank"
