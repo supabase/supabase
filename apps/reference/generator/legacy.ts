@@ -130,7 +130,8 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
   if (param.type?.declaration?.children) {
     children = param.type?.declaration?.children
   } else if (isUnion(param)) {
-    children = param.type.types
+    // children = param.type.types
+    children = null // We don't want to show the union types
   } else if (param.type === 'reflection') {
     children = param.declaration.children
   }
