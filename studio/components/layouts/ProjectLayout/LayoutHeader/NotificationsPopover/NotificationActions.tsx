@@ -1,104 +1,104 @@
-import { FC, useState } from 'react'
+import { FC, Fragment } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from '@supabase/ui'
+import { Button, IconExternalLink } from '@supabase/ui'
 import { Action, ActionType } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
-import { API_URL } from 'lib/constants'
-import { post, delete_, patch } from 'lib/common/fetch'
-import { useStore } from 'hooks/misc/useStore'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import Link from 'next/link'
+
+// [Joshen TODO] Remove all things about "ownerReassignStatus" after 5th November
+// double check with Qiao before we remove them.
 
 interface Props {
   project: Project
+  changelogLink?: string
+  ownerReassignStatus?: any
   availableActions: Action[]
   onSelectRestartProject: () => void
+  onSelectApplyMigration: () => void
+  onSelectRollbackMigration: () => void
+  onSelectFinalizeMigration: () => void
 }
 
-const NotificationActions: FC<Props> = ({ project, availableActions, onSelectRestartProject }) => {
+const NotificationActions: FC<Props> = ({
+  project,
+  changelogLink,
+  ownerReassignStatus,
+  availableActions,
+  onSelectRestartProject,
+  onSelectApplyMigration,
+  onSelectRollbackMigration,
+  onSelectFinalizeMigration,
+}) => {
   const router = useRouter()
-  const { app } = useStore()
-  const [showModal, setShowModal] = useState<boolean>(false)
 
   const onSelectUpgradeProject = () => {
     return router.push(`/project/${project.ref}/settings/billing/update/pro`)
   }
 
-  // TODO: allow configuring other routes
-  const onSelectMigrateProject = () => {
-    post(`${API_URL}/platform/database/${project.ref}/owner-reassign`, {})
-      // Refresh database connection string
-      .then((_) => app.projects.fetchDetail(project.ref))
-      .catch((err) => console.info(err))
-  }
-  const onSelectRollbackProject = () => {
-    delete_(`${API_URL}/platform/database/${project.ref}/owner-reassign`, {})
-      // Refresh database connection string
-      .then((_) => app.projects.fetchDetail(project.ref))
-      .catch((err) => console.info(err))
-  }
-  const onSelectFinalizeProject = () => {
-    patch(`${API_URL}/platform/database/${project.ref}/owner-reassign`, {})
-      // Refresh database connection string
-      .then((_) => app.projects.fetchDetail(project.ref))
-      .catch((err) => console.info(err))
-  }
-
-  return (
-    <div className="space-y-2">
-      {availableActions.map((action) => {
-        if (action.action_type === ActionType.UpgradeProjectToPro) {
+  const renderActionButton = (action: Action) => {
+    switch (action.action_type) {
+      case ActionType.UpgradeProjectToPro:
+        return (
+          <Button type="default" onClick={onSelectUpgradeProject}>
+            Upgrade project
+          </Button>
+        )
+      case ActionType.SchedulePostgresRestart:
+        return (
+          <Button type="default" onClick={onSelectRestartProject}>
+            Restart project
+          </Button>
+        )
+      case ActionType.MigratePostgresSchema:
+        if (action.reason === 'finalize') {
           return (
-            <Button key={action.action_type} type="default" onClick={onSelectUpgradeProject}>
-              Upgrade project
+            <Button type="default" onClick={onSelectFinalizeMigration}>
+              Finalize
             </Button>
           )
-        } else if (action.action_type === ActionType.SchedulePostgresRestart) {
-          return (
-            <Button key={action.action_type} type="default" onClick={onSelectRestartProject}>
-              Restart project
-            </Button>
-          )
-        } else if (action.action_type === ActionType.MigratePostgresSchema) {
-          if (action.reason === 'finalize') {
+        } else if (action.reason === 'rollback') {
+          if (ownerReassignStatus?.current === 'temp_role') {
             return (
-              <Button
-                key={`${action.action_type}_${action.reason}`}
-                type="default"
-                onClick={() => setShowModal(true)}
-              >
-                Finalize
-              </Button>
-            )
-          }
-          if (action.reason === 'rollback') {
-            return (
-              <Button
-                key={`${action.action_type}_${action.reason}`}
-                type="default"
-                onClick={onSelectRollbackProject}
-              >
+              <Button type="default" onClick={onSelectRollbackMigration}>
                 Rollback
               </Button>
             )
+          } else {
+            return <></>
           }
+        } else {
           return (
-            <Button key={action.action_type} type="default" onClick={onSelectMigrateProject}>
-              Apply now
-            </Button>
+            <>
+              {ownerReassignStatus?.current === 'unmigrated' && (
+                <Button type="default" onClick={onSelectApplyMigration}>
+                  Apply now
+                </Button>
+              )}
+            </>
           )
         }
+    }
+  }
+
+  return (
+    <div className="flex items-center space-x-2">
+      {availableActions.map((action) => {
+        return (
+          <Fragment key={`${action.action_type}_${action.reason}`}>
+            {renderActionButton(action)}
+          </Fragment>
+        )
       })}
-      <ConfirmModal
-        danger
-        visible={showModal}
-        title={`Schema migration for "${project.name}"`}
-        description={`Are you sure you want to finalize the current schema migration? This action is irreversible.`}
-        buttonLabel="Finalize"
-        buttonLoadingLabel="Finalizing"
-        onSelectCancel={() => setShowModal(false)}
-        onSelectConfirm={onSelectFinalizeProject}
-      />
+      {changelogLink && (
+        <Link href={changelogLink}>
+          <a>
+            <Button as="span" type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+              More info
+            </Button>
+          </a>
+        </Link>
+      )}
     </div>
   )
 }

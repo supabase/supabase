@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Project } from 'types'
 import {
   Action,
@@ -12,7 +13,11 @@ import {
 import { IconArrowRight, IconExternalLink } from '@supabase/ui'
 import Link from 'next/link'
 
-export const formatNotificationText = (project: Project, notification: Notification) => {
+export const formatNotificationText = (
+  project: Project,
+  notification: Notification,
+  ownerReassignStatus?: any
+) => {
   const projectName = project.name
 
   if (notification.data.name === NotificationName.ProjectExceedingTierLimit) {
@@ -83,12 +88,28 @@ export const formatNotificationText = (project: Project, notification: Notificat
       )
     } else if (upgrade_type === 'schema-migration') {
       const { version_to } = additional
-      return (
-        <p className="text-sm">
-          The schema migration to "{version_to}" has been successfully applied to your project "
-          {projectName}".
-        </p>
-      )
+      if (ownerReassignStatus?.current === 'unmigrated') {
+        return (
+          <p className="text-sm">
+            The schema migration "{version_to}" will be applied for project "{projectName}" within a
+            few days. You may opt to apply the changes now, or it'll be done so automatically.
+          </p>
+        )
+      } else if (ownerReassignStatus?.current === 'temp_role') {
+        return (
+          <p className="text-sm">
+            The schema migration "{version_to}" will be finalized for project "{projectName}" within
+            a few days. You may opt to finalize the changes now, or it'll be done so automatically.
+          </p>
+        )
+      } else {
+        return (
+          <p className="text-sm">
+            The schema migration "{version_to}" has been successfully applied for project "
+            {projectName}".
+          </p>
+        )
+      }
     }
   } else if (notification.data.name === NotificationName.ProjectUpdateCompleted) {
     const { upgrades } = notification.data
@@ -135,7 +156,10 @@ export const formatNotificationText = (project: Project, notification: Notificat
   }
 }
 
-export const formatNotificationCTAText = (availableActions: Action[]) => {
+export const formatNotificationCTAText = (
+  availableActions: Action[],
+  ownerReassignStatus?: any
+) => {
   const [action] = availableActions
   if (!action) return <p className="text-sm"></p>
 
@@ -147,26 +171,30 @@ export const formatNotificationCTAText = (availableActions: Action[]) => {
     case ActionType.PgBouncerRestart:
       return <p className="text-sm">Restart your connection pooler to get the latest updates.</p>
     case ActionType.MigratePostgresSchema:
-      return (
-        <p className="text-sm">
-          {action.deadline &&
-            `This patch will be automatically applied after ${new Date(
-              action.deadline
-            ).toLocaleDateString()} `}
-          {action.reason?.startsWith('https://') && (
-            <Link href={action.reason}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
-                style={{ display: 'inline-block' }}
-              >
-                <IconExternalLink size={12} strokeWidth={2} />
-              </a>
-            </Link>
-          )}
-        </p>
-      )
+      if (action.deadline) {
+        if (ownerReassignStatus?.current === 'temp_role') {
+          return (
+            <p className="text-sm space-x-1">
+              {action.deadline &&
+                `This patch has been applied on ${dayjs(
+                  new Date(ownerReassignStatus?.migrated_at ?? 0)
+                ).format('DD MMM YYYY, HH:mma')}`}
+            </p>
+          )
+        } else {
+          return (
+            <p className="text-sm space-x-1">
+              {action.deadline &&
+                `This patch will be automatically applied after ${dayjs(
+                  new Date(action.deadline)
+                ).format('DD MMM YYYY, HH:mma')}`}
+            </p>
+          )
+        }
+      } else {
+        return ''
+      }
+
     default:
       return ''
   }
