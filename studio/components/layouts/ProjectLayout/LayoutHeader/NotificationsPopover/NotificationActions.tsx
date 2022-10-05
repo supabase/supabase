@@ -37,7 +37,7 @@ const NotificationActions: FC<Props> = ({ project, availableActions, onSelectRes
       .then((_) => app.projects.fetchDetail(project.ref))
       .catch((err) => console.info(err))
   }
-  const onSelectFinaliseProject = () => {
+  const onSelectFinalizeProject = () => {
     patch(`${API_URL}/platform/database/${project.ref}/owner-reassign`, {})
       // Refresh database connection string
       .then((_) => app.projects.fetchDetail(project.ref))
@@ -60,14 +60,14 @@ const NotificationActions: FC<Props> = ({ project, availableActions, onSelectRes
             </Button>
           )
         } else if (action.action_type === ActionType.MigratePostgresSchema) {
-          if (action.reason === 'finalise') {
+          if (action.reason === 'finalize') {
             return (
               <Button
                 key={`${action.action_type}_${action.reason}`}
                 type="default"
                 onClick={() => setShowModal(true)}
               >
-                Finalise
+                Finalize
               </Button>
             )
           }
@@ -94,10 +94,10 @@ const NotificationActions: FC<Props> = ({ project, availableActions, onSelectRes
         visible={showModal}
         title={`Schema migration for "${project.name}"`}
         description={`Are you sure you want to reassign entities owned by temporary role to postgres? This action is irreversible.`}
-        buttonLabel="Finalise"
-        buttonLoadingLabel="Finalising"
+        buttonLabel="Finalize"
+        buttonLoadingLabel="Finalizing"
         onSelectCancel={() => setShowModal(false)}
-        onSelectConfirm={onSelectFinaliseProject}
+        onSelectConfirm={onSelectFinalizeProject}
       />
     </div>
   )
