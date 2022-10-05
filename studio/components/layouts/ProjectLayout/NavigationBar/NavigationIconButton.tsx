@@ -3,6 +3,7 @@ import Link from 'next/link'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { Route } from 'components/ui/ui.types'
+import ConditionalWrap from 'components/ui/ConditionalWrap'
 
 interface Props {
   route: Route
@@ -13,7 +14,10 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
-        <Link href={route.link}>
+        <ConditionalWrap
+          condition={route.link !== undefined}
+          wrap={(children) => <Link href={route.link!}>{children}</Link>}
+        >
           <a
             className={[
               'transition-colors duration-200',
@@ -25,7 +29,7 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
           >
             {route.icon}
           </a>
-        </Link>
+        </ConditionalWrap>
       </Tooltip.Trigger>
       <Tooltip.Content side="right">
         <Tooltip.Arrow className="radix-tooltip-arrow" />
