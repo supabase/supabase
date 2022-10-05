@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { Project } from 'types'
 import {
   Action,
+  ActionReason,
   ActionType,
   ExtensionsUpgrade,
   Notification,
@@ -88,14 +89,14 @@ export const formatNotificationText = (
       )
     } else if (upgrade_type === 'schema-migration') {
       const { version_to } = additional
-      if (ownerReassignStatus?.current === 'unmigrated') {
+      if (ownerReassignStatus?.desired === 'unmigrated') {
         return (
           <p className="text-sm">
             The schema migration "{version_to}" will be applied for project "{projectName}" within a
             few days. You may opt to apply the changes now, or it'll be done so automatically.
           </p>
         )
-      } else if (ownerReassignStatus?.current === 'temp_role') {
+      } else if (ownerReassignStatus?.desired === 'temp_role') {
         return (
           <p className="text-sm">
             The schema migration "{version_to}" will be finalized for project "{projectName}" within
@@ -172,24 +173,36 @@ export const formatNotificationCTAText = (
       return <p className="text-sm">Restart your connection pooler to get the latest updates.</p>
     case ActionType.MigratePostgresSchema:
       if (action.deadline) {
-        if (ownerReassignStatus?.current === 'temp_role') {
+        if (ownerReassignStatus?.desired === 'migrated') {
           return (
             <p className="text-sm space-x-1">
-              {action.deadline &&
-                `This patch was applied on ${dayjs(
-                  new Date(ownerReassignStatus?.migrated_at ?? 0)
-                ).format('DD MMM YYYY, HH:mma')}`}
+              This patch was applied on{' '}
+              {dayjs(new Date(ownerReassignStatus.migrated_at ?? action.deadline)).format('DD MMM YYYY, HH:mma')}
+            </p>
+          )
+        } else if (ownerReassignStatus?.desired === 'unmigrated') {
+          return (
+            <p className="text-sm space-x-1">
+              This patch will be automatically applied after{' '}
+              {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
             </p>
           )
         } else {
-          return (
-            <p className="text-sm space-x-1">
-              {action.deadline &&
-                `This patch will be automatically applied after ${dayjs(
-                  new Date(action.deadline)
-                ).format('DD MMM YYYY, HH:mma')}`}
-            </p>
-          )
+          if (action.reason === ActionReason.Finalize) {
+            return (
+              <p className="text-sm space-x-1">
+                This patch will be automatically applied after{' '}
+                {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
+              </p>
+            )
+          } else {
+            return (
+              <p className="text-sm space-x-1">
+                This patch was applied on{' '}
+                {dayjs(new Date(ownerReassignStatus.modified_at)).format('DD MMM YYYY, HH:mma')}
+              </p>
+            )
+          }
         }
       } else {
         return ''

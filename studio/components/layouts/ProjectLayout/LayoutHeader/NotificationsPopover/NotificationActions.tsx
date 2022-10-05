@@ -1,7 +1,7 @@
 import { FC, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { Button, IconExternalLink } from '@supabase/ui'
-import { Action, ActionType } from '@supabase/shared-types/out/notifications'
+import { Action, ActionReason, ActionType } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
 import Link from 'next/link'
@@ -51,31 +51,29 @@ const NotificationActions: FC<Props> = ({
           </Button>
         )
       case ActionType.MigratePostgresSchema:
-        if (action.reason === 'finalize') {
+        if (action.reason === ActionReason.Finalize) {
           return (
-            <Button type="default" onClick={onSelectFinalizeMigration}>
-              Finalize
-            </Button>
-          )
-        } else if (action.reason === 'rollback') {
-          if (ownerReassignStatus?.current === 'temp_role') {
-            return (
-              <Button type="default" onClick={onSelectRollbackMigration}>
-                Rollback
+            ownerReassignStatus?.desired !== 'migrated' && (
+              <Button type="default" onClick={onSelectFinalizeMigration}>
+                Finalize
               </Button>
             )
-          } else {
-            return <></>
-          }
+          )
+        } else if (action.reason === ActionReason.Rollback) {
+            return (
+              ownerReassignStatus?.desired === 'temp_role' && (
+                <Button type="default" onClick={onSelectRollbackMigration}>
+                  Rollback
+                </Button>
+              )
+            )
         } else {
           return (
-            <>
-              {ownerReassignStatus?.current === 'unmigrated' && (
-                <Button type="default" onClick={onSelectApplyMigration}>
-                  Apply now
-                </Button>
-              )}
-            </>
+            ownerReassignStatus?.desired === 'unmigrated' && (
+              <Button type="default" onClick={onSelectApplyMigration}>
+                Apply now
+              </Button>
+            )
           )
         }
     }
