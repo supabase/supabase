@@ -8,7 +8,7 @@ info:
     Supabase JavaScript.
 
   definition: ../../spec/enrichments/tsdoc_v1/combined.json
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1.yml
   slugPrefix: '/'
   libraries:
     - name: 'JavaScript'
