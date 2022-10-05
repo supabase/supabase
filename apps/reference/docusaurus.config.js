@@ -4,6 +4,7 @@
 const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
+const mdxMermaid = require('mdx-mermaid')
 
 const baseUrl = '/docs/'
 
@@ -136,6 +137,7 @@ const config = {
           breadcrumbs: false,
           editUrl:
             'https://github.com/supabase/supabase/edit/master/apps/reference',
+          //remarkPlugins: [mdxMermaid.default],
         },
         blog: false,
         theme: {
