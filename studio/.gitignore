@@ -32,5 +32,4 @@ yarn-error.log*
 .env.staging.local
 .env.production.local
 
-!.vercel
 .vercel
