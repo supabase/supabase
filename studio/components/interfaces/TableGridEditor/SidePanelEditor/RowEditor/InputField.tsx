@@ -28,7 +28,7 @@ const InputField: FC<Props> = ({
       <Select
         size="medium"
         layout="horizontal"
-        value={field.value}
+        value={field.value ?? ''}
         label={field.name}
         labelOptional={field.format}
         descriptionText={field.comment}
@@ -51,7 +51,7 @@ const InputField: FC<Props> = ({
       <Input
         layout="horizontal"
         label={field.name}
-        value={field.value}
+        value={field.value ?? ''}
         // @ts-ignore This is creating some validateDOMNesting errors
         // because descriptionText is a <p> element as a parent
         descriptionText={
@@ -72,7 +72,13 @@ const InputField: FC<Props> = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button type="default" htmlType="button" onClick={onViewForeignKey} icon={<IconLink />}>
+          <Button
+            disabled={field.value === null || field.value?.length === 0}
+            type="default"
+            htmlType="button"
+            onClick={onViewForeignKey}
+            icon={<IconLink />}
+          >
             View data
           </Button>
         }
@@ -92,11 +98,13 @@ const InputField: FC<Props> = ({
           disabled={!isEditable}
           error={errors[field.name]}
           rows={5}
-          value={field.value}
+          value={field.value ?? ''}
           placeholder={
-            typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+            field.defaultValue === null
+              ? ''
+              : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
               ? 'Default: Empty string'
-              : field.defaultValue
+              : `Default: ${field.defaultValue}`
           }
           onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         />
@@ -108,12 +116,12 @@ const InputField: FC<Props> = ({
     return (
       <Input
         layout="horizontal"
-        value={field.value}
+        value={field.value ?? ''}
         label={field.name}
         descriptionText={field.comment}
         labelOptional={field.format}
         disabled={!isEditable}
-        placeholder={field.defaultValue}
+        placeholder={field?.defaultValue ?? ''}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
@@ -135,7 +143,7 @@ const InputField: FC<Props> = ({
       <DateTimeInput
         name={field.name}
         format={field.format}
-        value={field.value}
+        value={field.value ?? ''}
         description={field.comment}
         onChange={(value: any) => onUpdateField({ [field.name]: value })}
       />
@@ -149,8 +157,14 @@ const InputField: FC<Props> = ({
       descriptionText={field.comment}
       labelOptional={field.format}
       error={errors[field.name]}
-      value={field.value}
-      placeholder={field.isIdentity ? 'Automatically generated as identity' : field.defaultValue}
+      value={field.value ?? ''}
+      placeholder={
+        field.isIdentity
+          ? 'Automatically generated as identity'
+          : field.defaultValue !== null
+          ? `Default: ${field.defaultValue}`
+          : ''
+      }
       disabled={!isEditable}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
     />

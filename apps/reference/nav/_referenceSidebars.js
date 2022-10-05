@@ -4,12 +4,7 @@ const sidebars = {
       type: 'category',
       label: 'Overview',
       collapsed: true,
-      items: [
-        'about',
-        'architecture',
-        'guides/hosting/platform',
-        'guides/examples',
-      ],
+      items: ['about', 'architecture', 'guides/examples'],
     },
     {
       type: 'category',
@@ -34,18 +29,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Migrate to Supabase',
-      collapsed: true,
-      items: [
-        'guides/migrations/firebase-auth',
-        'guides/migrations/firestore-data',
-        'guides/migrations/firebase-storage',
-        'guides/migrations/heroku',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Supabase CLI',
+      label: 'CLI',
       collapsed: true,
       items: [
         'guides/cli',
@@ -95,6 +79,7 @@ const sidebars = {
           items: [
             'guides/auth/row-level-security',
             'guides/auth/managing-user-data',
+            'guides/auth/auth-captcha',
           ],
         },
         {
@@ -188,13 +173,14 @@ const sidebars = {
       type: 'category',
       label: 'Storage',
       collapsed: true,
-      items: ['guides/storage', 'guides/storage-caching'],
+      items: ['guides/storage', 'guides/storage-cdn'],
     },
     {
       type: 'category',
       label: 'Platform',
       collapsed: true,
       items: [
+        'guides/hosting/platform',
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
@@ -211,6 +197,17 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Migrate to Supabase',
+      collapsed: true,
+      items: [
+        'guides/migrations/firebase-auth',
+        'guides/migrations/firestore-data',
+        'guides/migrations/firebase-storage',
+        'guides/migrations/heroku',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Integrations',
       collapsed: true,
       items: [
@@ -223,26 +220,13 @@ const sidebars = {
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
+        'guides/integrations/polyscale',
         'guides/integrations/prisma',
         'guides/integrations/sequin',
         'guides/integrations/snaplet',
         'guides/integrations/stytch',
         'guides/integrations/supertokens',
         'guides/integrations/vercel',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'See Also',
-      collapsed: true,
-      items: [
-        'faq',
-        'handbook/contributing',
-        'handbook/supasquad',
-        'company/terms',
-        'company/privacy',
-        'company/aup',
-        'company/sla',
       ],
     },
   ],

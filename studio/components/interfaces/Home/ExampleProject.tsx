@@ -30,7 +30,7 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
             <img
               className="transition-all group-hover:scale-110"
               src={`/img/libraries/${framework.toLowerCase()}${
-                framework.toLowerCase() == 'nextjs' ? (isDarkTheme ? '-dark' : '') : ''
+                ['expo', 'nextjs'].includes(framework.toLowerCase()) ? (isDarkTheme ? '-dark' : '') : ''
               }-icon.svg`}
               alt={`${framework} logo`}
               width={26}

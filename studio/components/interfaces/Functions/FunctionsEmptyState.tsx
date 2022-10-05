@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, IconBookOpen } from 'ui'
+import { Button, IconBookOpen, IconCode } from 'ui'
 import TerminalInstructions from './TerminalInstructions'
 
 const FunctionsEmptyState = () => {
@@ -19,6 +19,14 @@ const FunctionsEmptyState = () => {
             <Link passHref href="https://supabase.com/docs/guides/functions">
               <Button as="a" type="default" iconRight={<IconBookOpen />}>
                 Documentation
+              </Button>
+            </Link>
+            <Link
+              passHref
+              href="https://github.com/supabase/supabase/tree/chore/stripe-issue/examples/edge-functions/supabase/functions"
+            >
+              <Button as="a" type="default" iconRight={<IconCode />}>
+                Examples
               </Button>
             </Link>
           </div>

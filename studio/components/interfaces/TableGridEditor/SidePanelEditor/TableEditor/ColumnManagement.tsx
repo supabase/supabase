@@ -1,6 +1,8 @@
+import Link from 'next/link'
 import React, { FC, useState } from 'react'
 import { partition, isEmpty, isUndefined } from 'lodash'
-import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash } from 'ui'
+import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
+
 import {
   PostgresTable,
   PostgresColumn,
@@ -41,7 +43,7 @@ const ColumnManagement: FC<Props> = ({
   tables = [],
   columns = [],
   enumTypes = [],
-  importContent = {},
+  importContent,
   isNewRecord,
   onColumnsUpdated = () => {},
   onSelectImportData = () => {},
@@ -310,11 +312,24 @@ const ColumnManagement: FC<Props> = ({
           </DragDropContext>
         </div>
 
-        {!hasImportContent && (
-          <Button type="default" onClick={() => onAddColumn()}>
-            Add column
-          </Button>
-        )}
+        <div className="flex items-center justify-between">
+          {!hasImportContent && (
+            <Button type="default" onClick={() => onAddColumn()}>
+              Add column
+            </Button>
+          )}
+          <Link href="https://supabase.com/docs/guides/database/tables#data-types">
+            <a>
+              <Button
+                type="text"
+                className="text-scale-1000 hover:text-scale-1200"
+                icon={<IconExternalLink size={12} strokeWidth={2} />}
+              >
+                Learn more about data types
+              </Button>
+            </a>
+          </Link>
+        </div>
       </div>
       <ForeignKeySelector
         tables={tables}

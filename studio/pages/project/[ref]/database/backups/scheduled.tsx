@@ -27,7 +27,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           if (id === 'pitr') router.push(`/project/${ref}/database/backups/pitr`)
         }}
       >
-        <Tabs.Panel id="scheduled" label="Scheduled" />
+        <Tabs.Panel id="scheduled" label="Scheduled backups" />
         <Tabs.Panel id="pitr" label="Point in Time" />
       </Tabs>
 

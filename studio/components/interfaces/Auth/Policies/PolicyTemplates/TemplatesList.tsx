@@ -21,10 +21,11 @@ const TemplatesList: FC<Props> = ({
       style={{ maxHeight: '24rem' }}
     >
       <Menu type="border">
-        {templates.map((template) => {
+        {templates.map((template, i) => {
           const active = selectedTemplate === template
           return (
             <div
+              key={i}
               className={
                 'border-b border-scale-400 hover:bg-scale-400 ' +
                 (active ? 'bg-scale-300 dark:bg-scale-500' : '')

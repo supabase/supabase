@@ -342,6 +342,7 @@ const SupportForm: FC<Props> = ({ setSent }) => {
           <div className="flex items-center space-x-2">
             {uploadedDataUrls.map((x: any, idx: number) => (
               <div
+                key={idx}
                 style={{ backgroundImage: `url("${x}")` }}
                 className="relative h-14 w-14 rounded bg-cover bg-center bg-no-repeat"
               >

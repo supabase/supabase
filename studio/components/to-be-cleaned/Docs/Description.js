@@ -43,7 +43,7 @@ export default function Description({ content, metadata, onChange = () => {} }) 
     if (table && column)
       query = `comment on column public."${table}"."${column}" is '${description}';`
     if (table && !column) query = `comment on table public."${table}" is '${description}';`
-    if (rpc) query = `comment on function ${rpc} is '${description}';`
+    if (rpc) query = `comment on function "${rpc}" is '${description}';`
 
     if (query) {
       const res = await meta.query(query)

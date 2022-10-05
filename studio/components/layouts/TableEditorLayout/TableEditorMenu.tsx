@@ -105,8 +105,8 @@ const TableEditorMenu: FC<Props> = ({
     <div className="my-6 mx-4 flex flex-grow flex-col space-y-6">
       {/* Schema selection dropdown */}
       <div className="px-3">
-        {meta.schemas.isLoading ? (
-          <div className="flex h-[30px] items-center space-x-3 rounded border border-gray-500 px-3">
+        {!meta.schemas.isInitialized ? (
+          <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
             <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
@@ -122,7 +122,7 @@ const TableEditorMenu: FC<Props> = ({
             }}
           >
             <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
-              <p className="text-sm">Schemas</p>
+              <p className="text-xs text-scale-1100">Schemas</p>
             </Listbox.Option>
             {/* @ts-ignore */}
             {openSchemas.map((schema) => (
@@ -130,9 +130,9 @@ const TableEditorMenu: FC<Props> = ({
                 key={schema.id}
                 value={schema.name}
                 label={schema.name}
-                addOnBefore={() => <span className="text-scale-900">schema</span>}
+                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
               >
-                <span className="text-sm text-scale-1200">{schema.name}</span>
+                <span className="text-scale-1200 text-xs">{schema.name}</span>
               </Listbox.Option>
             ))}
             <Listbox.Option
@@ -141,16 +141,16 @@ const TableEditorMenu: FC<Props> = ({
               value="protected-schemas"
               label="Protected schemas"
             >
-              <p className="text-sm">Protected schemas</p>
+              <p className="text-xs text-scale-1100">Protected schemas</p>
             </Listbox.Option>
             {protectedSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
                 value={schema.name}
                 label={schema.name}
-                addOnBefore={() => <span className="text-scale-900">schema</span>}
+                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
               >
-                <span className="text-sm text-scale-1200">{schema.name}</span>
+                <span className="text-scale-1200 text-xs">{schema.name}</span>
               </Listbox.Option>
             ))}
           </Listbox>

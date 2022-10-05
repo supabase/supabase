@@ -69,9 +69,9 @@ const Column: FC<Props> = ({
           <Input
             value={column.name}
             size="small"
-            placeholder="column name"
             title={column.name}
             disabled={hasImportContent}
+            placeholder="Column name"
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
@@ -119,7 +119,7 @@ const Column: FC<Props> = ({
             }`}
             suggestions={suggestions}
             suggestionsHeader="Suggested expressions"
-            suggestionsWidth={410}
+            suggestionsTooltip="Suggested expressions"
             onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
               onUpdateColumn({ defaultValue: suggestion.value })
@@ -222,9 +222,9 @@ const Column: FC<Props> = ({
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
+          <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
             <IconX strokeWidth={1} />
-          </div>
+          </button>
         </div>
       )}
     </div>

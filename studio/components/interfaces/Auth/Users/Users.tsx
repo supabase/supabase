@@ -53,8 +53,8 @@ const Users = () => {
   }
 
   return (
-    <div className="">
-      <div className="flex justify-between px-6 pt-6 pb-2">
+    <div className="overflow-scroll">
+      <div className="justify-between px-6 pt-6 pb-2 md:flex">
         <div className="relative flex space-x-4">
           <Input
             size="small"
@@ -94,7 +94,7 @@ const Users = () => {
             </Listbox.Option>
           </Listbox>
         </div>
-        <div className="flex items-center">
+        <div className="mt-4 flex items-center md:mt-0">
           <Button
             className="mr-2"
             size="tiny"
@@ -109,7 +109,7 @@ const Users = () => {
         </div>
       </div>
       <section className="mt-4 overflow-visible px-6">
-        <div className="section-block--body relative rounded">
+        <div className="section-block--body relative overflow-scroll rounded">
           <div className="inline-block min-w-full align-middle">
             <UsersList />
           </div>

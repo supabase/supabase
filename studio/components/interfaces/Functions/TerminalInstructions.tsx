@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router'
-import { Button, IconTerminal, IconMaximize2, IconMinimize2 } from 'ui'
+import { Button, IconTerminal, IconMaximize2, IconMinimize2, IconBookOpen, IconCode } from 'ui'
 import { useProjectSettings } from 'hooks'
 import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import { Commands } from './Functions.types'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { FC, useState } from 'react'
 import { useStore } from 'hooks'
+import Link from 'next/link'
 
 interface Props {
   closable?: boolean
@@ -122,7 +123,31 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
             Access tokens
           </Button>
         </div>
-      ) : null}
+      ) : (
+        <div className="space-y-3 border-t px-8 py-6">
+          <div>
+            <h3 className="text-base text-scale-1200">Need help?</h3>
+            <p className="text-sm text-scale-1100">
+              Read the documentation, or browse some sample code.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link passHref href="https://supabase.com/docs/guides/functions">
+              <Button as="a" type="default" iconRight={<IconBookOpen />}>
+                Documentation
+              </Button>
+            </Link>
+            <Link
+              passHref
+              href="https://github.com/supabase/supabase/tree/chore/stripe-issue/examples/edge-functions/supabase/functions"
+            >
+              <Button as="a" type="default" iconRight={<IconCode />}>
+                Examples
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

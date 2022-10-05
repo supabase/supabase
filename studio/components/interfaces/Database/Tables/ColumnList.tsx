@@ -1,68 +1,42 @@
-import { FC, ReactNode, useState } from 'react'
+import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
 
-import Table from '../../../to-be-cleaned/Table'
+import { useStore } from 'hooks'
+import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import { PostgresTable } from '@supabase/postgres-meta'
 
-const Header: FC<{
-  filterString: string
-  filterPlaceholder: string
-  leftComponents: ReactNode
-  rightComponents: ReactNode
-  setFilterString: (value: string) => void
-}> = ({
-  filterString,
-  setFilterString,
-  filterPlaceholder = 'Filter',
-  leftComponents,
-  rightComponents,
-}) => (
-  <div className="flex items-center justify-between">
-    <div className="flex items-center">
-      <div>{leftComponents}</div>
-      <div>
-        <Input
-          size="small"
-          placeholder={filterPlaceholder}
-          value={filterString}
-          onChange={(e: any) => setFilterString(e.target.value)}
-          icon={<IconSearch size="tiny" />}
-        />
-      </div>
-    </div>
-    <div className="">{rightComponents}</div>
-  </div>
-)
-
-const ColumnList: FC<{
-  selectedTable: any
+interface Props {
+  selectedTable: PostgresTable
   onSelectBack: () => void
   onAddColumn: () => void
   onEditColumn: (column: any) => void
   onDeleteColumn: (column: any) => void
-}> = ({
+}
+
+const ColumnList: FC<Props> = ({
   selectedTable,
   onSelectBack = () => {},
   onAddColumn = () => {},
   onEditColumn = () => {},
   onDeleteColumn = () => {},
 }) => {
+  const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const columns =
     filterString.length === 0
       ? selectedTable.columns
       : selectedTable.columns.filter((column: any) => column.name.includes(filterString))
 
+  const isLocked = meta.excludedSchemas.includes(selectedTable?.schema ?? '')
+
   return (
     <>
       <div className="mb-4">
-        <Header
-          filterPlaceholder="Filter columns"
-          filterString={filterString}
-          setFilterString={setFilterString}
-          leftComponents={
-            <div className="mr-4 flex items-center">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="flex items-center mr-4">
               <Button
                 type="outline"
                 className="mr-4"
@@ -72,13 +46,24 @@ const ColumnList: FC<{
               />
               <code>{selectedTable.name}</code>
             </div>
-          }
-          rightComponents={
-            <Button icon={<IconPlus />} onClick={() => onAddColumn()}>
-              New
-            </Button>
-          }
-        />
+            <div>
+              <Input
+                size="small"
+                placeholder="Filter columns"
+                value={filterString}
+                onChange={(e: any) => setFilterString(e.target.value)}
+                icon={<IconSearch size="tiny" />}
+              />
+            </div>
+          </div>
+          {!isLocked && (
+            <div>
+              <Button icon={<IconPlus />} onClick={() => onAddColumn()}>
+                New column
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
       {columns.length === 0 ? (
         <NoSearchResults />
@@ -103,8 +88,12 @@ const ColumnList: FC<{
                 <Table.td>
                   <p>{x.name}</p>
                 </Table.td>
-                <Table.td>
-                  <p>{x.comment}</p>
+                <Table.td className="break-all whitespace-normal">
+                  {x.comment !== null ? (
+                    <p title={x.comment}>{x.comment}</p>
+                  ) : (
+                    <p className="text-scale-800">No description</p>
+                  )}
                 </Table.td>
                 <Table.td>
                   <code className="text-sm">{x.data_type}</code>
@@ -119,12 +108,14 @@ const ColumnList: FC<{
                       icon={<IconEdit3 />}
                       style={{ padding: 5 }}
                       type="text"
+                      disabled={isLocked}
                     />
                     <Button
                       onClick={() => onDeleteColumn(x)}
                       icon={<IconTrash />}
                       style={{ padding: 5 }}
                       type="text"
+                      disabled={isLocked}
                     />
                   </div>
                 </Table.td>
