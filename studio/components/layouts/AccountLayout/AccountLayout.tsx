@@ -47,9 +47,9 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       key: 'projects',
       links: [
         {
-          isActive: router.pathname === '/',
+          isActive: router.pathname === '/projects',
           label: 'All projects',
-          href: '/',
+          href: '/projects',
           key: 'all-projects-item',
         },
       ],
