@@ -3788,7 +3788,7 @@
                               ],
                               "type": {
                                 "type": "reference",
-                                "id": 557,
+                                "id": 558,
                                 "name": "CookieOptions"
                               }
                             },
@@ -3975,7 +3975,7 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 557,
+                "id": 558,
                 "name": "CookieOptions"
               }
             },
@@ -4246,7 +4246,7 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 539,
+                        "id": 540,
                         "name": "AdminUserAttributes"
                       }
                     }
@@ -4355,7 +4355,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 },
@@ -4392,7 +4392,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 }
@@ -4600,7 +4600,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -4656,7 +4656,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -4884,7 +4884,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -5236,7 +5236,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -5292,7 +5292,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -5399,7 +5399,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -5482,7 +5482,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -5631,7 +5631,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 },
@@ -5813,7 +5813,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -5977,7 +5977,7 @@
                                     "type": "array",
                                     "elementType": {
                                       "type": "reference",
-                                      "id": 505,
+                                      "id": 513,
                                       "name": "User"
                                     }
                                   }
@@ -7054,7 +7054,7 @@
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 583,
+                        "id": 584,
                         "name": "OpenIDConnectCredentials"
                       }
                     }
@@ -7608,7 +7608,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -7819,7 +7819,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -7920,7 +7920,7 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 533,
+                        "id": 534,
                         "name": "UserAttributes"
                       }
                     }
@@ -7959,7 +7959,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -8015,7 +8015,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -8085,7 +8085,7 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 539,
+                        "id": 540,
                         "name": "AdminUserAttributes"
                       }
                     }
@@ -8124,7 +8124,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -8180,7 +8180,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -8348,7 +8348,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -8432,7 +8432,7 @@
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 570,
+                        "id": 571,
                         "name": "VerifyOTPParams"
                       }
                     },
@@ -8523,7 +8523,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -8691,7 +8691,7 @@
                               ],
                               "type": {
                                 "type": "reference",
-                                "id": 557,
+                                "id": 558,
                                 "name": "CookieOptions"
                               }
                             },
@@ -9099,7 +9099,7 @@
                   },
                   {
                     "type": "reference",
-                    "id": 505,
+                    "id": 513,
                     "name": "User"
                   }
                 ]
@@ -9266,7 +9266,7 @@
                   },
                   {
                     "type": "reference",
-                    "id": 549,
+                    "id": 550,
                     "name": "Subscription"
                   }
                 ],
@@ -9287,7 +9287,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 695,
+                  "line": 697,
                   "character": 16
                 }
               ],
@@ -9435,7 +9435,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 520,
+                  "line": 522,
                   "character": 16
                 }
               ],
@@ -9495,7 +9495,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 525,
+                                  "line": 527,
                                   "character": 6
                                 }
                               ],
@@ -9515,7 +9515,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 524,
+                                  "line": 526,
                                   "character": 6
                                 }
                               ],
@@ -9680,7 +9680,7 @@
                                       },
                                       {
                                         "type": "reference",
-                                        "id": 505,
+                                        "id": 513,
                                         "name": "User"
                                       }
                                     ]
@@ -9718,7 +9718,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 595,
+                  "line": 597,
                   "character": 16
                 }
               ],
@@ -9738,7 +9738,7 @@
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 583,
+                        "id": 584,
                         "name": "OpenIDConnectCredentials"
                       }
                     }
@@ -9764,7 +9764,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 604,
+                                  "line": 606,
                                   "character": 4
                                 }
                               ],
@@ -9792,7 +9792,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 602,
+                                  "line": 604,
                                   "character": 4
                                 }
                               ],
@@ -9820,7 +9820,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 603,
+                                  "line": 605,
                                   "character": 4
                                 }
                               ],
@@ -9833,7 +9833,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -9868,7 +9868,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 546,
+                  "line": 548,
                   "character": 16
                 }
               ],
@@ -9928,7 +9928,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 550,
+                                  "line": 552,
                                   "character": 6
                                 }
                               ],
@@ -10093,7 +10093,7 @@
                                       },
                                       {
                                         "type": "reference",
-                                        "id": 505,
+                                        "id": 513,
                                         "name": "User"
                                       }
                                     ]
@@ -10131,7 +10131,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 568,
+                  "line": 570,
                   "character": 10
                 }
               ],
@@ -10181,7 +10181,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 573,
+                                  "line": 575,
                                   "character": 6
                                 }
                               ],
@@ -10230,7 +10230,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 571,
+                                  "line": 573,
                                   "character": 6
                                 }
                               ],
@@ -10250,7 +10250,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 572,
+                                  "line": 574,
                                   "character": 6
                                 }
                               ],
@@ -10471,7 +10471,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 800,
+                  "line": 802,
                   "character": 10
                 }
               ],
@@ -10509,7 +10509,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 777,
+                  "line": 779,
                   "character": 10
                 }
               ],
@@ -10550,7 +10550,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 714,
+                  "line": 716,
                   "character": 10
                 }
               ],
@@ -10593,7 +10593,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 741,
+                  "line": 743,
                   "character": 10
                 }
               ],
@@ -10636,7 +10636,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 650,
+                  "line": 652,
                   "character": 16
                 }
               ],
@@ -10685,7 +10685,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 630,
+                  "line": 632,
                   "character": 10
                 }
               ],
@@ -10726,7 +10726,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 746,
+                  "line": 748,
                   "character": 16
                 }
               ],
@@ -10763,7 +10763,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 722,
+                  "line": 724,
                   "character": 10
                 }
               ],
@@ -10809,7 +10809,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 757,
+                  "line": 759,
                   "character": 10
                 }
               ],
@@ -11017,7 +11017,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 500,
+                  "line": 502,
                   "character": 2
                 }
               ],
@@ -11117,7 +11117,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 501,
+                              "line": 503,
                               "character": 4
                             }
                           ],
@@ -11130,7 +11130,7 @@
                               },
                               {
                                 "type": "reference",
-                                "id": 549,
+                                "id": 550,
                                 "name": "Subscription"
                               }
                             ]
@@ -11145,7 +11145,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 502,
+                              "line": 504,
                               "character": 4
                             }
                           ],
@@ -11290,7 +11290,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -11558,7 +11558,7 @@
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 563,
+                        "id": 564,
                         "name": "UserCredentials"
                       }
                     },
@@ -11859,7 +11859,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -11892,7 +11892,7 @@
               "sources": [
                 {
                   "fileName": "src/GoTrueClient.ts",
-                  "line": 485,
+                  "line": 487,
                   "character": 8
                 }
               ],
@@ -11928,7 +11928,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 485,
+                                  "line": 487,
                                   "character": 29
                                 }
                               ],
@@ -11997,7 +11997,7 @@
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 563,
+                        "id": 564,
                         "name": "UserCredentials"
                       }
                     },
@@ -12179,7 +12179,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -12235,7 +12235,7 @@
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 533,
+                        "id": 534,
                         "name": "UserAttributes"
                       }
                     }
@@ -12274,7 +12274,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -12330,7 +12330,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -12387,7 +12387,7 @@
                       },
                       {
                         "type": "reference",
-                        "id": 505,
+                        "id": 513,
                         "name": "User"
                       }
                     ]
@@ -12427,7 +12427,7 @@
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 570,
+                        "id": 571,
                         "name": "VerifyOTPParams"
                       }
                     },
@@ -12569,7 +12569,7 @@
                                   },
                                   {
                                     "type": "reference",
-                                    "id": 505,
+                                    "id": 513,
                                     "name": "User"
                                   }
                                 ]
@@ -12623,14 +12623,14 @@
           ]
         },
         {
-          "id": 539,
+          "id": 540,
           "name": "AdminUserAttributes",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 541,
+              "id": 542,
               "name": "app_metadata",
               "kind": 1024,
               "kindString": "Property",
@@ -12644,7 +12644,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 137,
+                  "line": 142,
                   "character": 2
                 }
               ],
@@ -12654,7 +12654,7 @@
               }
             },
             {
-              "id": 548,
+              "id": 549,
               "name": "data",
               "kind": 1024,
               "kindString": "Property",
@@ -12667,7 +12667,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 112,
+                  "line": 117,
                   "character": 2
                 }
               ],
@@ -12677,12 +12677,12 @@
               },
               "inheritedFrom": {
                 "type": "reference",
-                "id": 538,
+                "id": 539,
                 "name": "UserAttributes.data"
               }
             },
             {
-              "id": 544,
+              "id": 545,
               "name": "email",
               "kind": 1024,
               "kindString": "Property",
@@ -12691,114 +12691,6 @@
               },
               "comment": {
                 "shortText": "The user's email."
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 92,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              },
-              "inheritedFrom": {
-                "type": "reference",
-                "id": 534,
-                "name": "UserAttributes.email"
-              }
-            },
-            {
-              "id": 547,
-              "name": "email_change_token",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "An email change token."
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 107,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              },
-              "inheritedFrom": {
-                "type": "reference",
-                "id": 537,
-                "name": "UserAttributes.email_change_token"
-              }
-            },
-            {
-              "id": 542,
-              "name": "email_confirm",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "Sets if a user has confirmed their email address.",
-                "text": "Only a service role can modify.\n"
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 144,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "boolean"
-              }
-            },
-            {
-              "id": 546,
-              "name": "password",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "The user's password."
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 102,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              },
-              "inheritedFrom": {
-                "type": "reference",
-                "id": 536,
-                "name": "UserAttributes.password"
-              }
-            },
-            {
-              "id": 545,
-              "name": "phone",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "The user's phone."
               },
               "sources": [
                 {
@@ -12814,11 +12706,119 @@
               "inheritedFrom": {
                 "type": "reference",
                 "id": 535,
-                "name": "UserAttributes.phone"
+                "name": "UserAttributes.email"
+              }
+            },
+            {
+              "id": 548,
+              "name": "email_change_token",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "An email change token."
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 112,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "id": 538,
+                "name": "UserAttributes.email_change_token"
               }
             },
             {
               "id": 543,
+              "name": "email_confirm",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Sets if a user has confirmed their email address.",
+                "text": "Only a service role can modify.\n"
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 149,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              }
+            },
+            {
+              "id": 547,
+              "name": "password",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The user's password."
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 107,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "id": 537,
+                "name": "UserAttributes.password"
+              }
+            },
+            {
+              "id": 546,
+              "name": "phone",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The user's phone."
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 102,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "id": 536,
+                "name": "UserAttributes.phone"
+              }
+            },
+            {
+              "id": 544,
               "name": "phone_confirm",
               "kind": 1024,
               "kindString": "Property",
@@ -12832,7 +12832,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 151,
+                  "line": 156,
                   "character": 2
                 }
               ],
@@ -12842,7 +12842,7 @@
               }
             },
             {
-              "id": 540,
+              "id": 541,
               "name": "user_metadata",
               "kind": 1024,
               "kindString": "Property",
@@ -12856,7 +12856,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 127,
+                  "line": 132,
                   "character": 2
                 }
               ],
@@ -12870,20 +12870,20 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [541, 548, 544, 547, 542, 546, 545, 543, 540]
+              "children": [542, 549, 545, 548, 543, 547, 546, 544, 541]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 115,
+              "line": 120,
               "character": 17
             }
           ],
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 533,
+              "id": 534,
               "name": "UserAttributes"
             }
           ]
@@ -12948,14 +12948,14 @@
           ]
         },
         {
-          "id": 557,
+          "id": 558,
           "name": "CookieOptions",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 560,
+              "id": 561,
               "name": "domain",
               "kind": 1024,
               "kindString": "Property",
@@ -12965,7 +12965,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 175,
+                  "line": 180,
                   "character": 2
                 }
               ],
@@ -12975,7 +12975,7 @@
               }
             },
             {
-              "id": 559,
+              "id": 560,
               "name": "lifetime",
               "kind": 1024,
               "kindString": "Property",
@@ -12985,7 +12985,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 173,
+                  "line": 178,
                   "character": 2
                 }
               ],
@@ -12995,28 +12995,8 @@
               }
             },
             {
-              "id": 558,
+              "id": 559,
               "name": "name",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 171,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 561,
-              "name": "path",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13036,6 +13016,26 @@
             },
             {
               "id": 562,
+              "name": "path",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 181,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 563,
               "name": "sameSite",
               "kind": 1024,
               "kindString": "Property",
@@ -13045,7 +13045,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 178,
+                  "line": 183,
                   "character": 2
                 }
               ],
@@ -13059,26 +13059,26 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [560, 559, 558, 561, 562]
+              "children": [561, 560, 559, 562, 563]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 169,
+              "line": 174,
               "character": 17
             }
           ]
         },
         {
-          "id": 583,
+          "id": 584,
           "name": "OpenIDConnectCredentials",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 587,
+              "id": 588,
               "name": "client_id",
               "kind": 1024,
               "kindString": "Property",
@@ -13088,45 +13088,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 211,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 584,
-              "name": "id_token",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 208,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 588,
-              "name": "issuer",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 212,
+                  "line": 216,
                   "character": 2
                 }
               ],
@@ -13137,14 +13099,34 @@
             },
             {
               "id": 585,
-              "name": "nonce",
+              "name": "id_token",
               "kind": 1024,
               "kindString": "Property",
               "flags": {},
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 209,
+                  "line": 213,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 589,
+              "name": "issuer",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 217,
                   "character": 2
                 }
               ],
@@ -13155,6 +13137,24 @@
             },
             {
               "id": 586,
+              "name": "nonce",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 214,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 587,
               "name": "provider",
               "kind": 1024,
               "kindString": "Property",
@@ -13164,7 +13164,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 210,
+                  "line": 215,
                   "character": 2
                 }
               ],
@@ -13179,13 +13179,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [587, 584, 588, 585, 586]
+              "children": [588, 585, 589, 586, 587]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 207,
+              "line": 212,
               "character": 17
             }
           ]
@@ -13198,7 +13198,7 @@
           "flags": {},
           "children": [
             {
-              "id": 488,
+              "id": 489,
               "name": "access_token",
               "kind": 1024,
               "kindString": "Property",
@@ -13206,7 +13206,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 34,
+                  "line": 35,
                   "character": 2
                 }
               ],
@@ -13216,7 +13216,7 @@
               }
             },
             {
-              "id": 490,
+              "id": 491,
               "name": "expires_at",
               "kind": 1024,
               "kindString": "Property",
@@ -13229,7 +13229,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 42,
+                  "line": 43,
                   "character": 2
                 }
               ],
@@ -13239,7 +13239,7 @@
               }
             },
             {
-              "id": 489,
+              "id": 490,
               "name": "expires_in",
               "kind": 1024,
               "kindString": "Property",
@@ -13252,13 +13252,42 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 38,
+                  "line": 39,
                   "character": 2
                 }
               ],
               "type": {
                 "type": "intrinsic",
                 "name": "number"
+              }
+            },
+            {
+              "id": 488,
+              "name": "provider_refresh_token",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 34,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": null
+                  },
+                  {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                ]
               }
             },
             {
@@ -13291,31 +13320,13 @@
               }
             },
             {
-              "id": 491,
+              "id": 492,
               "name": "refresh_token",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
                 "isOptional": true
               },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 43,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 492,
-              "name": "token_type",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
@@ -13330,7 +13341,7 @@
             },
             {
               "id": 493,
-              "name": "user",
+              "name": "token_type",
               "kind": 1024,
               "kindString": "Property",
               "flags": {},
@@ -13338,6 +13349,24 @@
                 {
                   "fileName": "src/lib/types.ts",
                   "line": 45,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 494,
+              "name": "user",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 46,
                   "character": 2
                 }
               ],
@@ -13350,7 +13379,7 @@
                   },
                   {
                     "type": "reference",
-                    "id": 505,
+                    "id": 513,
                     "name": "User"
                   }
                 ]
@@ -13361,7 +13390,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [488, 490, 489, 487, 491, 492, 493]
+              "children": [489, 491, 490, 488, 487, 492, 493, 494]
             }
           ],
           "sources": [
@@ -13373,14 +13402,14 @@
           ]
         },
         {
-          "id": 549,
+          "id": 550,
           "name": "Subscription",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 550,
+              "id": 551,
               "name": "id",
               "kind": 1024,
               "kindString": "Property",
@@ -13391,7 +13420,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 158,
+                  "line": 163,
                   "character": 2
                 }
               ],
@@ -13401,7 +13430,7 @@
               }
             },
             {
-              "id": 551,
+              "id": 552,
               "name": "callback",
               "kind": 2048,
               "kindString": "Method",
@@ -13409,13 +13438,13 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 162,
+                  "line": 167,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 552,
+                  "id": 553,
                   "name": "callback",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -13425,7 +13454,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 553,
+                      "id": 554,
                       "name": "event",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -13437,7 +13466,7 @@
                       }
                     },
                     {
-                      "id": 554,
+                      "id": 555,
                       "name": "session",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -13466,7 +13495,7 @@
               ]
             },
             {
-              "id": 555,
+              "id": 556,
               "name": "unsubscribe",
               "kind": 2048,
               "kindString": "Method",
@@ -13474,13 +13503,13 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 166,
+                  "line": 171,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 556,
+                  "id": 557,
                   "name": "unsubscribe",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -13500,244 +13529,32 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [550]
+              "children": [551]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [551, 555]
+              "children": [552, 556]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 154,
+              "line": 159,
               "character": 17
             }
           ]
         },
         {
-          "id": 505,
+          "id": 513,
           "name": "User",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 522,
-              "name": "action_link",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 75,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 507,
-              "name": "app_metadata",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 62,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "reflection",
-                "declaration": {
-                  "id": 508,
-                  "name": "__type",
-                  "kind": 65536,
-                  "kindString": "Type literal",
-                  "flags": {},
-                  "children": [
-                    {
-                      "id": 509,
-                      "name": "provider",
-                      "kind": 1024,
-                      "kindString": "Property",
-                      "flags": {
-                        "isOptional": true
-                      },
-                      "sources": [
-                        {
-                          "fileName": "src/lib/types.ts",
-                          "line": 63,
-                          "character": 4
-                        }
-                      ],
-                      "type": {
-                        "type": "intrinsic",
-                        "name": "string"
-                      }
-                    }
-                  ],
-                  "groups": [
-                    {
-                      "title": "Properties",
-                      "kind": 1024,
-                      "children": [509]
-                    }
-                  ],
-                  "indexSignature": {
-                    "id": 510,
-                    "name": "__index",
-                    "kind": 8192,
-                    "kindString": "Index signature",
-                    "flags": {},
-                    "parameters": [
-                      {
-                        "id": 511,
-                        "name": "key",
-                        "kind": 32768,
-                        "flags": {},
-                        "type": {
-                          "type": "intrinsic",
-                          "name": "string"
-                        }
-                      }
-                    ],
-                    "type": {
-                      "type": "intrinsic",
-                      "name": "any"
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "id": 516,
-              "name": "aud",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 69,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 517,
-              "name": "confirmation_sent_at",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 70,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 526,
-              "name": "confirmed_at",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 79,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 525,
-              "name": "created_at",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 78,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
               "id": 523,
-              "name": "email",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 76,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 519,
-              "name": "email_change_sent_at",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 72,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 527,
-              "name": "email_confirmed_at",
+              "name": "action_link",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13756,55 +13573,30 @@
               }
             },
             {
-              "id": 506,
-              "name": "id",
+              "id": 515,
+              "name": "app_metadata",
               "kind": 1024,
               "kindString": "Property",
               "flags": {},
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 61,
+                  "line": 72,
                   "character": 2
                 }
               ],
               "type": {
-                "type": "intrinsic",
-                "name": "string"
+                "type": "reference",
+                "id": 506,
+                "name": "UserAppMetadata"
               }
             },
             {
-              "id": 532,
-              "name": "identities",
+              "id": 517,
+              "name": "aud",
               "kind": 1024,
               "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 85,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "array",
-                "elementType": {
-                  "type": "reference",
-                  "id": 494,
-                  "name": "UserIdentity"
-                }
-              }
-            },
-            {
-              "id": 521,
-              "name": "invited_at",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
+              "flags": {},
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
@@ -13818,8 +13610,8 @@
               }
             },
             {
-              "id": 529,
-              "name": "last_sign_in_at",
+              "id": 518,
+              "name": "confirmation_sent_at",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13828,7 +13620,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 82,
+                  "line": 75,
                   "character": 2
                 }
               ],
@@ -13838,8 +13630,8 @@
               }
             },
             {
-              "id": 520,
-              "name": "new_email",
+              "id": 527,
+              "name": "confirmed_at",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13848,7 +13640,25 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 73,
+                  "line": 84,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 526,
+              "name": "created_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 83,
                   "character": 2
                 }
               ],
@@ -13859,7 +13669,27 @@
             },
             {
               "id": 524,
-              "name": "phone",
+              "name": "email",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 81,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 520,
+              "name": "email_change_sent_at",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13879,7 +13709,7 @@
             },
             {
               "id": 528,
-              "name": "phone_confirmed_at",
+              "name": "email_confirmed_at",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13888,7 +13718,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 81,
+                  "line": 85,
                   "character": 2
                 }
               ],
@@ -13898,13 +13728,11 @@
               }
             },
             {
-              "id": 518,
-              "name": "recovery_sent_at",
+              "id": 514,
+              "name": "id",
               "kind": 1024,
               "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
+              "flags": {},
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
@@ -13918,8 +13746,8 @@
               }
             },
             {
-              "id": 530,
-              "name": "role",
+              "id": 533,
+              "name": "identities",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13928,7 +13756,131 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 83,
+                  "line": 90,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "array",
+                "elementType": {
+                  "type": "reference",
+                  "id": 495,
+                  "name": "UserIdentity"
+                }
+              }
+            },
+            {
+              "id": 522,
+              "name": "invited_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 79,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 530,
+              "name": "last_sign_in_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 87,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 521,
+              "name": "new_email",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 78,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 525,
+              "name": "phone",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 82,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 529,
+              "name": "phone_confirmed_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 86,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 519,
+              "name": "recovery_sent_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 76,
                   "character": 2
                 }
               ],
@@ -13939,7 +13891,7 @@
             },
             {
               "id": 531,
-              "name": "updated_at",
+              "name": "role",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -13948,7 +13900,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 84,
+                  "line": 88,
                   "character": 2
                 }
               ],
@@ -13958,7 +13910,27 @@
               }
             },
             {
-              "id": 512,
+              "id": 532,
+              "name": "updated_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 89,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 516,
               "name": "user_metadata",
               "kind": 1024,
               "kindString": "Property",
@@ -13966,42 +13938,14 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 66,
+                  "line": 73,
                   "character": 2
                 }
               ],
               "type": {
-                "type": "reflection",
-                "declaration": {
-                  "id": 513,
-                  "name": "__type",
-                  "kind": 65536,
-                  "kindString": "Type literal",
-                  "flags": {},
-                  "indexSignature": {
-                    "id": 514,
-                    "name": "__index",
-                    "kind": 8192,
-                    "kindString": "Index signature",
-                    "flags": {},
-                    "parameters": [
-                      {
-                        "id": 515,
-                        "name": "key",
-                        "kind": 32768,
-                        "flags": {},
-                        "type": {
-                          "type": "intrinsic",
-                          "name": "string"
-                        }
-                      }
-                    ],
-                    "type": {
-                      "type": "intrinsic",
-                      "name": "any"
-                    }
-                  }
-                }
+                "type": "reference",
+                "id": 510,
+                "name": "UserMetadata"
               }
             }
           ],
@@ -14010,28 +13954,94 @@
               "title": "Properties",
               "kind": 1024,
               "children": [
-                522, 507, 516, 517, 526, 525, 523, 519, 527, 506, 532, 521, 529, 520, 524, 528, 518,
-                530, 531, 512
+                523, 515, 517, 518, 527, 526, 524, 520, 528, 514, 533, 522, 530, 521, 525, 529, 519,
+                531, 532, 516
               ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 60,
+              "line": 70,
               "character": 17
             }
           ]
         },
         {
-          "id": 533,
+          "id": 506,
+          "name": "UserAppMetadata",
+          "kind": 256,
+          "kindString": "Interface",
+          "flags": {},
+          "children": [
+            {
+              "id": 507,
+              "name": "provider",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 62,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [507]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 61,
+              "character": 17
+            }
+          ],
+          "indexSignature": {
+            "id": 508,
+            "name": "__index",
+            "kind": 8192,
+            "kindString": "Index signature",
+            "flags": {},
+            "parameters": [
+              {
+                "id": 509,
+                "name": "key",
+                "kind": 32768,
+                "flags": {},
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              }
+            ],
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        },
+        {
+          "id": 534,
           "name": "UserAttributes",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 538,
+              "id": 539,
               "name": "data",
               "kind": 1024,
               "kindString": "Property",
@@ -14044,7 +14054,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 112,
+                  "line": 117,
                   "character": 2
                 }
               ],
@@ -14054,7 +14064,7 @@
               }
             },
             {
-              "id": 534,
+              "id": 535,
               "name": "email",
               "kind": 1024,
               "kindString": "Property",
@@ -14067,7 +14077,30 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 92,
+                  "line": 97,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 538,
+              "name": "email_change_token",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "An email change token."
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 112,
                   "character": 2
                 }
               ],
@@ -14078,14 +14111,14 @@
             },
             {
               "id": 537,
-              "name": "email_change_token",
+              "name": "password",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
                 "isOptional": true
               },
               "comment": {
-                "shortText": "An email change token."
+                "shortText": "The user's password."
               },
               "sources": [
                 {
@@ -14101,29 +14134,6 @@
             },
             {
               "id": 536,
-              "name": "password",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "The user's password."
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 102,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 535,
               "name": "phone",
               "kind": 1024,
               "kindString": "Property",
@@ -14136,7 +14146,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 97,
+                  "line": 102,
                   "character": 2
                 }
               ],
@@ -14150,115 +14160,34 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [538, 534, 537, 536, 535]
+              "children": [539, 535, 538, 537, 536]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 88,
+              "line": 93,
               "character": 17
             }
           ],
           "extendedBy": [
             {
               "type": "reference",
-              "id": 539,
+              "id": 540,
               "name": "AdminUserAttributes"
             }
           ]
         },
         {
-          "id": 563,
+          "id": 564,
           "name": "UserCredentials",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 564,
-              "name": "email",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 182,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 569,
-              "name": "oidc",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 188,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "id": 583,
-                "name": "OpenIDConnectCredentials"
-              }
-            },
-            {
-              "id": 566,
-              "name": "password",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 184,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
               "id": 565,
-              "name": "phone",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 183,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 568,
-              "name": "provider",
+              "name": "email",
               "kind": 1024,
               "kindString": "Property",
               "flags": {
@@ -14272,13 +14201,94 @@
                 }
               ],
               "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 570,
+              "name": "oidc",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 193,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 584,
+                "name": "OpenIDConnectCredentials"
+              }
+            },
+            {
+              "id": 567,
+              "name": "password",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 189,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 566,
+              "name": "phone",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 188,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 569,
+              "name": "provider",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 192,
+                  "character": 2
+                }
+              ],
+              "type": {
                 "type": "reference",
                 "id": 481,
                 "name": "Provider"
               }
             },
             {
-              "id": 567,
+              "id": 568,
               "name": "refreshToken",
               "kind": 1024,
               "kindString": "Property",
@@ -14288,7 +14298,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 185,
+                  "line": 190,
                   "character": 2
                 }
               ],
@@ -14302,110 +14312,27 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [564, 569, 566, 565, 568, 567]
+              "children": [565, 570, 567, 566, 569, 568]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 181,
+              "line": 186,
               "character": 17
             }
           ]
         },
         {
-          "id": 494,
+          "id": 495,
           "name": "UserIdentity",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 502,
-              "name": "created_at",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 55,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 495,
-              "name": "id",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 49,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 497,
-              "name": "identity_data",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 51,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "reflection",
-                "declaration": {
-                  "id": 498,
-                  "name": "__type",
-                  "kind": 65536,
-                  "kindString": "Type literal",
-                  "flags": {},
-                  "indexSignature": {
-                    "id": 499,
-                    "name": "__index",
-                    "kind": 8192,
-                    "kindString": "Index signature",
-                    "flags": {},
-                    "parameters": [
-                      {
-                        "id": 500,
-                        "name": "key",
-                        "kind": 32768,
-                        "flags": {},
-                        "type": {
-                          "type": "intrinsic",
-                          "name": "string"
-                        }
-                      }
-                    ],
-                    "type": {
-                      "type": "intrinsic",
-                      "name": "any"
-                    }
-                  }
-                }
-              }
-            },
-            {
               "id": 503,
-              "name": "last_sign_in_at",
+              "name": "created_at",
               "kind": 1024,
               "kindString": "Property",
               "flags": {},
@@ -14422,46 +14349,8 @@
               }
             },
             {
-              "id": 501,
-              "name": "provider",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 54,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 504,
-              "name": "updated_at",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 57,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
               "id": 496,
-              "name": "user_id",
+              "name": "id",
               "kind": 1024,
               "kindString": "Property",
               "flags": {},
@@ -14476,33 +14365,309 @@
                 "type": "intrinsic",
                 "name": "string"
               }
+            },
+            {
+              "id": 498,
+              "name": "identity_data",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 52,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 499,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "indexSignature": {
+                    "id": 500,
+                    "name": "__index",
+                    "kind": 8192,
+                    "kindString": "Index signature",
+                    "flags": {},
+                    "parameters": [
+                      {
+                        "id": 501,
+                        "name": "key",
+                        "kind": 32768,
+                        "flags": {},
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "any"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": 504,
+              "name": "last_sign_in_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 57,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 502,
+              "name": "provider",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 55,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 505,
+              "name": "updated_at",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 58,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 497,
+              "name": "user_id",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 51,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
             }
           ],
           "groups": [
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [502, 495, 497, 503, 501, 504, 496]
+              "children": [503, 496, 498, 504, 502, 505, 497]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 48,
+              "line": 49,
               "character": 17
             }
           ]
         },
         {
-          "id": 576,
+          "id": 510,
+          "name": "UserMetadata",
+          "kind": 256,
+          "kindString": "Interface",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 66,
+              "character": 17
+            }
+          ],
+          "indexSignature": {
+            "id": 511,
+            "name": "__index",
+            "kind": 8192,
+            "kindString": "Index signature",
+            "flags": {},
+            "parameters": [
+              {
+                "id": 512,
+                "name": "key",
+                "kind": 32768,
+                "flags": {},
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              }
+            ],
+            "type": {
+              "type": "intrinsic",
+              "name": "any"
+            }
+          }
+        },
+        {
+          "id": 577,
           "name": "VerifyEmailOTPParams",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 577,
+              "id": 578,
               "name": "email",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 204,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 579,
+              "name": "phone",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 205,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "undefined"
+              }
+            },
+            {
+              "id": 580,
+              "name": "token",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 206,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 581,
+              "name": "type",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 207,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 583,
+                "name": "EmailOTPType"
+              }
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [578, 579, 580, 581]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 203,
+              "character": 17
+            }
+          ]
+        },
+        {
+          "id": 572,
+          "name": "VerifyMobileOTPParams",
+          "kind": 256,
+          "kindString": "Interface",
+          "flags": {},
+          "children": [
+            {
+              "id": 573,
+              "name": "email",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 198,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "undefined"
+              }
+            },
+            {
+              "id": 574,
+              "name": "phone",
               "kind": 1024,
               "kindString": "Property",
               "flags": {},
@@ -14519,13 +14684,11 @@
               }
             },
             {
-              "id": 578,
-              "name": "phone",
+              "id": 575,
+              "name": "token",
               "kind": 1024,
               "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
+              "flags": {},
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
@@ -14535,15 +14698,17 @@
               ],
               "type": {
                 "type": "intrinsic",
-                "name": "undefined"
+                "name": "string"
               }
             },
             {
-              "id": 579,
-              "name": "token",
+              "id": 576,
+              "name": "type",
               "kind": 1024,
               "kindString": "Property",
-              "flags": {},
+              "flags": {
+                "isOptional": true
+              },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
@@ -14552,126 +14717,8 @@
                 }
               ],
               "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 580,
-              "name": "type",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 202,
-                  "character": 2
-                }
-              ],
-              "type": {
                 "type": "reference",
                 "id": 582,
-                "name": "EmailOTPType"
-              }
-            }
-          ],
-          "groups": [
-            {
-              "title": "Properties",
-              "kind": 1024,
-              "children": [577, 578, 579, 580]
-            }
-          ],
-          "sources": [
-            {
-              "fileName": "src/lib/types.ts",
-              "line": 198,
-              "character": 17
-            }
-          ]
-        },
-        {
-          "id": 571,
-          "name": "VerifyMobileOTPParams",
-          "kind": 256,
-          "kindString": "Interface",
-          "flags": {},
-          "children": [
-            {
-              "id": 572,
-              "name": "email",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 193,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "undefined"
-              }
-            },
-            {
-              "id": 573,
-              "name": "phone",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 194,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 574,
-              "name": "token",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 195,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "intrinsic",
-                "name": "string"
-              }
-            },
-            {
-              "id": 575,
-              "name": "type",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 196,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "id": 581,
                 "name": "MobileOTPType"
               }
             }
@@ -14680,13 +14727,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [572, 573, 574, 575]
+              "children": [573, 574, 575, 576]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 192,
+              "line": 197,
               "character": 17
             }
           ]
@@ -14735,7 +14782,7 @@
           }
         },
         {
-          "id": 582,
+          "id": 583,
           "name": "EmailOTPType",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -14743,7 +14790,7 @@
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 205,
+              "line": 210,
               "character": 12
             }
           ],
@@ -14774,7 +14821,7 @@
           }
         },
         {
-          "id": 581,
+          "id": 582,
           "name": "MobileOTPType",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -14782,7 +14829,7 @@
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 204,
+              "line": 209,
               "character": 12
             }
           ],
@@ -14884,7 +14931,7 @@
           }
         },
         {
-          "id": 589,
+          "id": 590,
           "name": "SupportedStorage",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -14892,7 +14939,7 @@
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 224,
+              "line": 229,
               "character": 12
             }
           ],
@@ -14935,7 +14982,7 @@
           }
         },
         {
-          "id": 570,
+          "id": 571,
           "name": "VerifyOTPParams",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -14943,7 +14990,7 @@
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 191,
+              "line": 196,
               "character": 12
             }
           ],
@@ -14952,12 +14999,12 @@
             "types": [
               {
                 "type": "reference",
-                "id": 571,
+                "id": 572,
                 "name": "VerifyMobileOTPParams"
               },
               {
                 "type": "reference",
-                "id": 576,
+                "id": 577,
                 "name": "VerifyEmailOTPParams"
               }
             ]
@@ -14973,12 +15020,12 @@
         {
           "title": "Interfaces",
           "kind": 256,
-          "children": [539, 483, 557, 583, 486, 549, 505, 533, 563, 494, 576, 571]
+          "children": [540, 483, 558, 584, 486, 550, 513, 506, 534, 564, 495, 510, 577, 572]
         },
         {
           "title": "Type aliases",
           "kind": 4194304,
-          "children": [482, 582, 581, 481, 589, 570]
+          "children": [482, 583, 582, 481, 590, 571]
         }
       ],
       "sources": [
@@ -23897,7 +23944,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 73,
+                      "line": 74,
                       "character": 3
                     }
                   ]
@@ -23913,7 +23960,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 43,
+                      "line": 44,
                       "character": 13
                     }
                   ],
@@ -23943,7 +23990,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 44,
+                      "line": 45,
                       "character": 10
                     }
                   ],
@@ -23968,7 +24015,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 60,
+                      "line": 61,
                       "character": 6
                     }
                   ],
@@ -23998,7 +24045,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 58,
+                      "line": 59,
                       "character": 8
                     }
                   ],
@@ -24018,7 +24065,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 57,
+                      "line": 58,
                       "character": 8
                     }
                   ],
@@ -24038,7 +24085,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 45,
+                      "line": 46,
                       "character": 10
                     }
                   ],
@@ -24060,7 +24107,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 46,
+                      "line": 47,
                       "character": 9
                     }
                   ],
@@ -24128,7 +24175,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 50,
+                      "line": 51,
                       "character": 21
                     }
                   ],
@@ -24149,7 +24196,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 52,
+                      "line": 53,
                       "character": 16
                     }
                   ],
@@ -24188,7 +24235,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 56,
+                      "line": 57,
                       "character": 8
                     }
                   ],
@@ -24209,7 +24256,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 51,
+                      "line": 52,
                       "character": 19
                     }
                   ],
@@ -24231,7 +24278,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 47,
+                      "line": 48,
                       "character": 8
                     }
                   ],
@@ -24298,7 +24345,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 53,
+                      "line": 54,
                       "character": 21
                     }
                   ],
@@ -24328,7 +24375,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 59,
+                      "line": 60,
                       "character": 18
                     }
                   ],
@@ -24348,7 +24395,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 55,
+                      "line": 56,
                       "character": 16
                     }
                   ],
@@ -24369,7 +24416,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 54,
+                      "line": 55,
                       "character": 5
                     }
                   ],
@@ -24390,7 +24437,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 61,
+                      "line": 62,
                       "character": 12
                     }
                   ],
@@ -24414,7 +24461,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 62,
+                      "line": 63,
                       "character": 12
                     }
                   ],
@@ -24436,7 +24483,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 48,
+                      "line": 49,
                       "character": 9
                     }
                   ],
@@ -24457,7 +24504,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 49,
+                      "line": 50,
                       "character": 11
                     }
                   ],
@@ -24550,7 +24597,7 @@
                               "sources": [
                                 {
                                   "fileName": "RealtimeClient.ts",
-                                  "line": 405,
+                                  "line": 406,
                                   "character": 11
                                 }
                               ]
@@ -24567,7 +24614,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 403,
+                      "line": 404,
                       "character": 23
                     }
                   ]
@@ -24599,7 +24646,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 416,
+                      "line": 417,
                       "character": 26
                     }
                   ]
@@ -24646,7 +24693,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 383,
+                      "line": 384,
                       "character": 22
                     }
                   ]
@@ -24693,7 +24740,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 391,
+                      "line": 392,
                       "character": 22
                     }
                   ]
@@ -24725,7 +24772,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 371,
+                      "line": 372,
                       "character": 21
                     }
                   ]
@@ -24757,7 +24804,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 423,
+                      "line": 424,
                       "character": 24
                     }
                   ]
@@ -24789,7 +24836,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 397,
+                      "line": 398,
                       "character": 27
                     }
                   ]
@@ -24835,7 +24882,7 @@
                           },
                           "type": {
                             "type": "reference",
-                            "id": 364,
+                            "id": 365,
                             "name": "ChannelParams"
                           },
                           "defaultValue": "{}"
@@ -24851,7 +24898,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 264,
+                      "line": 265,
                       "character": 9
                     }
                   ]
@@ -24885,7 +24932,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 125,
+                      "line": 126,
                       "character": 9
                     }
                   ]
@@ -24920,7 +24967,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 233,
+                      "line": 234,
                       "character": 17
                     }
                   ]
@@ -25024,7 +25071,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 151,
+                                      "line": 152,
                                       "character": 40
                                     }
                                   ],
@@ -25044,7 +25091,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 151,
+                                      "line": 152,
                                       "character": 20
                                     }
                                   ],
@@ -25073,7 +25120,7 @@
                               "sources": [
                                 {
                                   "fileName": "RealtimeClient.ts",
-                                  "line": 151,
+                                  "line": 152,
                                   "character": 13
                                 }
                               ]
@@ -25087,7 +25134,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 148,
+                      "line": 149,
                       "character": 12
                     }
                   ]
@@ -25121,7 +25168,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 320,
+                      "line": 321,
                       "character": 13
                     }
                   ]
@@ -25155,7 +25202,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 249,
+                      "line": 250,
                       "character": 13
                     }
                   ]
@@ -25204,7 +25251,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 361,
+                      "line": 362,
                       "character": 16
                     }
                   ]
@@ -25281,7 +25328,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 178,
+                      "line": 179,
                       "character": 5
                     }
                   ]
@@ -25315,7 +25362,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 330,
+                      "line": 331,
                       "character": 9
                     }
                   ]
@@ -25373,7 +25420,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 202,
+                      "line": 203,
                       "character": 9
                     }
                   ]
@@ -25426,7 +25473,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 290,
+                                      "line": 291,
                                       "character": 34
                                     }
                                   ],
@@ -25446,7 +25493,7 @@
                               "sources": [
                                 {
                                   "fileName": "RealtimeClient.ts",
-                                  "line": 290,
+                                  "line": 291,
                                   "character": 27
                                 }
                               ]
@@ -25463,7 +25510,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 290,
+                      "line": 291,
                       "character": 15
                     }
                   ]
@@ -25521,7 +25568,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 214,
+                      "line": 215,
                       "character": 9
                     }
                   ]
@@ -25579,7 +25626,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 226,
+                      "line": 227,
                       "character": 11
                     }
                   ]
@@ -25637,7 +25684,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 190,
+                      "line": 191,
                       "character": 8
                     }
                   ]
@@ -25688,7 +25735,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 275,
+                      "line": 276,
                       "character": 6
                     }
                   ]
@@ -25741,7 +25788,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 258,
+                      "line": 259,
                       "character": 8
                     }
                   ]
@@ -25802,7 +25849,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 346,
+                      "line": 347,
                       "character": 9
                     }
                   ]
@@ -25827,7 +25874,7 @@
                       "sources": [
                         {
                           "fileName": "RealtimeClient.ts",
-                          "line": 70,
+                          "line": 71,
                           "character": 9
                         }
                       ],
@@ -25851,7 +25898,7 @@
                       "sources": [
                         {
                           "fileName": "RealtimeClient.ts",
-                          "line": 71,
+                          "line": 72,
                           "character": 9
                         }
                       ],
@@ -25875,7 +25922,7 @@
                       "sources": [
                         {
                           "fileName": "RealtimeClient.ts",
-                          "line": 72,
+                          "line": 73,
                           "character": 11
                         }
                       ],
@@ -25899,7 +25946,7 @@
                       "sources": [
                         {
                           "fileName": "RealtimeClient.ts",
-                          "line": 69,
+                          "line": 70,
                           "character": 8
                         }
                       ],
@@ -25923,7 +25970,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 63,
+                      "line": 64,
                       "character": 22
                     }
                   ],
@@ -25964,13 +26011,13 @@
               "sources": [
                 {
                   "fileName": "RealtimeClient.ts",
-                  "line": 42,
+                  "line": 43,
                   "character": 35
                 }
               ]
             },
             {
-              "id": 364,
+              "id": 365,
               "name": "ChannelParams",
               "kind": 4194304,
               "kindString": "Type alias",
@@ -25978,28 +26025,28 @@
               "sources": [
                 {
                   "fileName": "RealtimeClient.ts",
-                  "line": 35,
+                  "line": 36,
                   "character": 18
                 }
               ],
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 365,
+                  "id": 366,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "indexSignature": [
                     {
-                      "id": 367,
+                      "id": 368,
                       "name": "__index",
                       "kind": 8192,
                       "kindString": "Index signature",
                       "flags": {},
                       "parameters": [
                         {
-                          "id": 368,
+                          "id": 369,
                           "name": "key",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -26018,7 +26065,7 @@
                   ],
                   "children": [
                     {
-                      "id": 366,
+                      "id": 367,
                       "name": "selfBroadcast",
                       "kind": 32,
                       "kindString": "Variable",
@@ -26028,7 +26075,7 @@
                       "sources": [
                         {
                           "fileName": "RealtimeClient.ts",
-                          "line": 36,
+                          "line": 37,
                           "character": 15
                         }
                       ],
@@ -26055,13 +26102,13 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [366]
+                      "children": [367]
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 35,
+                      "line": 36,
                       "character": 20
                     }
                   ]
@@ -26106,6 +26153,35 @@
                       "type": {
                         "type": "intrinsic",
                         "name": "string"
+                      }
+                    },
+                    {
+                      "id": 364,
+                      "name": "join_ref",
+                      "kind": 32,
+                      "kindString": "Variable",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "RealtimeClient.ts",
+                          "line": 33,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "intrinsic",
+                            "name": "undefined"
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        ]
                       }
                     },
                     {
@@ -26167,7 +26243,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [361, 362, 363, 360]
+                      "children": [361, 364, 362, 363, 360]
                     }
                   ],
                   "sources": [
@@ -26556,7 +26632,7 @@
               }
             },
             {
-              "id": 369,
+              "id": 370,
               "name": "noop",
               "kind": 64,
               "kindString": "Function",
@@ -26565,7 +26641,7 @@
               },
               "signatures": [
                 {
-                  "id": 370,
+                  "id": 371,
                   "name": "noop",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -26579,7 +26655,7 @@
               "sources": [
                 {
                   "fileName": "RealtimeClient.ts",
-                  "line": 40,
+                  "line": 41,
                   "character": 10
                 }
               ]
@@ -26594,12 +26670,12 @@
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [364, 358, 340]
+              "children": [365, 358, 340]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [369]
+              "children": [370]
             }
           ],
           "sources": [
@@ -28080,7 +28156,7 @@
           ]
         },
         {
-          "id": 445,
+          "id": 446,
           "name": "\"index\"",
           "kind": 1,
           "kindString": "Module",
@@ -29342,7 +29418,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 100,
+                      "line": 101,
                       "character": 25
                     }
                   ]
@@ -29374,7 +29450,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 108,
+                      "line": 109,
                       "character": 24
                     }
                   ]
@@ -29434,7 +29510,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 125,
+                      "line": 126,
                       "character": 22
                     }
                   ]
@@ -29489,7 +29565,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/push.ts",
-                                      "line": 115,
+                                      "line": 116,
                                       "character": 12
                                     }
                                   ],
@@ -29509,7 +29585,7 @@
                                   "sources": [
                                     {
                                       "fileName": "lib/push.ts",
-                                      "line": 114,
+                                      "line": 115,
                                       "character": 10
                                     }
                                   ],
@@ -29529,7 +29605,7 @@
                               "sources": [
                                 {
                                   "fileName": "lib/push.ts",
-                                  "line": 113,
+                                  "line": 114,
                                   "character": 24
                                 }
                               ]
@@ -29546,7 +29622,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 113,
+                      "line": 114,
                       "character": 23
                     }
                   ]
@@ -29577,7 +29653,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 95,
+                      "line": 96,
                       "character": 9
                     }
                   ]
@@ -29636,7 +29712,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 61,
+                      "line": 62,
                       "character": 9
                     }
                   ]
@@ -29744,7 +29820,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 70,
+                      "line": 71,
                       "character": 14
                     }
                   ]
@@ -29803,7 +29879,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 91,
+                      "line": 92,
                       "character": 9
                     }
                   ]
@@ -29877,7 +29953,7 @@
                               "sources": [
                                 {
                                   "fileName": "lib/push.ts",
-                                  "line": 57,
+                                  "line": 58,
                                   "character": 24
                                 }
                               ]
@@ -29894,7 +29970,7 @@
                   "sources": [
                     {
                       "fileName": "lib/push.ts",
-                      "line": 57,
+                      "line": 58,
                       "character": 15
                     }
                   ]
@@ -30695,7 +30771,7 @@
           ]
         },
         {
-          "id": 371,
+          "id": 372,
           "name": "\"lib/transformers\"",
           "kind": 1,
           "kindString": "Module",
@@ -30705,7 +30781,7 @@
           "originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/transformers.ts",
           "children": [
             {
-              "id": 372,
+              "id": 373,
               "name": "PostgresTypes",
               "kind": 4,
               "kindString": "Enumeration",
@@ -30717,7 +30793,7 @@
               },
               "children": [
                 {
-                  "id": 373,
+                  "id": 374,
                   "name": "abstime",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30734,7 +30810,7 @@
                   "defaultValue": "\"abstime\""
                 },
                 {
-                  "id": 374,
+                  "id": 375,
                   "name": "bool",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30751,7 +30827,7 @@
                   "defaultValue": "\"bool\""
                 },
                 {
-                  "id": 375,
+                  "id": 376,
                   "name": "date",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30768,7 +30844,7 @@
                   "defaultValue": "\"date\""
                 },
                 {
-                  "id": 376,
+                  "id": 377,
                   "name": "daterange",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30785,7 +30861,7 @@
                   "defaultValue": "\"daterange\""
                 },
                 {
-                  "id": 377,
+                  "id": 378,
                   "name": "float4",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30802,7 +30878,7 @@
                   "defaultValue": "\"float4\""
                 },
                 {
-                  "id": 378,
+                  "id": 379,
                   "name": "float8",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30819,7 +30895,7 @@
                   "defaultValue": "\"float8\""
                 },
                 {
-                  "id": 379,
+                  "id": 380,
                   "name": "int2",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30836,7 +30912,7 @@
                   "defaultValue": "\"int2\""
                 },
                 {
-                  "id": 380,
+                  "id": 381,
                   "name": "int4",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30853,7 +30929,7 @@
                   "defaultValue": "\"int4\""
                 },
                 {
-                  "id": 381,
+                  "id": 382,
                   "name": "int4range",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30870,7 +30946,7 @@
                   "defaultValue": "\"int4range\""
                 },
                 {
-                  "id": 382,
+                  "id": 383,
                   "name": "int8",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30887,7 +30963,7 @@
                   "defaultValue": "\"int8\""
                 },
                 {
-                  "id": 383,
+                  "id": 384,
                   "name": "int8range",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30904,7 +30980,7 @@
                   "defaultValue": "\"int8range\""
                 },
                 {
-                  "id": 384,
+                  "id": 385,
                   "name": "json",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30921,7 +30997,7 @@
                   "defaultValue": "\"json\""
                 },
                 {
-                  "id": 385,
+                  "id": 386,
                   "name": "jsonb",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30938,7 +31014,7 @@
                   "defaultValue": "\"jsonb\""
                 },
                 {
-                  "id": 386,
+                  "id": 387,
                   "name": "money",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30955,7 +31031,7 @@
                   "defaultValue": "\"money\""
                 },
                 {
-                  "id": 387,
+                  "id": 388,
                   "name": "numeric",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30972,7 +31048,7 @@
                   "defaultValue": "\"numeric\""
                 },
                 {
-                  "id": 388,
+                  "id": 389,
                   "name": "oid",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -30989,7 +31065,7 @@
                   "defaultValue": "\"oid\""
                 },
                 {
-                  "id": 389,
+                  "id": 390,
                   "name": "reltime",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31006,7 +31082,7 @@
                   "defaultValue": "\"reltime\""
                 },
                 {
-                  "id": 390,
+                  "id": 391,
                   "name": "text",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31023,7 +31099,7 @@
                   "defaultValue": "\"text\""
                 },
                 {
-                  "id": 391,
+                  "id": 392,
                   "name": "time",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31040,7 +31116,7 @@
                   "defaultValue": "\"time\""
                 },
                 {
-                  "id": 392,
+                  "id": 393,
                   "name": "timestamp",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31057,7 +31133,7 @@
                   "defaultValue": "\"timestamp\""
                 },
                 {
-                  "id": 393,
+                  "id": 394,
                   "name": "timestamptz",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31074,7 +31150,7 @@
                   "defaultValue": "\"timestamptz\""
                 },
                 {
-                  "id": 394,
+                  "id": 395,
                   "name": "timetz",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31091,7 +31167,7 @@
                   "defaultValue": "\"timetz\""
                 },
                 {
-                  "id": 395,
+                  "id": 396,
                   "name": "tsrange",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31108,7 +31184,7 @@
                   "defaultValue": "\"tsrange\""
                 },
                 {
-                  "id": 396,
+                  "id": 397,
                   "name": "tstzrange",
                   "kind": 16,
                   "kindString": "Enumeration member",
@@ -31130,8 +31206,8 @@
                   "title": "Enumeration members",
                   "kind": 16,
                   "children": [
-                    373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388,
-                    389, 390, 391, 392, 393, 394, 395, 396
+                    374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389,
+                    390, 391, 392, 393, 394, 395, 396, 397
                   ]
                 }
               ],
@@ -31144,7 +31220,7 @@
               ]
             },
             {
-              "id": 403,
+              "id": 404,
               "name": "BaseValue",
               "kind": 4194304,
               "kindString": "Type alias",
@@ -31179,7 +31255,7 @@
               }
             },
             {
-              "id": 397,
+              "id": 398,
               "name": "Columns",
               "kind": 4194304,
               "kindString": "Type alias",
@@ -31196,14 +31272,14 @@
                 "elementType": {
                   "type": "reflection",
                   "declaration": {
-                    "id": 398,
+                    "id": 399,
                     "name": "__type",
                     "kind": 65536,
                     "kindString": "Type literal",
                     "flags": {},
                     "children": [
                       {
-                        "id": 401,
+                        "id": 402,
                         "name": "flags",
                         "kind": 32,
                         "kindString": "Variable",
@@ -31226,7 +31302,7 @@
                         }
                       },
                       {
-                        "id": 399,
+                        "id": 400,
                         "name": "name",
                         "kind": 32,
                         "kindString": "Variable",
@@ -31244,7 +31320,7 @@
                         }
                       },
                       {
-                        "id": 400,
+                        "id": 401,
                         "name": "type",
                         "kind": 32,
                         "kindString": "Variable",
@@ -31262,7 +31338,7 @@
                         }
                       },
                       {
-                        "id": 402,
+                        "id": 403,
                         "name": "type_modifier",
                         "kind": 32,
                         "kindString": "Variable",
@@ -31295,7 +31371,7 @@
                       {
                         "title": "Variables",
                         "kind": 32,
-                        "children": [401, 399, 400, 402]
+                        "children": [402, 400, 401, 403]
                       }
                     ],
                     "sources": [
@@ -31310,7 +31386,7 @@
               }
             },
             {
-              "id": 405,
+              "id": 406,
               "name": "Record",
               "kind": 4194304,
               "kindString": "Type alias",
@@ -31325,21 +31401,21 @@
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 406,
+                  "id": 407,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "indexSignature": [
                     {
-                      "id": 407,
+                      "id": 408,
                       "name": "__index",
                       "kind": 8192,
                       "kindString": "Index signature",
                       "flags": {},
                       "parameters": [
                         {
-                          "id": 408,
+                          "id": 409,
                           "name": "key",
                           "kind": 32768,
                           "kindString": "Parameter",
@@ -31352,7 +31428,7 @@
                       ],
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     }
@@ -31368,7 +31444,7 @@
               }
             },
             {
-              "id": 404,
+              "id": 405,
               "name": "RecordValue",
               "kind": 4194304,
               "kindString": "Type alias",
@@ -31385,14 +31461,14 @@
                 "types": [
                   {
                     "type": "reference",
-                    "id": 403,
+                    "id": 404,
                     "name": "BaseValue"
                   },
                   {
                     "type": "array",
                     "elementType": {
                       "type": "reference",
-                      "id": 403,
+                      "id": 404,
                       "name": "BaseValue"
                     }
                   }
@@ -31400,7 +31476,7 @@
               }
             },
             {
-              "id": 422,
+              "id": 423,
               "name": "convertCell",
               "kind": 64,
               "kindString": "Function",
@@ -31427,7 +31503,7 @@
               },
               "signatures": [
                 {
-                  "id": 423,
+                  "id": 424,
                   "name": "convertCell",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -31453,7 +31529,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 424,
+                      "id": 425,
                       "name": "type",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31469,7 +31545,7 @@
                       }
                     },
                     {
-                      "id": 425,
+                      "id": 426,
                       "name": "value",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31478,14 +31554,14 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -31499,7 +31575,7 @@
               ]
             },
             {
-              "id": 409,
+              "id": 410,
               "name": "convertChangeData",
               "kind": 64,
               "kindString": "Function",
@@ -31518,7 +31594,7 @@
               },
               "signatures": [
                 {
-                  "id": 410,
+                  "id": 411,
                   "name": "convertChangeData",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -31536,7 +31612,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 411,
+                      "id": 412,
                       "name": "columns",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31545,12 +31621,12 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 397,
+                        "id": 398,
                         "name": "Columns"
                       }
                     },
                     {
-                      "id": 412,
+                      "id": 413,
                       "name": "record",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31560,12 +31636,12 @@
                       "comment": {},
                       "type": {
                         "type": "reference",
-                        "id": 405,
+                        "id": 406,
                         "name": "Record"
                       }
                     },
                     {
-                      "id": 413,
+                      "id": 414,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31578,7 +31654,7 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 414,
+                          "id": 415,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
@@ -31587,7 +31663,7 @@
                           },
                           "children": [
                             {
-                              "id": 415,
+                              "id": 416,
                               "name": "skipTypes",
                               "kind": 32,
                               "kindString": "Variable",
@@ -31615,7 +31691,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [415]
+                              "children": [416]
                             }
                           ],
                           "sources": [
@@ -31632,7 +31708,7 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 405,
+                    "id": 406,
                     "name": "Record"
                   }
                 }
@@ -31646,7 +31722,7 @@
               ]
             },
             {
-              "id": 416,
+              "id": 417,
               "name": "convertColumn",
               "kind": 64,
               "kindString": "Function",
@@ -31670,7 +31746,7 @@
               },
               "signatures": [
                 {
-                  "id": 417,
+                  "id": 418,
                   "name": "convertColumn",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -31693,7 +31769,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 418,
+                      "id": 419,
                       "name": "columnName",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31709,7 +31785,7 @@
                       }
                     },
                     {
-                      "id": 419,
+                      "id": 420,
                       "name": "columns",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31718,12 +31794,12 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 397,
+                        "id": 398,
                         "name": "Columns"
                       }
                     },
                     {
-                      "id": 420,
+                      "id": 421,
                       "name": "record",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31735,12 +31811,12 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 405,
+                        "id": 406,
                         "name": "Record"
                       }
                     },
                     {
-                      "id": 421,
+                      "id": 422,
                       "name": "skipTypes",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31761,7 +31837,7 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -31775,7 +31851,7 @@
               ]
             },
             {
-              "id": 426,
+              "id": 427,
               "name": "noop",
               "kind": 64,
               "kindString": "Function",
@@ -31784,28 +31860,28 @@
               },
               "signatures": [
                 {
-                  "id": 427,
+                  "id": 428,
                   "name": "noop",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 428,
+                      "id": 429,
                       "name": "value",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -31819,7 +31895,7 @@
               ]
             },
             {
-              "id": 438,
+              "id": 439,
               "name": "toArray",
               "kind": 64,
               "kindString": "Function",
@@ -31846,7 +31922,7 @@
               },
               "signatures": [
                 {
-                  "id": 439,
+                  "id": 440,
                   "name": "toArray",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -31872,7 +31948,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 440,
+                      "id": 441,
                       "name": "value",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31881,12 +31957,12 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     },
                     {
-                      "id": 441,
+                      "id": 442,
                       "name": "type",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31901,7 +31977,7 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -31915,7 +31991,7 @@
               ]
             },
             {
-              "id": 429,
+              "id": 430,
               "name": "toBoolean",
               "kind": 64,
               "kindString": "Function",
@@ -31925,7 +32001,7 @@
               },
               "signatures": [
                 {
-                  "id": 430,
+                  "id": 431,
                   "name": "toBoolean",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -31934,7 +32010,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 431,
+                      "id": 432,
                       "name": "value",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31943,14 +32019,14 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -31964,7 +32040,7 @@
               ]
             },
             {
-              "id": 435,
+              "id": 436,
               "name": "toJson",
               "kind": 64,
               "kindString": "Function",
@@ -31974,7 +32050,7 @@
               },
               "signatures": [
                 {
-                  "id": 436,
+                  "id": 437,
                   "name": "toJson",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -31983,7 +32059,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 437,
+                      "id": 438,
                       "name": "value",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -31992,14 +32068,14 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -32013,7 +32089,7 @@
               ]
             },
             {
-              "id": 432,
+              "id": 433,
               "name": "toNumber",
               "kind": 64,
               "kindString": "Function",
@@ -32023,7 +32099,7 @@
               },
               "signatures": [
                 {
-                  "id": 433,
+                  "id": 434,
                   "name": "toNumber",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -32032,7 +32108,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 434,
+                      "id": 435,
                       "name": "value",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -32041,14 +32117,14 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -32062,7 +32138,7 @@
               ]
             },
             {
-              "id": 442,
+              "id": 443,
               "name": "toTimestampString",
               "kind": 64,
               "kindString": "Function",
@@ -32081,7 +32157,7 @@
               },
               "signatures": [
                 {
-                  "id": 443,
+                  "id": 444,
                   "name": "toTimestampString",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -32099,7 +32175,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 444,
+                      "id": 445,
                       "name": "value",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -32108,14 +32184,14 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 404,
+                        "id": 405,
                         "name": "RecordValue"
                       }
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 404,
+                    "id": 405,
                     "name": "RecordValue"
                   }
                 }
@@ -32133,17 +32209,17 @@
             {
               "title": "Enumerations",
               "kind": 4,
-              "children": [372]
+              "children": [373]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [403, 397, 405, 404]
+              "children": [404, 398, 406, 405]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [422, 409, 416, 426, 438, 429, 435, 432, 442]
+              "children": [423, 410, 417, 427, 439, 430, 436, 433, 443]
             }
           ],
           "sources": [
@@ -32207,7 +32283,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [227, 139, 445, 3, 73, 48, 34, 371, 1]
+          "children": [227, 139, 446, 3, 73, 48, 34, 372, 1]
         }
       ]
     },
