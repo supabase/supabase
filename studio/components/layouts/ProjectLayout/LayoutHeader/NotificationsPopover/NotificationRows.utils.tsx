@@ -180,14 +180,7 @@ export const formatNotificationCTAText = (
               {dayjs(new Date(ownerReassignStatus.migrated_at ?? action.deadline)).format('DD MMM YYYY, HH:mma')}
             </p>
           )
-        } else if (ownerReassignStatus?.desired === 'unmigrated') {
-          return (
-            <p className="text-sm space-x-1">
-              This patch will be automatically applied after{' '}
-              {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
-            </p>
-          )
-        } else {
+        } else if (ownerReassignStatus?.desired === 'temp_role') {
           if (action.reason === ActionReason.Finalize) {
             return (
               <p className="text-sm space-x-1">
@@ -203,6 +196,13 @@ export const formatNotificationCTAText = (
               </p>
             )
           }
+        } else {
+          return (
+            <p className="text-sm space-x-1">
+              This patch will be automatically applied after{' '}
+              {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
+            </p>
+          )
         }
       } else {
         return ''
