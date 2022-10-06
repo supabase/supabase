@@ -358,7 +358,10 @@ const Results = ({ results }) => {
   function onCopyCell() {
     if (columns && cellPosition) {
       const { idx, rowIdx } = cellPosition
-      const colKey = columns[idx].key
+      const column = columns[idx]
+      if (!column) return
+
+      const colKey = column.key
       const cellValue = results[rowIdx]?.[colKey] ?? ''
       const value = formatClipboardValue(cellValue)
       copyToClipboard(value)
