@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 import { isNil } from 'lodash'
-import { Select } from '@supabase/ui'
+import { Select } from 'ui'
 import { PostgresType } from '@supabase/postgres-meta'
 
 import InputWithSuggestions from './InputWithSuggestions'

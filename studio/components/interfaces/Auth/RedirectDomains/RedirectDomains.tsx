@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { object, string } from 'yup'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Form, Input, Modal } from '@supabase/ui'
+import { Button, Form, Input, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -101,11 +101,11 @@ const RedirectDomains = () => {
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">
+                <span className="text-xs text-scale-1200">
                   You need additional permissions to update redirect URLs
                 </span>
               </div>
@@ -132,7 +132,7 @@ const RedirectDomains = () => {
             return (
               <div className="mb-4 space-y-4 pt-4">
                 <div className="px-5">
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-sm text-scale-1100">
                     This will add a domain to a list of allowed domains that can interact with your
                     Authenticaton services for this project.
                   </p>
@@ -173,11 +173,11 @@ const RedirectDomains = () => {
       >
         <div className="mb-4 space-y-4 pt-4">
           <div className="px-5">
-            <p className="text-scale-1100 mb-2 text-sm">
+            <p className="mb-2 text-sm text-scale-1100">
               Are you sure you want to remove{' '}
               <span className="text-scale-1200">{selectedDomainToDelete}</span>?
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               This domain will no longer work with your authentication configuration.
             </p>
           </div>

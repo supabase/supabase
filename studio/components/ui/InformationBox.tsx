@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState } from 'react'
-import { IconMaximize2, IconMinimize2 } from '@supabase/ui'
+import { IconMaximize2, IconMinimize2 } from 'ui'
 
 interface Props {
   icon?: ReactNode
@@ -31,19 +31,19 @@ const InformationBox: FC<Props> = ({
   return (
     <div
       className={`${block ? 'block w-full' : ''}
-      bg-scale-100 dark:bg-scale-400 border-scale-600 dark:border-scale-500 block w-full rounded border py-3 ${className}`}
+      block w-full rounded border border-scale-600 bg-scale-100 py-3 dark:border-scale-500 dark:bg-scale-400 ${className}`}
     >
       <div className="flex flex-col px-4">
         <div className="flex items-center justify-between">
           <div className="flex w-full space-x-3 lg:items-start">
             {icon && <span className="text-scale-900">{icon}</span>}
             <div className="flex-grow">
-              <h5 className="text-scale-1200 text-sm">{title}</h5>
+              <h5 className="text-sm text-scale-1200">{title}</h5>
             </div>
           </div>
           {description && !hideCollapse ? (
             <div
-              className="text-scale-900 cursor-pointer"
+              className="cursor-pointer text-scale-900"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (

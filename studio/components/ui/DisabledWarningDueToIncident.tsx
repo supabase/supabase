@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconAlertCircle } from '@supabase/ui'
+import { IconAlertCircle } from 'ui'
 import InformationBox from 'components/ui/InformationBox'
 
 interface Props {

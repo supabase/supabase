@@ -1,7 +1,7 @@
 import React, { useState, FC } from 'react'
 import { isEmpty } from 'lodash'
+import { Button, IconSearch, Input, IconHelpCircle } from 'ui'
 import { useRouter } from 'next/router'
-import { Button, IconHelpCircle, IconSearch, Input } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
@@ -96,7 +96,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <AuthLayout title="Auth">
-    <div className="p-4 h-full">{page}</div>
+    <div className="h-full p-4">{page}</div>
   </AuthLayout>
 )
 

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, partition, isEmpty } from 'lodash'
-import { SidePanel } from '@supabase/ui'
+import { SidePanel } from 'ui'
 import { Dictionary } from 'components/grid'
 import { Query } from 'components/grid/query/Query'
 import { PostgresTable } from '@supabase/postgres-meta'
@@ -188,8 +188,8 @@ const RowEditor: FC<Props> = ({
                 <SidePanel.Content>
                   <div className="space-y-10 py-6">
                     <div>
-                      <h3 className="text-scale-1200 text-base">Optional Fields</h3>
-                      <p className="text-scale-900 text-sm">
+                      <h3 className="text-base text-scale-1200">Optional Fields</h3>
+                      <p className="text-sm text-scale-900">
                         These are columns that do not need any value
                       </p>
                     </div>
