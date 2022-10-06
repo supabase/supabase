@@ -33,4 +33,4 @@ jobs:
         working-directory: ./
       - name: Run tests
         run: npm run test:studio
-        working-directory: ./studio
+        working-directory: ./
