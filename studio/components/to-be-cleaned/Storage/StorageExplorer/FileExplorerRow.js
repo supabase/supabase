@@ -15,7 +15,7 @@ import {
   IconCopy,
   IconEdit,
   IconMove,
-} from '@supabase/ui'
+} from 'ui'
 import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useContextMenu } from 'react-contexify'
@@ -115,7 +115,7 @@ const FileExplorerRow = ({
 
     return (
       <div className="storage-row flex items-center justify-between rounded bg-gray-500">
-        <div className="flex flex-grow items-center h-full px-2.5">
+        <div className="flex h-full flex-grow items-center px-2.5">
           <div className="">
             <RowIcon
               view={view}
@@ -128,7 +128,7 @@ const FileExplorerRow = ({
             <input
               autoFocus
               ref={inputRef}
-              className="storage-row-input text-sm ml-3 p-0 px-1 h-full bg-inherit"
+              className="storage-row-input ml-3 h-full bg-inherit p-0 px-1 text-sm"
               type="text"
               value={itemName}
               onChange={(event) => setItemName(event.target.value)}
@@ -209,7 +209,7 @@ const FileExplorerRow = ({
 
   return (
     <div
-      className="border-b dark:border-dark h-full"
+      className="h-full border-b dark:border-dark"
       onContextMenu={(event) => {
         event.stopPropagation()
         item.type === STORAGE_ROW_TYPES.FILE
@@ -219,7 +219,7 @@ const FileExplorerRow = ({
     >
       <div
         className={[
-          'storage-row px-2.5 flex items-center group h-full',
+          'storage-row group flex h-full items-center px-2.5',
           'hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-scale-400' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''}`,
@@ -269,7 +269,7 @@ const FileExplorerRow = ({
               }}
             />
           </div>
-          <p title={item.name} className="text-sm truncate" style={{ width: nameWidth }}>
+          <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
             {item.name}
           </p>
           {item.isCorrupted && (
@@ -281,11 +281,11 @@ const FileExplorerRow = ({
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                    'border-scale-200 border',
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-scale-1200 text-xs">
+                  <span className="text-xs text-scale-1200">
                     File is corrupted, please delete and reupload again.
                   </span>
                 </div>
@@ -296,10 +296,10 @@ const FileExplorerRow = ({
 
         {view === STORAGE_VIEWS.LIST && (
           <>
-            <p className="text-sm truncate w-[11%] min-w-[100px]">{size}</p>
-            <p className="text-sm truncate w-[14%] min-w-[100px]">{mimeType}</p>
-            <p className="text-sm truncate w-[15%] min-w-[160px]">{createdAt}</p>
-            <p className="text-sm truncate w-[15%] min-w-[160px]">{updatedAt}</p>
+            <p className="w-[11%] min-w-[100px] truncate text-sm">{size}</p>
+            <p className="w-[14%] min-w-[100px] truncate text-sm">{mimeType}</p>
+            <p className="w-[15%] min-w-[160px] truncate text-sm">{createdAt}</p>
+            <p className="w-[15%] min-w-[160px] truncate text-sm">{updatedAt}</p>
           </>
         )}
 

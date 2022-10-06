@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, Menu } from '@supabase/ui'
+import { Badge, Menu } from 'ui'
 import ProductMenuItem from './ProductMenuItem'
 import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
 
@@ -42,7 +42,7 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                 </div>
               </div>
             </div>
-            {idx !== menu.length - 1 && <div className="bg-scale-500 h-px w-full"></div>}
+            {idx !== menu.length - 1 && <div className="h-px w-full bg-scale-500"></div>}
           </div>
         ))}
       </Menu>

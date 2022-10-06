@@ -42,22 +42,19 @@ const MfaContactForm = () => {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
 
   const handleFormSubmit = async (values: typeof INITIAL_VALUES, { resetForm }: any) => {
-    const { error } = await supabase.from('mfa_early_access_contacts').insert(
-      [
-        {
-          company_name: values.companyName,
-          contact_name: `${values.contactFirstName} ${values.contactLastName}`,
-          contact_first_name: values.contactFirstName,
-          contact_last_name: values.contactLastName,
-          contact_email: values.contactEmail,
-          contact_phone: values.contactPhone,
-          company_size: values.companySize,
-          details: values.details,
-          country: values.country,
-        },
-      ],
-      { returning: 'minimal' }
-    )
+    const { error } = await supabase.from('mfa_early_access_contacts').insert([
+      {
+        company_name: values.companyName,
+        contact_name: `${values.contactFirstName} ${values.contactLastName}`,
+        contact_first_name: values.contactFirstName,
+        contact_last_name: values.contactLastName,
+        contact_email: values.contactEmail,
+        contact_phone: values.contactPhone,
+        company_size: values.companySize,
+        details: values.details,
+        country: values.country,
+      },
+    ])
 
     // TODO: handle error
     console.log('error:', error)

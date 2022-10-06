@@ -14,11 +14,14 @@ init:
 ###############################################################################
 # Download all the specs
 ###############################################################################
-download: download.api.v1 download.storage.v1 download.tsdoc.v1 download.tsdoc.v2
+download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v1 download.tsdoc.v2
 
 download.api.v1:
 	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v0_openapi.json
 	
+download.auth.v1:
+	curl -sS https://supabase.github.io/gotrue/swagger.json > $(REPO_DIR)/auth_v1_openapi.json
+
 download.storage.v1:
 	curl -sS https://supabase.github.io/storage-api/api.json > $(REPO_DIR)/storage_v0_openapi.json
 
@@ -42,10 +45,13 @@ download.tsdoc.v2:
 ###############################################################################
 # Transform docs into working files
 ###############################################################################
-transform: dereference.api.v0 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v1 combine.tsdoc.v2
+transform: dereference.api.v0  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v1 combine.tsdoc.v2
 
 dereference.api.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
+
+dereference.auth.v1:
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
 
 dereference.storage.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json

@@ -2,14 +2,7 @@ import dayjs from 'dayjs'
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
-import {
-  Button,
-  Modal,
-  IconChevronLeft,
-  IconChevronRight,
-  IconHelpCircle,
-  Alert,
-} from '@supabase/ui'
+import { Button, Modal, IconChevronLeft, IconChevronRight, IconHelpCircle, Alert } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'

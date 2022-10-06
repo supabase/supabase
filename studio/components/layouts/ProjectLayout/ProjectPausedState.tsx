@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Alert, Button, IconPauseCircle } from '@supabase/ui'
+import { Alert, Button, IconPauseCircle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { Project } from 'types'
@@ -62,7 +62,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
           </div>
         )}
         <div className="mx-auto mb-16 w-full max-w-7xl">
-          <div className="bg-scale-300 border-scale-400 mx-6 flex h-[500px] items-center justify-center rounded border p-8">
+          <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
             <div className="grid w-[420px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <IconPauseCircle className="text-scale-1100" size={50} strokeWidth={1.5} />
@@ -87,11 +87,11 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
                         className={[
-                          'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                          'border-scale-200 border ', //border
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                          'border border-scale-200 ', //border
                         ].join(' ')}
                       >
-                        <span className="text-scale-1200 text-xs">
+                        <span className="text-xs text-scale-1200">
                           You need additional permissions to resume this project
                         </span>
                       </div>
@@ -102,7 +102,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
               </div>
 
               {!hasExceedActiveFreeProjectsLimit && (
-                <p className="text-scale-1000 mt-4 text-sm">
+                <p className="mt-4 text-sm text-scale-1000">
                   Restore this project and get back to building the next big thing!
                 </p>
               )}
