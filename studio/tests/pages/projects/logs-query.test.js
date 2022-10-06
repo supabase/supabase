@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
+import { useProjectSubscription } from 'hooks'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -136,17 +137,26 @@ test('custom sql querying', async () => {
   // should not see chronological features
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
+
 test.only('datepicker interaction updates query params', async () => {
   render(<LogsExplorerPage />)
   clickDropdown(await screen.findByText(/Last 24 hours/))
   userEvent.click(await screen.findByText(/Last 3 days/))
 
-  // Not sure how to mock this
-  const tier = 'FREE'
-  if (tier !== 'FREE') {
+  useProjectSubscription.mockReturnValue({
+    subscription: {
+      tier: {
+        supabase_prod_id: 'tier_pro',
+      },
+    },
+  })
+
+  const { subscription } = useProjectSubscription()
+
+  if (subscription.tier.supabase_prod_id === 'tier_pro') {
     const router = useRouter()
     expect(router.push).toBeCalled()
-    expect(router.push).not.toBeCalledWith(
+    expect(router.push).toBeCalledWith(
       expect.objectContaining({
         query: expect.objectContaining({
           its: expect.any(String),
