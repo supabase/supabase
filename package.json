@@ -11,6 +11,7 @@
     "apps/temp-docs",
     "apps/www",
     "studio",
+    "tests",
     "packages/*"
   ],
   "scripts": {
@@ -25,6 +26,7 @@
     "docker:down": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
     "docker:remove": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
     "test": "jest",
+    "test:studio": "turbo run test --filter=studio",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables"
   },
