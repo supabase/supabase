@@ -404,31 +404,39 @@ class StorageExplorerStore {
       // Already generated signed URL
       copyToClipboard(filePreview.url, () => {
         this.ui.setNotification({
-          message: `Copied URL for ${file.name} to clipboard.`,
           category: 'success',
+          message: `Copied URL for ${file.name} to clipboard.`,
           duration: 4000,
         })
       })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
       const signedUrl = await this.fetchFilePreview(file.name)
-      let formattedUrl = new URL(signedUrl)
-      formattedUrl.searchParams.set('t', new Date().toISOString())
 
-      copyToClipboard(formattedUrl.toString(), () => {
-        this.ui.setNotification({
-          message: `Copied URL for ${file.name} to clipboard.`,
-          category: 'success',
-          duration: 4000,
+      try {
+        let formattedUrl = new URL(signedUrl)
+        formattedUrl.searchParams.set('t', new Date().toISOString())
+
+        copyToClipboard(formattedUrl.toString(), () => {
+          this.ui.setNotification({
+            category: 'success',
+            message: `Copied URL for ${file.name} to clipboard.`,
+            duration: 4000,
+          })
         })
-      })
-      const fileCache = {
-        id: file.id,
-        url: formattedUrl.toString(),
-        expiresIn: DEFAULT_EXPIRY,
-        fetchedAt: Date.now(),
+        const fileCache = {
+          id: file.id,
+          url: formattedUrl.toString(),
+          expiresIn: DEFAULT_EXPIRY,
+          fetchedAt: Date.now(),
+        }
+        this.addFileToPreviewCache(fileCache)
+      } catch (error) {
+        this.ui.setNotification({
+          category: 'error',
+          message: `Failed to copy URL: ${error}`,
+        })
       }
-      this.addFileToPreviewCache(fileCache)
     }
   }
 
