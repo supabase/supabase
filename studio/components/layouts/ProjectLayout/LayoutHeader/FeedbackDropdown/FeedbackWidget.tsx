@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Input, Popover } from '@supabase/ui'
+import { Button, Input, Popover } from 'ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -75,14 +75,14 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
             <a>
-              <span className="cursor-pointer transition-colors text-brand-900 hover:text-brand-1200">
+              <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
                 Supabase support
               </span>
             </a>
           </Link>{' '}
           or{' '}
           <a href="https://supabase.com/docs" target="_blank">
-            <span className="cursor-pointer transition-colors text-brand-900 hover:text-brand-1200">
+            <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
               browse our docs
             </span>
           </a>

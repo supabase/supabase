@@ -1,6 +1,6 @@
 import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconKey } from '@supabase/ui'
+import { Button, Dropdown, IconKey } from 'ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
@@ -138,9 +138,9 @@ const DocView: FC<any> = observer(({}) => {
                 onClick={() => setSelectedLang('js')}
                 className={`${
                   selectedLang == 'js'
-                    ? 'text-scale-1200 bg-scale-300 dark:bg-scale-200 font-medium'
-                    : 'text-scale-900 bg-scale-100 dark:bg-scale-100'
-                } border-scale-200 hover:text-scale-1200 relative inline-flex items-center border-r p-1 px-2 text-sm transition focus:outline-none`}
+                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
               >
                 JavaScript
               </button>
@@ -149,22 +149,22 @@ const DocView: FC<any> = observer(({}) => {
                 onClick={() => setSelectedLang('bash')}
                 className={`${
                   selectedLang == 'bash'
-                    ? 'text-scale-1200 bg-scale-300 dark:bg-scale-200 font-medium'
-                    : 'text-scale-900 bg-scale-100 dark:bg-scale-100'
-                } border-scale-200 hover:text-scale-1200 relative inline-flex items-center border-r p-1 px-2 text-sm transition focus:outline-none`}
+                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
               >
                 Bash
               </button>
               {selectedLang == 'bash' && (
                 <div className="flex">
-                  <div className="text-scale-900 flex items-center gap-2 p-1 pl-2 text-xs">
+                  <div className="flex items-center gap-2 p-1 pl-2 text-xs text-scale-900">
                     <IconKey size={12} strokeWidth={1.5} />
                     <span>Project API key :</span>
                   </div>
                   <Dropdown
                     align="end"
                     side="bottom"
-                    className="text-scale-900 cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm"
+                    className="cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm text-scale-900"
                     overlay={
                       <>
                         <Dropdown.Item key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>

@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconGlobe, IconTerminal } from '@supabase/ui'
+import { IconGlobe, IconTerminal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -141,31 +141,31 @@ const PageLayout: NextPageWithLayout = () => {
       <div>
         <div
           className="
-        px-10 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
-        space-y-6
+        space-y-6 rounded border bg-scale-100 px-10 py-8 drop-shadow-sm
+        dark:bg-scale-300
         "
         >
-          <div className="space-y-4 w-full">
+          <div className="w-full space-y-4">
             <div className="grid grid-cols-3">
-              <span className="block text-scale-1000 text-sm mb-1">Function Name</span>
+              <span className="mb-1 block text-sm text-scale-1000">Function Name</span>
               <div className="text-sm text-scale-1200">{selectedFunction?.name}</div>
             </div>
 
             <div className="grid grid-cols-3">
-              <span className="block text-scale-1000 text-sm mb-1">Status</span>
-              <div className="flex flex-col gap-2 col-span-2">
+              <span className="mb-1 block text-sm text-scale-1000">Status</span>
+              <div className="col-span-2 flex flex-col gap-2">
                 <div className="flex">
                   <div
                     className="
-                    text-base bg-brand-300 dark:bg-brand-100 px-3 py-0.5 rounded-full lowercasefirst-letter
-                    flex flex-row items-center gap-3 lowercase text-brand-900
+                    lowercasefirst-letter flex flex-row items-center gap-3 rounded-full bg-brand-300
+                    px-3 py-0.5 text-base lowercase text-brand-900 dark:bg-brand-100
               "
                   >
                     {selectedFunction?.status}
-                    <div className="relative w-2 h-2">
+                    <div className="relative h-2 w-2">
                       <span className="flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-800 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-900"></span>
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-800 opacity-75"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-900"></span>
                       </span>
                     </div>
                   </div>
@@ -175,37 +175,37 @@ const PageLayout: NextPageWithLayout = () => {
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1 cols-span-1">Endpoint URL</span>
+            <span className="cols-span-1 mb-1 block text-sm text-scale-1000">Endpoint URL</span>
             <div className="col-span-2">
-              <span className="text-sm text-scale-1200 break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
+              <span className="w-full break-words text-sm text-scale-1200">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1">Created At</span>
-            <div className="text-sm text-scale-1200 col-span-2">
+            <span className="mb-1 block text-sm text-scale-1000">Created At</span>
+            <div className="col-span-2 text-sm text-scale-1200">
               {selectedFunction?.created_at &&
                 dayjs(selectedFunction.created_at).format('dddd, MMMM D, YYYY h:mm A')}
             </div>
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1">Updated At</span>
-            <div className="text-sm text-scale-1200 col-span-2">
+            <span className="mb-1 block text-sm text-scale-1000">Updated At</span>
+            <div className="col-span-2 text-sm text-scale-1200">
               {selectedFunction?.updated_at &&
                 dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
             </div>
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1">Version</span>
-            <div className="text-sm text-scale-1200 col-span-2">v{selectedFunction?.version}</div>
+            <span className="mb-1 block text-sm text-scale-1000">Version</span>
+            <div className="col-span-2 text-sm text-scale-1200">v{selectedFunction?.version}</div>
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1">Regions</span>
-            <div className="flex flex-col gap-1 col-span-2">
-              <div className="text-sm text-scale-1200 flex items-center gap-2">
+            <span className="mb-1 block text-sm text-scale-1000">Regions</span>
+            <div className="col-span-2 flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-sm text-scale-1200">
                 <IconGlobe />
                 <span>Earth</span>
               </div>
@@ -217,13 +217,13 @@ const PageLayout: NextPageWithLayout = () => {
 
       <div>
         <div
-          className="px-10 py-8
-        bg-scale-100 dark:bg-scale-300 border drop-shadow-sm
-        rounded
-        space-y-6"
+          className="space-y-6 rounded
+        border bg-scale-100 px-10 py-8
+        drop-shadow-sm
+        dark:bg-scale-300"
         >
           <div className="flex items-center gap-3">
-            <div className="border p-2 flex items-center justify-center w-8 h-8 text-scale-100 dark:text-scale-1200 bg-scale-1200 dark:bg-scale-100 rounded">
+            <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-1200 p-2 text-scale-100 dark:bg-scale-100 dark:text-scale-1200">
               <IconTerminal strokeWidth={2} />
             </div>
             <h4>Command line access</h4>

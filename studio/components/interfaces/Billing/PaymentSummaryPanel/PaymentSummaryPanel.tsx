@@ -8,7 +8,7 @@ import {
   IconCreditCard,
   Modal,
   Alert,
-} from '@supabase/ui'
+} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -93,14 +93,14 @@ const PaymentSummaryPanel: FC<Props> = ({
   return (
     <>
       <div
-        className="bg-panel-body-light dark:bg-panel-body-dark w-full space-y-8 border-l px-6 py-10 lg:px-12"
+        className="w-full space-y-8 border-l bg-panel-body-light px-6 py-10 dark:bg-panel-body-dark lg:px-12"
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
 
         {/* Subscription details */}
         <div className="space-y-1">
-          <p className="text-scale-1100 text-sm">Selected subscription</p>
+          <p className="text-sm text-scale-1100">Selected subscription</p>
           <div className="flex items-center justify-between">
             <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
               {getPlanName(currentPlan)}
@@ -124,7 +124,7 @@ const PaymentSummaryPanel: FC<Props> = ({
           <div className="space-y-1">
             <p className="text-sm">Selected add-ons</p>
             {currentComputeSize === undefined && selectedComputeSize === undefined && (
-              <p className="text-scale-1100 text-sm">No add-ons selected</p>
+              <p className="text-sm text-scale-1100">No add-ons selected</p>
             )}
             {currentComputeSize !== undefined && (
               <div className="flex items-center justify-between">
@@ -166,7 +166,7 @@ const PaymentSummaryPanel: FC<Props> = ({
           </div>
         )}
 
-        <div className="bg-scale-600 h-px w-full" />
+        <div className="h-px w-full bg-scale-600" />
 
         <PaymentTotal
           subscriptionPreview={subscriptionPreview}
@@ -178,13 +178,13 @@ const PaymentSummaryPanel: FC<Props> = ({
         <div className="space-y-2">
           <p className="text-sm">Select payment method</p>
           {isLoadingPaymentMethods ? (
-            <div className="bg-scale-400 border-scale-700 flex items-center space-x-4 rounded-md border px-4 py-2">
+            <div className="flex items-center space-x-4 rounded-md border border-scale-700 bg-scale-400 px-4 py-2">
               <IconLoader className="animate-spin" size={14} />
-              <p className="text-scale-1100 text-sm">Retrieving payment methods</p>
+              <p className="text-sm text-scale-1100">Retrieving payment methods</p>
             </div>
           ) : paymentMethods.length === 0 ? (
-            <div className="bg-scale-100 flex items-center justify-between rounded-md border border-dashed px-4 py-2">
-              <div className="text-scale-1100 flex items-center space-x-4">
+            <div className="flex items-center justify-between rounded-md border border-dashed bg-scale-100 px-4 py-2">
+              <div className="flex items-center space-x-4 text-scale-1100">
                 <IconAlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm">No saved payment methods</p>
               </div>
@@ -205,11 +205,11 @@ const PaymentSummaryPanel: FC<Props> = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                        'border-scale-200 w-48 border text-center', //border
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        'w-48 border border-scale-200 text-center', //border
                       ].join(' ')}
                     >
-                      <span className="text-scale-1200 text-xs">
+                      <span className="text-xs text-scale-1200">
                         {enablePermissions
                           ? 'You need additional permissions to add new payment methods to this organization'
                           : 'Only organization owners can add new payment methods'}
@@ -244,11 +244,11 @@ const PaymentSummaryPanel: FC<Props> = ({
                 )
               })}
               <div
-                className="hover:bg-scale-500 group flex cursor-pointer items-center space-x-2 py-2 px-3 transition"
+                className="group flex cursor-pointer items-center space-x-2 py-2 px-3 transition hover:bg-scale-500"
                 onClick={onSelectAddNewPaymentMethod}
               >
                 <IconPlus size={16} />
-                <p className="text-scale-1000 group-hover:text-scale-1200 transition">
+                <p className="text-scale-1000 transition group-hover:text-scale-1200">
                   Add new payment method
                 </p>
               </div>
@@ -289,7 +289,7 @@ const PaymentSummaryPanel: FC<Props> = ({
             </Alert>
           </Modal.Content>
           <Modal.Content>
-            <p className="text-scale-1200 text-sm">Would you like to update your project now?</p>
+            <p className="text-sm text-scale-1200">Would you like to update your project now?</p>
           </Modal.Content>
           <Modal.Seperator />
           <Modal.Content>

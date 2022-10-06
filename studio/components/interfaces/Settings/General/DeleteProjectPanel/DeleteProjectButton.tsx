@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore, checkPermissions, useFlag } from 'hooks'
@@ -65,11 +65,11 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                'border-scale-200 border ', //border
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                'border border-scale-200 ', //border
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">
+              <span className="text-xs text-scale-1200">
                 You need additional permissions to delete this project
               </span>
             </div>

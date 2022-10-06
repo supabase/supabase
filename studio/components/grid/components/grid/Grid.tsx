@@ -1,14 +1,14 @@
 import { forwardRef } from 'react'
 import { memo } from 'react-tracked'
 import DataGrid, { DataGridHandle, RowsChangeData } from '@supabase/react-data-grid'
-import { IconLoader } from '@supabase/ui'
+import { IconLoader } from 'ui'
 import { GridProps, SupaRow } from '../../types'
 import { useDispatch, useTrackedState } from '../../store'
 import RowRenderer from './RowRenderer'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 
 function rowKeyGetter(row: SupaRow) {
-  return row.idx
+  return row?.idx ?? -1
 }
 
 interface IGrid extends GridProps {
@@ -71,10 +71,10 @@ export const Grid = memo(
             style={{ width: width || '100%', height: height || '50vh' }}
           >
             <div className="sb-grid-grid--loading__inner flex items-center gap-2">
-              <div className="text-scale-900 animate-spin">
+              <div className="animate-spin text-scale-900">
                 <IconLoader />
               </div>
-              <div className="text-scale-1100 text-sm">Loading...</div>
+              <div className="text-sm text-scale-1100">Loading...</div>
             </div>
           </div>
         )

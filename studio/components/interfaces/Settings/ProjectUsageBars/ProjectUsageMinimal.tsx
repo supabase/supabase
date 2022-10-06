@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Loading } from '@supabase/ui'
+import { Loading } from 'ui'
 
 import { useProjectSubscription, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -42,7 +42,7 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
 
             return (
               <div key={feature.key} className="space-y-1">
-                <h5 className="text-scale-1200 text-sm">{feature.title}</h5>
+                <h5 className="text-sm text-scale-1200">{feature.title}</h5>
                 <SparkBar
                   type="horizontal"
                   barClass={`${

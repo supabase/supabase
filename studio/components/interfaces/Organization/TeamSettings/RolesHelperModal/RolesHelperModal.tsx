@@ -1,5 +1,5 @@
 import { FC, Fragment, useState } from 'react'
-import { IconCheck, IconHelpCircle, Modal } from '@supabase/ui'
+import { IconCheck, IconHelpCircle, Modal } from 'ui'
 import { useFlag } from 'hooks'
 import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 
@@ -23,7 +23,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
       <IconHelpCircle
         size={16}
         strokeWidth={1.5}
-        className="cursor-pointer hover:text-scale-1200 transition"
+        className="cursor-pointer transition hover:text-scale-1200"
         onClick={() => setShowModal(!showModal)}
       />
       <Modal
@@ -34,7 +34,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
         header="Permissions for each role"
         onCancel={() => setShowModal(!showModal)}
       >
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           <Modal.Content>
             <p className="text-sm">
               The following table shows the corresponding permissions for each available role in the
@@ -42,7 +42,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
             </p>
           </Modal.Content>
           <Modal.Content>
-            <div className="bg-scale-400 border border-scale-500 rounded">
+            <div className="rounded border border-scale-500 bg-scale-400">
               <div className="flex items-center border-b border-scale-600">
                 <div className={permissionColumnClassName}>Permissions</div>
                 <div className={roleColumnClassName}>Owner</div>
@@ -59,13 +59,13 @@ const RolesHelperModal: FC<Props> = ({}) => {
               <div className="max-h-[425px] overflow-y-auto">
                 {PERMISSIONS_MAPPING.map((group) => (
                   <Fragment key={group.title}>
-                    <div className="flex items-center py-2 px-4 border-b border-scale-600 last:border-none">
-                      <div className="text-sm w-[100%]">{group.title}</div>
+                    <div className="flex items-center border-b border-scale-600 py-2 px-4 last:border-none">
+                      <div className="w-[100%] text-sm">{group.title}</div>
                     </div>
                     {group.actions.map((action, idx) => (
                       <div
                         key={`${group.title}-${idx}`}
-                        className="bg-scale-500 flex items-center border-b border-scale-600 last:border-none"
+                        className="flex items-center border-b border-scale-600 bg-scale-500 last:border-none"
                       >
                         <div className={permissionColumnClassName}>{action.description}</div>
                         <div className={roleColumnClassName}>
