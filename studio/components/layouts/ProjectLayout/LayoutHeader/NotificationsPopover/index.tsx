@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC, Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconBell, Popover, IconArrowRight, Alert } from '@supabase/ui'
+import { Alert, Button, IconBell, Popover, IconArrowRight } from 'ui'
 import {
   Notification,
   NotificationStatus,
@@ -179,7 +179,7 @@ const NotificationsPopover: FC<Props> = () => {
             <div className="max-h-[380px] overflow-y-auto py-2">
               {notifications.length === 0 ? (
                 <div className="py-2 px-4">
-                  <p className="text-scale-1000 text-sm">No notifications available</p>
+                  <p className="text-sm text-scale-1000">No notifications available</p>
                 </div>
               ) : (
                 <>
