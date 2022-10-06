@@ -28,6 +28,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           key: 'functions',
           url: `/project/${ref}/database/functions`,
           items: [],
+          isPreview: true,
         },
         {
           name: 'Extensions',
@@ -90,37 +91,6 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                       name: 'Realtime logs',
                       key: 'realtime-logs',
                       url: `/project/${ref}/database/realtime-logs`,
-                      items: [],
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
-            title: 'Alpha Preview',
-            items: [
-              {
-                name: 'Database Triggers',
-                key: 'triggers',
-                url: `/project/${ref}/database/triggers`,
-                items: [],
-              },
-              {
-                name: 'Database Functions',
-                key: 'functions',
-                url: `/project/${ref}/database/functions`,
-                items: [],
-              },
-              ...(showHooksRoute
-                ? [
-                    {
-                      name: 'Database Webhooks',
-                      key: 'hooks',
-                      url: `/project/${ref}/database/hooks`,
                       items: [],
                     },
                   ]
