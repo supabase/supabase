@@ -1,5 +1,5 @@
 import { FC, useState, FormEvent } from 'react'
-import { Listbox, IconSearch, IconGlobe } from '@supabase/ui'
+import { Listbox, IconSearch, IconGlobe } from 'ui'
 
 import { ALL_TIMEZONES } from './PITR.constants'
 

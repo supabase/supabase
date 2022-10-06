@@ -16,11 +16,13 @@ Migrating projects can be achieved using standard PostgreSQL tooling. This is pa
 ## Migrate the database
 
 In your old project:
+
 1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
 1. Run `pg_dump --clean --if-exists --quote-all-identifiers -h $OLD_DB_URL -U postgres > dump.sql` from your terminal.
 1. Run `ALTER ROLE postgres NOSUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
 
 In your new project:
+
 1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
 1. Run `psql -h $NEW_DB_URL -U postgres -f dump.sql` from your terminal.
 1. Run `TRUNCATE storage.objects` in the [SQL editor](https://app.supabase.com/project/_/sql).
@@ -94,4 +96,3 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
   }
 })()
 ```
-

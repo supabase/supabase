@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 interface ActionBarProps {
   loading?: boolean
@@ -33,7 +33,7 @@ const ActionBar: FC<ActionBarProps> = ({
   }
 
   return (
-    <div className="border-scale-500 flex w-full justify-between space-x-3 border-t px-3 py-4">
+    <div className="flex w-full justify-between space-x-3 border-t border-scale-500 px-3 py-4">
       <Button size="small" onClick={closePanel} type="default" htmlType="button">
         {backButtonLabel}
       </Button>

@@ -122,11 +122,11 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    dark:bg-scale-400 lg:justify-evenly gap-2
-                    flex flex-row rounded rounded-t-none border-b
-                    border-r border-l
-                    border-gray-100 bg-white p-5
-                    pt-14 dark:border-gray-600"
+                    dark:bg-scale-400 flex flex-row
+                    gap-2 rounded rounded-t-none border-b border-r
+                    border-l border-gray-100
+                    bg-white p-5 pt-14
+                    dark:border-gray-600 lg:justify-evenly"
                   >
                     <Link
                       href="https://github.com/supabase/supabase/discussions"
