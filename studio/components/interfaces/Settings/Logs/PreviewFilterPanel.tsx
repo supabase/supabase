@@ -1,13 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import {
-  Button,
-  Input,
-  IconRefreshCw,
-  IconSearch,
-  IconExternalLink,
-  IconEye,
-  IconEyeOff,
-} from '@supabase/ui'
+import { Button, Input, IconRefreshCw, IconSearch, IconExternalLink, IconEye, IconEyeOff } from 'ui'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'
@@ -133,7 +125,7 @@ const PreviewFilterPanel: FC<Props> = ({
               hasEdits && (
                 <button
                   onClick={() => handleInputSearch(search)}
-                  className="text-scale-1100 hover:text-scale-1200 mx-2"
+                  className="mx-2 text-scale-1100 hover:text-scale-1200"
                 >
                   {'↲'}
                 </button>

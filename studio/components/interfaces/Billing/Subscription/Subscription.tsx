@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { FC } from 'react'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
-import { Button, Loading } from '@supabase/ui'
+import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -65,11 +65,11 @@ const Subscription: FC<Props> = ({
 
   return (
     <Loading active={loading}>
-      <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
+      <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="flex items-center justify-between px-6 pt-4">
             <div className="flex flex-col">
-              <p className="text-scale-1100 text-sm">
+              <p className="text-sm text-scale-1100">
                 {showProjectName ? project.name : 'Current subscription'}
               </p>
               <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
@@ -95,11 +95,11 @@ const Subscription: FC<Props> = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'border-scale-200 border text-center', //border
-                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                        'border border-scale-200 text-center', //border
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
                       ].join(' ')}
                     >
-                      <span className="text-scale-1200 text-xs">
+                      <span className="text-xs text-scale-1200">
                         {projectUpdateDisabled ? (
                           <>
                             Subscription changes are currently disabled.
@@ -131,7 +131,7 @@ const Subscription: FC<Props> = ({
             </div>
           )}
           <div className="mt-2 px-6 pb-4">
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               See our{' '}
               <a href="https://supabase.com/pricing" target="_blank" className="underline">
                 pricing
@@ -147,18 +147,18 @@ const Subscription: FC<Props> = ({
           ) : !loading && subscription ? (
             // Cost breakdown
             <>
-              <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
+              <div className="relative flex items-center border-t border-panel-border-light px-6 py-3 dark:border-panel-border-dark">
                 <div className="w-[40%]">
-                  <p className="text-scale-900 text-xs uppercase">Item</p>
+                  <p className="text-xs uppercase text-scale-900">Item</p>
                 </div>
                 <div className="flex w-[20%] justify-end">
-                  <p className="text-scale-900 text-xs uppercase">Amount</p>
+                  <p className="text-xs uppercase text-scale-900">Amount</p>
                 </div>
                 <div className="flex w-[20%] justify-end">
-                  <p className="text-scale-900 text-xs uppercase">Unit Price</p>
+                  <p className="text-xs uppercase text-scale-900">Unit Price</p>
                 </div>
                 <div className="flex w-[20%] justify-end">
-                  <p className="text-scale-900 text-xs uppercase">Price</p>
+                  <p className="text-xs uppercase text-scale-900">Price</p>
                 </div>
               </div>
               <CostBreakdownRow
@@ -195,9 +195,9 @@ const Subscription: FC<Props> = ({
                     )
                   })
                 )}
-              <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
+              <div className="relative flex items-center border-t border-panel-border-light px-6 py-3 dark:border-panel-border-dark">
                 <div className="w-[80%]">
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-sm text-scale-1100">
                     Estimated cost for {dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}{' '}
                     - {dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')} so far
                   </p>
