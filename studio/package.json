@@ -78,7 +78,6 @@
     "sqlstring": "^2.3.2",
     "swr": "^1.2.1",
     "ui": "*",
-    "common": "*",
     "uniforms-bootstrap4": "^3.6.2",
     "uniforms-bridge-json-schema": "^3.6.2",
     "uuid": "^8.3.2",
@@ -86,7 +85,6 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "common": "*",
     "config": "*",
     "@babel/core": "^7.17.5",
     "@storybook/addon-actions": "^6.4.19",
