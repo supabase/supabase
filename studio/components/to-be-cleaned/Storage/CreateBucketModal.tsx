@@ -4,13 +4,13 @@ import { Modal, Alert, Button, Input, Toggle } from 'ui'
 interface Props {
   visible: boolean
   onSelectCancel: () => {}
-  onSelectSave: () => {}
+  onSelectSave: (bucketName: string, isPublic: boolean) => {}
 }
 
 const CreateBucketModal: FC<Props> = ({
   visible = false,
   onSelectCancel = () => {},
-  onSelectSave = (bucketName: string, isPublic: boolean) => {},
+  onSelectSave = () => {},
 }) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
