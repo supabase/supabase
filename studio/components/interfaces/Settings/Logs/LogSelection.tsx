@@ -1,19 +1,15 @@
 import { FC } from 'react'
-import { IconX, Loading } from '@supabase/ui'
+import { IconX } from 'ui'
 
 import { LogData, QueryType } from './Logs.types'
 
-import DatabaseApiSelectionRender, {
-  DatabaseApiSelectionHeaderRender,
-} from './LogSelectionRenderers/DatabaseApiSelectionRender'
+import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
-import FunctionInvocationSelectionRender, {
-  FunctionInvocationHeaderRender,
-} from './LogSelectionRenderers/FunctionInvocationSelectionRender'
+import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import { isDefaultLogPreviewFormat, LogsEndpointParams, LogsTableName } from '.'
+import { isDefaultLogPreviewFormat, LogsEndpointParams } from '.'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import Connecting from 'components/ui/Loading/Loading'
 
@@ -71,36 +67,36 @@ const LogSelection: FC<LogSelectionProps> = ({
   return (
     <div
       className={[
-        'relative h-full flex flex-col flex-grow border border-l',
+        'relative flex h-full flex-grow flex-col border border-l',
         'border-panel-border-light dark:border-panel-border-dark',
-        'bg-gray-200 overflow-y-scroll',
+        'overflow-y-scroll bg-gray-200',
       ].join(' ')}
     >
       <div
         className={
-          `overflow-y-scroll transition-all
-          bg-scale-200 absolute w-full h-full text-center flex-col gap-2 flex items-center justify-center opacity-0 ` +
-          (partialLog ? 'opacity-0 z-0' : 'opacity-100 z-10')
+          `absolute flex
+          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-scale-200 text-center opacity-0 transition-all ` +
+          (partialLog ? 'z-0 opacity-0' : 'z-10 opacity-100')
         }
       >
         <div
           className={
-            `transition-all
-          duration-500
-          delay-300
+            `flex
           w-full
-          flex
-          flex-col
-          justify-center
-          items-center
-          gap-6
           max-w-sm
-          text-center scale-95 opacity-0 ` +
-            (partialLog || isLoading ? 'mt-0 opacity-0 scale-95' : 'mt-8 opacity-100 scale-100')
+          scale-95
+          flex-col
+          items-center
+          justify-center
+          gap-6
+          text-center
+          opacity-0
+          transition-all delay-300 duration-500 ` +
+            (partialLog || isLoading ? 'mt-0 scale-95 opacity-0' : 'mt-8 scale-100 opacity-100')
           }
         >
-          <div className="relative border border-scale-600 dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
-            <div className="h-0.5 rounded-full w-2/3 bg-scale-600 dark:bg-scale-500"></div>
+          <div className="relative flex h-4 w-32 items-center rounded border border-scale-600 px-2 dark:border-scale-400">
+            <div className="h-0.5 w-2/3 rounded-full bg-scale-600 dark:bg-scale-500"></div>
             <div className="absolute right-1 -bottom-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -130,19 +126,19 @@ const LogSelection: FC<LogSelectionProps> = ({
       <div
         className=" 
           relative
-          flex-grow
           h-px
+          flex-grow
           bg-scale-300
         "
       >
         <div
-          className="transition absolute cursor-pointer top-6 right-6 text-scale-900 hover:text-scale-1200"
+          className="absolute top-6 right-6 cursor-pointer text-scale-900 transition hover:text-scale-1200"
           onClick={onClose}
         >
           <IconX size={14} strokeWidth={2} />
         </div>
         {isLoading && <Connecting />}
-        <div className="bg-scale-300 py-8 flex flex-col space-y-6">
+        <div className="flex flex-col space-y-6 bg-scale-300 py-8">
           {!isLoading && <Formatter />}
         </div>
       </div>

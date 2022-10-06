@@ -42,7 +42,7 @@ const data: CommunityItem[] = [
   },
   {
     title: 'Twitter',
-    stat: '40,000+',
+    stat: '44,000+',
     statLabel: 'Followers',
     img: 'twitter.png',
     detail: () => (

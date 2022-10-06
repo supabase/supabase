@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from 'ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
@@ -53,8 +53,8 @@ const Users = () => {
   }
 
   return (
-    <div className="">
-      <div className="flex justify-between px-6 pt-6 pb-2">
+    <div className="overflow-scroll">
+      <div className="justify-between px-6 pt-6 pb-2 md:flex">
         <div className="relative flex space-x-4">
           <Input
             size="small"
@@ -94,7 +94,7 @@ const Users = () => {
             </Listbox.Option>
           </Listbox>
         </div>
-        <div className="flex items-center">
+        <div className="mt-4 flex items-center md:mt-0">
           <Button
             className="mr-2"
             size="tiny"
@@ -108,9 +108,9 @@ const Users = () => {
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
-      <section className="overflow-visible mt-4 px-6">
-        <div className="relative section-block--body rounded">
-          <div className="align-middle inline-block min-w-full">
+      <section className="mt-4 overflow-visible px-6">
+        <div className="section-block--body relative overflow-scroll rounded">
+          <div className="inline-block min-w-full align-middle">
             <UsersList />
           </div>
         </div>

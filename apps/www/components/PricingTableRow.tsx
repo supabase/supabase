@@ -67,9 +67,9 @@ export const PricingTableRowDesktop = (props: any) => {
         <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
       </tr>
 
-      {category.features.map((feat: any) => {
+      {category.features.map((feat: any, i: number) => {
         return (
-          <tr className="divide-scale-600 dark:divide-scale-400 divide-x">
+          <tr className="divide-scale-600 dark:divide-scale-400 divide-x" key={i}>
             <th
               className="text-scale-1200 flex items-center px-6 py-3 text-left text-sm font-normal dark:text-white"
               scope="row"

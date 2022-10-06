@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Loading } from '@supabase/ui'
+import { Loading } from 'ui'
 import { useState } from 'react'
 import {
   BarChart as RechartBarChart,
@@ -89,7 +89,7 @@ const Header = ({
   const highlighted = (
     <h5
       className={
-        'text-scale-1200 text-xl font-normal ' + (minimalHeader ? 'text-base' : 'text-2xl')
+        'text-xl font-normal text-scale-1200 ' + (minimalHeader ? 'text-base' : 'text-2xl')
       }
     >
       {title}
@@ -97,7 +97,7 @@ const Header = ({
     </h5>
   )
   const date = (
-    <h5 className="text-scale-900 text-xs">
+    <h5 className="text-xs text-scale-900">
       {focus ? (
         data && data[focus] && day(data[focus].period_start).format(FOCUS_FORMAT)
       ) : (
@@ -247,7 +247,7 @@ export function BarChart({
                 </RechartBarChart>
               </ResponsiveContainer>
               {data && (
-                <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
+                <div className="-mt-5 flex items-center justify-between text-xs text-scale-900">
                   <span>
                     {day(data[0].period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
@@ -369,7 +369,7 @@ export function AreaChart({
               </RechartAreaChart>
             </ResponsiveContainer>
             {data && (
-              <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
+              <div className="-mt-5 flex items-center justify-between text-xs text-scale-900">
                 <span>
                   {dayjs(data[0].period_start).format(
                     customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
