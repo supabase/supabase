@@ -234,6 +234,8 @@ const StorageExplorer = observer(({ bucket }) => {
   const onDeleteSelectedFiles = async () => {
     if (selectedItemsToDelete.length === 1) {
       const [itemToDelete] = selectedItemsToDelete
+      if (!itemToDelete) return
+
       switch (itemToDelete.type) {
         case STORAGE_ROW_TYPES.FOLDER:
           await deleteFolder(itemToDelete)
