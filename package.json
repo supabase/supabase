@@ -32,7 +32,7 @@
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
     "prettier": "^2.5.1",
-    "turbo": "1.4.7"
+    "turbo": "1.4.6"
   },
   "repository": {
     "type": "git",
