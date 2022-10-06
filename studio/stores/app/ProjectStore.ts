@@ -9,7 +9,7 @@ import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/Postgre
 import pingPostgrest from 'lib/pingPostgrest'
 
 export interface IProjectStore extends IPostgresMetaInterface<Project> {
-  fetchDetail: (projectRef: string) => Promise<void>
+  fetchDetail: (projectRef: string, callback?: (project: Project) => void) => Promise<void>
 }
 
 export default class ProjectStore extends PostgresMetaInterface<Project> {
@@ -44,7 +44,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     this.data = formattedValue
   }
 
-  async fetchDetail(projectRef: string) {
+  async fetchDetail(projectRef: string, callback?: (project: Project) => void) {
     const url = `${this.url}/${projectRef}`
     const headers = constructHeaders(this.headers)
     const response = await get(url, { headers })
@@ -55,6 +55,8 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       project.postgrestStatus = await this.pingPostgrest(project)
       // update project detail by key id
       this.data[project.id] = project
+
+      callback?.(project)
 
       // lazy fetches
       if (IS_PLATFORM) {

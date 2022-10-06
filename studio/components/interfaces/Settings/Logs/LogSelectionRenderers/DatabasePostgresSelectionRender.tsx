@@ -1,4 +1,4 @@
-import { Alert } from '@supabase/ui'
+import { Alert } from 'ui'
 import React from 'react'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import LogsDivider from '../Logs.Divider'
@@ -12,8 +12,8 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
   const DetailedRow = ({ label, value }: { label: string; value: string | React.ReactNode }) => {
     return (
       <div className="grid grid-cols-12">
-        <p className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</p>
-        <p className="text-scale-1200 text-base col-span-8 whitespace-pre-wrap">{value}</p>
+        <p className="col-span-4 whitespace-pre-wrap text-sm text-scale-900">{label}</p>
+        <p className="col-span-8 whitespace-pre-wrap text-base text-scale-1200">{value}</p>
       </div>
     )
   }
@@ -21,9 +21,9 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
   return (
     <>
       <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
-        <span className="text-scale-900 text-sm col-span-4">Event message</span>
+        <span className="col-span-4 text-sm text-scale-900">Event message</span>
 
-        <div className="text-xs text-wrap font-mono text-scale-1200 mt-2  whitespace-pre-wrap overflow-x-auto">
+        <div className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono  text-xs text-scale-1200">
           {log.event_message}
         </div>
       </div>
@@ -40,8 +40,8 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
       )}
       <LogsDivider />
       <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
-        <h3 className="text-lg text-scale-1200 mb-4">Metadata</h3>
-        <pre className="text-sm syntax-highlight overflow-x-auto">
+        <h3 className="mb-4 text-lg text-scale-1200">Metadata</h3>
+        <pre className="syntax-highlight overflow-x-auto text-sm">
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{

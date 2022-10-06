@@ -1,6 +1,6 @@
 import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
-import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
+import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from 'ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../../ActionBar'
@@ -8,7 +8,11 @@ import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
 import SpreadsheetPreview from './SpreadsheetPreview'
 import { SpreadsheetData } from './SpreadsheetImport.types'
-import { acceptedFileExtension, parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
+import {
+  acceptedFileExtension,
+  parseSpreadsheet,
+  parseSpreadsheetText,
+} from './SpreadsheetImport.utils'
 import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 
 interface Props {

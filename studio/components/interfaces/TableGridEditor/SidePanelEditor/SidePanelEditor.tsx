@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
 import { Query, Dictionary } from 'components/grid'
-import { Modal } from '@supabase/ui'
+import { Modal } from 'ui'
 import {
   PostgresRelationship,
   PostgresTable,
@@ -293,7 +293,7 @@ const SidePanelEditor: FC<Props> = ({
         }}
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>

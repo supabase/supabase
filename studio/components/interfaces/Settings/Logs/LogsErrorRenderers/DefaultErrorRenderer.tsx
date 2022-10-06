@@ -1,4 +1,4 @@
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 import { LogQueryError } from '..'
 
 export interface ErrorRendererProps {
@@ -11,7 +11,7 @@ const DefaultErrorRenderer: React.FC<ErrorRendererProps> = ({ error }) => (
     size="tiny"
     value={typeof error === 'string' ? error : JSON.stringify(error, null, 2)}
     borderless
-    className="font-mono w-full mt-4"
+    className="mt-4 w-full font-mono"
     copy
     rows={7}
   />

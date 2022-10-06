@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
-import { Popover, IconCheck, IconAlertCircle, IconSearch, IconPlus } from '@supabase/ui'
+import { Popover, IconCheck, IconAlertCircle, IconSearch, IconPlus } from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
@@ -116,7 +116,7 @@ export default function MultiSelect({
       <div
         className={[
           'form-control form-control--multi-select',
-          'bg-scaleA-200 border-scale-700 border',
+          'border border-scale-700 bg-scaleA-200',
           'multi-select relative block w-full w-full space-x-1 overflow-auto rounded',
           `${error !== undefined ? 'border-red-800 bg-red-100' : ''}`,
         ].join(' ')}
@@ -132,7 +132,7 @@ export default function MultiSelect({
               <IconSearch size={14} />
               <input
                 autoFocus
-                className="placeholder-scale-1000 w-72 bg-transparent text-sm outline-none"
+                className="w-72 bg-transparent text-sm placeholder-scale-1000 outline-none"
                 value={searchString}
                 placeholder={searchPlaceholder}
                 onKeyPress={onKeyPress}
@@ -188,7 +188,7 @@ export default function MultiSelect({
               ) : options.length === 0 ? (
                 <div
                   className={[
-                    'dark:border-dark flex h-full w-full flex-col',
+                    'flex h-full w-full flex-col dark:border-dark',
                     'items-center justify-center border border-dashed p-3',
                   ].join(' ')}
                 >
@@ -197,14 +197,14 @@ export default function MultiSelect({
                   ) : (
                     <div className="flex w-full items-center space-x-2">
                       <IconAlertCircle strokeWidth={1.5} size={18} className="text-scale-1000" />
-                      <p className="text-scale-1000 text-sm">No options available</p>
+                      <p className="text-sm text-scale-1000">No options available</p>
                     </div>
                   )}
                 </div>
               ) : (
                 <div
                   className={[
-                    'dark:border-dark flex h-full w-full flex-col',
+                    'flex h-full w-full flex-col dark:border-dark',
                     'items-center justify-center border border-dashed p-3',
                   ].join(' ')}
                 >
@@ -212,7 +212,7 @@ export default function MultiSelect({
                     emptyMessage
                   ) : (
                     <div className="flex w-full items-center space-x-2">
-                      <p className="text-scale-1000 text-sm">No options found</p>
+                      <p className="text-sm text-scale-1000">No options found</p>
                     </div>
                   )}
                 </div>
@@ -228,7 +228,7 @@ export default function MultiSelect({
             ].join(' ')}
           >
             {selectedOptions.length === 0 && placeholder && (
-              <div className="text-scale-1000 px-2 text-sm">{placeholder}</div>
+              <div className="px-2 text-sm text-scale-1000">{placeholder}</div>
             )}
             {selectedOptions.map((value, idx) => {
               const id = `${value}-${idx}`
@@ -255,7 +255,7 @@ export default function MultiSelect({
       </div>
 
       {descriptionText && (
-        <span className="form-text text-muted text-sm mt-2">{descriptionText}</span>
+        <span className="form-text text-muted mt-2 text-sm">{descriptionText}</span>
       )}
       {error && <span className="text-red-900 text-sm mt-2">{error}</span>}
     </div>

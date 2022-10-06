@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input, Button, IconExternalLink } from '@supabase/ui'
+import { Checkbox, SidePanel, Input, Button, IconExternalLink } from 'ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -55,7 +55,6 @@ const ColumnEditor: FC<Props> = ({
   updateEditorDirty = () => {},
 }) => {
   const isNewRecord = isUndefined(column)
-  const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
   const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})

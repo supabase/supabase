@@ -1,15 +1,6 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
-import {
-  Checkbox,
-  Input,
-  IconX,
-  IconMenu,
-  Popover,
-  IconLink,
-  IconSettings,
-  Button,
-} from '@supabase/ui'
+import { Checkbox, Input, IconX, IconMenu, Popover, IconLink, IconSettings, Button } from 'ui'
 import { PostgresType } from '@supabase/postgres-meta'
 
 import { ColumnField } from '../SidePanelEditor.types'
@@ -128,7 +119,7 @@ const Column: FC<Props> = ({
             }`}
             suggestions={suggestions}
             suggestionsHeader="Suggested expressions"
-            suggestionsWidth={410}
+            suggestionsTooltip="Suggested expressions"
             onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
               onUpdateColumn({ defaultValue: suggestion.value })

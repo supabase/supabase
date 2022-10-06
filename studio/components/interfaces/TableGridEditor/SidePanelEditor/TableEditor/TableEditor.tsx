@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input } from '@supabase/ui'
+import { Badge, Checkbox, SidePanel, Input } from 'ui'
 import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
