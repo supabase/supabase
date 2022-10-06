@@ -451,7 +451,7 @@ class StorageExplorerStore {
       })
     }
 
-    const { error } = await this.supabaseClient.storage.createBucket(bucketName, {
+    const { data, error } = await this.supabaseClient.storage.createBucket(bucketName, {
       public: isPublic,
     })
     if (error) {
@@ -464,6 +464,7 @@ class StorageExplorerStore {
 
     await this.fetchBuckets()
     this.closeCreateBucketModal()
+    return data
   }
 
   openBucket = async (bucket) => {
