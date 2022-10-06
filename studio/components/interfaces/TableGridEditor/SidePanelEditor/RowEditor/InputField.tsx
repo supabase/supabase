@@ -5,8 +5,6 @@ import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from 'ui'
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
 import { TEXT_TYPES, JSON_TYPES, DATETIME_TYPES } from '../SidePanelEditor.constants'
-import MultiSelect from 'components/ui/MultiSelect'
-import { convertPgArrayToJsArray, convertJsArraytoPgArray, uuidv4 } from 'lib/helpers'
 
 interface Props {
   field: RowField
@@ -27,34 +25,28 @@ const InputField: FC<Props> = ({
 }) => {
   if (field.enums.length > 0) {
     const isArray = field.format[0] === '_'
-
     if (isArray) {
-      const formattedValue = convertPgArrayToJsArray(field?.value ?? '')
-      const options = field.enums.map((value: string) => {
-        return { id: uuidv4(), value, name: value, disabled: false }
-      })
       return (
-        <div className="grid gap-x-2 md:grid-cols-12 md:gap-x-4">
-          <div className="col-span-4">
-            <label className="block text-scale-1100 text-sm break-all">{field.name}</label>
-            <span className="text-scale-900 text-sm" id="-optional">
-              {field.format}
-            </span>
-          </div>
-          <div className="col-span-8">
-            <MultiSelect
-              allowDuplicateSelection
-              options={options}
-              value={formattedValue}
-              searchPlaceholder="Search for a value"
-              placeholder="NULL"
-              error={errors[field.name]}
-              onChange={(values) => {
-                const formattedValues = convertJsArraytoPgArray(values)
-                onUpdateField({ [field.name]: formattedValues })
-              }}
-            />
-          </div>
+        <div className="text-area-text-sm">
+          <Input.TextArea
+            layout="horizontal"
+            label={field.name}
+            className="text-sm"
+            descriptionText={field.comment}
+            labelOptional={field.format}
+            disabled={!isEditable}
+            error={errors[field.name]}
+            rows={5}
+            value={field.value ?? ''}
+            placeholder={
+              field.defaultValue === null
+                ? ''
+                : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+                ? 'Default: Empty string'
+                : `Default: ${field.defaultValue}`
+            }
+            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          />
         </div>
       )
     } else {
