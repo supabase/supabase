@@ -272,14 +272,14 @@ import { Component, createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
 
 interface Props {
-  session: AuthSession
+  session: AuthSession;
 }
 
 const Account: Component<Props> = ({ session }) => {
   const [loading, setLoading] = createSignal(true)
-  const [username, setUsername] = createSignal<string | null>(null)
-  const [website, setWebsite] = createSignal<string | null>(null)
-  const [avatarUrl, setAvatarUrl] = createSignal<string | null>(null)
+  const [username, setUsername] = (createSignal < string) | (null > null)
+  const [website, setWebsite] = (createSignal < string) | (null > null)
+  const [avatarUrl, setAvatarUrl] = (createSignal < string) | (null > null)
 
   createEffect(() => {
     getProfile()
@@ -366,11 +366,19 @@ const Account: Component<Props> = ({ session }) => {
           />
         </div>
         <div>
-          <button type="submit" class="button primary block" disabled={loading()}>
+          <button
+            type="submit"
+            class="button primary block"
+            disabled={loading()}
+          >
             {loading() ? 'Saving ...' : 'Update profile'}
           </button>
         </div>
-        <button type="button" class="button block" onClick={() => supabase.auth.signOut()}>
+        <button
+          type="button"
+          class="button block"
+          onClick={() => supabase.auth.signOut()}
+        >
           Sign Out
         </button>
       </form>

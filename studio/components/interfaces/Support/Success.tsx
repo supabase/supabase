@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { Button, IconCheckCircle } from '@supabase/ui'
+import { Button, IconCheckCircle } from 'ui'
 
 const Success = () => {
   return (
-    <div className="space-y-4 my-10 mx-32 relative">
+    <div className="relative my-10 mx-32 space-y-4">
       <div className="absolute -left-14 -top-2.5">
         <IconCheckCircle strokeWidth={2} size={24} background="brand" />
       </div>
