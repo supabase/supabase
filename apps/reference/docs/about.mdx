@@ -79,7 +79,7 @@ You can use it completely, or just the features you need.
         description={'User management with Row Level Security.'}
         style={{ height: '100%' }}
       />
-    </div>    
+    </div>
     {/* Auto-generated APIs */}
     <div class="col col--4">
       <ButtonCard
@@ -150,7 +150,7 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
 <div>
   <div class="row is-multiline">
     {frameworks.map((x) => (
-    <div key={x.name} class="col col--3">
+      <div key={x.name} class="col col--3">
         <ButtonCard
           layout="horizontal"
           icon={
@@ -162,7 +162,12 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
               />
             ) : (
               <ThemedImage
-                style={{ display: 'block', maxHeight: 20, minWidth: 20, margin: 0 }}
+                style={{
+                  display: 'block',
+                  maxHeight: 20,
+                  minWidth: 20,
+                  margin: 0,
+                }}
                 alt={x.name}
                 width="20"
                 sources={{

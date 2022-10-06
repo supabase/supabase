@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Form, Modal, Input } from '@supabase/ui'
+import { Button, Form, Modal, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -74,8 +74,8 @@ const DeleteOrganizationButton = observer(() => {
         onCancel={() => setIsOpen(false)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-scale-1200 text-sm">Delete organisation</h5>
-            <span className="text-scale-900 text-xs">Are you sure?</span>
+            <h5 className="text-sm text-scale-1200">Delete organisation</h5>
+            <span className="text-xs text-scale-900">Are you sure?</span>
           </div>
         }
       >
@@ -88,7 +88,7 @@ const DeleteOrganizationButton = observer(() => {
           {({ isSubmitting }: { isSubmitting: boolean }) => (
             <div className="space-y-4 py-3">
               <Modal.Content>
-                <p className="text-scale-900 text-sm">
+                <p className="text-sm text-scale-900">
                   This action <span className="text-scale-1200">cannot</span> be undone. This will
                   permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
                   organization and remove all of its projects.

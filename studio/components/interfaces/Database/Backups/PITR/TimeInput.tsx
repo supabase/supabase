@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { isNaN } from 'lodash'
 import { ChangeEvent, FC, useEffect, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { IconClock } from '@supabase/ui'
+import { IconClock } from 'ui'
 
 import { Time } from './PITR.types'
 import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'

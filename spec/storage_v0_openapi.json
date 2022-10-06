@@ -783,6 +783,16 @@
         "tags": ["object"],
         "parameters": [
           {
+            "schema": { "type": "string" },
+            "examples": {
+              "filename.jpg": { "value": "filename.jpg" },
+              "example2": { "value": null }
+            },
+            "in": "query",
+            "name": "download",
+            "required": false
+          },
+          {
             "schema": {
               "type": "string",
               "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk"

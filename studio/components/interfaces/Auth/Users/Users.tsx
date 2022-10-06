@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from 'ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, IconLoader } from '@supabase/ui'
+import { Button, IconLoader } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -85,7 +85,7 @@ export default function Description({ content, metadata, onChange = () => {} }) 
       />
       <div
         className={`flex items-center gap-2 ${
-          hasChanged ? 'opacity-100' : 'opacity-0 cursor-default h-0'
+          hasChanged ? 'opacity-100' : 'h-0 cursor-default opacity-0'
         } ${animateCss}`}
       >
         <Button
@@ -100,7 +100,7 @@ export default function Description({ content, metadata, onChange = () => {} }) 
         </Button>
         <Button disabled={!hasChanged} onClick={updateDescription}>
           {isUpdating ? (
-            <IconLoader className="animate-spin mx-auto" size={14} strokeWidth={2} />
+            <IconLoader className="mx-auto animate-spin" size={14} strokeWidth={2} />
           ) : (
             <span>Save</span>
           )}
