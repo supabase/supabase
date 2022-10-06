@@ -1,9 +1,10 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface Props {
   title?: string
+  size?: 'medium' | 'large'
   children?: ReactNode
   ctaButtonLabel?: string
   infoButtonLabel?: string
@@ -15,6 +16,7 @@ interface Props {
 
 const ProductEmptyState: FC<Props> = ({
   title = '',
+  size = 'medium',
   children,
   ctaButtonLabel = '',
   infoButtonLabel = '',
@@ -26,11 +28,11 @@ const ProductEmptyState: FC<Props> = ({
   const hasAction = (ctaButtonLabel && onClickCta) || (infoButtonUrl && infoButtonLabel)
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="flex space-x-4 p-6 rounded border border-panel-border-light dark:border-panel-border-dark bg-panel-body-light dark:bg-panel-body-dark shadow-md">
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="flex space-x-4 rounded border border-panel-border-light bg-panel-body-light p-6 shadow-md dark:border-panel-border-dark dark:bg-panel-body-dark">
         {/* A graphic can probably be placed here as a sibling to the div below*/}
         <div className="flex flex-col">
-          <div className="w-80 space-y-4">
+          <div className={`${size === 'medium' ? 'w-80' : 'w-[400px]'} space-y-4`}>
             <h5>{title}</h5>
             <div className="flex flex-col space-y-2">{children}</div>
             {hasAction && (
@@ -47,11 +49,11 @@ const ProductEmptyState: FC<Props> = ({
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                            'border-scale-200 border',
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-scale-1200 text-xs">{disabledMessage}</span>
+                          <span className="text-xs text-scale-1200">{disabledMessage}</span>
                         </div>
                       </Tooltip.Content>
                     )}

@@ -185,7 +185,9 @@ export const genCountQuery = (table: string): string => `SELECT count(*) as coun
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
 export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
-  const its = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+  // todo @TzeYiing needs typing
+  const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+
   let trunc = 'minute'
   let extendValue = 60 * 6
   const minuteDiff = ite.diff(its, 'minute')

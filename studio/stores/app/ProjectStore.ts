@@ -3,13 +3,13 @@ import { Project } from 'types'
 import { IRootStore } from '../RootStore'
 import { constructHeaders } from 'lib/api/apiHelpers'
 import { get } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 
 import pingPostgrest from 'lib/pingPostgrest'
 
 export interface IProjectStore extends IPostgresMetaInterface<Project> {
-  fetchDetail: (projectRef: string) => Promise<void>
+  fetchDetail: (projectRef: string, callback?: (project: Project) => void) => Promise<void>
 }
 
 export default class ProjectStore extends PostgresMetaInterface<Project> {
@@ -44,7 +44,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     this.data = formattedValue
   }
 
-  async fetchDetail(projectRef: string) {
+  async fetchDetail(projectRef: string, callback?: (project: Project) => void) {
     const url = `${this.url}/${projectRef}`
     const headers = constructHeaders(this.headers)
     const response = await get(url, { headers })
@@ -56,8 +56,12 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       // update project detail by key id
       this.data[project.id] = project
 
+      callback?.(project)
+
       // lazy fetches
-      this.fetchSubscriptionTier(project)
+      if (IS_PLATFORM) {
+        this.fetchSubscriptionTier(project)
+      }
     }
   }
 

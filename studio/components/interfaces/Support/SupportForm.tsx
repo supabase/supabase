@@ -2,7 +2,7 @@ import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { useEffect, useReducer, useState, FC, ChangeEvent, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconMail, IconPlus, IconX, Input, Listbox } from '@supabase/ui'
+import { Button, IconMail, IconPlus, IconX, Input, Listbox } from 'ui'
 
 import { useStore } from 'hooks'
 import { Project } from 'types'
@@ -309,7 +309,7 @@ const SupportForm: FC<Props> = ({ setSent }) => {
           />
         </div>
 
-        <div className="px-6 text-area-text-sm">
+        <div className="text-area-text-sm px-6">
           <Input.TextArea
             label="Message"
             placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
@@ -320,10 +320,10 @@ const SupportForm: FC<Props> = ({ setSent }) => {
             error={formState.body.error}
           />
         </div>
-        <div className="px-6 space-y-4">
+        <div className="space-y-4 px-6">
           <div className="space-y-1">
-            <p className="block text-scale-1100 text-sm">Attachments</p>
-            <p className="block text-scale-1000 text-sm">
+            <p className="block text-sm text-scale-1100">Attachments</p>
+            <p className="block text-sm text-scale-1000">
               Upload up to {MAX_ATTACHMENTS} screenshots that might be relevant to the issue that
               you're facing
             </p>
@@ -342,12 +342,13 @@ const SupportForm: FC<Props> = ({ setSent }) => {
           <div className="flex items-center space-x-2">
             {uploadedDataUrls.map((x: any, idx: number) => (
               <div
+                key={idx}
                 style={{ backgroundImage: `url("${x}")` }}
-                className="bg-center bg-cover bg-no-repeat h-14 w-14 rounded relative"
+                className="relative h-14 w-14 rounded bg-cover bg-center bg-no-repeat"
               >
                 <div
                   className={[
-                    'rounded-full w-4 h-4 bg-red-900 flex items-center justify-center',
+                    'flex h-4 w-4 items-center justify-center rounded-full bg-red-900',
                     'absolute -top-1 -right-1 cursor-pointer',
                   ].join(' ')}
                   onClick={() => removeUploadedFile(idx)}
@@ -359,8 +360,8 @@ const SupportForm: FC<Props> = ({ setSent }) => {
             {uploadedFiles.length < MAX_ATTACHMENTS && (
               <div
                 className={[
-                  'border border-scale-800 transition opacity-50 hover:opacity-100',
-                  'w-14 h-14 rounded flex items-center justify-center group cursor-pointer',
+                  'border border-scale-800 opacity-50 transition hover:opacity-100',
+                  'group flex h-14 w-14 cursor-pointer items-center justify-center rounded',
                 ].join(' ')}
                 onClick={() => {
                   if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
