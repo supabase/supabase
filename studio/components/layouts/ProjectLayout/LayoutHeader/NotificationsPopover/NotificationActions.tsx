@@ -1,6 +1,6 @@
 import { FC, Fragment } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconExternalLink } from '@supabase/ui'
+import { Button, IconExternalLink } from 'ui'
 import { Action, ActionReason, ActionType } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
@@ -60,13 +60,13 @@ const NotificationActions: FC<Props> = ({
             )
           )
         } else if (action.reason === ActionReason.Rollback) {
-            return (
-              ownerReassignStatus?.desired === 'temp_role' && (
-                <Button type="default" onClick={onSelectRollbackMigration}>
-                  Rollback
-                </Button>
-              )
+          return (
+            ownerReassignStatus?.desired === 'temp_role' && (
+              <Button type="default" onClick={onSelectRollbackMigration}>
+                Rollback
+              </Button>
             )
+          )
         } else {
           return (
             ownerReassignStatus?.desired === 'unmigrated' && (

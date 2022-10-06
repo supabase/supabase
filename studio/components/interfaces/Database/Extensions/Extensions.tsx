@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { partition, isNull } from 'lodash'
-import { Input, IconSearch, IconAlertCircle } from '@supabase/ui'
+import { Input, IconSearch, IconAlertCircle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, useFlag, checkPermissions } from 'hooks'

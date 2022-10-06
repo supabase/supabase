@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Input, Modal, Form, Button } from '@supabase/ui'
+import { Input, Modal, Form, Button } from 'ui'
 
 import { useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
@@ -219,7 +219,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                   </div>
                 </Modal.Content>
               </div>
-              <div className="bg-scale-300 border-t py-3">
+              <div className="border-t bg-scale-300 py-3">
                 <Modal.Content>
                   <div className="flex items-center justify-end gap-2">
                     <Button
