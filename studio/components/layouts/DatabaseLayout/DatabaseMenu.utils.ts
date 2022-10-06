@@ -16,18 +16,38 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
       title: 'Database',
       items: [
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
-        { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
+        {
+          name: 'Triggers',
+          key: 'triggers',
+          url: `/project/${ref}/database/triggers`,
+          items: [],
+          isPreview: true,
+        },
+        {
+          name: 'Functions',
+          key: 'functions',
+          url: `/project/${ref}/database/functions`,
+          items: [],
+        },
         {
           name: 'Extensions',
           key: 'extensions',
           url: `/project/${ref}/database/extensions`,
           items: [],
         },
+        { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
         {
           name: 'Replication',
           key: 'replication',
           url: `/project/${ref}/database/replication`,
           items: [],
+        },
+        {
+          name: 'Webhooks',
+          key: 'hooks',
+          url: `/project/${ref}/database/hooks`,
+          items: [],
+          isPreview: true,
         },
         {
           name: 'Backups',

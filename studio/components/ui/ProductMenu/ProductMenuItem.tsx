@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import { Button, IconExternalLink, Menu } from '@supabase/ui'
+import { Badge, Button, IconExternalLink, Menu } from '@supabase/ui'
 
 interface Props {
   name: string | ReactNode
@@ -13,6 +13,7 @@ interface Props {
   onClick?: () => void
   textClassName?: string
   hoverText?: string
+  ispreview?: boolean
 }
 
 const ProductMenuItem: FC<Props> = ({
@@ -26,6 +27,7 @@ const ProductMenuItem: FC<Props> = ({
   onClick,
   textClassName = '',
   hoverText = '',
+  isPreview = false,
 }) => {
   const menuItem = (
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
@@ -34,7 +36,7 @@ const ProductMenuItem: FC<Props> = ({
           title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
           className={'flex items-center truncate ' + textClassName}
         >
-          {name}
+          {name} {isPreview && <Badge color="amber">Alpha</Badge>}
         </span>
         {action}
       </div>
