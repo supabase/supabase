@@ -6,7 +6,7 @@ import {
   Popover,
   IconBookOpen,
   IconActivity,
-} from '@supabase/ui'
+} from 'ui'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
 import Link from 'next/link'
@@ -28,8 +28,8 @@ const HelpPopover: FC<Props> = () => {
       side="bottom"
       sideOffset={8}
       overlay={
-        <div className="space-y-4 my-4 w-96">
-          <div className="px-5 space-y-4 my-5">
+        <div className="my-4 w-96 space-y-4">
+          <div className="my-5 space-y-4 px-5">
             <h5 className="text-scale-1200">Need help with your project?</h5>
             <p className="text-sm text-scale-900">
               For issues with your project hosted on supabase.com, or other inquiries about our
@@ -58,8 +58,8 @@ const HelpPopover: FC<Props> = () => {
             </p>
           </div>
           <Popover.Seperator />
-          <div className="space-y-2 mb-4">
-            <div className="px-5 mb-4">
+          <div className="mb-4 space-y-2">
+            <div className="mb-4 px-5">
               <h5 className={'mb-2'}>Reach out to the community</h5>
 
               <p className="text-sm text-scale-900">
@@ -69,13 +69,13 @@ const HelpPopover: FC<Props> = () => {
             </div>
             <div className="px-5">
               <div
-                className="relative px-5 py-4 pb-12 rounded overflow-hidden space-y-2 shadow-md"
+                className="relative space-y-2 overflow-hidden rounded px-5 py-4 pb-12 shadow-md"
                 style={{ background: '#404EED' }}
               >
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
-                  className="block cursor-pointer dark"
+                  className="dark block cursor-pointer"
                 >
                   <Image
                     className="absolute left-0 top-0 opacity-50"
@@ -86,7 +86,7 @@ const HelpPopover: FC<Props> = () => {
                   />
                   <Button
                     type="secondary"
-                    icon={<SVG src={`/img/discord-icon.svg`} className="w-4 h-4" />}
+                    icon={<SVG src={`/img/discord-icon.svg`} className="h-4 w-4" />}
                   >
                     <span style={{ color: '#404EED' }}>Join Discord server</span>
                   </Button>
@@ -94,7 +94,7 @@ const HelpPopover: FC<Props> = () => {
               </div>
             </div>
             <div className="px-5">
-              <div className="relative px-5 py-4 pb-12 rounded overflow-hidden space-y-2 shadow-md">
+              <div className="relative space-y-2 overflow-hidden rounded px-5 py-4 pb-12 shadow-md">
                 <a
                   href="https://github.com/supabase/supabase/discussions"
                   target="_blank"

@@ -7,7 +7,7 @@ import {
   IconList,
   IconSettings,
   IconUsers,
-} from '@supabase/ui'
+} from 'ui'
 import SVG from 'react-inlinesvg'
 
 import { ProjectBase } from 'types'

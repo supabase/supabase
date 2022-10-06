@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import { Badge, Button, IconExternalLink, Menu } from '@supabase/ui'
+import { Badge, Button, Menu } from 'ui'
 
 interface Props {
   name: string | ReactNode

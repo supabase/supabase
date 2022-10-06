@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { IconAlertCircle, IconLoader, Input } from '@supabase/ui'
+import { IconAlertCircle, IconLoader, Input } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -47,14 +47,14 @@ const DisplayApiSettings = () => {
       }
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center space-x-2 py-8">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center space-x-2 py-8">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading || isApiKeysEmpty
@@ -86,7 +86,7 @@ const DisplayApiSettings = () => {
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-xs bg-red-900 text-white">{'secret'}</code>
+                      <code className="bg-red-900 text-xs text-white">{'secret'}</code>
                     </>
                   )}
                   {x.tags === 'anon' && <code className="text-xs text-code">{'public'}</code>}

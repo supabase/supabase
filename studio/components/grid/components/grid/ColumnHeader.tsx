@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IconKey, IconLink } from '@supabase/ui'
+import { IconKey, IconLink } from 'ui'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 import { XYCoord } from 'dnd-core'
 import { useDispatch } from '../../store'

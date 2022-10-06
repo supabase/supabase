@@ -3,7 +3,7 @@ import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui'
+import { Button, Dropdown, IconHome, IconSettings, IconUser } from 'ui'
 
 import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -35,7 +35,7 @@ const NavigationBar: FC<Props> = ({}) => {
       style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
       className={[
         'flex w-14 flex-col justify-between overflow-y-hidden p-2',
-        'bg-sidebar-light dark:bg-sidebar-dark dark:border-dark border-r',
+        'border-r bg-sidebar-light dark:border-dark dark:bg-sidebar-dark',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
@@ -74,7 +74,7 @@ const NavigationBar: FC<Props> = ({}) => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="bg-scale-500 h-px w-full"></div>
+        <div className="h-px w-full bg-scale-500"></div>
         {otherRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
