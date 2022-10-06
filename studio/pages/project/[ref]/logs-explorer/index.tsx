@@ -73,6 +73,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       pathname: router.pathname,
       query: { ...router.query, q: template.searchString },
     })
+    content.addRecentLogSqlSnippet({
+      sql: template.searchString,
+    })
   }
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
