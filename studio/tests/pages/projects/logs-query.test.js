@@ -8,6 +8,7 @@ import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
 import { useProjectSubscription } from 'hooks'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -138,8 +139,38 @@ test('custom sql querying', async () => {
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
-test.only('datepicker interaction updates query params', async () => {
+test('datepicker interaction updates query params', async () => {
   render(<LogsExplorerPage />)
+  clickDropdown(await screen.findByText(/Last 24 hours/))
+  userEvent.click(await screen.findByText(/Last 3 days/))
+
+  useProjectSubscription.mockReturnValue({
+    subscription: {
+      tier: {
+        supabase_prod_id: 'tier_pro',
+      },
+    },
+  })
+
+  const { subscription } = useProjectSubscription()
+
+  if (subscription.tier.supabase_prod_id === 'tier_pro') {
+    const router = useRouter()
+    expect(router.push).toBeCalled()
+    expect(router.push).toBeCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({
+          its: expect.any(String),
+        }),
+      })
+    )
+  }
+})
+
+test('Upgrade prompt displays if user on free plan and tries to view beyond 24hrs', async () => {
+  render(<LogsExplorerPage />)
+  render(<UpgradePrompt />)
+
   clickDropdown(await screen.findByText(/Last 24 hours/))
   userEvent.click(await screen.findByText(/Last 3 days/))
 
