@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, Button } from '@supabase/ui'
+import { Badge, Button } from 'ui'
 
 import { Project } from 'types'
 
@@ -15,16 +15,16 @@ const PausedProjectCard: FC<Props> = ({
   onSelectDelete = () => {},
 }) => {
   return (
-    <li className="col-span-1 flex shadow-sm rounded-md">
-      <a className="w-full col-span-3 md:col-span-1 ">
+    <li className="col-span-1 flex rounded-md shadow-sm">
+      <a className="col-span-3 w-full md:col-span-1 ">
         <div
           className={[
             'bg-panel-header-light dark:bg-panel-header-dark',
             'hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark',
             'border border-border-secondary-light dark:border-border-secondary-dark',
             'hover:border-border-secondary-hover-light dark:hover:border-border-secondary-hover-dark',
-            'p-4 h-32 rounded',
-            'transition ease-in-out duration-150 flex flex-col justify-between',
+            'h-32 rounded p-4',
+            'flex flex-col justify-between transition duration-150 ease-in-out',
           ].join(' ')}
         >
           <div className="flex items-center justify-between space-x-2">

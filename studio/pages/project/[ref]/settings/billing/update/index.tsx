@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Modal } from '@supabase/ui'
+import { Button, Modal } from 'ui'
 
 import { useStore, useSubscriptionStats } from 'hooks'
 import { get } from 'lib/common/fetch'
@@ -149,7 +149,7 @@ const BillingUpdate: NextPageWithLayout = () => {
       >
         <div className="space-y-4 py-4">
           <Modal.Content>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               Your account is entitled up to {freeProjectsLimit} free projects across all
               organizations you own. You will need to delete or upgrade an existing free project
               first, before being able to downgrade this project.

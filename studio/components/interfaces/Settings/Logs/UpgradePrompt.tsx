@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { Button, IconHelpCircle, IconLoader, Modal } from '@supabase/ui'
+import { Button, IconHelpCircle, IconLoader, Modal } from 'ui'
 
 import { TIER_QUERY_LIMITS } from '.'
 import { useProjectSubscription } from 'hooks'
@@ -30,7 +30,7 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
       <div
         className={`flex flex-row items-center gap-3 px-2 py-1 text-xs transition-all ${
           isExceedingLimit
-            ? 'text-yellow-1100  rounded border border-yellow-700 bg-yellow-200 font-semibold'
+            ? 'rounded  border border-yellow-700 bg-yellow-200 font-semibold text-yellow-1100'
             : ''
         }`}
       >
@@ -38,7 +38,7 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
         <IconHelpCircle
           size={16}
           strokeWidth={1.5}
-          className="text-scale-1100 hover:text-scale-1200 cursor-pointer transition"
+          className="cursor-pointer text-scale-1100 transition hover:text-scale-1200"
           onClick={() => setShowHelperModal(true)}
         />
         {queryLimit.promptUpgrade && (
@@ -63,10 +63,10 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
                 project is on. The table below shows an overview of the duration for which your logs
                 will be retained for based on each plan.
               </p>
-              <div className="border-scale-600 bg-scale-500 rounded border">
+              <div className="rounded border border-scale-600 bg-scale-500">
                 <div className="flex items-center px-4 pt-2 pb-1">
-                  <p className="text-scale-1100 w-[40%] text-sm">Plan</p>
-                  <p className="text-scale-1100 w-[60%] text-sm">Retention duration</p>
+                  <p className="w-[40%] text-sm text-scale-1100">Plan</p>
+                  <p className="w-[60%] text-sm text-scale-1100">Retention duration</p>
                 </div>
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">

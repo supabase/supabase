@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Button, IconList, IconChevronDown, Popover } from '@supabase/ui'
+import { Button, IconList, IconChevronDown, Popover } from 'ui'
 
 import { useUrlState } from 'hooks'
 import SortRow from './SortRow'
@@ -65,8 +65,8 @@ const Sort: FC = () => {
       ))}
       {formattedSorts.length === 0 && (
         <div className="space-y-1 px-3">
-          <h5 className="text-scale-1100 text-sm">No sorts applied to this view</h5>
-          <p className="text-scale-900 text-xs">Add a column below to sort the view</p>
+          <h5 className="text-sm text-scale-1100">No sorts applied to this view</h5>
+          <p className="text-xs text-scale-900">Add a column below to sort the view</p>
         </div>
       )}
 
@@ -89,7 +89,7 @@ const Sort: FC = () => {
             </Button>
           </DropdownControl>
         ) : (
-          <p className="text-scale-1100 text-sm">All columns have been added</p>
+          <p className="text-sm text-scale-1100">All columns have been added</p>
         )}
       </div>
     </div>

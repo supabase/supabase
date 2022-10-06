@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
+// import { Button } from 'ui'
 import {
   Alert,
   Button,
@@ -17,7 +18,7 @@ import {
   Input,
   Listbox,
   Menu,
-} from '@supabase/ui'
+} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
@@ -107,7 +108,7 @@ const TableEditorMenu: FC<Props> = ({
         {!meta.schemas.isInitialized ? (
           <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
-            <span className="text-scale-900 text-xs">Loading schemas...</span>
+            <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
         ) : (
           <Listbox
@@ -184,11 +185,11 @@ const TableEditorMenu: FC<Props> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                      'border-scale-200 border',
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-scale-1200 text-xs">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to create tables
                     </span>
                   </div>
@@ -200,7 +201,7 @@ const TableEditorMenu: FC<Props> = ({
         {/* Table search input */}
         <div className="mb-2 block px-3">
           <Input
-            className="border-none table-editor-search"
+            className="table-editor-search border-none"
             icon={<IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />}
             placeholder="Search tables"
             onChange={(e) => setSearchText(e.target.value)}
@@ -276,7 +277,7 @@ const TableEditorMenu: FC<Props> = ({
                           </Dropdown.Item>,
                         ]}
                       >
-                        <div className="text-scale-900 hover:text-scale-1200 transition-colors">
+                        <div className="text-scale-900 transition-colors hover:text-scale-1200">
                           <IconChevronDown size={14} strokeWidth={2} />
                         </div>
                       </Dropdown>
@@ -320,18 +321,18 @@ const TableEditorMenu: FC<Props> = ({
       )}
 
       {searchText.length > 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
+        <div className="mx-3 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
           <p className="text-xs">No results found</p>
-          <p className="text-scale-1100 text-xs">
+          <p className="text-xs text-scale-1100">
             There are no tables or views that match your search
           </p>
         </div>
       )}
 
       {searchText.length === 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
+        <div className="mx-3 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
           <p className="text-xs">No tables available</p>
-          <p className="text-scale-1100 text-xs">This schema has no tables available yet</p>
+          <p className="text-xs text-scale-1100">This schema has no tables available yet</p>
         </div>
       )}
     </div>

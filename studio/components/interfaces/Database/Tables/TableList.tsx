@@ -4,13 +4,14 @@ import {
   Button,
   IconPlus,
   Input,
-  Listbox,
   IconSearch,
   IconTrash,
   IconEdit3,
   IconColumns,
+  Listbox,
   IconLock,
-} from '@supabase/ui'
+} from 'ui'
+
 import { partition } from 'lodash'
 
 import { useStore } from 'hooks'

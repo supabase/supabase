@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Loading, IconArrowRight } from '@supabase/ui'
+import { Loading, IconArrowRight } from 'ui'
 
 import { Project, NextPageWithLayout } from 'types'
 import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
@@ -80,8 +80,8 @@ const Settings: FC<SettingsProps> = ({ project }) => {
       />
       {loading ? (
         <Loading active={loading}>
-          <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
-            <div className="bg-panel-body-light dark:bg-panel-body-dark flex items-center justify-center px-6 py-6">
+          <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
+            <div className="flex items-center justify-center bg-panel-body-light px-6 py-6 dark:bg-panel-body-dark">
               <p>Loading usage breakdown</p>
             </div>
           </div>
