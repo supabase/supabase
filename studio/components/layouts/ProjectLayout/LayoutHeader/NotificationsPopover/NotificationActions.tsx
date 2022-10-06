@@ -1,39 +1,102 @@
-import { FC } from 'react'
+import { FC, Fragment } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from '@supabase/ui'
+import { Button, IconExternalLink } from '@supabase/ui'
+import { Action, ActionReason, ActionType } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
+import Link from 'next/link'
+
+// [Joshen TODO] Remove all things about "ownerReassignStatus" after 5th November
+// double check with Qiao before we remove them.
 
 interface Props {
   project: Project
-  availableActions: any[]
+  changelogLink?: string
+  ownerReassignStatus?: any
+  availableActions: Action[]
   onSelectRestartProject: () => void
+  onSelectApplyMigration: () => void
+  onSelectRollbackMigration: () => void
+  onSelectFinalizeMigration: () => void
 }
 
-const NotificationActions: FC<Props> = ({ project, availableActions, onSelectRestartProject }) => {
+const NotificationActions: FC<Props> = ({
+  project,
+  changelogLink,
+  ownerReassignStatus,
+  availableActions,
+  onSelectRestartProject,
+  onSelectApplyMigration,
+  onSelectRollbackMigration,
+  onSelectFinalizeMigration,
+}) => {
   const router = useRouter()
 
   const onSelectUpgradeProject = () => {
     return router.push(`/project/${project.ref}/settings/billing/update/pro`)
   }
 
-  return (
-    <div className="space-y-2">
-      {availableActions.map((action: any) => {
-        if (action.action_type === 'project.upgrade') {
+  const renderActionButton = (action: Action) => {
+    switch (action.action_type) {
+      case ActionType.UpgradeProjectToPro:
+        return (
+          <Button type="default" onClick={onSelectUpgradeProject}>
+            Upgrade project
+          </Button>
+        )
+      case ActionType.SchedulePostgresRestart:
+        return (
+          <Button type="default" onClick={onSelectRestartProject}>
+            Restart project
+          </Button>
+        )
+      case ActionType.MigratePostgresSchema:
+        if (action.reason === ActionReason.Finalize) {
           return (
-            <Button key={action.action_type} type="default" onClick={onSelectUpgradeProject}>
-              Upgrade project
-            </Button>
+            ownerReassignStatus?.desired !== 'migrated' && (
+              <Button type="default" onClick={onSelectFinalizeMigration}>
+                Finalize
+              </Button>
+            )
           )
-        } else if (action.action_type === 'postgresql.restart') {
+        } else if (action.reason === ActionReason.Rollback) {
+            return (
+              ownerReassignStatus?.desired === 'temp_role' && (
+                <Button type="default" onClick={onSelectRollbackMigration}>
+                  Rollback
+                </Button>
+              )
+            )
+        } else {
           return (
-            <Button key={action.action_type} type="default" onClick={onSelectRestartProject}>
-              Restart project
-            </Button>
+            ownerReassignStatus?.desired === 'unmigrated' && (
+              <Button type="default" onClick={onSelectApplyMigration}>
+                Apply now
+              </Button>
+            )
           )
         }
+    }
+  }
+
+  return (
+    <div className="flex items-center space-x-2">
+      {availableActions.map((action) => {
+        return (
+          <Fragment key={`${action.action_type}_${action.reason}`}>
+            {renderActionButton(action)}
+          </Fragment>
+        )
       })}
+      {changelogLink && (
+        <Link href={changelogLink}>
+          <a>
+            <Button as="span" type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+              More info
+            </Button>
+          </a>
+        </Link>
+      )}
     </div>
   )
 }
