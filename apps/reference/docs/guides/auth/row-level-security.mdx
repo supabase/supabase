@@ -26,74 +26,100 @@ you to write complex SQL rules which fit your unique business needs.
 Policies are easy to understand once you get the hang of them. Each policy is
 attached to a table, and the policy is executed every time a table is accessed.
 You can just think of them as adding a `WHERE` clause to every query. For
-example a policy like this ...
+example a policy like this:
 
 ```sql
 create policy "Individuals can view their own todos."
   on todos
+  as restrictive
   for select
   using ( auth.uid() = user_id );
 ```
 
-... would translate to this whenever a user tries to select from the todos
+Would translate to this whenever a user tries to select from the todos
 table:
 
 ```sql
 select *
-from todos
-where auth.uid() = todos.user_id; -- Policy is implicitly added.
+  from todos
+  where auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
-## Helper Functions
+### Restrictive vs. Permissive
 
-Supabase provides you with a few easy functions that you can use with your policies.
+Many policies can be attached to a table, allowing you to simplify the
+management of complex authorization rules.
 
-### `auth.uid()`
+PostgreSQL supports two modes for composing policies.
 
-Returns the ID of the user making the request.
+1. **Permissive.**  
+Only one policy needs to evaluate to `true` and the command will be executed.
+2. **Restrictive.**  
+All policies must evaluate to `true` for the command to be executed.
 
-### `auth.jwt()`
+**Unless you explicitly specify that policies are restrictive, they are
+permissive by default. This may produce some surprising results!**
 
-Returns the JWT of the user making the request.
-
-### `auth.role()`
-
-:::caution
-
-Deprecated
-
-:::
-
-The `auth.role()` function has been deprecated in favour of using the `TO`
-field, natively supported within Postgres.
+You can declare a policy as **restrictive** by adding `as restrictive`
+to the `create policy` statement. Example:
 
 ```sql
--- DEPRECATED
-create policy "Public profiles are viewable by everyone."
-  on profiles
-  for select using (
-    auth.role() = 'authenticated' or auth.role() = 'anon'
-  );
-
--- RECOMMENDED
-create policy "Public profiles are viewable by everyone."
-  on profiles
-  for select
-  to authenticated, anon
-  using (
-    true
-  );
+create policy "Policy name."
+  on table_name
+  as restrictive -- <<< important bit
+  ...
+  using ...;
 ```
 
-### `auth.email()`
+If you have both permissive and restrictive policies defined for a table, the
+rule is that **all of the restrictive must evaluate to `true` and only one of
+the permissive ones.**
 
-:::caution
-
-Deprecated. Use `auth.jwt() ->> 'email'` instead.
-
+:::tip
+We recommend you always declare policies `as restrictive` because this often
+reduces accidental broadening of access.
 :::
 
-Returns the email of the user making the request.
+A fairly common problem occurs when adding a policy such as:
+
+```sql
+create policy "Allow everyone to read table."
+  on table_name
+  for select
+  using (true);
+```
+
+_Note the missing `as restricted` clause._
+
+This policy naively says that everyone will be given read access to the table.
+This is true until you attempt to add a more restrictive policy in the future
+without removing the previous one. For example, you may want to add another
+policy on the same table that checks whether the `is_public` column is `true`:
+
+```sql
+create policy "Allow only public rows to be read by everyone."
+  on table_name
+  for select
+  using (is_public = true);
+```
+
+_Note the missing `as restricted` clause, again._
+
+The desired effect of the second policy would in fact not apply, since the
+first policy lets everyone read all rows. According to the PostgreSQL rules for
+permissive policies, only one needs to evaluate to `true`. Thus any policy you
+may add without an `as restrictive` clause will never apply.
+
+#### Tips
+
+You can avoid this undesirable scenario by consistently following these rules:
+
+1. Always use `as restricted` in policy statements.
+2. Keep policies short and easy to read. You can use full strings for policy
+names.
+3. If you must use permissive policies, avoid the use of statements such as
+`using (true)` that give broad access.
+4. Periodically review all policies as a whole to catch subtle issues.
 
 ## Examples
 
@@ -115,10 +141,15 @@ alter table profiles
 -- 3. Create Policy
 create policy "Public profiles are viewable by everyone."
   on profiles
-  for select using (
-    true
-  );
+  as restrictive -- very important when using (true)
+  for select using (true);
 ```
+
+:::warning
+Always mark policies `as restrictive` if the `using` clause is `true` as shown
+in the example above. Otherwise, all rows will be visible once the restricted
+policies match!
+:::
 
 1. Creates a table called `profiles` in the public schema (default schema).
 2. Enables Row Level Security.
@@ -140,6 +171,7 @@ alter table profiles
 -- 3. Create Policy
 create policy "Users can update their own profiles."
   on profiles
+  as restrictive
   for update using (
     auth.uid() = id
   );
@@ -149,19 +181,24 @@ create policy "Users can update their own profiles."
 2. Enables RLS.
 3. Creates a policy which allows logged in users to update their own data.
 
-### Only anon or authenticated access
+### Only `anon` or `authenticated` access
 
 You can add a Postgres role
 
 ```sql
 create policy "Public profiles are viewable by everyone."
   on profiles
+  as restrictive -- very important when using (true)
   for select
   to authenticated, anon
-  using (
-    true
-  );
+  using (true);
 ```
+
+:::warning
+Always mark policies `as restrictive` if the `using` clause is `true` as shown
+in the example above. Otherwise, all rows will be visible once the restricted
+policies match!
+:::
 
 ### Policies with joins
 
@@ -187,6 +224,7 @@ alter table teams
 -- 4. Create Policy
 create policy "Team members can update team details if they belong to the team."
   on teams
+  as restricitve
   for update using (
     auth.uid() in (
       select user_id from members
@@ -230,6 +268,7 @@ $$;
 -- 4. Create Policy
 create policy "Team members can update team members if they belong to the team."
   on members
+  as restrictive
   for all using (
     team_id in (
       select get_teams_for_authenticated_user()
@@ -258,6 +297,7 @@ alter table leaderboard
 -- 3. Create Policy
 create policy "Only Blizzard staff can update leaderboard"
   on leaderboard
+  as restrictive
   for update using (
     right(auth.jwt() ->> 'email', 13) = '@blizzard.com'
   );
@@ -284,6 +324,7 @@ alter table stories
 -- 3. Create Policy
 create policy "Stories are live for a day"
   on stories
+  as restrictive
   for select using (
     created_at > (current_timestamp - interval '1 day')
   );
@@ -317,6 +358,7 @@ create table comments (
 
 create policy "Creator can see their own posts"
   on posts
+  as restrictive
   for select
   using (
     auth.uid() = posts.creator_id
@@ -324,6 +366,7 @@ create policy "Creator can see their own posts"
 
 create policy "Logged in users can see the posts if they belong to the post 'audience'."
   on posts
+  as restrictive
   for select
   using (
     auth.uid() = any (posts.audience)
@@ -331,6 +374,7 @@ create policy "Logged in users can see the posts if they belong to the post 'aud
 
 create policy "Users can see all comments for posts they have access to."
   on comments
+  as restrictive
   for select
   using (
     exists (
@@ -393,3 +437,76 @@ bypass RLS.
 Supabase provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are
 useful for administrative tasks.
+
+## Built-in authentication functions
+
+Supabase provides you with a few easy functions that you can use with your policies.
+
+### `auth.uid()`
+
+Returns the ID of the user making the request.
+
+### `auth.jwt()`
+
+Returns the JWT of the user making the request. The returned value is a
+[PostgreSQL JSON
+object](https://www.postgresql.org/docs/current/functions-json.html) of the JWT
+body.
+
+Some useful operators:
+
+- `X->>Y`  
+Access the property `Y` (can be an index for arrays, or a key for objects) on
+the object `X` as if the value was text (string). If `X` is not a JSON object
+or `Y` is not defined, it returns `NULL`.
+- `X#>>array[A,B,C]`  
+Access the value nested by accessing `A` then `B` and then `C`, as if the final
+value was text (string). If the path does not exist, it returns `NULL`.
+
+### `auth.role()`
+
+:::caution
+Deprecated. Use the built-in `to role, ...` SQL clause when creating a policy.
+
+```sql
+create or replace policy "Policy name."
+  on table_name
+  to authenticated, anon -- <<< roles that the policy applies to
+  ...
+  using ...;
+```
+:::
+
+```sql
+-- DEPRECATED
+create policy "Public profiles are viewable by everyone."
+  on profiles
+  as restrictive
+  for select using (
+    auth.role() = 'authenticated' or auth.role() = 'anon'
+  );
+
+-- RECOMMENDED
+create policy "Public profiles are viewable by everyone."
+  on profiles
+  as restrictive -- very important when using (true)
+  for select
+  to authenticated, anon
+  using (true);
+```
+
+:::warning
+Always mark policies `as restrictive` if the `using` clause is `true` as shown
+in the example above. Otherwise, all rows will be visible once the restricted
+policies match!
+:::
+
+### `auth.email()`
+
+:::caution
+
+Deprecated. Use `auth.jwt() ->> 'email'` instead.
+
+:::
+
+Returns the email of the user making the request.
