@@ -5,7 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 // this is required to use shared packages in the packages directory
-const withTM = require('next-transpile-modules')(['ui'])
+const withTM = require('next-transpile-modules')(['ui', 'common'])
 
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
