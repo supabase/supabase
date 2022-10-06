@@ -1,6 +1,8 @@
+import dayjs from 'dayjs'
 import { Project } from 'types'
 import {
   Action,
+  ActionReason,
   ActionType,
   ExtensionsUpgrade,
   Notification,
@@ -12,7 +14,11 @@ import {
 import { IconArrowRight, IconExternalLink } from 'ui'
 import Link from 'next/link'
 
-export const formatNotificationText = (project: Project, notification: Notification) => {
+export const formatNotificationText = (
+  project: Project,
+  notification: Notification,
+  ownerReassignStatus?: any
+) => {
   const projectName = project.name
 
   if (notification.data.name === NotificationName.ProjectExceedingTierLimit) {
@@ -44,6 +50,22 @@ export const formatNotificationText = (project: Project, notification: Notificat
           New version of "{name}" ({version_to}) is now available for project "{projectName}".
         </p>
       )
+    } else if (upgrade_type === 'schema-migration') {
+      const { name, version_to } = additional as ExtensionsUpgrade
+      return (
+        <div className="text-sm space-y-1">
+          <p>A new schema migration is available for your project "{projectName}".</p>
+          <ol className="list-disc pl-6">
+            <li>
+              <div className="flex items-center space-x-1">
+                <p>{name}</p>
+                <IconArrowRight size={12} strokeWidth={2} />
+                <p>{version_to}</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      )
     }
     return ''
   } else if (notification.data.name === NotificationName.PostgresqlUpgradeCompleted) {
@@ -65,15 +87,33 @@ export const formatNotificationText = (project: Project, notification: Notificat
           {projectName}".
         </p>
       )
+    } else if (upgrade_type === 'schema-migration') {
+      const { version_to } = additional
+      if (ownerReassignStatus?.desired === 'unmigrated') {
+        return (
+          <p className="text-sm">
+            The schema migration "{version_to}" will be applied for project "{projectName}" within a
+            few days. You may opt to apply the changes now, or it'll be done so automatically.
+          </p>
+        )
+      } else if (ownerReassignStatus?.desired === 'temp_role') {
+        return (
+          <p className="text-sm">
+            The schema migration "{version_to}" will be finalized for project "{projectName}" within
+            a few days. You may opt to finalize the changes now, or it'll be done so automatically.
+          </p>
+        )
+      } else {
+        return (
+          <p className="text-sm">
+            The schema migration "{version_to}" has been successfully applied for project "
+            {projectName}".
+          </p>
+        )
+      }
     }
   } else if (notification.data.name === NotificationName.ProjectUpdateCompleted) {
     const { upgrades } = notification.data
-    const upgradesText = upgrades
-      .map(
-        (upgrade: ServiceUpgrade) =>
-          `${upgrade.name}: ${upgrade.version_to} ${upgrade.changelog_link}`
-      )
-      .reduce((a: string, b: string) => `${a}\n${b}`)
     return (
       <div>
         <p className="text-sm">
@@ -117,17 +157,57 @@ export const formatNotificationText = (project: Project, notification: Notificat
   }
 }
 
-export const formatNotificationCTAText = (availableActions: Action[]) => {
+export const formatNotificationCTAText = (
+  availableActions: Action[],
+  ownerReassignStatus?: any
+) => {
   const [action] = availableActions
-  if (!action) return ''
+  if (!action) return <p className="text-sm"></p>
 
   switch (action.action_type) {
     case ActionType.SchedulePostgresRestart:
-      return 'Restart your project to get the latest updates.'
+      return <p className="text-sm">Restart your project to get the latest updates.</p>
     case ActionType.UpgradeProjectToPro:
-      return 'Upgrade your project to ensure continued availability.'
+      return <p className="text-sm">Upgrade your project to ensure continued availability.</p>
     case ActionType.PgBouncerRestart:
-      return 'Restart your connection pooler to get the latest updates.'
+      return <p className="text-sm">Restart your connection pooler to get the latest updates.</p>
+    case ActionType.MigratePostgresSchema:
+      if (action.deadline) {
+        if (ownerReassignStatus?.desired === 'migrated') {
+          return (
+            <p className="text-sm space-x-1">
+              This patch was applied on{' '}
+              {dayjs(new Date(ownerReassignStatus.migrated_at ?? action.deadline)).format('DD MMM YYYY, HH:mma')}
+            </p>
+          )
+        } else if (ownerReassignStatus?.desired === 'temp_role') {
+          if (action.reason === ActionReason.Finalize) {
+            return (
+              <p className="text-sm space-x-1">
+                This patch will be automatically applied after{' '}
+                {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
+              </p>
+            )
+          } else {
+            return (
+              <p className="text-sm space-x-1">
+                This patch was applied on{' '}
+                {dayjs(new Date(ownerReassignStatus.modified_at)).format('DD MMM YYYY, HH:mma')}
+              </p>
+            )
+          }
+        } else {
+          return (
+            <p className="text-sm space-x-1">
+              This patch will be automatically applied after{' '}
+              {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
+            </p>
+          )
+        }
+      } else {
+        return ''
+      }
+
     default:
       return ''
   }
