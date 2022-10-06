@@ -152,8 +152,6 @@ test('datepicker interaction updates query params', async () => {
     },
   })
 
-  const { subscription } = useProjectSubscription()
-
   if (subscription.tier.supabase_prod_id === 'tier_pro') {
     const router = useRouter()
     expect(router.push).toBeCalled()
@@ -168,21 +166,19 @@ test('datepicker interaction updates query params', async () => {
 })
 
 test.only('Upgrade prompt displays if user on free plan and tries to view beyond 24hrs', async () => {
+  useProjectSubscription.mockReturnValue({
+    subscription: {
+      tier: {
+        supabase_prod_id: 'tier_free',
+      },
+    },
+  })
+
   render(<LogsExplorerPage />)
   render(<UpgradePrompt />)
 
   clickDropdown(await screen.findByText(/Last 24 hours/))
   userEvent.click(await screen.findByText(/Last 3 days/))
-
-  useProjectSubscription.mockReturnValue({
-    subscription: {
-      tier: {
-        supabase_prod_id: 'free',
-      },
-    },
-  })
-
-  const { subscription } = useProjectSubscription()
 
   if (subscription.tier.supabase_prod_id !== 'free') {
     expect(getByText('Logs can be retained up to a')).toBeInTheDocument()

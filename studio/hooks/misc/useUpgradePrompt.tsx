@@ -6,7 +6,7 @@ import { maybeShowUpgradePrompt, TIER_QUERY_LIMITS } from 'components/interfaces
 import Link from 'next/link'
 import { StripeProduct } from 'components/interfaces/Billing'
 
-export const useUpgradePrompt = (from: any) => {
+export const useUpgradePrompt = (from: string) => {
   const router = useRouter()
   const { ref } = router.query
   const { subscription } = useProjectSubscription(ref as string)
