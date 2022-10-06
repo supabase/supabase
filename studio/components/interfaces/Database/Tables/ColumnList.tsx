@@ -1,14 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import {
-  Input,
-  Button,
-  IconSearch,
-  IconPlus,
-  IconChevronLeft,
-  IconEdit3,
-  IconTrash,
-} from '@supabase/ui'
+import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
 
 import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'

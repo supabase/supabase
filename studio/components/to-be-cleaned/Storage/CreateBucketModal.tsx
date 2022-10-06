@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Modal, Alert, Button, Input, Toggle } from '@supabase/ui'
+import { Modal, Alert, Button, Input, Toggle } from 'ui'
 
 interface Props {
   visible: boolean
@@ -67,7 +67,7 @@ const CreateBucketModal: FC<Props> = ({
     >
       <form className="space-y-6 py-4">
         <Modal.Content>
-          <div className="flex items-center relative">
+          <div className="relative flex items-center">
             <Input
               autoFocus
               label="Name of bucket"
