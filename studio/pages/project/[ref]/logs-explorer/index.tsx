@@ -45,7 +45,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     })
 
   const { UpgradePrompt, showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
-    params.iso_timestamp_start
+    params.iso_timestamp_start as string
   )
 
   useEffect(() => {
@@ -122,9 +122,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
-    }
-
-    if (!shouldShowUpgradePrompt) {
+    } else {
       setParams((prev) => ({
         ...prev,
         iso_timestamp_start: from || '',
