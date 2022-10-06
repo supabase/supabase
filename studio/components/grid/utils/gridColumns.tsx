@@ -114,7 +114,9 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
       })
       return (p: any) => <SelectEditor {...p} options={options} />
     }
-    case 'array':
+    case 'array': {
+      return TextEditor
+    }
     case 'json': {
       return JsonEditor
     }
