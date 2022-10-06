@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, IconCalendar } from '@supabase/ui'
+import { Button, IconCalendar } from 'ui'
 import { FormPanel } from 'components/ui/Forms'
 
 const PITRNotice = ({}) => {

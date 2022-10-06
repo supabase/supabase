@@ -1,4 +1,4 @@
-import { Button, IconPlay } from '@supabase/ui'
+import { Button, IconPlay } from 'ui'
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import { LogSqlSnippets } from 'types'
@@ -15,7 +15,7 @@ const RecentQueriesItem: React.FC<Props> = ({ item }) => {
   return (
     <Table.tr key={item.sql}>
       <Table.td
-        className={`transition-all expanded-row-content bg-scale-100 border-l border-r !pt-0 !pb-0 !px-3`}
+        className={`expanded-row-content border-l border-r bg-scale-100 !px-3 !pt-0 !pb-0 transition-all`}
       >
         <SqlSnippetCode>{item.sql}</SqlSnippetCode>
       </Table.td>
