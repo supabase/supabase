@@ -4,21 +4,8 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
-      title: 'General',
-      items: [
-        { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
-        { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Logs',
-                key: 'logs',
-                url: `/project/${ref}/auth/logs`,
-                items: [],
-              },
-            ]
-          : []),
-      ],
+      title: 'Users (?)',
+      items: [{ name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] }],
     },
     ...(IS_PLATFORM
       ? [
@@ -28,13 +15,26 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
               ...(IS_PLATFORM
                 ? [
                     {
-                      name: 'Settings',
+                      name: 'Settings or General?',
                       key: 'settings',
                       url: `/project/${ref}/auth/settings`,
                       items: [],
                     },
                   ]
                 : []),
+
+              {
+                name: 'Policies',
+                key: 'policies',
+                url: `/project/${ref}/auth/policies`,
+                items: [],
+              },
+              {
+                name: 'Providers?',
+                key: 'policies',
+                url: `/project/${ref}/auth/policies`,
+                items: [],
+              },
               {
                 name: 'Email Templates',
                 key: 'templates',
