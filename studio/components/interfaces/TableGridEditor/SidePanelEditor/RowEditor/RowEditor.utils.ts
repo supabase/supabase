@@ -53,6 +53,15 @@ export const generateRowFields = (
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {
+    const isArray = field.format.startsWith('_')
+
+    if (isArray && field.value && field.enums.length === 0) {
+      try {
+        JSON.parse(field.value)
+      } catch {
+        errors[field.name] = 'Value is an invalid array'
+      }
+    }
     if (field.format.includes('json') && (field.value?.length ?? 0) > 0) {
       try {
         minifyJSON(field.value ?? '')
@@ -174,8 +183,12 @@ export const generateRowObjectFromFields = (
 ): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
+    const isArray = field.format.startsWith('_')
     const value = (field?.value ?? '').length === 0 ? null : field.value
-    if (field.format.includes('json')) {
+
+    if (isArray && value !== null && field.enums.length === 0) {
+      rowObject[field.name] = tryParseJson(value)
+    } else if (field.format.includes('json')) {
       if (typeof field.value === 'object') {
         rowObject[field.name] = value
       } else if (isString(value)) {

@@ -1,6 +1,7 @@
 import { v4 as _uuidV4 } from 'uuid'
 import { post } from 'lib/common/fetch'
 import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
+import { TEXT_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -213,20 +214,4 @@ export const detectBrowser = () => {
   } else if (navigator.userAgent.indexOf('Safari') !== -1) {
     return 'Safari'
   }
-}
-
-export const convertPgArrayToJsArray = (value: string): string[] => {
-  if (!value) return []
-
-  const valueArray = value
-    .slice(1, value.length - 1)
-    .split(',')
-    .map((x) => `"${x}"`)
-  const formattedValue = `[${valueArray.join(',')}]`
-  return tryParseJson(formattedValue) ?? []
-}
-
-export const convertJsArraytoPgArray = (value: string[]) => {
-  if (value.length === 0) return null
-  else return `{${value.join(',')}}`
 }
