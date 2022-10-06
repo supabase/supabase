@@ -1,30 +1,36 @@
-name: SAST
-on: 
+name: boostsecurity.io
+on:
   workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'     
-        required: true
-        default: 'INFO' 
-        type: choice
-        options:
-        - INFO
-        - DEBUG
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
 jobs:
-  boost_security_sast:
-    name: Boost Security / Native Scanner
+  boost-sast:
+    name: SAST
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Native Scanner
-        uses: boostsecurityio/boostsec-scanner-github@v3
-        env:
-          BOOST_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
-          BOOST_GIT_MAIN_BRANCH: master
+        uses: actions/checkout@v3
+      - name: Run Native Scanner
+        uses: boostsecurityio/boostsec-scanner-github@v4
         with:
-          action: scan
-          api_token: ${{ secrets.BOOST_API_KEY }}
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          registry_module: boostsecurityio/native-scanner
+  boost-sbom:
+    name: SBOM
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Upload SBOM from Trivy
+        uses: boostsecurityio/boostsec-scanner-github@v4
+        with:
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          registry_module: boostsecurityio/trivy-sbom
