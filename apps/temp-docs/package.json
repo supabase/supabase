@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "config": "*",
     "@apollo/client": "^3.6.6",
     "@mdx-js/loader": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
@@ -17,6 +16,7 @@
     "@supabase/ui": "v0.37.0-alpha.50",
     "@tailwindcss/typography": "^0.4.1",
     "common": "*",
+    "config": "*",
     "graphql": "^16.5.0",
     "gray-matter": "^4.0.3",
     "markdown-toc": "^1.2.0",
@@ -34,12 +34,13 @@
     "remark-prism": "^1.3.6"
   },
   "devDependencies": {
-    "config": "*",
-    "tsconfig": "*",
     "@types/node": "^17.0.12",
     "@types/react": "17.0.39",
+    "@types/react-syntax-highlighter": "^15.5.5",
+    "config": "*",
     "eslint": "8.9.0",
     "next-transpile-modules": "9.0.0",
+    "tsconfig": "*",
     "typescript": "^4.5.3"
   }
 }
