@@ -178,7 +178,7 @@ const MonacoEditor = ({ error, updateSqlSnippet, setUpdatingRequired }) => {
     // this is so we can block the tab being closed if an update is required
     setUpdatingRequired?.()
 
-    // debounce changes
+    // debounce changes.
     debounceUpdateSqlSnippet(value)
   }
 
