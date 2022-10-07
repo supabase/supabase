@@ -13,6 +13,7 @@ import { WizardLayoutWithoutAuth } from './WizardLayout'
 import VercelIntegrationLayout from './VercelIntegrationLayout'
 import BillingLayout from './BillingLayout'
 import LogsExplorerLayout from './LogsExplorerLayout/LogsExplorerLayout'
+import LoginLayout from './LoginLayout/LoginLayout'
 
 export {
   ProjectLayoutWithAuth,
@@ -30,6 +31,7 @@ export {
   VercelIntegrationLayout,
   BillingLayout,
   LogsExplorerLayout,
+  LoginLayout,
 }
 
 export default ProjectLayout

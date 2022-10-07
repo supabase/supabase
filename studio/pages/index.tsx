@@ -1,50 +1,58 @@
-import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { NextRouter, useRouter } from 'next/router'
-
-import { NextPageWithLayout } from 'types'
-import { useProfile, useStore, withAuth } from 'hooks'
+import { useEffect } from 'react'
+import { withAuth } from 'hooks'
 import { auth } from 'lib/gotrue'
-import { IS_PLATFORM } from 'lib/constants'
-
-import Connecting from 'components/ui/Loading'
-import { AccountLayoutWithoutAuth } from 'components/layouts'
+import { NextPageWithLayout } from 'types'
 import Landing from 'components/interfaces/Home/Landing'
-import ProjectList from 'components/interfaces/Home/ProjectList'
-import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
+import LoginForm from 'components/interfaces/Login/LoginForm'
+import LoginWithGitHub from 'components/interfaces/Login/LoginWithGitHub'
+import { AccountLayoutWithoutAuth, LoginLayout } from 'components/layouts'
+import Connecting from 'components/ui/Loading'
+import Link from 'next/link'
 
-const Home: NextPageWithLayout = () => {
-  const { app } = useStore()
-
+const LoginPage: NextPageWithLayout = () => {
   return (
     <>
-      {app.organizations.isLoading ? (
-        <div className="flex h-full items-center justify-center space-x-2">
-          <Connecting />
-        </div>
-      ) : (
-        <div className="py-4 px-5">
-          {IS_PLATFORM && (
-            <div className="my-2">
-              <div className="flex">
-                <div className="">
-                  <OrganizationDropdown organizations={app.organizations} />
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="my-8 space-y-8">
-            <ProjectList />
+      <div className="flex flex-col gap-4">
+        <LoginWithGitHub />
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-scale-700" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-scale-400 px-2">Or</span>
           </div>
         </div>
-      )}
+
+        <LoginForm />
+      </div>
+
+      <div className="w-full border-t border-scale-700 my-4" />
+
+      <div className="mb-4">
+        <div>
+          <span className="text-scale-1000">Need an account?</span>{' '}
+          <Link href="/register">
+            <a className="underline hover:text-scale-1100">Register</a>
+          </Link>
+        </div>
+
+        <div>
+          <span className="text-scale-1000">Forgot your password?</span>{' '}
+          <Link href="/forgot-password">
+            <a className="underline hover:text-scale-1100">Reset Password</a>
+          </Link>
+        </div>
+      </div>
     </>
   )
 }
 
-Home.getLayout = (page) => <IndexLayout>{page}</IndexLayout>
+LoginPage.getLayout = (page) => <LoginLayout title="Login">{page}</LoginLayout>
 
-export default observer(Home)
+export default LoginPage
 
 // detect for redirect from 3rd party service like vercel, aws...
 const isRedirectFromThirdPartyService = (router: NextRouter) => router.query.next !== undefined
@@ -73,37 +81,32 @@ const UnauthorizedLanding = () => {
 const IndexLayout = withAuth(
   observer(({ children }) => {
     const router = useRouter()
-    const { profile, isLoading } = useProfile()
 
-    if (isLoading) {
-      return <Connecting />
-    }
+    // if (!profile) {
+    //   return <UnauthorizedLanding />
+    // } else {
+    //   const isRedirect = isRedirectFromThirdPartyService(router)
+    //   if (isRedirect) {
+    //     const queryParams = (router.query as any) || {}
+    //     const params = new URLSearchParams(queryParams)
+    //     if (router.query?.next?.includes('https://vercel.com')) {
+    //       router.push(`/vercel/integrate?${params.toString()}`)
+    //     } else if (router.query?.next?.includes('new-project')) {
+    //       router.push('/new/project')
+    //     } else if (router.query?.next?.includes('join')) {
+    //       router.push(`/${router.query.next}`)
+    //     } else if (
+    //       typeof router.query?.next === 'string' &&
+    //       router.query?.next?.startsWith('project/_/')
+    //     ) {
+    //       router.push(router.query.next as string)
+    //     } else {
+    //       router.push('/')
+    //     }
 
-    if (!profile) {
-      return <UnauthorizedLanding />
-    } else {
-      const isRedirect = isRedirectFromThirdPartyService(router)
-      if (isRedirect) {
-        const queryParams = (router.query as any) || {}
-        const params = new URLSearchParams(queryParams)
-        if (router.query?.next?.includes('https://vercel.com')) {
-          router.push(`/vercel/integrate?${params.toString()}`)
-        } else if (router.query?.next?.includes('new-project')) {
-          router.push('/new/project')
-        } else if (router.query?.next?.includes('join')) {
-          router.push(`/${router.query.next}`)
-        } else if (
-          typeof router.query?.next === 'string' &&
-          router.query?.next?.startsWith('project/_/')
-        ) {
-          router.push(router.query.next as string)
-        } else {
-          router.push('/')
-        }
-
-        return <Connecting />
-      }
-    }
+    //     return <Connecting />
+    //   }
+    // }
 
     return (
       <AccountLayoutWithoutAuth
