@@ -184,6 +184,11 @@ export class SqlRowService implements IRowService {
       // remove primary key from updated value object
       delete value[key]
     })
+    const enumArrayColumns = this.table.columns
+      .filter((column) => {
+        return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
     const query = this.query
       .from(this.table.name, this.table.schema ?? undefined)
       .update(
@@ -192,7 +197,7 @@ export class SqlRowService implements IRowService {
               [changedColumn]: value[changedColumn],
             }
           : value,
-        { returning: true }
+        { returning: true, enumArrayColumns }
       )
       .match(matchValues)
       .toSql()

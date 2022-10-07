@@ -21,7 +21,7 @@ export class QueryModifier implements IQueryModifier {
     protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
     protected options?: {
       actionValue?: string | string[] | Dictionary<any> | Dictionary<any>[]
-      actionOptions?: { returning?: boolean; cascade?: boolean }
+      actionOptions?: { returning?: boolean; cascade?: boolean; enumArrayColumns?: string[] }
       filters?: Filter[]
       sorts?: Sort[]
     }
@@ -51,11 +51,13 @@ export class QueryModifier implements IQueryModifier {
         case 'delete': {
           return deleteQuery(this.table, filters, {
             returning: actionOptions?.returning,
+            enumArrayColumns: actionOptions?.enumArrayColumns,
           })
         }
         case 'insert': {
           return insertQuery(this.table, actionValue as Dictionary<any>[], {
             returning: actionOptions?.returning,
+            enumArrayColumns: actionOptions?.enumArrayColumns,
           })
         }
         case 'select': {
@@ -69,6 +71,7 @@ export class QueryModifier implements IQueryModifier {
           return updateQuery(this.table, actionValue as Dictionary<any>, {
             filters,
             returning: actionOptions?.returning,
+            enumArrayColumns: actionOptions?.enumArrayColumns,
           })
         }
         case 'truncate': {

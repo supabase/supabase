@@ -1,7 +1,7 @@
 import { v4 as _uuidV4 } from 'uuid'
+import { PostgresColumn } from '@supabase/postgres-meta'
 import { post } from 'lib/common/fetch'
 import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
-import { TEXT_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 
 export const tryParseJson = (jsonString: any) => {
   try {
