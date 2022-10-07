@@ -89,7 +89,17 @@ export class SqlRowService implements IRowService {
     const pageFromZero = page > 0 ? page - 1 : page
     const from = pageFromZero * rowsPerPage
     const to = (pageFromZero + 1) * rowsPerPage - 1
-    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).select()
+
+    const enumArrayColumns = this.table.columns
+      .filter((column) => {
+        return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
+
+    let queryChains = this.query
+      .from(this.table.name, this.table.schema ?? undefined)
+      .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
+
     filters
       .filter((x) => x.value && x.value != '')
       .forEach((x) => {

@@ -20,7 +20,7 @@ export class QueryModifier implements IQueryModifier {
     protected table: QueryTable,
     protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
     protected options?: {
-      actionValue?: string[] | Dictionary<any> | Dictionary<any>[]
+      actionValue?: string | string[] | Dictionary<any> | Dictionary<any>[]
       actionOptions?: { returning?: boolean; cascade?: boolean }
       filters?: Filter[]
       sorts?: Sort[]
@@ -59,7 +59,7 @@ export class QueryModifier implements IQueryModifier {
           })
         }
         case 'select': {
-          return selectQuery(this.table, actionValue as string[] | undefined, {
+          return selectQuery(this.table, actionValue as string | undefined, {
             filters,
             pagination: this.pagination,
             sorts,

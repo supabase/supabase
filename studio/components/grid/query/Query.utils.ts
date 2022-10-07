@@ -88,7 +88,7 @@ export function insertQuery(
 
 export function selectQuery(
   table: QueryTable,
-  columns?: string[],
+  columns?: string,
   options?: {
     filters?: Filter[]
     pagination?: QueryPagination
@@ -96,7 +96,7 @@ export function selectQuery(
   }
 ) {
   let query = ''
-  const queryColumn = columns?.map((x) => ident(x)).join(', ') ?? '*'
+  const queryColumn = columns ?? '*'
   query += `select ${queryColumn} from ${queryTable(table)}`
 
   const { filters, pagination, sorts } = options ?? {}
