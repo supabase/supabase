@@ -64,5 +64,4 @@ const nextConfig = {
     return redirects
   },
 }
-
 export default withMDX(nextConfig)
