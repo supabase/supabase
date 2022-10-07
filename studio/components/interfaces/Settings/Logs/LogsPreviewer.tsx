@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconAlertCircle, IconRewind, Button, Card, Input } from 'ui'
+import { IconRewind, Button } from 'ui'
 
 import {
   LogTable,
@@ -62,7 +62,7 @@ export const LogsPreviewer: React.FC<Props> = ({
   ] = useLogsPreview(projectRef as string, table, filterOverride)
 
   const { UpgradePrompt, showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
-    params.iso_timestamp_start
+    params.iso_timestamp_start as string
   )
 
   useEffect(() => {
