@@ -15,7 +15,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     protected table: QueryTable,
     protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
     protected actionValue?: string | string[] | Dictionary<any> | Dictionary<any>[],
-    protected actionOptions?: { returning: boolean }
+    protected actionOptions?: { returning: boolean; enumArrayColumns?: string[] }
   ) {}
 
   filter(column: string, operator: FilterOperator, value: any) {

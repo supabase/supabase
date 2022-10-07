@@ -35,18 +35,22 @@ export function deleteQuery(
   filters?: Filter[],
   options?: {
     returning?: boolean
+    enumArrayColumns?: string[]
   }
 ) {
   if (!filters || filters.length === 0) {
     throw { message: 'no filters for this delete query' }
   }
   let query = `delete from ${queryTable(table)}`
-  const { returning } = options ?? {}
+  const { returning, enumArrayColumns } = options ?? {}
   if (filters) {
     query = applyFilters(query, filters)
   }
   if (returning) {
-    query += ' returning *'
+    query +=
+      enumArrayColumns === undefined
+        ? ` returning *`
+        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
   }
   return query + ';'
 }
@@ -56,12 +60,13 @@ export function insertQuery(
   values: Dictionary<any>[],
   options?: {
     returning?: boolean
+    enumArrayColumns?: string[]
   }
 ) {
   if (!values || values.length === 0) {
     throw { message: 'no value to insert' }
   }
-  const { returning } = options ?? {}
+  const { returning, enumArrayColumns } = options ?? {}
   const queryColumns = Object.keys(values[0])
     .map((x) => ident(x))
     .join(',')
@@ -81,7 +86,10 @@ export function insertQuery(
     )
   }
   if (returning) {
-    query += ' returning *'
+    query +=
+      enumArrayColumns === undefined
+        ? ` returning *`
+        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
   }
   return query + ';'
 }
@@ -119,9 +127,10 @@ export function updateQuery(
   options?: {
     filters?: Filter[]
     returning?: boolean
+    enumArrayColumns?: string[]
   }
 ) {
-  const { filters, returning } = options ?? {}
+  const { filters, returning, enumArrayColumns } = options ?? {}
   if (!filters || filters.length === 0) {
     throw { message: 'no filters for this update query' }
   }
@@ -138,8 +147,12 @@ export function updateQuery(
     query = applyFilters(query, filters)
   }
   if (returning) {
-    query += ' returning *'
+    query +=
+      enumArrayColumns === undefined
+        ? ` returning *`
+        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
   }
+
   return query + ';'
 }
 
