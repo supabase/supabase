@@ -143,10 +143,6 @@ const nowDateTimeValue = (format: string) => {
 }
 
 const convertPostgresDatetimeToInputDatetime = (format: string, value: string) => {
-  if (value) {
-    value = value.includes('-') ? value.replaceAll('-', '/') : value
-  }
-
   if (!value || value.length == 0) return ''
   if (TIMESTAMP_TYPES.includes(format)) {
     return dayjs(value).format('YYYY-MM-DDTHH:mm:ss')
