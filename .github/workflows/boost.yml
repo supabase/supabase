@@ -11,8 +11,8 @@ on:
       - opened
       - synchronize
 jobs:
-  boost-sast:
-    name: SAST
+  boost-native:
+    name: Native Scanner
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,15 +22,30 @@ jobs:
         with:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           registry_module: boostsecurityio/native-scanner
+
   boost-sbom:
     name: SBOM
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Upload SBOM from Trivy
+      - name: Run SBOM
         uses: boostsecurityio/boostsec-scanner-github@v4
         with:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           registry_module: boostsecurityio/trivy-sbom
+
+  boost-semgrep:
+    name: semgrep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run semgrep
+        uses: boostsecurityio/boostsec-scanner-github@v4
+        with:
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          registry_module: boostsecurityio/semgrep-scanner
+      - env:
+        - SEMGREP_RULES: p/javascript
+              
