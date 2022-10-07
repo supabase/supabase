@@ -5,7 +5,7 @@ export interface IQueryAction {
   count: () => IQueryFilter
   delete: (options?: { returning: boolean }) => IQueryFilter
   insert: (values: Dictionary<any>[], options?: { returning: boolean }) => IQueryFilter
-  select: (columns?: string[]) => IQueryFilter
+  select: (columns?: string) => IQueryFilter
   update: (value: Dictionary<any>, options?: { returning: boolean }) => IQueryFilter
   truncate: (options?: { returning: boolean }) => IQueryFilter
 }
@@ -44,7 +44,7 @@ export class QueryAction implements IQueryAction {
    *
    * @param columns the query columns, by default set to '*'.
    */
-  select(columns?: string[]) {
+  select(columns?: string) {
     return new QueryFilter(this.table, 'select', columns)
   }
 

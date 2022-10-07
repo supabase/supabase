@@ -95,8 +95,6 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
     return
   }
 
-  console.log('getColumnEditor', columnDefinition, columnType)
-
   switch (columnType) {
     case 'boolean': {
       return columnDefinition.isNullable ? NullableBooleanEditor : BooleanEditor
@@ -116,10 +114,7 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
       })
       return (p: any) => <SelectEditor {...p} options={options} />
     }
-    case 'array': {
-      if ((columnDefinition?.enum ?? []).length > 0) return TextEditor
-      return JsonEditor
-    }
+    case 'array':
     case 'json': {
       return JsonEditor
     }

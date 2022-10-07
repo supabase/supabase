@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { find, isUndefined, compact, includes, isEqual, omitBy, isNull, isString } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
@@ -55,7 +55,7 @@ export const validateFields = (fields: RowField[]) => {
   fields.forEach((field) => {
     const isArray = field.format.startsWith('_')
 
-    if (isArray && field.value && field.enums.length === 0) {
+    if (isArray && field.value) {
       try {
         JSON.parse(field.value)
       } catch {
@@ -104,8 +104,9 @@ const parseValue = (originalValue: string, format: string) => {
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
       return (originalValue as any).toString()
+    } else {
+      return originalValue
     }
-    return originalValue
   } catch (error) {
     return originalValue
   }
@@ -186,7 +187,7 @@ export const generateRowObjectFromFields = (
     const isArray = field.format.startsWith('_')
     const value = (field?.value ?? '').length === 0 ? null : field.value
 
-    if (isArray && value !== null && field.enums.length === 0) {
+    if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
     } else if (field.format.includes('json')) {
       if (typeof field.value === 'object') {
