@@ -46,6 +46,6 @@ jobs:
         with:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           registry_module: boostsecurityio/semgrep-scanner
-      - env:
-        - SEMGREP_RULES: p/javascript
+        env:
+          SEMGREP_RULES: p/javascript
               
