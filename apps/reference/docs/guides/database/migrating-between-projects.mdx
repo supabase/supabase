@@ -10,29 +10,49 @@ Migrating projects can be achieved using standard PostgreSQL tooling. This is pa
 
 - Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
 - Create a new [Supabase project](https://app.supabase.com).
-- Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) in your new project if you enabled them in your old project.
 - Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
 
 ## Migrate the database
 
-In your old project:
+1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) in your new project if you enabled them in your old project.
+2. In your new project, enable all extensions that were enabled in your old project.
+3. Run the following command from your terminal:
 
-1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
-1. Run `pg_dump --clean --if-exists --quote-all-identifiers -h $OLD_DB_URL -U postgres > dump.sql` from your terminal.
-1. Run `ALTER ROLE postgres NOSUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+```sh
+set -euo pipefail
 
-In your new project:
+pg_dump \
+  --clean \
+  --if-exists \
+  --quote-all-identifiers \
+  --exclude-table-data 'storage.objects' \
+  --exclude-schema 'extensions|graphql|graphql_public|net|pgbouncer|pgsodium|pgsodium_masks|realtime|supabase_functions|pg_toast|pg_catalog|information_schema' \
+  --schema '*' \
+  --dbname "$OLD_DB_URL" \
+| sed 's/^DROP SCHEMA IF EXISTS "auth";$/-- DROP SCHEMA IF EXISTS "auth";/' \
+| sed 's/^DROP SCHEMA IF EXISTS "storage";$/-- DROP SCHEMA IF EXISTS "storage";/' \
+| sed 's/^CREATE SCHEMA "auth";$/-- CREATE SCHEMA "auth";/' \
+| sed 's/^CREATE SCHEMA "storage";$/-- CREATE SCHEMA "storage";/' \
+| sed 's/^ALTER DEFAULT PRIVILEGES FOR ROLE "supabase_admin"/-- ALTER DEFAULT PRIVILEGES FOR ROLE "supabase_admin"/' \
+> dump.sql
 
-1. Run `ALTER ROLE postgres SUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
-1. Run `psql -h $NEW_DB_URL -U postgres -f dump.sql` from your terminal.
-1. Run `TRUNCATE storage.objects` in the [SQL editor](https://app.supabase.com/project/_/sql).
-1. Run `ALTER ROLE postgres NOSUPERUSER` in the [SQL editor](https://app.supabase.com/project/_/sql).
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file dump.sql \
+  --dbname "$NEW_DB_URL"
+```
 
-## Migrate storage objects
+## Enable publication on tables
 
-The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.io](mailto:support@supabase.io).
+Replication for Realtime is disabled for all tables in your new project. On the [Replication](https://app.supabase.com/project/_/database/replication) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
+
+## Migrate Storage objects
+
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.com](mailto:support@supabase.com).
 
 ```js
+// npm install @supabase/supabase-js@1
 const { createClient } = require('@supabase/supabase-js')
 
 const OLD_PROJECT_URL = 'https://xxx.supabase.co'
