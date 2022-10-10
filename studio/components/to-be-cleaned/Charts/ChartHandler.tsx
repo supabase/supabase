@@ -6,7 +6,8 @@ import { Dictionary } from 'components/grid'
 
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
-import { BarChart, AreaChart } from './ChartRenderer'
+import { BarChart } from './ChartRenderer'
+import AreaChart from 'components/ui/Charts/AreaChart'
 import { ChartData } from './ChartHandler.types'
 import { AreaProps } from 'recharts'
 
@@ -172,10 +173,10 @@ const ChartHandler: FC<Props> = ({
         <AreaChart
           data={chartData?.data ?? []}
           format={format || chartData?.format}
-          attribute={attribute}
-          yAxisLimit={chartData?.yAxisLimit}
+          xAxisKey="timestamp"
+          yAxisKey={attribute}
           highlightedValue={highlightedValue}
-          label={label}
+          title={label}
           customDateFormat={customDateFormat}
         />
       )}

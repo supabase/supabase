@@ -15,9 +15,7 @@ import utc from 'dayjs/plugin/utc'
 import ChartNoData from './NoDataPlaceholder'
 dayjs.extend(utc)
 
-export interface AreaChartProps<D = Datum> extends CommonChartProps {
-  data: D[]
-  yAxisLimit?: any
+export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
   format?: string
@@ -27,7 +25,6 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps {
 
 const AreaChart: React.FC<AreaChartProps> = ({
   data,
-  yAxisLimit,
   yAxisKey,
   xAxisKey,
   format,
@@ -99,7 +96,6 @@ const AreaChart: React.FC<AreaChartProps> = ({
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
-          {yAxisLimit && <YAxis type="number" domain={[0, yAxisLimit]} hide />}
           <Tooltip content={() => null} />
           <Area
             type="monotone"
