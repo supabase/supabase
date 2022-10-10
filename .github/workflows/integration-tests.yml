@@ -76,7 +76,7 @@ jobs:
           keep_reports: 50
 
       - name: Deploy report to Github Pages
-        if: ${{ !github.event.pull_request.head.repo.fork }}
+        if: always()
         uses: peaceiris/actions-gh-pages@v2
         env:
           EXTERNAL_REPOSITORY: supabase/test-reports
@@ -85,7 +85,7 @@ jobs:
           PUBLISH_DIR: allure-history
 
       - name: Post the link to the report
-        if: ${{ !github.event.pull_request.head.repo.fork }}
+        if: always()
         uses: Sibz/github-status-action@v1
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}

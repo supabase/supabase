@@ -21,9 +21,6 @@ export abstract class Hooks {
     username: 'postgres',
     password: process.env.SUPABASE_DB_PASS,
   })
-  static seed = (async () => {
-    await Hooks.sql.file('data/data.sql')
-  })()
 
   @step('terminate sql connection')
   static async after(): Promise<any> {
