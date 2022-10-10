@@ -10,6 +10,6 @@ export const supabaseClient = createClient(
 export const supabaseAdminClient = createClient(
   // Supabase API URL - env var exported by default when deployed.
   Deno.env.get('SUPABASE_URL') ?? '',
-  // Supabase API ANON KEY - env var exported by default when deployed.
+  // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
