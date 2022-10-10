@@ -238,7 +238,7 @@ class Storage extends Hooks {
   @severity(Severity.BLOCKER)
   @description('move file')
   @test
-  async '[skip-local] move file in bucket'() {
+  async 'move file in bucket'() {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
@@ -263,7 +263,7 @@ class Storage extends Hooks {
   @severity(Severity.BLOCKER)
   @description('copy file')
   @test
-  async '[skip-local] copy file in bucket'() {
+  async 'copy file in bucket'() {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
     const bucket = await this.createBucket()
 
