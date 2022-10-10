@@ -48,7 +48,7 @@ export function deleteQuery(
   }
   if (returning) {
     query +=
-      enumArrayColumns === undefined
+      enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
         : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
   }
@@ -87,7 +87,7 @@ export function insertQuery(
   }
   if (returning) {
     query +=
-      enumArrayColumns === undefined
+      enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
         : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
   }
@@ -148,7 +148,7 @@ export function updateQuery(
   }
   if (returning) {
     query +=
-      enumArrayColumns === undefined
+      enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
         : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
   }

@@ -139,7 +139,6 @@ const RowEditor: FC<Props> = ({
         configuration.rowIdx = row!.idx
       }
 
-      console.log('onSaveChanges', payload)
       saveChanges(payload, isNewRecord, configuration, () => setLoading(false))
     } else {
       setLoading(false)
