@@ -1,3 +1,9 @@
+export interface CommonChartProps {
+  title?: string
+  minimalHeader?: boolean
+  highlightedValue?: number
+}
+
 export type HeaderType<D> = {
   attribute: string
   focus: number | null
