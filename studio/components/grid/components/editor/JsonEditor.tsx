@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react'
-
-import { EditorProps } from '@supabase/react-data-grid'
-import { useTrackedState } from '../../store'
-import { BlockKeys, MonacoEditor, NullValue } from '../common'
 import { Popover } from 'ui'
+import { useState, useCallback } from 'react'
+import { EditorProps } from '@supabase/react-data-grid'
+
+import { useTrackedState } from 'components/grid/store'
+import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
 
 export function JsonEditor<TRow, TSummaryRow = unknown>({
   row,
@@ -11,12 +11,13 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
   onRowChange,
 }: EditorProps<TRow, TSummaryRow>) {
   const state = useTrackedState()
-  const [isPopoverOpen, setIsPopoverOpen] = useState(true)
+
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as unknown
-  const jsonString = initialValue ? JSON.stringify(initialValue) : ''
-  const prettyJsonValue = prettifyJSON(jsonString)
-  const [value, setValue] = useState<string | null>(prettyJsonValue)
+  const jsonString = prettifyJSON(initialValue ? JSON.stringify(initialValue) : '')
+
+  const [isPopoverOpen, setIsPopoverOpen] = useState(true)
+  const [value, setValue] = useState<string | null>(jsonString)
 
   const cancelChanges = useCallback(() => {
     onRowChange(row, true)

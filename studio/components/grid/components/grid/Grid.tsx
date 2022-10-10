@@ -39,6 +39,7 @@ export const Grid = memo(
         const changedColumn = Object.keys(rowData).find(
           (name) => rowData[name] !== originRowData![name]
         )
+
         if (changedColumn) {
           const { error } = state.rowService!.update(rowData, changedColumn, (payload) => {
             dispatch({
