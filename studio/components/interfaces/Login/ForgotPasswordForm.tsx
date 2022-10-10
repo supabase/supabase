@@ -1,4 +1,6 @@
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
+import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
@@ -7,16 +9,39 @@ const forgotPasswordSchema = object({
 })
 
 const ForgotPasswordForm = () => {
+  const { ui } = useStore()
+  const router = useRouter()
+
   const onForgotPassword = async ({ email }: { email: string }) => {
-    const result = await auth.resetPasswordForEmail(email)
-    console.log('result:', result)
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Sending password reset email...`,
+    })
+
+    const { error } = await auth.resetPasswordForEmail(email)
+
+    if (!error) {
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Password reset email sent successfully!`,
+      })
+
+      await router.push('/')
+    } else {
+      ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: error.message,
+      })
+    }
   }
 
   return (
     <Form
       validateOnBlur
       id="forgot-password-form"
-      initialValues={{ email: '', password: '' }}
+      initialValues={{ email: '' }}
       validationSchema={forgotPasswordSchema}
       onSubmit={onForgotPassword}
     >
