@@ -12,6 +12,7 @@ import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.const
 import ChartHeader from './ChartHeader'
 import { Datum, CommonChartProps } from './Charts.types'
 import utc from 'dayjs/plugin/utc'
+import ChartNoData from './NoDataPlaceholder'
 dayjs.extend(utc)
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps {
@@ -40,6 +41,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
 
   // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
   const chartHeight = 160
+
+  if (data.length === 0) return <ChartNoData />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const highlightedLabel =

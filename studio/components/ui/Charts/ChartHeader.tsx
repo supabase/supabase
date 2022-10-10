@@ -35,7 +35,7 @@ const ChartHeader: React.FC<ChartHeaderProps> = ({
       <div className="flex flex-row items-center gap-x-4" style={{ minHeight: '1.8rem' }}>
         {chartTitle}
         <div className="flex flex-row items-baseline gap-x-2">
-          {highlighted}
+          {highlightedValue && highlighted}
           {label}
         </div>
       </div>
@@ -45,7 +45,7 @@ const ChartHeader: React.FC<ChartHeaderProps> = ({
   return (
     <div className="h-16">
       {chartTitle}
-      {highlighted}
+      {highlightedValue && highlighted}
       {label}
     </div>
   )
