@@ -96,9 +96,12 @@ export class SqlRowService implements IRowService {
       })
       .map((column) => column.name)
 
-    let queryChains = this.query
-      .from(this.table.name, this.table.schema ?? undefined)
-      .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
+    let queryChains =
+      enumArrayColumns.length > 0
+        ? this.query
+            .from(this.table.name, this.table.schema ?? undefined)
+            .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
+        : this.query.from(this.table.name, this.table.schema ?? undefined).select()
 
     filters
       .filter((x) => x.value && x.value != '')
