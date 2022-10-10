@@ -10,21 +10,21 @@ import {
 import dayjs from 'dayjs'
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
-import { Datum } from './Charts.types'
+import { Datum, CommonChartProps } from './Charts.types'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
-interface Props<D = Datum> {
+export interface AreaChartProps<D = Datum> extends CommonChartProps {
   data: D[]
   yAxisLimit?: any
   yAxisKey: string
   xAxisKey: string
   format?: string
   customDateFormat?: string
-  title?: string
-  highlightedValue?: string | number
   displayDateInUtc?: boolean
 }
 
-const AreaChart: React.FC<Props> = ({
+const AreaChart: React.FC<AreaChartProps> = ({
   data,
   yAxisLimit,
   yAxisKey,
@@ -34,6 +34,7 @@ const AreaChart: React.FC<Props> = ({
   title,
   highlightedValue,
   displayDateInUtc,
+  minimalHeader,
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -59,6 +60,7 @@ const AreaChart: React.FC<Props> = ({
         customDateFormat={customDateFormat}
         highlightedValue={resolvedHighlightedValue}
         highlightedLabel={highlightedLabel}
+        minimalHeader={minimalHeader}
       />
       <ResponsiveContainer width="100%" height={chartHeight}>
         <RechartAreaChart

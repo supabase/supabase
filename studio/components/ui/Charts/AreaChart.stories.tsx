@@ -1,6 +1,6 @@
 import React from 'react'
 import { ComponentMeta } from '@storybook/react'
-import Chart from './AreaChart'
+import Chart, { AreaChartProps } from './AreaChart'
 import dayjs from 'dayjs'
 
 export default {
@@ -12,16 +12,30 @@ const DATA = [290, 430, 649, 422, 321, 893, 111].map((value, index) => ({
   timestamp: dayjs().subtract(index, 'day').toISOString(),
 }))
 
+const PROPS: AreaChartProps<typeof DATA[number]> = {
+  title: 'Memory usage',
+  xAxisKey: 'timestamp',
+  yAxisKey: 'ram_usage',
+  data: DATA,
+}
+
 export const AreaChart = () => (
   <div className="flex flex-row gap-4 flex-wrap">
-    <div className="w-72">
-      <ExampleName>Normal</ExampleName>
-      <Chart title="Memory usage" xAxisKey="timestamp" yAxisKey="ram_usage" data={DATA} />
-    </div>
-    <div className="w-72">
-      <ExampleName>No title prop</ExampleName>
-      <Chart xAxisKey="timestamp" yAxisKey="ram_usage" data={DATA} />
-    </div>
+    {[
+      { title: 'Normal', props: {} },
+      { title: 'No title', props: { title: undefined } },
+      { title: 'Minimal Header', props: { minimalHeader: true } },
+      { title: 'Highlighted Value', props: { highlightedValue: 123 } },
+      { title: 'UTC Dates', props: { displayDateInUtc: true } },
+      { title: 'Custom date format', props: { customDateFormat: "HH:mm" } },
+    ].map(({ title, props }) => (
+      <div className="w-72">
+        <ExampleName>{title}</ExampleName>
+        <div className="w-full mt-4">
+          <Chart {...PROPS} {...props} />
+        </div>
+      </div>
+    ))}
   </div>
 )
 
