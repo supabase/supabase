@@ -353,7 +353,6 @@ const StorageExplorer = observer(({ bucket }) => {
           file={selectedFilePreview}
           width={previewPaneWidth}
           onCopyFileURL={onCopyFileURL}
-          onDownloadFile={onDownloadFile}
           onSelectFileDelete={onSelectItemDelete}
           onClosePreviewPane={closeFilePreview}
         />
