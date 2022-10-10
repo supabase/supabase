@@ -50,7 +50,11 @@ const LoginPage: NextPageWithLayout = () => {
   )
 }
 
-LoginPage.getLayout = (page) => <LoginLayout title="Login">{page}</LoginLayout>
+LoginPage.getLayout = (page) => (
+  <LoginLayout title="Login" logoLinkToMarketingSite={true}>
+    {page}
+  </LoginLayout>
+)
 
 export default LoginPage
 

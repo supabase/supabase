@@ -1,5 +1,6 @@
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Button, Form, IconLock, Input } from 'ui'
 import { object, string } from 'yup'
 
@@ -13,10 +14,15 @@ const registerSchema = object({
     )
     .required('Username is required'),
   email: string().email('Must be a valid email').required('Email is required'),
-  password: string().required('Password is required'),
+  password: string()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters long'),
 })
 
 const RegisterForm = () => {
+  const { ui } = useStore()
+  const router = useRouter()
+
   const onRegister = async ({
     username,
     email,
@@ -26,8 +32,28 @@ const RegisterForm = () => {
     email: string
     password: string
   }) => {
-    const result = await auth.signUp({ email, password, options: { data: { username } } })
-    console.log('result:', result)
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Registering...`,
+    })
+
+    const { error } = await auth.signUp({ email, password, options: { data: { username } } })
+
+    if (!error) {
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Logged in successfully!`,
+      })
+
+      await router.push('/projects')
+    } else {
+      ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: error.message,
+      })
+    }
   }
 
   return (

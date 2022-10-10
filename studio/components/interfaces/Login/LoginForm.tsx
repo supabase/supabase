@@ -1,4 +1,7 @@
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
+import { useRouter } from 'next/router'
+import { useSWRConfig } from 'swr'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
@@ -8,9 +11,37 @@ const loginSchema = object({
 })
 
 const LoginForm = () => {
+  const { ui } = useStore()
+  const router = useRouter()
+  const { cache } = useSWRConfig()
+
   const onLogin = async ({ email, password }: { email: string; password: string }) => {
-    const result = await auth.signInWithPassword({ email, password })
-    console.log('result:', result)
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Logging in...`,
+    })
+
+    const { error } = await auth.signInWithPassword({ email, password })
+
+    if (!error) {
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Logged in successfully!`,
+      })
+
+      // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
+      // @ts-ignore
+      cache.clear()
+
+      await router.push('/projects')
+    } else {
+      ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: error.message,
+      })
+    }
   }
 
   return (
