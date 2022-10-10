@@ -6,6 +6,7 @@ import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
+import { useProjectSubscription } from 'hooks'
 import dayjs from 'dayjs'
 
 const defaultRouterMock = () => {
@@ -164,3 +165,41 @@ test('query warnings', async () => {
   render(<LogsExplorerPage />)
   await screen.findByText('1 warning')
 })
+
+describe.each(['tier_free', 'tier_pro', 'tier_enterprise'])(
+  'upgrade modal for %s',
+  (supabase_prod_id) => {
+    beforeEach(() => {
+      useProjectSubscription.mockReturnValue({
+        subscription: {
+          tier: {
+            supabase_prod_id,
+          },
+        },
+      })
+    })
+    test('based on query params', async () => {
+      const router = defaultRouterMock()
+      router.query = {
+        ...router.query,
+        q: 'some_query',
+        its: dayjs().subtract(4, 'months').toISOString(),
+        ite: dayjs().toISOString(),
+      }
+      useRouter.mockReturnValue(router)
+      render(<LogsExplorerPage />)
+      await screen.findByText('Log retention') // assert modal title is present
+    })
+
+    test('based on datepicker helpers', async () => {
+      render(<LogsExplorerPage />)
+      // click on the dropdown
+      userEvent.click(await screen.findByText('Last day'))
+      userEvent.click(await screen.findByText('Last 7 days'))
+      // only free tier will show modal
+      if (supabase_prod_id === 'tier_free') {
+        await screen.findByText('Log retention') // assert modal title is present
+      }
+    })
+  }
+)

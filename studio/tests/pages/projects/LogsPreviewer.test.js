@@ -393,3 +393,32 @@ test('filters accept filterOverride', async () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
   })
 })
+
+
+describe.each(['tier_free', 'tier_pro', 'tier_enterprise'])(
+  'upgrade modal for %s',
+  (supabase_prod_id) => {
+    beforeEach(() => {
+      useProjectSubscription.mockReturnValue({
+        subscription: {
+          tier: {
+            supabase_prod_id,
+          },
+        },
+      })
+    })
+    test('based on query params', async () => {
+      const router = defaultRouterMock()
+      router.query = {
+        ...router.query,
+        q: 'some_query',
+        its: dayjs().subtract(4, 'months').toISOString(),
+        ite: dayjs().toISOString(),
+      }
+      useRouter.mockReturnValue(router)
+      render(<LogsExplorerPage />)
+      await screen.findByText('Log retention') // assert modal title is present
+    })
+  }
+)
+
