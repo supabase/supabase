@@ -4,7 +4,7 @@ const sidebars = {
       type: 'category',
       label: 'Overview',
       collapsed: true,
-      items: ['about', 'architecture', 'guides/examples'],
+      items: ['about', 'guides/features', 'architecture', 'guides/examples'],
     },
     {
       type: 'category',
