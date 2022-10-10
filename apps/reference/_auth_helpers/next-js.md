@@ -279,28 +279,36 @@ If you visit `/api/protected-route` without a valid session cookie, you will get
 
 ## Protecting routes with [Nextjs Middleware](https://nextjs.org/docs/middleware)
 
-As an alternative to protecting individual pages using `getServerSideProps` with `withPageAuth`, `withMiddlewareAuth` can be used from inside a `_middleware` file to protect an entire directory. In the following example, all requests to `/protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected to `/login` (defaults to: `/`) with a 307 Temporary Redirect response status:
+As an alternative to protecting individual pages using `getServerSideProps` with `withPageAuth`, `withMiddlewareAuth` can be used from inside a `middleware` file to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected to `/login` (defaults to: `/`) with a 307 Temporary Redirect response status:
 
 ```ts
-// pages/protected/_middleware.ts
-import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs/middleware'
+// /middleware.ts
+import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs';
 
-export const middleware = withMiddlewareAuth({ redirectTo: '/login' })
+export const middleware = withMiddlewareAuth({ redirectTo: '/' });
+
+export const config = {
+  matcher: ['/middleware-protected/:path*']
+};
 ```
 
 It is also possible to add finer granularity based on the user logged in. I.e. you can specify a promise to determine if a specific user has permission or not.
 
 ```ts
-// pages/protected/_middleware.ts
-import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs/dist/middleware'
+// middlware.ts
+import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs/middleware';
 
 export const middleware = withMiddlewareAuth({
   redirectTo: '/login',
   authGuard: {
     isPermitted: async (user) => user.email?.endsWith('@example.com') ?? false,
-    redirectTo: '/insufficient-permissions',
-  },
-})
+    redirectTo: '/insufficient-permissions'
+  }
+});
+
+export const config = {
+  matcher: ['/middleware-protected/:path*']
+};
 ```
 
 ## Migrating from @supabase/supabase-auth-helpers to @supabase/auth-helpers
