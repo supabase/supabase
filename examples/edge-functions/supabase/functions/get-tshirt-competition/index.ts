@@ -40,10 +40,13 @@ serve(async (req) => {
       )
 
     // Submit email to draw
-    const { error } = await supabaseAdminClient.from('get-tshirt-competition').insert({
-      email,
-      twitter,
-    })
+    const { error } = await supabaseAdminClient.from('get-tshirt-competition').upsert(
+      {
+        email,
+        twitter,
+      },
+      { onConflict: 'email' }
+    )
     if (error) {
       console.log(error)
       throw new Error(error.details)
