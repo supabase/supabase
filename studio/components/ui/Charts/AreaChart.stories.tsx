@@ -29,9 +29,9 @@ export const AreaChart = () => (
       { title: 'Highlighted Value', props: { highlightedValue: 123 } },
       { title: 'UTC Dates', props: { displayDateInUtc: true } },
       { title: 'Custom date format', props: { customDateFormat: 'HH:mm' } },
-      { title: 'No data', props: { data: [] } },
       { title: 'Value format', props: { format: 'c' } },
       { title: 'Minimal Value format', props: { minimalHeader: true, format: 'c' } },
+      { title: 'No data', props: { data: [] } },
     ].map(({ title, props }) => (
       <div className="w-72 h-72">
         <ExampleName>{title}</ExampleName>
