@@ -154,9 +154,9 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Functions',
+      label: 'Edge Functions',
       collapsed: true,
-      items: ['guides/functions'],
+      items: ['guides/functions', 'guides/functions/cicd-workflow'],
     },
     {
       type: 'category',
@@ -164,9 +164,8 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/realtime',
-        'guides/realtime/broadcast',
-        'guides/realtime/presence',
-        'guides/realtime/postgres-changes',
+        'guides/realtime/quickstart',
+        'guides/realtime/postgres-cdc',
       ],
     },
     {
