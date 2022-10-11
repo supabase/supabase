@@ -3,17 +3,19 @@ import { useRouter } from 'next/router'
 import { observer, useStaticRendering } from 'mobx-react-lite'
 import { IconCode, Badge, Collapsible, Button, Popover } from 'ui'
 import { TEMPLATES } from 'components/interfaces/Settings/Logs'
-import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'
 import { NextPageWithLayout } from 'types'
+import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
   return (
-    <div>
-      <div className="grid grid-cols-3 gap-6">
+    <div className="mx-auto h-full w-full px-5 py-6">
+      <LogsExplorerHeader />
+      <div className="grid grid-cols-3 gap-6 mt-4">
         {TEMPLATES.filter((template) => template.mode === 'custom').map((template, i) => {
           const [showPreview, setShowPreview] = useState(false)
           return (
@@ -72,6 +74,6 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
   )
 }
 
-LogsTemplatesPage.getLayout = (page) => <LogsExplorerLayout>{page}</LogsExplorerLayout>
+LogsTemplatesPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
 export default observer(LogsTemplatesPage)
