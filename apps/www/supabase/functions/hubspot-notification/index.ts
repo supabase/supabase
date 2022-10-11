@@ -26,6 +26,7 @@ serve(async (req) => {
   const jobtitle = input.record.title
   const website = input.record.website
   const partner_gallery_type = input.record.type
+  const document = input.document
 
   let formData: object = {
     email,
@@ -52,6 +53,13 @@ serve(async (req) => {
       phone,
       lastName,
       firstName,
+    }
+  }
+
+  if (input.table === 'dpa_downloads') {
+    formData = {
+      ...formData,
+      document,
     }
   }
 
