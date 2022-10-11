@@ -79,16 +79,16 @@ class Realtime extends Hooks {
     await this.waitForChannelJoined(channel)
     expect(catchError).toBeUndefined()
     // we should wait around 6 seconds to connect to database changes
-    await new Promise((resolve) => setTimeout(resolve, 10000))
+    await new Promise((resolve) => setTimeout(resolve, 15000))
 
-    const eventPromise = new Promise((resolve, reject) => {
+    const eventPromise = new Promise((resolve) => {
       res = resolve
       new Promise(() => {
-        t = setTimeout(() => reject(new Error('timeout')), 30000)
+        t = setTimeout(() => resolve(new Error('timeout')), 30000)
       })
     })
     await this.insertProfile(supabase, user, user)
-    expect(eventPromise).resolves.toBeNull()
+    expect(await eventPromise).toBeNull()
 
     const ok = await supabase.removeChannel(channel)
     expect(ok).toBe('ok')

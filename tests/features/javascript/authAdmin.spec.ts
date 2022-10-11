@@ -8,9 +8,9 @@ import { FEATURE } from '../templates/enums'
 import { description, feature, log, severity, step } from '../../.jest/jest-custom-reporter'
 import { Hooks } from './hooks'
 
-@suite('authentication API')
+@suite('auth_admin')
 class AuthenticationAPI extends Hooks {
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.NORMAL)
   @description('When you create user then it has to be in auth db schema')
   @test
@@ -20,7 +20,7 @@ class AuthenticationAPI extends Hooks {
     expect(user).not.toBeNull()
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.NORMAL)
   @description('When you create user then he can sign in')
   @test
@@ -43,7 +43,7 @@ class AuthenticationAPI extends Hooks {
     expect(createdUser.id).toBe(user.id)
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.CRITICAL)
   @description('When you try to create user with anon key then you should get error')
   @test
@@ -63,7 +63,7 @@ class AuthenticationAPI extends Hooks {
     expect(error).not.toBeNull()
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.CRITICAL)
   @description('When you try to create user as logged in user then you should get error')
   @test
@@ -89,7 +89,7 @@ class AuthenticationAPI extends Hooks {
     expect(error).not.toBeNull()
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.NORMAL)
   @description('When you list users then you should get all users')
   @test
@@ -109,7 +109,7 @@ class AuthenticationAPI extends Hooks {
     expect(users.map((u) => u.id)).toEqual(expect.arrayContaining([user1.id, user2.id]))
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.CRITICAL)
   @description('When you try to list user with anon key then you should get error')
   @test
@@ -127,7 +127,7 @@ class AuthenticationAPI extends Hooks {
     expect(users).toHaveLength(0)
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.CRITICAL)
   @description('When you try to list user as logged in user then you should get error')
   @test
@@ -150,7 +150,7 @@ class AuthenticationAPI extends Hooks {
     expect(users).toHaveLength(0)
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.NORMAL)
   @description('When you get provider url then corresponding auth provider url should be returned')
   @params.skip({ provider: 'google', options: {}, expectedURL: 'todo' })
@@ -165,7 +165,7 @@ class AuthenticationAPI extends Hooks {
     // todo
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.NORMAL)
   @description('When you get user by id he has to be returned')
   @test
@@ -184,7 +184,7 @@ class AuthenticationAPI extends Hooks {
     expect(foundUser.email).toBe(user.email)
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.NORMAL)
   @description('When you update user then this user has to be updated')
   @test
@@ -209,7 +209,7 @@ class AuthenticationAPI extends Hooks {
     expect(resultUser.phone).toBe(updatedUser.phone)
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.NORMAL)
   @description('When you delete user then this user has to be removed')
   @test
@@ -231,7 +231,7 @@ class AuthenticationAPI extends Hooks {
     expect(foundUser).toBeNull()
   }
 
-  @feature(FEATURE.AUTHENTICATION)
+  @feature(FEATURE.AUTH_ADMIN)
   @severity(Severity.CRITICAL)
   @description('When you delete user with anon key you have to receive an error')
   @test
