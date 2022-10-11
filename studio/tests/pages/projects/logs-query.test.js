@@ -1,6 +1,6 @@
 import { get } from 'lib/common/fetch'
 import { useRouter } from 'next/router'
-import { LogsExplorerPage } from 'pages/project/[ref]/logs-explorer/index'
+import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
 import { render } from 'tests/helpers'
 import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
