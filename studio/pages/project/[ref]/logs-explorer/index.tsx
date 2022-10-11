@@ -26,6 +26,7 @@ import {
 } from 'components/interfaces/Settings/Logs'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { StripeProduct } from 'components/interfaces/Billing'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -44,7 +45,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       iso_timestamp_end: ite ? (ite as string) : undefined,
     })
 
-  const { UpgradePrompt, showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
+  const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
   )
 
@@ -72,6 +73,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
     setWarnings(newWarnings)
   }, [editorValue, params.iso_timestamp_start, params.iso_timestamp_end])
+
+  // Show the prompt on page load based on query params
+  useEffect(() => {
+    if (its) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier as StripeProduct)
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      }
+    }
+  }, [its, tier])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setEditorValue(template.searchString)
@@ -170,7 +181,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               <LogTable params={params} data={logData} error={error} projectRef={ref as string} />
             </div>
           </LoadingOpacity>
-          <div className="mt-2 flex flex-row justify-end">{UpgradePrompt}</div>
+          <div className="mt-2 flex flex-row justify-end">
+            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+          </div>
         </div>
       </div>
       <Modal
