@@ -255,7 +255,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/auth-signin',
-    destination: '/docs/reference/javascript/auth-signin',
+    destination: '/docs/reference/javascript/v1/auth-signin',
   },
   {
     permanent: false,
@@ -1331,7 +1331,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/next/migration-guide',
-    destination: '/docs/reference/javascript/next/release-notes',
+    destination: '/docs/reference/javascript/release-notes',
   },
   {
     permanent: true,
