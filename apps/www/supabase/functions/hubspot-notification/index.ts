@@ -28,15 +28,7 @@ serve(async (req) => {
   const partner_gallery_type = input.record.type
 
   let formData: object = {
-    supabase_table_id,
-    country,
-    form_note,
-    company,
-    company_size,
     email,
-    phone,
-    lastName,
-    firstName,
   }
 
   if (input.table === 'partner_contacts') {
@@ -45,6 +37,21 @@ serve(async (req) => {
       jobtitle,
       website,
       partner_gallery_type,
+    }
+  }
+
+  if (input.table === 'enterprise_contacts') {
+    formData = {
+      ...formData,
+      supabase_table_id,
+      country,
+      form_note,
+      company,
+      company_size,
+      email,
+      phone,
+      lastName,
+      firstName,
     }
   }
 
