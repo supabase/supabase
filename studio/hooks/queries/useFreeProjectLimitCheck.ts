@@ -14,7 +14,7 @@ export function useFreeProjectLimitCheck(slug?: string) {
   const anyError = data?.error || error
 
   return {
-    members: anyError ? undefined : (data as MemberWithFreeProjectLimit[]),
+    membersExceededLimit: anyError ? undefined : (data as MemberWithFreeProjectLimit[]),
     error: anyError,
     isLoading: !anyError && !data,
     isError: !!anyError,
