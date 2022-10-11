@@ -4,7 +4,7 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from 'ui'
+import { Button, Listbox, IconUsers, Input, Alert } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -19,10 +19,16 @@ import {
   PRICING_TIER_LABELS,
   PRICING_TIER_DEFAULT_KEY,
   PRICING_TIER_FREE_KEY,
-  DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, useSubscriptionStats, checkPermissions } from 'hooks'
+import {
+  useStore,
+  useFlag,
+  withAuth,
+  useSubscriptionStats,
+  checkPermissions,
+  useFreeProjectLimitCheck,
+} from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -43,6 +49,9 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
   const subscriptionStats = useSubscriptionStats()
+  const { members, isLoading: isLoadingFreeProjectLimitCheck } = useFreeProjectLimitCheck(
+    slug as string
+  )
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -59,31 +68,29 @@ const Wizard: NextPageWithLayout = () => {
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
   const isOrganizationOwner = ui.selectedOrganization?.is_owner
-  const totalFreeProjects = subscriptionStats.total_active_free_projects
-  const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
   const availableRegions = getAvailableRegions()
 
   const isAdmin = enablePermissions
     ? checkPermissions(PermissionAction.CREATE, 'projects')
     : isOrganizationOwner
 
+  const isInvalidSlug = isUndefined(currentOrg)
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
-  const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
-  const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
+  const hasMembersExceedingFreeTierLimit = (members || []).length > 0
 
   const canCreateProject =
     isAdmin &&
     !subscriptionStats.isError &&
     !subscriptionStats.isLoading &&
-    (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
+    (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
 
   const canSubmit =
-    projectName != '' &&
+    projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != '' &&
-    dbPricingTierKey != '' &&
+    dbRegion !== '' &&
+    dbPricingTierKey !== '' &&
     (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
 
   const delayedCheckPasswordStrength = useRef(
@@ -202,7 +209,11 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      loading={!app.organizations.isInitialized}
+      loading={
+        !app.organizations.isInitialized ||
+        subscriptionStats.isLoading ||
+        isLoadingFreeProjectLimitCheck
+      }
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
@@ -243,7 +254,12 @@ const Wizard: NextPageWithLayout = () => {
           </Panel.Content>
         ) : (
           <>
-            <Panel.Content className="Form section-block--body has-inputs-centered space-y-4 border-t border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+            <Panel.Content
+              className={[
+                'Form section-block--body has-inputs-centered space-y-4 border-t border-b',
+                'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+              ].join(' ')}
+            >
               {organizations.length > 0 && (
                 <Listbox
                   label="Organization"
@@ -266,9 +282,15 @@ const Wizard: NextPageWithLayout = () => {
 
               {!isAdmin && <NotOrganizationOwnerWarning />}
             </Panel.Content>
+
             {canCreateProject && (
               <>
-                <Panel.Content className="Form section-block--body has-inputs-centered border-t border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content
+                  className={[
+                    'Form section-block--body has-inputs-centered border-t border-b',
+                    'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                  ].join(' ')}
+                >
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -335,6 +357,7 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
               </>
             )}
+
             {isAdmin && (
               <Panel.Content className="Form section-block--body has-inputs-centered ">
                 <Listbox
@@ -376,20 +399,13 @@ const Wizard: NextPageWithLayout = () => {
                   })}
                 </Listbox>
 
-                {isSelectFreeTier && isOverFreeProjectLimit && (
-                  <FreeProjectLimitWarning limit={freeProjectsLimit} />
+                {isSelectFreeTier && hasMembersExceedingFreeTierLimit && (
+                  <FreeProjectLimitWarning members={members || []} />
                 )}
 
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
                   <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
                 )}
-              </Panel.Content>
-            )}
-            {subscriptionStats.isLoading && (
-              <Panel.Content>
-                <div className="flex items-center justify-center py-10">
-                  <IconLoader size={16} className="animate-spin" />
-                </div>
               </Panel.Content>
             )}
           </>
