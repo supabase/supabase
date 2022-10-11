@@ -49,8 +49,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
-```jsx
-// pages/_app.js
+```jsx title="pages/_app.js"
 import React from 'react'
 import { useRouter } from 'next/router'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -158,8 +157,7 @@ export default LoginPage
 
 If you wrap your `getServerSideProps` with `withPageAuth` your props object will be augmented with the user object.
 
-```js
-// pages/profile.js
+```js title="pages/profile.js"
 import { withPageAuth } from '@supabase/auth-helpers-nextjs'
 
 export default function Profile({ user }) {
@@ -174,8 +172,7 @@ If there is no authenticated user, they will be redirect to your home page, unle
 You can pass in your own `getServerSideProps` method, the props returned from this will be merged with the
 user props. You can also access the user session data by calling `getUser` inside of this method, eg:
 
-```js
-// pages/protected-page.js
+```js title="pages/protected-page.js"
 import { withPageAuth } from '@supabase/auth-helpers-nextjs'
 
 export default function ProtectedPage({ user, customProp }) {
@@ -274,8 +271,7 @@ export const getServerSideProps = withPageAuth({
 Wrap an API Route to check that the user has a valid session. If they're not logged in the handler will return a
 401 Unauthorized.
 
-```js
-// pages/api/protected-route.js
+```js title="pages/api/protected-route.js"
 import { withApiAuth } from '@supabase/auth-helpers-nextjs'
 
 export default withApiAuth(async function ProtectedRoute(
@@ -295,8 +291,7 @@ If you visit `/api/protected-route` without a valid session cookie, you will get
 
 As an alternative to protecting individual pages using `getServerSideProps` with `withPageAuth`, `withMiddlewareAuth` can be used from inside a `middleware` file to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected to `/login` (defaults to: `/`) with a 307 Temporary Redirect response status:
 
-```ts
-// middleware.ts
+```ts title="middleware.ts"
 import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs'
 
 export const middleware = withMiddlewareAuth({ redirectTo: '/login' })
@@ -308,8 +303,7 @@ export const config = {
 
 It is also possible to add finer granularity based on the user logged in. I.e. you can specify a promise to determine if a specific user has permission or not.
 
-```ts
-// middleware.ts
+```ts title="middleware.ts"
 import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs'
 
 export const middleware = withMiddlewareAuth({
