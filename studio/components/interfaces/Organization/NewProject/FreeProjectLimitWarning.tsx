@@ -4,10 +4,10 @@ import InformationBox from 'components/ui/InformationBox'
 import { MemberWithFreeProjectLimit } from 'hooks'
 
 interface Props {
-  members: MemberWithFreeProjectLimit[]
+  membersExceededLimit: MemberWithFreeProjectLimit[]
 }
 
-const FreeProjectLimitWarning: FC<Props> = ({ members }) => {
+const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit }) => {
   return (
     <div className="mt-4">
       <InformationBox
@@ -22,7 +22,7 @@ const FreeProjectLimitWarning: FC<Props> = ({ members }) => {
               tier projects within organizations where they are an administrator or owner:
             </p>
             <ul className="list-disc pl-5">
-              {members.map((member, idx: number) => (
+              {membersExceededLimit.map((member, idx: number) => (
                 <li key={`member-${idx}`}>
                   {member.username || member.primary_email} (Limit: {member.free_project_limit} free
                   projects)
@@ -30,7 +30,7 @@ const FreeProjectLimitWarning: FC<Props> = ({ members }) => {
               ))}
             </ul>
             <p className="text-sm leading-normal">
-              These members will need to either delete, pause or upgrade one or more of these
+              These members will need to either delete, pause, or upgrade one or more of these
               projects before you're able to create a free project within this organization.
             </p>
           </div>

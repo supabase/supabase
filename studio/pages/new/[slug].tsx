@@ -49,9 +49,8 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
   const subscriptionStats = useSubscriptionStats()
-  const { members, isLoading: isLoadingFreeProjectLimitCheck } = useFreeProjectLimitCheck(
-    slug as string
-  )
+  const { membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
+    useFreeProjectLimitCheck(slug as string)
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -78,7 +77,7 @@ const Wizard: NextPageWithLayout = () => {
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
-  const hasMembersExceedingFreeTierLimit = (members || []).length > 0
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const canCreateProject =
     isAdmin &&
@@ -400,7 +399,7 @@ const Wizard: NextPageWithLayout = () => {
                 </Listbox>
 
                 {isSelectFreeTier && hasMembersExceedingFreeTierLimit && (
-                  <FreeProjectLimitWarning members={members || []} />
+                  <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                 )}
 
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
