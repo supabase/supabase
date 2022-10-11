@@ -39,7 +39,7 @@ A teljes dokumentációért látogasson el a [supabase.com/docs](https://supabas
 
 Jelenleg a Publikus Béta állapotban vagyunk. Nézze a repo "releases" fülét hogy értesüljön a nagy frissítésekről.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -52,7 +52,7 @@ A Supabase nyílt forráskódú eszközök kombinációja.A Firebase funkcióit 
 Supabase egy [hosztolt platform](https://app.supabase.com). Regisztrálással letöltés nélkül is elkezdheted használni.
 De [hosztolhatod magadnak](https://supabase.com/docs/guides/hosting/overview) és akár [fejlesztheted helyileg](https://supabase.com/docs/guides/local-development).
 
-![Architektúra](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architektúra](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) egy objektum-kapcsolati adatbázis rendszer több mint 30 évnyi aktív fejlesztéssel ezalatt hírnevvet szerzett megbízhatóságáról, robosztus felépítéséről, és teljesítményéről.
 - [Valós idő](https://github.com/supabase/realtime) egy Elixir szerver ami lehetővé teszi hogy figyeld a PostgreSQL beillesztéseket, frissítéseket, és törléseket websocket-ek felhasználásával. Supabase figyeli a Postgres belső replikációs funkcióját, átalakítja a replikációs bájtokat egy JSON-be, majd a JSON-t elküldi a websocket kapcsolaton.

@@ -1315,6 +1315,21 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/realtime/broadcast',
+    destination: '/docs/guides/realtime#broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/presence',
+    destination: '/docs/guides/realtime#presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/postgres-changes',
+    destination: '/docs/guides/realtime/postgres-cdc',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/javascript/next/migration-guide',
     destination: '/docs/reference/javascript/next/release-notes',
   },
