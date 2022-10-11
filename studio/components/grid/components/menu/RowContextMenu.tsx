@@ -21,6 +21,8 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
         const { props } = p
         const { rowIdx } = props
         const row = state.rows[rowIdx]
+        if (!row) return
+
         const { error } = state.rowService!.delete([row])
         if (error) {
           if (state.onError) state.onError(error)

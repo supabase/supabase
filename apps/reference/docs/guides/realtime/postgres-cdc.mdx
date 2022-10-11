@@ -1,16 +1,20 @@
 ---
-id: postgres-changes
-title: Postgres Changes
-description: Getting started with Realtime's Postgres Changes feature
+id: postgres-cdc
+title: Postgres CDC
+description: Getting started with Realtime's Postgres CDC feature
 ---
 
-Supabase Postgres Changes listen for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
+Realtime's Postgres Change Data Capture (CDC) feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
+
+Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/auth/row-level-security) enabled and policies in place.
+
+Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table. Your clients should only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to.
 
 :::caution
-Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/auth/row-level-security) enabled and policies in place.
+Postgres CDC works out of the box for tables in the `public` schema. We do not yet recommend attempting to listen to tables in private schemas due to security concerns and additional permission requirements.
 :::
 
-Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table.Your clients can only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to. You can do this in the [Replication](https://app.supabase.com/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://app.supabase.com/project/_/sql):
+You can do this in the [Replication](https://app.supabase.com/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://app.supabase.com/project/_/sql):
 
 ```sql
 begin;
