@@ -57,7 +57,7 @@ const RowEditor: FC<Props> = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable, isNewRecord)
+      const rowFields = generateRowFields(row, selectedTable)
       setRowFields(rowFields)
     }
   }, [visible])
