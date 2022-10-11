@@ -5,11 +5,22 @@ description: Authentication helpers for Next.js API routes, middleware, and SSR.
 sidebar_label: 'Next.js'
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 This submodule provides convenience helpers for implementing user authentication in Next.js applications.
 
-## Installation
+## Install the Next.js helper library
 
-Using [npm](https://npmjs.org):
+<Tabs
+  groupId="install"
+  defaultValue="npm"
+  values={[
+    {label: 'npm', value: 'npm'},
+    {label: 'Yarn', value: 'yarn'},
+  ]}>
+
+<TabItem value="npm">
 
 ```sh
 npm install @supabase/auth-helpers-nextjs
@@ -18,7 +29,8 @@ npm install @supabase/auth-helpers-nextjs
 npm install @supabase/auth-helpers-react
 ```
 
-Using [yarn](https://yarnpkg.com/):
+</TabItem>
+<TabItem value="yarn">
 
 ```sh
 yarn add @supabase/auth-helpers-nextjs
@@ -27,15 +39,16 @@ yarn add @supabase/auth-helpers-nextjs
 yarn add @supabase/auth-helpers-react
 ```
 
+</TabItem>
+</Tabs>
+
 This library supports the following tooling versions:
 
 - Node.js: `^10.13.0 || >=12.0.0`
 
 - Next.js: `>=10`
 
-## Getting Started
-
-### Configuration
+## Set up environment variables
 
 Set up the following env vars. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
 
@@ -45,7 +58,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### Basic Setup
+## Basic Setup
 
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
@@ -81,7 +94,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 You can now determine if a user is authenticated by checking that the `user` object returned by the `useUser()` hook is defined.
 
-### Usage with TypeScript
+## Usage with TypeScript
 
 You can pass types that were [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/next/typescript-support#generating-types) to the Supabase Client to get enhanced type safety and auto completion:
 
