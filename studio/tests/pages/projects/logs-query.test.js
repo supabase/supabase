@@ -139,52 +139,6 @@ test('custom sql querying', async () => {
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
-test('datepicker interaction updates query params', async () => {
-  render(<LogsExplorerPage />)
-  clickDropdown(await screen.findByText(/Last 24 hours/))
-  userEvent.click(await screen.findByText(/Last 3 days/))
-
-  useProjectSubscription.mockReturnValue({
-    subscription: {
-      tier: {
-        supabase_prod_id: 'tier_pro',
-      },
-    },
-  })
-
-  if (subscription.tier.supabase_prod_id === 'tier_pro') {
-    const router = useRouter()
-    expect(router.push).toBeCalled()
-    expect(router.push).toBeCalledWith(
-      expect.objectContaining({
-        query: expect.objectContaining({
-          its: expect.any(String),
-        }),
-      })
-    )
-  }
-})
-
-test.only('Upgrade prompt displays if user on free plan and tries to view beyond 24hrs', async () => {
-  useProjectSubscription.mockReturnValue({
-    subscription: {
-      tier: {
-        supabase_prod_id: 'tier_free',
-      },
-    },
-  })
-
-  render(<LogsExplorerPage />)
-  render(<UpgradePrompt />)
-
-  clickDropdown(await screen.findByText(/Last 24 hours/))
-  userEvent.click(await screen.findByText(/Last 3 days/))
-
-  if (subscription.tier.supabase_prod_id !== 'free') {
-    expect(getByText('Logs can be retained up to a')).toBeInTheDocument()
-  }
-})
-
 test('query warnings', async () => {
   const router = defaultRouterMock()
   router.query = {
@@ -197,3 +151,43 @@ test('query warnings', async () => {
   render(<LogsExplorerPage />)
   await screen.findByText('1 warning')
 })
+
+describe.each(['tier_free', 'tier_pro', 'tier_enterprise'])(
+  'upgrade modal for %s',
+  (supabase_prod_id) => {
+    beforeEach(() => {
+      useProjectSubscription.mockReturnValue({
+        subscription: {
+          tier: {
+            supabase_prod_id,
+          },
+        },
+      })
+    })
+    test.only('based on query params', async () => {
+      const router = defaultRouterMock()
+      router.query = {
+        ...router.query,
+        q: 'some_query',
+        its: dayjs().subtract(4, 'months').toISOString(),
+        ite: dayjs().toISOString(),
+      }
+      useRouter.mockReturnValue(router)
+      render(<LogsExplorerPage />)
+
+      await screen.findByText('Log retention') // assert modal title is present
+    })
+
+    test.only('based on datepicker helpers', async () => {
+      render(<LogsExplorerPage />)
+      // click on the dropdown
+      clickDropdown(await screen.findByText('Last 24 hours'))
+      userEvent.click(await screen.findByText('Last 3 days'))
+
+      // only free tier will show modal
+      if (supabase_prod_id === 'tier_free') {
+        await screen.findByText('Log retention') // assert modal title is present
+      }
+    })
+  }
+)
