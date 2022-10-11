@@ -15,7 +15,7 @@ class Realtime extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When you call "on" table then connected realtime client should be returned')
   @test
-  async '[skip-local] realtime connect'() {
+  async '[skip-stage] realtime connect'() {
     let catchError: Error = undefined
     const { supabase } = await this.createSignedInSupaClient()
 
@@ -45,7 +45,7 @@ class Realtime extends Hooks {
   @description('When you subscrive to realtime, you have to receive updates')
   @timeout(60000)
   @test
-  async '[skip-local] realtime receive event'() {
+  async '[skip-stage] realtime receive event'() {
     let catchError: Error = undefined
     let res: any
     let t: NodeJS.Timeout
@@ -98,7 +98,7 @@ class Realtime extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you call "on" table but not subscribe then no events have to be returned')
   @test
-  async '[skip-local] no event updates until subscribe'() {
+  async 'no event updates until subscribe'() {
     let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
@@ -249,7 +249,7 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you unsubscribe from table then no events have to be returned')
   @test
-  async '[skip-local] unsubscribe from table'() {
+  async '[skip-stage] unsubscribe from table'() {
     let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
@@ -285,7 +285,7 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you remove one subscription then only events from another have to be returned')
   @test
-  async '[skip-local] remove one subscription'() {
+  async '[skip-stage] remove one subscription'() {
     let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
@@ -320,7 +320,7 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you remove all subscription then no events have to be returned')
   @test
-  async '[skip-local] remove all subscriptions'() {
+  async '[skip-stage] remove all subscriptions'() {
     let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
