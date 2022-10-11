@@ -11,7 +11,7 @@ import { PendingQuery, Row } from 'postgres'
 @suite('rpc')
 @timeout(30000)
 class Procedures extends Hooks {
-  @feature(FEATURE.STORAGE)
+  @feature(FEATURE.RPC)
   @severity(Severity.BLOCKER)
   @description('When you call rpc then you are able to receive its result')
   @test
@@ -40,7 +40,7 @@ class Procedures extends Hooks {
     await this.dropFunction(Procedures.sql`test_procedure()`)
   }
 
-  @feature(FEATURE.STORAGE)
+  @feature(FEATURE.RPC)
   @severity(Severity.BLOCKER)
   @description('When you call rpc, params should be passed properly')
   @test
@@ -71,7 +71,7 @@ class Procedures extends Hooks {
     await this.dropFunction(Procedures.sql`test_procedure(filter text)`)
   }
 
-  @feature(FEATURE.STORAGE)
+  @feature(FEATURE.RPC)
   @severity(Severity.NORMAL)
   @description('When you call rpc with head param, no data should be returned')
   @test
