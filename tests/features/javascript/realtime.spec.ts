@@ -16,25 +16,18 @@ class Realtime extends Hooks {
   @description('When you call "on" table then connected realtime client should be returned')
   @test
   async '[skip-stage] realtime connect'() {
-    let catchError: Error = undefined
     const { supabase } = await this.createSignedInSupaClient()
 
-    const subscription = {
-      type: 'postgres_changes',
-      filter: { event: '*', schema: 'public' },
-    }
     const channel = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, (payload: any) => console.log(payload))
-    channel.onError((error: any) => {
-      catchError = error
-    })
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) =>
+        console.log(payload)
+      )
     channel.subscribe()
 
     expect(channel).toBeDefined()
     const err = await this.waitForChannelJoined(channel)
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(catchError).toBeUndefined()
     expect(err).toBeNull()
     const ok = await supabase.removeChannel(channel)
     expect(ok).toBe('ok')
@@ -46,18 +39,15 @@ class Realtime extends Hooks {
   @timeout(60000)
   @test
   async '[skip-stage] realtime receive event'() {
-    let catchError: Error = undefined
     let res: any
     let t: NodeJS.Timeout
     const { supabase, user } = await this.createSignedInSupaClient()
 
-    const subscription = {
-      type: 'postgres_changes',
-      filter: { event: '*', schema: 'public' },
-    }
     let payloadReceived = (payload: any) => {
+      if (payload?.eventType !== 'INSERT') {
+        return
+      }
       clearTimeout(t)
-      expect(payload.eventType).toBe('INSERT')
       expect(payload.schema).toBe('public')
       expect(payload.table).toBe('profiles')
       expect(payload.new.id).toBe(user.id)
@@ -69,17 +59,13 @@ class Realtime extends Hooks {
 
     const channel = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, payloadReceived)
-    channel.onError((error: any) => {
-      catchError = error
-    })
+      .on('postgres_changes', { event: '*', schema: 'public' }, payloadReceived)
     channel.subscribe()
 
     expect(channel).toBeDefined()
     await this.waitForChannelJoined(channel)
-    expect(catchError).toBeUndefined()
-    // we should wait around 6 seconds to connect to database changes
-    await new Promise((resolve) => setTimeout(resolve, 15000))
+    // we should wait some time seconds to connect to database changes
+    await new Promise((resolve) => setTimeout(resolve, 10000))
 
     const eventPromise = new Promise((resolve) => {
       res = resolve
@@ -99,30 +85,21 @@ class Realtime extends Hooks {
   @description('When you call "on" table but not subscribe then no events have to be returned')
   @test
   async 'no event updates until subscribe'() {
-    let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
-    const subscription = {
-      type: 'postgres_changes',
-      filter: { event: '*', schema: 'public' },
-    }
     const channel = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, (payload: any) => {
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
         console.log(payload)
         expect('event received').toBe('should not receive event')
       })
-    channel.onError((error: any) => {
-      catchError = error
-    })
 
     expect(channel).toBeDefined()
     await this.insertProfile(supabase, user, user)
 
     // wait for 1 second to see if we receive any events
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel.isClosed).toBeTruthy()
-    expect(catchError).toBeUndefined()
+    expect(channel._isClosed).toBeTruthy()
     const ok = await supabase.removeChannel(channel)
     expect(ok).toBe('ok')
   }
@@ -134,21 +111,17 @@ class Realtime extends Hooks {
   )
   @test
   async 'get subscriptions'() {
-    const { supabase, user } = await this.createSignedInSupaClient()
+    const { supabase } = await this.createSignedInSupaClient()
 
-    const subscription = {
-      type: 'postgres_changes',
-      filter: { event: '*', schema: 'public' },
-    }
     const channel1 = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, (payload: any) => {
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
         console.log(payload)
         expect('event received').toBe('should not receive event')
       })
     const channel2 = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, (payload: any) => {
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
         console.log(payload)
         expect('event received').toBe('should not receive event')
       })
@@ -250,22 +223,14 @@ class Realtime extends Hooks {
   @description('When you unsubscribe from table then no events have to be returned')
   @test
   async '[skip-stage] unsubscribe from table'() {
-    let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
-    const subscription = {
-      type: 'postgres_changes',
-      filter: { event: '*', schema: 'public' },
-    }
     const channel = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, (payload: any) => {
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
         console.log(payload)
         expect('event received').toBe('should not receive event')
       })
-    channel.onError((error: any) => {
-      catchError = error
-    })
     channel.subscribe()
     // wait for subscription to postgres
     await new Promise((resolve) => setTimeout(resolve, 8000))
@@ -276,8 +241,7 @@ class Realtime extends Hooks {
 
     // wait for 1 second to see if we receive any events
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel.isClosed).toBeTruthy()
-    expect(catchError).toBeUndefined()
+    expect(channel._isClosed).toBeTruthy()
     await supabase.removeChannel(channel)
   }
 
@@ -286,22 +250,14 @@ class Realtime extends Hooks {
   @description('When you remove one subscription then only events from another have to be returned')
   @test
   async '[skip-stage] remove one subscription'() {
-    let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
-    const subscription = {
-      type: 'postgres_changes',
-      filter: { event: '*', schema: 'public' },
-    }
     const channel = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, (payload: any) => {
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
         console.log(payload)
         expect('event received').toBe('should not receive event')
       })
-    channel.onError((error: any) => {
-      catchError = error
-    })
     channel.subscribe()
     // wait for subscription to postgres
     await new Promise((resolve) => setTimeout(resolve, 8000))
@@ -312,8 +268,7 @@ class Realtime extends Hooks {
 
     // wait for 1 second to see if we receive any events
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel.isClosed).toBeTruthy()
-    expect(catchError).toBeUndefined()
+    expect(channel._isClosed).toBeTruthy()
   }
 
   @feature(FEATURE.REALTIME)
@@ -321,22 +276,14 @@ class Realtime extends Hooks {
   @description('When you remove all subscription then no events have to be returned')
   @test
   async '[skip-stage] remove all subscriptions'() {
-    let catchError: Error = undefined
     const { supabase, user } = await this.createSignedInSupaClient()
 
-    const subscription = {
-      type: 'postgres_changes',
-      filter: { event: '*', schema: 'public' },
-    }
     const channel = supabase
       .channel('profiles')
-      .on(subscription.type, subscription.filter, (payload: any) => {
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload: any) => {
         console.log(payload)
         expect('event received').toBe('should not receive event')
       })
-    channel.onError((error: any) => {
-      catchError = error
-    })
     channel.subscribe()
     // wait for subscription to postgres
     await new Promise((resolve) => setTimeout(resolve, 8000))
@@ -347,23 +294,19 @@ class Realtime extends Hooks {
 
     // wait for 1 second to see if we receive any events
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    expect(channel.isClosed).toBeTruthy()
-    expect(catchError).toBeUndefined()
+    expect(channel._isClosed).toBeTruthy()
   }
 
   @step('Wait until channel is joined')
   async waitForChannelJoined(channel: RealtimeChannel): Promise<Error> {
     for (let i = 0; i < 30; i++) {
-      if (channel.isJoined()) {
+      if (channel._isJoined()) {
         return null
       }
-      if (channel.isErrored()) {
-        return new Error('Channel is errored')
-      }
-      if (channel.isLeaving()) {
+      if (channel._isLeaving()) {
         return new Error('Channel is leaving')
       }
-      if (channel.isClosed()) {
+      if (channel._isClosed()) {
         return new Error('Channel is closed')
       }
       await new Promise((resolve) => setTimeout(resolve, 100))

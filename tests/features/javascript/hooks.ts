@@ -179,7 +179,7 @@ export abstract class Hooks {
       .select()
   }
 
-  @step('Check if I am logged in by checking if I can get my profile')
+  @step('I can get my profile via postgREST')
   async getUserProfile(supabase: SupabaseClient): Promise<{ data: any; error: any }> {
     return supabase.from('profiles').select().maybeSingle()
   }

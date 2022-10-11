@@ -68,14 +68,14 @@ class Authentication extends Hooks {
     })
     expect(signInError).toBeNull()
     expect(session).toBeDefined()
-    await supabase.auth.setSession(session.access_token)
+    await supabase.auth.setSession(session)
 
     // check if user is signed in
     const {
       data: [profile],
       error: errorInsert,
     } = await this.insertProfile(supabase, user, fakeUser)
-    expect(errorInsert).toBeUndefined()
+    expect(errorInsert).toBeNull()
     expect(profile.username).toMatch(fakeUser.username)
 
     const { data: profileGot } = await this.getUserProfile(supabase)
@@ -114,7 +114,7 @@ class Authentication extends Hooks {
       data: [profile],
       error: errorInsert,
     } = await this.insertProfile(supabase, user, fakeUser)
-    expect(errorInsert).toBeUndefined()
+    expect(errorInsert).toBeNull()
     expect(profile.username).toMatch(fakeUser.username)
 
     const { data: profileGot } = await this.getUserProfile(supabase)
@@ -153,7 +153,7 @@ class Authentication extends Hooks {
       data: [profileInserted],
       error: errorInsert,
     } = await this.insertProfile(supabase, user, fakeUser)
-    expect(errorInsert).toBeUndefined()
+    expect(errorInsert).toBeNull()
     expect(profileInserted.username).toMatch(fakeUser.username)
 
     const { data: profileGot } = await this.getUserProfile(supabase)
@@ -268,7 +268,7 @@ class Authentication extends Hooks {
     })
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
-    const { error: sessionErr } = await supabase.auth.setSession(session.refresh_token)
+    const { error: sessionErr } = await supabase.auth.setSession(session)
     expect(sessionErr).toBeNull()
 
     // check if user is signed in correctly and rls is working
@@ -277,7 +277,7 @@ class Authentication extends Hooks {
       fakeUser,
       fakeUser
     )
-    expect(errorInsert).toBeUndefined()
+    expect(errorInsert).toBeNull()
     expect(profileInserted).toHaveLength(1)
     expect(profileInserted[0].username).toMatch(fakeUser.username)
   }

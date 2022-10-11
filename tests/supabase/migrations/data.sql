@@ -24,6 +24,10 @@ create policy "Users can update own profile."
   on profiles for update
   using ( auth.uid() = id );
 
+create policy "Users can delete own profile."
+  on profiles for delete
+  using ( auth.uid() = id );
+
 -- Set up Realtime
 drop publication if exists supabase_realtime;
 create publication supabase_realtime;

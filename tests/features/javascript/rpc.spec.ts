@@ -33,7 +33,7 @@ class Procedures extends Hooks {
     await this.insertProfile(supabase, user, user)
 
     const result = await this.callRpc(supabase, 'test_procedure')
-    expect(result.error).toBeUndefined()
+    expect(result.error).toBeNull()
     expect(result.data).toBeDefined()
     expect(result.data).toBeGreaterThanOrEqual(1)
 
@@ -64,7 +64,7 @@ class Procedures extends Hooks {
     await this.insertProfile(supabase, user, user)
 
     const result = await this.callRpc(supabase, 'test_procedure', { filter: user.username })
-    expect(result.error).toBeUndefined()
+    expect(result.error).toBeNull()
     expect(result.data).toBeDefined()
     expect(result.data).toBeGreaterThanOrEqual(1)
 
@@ -93,8 +93,8 @@ class Procedures extends Hooks {
     await this.insertProfile(supabase, user, user)
 
     const result = await this.callRpc(supabase, 'test_procedure', {}, { head: true })
-    expect(result.error).toBeUndefined()
-    expect(result.data).toBeUndefined()
+    expect(result.error).toBeNull()
+    expect(result.data).toBeNull()
 
     await this.dropFunction(Procedures.sql`test_procedure()`)
   }

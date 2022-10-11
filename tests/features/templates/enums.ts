@@ -5,7 +5,7 @@ export enum FEATURE {
   STORAGE = 'storage',
   FUNCTIONS = 'functions',
   RPC = 'rpc',
-  DB = 'database',
-  Filters = 'database.filters',
-  Modifiers = 'database.modifiers',
+  POSTGREST = 'postgrest',
+  FILTERS = 'postgrest_filters',
+  MODIFIERS = 'postgrest_modifiers',
 }
