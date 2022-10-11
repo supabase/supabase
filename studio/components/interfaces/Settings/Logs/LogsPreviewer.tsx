@@ -23,6 +23,7 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { useProjectSubscription } from 'hooks'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { StripeProduct } from 'components/interfaces/Billing'
+import UpgradePrompt from './UpgradePrompt'
 
 /**
  * Acts as a container component for the entire log display
@@ -61,7 +62,7 @@ export const LogsPreviewer: React.FC<Props> = ({
     { loadOlder, setFilters, refresh, setParams },
   ] = useLogsPreview(projectRef as string, table, filterOverride)
 
-  const { UpgradePrompt, showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
+  const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
   )
 
@@ -75,6 +76,16 @@ export const LogsPreviewer: React.FC<Props> = ({
       }))
     }
   }, [s, ite, its])
+
+  // Show the prompt on page load based on query params
+  useEffect(() => {
+    if (its) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier as StripeProduct)
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      }
+    }
+  }, [its, tier])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -122,9 +133,7 @@ export const LogsPreviewer: React.FC<Props> = ({
 
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
-      }
-
-      if (!shouldShowUpgradePrompt) {
+      } else {
         setParams((prev) => ({
           ...prev,
           iso_timestamp_start: from || '',
@@ -215,7 +224,9 @@ export const LogsPreviewer: React.FC<Props> = ({
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
               Load older
             </Button>
-            {UpgradePrompt}
+            <div className="mt-2 flex flex-row justify-end">
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+            </div>
           </div>
         )}
       </div>
