@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
-import { find, isUndefined, compact, includes, isEqual, omitBy, isNull, isString } from 'lodash'
+import { find, isUndefined, compact, isEqual, omitBy, isNull, isString } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
@@ -9,19 +9,15 @@ import { DATETIME_TYPES, TIME_TYPES, TIMESTAMP_TYPES } from '../SidePanelEditor.
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
-  table: PostgresTable,
-  isNewRecord?: boolean
+  table: PostgresTable
 ): RowField[] => {
   const { relationships, primary_keys } = table
   // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns.map((column) => {
-    const defaultValue = column?.default_value as string | null
     const value = isUndefined(row)
       ? ''
-      : isNewRecord && defaultValue?.includes('now()')
-      ? nowDateTimeValue(column.format)
       : DATETIME_TYPES.includes(column.format)
       ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
       : parseValue(row[column.name], column.format)
@@ -127,21 +123,6 @@ const parseDescription = (description: string | null) => {
     return `${commentLines[0]} (${commentLines[1]} ${commentLines[2]?.split('.<')[0]})`
   } else {
     return ''
-  }
-}
-
-const nowDateTimeValue = (format: string) => {
-  switch (format) {
-    case 'timestamptz':
-      return dayjs().format('YYYY-MM-DDTHH:mm:ss')
-    case 'timestamp':
-      return dayjs().format('YYYY-MM-DDTHH:mm:ss')
-    case 'timetz':
-      return dayjs().format('HH:mm:ss')
-    case 'time':
-      return dayjs().format('HH:mm:ss')
-    default:
-      return dayjs().format('YYYY-MM-DD')
   }
 }
 
