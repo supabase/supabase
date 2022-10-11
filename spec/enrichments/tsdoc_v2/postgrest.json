@@ -1717,7 +1717,7 @@
           "kindString": "Type parameter",
           "flags": {},
           "comment": {
-            "shortText": "Types for the schema from the [type\ngenerator](https://supabase.com/docs/reference/javascript/next/typescript-support)\n"
+            "shortText": "Types for the schema from the [type\ngenerator](https://supabase.com/docs/reference/javascript/typescript-support)\n"
           },
           "default": {
             "type": "intrinsic",
