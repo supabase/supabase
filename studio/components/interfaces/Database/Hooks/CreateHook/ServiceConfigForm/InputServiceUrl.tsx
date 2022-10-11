@@ -17,7 +17,7 @@ const InputServiceUrl: FC = observer(({}) => {
       onChange={(e) =>
         _localState.onFormChange({
           key: 'serviceUrl',
-          value: e.target.value.replaceAll(' ', ''),
+          value: e.target.value,
         })
       }
       size="medium"
