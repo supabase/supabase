@@ -15,7 +15,7 @@ class Procedures extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When you call rpc then you are able to receive its result')
   @test
-  async 'call rpc'() {
+  async 'call rpc and get result'() {
     await this.createFunction(Procedures.sql`
     CREATE OR REPLACE FUNCTION public.test_procedure() RETURNS int language plpgsql as $$
     declare
@@ -44,7 +44,7 @@ class Procedures extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When you call rpc, params should be passed properly')
   @test
-  async 'call rpc with params'() {
+  async 'call rpc method that has params'() {
     await this.createFunction(Procedures.sql`
     CREATE OR REPLACE FUNCTION public.test_procedure(filter text) 
       RETURNS int language plpgsql as $$
@@ -75,7 +75,7 @@ class Procedures extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you call rpc with head param, no data should be returned')
   @test
-  async 'call rpc with head'() {
+  async 'call rpc with head option'() {
     await this.createFunction(Procedures.sql`
     CREATE OR REPLACE FUNCTION public.test_procedure() RETURNS int language plpgsql as $$
     declare

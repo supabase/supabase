@@ -40,7 +40,7 @@ class Authentication extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When user sign up then he should not be logged in until he confirms his email')
   @test
-  async 'new users'() {
+  async 'sing up new user and sign in'() {
     // sign up user
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
 
@@ -90,7 +90,7 @@ class Authentication extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When user sign up with phone then he should be logged in')
   @test
-  async 'new users by phone'() {
+  async 'create new users by phone auth'() {
     // sign up user
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
 
@@ -129,7 +129,7 @@ class Authentication extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When user is already signed up then he should be able to log in')
   @test
-  async 'existing users'() {
+  async 'existing users should be able to login'() {
     // create user
     const fakeUser = await this.createUser()
 
@@ -168,7 +168,7 @@ class Authentication extends Hooks {
   @severity(Severity.NORMAL)
   @description('When user is signed in then he should be able to get his info and metadata')
   @test
-  async 'get user'() {
+  async 'get user should return logged in user'() {
     // create user
     const username = faker.internet.userName()
     const date = faker.date.recent().toUTCString()
@@ -207,7 +207,7 @@ class Authentication extends Hooks {
   @severity(Severity.NORMAL)
   @description('When user is signed in then he should be able update himself in auth schema')
   @test.skip
-  async 'update user'() {
+  async 'update user should update logged in user'() {
     // create user
     const fakeUser = await this.createUser()
 
@@ -254,7 +254,7 @@ class Authentication extends Hooks {
   @severity(Severity.NORMAL)
   @description('When user changes session then he still should be correctly logined')
   @test
-  async 'set session'() {
+  async 'set session should set new auth'() {
     // create user
     const fakeUser = await this.createUser()
 
@@ -286,7 +286,7 @@ class Authentication extends Hooks {
   @severity(Severity.NORMAL)
   @description('When user subscribes on auth changes then user has to receive auth updates')
   @test
-  async 'on auth state changed'() {
+  async 'on auth state changed should return events'() {
     // create user
     const fakeUser = await this.createUser()
     const events: { event: AuthChangeEvent; token: string }[] = []

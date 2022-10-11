@@ -15,7 +15,7 @@ class Realtime extends Hooks {
   @severity(Severity.BLOCKER)
   @description('When you call "on" table then connected realtime client should be returned')
   @test
-  async '[skip-stage] realtime connect'() {
+  async '[skip-stage] connect to realtime'() {
     const { supabase } = await this.createSignedInSupaClient()
 
     const channel = supabase
@@ -38,7 +38,7 @@ class Realtime extends Hooks {
   @description('When you subscrive to realtime, you have to receive updates')
   @timeout(60000)
   @test
-  async '[skip-stage] realtime receive event'() {
+  async '[skip-stage] receive event when connected to realtime'() {
     let res: any
     let t: NodeJS.Timeout
     const { supabase, user } = await this.createSignedInSupaClient()
@@ -84,7 +84,7 @@ class Realtime extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you call "on" table but not subscribe then no events have to be returned')
   @test
-  async 'no event updates until subscribe'() {
+  async 'you should get no events until subscribe'() {
     const { supabase, user } = await this.createSignedInSupaClient()
 
     const channel = supabase
@@ -110,7 +110,7 @@ class Realtime extends Hooks {
     'When you create 2 subs (1 subscribed and 1 not yet) then both should be returned on get subs'
   )
   @test
-  async 'get subscriptions'() {
+  async 'get supabase client subscriptions'() {
     const { supabase } = await this.createSignedInSupaClient()
 
     const channel1 = supabase
@@ -249,7 +249,7 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you remove one subscription then only events from another have to be returned')
   @test
-  async '[skip-stage] remove one subscription'() {
+  async '[skip-stage] remove one subscription from client'() {
     const { supabase, user } = await this.createSignedInSupaClient()
 
     const channel = supabase
@@ -275,7 +275,7 @@ class Realtime extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you remove all subscription then no events have to be returned')
   @test
-  async '[skip-stage] remove all subscriptions'() {
+  async '[skip-stage] remove all subscriptions from client'() {
     const { supabase, user } = await this.createSignedInSupaClient()
 
     const channel = supabase

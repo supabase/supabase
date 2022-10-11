@@ -14,7 +14,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you create user then it has to be in auth db schema')
   @test
-  async 'create user'() {
+  async 'create user via admin api'() {
     const { user, error } = await this.createUserAsAdmin()
     expect(error).toBeNull()
     expect(user).not.toBeNull()
@@ -24,7 +24,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you create user then he can sign in')
   @test
-  async 'create user can login'() {
+  async 'user created by admin can login'() {
     const { user, error } = await this.createUserAsAdmin()
     expect(error).toBeNull()
     expect(user).not.toBeNull()
@@ -47,7 +47,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you try to create user with anon key then you should get error')
   @test
-  async 'create user with anon key'() {
+  async 'admin create user with anon key should fail'() {
     const fakeUser = {
       email: faker.internet.exampleEmail(),
       password: faker.internet.password(),
@@ -67,7 +67,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you try to create user as logged in user then you should get error')
   @test
-  async 'create user with logged in user'() {
+  async 'admin create user with logged in user should fail'() {
     const { user } = await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
@@ -93,7 +93,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you list users then you should get all users')
   @test
-  async 'list users'() {
+  async 'list users with service key'() {
     const { user: user1 } = await this.createUserAsAdmin()
     const { user: user2 } = await this.createUserAsAdmin()
 
@@ -113,7 +113,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you try to list user with anon key then you should get error')
   @test
-  async 'list users with anon key'() {
+  async 'list users with anon key should fail'() {
     await this.createUserAsAdmin()
     await this.createUserAsAdmin()
 
@@ -131,7 +131,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you try to list user as logged in user then you should get error')
   @test
-  async 'list users as logged in user'() {
+  async 'list users as logged in user should fail'() {
     const { user } = await this.createUserAsAdmin()
     await this.createUserAsAdmin()
 
@@ -169,7 +169,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you get user by id he has to be returned')
   @test
-  async 'get user'() {
+  async 'get user should work'() {
     const { user } = await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
@@ -188,7 +188,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you update user then this user has to be updated')
   @test
-  async 'update user'() {
+  async 'update user should work'() {
     const { user } = await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
@@ -213,7 +213,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.NORMAL)
   @description('When you delete user then this user has to be removed')
   @test
-  async 'delete user'() {
+  async 'delete user should work'() {
     const { user } = await this.createUserAsAdmin()
 
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ADMIN)
@@ -235,7 +235,7 @@ class AuthenticationAPI extends Hooks {
   @severity(Severity.CRITICAL)
   @description('When you delete user with anon key you have to receive an error')
   @test
-  async 'delete user with anon key'() {
+  async 'delete user with anon key should fail'() {
     const { user } = await this.createUserAsAdmin()
     const { user: villain } = await this.createUserAsAdmin()
 
