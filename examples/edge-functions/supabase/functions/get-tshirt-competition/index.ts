@@ -3,7 +3,7 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
-import { supabaseAdminClient } from '../_shared/supabaseClient.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.0.0-rc.12'
 import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "get-tshirt-competition" up and running!`)
@@ -39,6 +39,12 @@ serve(async (req) => {
         `Sorry, that's wrong, please try again! HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
 
+    const supabaseAdminClient = createClient(
+      // Supabase API URL - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_URL') ?? '',
+      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
     // Submit email to draw
     const { error } = await supabaseAdminClient.from('get-tshirt-competition').upsert(
       {
