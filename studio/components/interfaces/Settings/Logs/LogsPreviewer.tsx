@@ -141,7 +141,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         defaultFromValue={params.iso_timestamp_start}
         onExploreClick={() => {
           router.push(
-            `/project/${projectRef}/logs-explorer?q=${encodeURIComponent(
+            `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
               params.sql || ''
             )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
               params.iso_timestamp_end || ''
