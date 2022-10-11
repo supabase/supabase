@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from '@supabase/ui'
+import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -23,7 +23,7 @@ const PolicyRow: FC<Props> = ({
   return (
     <Panel.Content
       className={[
-        'border-panel-border-light dark:border-panel-border-dark flex',
+        'flex border-panel-border-light dark:border-panel-border-dark',
         'w-full space-x-4 border-b py-4 lg:items-center',
       ].join(' ')}
     >
@@ -86,11 +86,11 @@ const PolicyRow: FC<Props> = ({
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                    'border-scale-200 border',
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-scale-1200 text-xs">
+                  <span className="text-xs text-scale-1200">
                     You need additional permissions to edit RLS policies
                   </span>
                 </div>
