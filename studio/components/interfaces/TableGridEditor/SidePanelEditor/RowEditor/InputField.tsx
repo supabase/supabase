@@ -171,7 +171,12 @@ const InputField: FC<Props> = ({
         name={field.name}
         format={field.format}
         value={field.value ?? ''}
-        description={field.comment}
+        description={
+          <>
+            {field.defaultValue && <p>Default: {field.defaultValue}</p>}
+            {field.comment && <p>{field.comment}</p>}
+          </>
+        }
         onChange={(value: any) => onUpdateField({ [field.name]: value })}
       />
     )
