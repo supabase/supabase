@@ -166,7 +166,6 @@ const InputField: FC<Props> = ({
   }
 
   if (includes(DATETIME_TYPES, field.format)) {
-    console.log(field)
     return (
       <DateTimeInput
         name={field.name}

@@ -38,13 +38,6 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
           )}
         </div>
       }
-      // descriptionText={
-      //   description && description.length !== 0
-      //     ? description
-      //     : format.includes('tz')
-      //     ? `Your local timezone will be automatically applied (${dayjs().format('ZZ')})`
-      //     : undefined
-      // }
       labelOptional={format}
       size="small"
       value={value}
