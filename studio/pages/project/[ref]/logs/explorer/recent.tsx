@@ -4,11 +4,12 @@ import { observer } from 'mobx-react-lite'
 import { Button, IconClock, IconSave, Loading } from 'ui'
 import { useStore, withAuth } from 'hooks'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
-import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import { LogSqlSnippets, NextPageWithLayout } from 'types'
+import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { content, ui } = useStore()
@@ -21,7 +22,8 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   const recent = content.recentLogSqlSnippets.slice().reverse()
 
   return (
-    <>
+    <div className="mx-auto w-full px-5 py-6 h-full">
+      <LogsExplorerHeader />
       {recent.length > 0 && (
         <Table
           head={
@@ -60,10 +62,10 @@ export const LogsSavedPage: NextPageWithLayout = () => {
           </div>
         </>
       )}
-    </>
+    </div>
   )
 }
 
-LogsSavedPage.getLayout = (page) => <LogsExplorerLayout>{page}</LogsExplorerLayout>
+LogsSavedPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
 export default observer(LogsSavedPage)

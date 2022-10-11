@@ -4,11 +4,12 @@ import { observer } from 'mobx-react-lite'
 import { IconSave, Loading } from 'ui'
 import { useStore } from 'hooks'
 import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
-import { LogsExplorerLayout } from 'components/layouts'
+import { LogsLayout } from 'components/layouts'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
+import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { content, ui } = useStore()
@@ -24,8 +25,9 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   }
   const saved = content.savedLogSqlSnippets()
   return (
-    <>
-      <div className="flex flex-col gap-3">
+    <div className="mx-auto w-full px-5 py-6 h-full">
+      <LogsExplorerHeader />
+      <div className="flex flex-col gap-3 py-6">
         {saved.length > 0 && (
           <Table
             headTrClasses="expandable-tr"
@@ -57,10 +59,10 @@ export const LogsSavedPage: NextPageWithLayout = () => {
           </p>
         </div>
       )}
-    </>
+    </div>
   )
 }
 
-LogsSavedPage.getLayout = (page) => <LogsExplorerLayout>{page}</LogsExplorerLayout>
+LogsSavedPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
 export default observer(LogsSavedPage)

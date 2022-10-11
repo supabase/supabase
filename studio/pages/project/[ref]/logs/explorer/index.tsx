@@ -3,13 +3,13 @@ import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Input, Modal, Form, Button } from 'ui'
+import { Input, Modal, Form, Button, Badge, IconList } from 'ui'
 
 import { useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { NextPageWithLayout, UserContent } from 'types'
 import { uuidv4 } from 'lib/helpers'
-import { LogsExplorerLayout } from 'components/layouts'
+import { LogsLayout } from 'components/layouts'
 import CodeEditor from 'components/ui/CodeEditor'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
@@ -24,6 +24,8 @@ import {
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
+import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -119,7 +121,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   return (
-    <>
+    <div className="mx-auto w-full px-5 py-6 h-full">
+      <LogsExplorerHeader />
+
       <div className="flex h-full flex-grow flex-col gap-4">
         <div className="rounded border">
           <LogsQueryPanel
@@ -239,10 +243,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           )}
         </Form>
       </Modal>
-    </>
+    </div>
   )
 }
 
-LogsExplorerPage.getLayout = (page) => <LogsExplorerLayout>{page}</LogsExplorerLayout>
+LogsExplorerPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
 export default observer(LogsExplorerPage)

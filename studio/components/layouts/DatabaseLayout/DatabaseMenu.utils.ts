@@ -63,34 +63,12 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           {
             title: 'Logs and Usage',
             items: [
-              {
-                name: 'API logs',
-                key: 'api-logs',
-                url: `/project/${ref}/database/api-logs`,
-                items: [],
-              },
               ...(reportsOverview
                 ? [
                     {
                       name: 'API usage',
                       key: 'api-usage',
                       url: `/project/${ref}/database/api-usage`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              {
-                name: 'Postgres logs',
-                key: 'postgres-logs',
-                url: `/project/${ref}/database/postgres-logs`,
-                items: [],
-              },
-              ...(logsRealtime
-                ? [
-                    {
-                      name: 'Realtime logs',
-                      key: 'realtime-logs',
-                      url: `/project/${ref}/database/realtime-logs`,
                       items: [],
                     },
                   ]
