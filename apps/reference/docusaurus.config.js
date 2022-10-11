@@ -123,18 +123,6 @@ const config = {
         },
       },
     ],
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: '_auth_helpers',
-        path: '_auth_helpers',
-        routeBasePath: '/reference/auth-helpers',
-        sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
-        breadcrumbs: false,
-        editUrl:
-          'https://github.com/supabase/supabase/edit/master/apps/reference/',
-      },
-    ],
   ],
 
   presets: [

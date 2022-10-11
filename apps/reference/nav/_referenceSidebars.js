@@ -251,19 +251,20 @@ const sidebars = {
         { type: 'link', label: 'Supabase API', href: '/reference/api' },
       ],
     },
-    {
-      type: 'category',
-      label: 'Community',
-      // link: { type: 'doc', id: 'about' },
-      collapsed: false,
-      items: [
-        {
-          type: 'link',
-          label: 'Supabase Auth Helpers',
-          href: '/reference/auth-helpers',
-        },
-      ],
-    },
+    // TODO: add back in with typedocs
+    // {
+    //   type: 'category',
+    //   label: 'Community',
+    //   // link: { type: 'doc', id: 'about' },
+    //   collapsed: false,
+    //   items: [
+    //     {
+    //       type: 'link',
+    //       label: 'Supabase Auth Helpers',
+    //       href: '/reference/auth-helpers',
+    //     },
+    //   ],
+    // },
     {
       type: 'category',
       label: 'Self-hosting',
