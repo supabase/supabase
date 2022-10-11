@@ -25,10 +25,10 @@ const DPA = () => {
     try {
       setError('')
 
-      const { error } = await supabase.from('dpa_downloads').insert([
+      const { error } = await supabase.from('soc2_downloads').insert([
         {
           contact_email: values.email,
-          document: 'dpa',
+          document: 'soc2',
         },
       ])
 
@@ -50,7 +50,7 @@ const DPA = () => {
           <div className="mx-auto grid max-w-2xl grid-cols-12 rounded-lg">
             <div className="col-span-12 flex items-center lg:col-span-12">
               <div className="prose flex flex-col space-y-8 p-16">
-                <h1 className="text-center text-5xl">DPA</h1>
+                <h1 className="text-center text-5xl">SOC2</h1>
                 <p>
                   We have a long-standing commitment to customer privacy and data protection, and as
                   part of that commitment we have prepared a pre-signed Data Processing Addendum
