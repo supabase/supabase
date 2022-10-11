@@ -117,7 +117,7 @@ let { user, error } = await supabase.auth.signUp({
 <TabItem value="HTTP">
 
 ```bash
-curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v2/signup' \
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 -H "apikey: SUPABASE_KEY" \
 -H "Content-Type: application/json" \
 -d '{
@@ -152,7 +152,7 @@ let { session, error } = await supabase.auth.verifyOTP({
 <TabItem value="HTTP">
 
 ```bash
-curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v2/verify' \
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
 -H "apikey: SUPABASE_KEY" \
 -H "Content-Type: application/json" \
 -d '{
@@ -199,7 +199,7 @@ let { user, error } = await supabase.auth.signInWithPassword({
 <TabItem value="HTTP">
 
 ```bash
-curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v2/token?grant_type=password' \
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=password' \
 -H "apikey: SUPABASE_KEY" \
 -H "Content-Type: application/json" \
 -d '{
@@ -235,7 +235,7 @@ let { user, error } = await supabase.auth.signInWithOtp({
 <TabItem value="HTTP">
 
 ```bash
-curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v2/otp' \
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
 -H "apikey: SUPABASE_KEY" \
 -H "Content-Type: application/json" \
 -d '{
@@ -267,7 +267,7 @@ let { session, error } = await supabase.auth.verifyOTP({
 <TabItem value="HTTP">
 
 ```bash
-curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v2/verify' \
+curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
 -H "apikey: SUPABASE_KEY" \
 -H "Content-Type: application/json" \
 -d '{
