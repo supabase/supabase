@@ -24,8 +24,15 @@ This submodule provides convenience helpers for implementing user authentication
 
 ```sh
 npm install @supabase/auth-helpers-nextjs
+```
 
-# Main components and hooks for React based frameworks (optional)
+This library supports the following tooling versions:
+
+- Node.js: `^10.13.0 || >=12.0.0`
+- Next.js: `>=10`
+
+Optionally, install **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
+```sh
 npm install @supabase/auth-helpers-react
 ```
 
@@ -34,26 +41,27 @@ npm install @supabase/auth-helpers-react
 
 ```sh
 yarn add @supabase/auth-helpers-nextjs
+```
 
-# Main components and hooks for React based frameworks (optional)
+This library supports the following tooling versions:
+
+- Node.js: `^10.13.0 || >=12.0.0`
+- Next.js: `>=10`
+
+Optionally, install **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
+
+```sh
 yarn add @supabase/auth-helpers-react
 ```
 
 </TabItem>
 </Tabs>
 
-This library supports the following tooling versions:
-
-- Node.js: `^10.13.0 || >=12.0.0`
-
-- Next.js: `>=10`
-
 ## Set up environment variables
 
-Set up the following env vars. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
+Retrieve your project URL and anon key in your project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
 
 ```bash
-# Find these in your Supabase project settings > API
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
