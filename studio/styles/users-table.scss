@@ -1,4 +1,11 @@
 .users-table-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--colors-slate9) var(--colors-slate1);
+
+  .dark & {
+    scrollbar-color: var(--colors-slate10) var(--colors-slate3o);
+  }
+
   ::-webkit-scrollbar {
     background: var(--colors-slate2);
     height: 3px;

@@ -109,7 +109,7 @@ const Users = () => {
         </div>
       </div>
       <section className="users-table-container mt-4 overflow-visible px-6">
-        <div className="section-block--body relative overflow-scroll rounded">
+        <div className="section-block--body relative overflow-x-scroll rounded">
           <div className="inline-block min-w-full align-middle">
             <UsersList />
           </div>
