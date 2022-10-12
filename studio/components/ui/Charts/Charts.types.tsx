@@ -2,6 +2,7 @@ export interface CommonChartProps<D>
   extends Pick<
     HeaderType<D>,
     | 'highlightedValue'
+    | 'highlightedLabel'
     | 'customDateFormat'
     | 'data'
     | 'format'
@@ -16,6 +17,7 @@ export type HeaderType<D> = {
   focus: number | null
   format?: string
   highlightedValue?: number | string
+  highlightedLabel?:  string
   data: D[]
   customDateFormat?: string
   label: string
