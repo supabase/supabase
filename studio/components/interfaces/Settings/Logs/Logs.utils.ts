@@ -1,6 +1,7 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
+import { StripeSubscription } from 'components/interfaces/Billing'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -130,10 +131,10 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     case 'postgres_logs':
-      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table} 
-  cross join unnest(metadata) as m 
-  cross join unnest(m.parsed) as parsed 
-  ${where} 
+      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+  ${where}
   limit 100
   `
 
@@ -145,7 +146,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     `
 
     case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request
@@ -156,7 +157,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
-  limit 100          
+  limit 100
   `
   }
 }
@@ -166,6 +167,18 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
  */
 export const genSingleLogQuery = (table: LogsTableName, id: string) =>
   `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
+
+/**
+ * Determine if we should show the user an upgrade prompt while browsing logs
+ */
+export const maybeShowUpgradePrompt = (
+  from: string | null | undefined,
+  tierKey?: StripeSubscription['tier']["key"]
+) => {
+  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+
+  return (day > 1 && tierKey === 'FREE') || (day > 7 && tierKey === 'PRO') || day > 90 && tierKey === 'ENTERPRISE'
+}
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
@@ -209,11 +222,10 @@ SELECT
 FROM
   ${table} t
   cross join unnest(t.metadata) as metadata
-  ${
-    where
+  ${where
       ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
       : `where t.timestamp > '${startOffset.toISOString()}'`
-  }
+    }
 GROUP BY
 timestamp
 ORDER BY

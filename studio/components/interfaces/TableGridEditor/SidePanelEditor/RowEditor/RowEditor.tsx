@@ -57,7 +57,7 @@ const RowEditor: FC<Props> = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable, isNewRecord)
+      const rowFields = generateRowFields(row, selectedTable)
       setRowFields(rowFields)
     }
   }, [visible])
@@ -147,6 +147,7 @@ const RowEditor: FC<Props> = ({
 
   return (
     <SidePanel
+      hideFooter
       size="large"
       key="RowEditor"
       visible={visible}
@@ -155,7 +156,6 @@ const RowEditor: FC<Props> = ({
         isEditingJson || isViewingReferenceRow ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
-      hideFooter
       onInteractOutside={(event) => {
         const isToast = (event.target as Element)?.closest('#toast')
         if (isToast) {

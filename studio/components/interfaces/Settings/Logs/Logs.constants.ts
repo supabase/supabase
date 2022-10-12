@@ -21,7 +21,7 @@ export const TEMPLATES: LogTemplate[] = [
     description: 'Count of commits made by users on the database',
     mode: 'custom',
     searchString: `select
-  p.user_name, 
+  p.user_name,
   count(*) as count
 from postgres_logs
   left join unnest(metadata) as m on true
@@ -38,7 +38,7 @@ group by
     description: 'List all IP addresses that used the Supabase API',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   h.x_real_ip
 from edge_logs
   left join unnest(metadata) as m on true
@@ -52,8 +52,8 @@ where h.x_real_ip is not null
     label: 'Requests by Country',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
-    searchString: `select 
-  cf.country, 
+    searchString: `select
+  cf.country,
   count(*) as count
 from edge_logs
   left join unnest(metadata) as m on true
@@ -71,11 +71,11 @@ order by
     mode: 'custom',
     description: 'List all Supabase API requests that are slow',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.origin_time
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.origin_time > 1000
@@ -90,11 +90,11 @@ limit 100
     description: 'List all Supabase API requests that responded witha 5XX status code',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.status_code
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.status_code >= 500
@@ -113,11 +113,11 @@ limit 100
   r.search as params,
   count(timestamp) as c
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
-group by 
+group by
   path,
-  params 
+  params
 order by
   c desc
 limit 100
@@ -132,7 +132,7 @@ limit 100
   cast(timestamp as datetime) as timestamp,
   event_message
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
 where
   path like '%rest/v1%'
@@ -453,14 +453,14 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     calcTo: () => '',
   },
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     default: true,
