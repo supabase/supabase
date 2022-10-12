@@ -9,7 +9,6 @@ import { get } from 'lib/common/fetch'
 import { BarChart } from './ChartRenderer'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import { ChartData } from './ChartHandler.types'
-import { AreaProps } from 'recharts'
 
 interface Props {
   label: string
@@ -20,7 +19,6 @@ interface Props {
   interval: string
   customDateFormat?: string
   children?: ReactNode
-  highlight?: 'total' | 'average' | 'maximum'
   defaultChartStyle?: 'bar' | 'line'
   hideChartType?: boolean
   data?: ChartData
@@ -28,7 +26,6 @@ interface Props {
   format?: string
   highlightedValue?: string | number
   onBarClick?: (v: any) => void
-  areaType?: AreaProps['type']
 }
 
 /**
@@ -49,7 +46,6 @@ const ChartHandler: FC<Props> = ({
   interval,
   customDateFormat,
   children = null,
-  highlight,
   defaultChartStyle = 'bar',
   hideChartType = false,
   data,
@@ -57,7 +53,6 @@ const ChartHandler: FC<Props> = ({
   format,
   highlightedValue,
   onBarClick,
-  areaType,
 }) => {
   const router = useRouter()
   const { ref } = router.query
