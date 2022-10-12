@@ -45,7 +45,7 @@ jobs:
         uses: boostsecurityio/boostsec-scanner-github@v4
         with:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
-          registry_module: boostsecurityio/semgrep-scanner
+          registry_module: boostsecurityio/semgrep
         env:
           SEMGREP_RULES: p/javascript
               
