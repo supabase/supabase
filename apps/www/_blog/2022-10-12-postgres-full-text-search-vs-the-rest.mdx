@@ -1,6 +1,6 @@
 ---
-title: Postgres FTS vs. the rest
-description: 
+title: Postgres FTS vs the rest
+description: Comparing one of the most popular Postgres features against alternatives
 author: victor
 image: postgres-fts-vs-the-rest/postgres-full-text-search.jpg
 thumb: postgres-fts-vs-the-rest/postgres-full-text-search.jpg
@@ -68,10 +68,11 @@ values
 );
 ```
 
-### Basic searching with `select` and `like`
+### Basic searching with select and like
 
 With nothing but the raw data in your database, we can actually do some *basic* searching using `select` and comparison tools like `like`.
 
+```
 select 
 	*
 from 
@@ -80,7 +81,7 @@ where
   title like '%Avengers%'
 	or 
 	overview like '%Avengers%';
-
+```
 
 The `LIKE` [operator](https://www.postgresql.org/docs/current/functions-matching.html#FUNCTIONS-LIKE) as used in the query above will match *only* the term "Avengers", but it will match it in any part of a given row's `title` or `overview`.
 
@@ -382,6 +383,7 @@ With the `ingest` and `query` machinery defined for the search engines, it's eas
 | `opensearch`  | "romance"    | `383`             | `23.9`       | `0.0625`                |
 | `opensearch`  | "comedy"     | `756`             | `40.1`       | `0.0531`                |
 | `opensearch`  | "awakening"  | `32`              | `9.84`       | `0.307`                 |
+
 ## What does the data tell us?
 
 There's a *lot* of tuning left undone here, but a few points stand out right away:
