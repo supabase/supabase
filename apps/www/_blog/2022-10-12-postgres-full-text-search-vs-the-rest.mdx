@@ -278,7 +278,7 @@ Similar to ingesting data, all the search engines take slightly different input 
 
 Here's what that script looks like for Postgres:
 
-```
+```sql
 // Querying search phrases
 async function query({ phrase, pool }) {
   const results = await pool.query(sql`
