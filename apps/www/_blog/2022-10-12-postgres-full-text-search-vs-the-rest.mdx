@@ -133,11 +133,8 @@ create index movies_fts_doc_en_idx
 Postgres supports even more features like [facilities for ranking search results](https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING) but for now we'll simply use `title`, `original_title`, and `overview` as they are.
 
 ``` select 
-	*
-from 
-	movies
-where 
-	doc_en @@ websearch_to_tsquery('english', 'Avengers'); 
+	* from movies
+where doc_en @@ websearch_to_tsquery('english', 'Avengers'); 
 ```
   
 ## Comparable FTS engines
@@ -217,6 +214,7 @@ Each system ingests data slightly differently, but with a little scripting we ca
 
 Here's an example of the `ingest` function used for Postgres (with `[slonik](https://github.com/gajus/slonik)` as our DB driver):
 
+```
 // Ingesting search documents
 async function ingest({ document, pool }) {
   // Ignore rows without proper release dates
@@ -248,6 +246,7 @@ on conflict (id) do update set
 ;
 `);
 }
+```
 
 The [repo](https://github.com/VADOSWARE/fts-benchmark/) contains the complete code for Postgres as well as the other search engines, written in much this same fashion.
 
