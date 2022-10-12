@@ -215,6 +215,7 @@ Each system ingests data slightly differently, but with a little scripting we ca
 
 Here's an example of the `ingest` function used for Postgres (with `[slonik](https://github.com/gajus/slonik)` as our DB driver):
 
+```js
 ```
 // Ingesting search documents
 async function ingest({ document, pool }) {
