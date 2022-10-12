@@ -41,7 +41,7 @@
 
 আমরা বর্তমানে পাবলিক বিটাতে আছি। বড় আপডেটের বিজ্ঞপ্তি পেতে এই রেপোর "রিলিজ" দেখুন।
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="এই রেপো দেখুন"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="এই রেপো দেখুন"/></kbd>
 
 ---
 
@@ -54,7 +54,7 @@
 সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://app.supabase.com)। আপনি সাইন আপ করতে পারেন এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
 এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [স্থানীয়ভাবে বিকাশ](https://supabase.com/docs/guides/local-development) করতে পারেন।
 
-![আর্কিটেকচার](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![আর্কিটেকচার](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) হল একটি অবজেক্ট-রিলেশনাল ডাটাবেস সিস্টেম যার 30 বছরের বেশি সক্রিয় বিকাশ রয়েছে যা এটিকে নির্ভরযোগ্যতা, বৈশিষ্ট্যের দৃঢ়তা এবং কর্মক্ষমতার জন্য একটি শক্তিশালী খ্যাতি অর্জন করেছে।
 - [রিয়েলটাইম](https://github.com/supabase/realtime) হল একটি Elixir সার্ভার যা আপনাকে ওয়েবসকেট ব্যবহার করে PostgreSQL সন্নিবেশ, আপডেট এবং মুছে ফেলা শুনতে দেয়। ডাটাবেস পরিবর্তনের জন্য রিয়েলটাইম পোল পোস্টগ্রেসের অন্তর্নির্মিত প্রতিলিপি কার্যকারিতা, পরিবর্তনগুলিকে JSON-এ রূপান্তরিত করে, তারপর অনুমোদিত ক্লায়েন্টদের কাছে ওয়েবসকেটের মাধ্যমে JSON সম্প্রচার করে।

@@ -154,9 +154,9 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Functions',
+      label: 'Edge Functions',
       collapsed: true,
-      items: ['guides/functions'],
+      items: ['guides/functions', 'guides/functions/cicd-workflow'],
     },
     {
       type: 'category',
@@ -164,9 +164,8 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/realtime',
-        'guides/realtime/broadcast',
-        'guides/realtime/presence',
-        'guides/realtime/postgres-changes',
+        'guides/realtime/quickstart',
+        'guides/realtime/postgres-cdc',
       ],
     },
     {
@@ -252,19 +251,20 @@ const sidebars = {
         { type: 'link', label: 'Supabase API', href: '/reference/api' },
       ],
     },
-    {
-      type: 'category',
-      label: 'Community',
-      // link: { type: 'doc', id: 'about' },
-      collapsed: false,
-      items: [
-        {
-          type: 'link',
-          label: 'Supabase Auth Helpers',
-          href: '/reference/auth-helpers',
-        },
-      ],
-    },
+    // TODO: add back in with typedocs
+    // {
+    //   type: 'category',
+    //   label: 'Community',
+    //   // link: { type: 'doc', id: 'about' },
+    //   collapsed: false,
+    //   items: [
+    //     {
+    //       type: 'link',
+    //       label: 'Supabase Auth Helpers',
+    //       href: '/reference/auth-helpers',
+    //     },
+    //   ],
+    // },
     {
       type: 'category',
       label: 'Self-hosting',
