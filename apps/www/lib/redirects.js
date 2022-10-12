@@ -1343,6 +1343,21 @@ module.exports = [
     source: '/docs/guides/client-libraries',
     destination: '/docs/reference',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers',
+    destination: '/docs/guides/auth/auth-helpers/',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers/next-js',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers/sveltekit',
+    destination: '/docs/guides/auth/auth-helpers/sveltekit',
+  },
 
   // V2 redirects
   // {
