@@ -27,8 +27,7 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
           <div className="space-y-4">
             <p className="text-sm">
               Logs can be retained up to a duration of 3 months depending on the plan that your
-              project is on. The table below shows an overview of the duration for which your logs
-              will be retained for based on each plan.
+              project is on.
             </p>
             <div className="border-scale-600 bg-scale-500 rounded border">
               <div className="flex items-center px-4 pt-2 pb-1">

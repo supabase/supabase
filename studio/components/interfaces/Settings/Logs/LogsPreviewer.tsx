@@ -80,7 +80,7 @@ export const LogsPreviewer: React.FC<Props> = ({
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier as StripeProduct)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier?.key)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
@@ -129,7 +129,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         },
       })
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier as StripeProduct)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
 
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)

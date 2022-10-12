@@ -11,7 +11,7 @@ export const useUpgradePrompt = (from: string) => {
   const tier = subscription?.tier
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
-  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier as StripeProduct)
+  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
 
   useEffect(() => {
     if (shouldShowUpgradePrompt) {
