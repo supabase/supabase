@@ -173,11 +173,11 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
  */
 export const maybeShowUpgradePrompt = (
   from: string | null | undefined,
-  tier: StripeSubscription['tier']
+  tierKey?: StripeSubscription['tier']["key"]
 ) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
-  return day > 1 && tier?.key === 'FREE'
+  return (day > 1 && tierKey === 'FREE') || (day > 7 && tierKey === 'PRO') || day > 90 && tierKey === 'ENTERPRISE'
 }
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
@@ -222,11 +222,10 @@ SELECT
 FROM
   ${table} t
   cross join unnest(t.metadata) as metadata
-  ${
-    where
+  ${where
       ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
       : `where t.timestamp > '${startOffset.toISOString()}'`
-  }
+    }
 GROUP BY
 timestamp
 ORDER BY

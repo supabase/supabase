@@ -152,42 +152,41 @@ test('query warnings', async () => {
   await screen.findByText('1 warning')
 })
 
-describe.each(['tier_free', 'tier_pro', 'tier_enterprise'])(
-  'upgrade modal for %s',
-  (supabase_prod_id) => {
-    beforeEach(() => {
-      useProjectSubscription.mockReturnValue({
-        subscription: {
-          tier: {
-            supabase_prod_id,
-          },
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
         },
-      })
+      },
     })
-    test.only('based on query params', async () => {
-      const router = defaultRouterMock()
-      router.query = {
-        ...router.query,
-        q: 'some_query',
-        its: dayjs().subtract(4, 'months').toISOString(),
-        ite: dayjs().toISOString(),
-      }
-      useRouter.mockReturnValue(router)
-      render(<LogsExplorerPage />)
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(5, 'month').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsExplorerPage />)
+    await screen.findByText(/Log retention/) // assert modal title is present
+  })
 
+  test('based on datepicker helpers', async () => {
+    render(<LogsExplorerPage />)
+    // click on the dropdown
+    clickDropdown(await screen.findByText('Last 24 hours'))
+    userEvent.click(await screen.findByText('Last 3 days'))
+
+    // only free tier will show modal
+    if (key === 'FREE') {
       await screen.findByText('Log retention') // assert modal title is present
-    })
-
-    test.only('based on datepicker helpers', async () => {
-      render(<LogsExplorerPage />)
-      // click on the dropdown
-      clickDropdown(await screen.findByText('Last 24 hours'))
-      userEvent.click(await screen.findByText('Last 3 days'))
-
-      // only free tier will show modal
-      if (supabase_prod_id === 'tier_free') {
-        await screen.findByText('Log retention') // assert modal title is present
-      }
-    })
-  }
-)
+    } else {
+      await expect(screen.findByText('Log retention')).rejects.toThrow()
+    }
+  })
+})
