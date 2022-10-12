@@ -31,6 +31,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   customDateFormat = DateTimeFormats.FULL,
   title,
   highlightedValue,
+  highlightedLabel,
   displayDateInUtc,
   minimalHeader,
 }) => {
@@ -42,15 +43,15 @@ const AreaChart: React.FC<AreaChartProps> = ({
   if (data.length === 0) return <ChartNoData />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
-  const highlightedLabel =
+  const resolvedHighlightedLabel =
     (focusDataIndex !== null &&
       data &&
       data[focusDataIndex] &&
       day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
-    null
+    highlightedLabel
 
   const resolvedHighlightedValue =
-    highlightedValue || (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : null)
+     (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : null) || highlightedValue
 
   return (
     <>
@@ -59,7 +60,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
         format={format}
         customDateFormat={customDateFormat}
         highlightedValue={resolvedHighlightedValue}
-        highlightedLabel={highlightedLabel}
+        highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
       />
       <ResponsiveContainer width="100%" height={chartHeight}>
