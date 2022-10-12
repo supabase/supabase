@@ -6,6 +6,7 @@ import { useFlag } from 'hooks'
 export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
   const logsRealtime = useFlag('logsRealtime')
+  const reportsOverview = useFlag('reportsOverview')
 
   return [
     {
@@ -65,13 +66,22 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
               },
             ]
           : []),
-
         ...(logsRealtime
           ? [
               {
                 name: 'Realtime logs',
                 key: 'realtime-logs',
                 url: `/project/${ref}/logs/realtime-logs`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM && reportsOverview
+          ? [
+              {
+                name: 'API usage',
+                key: 'api-usage',
+                url: `/project/${ref}/logs/api-usage`,
                 items: [],
               },
             ]

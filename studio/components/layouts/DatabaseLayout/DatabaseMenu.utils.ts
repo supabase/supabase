@@ -58,24 +58,5 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
         },
       ],
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            title: 'Logs and Usage',
-            items: [
-              ...(reportsOverview
-                ? [
-                    {
-                      name: 'API usage',
-                      key: 'api-usage',
-                      url: `/project/${ref}/database/api-usage`,
-                      items: [],
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]
-      : []),
   ]
 }
