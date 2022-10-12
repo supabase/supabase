@@ -313,5 +313,6 @@ serve(async (req) => {
   - Cannot write to File System
 - Edge Functions
   - Local development - only one function at a time
-  - Supabase Functions only supports `GET` and `POST` requests.
+  - Supabase Functions only supports `POST`, `OPTIONS`, and `GET` requests.
+  - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
   - Supabase Functions do not support HTML responses.
