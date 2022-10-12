@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 import PresetReport from 'components/interfaces/Reports/PresetReport'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
-import { DatabaseLayout } from 'components/layouts'
+import { LogsLayout } from 'components/layouts'
 
 export const ApiUsagePage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -13,6 +13,6 @@ export const ApiUsagePage: NextPageWithLayout = () => {
   return <PresetReport preset={Presets.OVERVIEW} projectRef={ref as string} />
 }
 
-ApiUsagePage.getLayout = (page) => <DatabaseLayout>{page}</DatabaseLayout>
+ApiUsagePage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
 export default observer(ApiUsagePage)
