@@ -20,6 +20,6 @@ You can use the `supabase-js` library to:
 ## Additional Links
 
 - Source Code: [github.com/supabase/supabase-js](https://github.com/supabase/supabase-js)
-- TypeDoc: [supabase.github.io/supabase-js](https://supabase.github.io/supabase-js)
+- TypeDoc: [supabase.github.io/supabase-js](https://supabase.github.io/supabase-js/v2/)
 - NPM: [npmjs.com/package/@supabase/supabase-js](https://www.npmjs.com/package/@supabase/supabase-js)
 - [Known bugs and issues](https://github.com/supabase/supabase-js/issues)
