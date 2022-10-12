@@ -132,7 +132,8 @@ create index movies_fts_doc_en_idx
 
 Postgres supports even more features like [facilities for ranking search results](https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING) but for now we'll simply use `title`, `original_title`, and `overview` as they are.
 
-``` select 
+```sql
+select 
 	* from movies
 where doc_en @@ websearch_to_tsquery('english', 'Avengers'); 
 ```
