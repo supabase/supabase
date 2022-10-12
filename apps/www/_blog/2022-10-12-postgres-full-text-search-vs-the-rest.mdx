@@ -11,7 +11,7 @@ toc_depth: 3
 ---
 Postgres is one of the best F/OSS databases partly because of its immense feature-set.
 
-One of my favorite Postgres features is [Full Text Search](https://www.postgresql.org/docs/current/textsearch.html) (FTS). Search is a common requirement of applications. Well-known search engines like [Solr](https://solr.apache.org/) and [ElasticSearch](https://www.elastic.co/elasticsearch) are often a first choice, but with Postgres in your stack you've got a great chance for [Pareto improvement](https://en.wikipedia.org/wiki/Pareto_principle) at low complexity cost.
+One of my favorite Postgres features is [Full Text Search](https://supabase.com/docs/guides/database/full-text-search) (FTS). Search is a common requirement of applications. Well-known search engines like [Solr](https://solr.apache.org/) and [ElasticSearch](https://www.elastic.co/elasticsearch) are often a first choice, but with Postgres in your stack you've got a great chance for [Pareto improvement](https://en.wikipedia.org/wiki/Pareto_principle) at low complexity cost.
 
 Many projects function just fine with Postgres Full Text Search and other [built-in](https://www.postgresql.org/docs/current/contrib.html) extensions like [trigram search (`pg_trgm`)](https://www.postgresql.org/docs/current/pgtrgm.html). [GitLab's blog has a great article](https://about.staging.gitlab.com/blog/2016/03/18/fast-search-using-postgresql-trigram-indexes/) on their use of Trigram indices to speed up search.
 
@@ -418,4 +418,13 @@ We've chosen specifically to keep the search tight because we received feedback 
 While this certainly isn't "big data", it looks like Postgres has very much held it's own, even without too much wrangling/tuning. Postgres is clearly more than capable of delivering *good enough* search for this very basic case.
 
 Special purpose systems are expected to out-perform a more general system like Postgres, but clearly result quality and search speed provided Postgres is likely to be *good enough* for many use cases, and is “complexity neutral” -- no new systems needed!
+
+## More Postgres resources
+
+- [Postgres WASM by Snaplet and Supabase](https://supabase.com/blog/postgres-wasm)
+- [Choosing a Postgres Primary Key](https://supabase.com/blog/choosing-a-postgres-primary-key)
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://supabase.com/postgresql-views)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)
 
