@@ -113,7 +113,7 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
       : []),
     {
       key: 'api',
-      label: 'API',
+      label: 'API Docs',
       icon: <IconFileText size={18} strokeWidth={2} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },

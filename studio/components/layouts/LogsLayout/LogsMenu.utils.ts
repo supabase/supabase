@@ -31,22 +31,16 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
         },
         {
           name: 'PostgREST logs',
-          key: 'api-logs',
-          url: `/project/${ref}/database/api-logs`,
-          items: [],
-        },
-        {
-          name: 'API logs(?)',
-          key: 'api-logs',
-          url: `/project/${ref}/database/api-logs`,
+          key: 'postgrest-logs',
+          url: `/project/${ref}/logs/postgrest-logs`,
           items: [],
         },
         ...(IS_PLATFORM
           ? [
               {
                 name: 'Auth logs',
-                key: 'logs',
-                url: `/project/${ref}/auth/logs`,
+                key: 'auth-logs',
+                url: `/project/${ref}/logs/auth-logs`,
                 items: [],
               },
             ]
@@ -65,8 +59,8 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
           ? [
               {
                 name: 'Storage logs',
-                key: 'logs',
-                url: `/project/${ref}/storage/logs`,
+                key: 'storage-logs',
+                url: `/project/${ref}/logs/storage-logs`,
                 items: [],
               },
             ]
@@ -77,7 +71,7 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
               {
                 name: 'Realtime logs',
                 key: 'realtime-logs',
-                url: `/project/${ref}/database/realtime-logs`,
+                url: `/project/${ref}/logs/realtime-logs`,
                 items: [],
               },
             ]
