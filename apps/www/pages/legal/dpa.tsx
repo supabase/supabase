@@ -20,7 +20,6 @@ const DPA = () => {
   })
 
   const handleFormSubmit = async (values: typeof INITIAL_VALUES, { resetForm }: any) => {
-    console.log('handleFormSubmit ran', values)
     try {
       setError(undefined)
       const { error } = await supabase
@@ -31,7 +30,7 @@ const DPA = () => {
 
       resetForm()
       setFormSubmitted(true)
-      window.open('https://supabase.com/downloads/docs/legal/dpa.pdf', '_blank')
+      window.open('https://supabase.com/downloads/docs/Supabase+DPA.pdf', '_blank')
     } catch (error: any) {
       setError(error.message)
     }
@@ -58,7 +57,8 @@ const DPA = () => {
 
                 {formSubmitted ? (
                   <p className="text-brand-900">
-                    A new tab should have opened with the DPA document
+                    Thank you for your submission! A new tab should have opened with the DPA
+                    document
                   </p>
                 ) : (
                   <Form
@@ -83,6 +83,7 @@ const DPA = () => {
                               htmlType="submit"
                               type="default"
                               iconRight={<IconDownload />}
+                              className="mr-1"
                               loading={isSubmitting}
                             >
                               Download DPA document

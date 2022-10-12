@@ -1,40 +1,10 @@
-import * as Yup from 'yup'
 import Link from 'next/link'
-import { useState } from 'react'
-import { Button, Form, Input } from '@supabase/ui'
-
-import supabase from '~/lib/supabase'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import SOC2RequestForm from '~/components/SOC2RequestForm'
 
 const SOC2 = () => {
-  const [email, setEmail] = useState<string>('')
-  const [error, setError] = useState<string>()
-  const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
-
-  const INITIAL_VALUES = { email: '' }
-
-  const FormSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('Required'),
-  })
-
-  const handleFormSubmit = async (values: typeof INITIAL_VALUES, { resetForm }: any) => {
-    console.log('handleFormSubmit ran', values)
-    try {
-      setError(undefined)
-      const { error } = await supabase
-        .from('soc2_downloads')
-        .insert([{ contact_email: values.email, document: 'soc2' }])
-
-      if (error) throw error
-
-      resetForm()
-      setFormSubmitted(true)
-    } catch (error: any) {
-      setError(error.message)
-    }
-  }
   return (
     <Layout>
       <SectionContainer>
@@ -49,49 +19,12 @@ const SOC2 = () => {
               </p>
 
               <p>
-                You can request for our latest SOC 2 document through our{' '}
+                You can request for our latest SOC 2 document either through our{' '}
                 <Link href="https://security.supabase.com/">security portal</Link>, or by submitting
-                your email here.
+                your request here.
               </p>
 
-              {formSubmitted ? (
-                <p className="text-brand-900">
-                  Thank you for your submission! A member from the Supabase team will reach out to
-                  you shortly!
-                </p>
-              ) : (
-                <Form
-                  initialValues={INITIAL_VALUES}
-                  validationSchema={FormSchema}
-                  onSubmit={handleFormSubmit}
-                >
-                  {({ isSubmitting }: any) => (
-                    <>
-                      <Input
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        type="email"
-                        name="email"
-                        id="email"
-                        required
-                        descriptionText="We only keep a record of your email so we can update you when the document has been updated."
-                        placeholder="Your email address"
-                        actions={
-                          <Button
-                            htmlType="submit"
-                            type="default"
-                            loading={isSubmitting}
-                            className="mr-1"
-                          >
-                            Request SOC2 document
-                          </Button>
-                        }
-                      />
-                      {error && <p>{error}</p>}
-                    </>
-                  )}
-                </Form>
-              )}
+              <SOC2RequestForm />
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@ const HUBSPOT_PORTAL = Deno.env.get('HUBSPOT_PORTAL')
 const PARTNER_FORM_ID = Deno.env.get('PARTNER_FORM_ID')
 const ENTERPRISE_FORM_ID = Deno.env.get('ENTERPRISE_FORM_ID')
 const DPA_FORM_ID = Deno.env.get('DPA_FORM_ID')
-const SOC2_FORM_ID = Deno.env.get('DPA_FORM_ID')
+const SOC2_FORM_ID = Deno.env.get('SOC2_FORM_ID')
 
 serve(async (req) => {
   const requestSecret = req.headers.get('x-function-secret')
@@ -28,7 +28,6 @@ serve(async (req) => {
   const jobtitle = input.record.title
   const website = input.record.website
   const partner_gallery_type = input.record.type
-  const document = input.document
 
   let formData: object = { email }
 
@@ -36,6 +35,7 @@ serve(async (req) => {
     case 'partner_contacts':
       formData = { ...formData, jobtitle, website, partner_gallery_type }
       break
+    case 'soc2_requests':
     case 'enterprise_contacts':
       formData = {
         ...formData,
@@ -50,9 +50,11 @@ serve(async (req) => {
         firstName,
       }
       break
-    case 'soc2_downloads':
     case 'dpa_downloads':
-      formData = { ...formData, document }
+      formData = { ...formData }
+      break
+    default:
+      break
   }
 
   const fields: { objectTypeId: '0-1'; name: string; value: string }[] = []
@@ -60,7 +62,14 @@ serve(async (req) => {
     fields.push({ objectTypeId: '0-1', name: key, value: value || 'NOT_PROVIDED' })
   }
 
-  const formId = input.table === 'partner_contacts' ? PARTNER_FORM_ID : ENTERPRISE_FORM_ID
+  const formId =
+    input.table === 'partner_contacts'
+      ? PARTNER_FORM_ID
+      : input.table === 'dpa_downloads'
+      ? DPA_FORM_ID
+      : input.table === 'soc2_requests'
+      ? SOC2_FORM_ID
+      : ENTERPRISE_FORM_ID
 
   // Using HubSpot's submit data to a form API
   // https://legacydocs.hubspot.com/docs/methods/forms/submit_form
