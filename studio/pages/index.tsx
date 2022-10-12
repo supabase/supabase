@@ -1,18 +1,38 @@
-import { observer } from 'mobx-react-lite'
-import { NextRouter, useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { withAuth } from 'hooks'
-import { auth } from 'lib/gotrue'
-import { NextPageWithLayout } from 'types'
-import Landing from 'components/interfaces/Home/Landing'
 import LoginForm from 'components/interfaces/Login/LoginForm'
 import LoginWithGitHub from 'components/interfaces/Login/LoginWithGitHub'
-import { AccountLayoutWithoutAuth, LoginLayout } from 'components/layouts'
+import { LoginLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading'
+import { auth } from 'lib/gotrue'
 import Link from 'next/link'
+import { NextRouter, useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { NextPageWithLayout } from 'types'
+
+// detect for redirect from 3rd party service like vercel, aws...
+const isRedirectFromThirdPartyService = (router: NextRouter) => router.query.next !== undefined
 
 const LoginPage: NextPageWithLayout = () => {
-  return (
+  const router = useRouter()
+  const autoLogin = isRedirectFromThirdPartyService(router)
+
+  useEffect(() => {
+    if (autoLogin) {
+      const queryParams = (router.query as any) || {}
+      const params = new URLSearchParams(queryParams)
+
+      // trigger github signIn
+      auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?${params.toString()}`,
+        },
+      })
+    }
+  }, [])
+
+  return autoLogin ? (
+    <Connecting />
+  ) : (
     <>
       <div className="flex flex-col gap-4">
         <LoginWithGitHub />
@@ -57,73 +77,3 @@ LoginPage.getLayout = (page) => (
 )
 
 export default LoginPage
-
-// detect for redirect from 3rd party service like vercel, aws...
-const isRedirectFromThirdPartyService = (router: NextRouter) => router.query.next !== undefined
-
-const UnauthorizedLanding = () => {
-  const router = useRouter()
-  const autoLogin = isRedirectFromThirdPartyService(router)
-
-  useEffect(() => {
-    if (autoLogin) {
-      const queryParams = (router.query as any) || {}
-      const params = new URLSearchParams(queryParams)
-      // trigger github signIn
-      auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?${params.toString()}`,
-        },
-      })
-    }
-  }, [])
-
-  return autoLogin ? <Connecting /> : <Landing />
-}
-
-const IndexLayout = withAuth(
-  observer(({ children }) => {
-    const router = useRouter()
-
-    // if (!profile) {
-    //   return <UnauthorizedLanding />
-    // } else {
-    //   const isRedirect = isRedirectFromThirdPartyService(router)
-    //   if (isRedirect) {
-    //     const queryParams = (router.query as any) || {}
-    //     const params = new URLSearchParams(queryParams)
-    //     if (router.query?.next?.includes('https://vercel.com')) {
-    //       router.push(`/vercel/integrate?${params.toString()}`)
-    //     } else if (router.query?.next?.includes('new-project')) {
-    //       router.push('/new/project')
-    //     } else if (router.query?.next?.includes('join')) {
-    //       router.push(`/${router.query.next}`)
-    //     } else if (
-    //       typeof router.query?.next === 'string' &&
-    //       router.query?.next?.startsWith('project/_/')
-    //     ) {
-    //       router.push(router.query.next as string)
-    //     } else {
-    //       router.push('/')
-    //     }
-
-    //     return <Connecting />
-    //   }
-    // }
-
-    return (
-      <AccountLayoutWithoutAuth
-        title="Supabase"
-        breadcrumbs={[
-          {
-            key: `supabase-projects`,
-            label: 'Projects',
-          },
-        ]}
-      >
-        {children}
-      </AccountLayoutWithoutAuth>
-    )
-  })
-)
