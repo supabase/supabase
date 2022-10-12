@@ -4,6 +4,8 @@ const FUNCTION_SECRET = Deno.env.get('FUNCTION_SECRET')
 const HUBSPOT_PORTAL = Deno.env.get('HUBSPOT_PORTAL')
 const PARTNER_FORM_ID = Deno.env.get('PARTNER_FORM_ID')
 const ENTERPRISE_FORM_ID = Deno.env.get('ENTERPRISE_FORM_ID')
+const DPA_FORM_ID = Deno.env.get('DPA_FORM_ID')
+const SOC2_FORM_ID = Deno.env.get('DPA_FORM_ID')
 
 serve(async (req) => {
   const requestSecret = req.headers.get('x-function-secret')
@@ -28,39 +30,29 @@ serve(async (req) => {
   const partner_gallery_type = input.record.type
   const document = input.document
 
-  let formData: object = {
-    email,
-  }
+  let formData: object = { email }
 
-  if (input.table === 'partner_contacts') {
-    formData = {
-      ...formData,
-      jobtitle,
-      website,
-      partner_gallery_type,
-    }
-  }
-
-  if (input.table === 'enterprise_contacts') {
-    formData = {
-      ...formData,
-      supabase_table_id,
-      country,
-      form_note,
-      company,
-      company_size,
-      email,
-      phone,
-      lastName,
-      firstName,
-    }
-  }
-
-  if (input.table === 'dpa_downloads') {
-    formData = {
-      ...formData,
-      document,
-    }
+  switch (input.table) {
+    case 'partner_contacts':
+      formData = { ...formData, jobtitle, website, partner_gallery_type }
+      break
+    case 'enterprise_contacts':
+      formData = {
+        ...formData,
+        supabase_table_id,
+        country,
+        form_note,
+        company,
+        company_size,
+        email,
+        phone,
+        lastName,
+        firstName,
+      }
+      break
+    case 'soc2_downloads':
+    case 'dpa_downloads':
+      formData = { ...formData, document }
   }
 
   const fields: { objectTypeId: '0-1'; name: string; value: string }[] = []
