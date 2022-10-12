@@ -394,32 +394,27 @@ test('filters accept filterOverride', async () => {
   })
 })
 
-
-
-describe.each(['FREE', 'PRO', 'ENTERPRISE'])(
-  'upgrade modal for %s',
-  (key) => {
-    beforeEach(() => {
-      useProjectSubscription.mockReturnValue({
-        subscription: {
-          tier: {
-            supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
-            key
-          },
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
         },
-      })
+      },
     })
-    test('based on query params', async () => {
-      const router = defaultRouterMock()
-      router.query = {
-        ...router.query,
-        q: 'some_query',
-        its: dayjs().subtract(4, 'months').toISOString(),
-        ite: dayjs().toISOString(),
-      }
-      useRouter.mockReturnValue(router)
-      render(<LogsExplorerPage />)
-      await screen.findByText('Log retention') // assert modal title is present
-    })
-  }
-)
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(4, 'months').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+    await screen.findByText('Log retention') // assert modal title is present
+  })
+})
