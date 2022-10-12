@@ -156,7 +156,12 @@ const sidebars = {
       type: 'category',
       label: 'Edge Functions',
       collapsed: true,
-      items: ['guides/functions', 'guides/functions/cicd-workflow'],
+      items: [
+        'guides/functions',
+        'guides/functions/auth',
+        'guides/functions/examples',
+        'guides/functions/cicd-workflow',
+      ],
     },
     {
       type: 'category',
