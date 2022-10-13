@@ -1558,6 +1558,8 @@ pages:
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
       - Primary keys must be included in `values` to use upsert.
+      - If you are using RLS, you might want to add some data to upsert.
+      - If the table is restricted to row `owners`, you need to include the column that the auth.id matches when doing bulk upsert request only when a select number of the columns are changing.
     examples:
       - name: Upsert your data
         description: |
