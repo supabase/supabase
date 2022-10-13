@@ -156,7 +156,12 @@ const sidebars = {
       type: 'category',
       label: 'Edge Functions',
       collapsed: true,
-      items: ['guides/functions', 'guides/functions/cicd-workflow'],
+      items: [
+        'guides/functions',
+        'guides/functions/auth',
+        'guides/functions/examples',
+        'guides/functions/cicd-workflow',
+      ],
     },
     {
       type: 'category',
@@ -251,19 +256,20 @@ const sidebars = {
         { type: 'link', label: 'Supabase API', href: '/reference/api' },
       ],
     },
-    {
-      type: 'category',
-      label: 'Community',
-      // link: { type: 'doc', id: 'about' },
-      collapsed: false,
-      items: [
-        {
-          type: 'link',
-          label: 'Supabase Auth Helpers',
-          href: '/reference/auth-helpers',
-        },
-      ],
-    },
+    // TODO: add back in with typedocs
+    // {
+    //   type: 'category',
+    //   label: 'Community',
+    //   // link: { type: 'doc', id: 'about' },
+    //   collapsed: false,
+    //   items: [
+    //     {
+    //       type: 'link',
+    //       label: 'Supabase Auth Helpers',
+    //       href: '/reference/auth-helpers',
+    //     },
+    //   ],
+    // },
     {
       type: 'category',
       label: 'Self-hosting',

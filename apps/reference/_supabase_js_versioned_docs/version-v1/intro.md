@@ -5,6 +5,10 @@ slug: /
 sidebar_label: Supabase JavaScript Library
 ---
 
+:::caution
+You're viewing the docs for an older version of the `supabase-js` library.
+:::
+
 This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`.
 
 You can use the `supabase-js` library to:

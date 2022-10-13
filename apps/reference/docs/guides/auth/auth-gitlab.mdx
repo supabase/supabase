@@ -17,16 +17,14 @@ Setting up GitLab logins for your application consists of 3 parts:
 - Add your GitLab Application keys to your [Supabase Project](https://app.supabase.com)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Steps
-
-### Access your GitLab account
+## Access your GitLab account
 
 - Go to [gitlab.com](https://gitlab.com).
 - Click on `Login` at the top right to log in.
 
 ![GitLab Developer Portal.](/img/guides/auth-gitlab/gitlab-portal.png)
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
@@ -47,7 +45,7 @@ The next step requires a callback URL, which looks like this:
   />
 </video>
 
-### Create your GitLab Application
+## Create your GitLab Application
 
 - Click on your `profile logo` (avatar) in the top-right corner.
 - Select `Edit profile`.
@@ -59,7 +57,7 @@ The next step requires a callback URL, which looks like this:
 - Click `Save Application` at the bottom.
 - Copy and save your `Application ID` (`client_id`) and `Secret` (`client_secret`) which you'll need later.
 
-### Add your GitLab credentials into your Supabase Project
+## Add your GitLab credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com).
 - In the left sidebar, click the `Authentication` icon (near the top).
@@ -69,27 +67,19 @@ The next step requires a callback URL, which looks like this:
 - Enter your `client_id` and `client_secret` saved in the previous step.
 - Click `Save`.
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'gitlab',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `gitlab` as the `provider`:
 
 ```js
 async function signInWithGitLab() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'gitlab',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

@@ -272,7 +272,7 @@ You can access the storage API directly with the same endpoint. See the <a href=
 
 Supabase Storage is integrated with your [Postgres Database](/docs/guides/database).
 This means that you can use the same [Row Level Security Policies](/docs/guides/auth#policies)
-for managing access to your files. Supabase Storage stores metadata in the `objects` and `buckets` table in the storage schema. To allow read access to files, the RLS policy must allow users to `SELECT` the `objects` table and for uploading a new object, the RLS policy must grant users access to `INSERT` into the `objects` table and so on. The mapping between the different API calls and the database permissions required is documented in the [Reference docs](/docs/reference/javascript/next/storage-createbucket).
+for managing access to your files. Supabase Storage stores metadata in the `objects` and `buckets` table in the storage schema. To allow read access to files, the RLS policy must allow users to `SELECT` the `objects` table and for uploading a new object, the RLS policy must grant users access to `INSERT` into the `objects` table and so on. The mapping between the different API calls and the database permissions required is documented in the [Reference docs](/docs/reference/javascript/storage-createbucket).
 
 :::note
 

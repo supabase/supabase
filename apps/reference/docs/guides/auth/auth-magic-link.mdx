@@ -1,13 +1,14 @@
 ---
 id: auth-magic-link
 title: 'Login With Magic Link'
-description: Use Supabase to Authenticate and Authorize your users using Magic Link.
+description: Use Supabase to authenticate and authorize your users using magic links.
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-By default, if no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+Magic links are a form of passwordless logins where users click on a link sent to their email address to log in to their accounts.
+Magic links only work with email addresses. By default, a user can only request a magic link once every 60 seconds.
 
 ## Overview
 
@@ -25,12 +26,7 @@ Setting up Magic Link logins for your Supabase application.
 - Under `Email Auth` turn `Enable Email Signup` to ON
 - Click `Save`
 
-### Add login code to your client app
-
-Add logins using our client libraries:
-
-- [JavaScript](/docs/reference/javascript/auth-signin#sign-in-with-magic-link)
-- [Dart](/docs/reference/dart/auth-signin#sign-in-with-magic-link)
+## Add login code to your client app
 
 <Tabs
   defaultValue="js"
@@ -40,39 +36,11 @@ Add logins using our client libraries:
 
 <TabItem value="js">
 
-```js
-const { user, error } = await supabase.auth.signIn({
-  email: 'example@email.com',
-})
-```
-
-</TabItem>
-
-<TabItem value="dart">
-
-```dart
-final res = await supabase.auth.signIn(email: 'example@email.com');
-
-final error = res.error;
-```
-
-</TabItem>
-
-</Tabs>
-
-Add this function which you can call from a button, link, or UI element.
-
-<Tabs
-  defaultValue="js"
-  groupId="guides/auth"
-  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
->
-
-<TabItem value="js">
+When your user signs in, call [signInWithOtp()](/docs/reference/javascript/auth-signinwithotp) with their email address:
 
 ```js
 async function signInWithEmail() {
-  const { user, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOtp({
     email: 'example@email.com',
   })
 }
@@ -81,6 +49,8 @@ async function signInWithEmail() {
 </TabItem>
 
 <TabItem value="dart">
+
+When your user signs in, call [signIn()](/docs/reference/dart/auth-signin) with their email address:
 
 ```dart
 Future<void> signInWithEmail() async {
@@ -92,8 +62,6 @@ Future<void> signInWithEmail() async {
 
 </Tabs>
 
-To log out:
-
 <Tabs
   defaultValue="js"
   groupId="guides/auth"
@@ -101,6 +69,8 @@ To log out:
 >
 
 <TabItem value="js">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signOut() {
@@ -111,6 +81,8 @@ async function signOut() {
 </TabItem>
 
 <TabItem value="dart">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```dart
 Future<void> signOut() async {

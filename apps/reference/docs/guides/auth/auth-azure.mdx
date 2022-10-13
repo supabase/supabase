@@ -18,14 +18,12 @@ Azure OAuth consists of four broad steps:
 - Create a `Secret ID` with “Sign In with Azure” capabilities. The value of the secret will be used as the `client secret`.
 - Add the callback url of your application to the allowlist.
 
-## Steps
-
-### Access your Azure Developer account
+## Access your Azure Developer account
 
 - Go to [portal.azure.com](https://portal.azure.com/#home).
 - Login and select "Azure Active Directory" under the list of Azure Services.
 
-### Register an application
+## Register an application
 
 - Under Azure Active Directory, select "App registrations" in the side panel.
 - Select "New registration".
@@ -36,7 +34,7 @@ Azure OAuth consists of four broad steps:
 
 ![Register an application.](/img/guides/auth-azure/azure-register-app.png)
 
-### Obtain a Client ID
+## Obtain a Client ID
 
 This will serve as the `client_id` when you make API calls to authenticate the user.
 
@@ -44,7 +42,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ![Obtain the client id](/img/guides/auth-azure/azure-client-id.png)
 
-### Obtain a Secret ID
+## Obtain a Secret ID
 
 This will serve as the `client_secret` when you make API calls to authenticate the user.
 
@@ -65,21 +63,13 @@ This will allow your users to use your custom Azure login page when logging in.
 
 ![Obtain the tenant url](/img/guides/auth-azure/azure-tenant-url.png)
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'azure',
-})
-```
-
-Add a function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```js
 async function signInWithAzure() {
-  const { user, session, error } = await supabase.auth.signIn(
+  const { data, error } = await supabase.auth.signInWithOAuth(
     {
       provider: 'azure',
     },
@@ -90,7 +80,7 @@ async function signInWithAzure() {
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {
@@ -100,5 +90,5 @@ async function signout() {
 
 ## Resources
 
-- [Azure Developer Account](https://portal.azure.com).
-- [GitHub Discussion](https://github.com/supabase/gotrue/pull/54#issuecomment-757043573).
+- [Azure Developer Account](https://portal.azure.com)
+- [GitHub Discussion](https://github.com/supabase/gotrue/pull/54#issuecomment-757043573)
