@@ -102,6 +102,9 @@ module.exports = ui({
               border: '1px solid ' + theme('borderColor.DEFAULT'),
               borderRadius: theme('borderRadius.lg'),
             },
+            td: {
+              borderBottom: '1px solid ' + theme('colors.scale[400]'),
+            },
             code: {
               fontWeight: '400',
               padding: '0.2rem 0.4rem',
