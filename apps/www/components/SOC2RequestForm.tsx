@@ -75,117 +75,125 @@ const SOC2RequestForm = () => {
       ) : (
         <>
           <Form initialValues={INITIAL_VALUES} validate={validate} onSubmit={handleFormSubmit}>
-            {({ isSubmitting }: any) => (
-              <div className="flex flex-col space-y-1">
-                <div>
-                  <Input
-                    label="Company Name *"
-                    id="companyName"
-                    name="companyName"
-                    layout="vertical"
-                    placeholder="Supa Inc."
-                  />
-                </div>
+            {({ values, isSubmitting }: any) => {
+              const selectedCountry = countries.find(
+                (country) => country.code === values['country']
+              )
+              const phonePlaceholder =
+                selectedCountry !== undefined ? `+${selectedCountry.phone_code}` : ''
 
-                <div className="flex space-x-4">
-                  <div className="flex-1">
+              return (
+                <div className="flex flex-col space-y-1">
+                  <div>
                     <Input
-                      label="Your First Name *"
-                      id="contactFirstName"
-                      name="contactFirstName"
+                      label="Company Name *"
+                      id="companyName"
+                      name="companyName"
                       layout="vertical"
-                      placeholder="Jane"
+                      placeholder="Supa Inc."
                     />
                   </div>
 
-                  <div className="flex-1">
+                  <div className="flex space-x-4">
+                    <div className="flex-1">
+                      <Input
+                        label="Your First Name *"
+                        id="contactFirstName"
+                        name="contactFirstName"
+                        layout="vertical"
+                        placeholder="Jane"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <Input
+                        label="Your Last Name *"
+                        id="contactLastName"
+                        name="contactLastName"
+                        layout="vertical"
+                        placeholder="Doe"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
                     <Input
-                      label="Your Last Name *"
-                      id="contactLastName"
-                      name="contactLastName"
+                      label="Your Business Email *"
+                      id="contactEmail"
+                      name="contactEmail"
                       layout="vertical"
-                      placeholder="Doe"
+                      placeholder="janedoe@example.com"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <Input
-                    label="Your Business Email *"
-                    id="contactEmail"
-                    name="contactEmail"
-                    layout="vertical"
-                    placeholder="janedoe@example.com"
-                  />
-                </div>
+                  <div>
+                    <Select
+                      label="Company Size"
+                      id="companySize"
+                      name="companySize"
+                      layout="vertical"
+                    >
+                      <Select.Option value="">{'--'}</Select.Option>
+                      <Select.Option value="1-10">1-10 Employees</Select.Option>
+                      <Select.Option value="11-50">11-50 Employees</Select.Option>
+                      <Select.Option value="51-200">51-200 Employees</Select.Option>
+                      <Select.Option value="201-500">201-500 Employees</Select.Option>
+                      <Select.Option value="501-1000">501-1000 Employees</Select.Option>
+                      <Select.Option value="1001-5000">1001-5000 Employees</Select.Option>
+                      <Select.Option value="5001+">5001+ Employees</Select.Option>
+                    </Select>
+                  </div>
 
-                <div>
-                  <Select
-                    label="Company Size"
-                    id="companySize"
-                    name="companySize"
-                    layout="vertical"
-                  >
-                    <Select.Option value="">{'--'}</Select.Option>
-                    <Select.Option value="1-10">1-10 Employees</Select.Option>
-                    <Select.Option value="11-50">11-50 Employees</Select.Option>
-                    <Select.Option value="51-200">51-200 Employees</Select.Option>
-                    <Select.Option value="201-500">201-500 Employees</Select.Option>
-                    <Select.Option value="501-1000">501-1000 Employees</Select.Option>
-                    <Select.Option value="1001-5000">1001-5000 Employees</Select.Option>
-                    <Select.Option value="5001+">5001+ Employees</Select.Option>
-                  </Select>
-                </div>
+                  <div>
+                    <Select
+                      label="Country / Main Timezone"
+                      id="country"
+                      name="country"
+                      layout="vertical"
+                    >
+                      {countries.map(({ code, name }) => (
+                        <Select.Option key={code} value={code}>
+                          {name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </div>
 
-                <div>
-                  <Input
-                    label="Your Phone Number"
-                    id="contactPhone"
-                    name="contactPhone"
-                    layout="vertical"
-                    placeholder="+65 1234 1234"
-                  />
-                </div>
+                  <div>
+                    <Input
+                      label="Your Phone Number"
+                      id="contactPhone"
+                      name="contactPhone"
+                      layout="vertical"
+                      placeholder={phonePlaceholder}
+                    />
+                  </div>
 
-                <div>
-                  <Select
-                    label="Country / Main Timezone"
-                    id="country"
-                    name="country"
-                    layout="vertical"
-                  >
-                    {countries.map(({ code, name }) => (
-                      <Select.Option key={code} value={code}>
-                        {name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </div>
+                  <div className="">
+                    <Input.TextArea
+                      id="details"
+                      name="details"
+                      label="Additional Details"
+                      placeholder="Tell us about your projects, clients, and technology..."
+                      rows={10}
+                    />
+                  </div>
 
-                <div className="">
-                  <Input.TextArea
-                    id="details"
-                    name="details"
-                    label="Additional Details"
-                    placeholder="Tell us about your projects, clients, and technology..."
-                    rows={10}
-                  />
+                  <div className="col-span-2 flex w-full flex-row-reverse pt-4">
+                    <Button
+                      type="primary"
+                      size="small"
+                      className="text-white"
+                      htmlType="submit"
+                      disabled={isSubmitting}
+                      loading={isSubmitting}
+                    >
+                      Submit request
+                    </Button>
+                  </div>
                 </div>
-
-                <div className="col-span-2 flex w-full flex-row-reverse pt-4">
-                  <Button
-                    type="primary"
-                    size="small"
-                    className="text-white"
-                    htmlType="submit"
-                    disabled={isSubmitting}
-                    loading={isSubmitting}
-                  >
-                    Submit request
-                  </Button>
-                </div>
-              </div>
-            )}
+              )
+            }}
           </Form>
           {error && <p className="text-sm">Error: {error}</p>}
         </>
