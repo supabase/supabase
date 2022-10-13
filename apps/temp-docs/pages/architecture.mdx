@@ -1,7 +1,9 @@
----
-title: 'Architecture'
-description: 'Supabase Architecture'
----
+import Layout from '~/layouts/Guide'
+
+export const meta = {
+  title: 'Architecture',
+  description: 'Supabase Architecture',
+}
 
 # Architecture
 
@@ -14,3 +16,5 @@ Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the 
 Our technological choices are quite different to Firebase. Everything we use is open source. Wherever possible, we use and support existing tools in the ecosystem, rather than developing from scratch.
 
 Most notably, we use Postgres rather than a NoSQL store. This was a deliberate choice. We believe that no other database on the market offers the scalability and functionality required to legitimately compete with Firebase.
+
+export default (context) => <Layout context={context} />

@@ -17,7 +17,7 @@ const nextConfig = {
   trailingSlash: false,
   reactStrictMode: true,
   images: {
-    domains: ['avatars.githubusercontent.com'],
+    domains: ['avatars.githubusercontent.com', 'supabase.com'],
   },
 }
 
