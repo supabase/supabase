@@ -318,16 +318,17 @@ const ColumnManagement: FC<Props> = ({
               Add column
             </Button>
           )}
-          <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-            <a>
+          <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
               <Button
+                as="a"
+                target="_blank" 
+                rel="noopener noreferrer"
                 type="text"
                 className="text-scale-1000 hover:text-scale-1200"
                 icon={<IconExternalLink size={12} strokeWidth={2} />}
               >
                 Learn more about data types
               </Button>
-            </a>
           </Link>
         </div>
       </div>
