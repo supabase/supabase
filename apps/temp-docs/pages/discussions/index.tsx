@@ -1,6 +1,6 @@
 import { ApolloClient, createHttpLink, InMemoryCache, gql } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import Layout from '../../components/layouts/Layout'
+import Layout from '../../layouts/Default'
 import { IconArrowUp, IconCheckCircle } from '@supabase/ui'
 import Image from 'next/image'
 import Link from 'next/link'

@@ -1,6 +1,6 @@
 import { ApolloClient, createHttpLink, InMemoryCache, gql } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import Layout from '../../components/layouts/Layout'
+import Layout from '../../layouts/Default'
 import { IconArrowLeft, Badge, Button, IconArrowUp, IconCheck } from '@supabase/ui'
 import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
