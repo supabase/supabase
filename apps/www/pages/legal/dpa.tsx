@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import CTABanner from 'components/CTABanner/index'
 import Link from 'next/link'
 import Layout from '~/components/Layouts/Default'

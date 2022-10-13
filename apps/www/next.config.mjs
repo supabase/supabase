@@ -5,6 +5,10 @@ import rehypeSlug from 'rehype-slug'
 
 import rewrites from './lib/rewrites.js'
 import redirects from './lib/redirects.js'
+import withTmInitializer from 'next-transpile-modules'
+import withPlugins from 'next-compose-plugins'
+
+const withTM = withTmInitializer(['ui', 'common'])
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -65,4 +69,4 @@ const nextConfig = {
   },
 }
 
-export default withMDX(nextConfig)
+export default withPlugins([withTM, withMDX], nextConfig)
