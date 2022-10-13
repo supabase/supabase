@@ -78,4 +78,4 @@ serve(async (req) => {
 })
 
 // To invoke:
-// curl -i --location --request GET 'http://localhost:54321/functions/v1/get-tshirt-competition?email=testr@test.de&twitter=thorwebdev&size=2XL&answer=20'
+// curl -i --location --request GET 'https://obuldanrptloktxcffvn.functions.supabase.co/get-tshirt-competition?email=testr@test.de&twitter=thorwebdev&size=2XL&answer=20'
