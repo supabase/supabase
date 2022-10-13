@@ -5,7 +5,7 @@ import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from 'ui'
+import { Button, Dropdown, IconChevronDown, IconClipboard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -311,11 +311,11 @@ const Results = ({ results }) => {
     {
       'Command+c': (event) => {
         event.stopPropagation()
-        onCopyCell()
+        onCopySelectedCell()
       },
       'Control+c': (event) => {
         event.stopPropagation()
-        onCopyCell()
+        onCopySelectedCell()
       },
     },
     ['INPUT', 'TEXTAREA']
@@ -337,7 +337,21 @@ const Results = ({ results }) => {
   }
 
   const formatter = (column, row) => {
-    return <span className="font-mono text-xs">{JSON.stringify(row[column])}</span>
+    return (
+      <div className="sb-grid-select-cell__formatter overflow-hidden">
+        <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
+
+        {row[column] && (
+          <Button
+            type="outline"
+            icon={<IconClipboard size="tiny" />}
+            onClick={() => copyToClipboard(formatClipboardValue(row[column]))}
+            className="sb-grid-select-cell__copy-action"
+            title="Copy"
+          />
+        )}
+      </div>
+    )
   }
   const columnRender = (name) => {
     return <div className="flex h-full items-center justify-center font-mono">{name}</div>
@@ -355,7 +369,7 @@ const Results = ({ results }) => {
     setCellPosition(position)
   }
 
-  function onCopyCell() {
+  function onCopySelectedCell() {
     if (columns && cellPosition) {
       const { idx, rowIdx } = cellPosition
       const column = columns[idx]
