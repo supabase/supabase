@@ -27,7 +27,7 @@
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/shared-types": "^0.1.29",
-    "@supabase/supabase-js": "^2.0.0-rc.2",
+    "@supabase/supabase-js": "^2.0.0",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",
     "awesome-debounce-promise": "^2.1.0",
