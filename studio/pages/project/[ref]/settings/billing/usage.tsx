@@ -1,20 +1,19 @@
 import dayjs from 'dayjs'
-import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Loading, IconArrowRight } from 'ui'
+import { FC, useEffect, useState } from 'react'
+import { IconArrowRight, Loading } from 'ui'
 
-import { Project, NextPageWithLayout } from 'types'
-import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
-import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
-import { SettingsLayout } from 'components/layouts'
-import LoadingUI from 'components/ui/Loading'
-import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
-import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
+import { PAYGUsage } from 'components/interfaces/Billing'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import { SettingsLayout } from 'components/layouts'
+import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import LoadingUI from 'components/ui/Loading'
+import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
+import { STRIPE_PRODUCT_IDS, TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { NextPageWithLayout, Project } from 'types'
 
-const ProjectBilling: NextPageWithLayout = () => {
+const ProjectBillingUsage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
@@ -27,11 +26,11 @@ const ProjectBilling: NextPageWithLayout = () => {
   )
 }
 
-ProjectBilling.getLayout = (page) => (
+ProjectBillingUsage.getLayout = (page) => (
   <SettingsLayout title="Billing and Usage">{page}</SettingsLayout>
 )
 
-export default observer(ProjectBilling)
+export default observer(ProjectBillingUsage)
 
 interface SettingsProps {
   project?: Project
@@ -39,7 +38,6 @@ interface SettingsProps {
 
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
-  const projectTier = ui.selectedProject?.subscription_tier
 
   const [dateRange, setDateRange] = useState<any>()
 
@@ -69,15 +67,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
 
   return (
     <div className="container max-w-4xl space-y-8 p-4">
-      {projectTier !== undefined && <OveragesBanner tier={projectTier} />}
-      <Subscription
-        loading={loading}
-        project={project}
-        subscription={subscription}
-        paygStats={paygStats}
-        currentPeriodStart={subscription?.billing.current_period_start}
-        currentPeriodEnd={subscription?.billing.current_period_end}
-      />
       {loading ? (
         <Loading active={loading}>
           <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
@@ -115,10 +104,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
       ) : (
         <ProjectUsage projectRef={project?.ref} />
       )}
-      <div className="space-y-2">
-        <h4 className="text-lg">Invoices</h4>
-        <Invoices projectRef={ui.selectedProject?.ref ?? ''} />
-      </div>
     </div>
   )
 }

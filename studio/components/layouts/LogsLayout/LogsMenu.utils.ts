@@ -25,12 +25,6 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
           items: [],
         },
         {
-          name: 'Query logs(?)',
-          key: 'api-logs',
-          url: `/project/${ref}/database/insights?`,
-          items: [],
-        },
-        {
           name: 'PostgREST logs',
           key: 'postgrest-logs',
           url: `/project/${ref}/logs/postgrest-logs`,

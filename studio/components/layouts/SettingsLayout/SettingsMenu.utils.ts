@@ -40,94 +40,24 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
       ],
     },
     {
-      title: 'Project settings',
-      items: [
-        {
-          name: 'Authentication',
-          key: 'auth',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/auth/settings`,
-          items: [],
-        },
-        {
-          name: 'Storage',
-          key: 'storage',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/settings`,
-          items: [],
-          // disabled: canReadStorage,
-        },
-        {
-          name: 'Billing & Usage',
-          key: 'billing',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing`,
-          items: [],
-          // disabled: canReadInvoices && canReadSubscriptions,
-        },
-      ],
-    },
-    {
-      title: 'API',
-      items: [
-        {
-          name: 'API Keys',
-          key: 'generaleeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
-        {
-          name: 'API Settings',
-          key: 'databaseeeeeeeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/databaseeeeee`,
-          items: [],
-        },
-      ],
-    },
-    {
-      title: 'Project keys',
-      items: [
-        {
-          name: 'Roll keys',
-          key: 'generaleeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
-        {
-          name: 'JWT',
-          key: 'databaseeeeeeeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/databaseeeeee`,
-          items: [],
-        },
-      ],
-    },
-    {
-      title: 'Backups?',
-      items: [
-        {
-          name: 'Backups?',
-          key: 'generaleeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
-      ],
-    },
-    {
       title: 'Billing',
       items: [
         {
           name: 'Subscription',
-          key: 'generaleeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+          key: 'billing',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/subscription`,
           items: [],
         },
         {
           name: 'Usage',
-          key: 'databaseeeeeeeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/databaseeeeee`,
+          key: 'usage',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
           items: [],
         },
         {
           name: 'Invoices',
-          key: 'databaseeeeeeeeeee',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/databaseeeeee`,
+          key: 'billing/invoices',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
           items: [],
         },
       ],
