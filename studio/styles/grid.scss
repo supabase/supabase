@@ -388,7 +388,7 @@
 .sb-grid-select-editor {
   button {
     @apply border-none rounded-none shadow-none;
-    box-shadow: none !important
+    box-shadow: none !important;
   }
 }
 
@@ -525,6 +525,22 @@
 .sb-grid-select-cell__header__input {
   /* @apply focus:ring-brand-500; */
   @apply border-scale-300;
+}
+
+/*
+  Cell copy action
+*/
+
+.sb-grid-select-cell__copy-action {
+  @apply hidden mr-1;
+}
+
+.sb-grid-select-cell__formatter:hover .sb-grid-select-cell__copy-action {
+  @apply block opacity-50;
+}
+
+.sb-grid-select-cell__copy-action:hover {
+  @apply opacity-100;
 }
 
 /*
