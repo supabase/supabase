@@ -4,7 +4,7 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
-      title: 'Users (?)',
+      title: 'Users',
       items: [{ name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] }],
     },
     ...(IS_PLATFORM
@@ -15,7 +15,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
               ...(IS_PLATFORM
                 ? [
                     {
-                      name: 'Settings or General?',
+                      name: 'Settings',
                       key: 'settings',
                       url: `/project/${ref}/auth/settings`,
                       items: [],
@@ -30,9 +30,9 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Providers?',
-                key: 'policies',
-                url: `/project/${ref}/auth/policies`,
+                name: 'Providers',
+                key: 'providers',
+                url: `/project/${ref}/auth/providers`,
                 items: [],
               },
               {
