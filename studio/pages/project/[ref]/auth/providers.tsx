@@ -4,8 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
 import { checkPermissions, useStore } from 'hooks'
-import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
-import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
+import { AuthProvidersForm } from 'components/interfaces'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
@@ -20,12 +19,11 @@ const PageLayout: NextPageWithLayout = () => {
   const canReadAuthSettings = checkPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   if (!canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
+    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
   } else if (authConfig) {
     return (
       <FormsContainer>
-        <AutoSchemaForm />
-        <RedirectDomains />
+        <AuthProvidersForm />
       </FormsContainer>
     )
   } else {
