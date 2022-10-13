@@ -82,13 +82,13 @@ For the curious, try heading to the SQL editor and querying:
 select * from auth.users;
 ```
 
-If supabase-js is loaded on your site (in this case http://localhost:3000) then it will automatically pluck the access_token out of the URL and initiate a session. You can check the [session()](../../reference/javascript/auth-session) method to see if there is a valid session:
+If supabase-js is loaded on your site (in this case http://localhost:3000) it automatically plucks the `access_token` out of the URL and initiates a session. You can retrieve the [session](/docs/reference/javascript/auth-getsession) to see if there is a valid session:
 
 ```jsx
-console.log(supabase.auth.session())
+console.log(supabase.auth.getSession())
 ```
 
-Now that we can use methods like `supabase.auth.signIn({ email, password})` to issue JWTs to users we want to start fetching resources specific to that user. So let's make some. Go to the SQL editor and run:
+Now that we can use methods to issue JWTs to users, we want to start fetching resources specific to that user. So let's make some. Go to the SQL editor and run:
 
 ```sql
 create table my_scores (
