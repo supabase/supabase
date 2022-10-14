@@ -1,22 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 import { uuidv4 } from 'lib/helpers'
 
-// const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
-// const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY || ''
-// const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
-//   auth: {
-//     persistSession: false,
-//     autoRefreshToken: false,
-//     // @ts-ignore
-//     multiTab: false,
-//     detectSessionInUrl: false,
-//     localStorage: {
-//       getItem: (key: string) => undefined,
-//       setItem: (key: string, value: string) => {},
-//       removeItem: (key: string) => {},
-//     },
-//   },
-// })
+const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL ?? 'default'
+const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY ?? 'default'
+const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    // @ts-ignore
+    multiTab: false,
+    detectSessionInUrl: false,
+    localStorage: {
+      getItem: (key: string) => undefined,
+      setItem: (key: string, value: string) => {},
+      removeItem: (key: string) => {},
+    },
+  },
+})
 
 export const convertB64toBlob = (image: string) => {
   const contentType = 'image/png'
