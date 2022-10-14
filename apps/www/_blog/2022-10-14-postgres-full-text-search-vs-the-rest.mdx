@@ -332,7 +332,7 @@ There's a _lot_ of tuning left undone here, but a few points stand out right awa
 - Postgres FTS is quite close performance-wise to many other solutions, at least in their default configuration.
 - Only Typesense and MeiliSearch properly handled mis-spellings (the "suprman" query).
 - Typesense was relatively strict with matches compared to other engines.
-- OpenSearch was _very_ fast with ingest, but also failed with the misspelling out of the box.
+- OpenSearch was _very_ fast with ingest, but the default configuration doesn't index misspellings.
 - In-memory SQLite is by far the fastest, and PG isn't too far behind for this small data set.
 
 ## Feedback from the other products
