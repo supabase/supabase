@@ -1,22 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 import { uuidv4 } from 'lib/helpers'
 
-const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
-const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY || ''
-const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-    // @ts-ignore
-    multiTab: false,
-    detectSessionInUrl: false,
-    localStorage: {
-      getItem: (key: string) => undefined,
-      setItem: (key: string, value: string) => {},
-      removeItem: (key: string) => {},
-    },
-  },
-})
+// const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
+// const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY || ''
+// const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
+//   auth: {
+//     persistSession: false,
+//     autoRefreshToken: false,
+//     // @ts-ignore
+//     multiTab: false,
+//     detectSessionInUrl: false,
+//     localStorage: {
+//       getItem: (key: string) => undefined,
+//       setItem: (key: string, value: string) => {},
+//       removeItem: (key: string) => {},
+//     },
+//   },
+// })
 
 export const convertB64toBlob = (image: string) => {
   const contentType = 'image/png'
@@ -43,21 +43,21 @@ export const uploadAttachment = async (ref: string, image: string) => {
   const blob = convertB64toBlob(image)
   const name = `${ref || 'no-project'}/${uuidv4()}.png`
   const options = { cacheControl: '3600' }
-  const { data: file, error: uploadError } = await supportSupabaseClient.storage
-    .from('feedback-attachments')
-    .upload(name, blob, options)
+  // const { data: file, error: uploadError } = await supportSupabaseClient.storage
+  //   .from('feedback-attachments')
+  //   .upload(name, blob, options)
 
-  if (uploadError) {
-    console.error('Failed to upload:', uploadError)
-    return undefined
-  }
+  // if (uploadError) {
+  //   console.error('Failed to upload:', uploadError)
+  //   return undefined
+  // }
 
-  if (file) {
-    const { data } = await supportSupabaseClient.storage
-      .from('feedback-attachments')
-      .createSignedUrls([file.path], 10 * 365 * 24 * 60 * 60)
-    return data?.[0].signedUrl
-  }
+  // if (file) {
+  //   const { data } = await supportSupabaseClient.storage
+  //     .from('feedback-attachments')
+  //     .createSignedUrls([file.path], 10 * 365 * 24 * 60 * 60)
+  //   return data?.[0].signedUrl
+  // }
 
   return undefined
 }
