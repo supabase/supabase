@@ -27,11 +27,17 @@ serve(async (req) => {
     const url = new URL(req.url)
     const email = url.searchParams.get('email')
     const twitter = url.searchParams.get('twitter')
+    const size = url.searchParams.get('size')
     const answer = url.searchParams.get('answer')
 
-    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email ?? '') || !answer)
+    if (
+      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email ?? '') ||
+      !answer ||
+      !twitter ||
+      !size
+    )
       throw new Error(
-        `You're missing either a valid 'email' and/or 'answer' param(s). HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
+        `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
 
     if (Number(answer) !== positionInAlphabet(email!))
@@ -50,6 +56,7 @@ serve(async (req) => {
       {
         email,
         twitter,
+        size,
       },
       { onConflict: 'email' }
     )
@@ -71,4 +78,4 @@ serve(async (req) => {
 })
 
 // To invoke:
-// curl -i --location --request GET 'http://localhost:54321/functions/v1/get-tshirt-competition?email=testr@test.de&answer=20'
+// curl -i --location --request GET 'http://localhost:54321/functions/v1/get-tshirt-competition?email=testr@test.de&twitter=thorwebdev&size=2XL&answer=20'
