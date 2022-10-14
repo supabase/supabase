@@ -225,6 +225,16 @@ const uiConfig = {
           '0%': { transform: 'translate-x-0', opacity: 1 },
           '100%': { transform: 'translateX(100%)', opacity: 0 },
         },
+        rotate360: {
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        prixClipFix: {
+          '0%': { clipPath: 'polygon(50% 50%,0 0,0 0,0 0,0 0,0 0)}' },
+          '25%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0)}' },
+          '50%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%)}' },
+          '75%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%)}' },
+          '100%': { clipPath: 'polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)}' },
+        },
       },
       animation: {
         'fade-in': 'fadeIn 300ms',
@@ -267,6 +277,13 @@ const uiConfig = {
     function ({ addUtilities, addVariant }) {
       // addVariant('data-open', '&:[data-state=open]')
       addUtilities({
+        '.loader': {
+          width: '48px',
+          height: '48px',
+          borderRadius: '50%',
+          position: 'relative',
+          animation: 'rotate360 1s linear infinite',
+        },
         ".dropdown-content[data-state='open']": {
           animation: 'fadeIn 50ms ease-out',
         },
