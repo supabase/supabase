@@ -1,15 +1,16 @@
 import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from '@supabase/ui'
+import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from 'ui'
 import { Enum } from './AuthProvidersForm.types'
 
 interface Props {
   name: string
   properties: any
   formValues: any
+  disabled?: boolean
 }
 
-const FormField: FC<Props> = ({ name, properties, formValues }) => {
+const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }) => {
   if (properties.show && formValues[properties.show.key] !== properties.show.matches) return <></>
 
   const [hidden, setHidden] = useState(!!properties.isSecret)
@@ -22,6 +23,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
           layout="vertical"
           id={name}
           name={name}
+          disabled={disabled}
           type={hidden ? 'password' : 'text'}
           label={properties.title}
           labelOptional={
@@ -46,7 +48,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
                 onClick={() => setHidden(!hidden)}
               />
             ) : (
-              <span className="text-scale-900 mr-3">
+              <span className="mr-3 text-scale-900">
                 {properties.units ? (
                   <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                     {properties.units}
@@ -64,6 +66,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
           layout="vertical"
           id={name}
           name={name}
+          disabled={disabled}
           label={properties.title}
           labelOptional={
             properties.descriptionOptional ? (
@@ -80,7 +83,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
             ) : null
           }
           actions={
-            <span className="text-scale-900 mr-3">
+            <span className="mr-3 text-scale-900">
               {properties.units ? (
                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                   {properties.units}
@@ -97,6 +100,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
           size="small"
           id={name}
           name={name}
+          disabled={disabled}
           label={properties.title}
           descriptionText={properties.description}
         />
@@ -107,6 +111,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
         <Listbox
           size="small"
           name={name}
+          disabled={disabled}
           label={properties.title}
           descriptionText={properties.description}
           defaultValue={properties.enum[0]}

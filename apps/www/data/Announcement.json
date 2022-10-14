@@ -1,6 +1,7 @@
 {
-  "show": true,
-  "text": "Launch Week 5",
-  "cta": "Get your ticket now",
-  "link": "//launch-week"
+  "show": false,
+  "text": "Auth UI Launch 🚀",
+  "cta": "Vote now",
+  "link": "https://www.producthunt.com/posts/pre-built-auth-ui-for-react",
+  "badge": "Product Hunt"
 }

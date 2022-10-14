@@ -15,7 +15,7 @@ Supabase generates three types of API directly from your database schema.
 
 - REST - interact with your database through a restful interface.
 - Realtime - listen to database changes.
-- GraphQL - [in beta](https://supabase.com/blog/2021/12/03/pg-graphql).
+- GraphQL - [in beta](https://supabase.com/blog/pg-graphql).
 
 The APIs are:
 
@@ -53,7 +53,7 @@ GraphQL is in Beta, and may have breaking changes. It is only available on self-
 
 :::
 
-GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/2021/12/03/pg-graphql), an open source PostgreSQL extension for GraphQL.
+GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-graphql), an open source PostgreSQL extension for GraphQL.
 
 ### Realtime API {#realtime-api-overview}
 
@@ -248,7 +248,7 @@ import { createClient, useQuery } from 'urql'
 // Prepare API key and Authorization header
 const headers = {
   apikey: <SUPABASE_ANON_KEY>,
-  authorization: `Bearer: ${<SUPABASE_ANON_KEY}`>
+  authorization: `Bearer ${<SUPABASE_ANON_KEY}`>
 }
 
 // Create GraphQL client
@@ -392,9 +392,9 @@ alter table todos enable row level security;
 
 ### The `service_role` key
 
-Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key can is designed to bypass Row Level Security - so it should only be used on a private server.
+Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key is designed to bypass Row Level Security - so it should only be used on a private server.
 
-We have [partnered with GitHub](https://supabase.com/blog/2022/03/28/community-day#supabase-is-now-a-github-secret-scanning-partner) to scan for Supabase `service_role` keys pushed to public repositories.
+We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase `service_role` keys pushed to public repositories.
 If they detect any keys with service_role privileges being pushed to GitHub, they will forward the API key to us, so that we can automatically revoke the detected secrets and notify you, protecting your data against malicious actors.
 
 ### Safeguards towards accidental deletes and updates

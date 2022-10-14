@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconGlobe, IconTrash } from '@supabase/ui'
+import { Button, IconGlobe, IconTrash } from 'ui'
 
 import { useStore } from 'hooks'
 import ValueContainer from './ValueContainer'
@@ -8,10 +8,11 @@ import { EmptyListState } from 'components/ui/States'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 
 interface Props {
+  canUpdate: boolean
   onSelectDomainToDelete: (domain: string) => void
 }
 
-const DomainList: FC<Props> = ({ onSelectDomainToDelete }) => {
+const DomainList: FC<Props> = ({ canUpdate, onSelectDomainToDelete }) => {
   const { authConfig } = useStore()
 
   const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
@@ -33,26 +34,28 @@ const DomainList: FC<Props> = ({ onSelectDomainToDelete }) => {
         URI_ALLOW_LIST_ARRAY.map((domain: string) => {
           return (
             <ValueContainer key={domain}>
-              <div className="flex items-center gap-2 font-mono">
+              <div className="flex items-center gap-4 font-mono">
                 <span className="text-scale-900">
                   <IconGlobe strokeWidth={2} size={14} />
                 </span>
-                {domain}
+                <span className="text-sm">{domain}</span>
               </div>
-              <Button
-                type="default"
-                icon={<IconTrash />}
-                onClick={() => onSelectDomainToDelete(domain)}
-              >
-                Remove
-              </Button>
+              {canUpdate && (
+                <Button
+                  type="default"
+                  icon={<IconTrash />}
+                  onClick={() => onSelectDomainToDelete(domain)}
+                >
+                  Remove
+                </Button>
+              )}
             </ValueContainer>
           )
         })
       ) : (
         <div
           className={[
-            'bg-scale-200 border-scale-400 text-scale-1200 flex items-center',
+            'flex items-center border-scale-400 bg-scale-200 text-scale-1200',
             'justify-center gap-2 rounded border px-6 py-8 text-sm',
           ].join(' ')}
         >

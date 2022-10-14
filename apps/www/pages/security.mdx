@@ -1,0 +1,140 @@
+import {
+  KeyIcon,
+  LinkIcon,
+  UserGroupIcon,
+  ShieldCheckIcon,
+  RewindIcon,
+  CreditCardIcon,
+  ClipboardCheckIcon,
+} from '@heroicons/react/outline'
+import { Button, IconGitHub } from '@supabase/ui'
+import Layout from '../layouts/Layout'
+import Link from 'next/link'
+
+export const meta = {
+  type: 'lp',
+  title: 'Security at Supabase',
+  description:
+    'Supabase is trusted by thousands of developers for building and deploying secure applications.',
+}
+
+export const Section = ({ children, icon, img }) => (
+  <div>
+    {icon && (
+      <div className="bordershadow-scale-500 not-prose dark:bg-scale-400 -mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-white">
+        <figure className="w-5">{icon}</figure>
+      </div>
+    )}
+    {img && <div className="-mb-4 flex h-12 w-12 items-center justify-center">{img}</div>}
+    {children}
+  </div>
+)
+
+<div className="container mx-auto px-8 sm:px-16 xl:px-20 grid grid-cols-12 items-center my-16">
+  <div className="col-span-12 lg:col-span-6">
+    <h1>Security at Supabase</h1>
+    <h2 className="text-xl text-scale-1100 max-w-xl">
+      Supabase is trusted by thousands of developers for building and deploying secure applications.
+    </h2>
+  </div>
+  <div className="col-span-12 lg:col-span-5 lg:col-start-8">
+
+![Supabase security](/images/security/security-hero.png)
+
+  </div>
+</div>
+
+<div className="container mx-auto px-8 sm:px-16 xl:px-20 mb-16">
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
+
+<Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
+
+### SOC 2
+
+Supabase is SOC2 Type 1 compliant. Enterprise customers can request a copy of our SOC2 through our [Security Portal](https://security.supabase.com).
+
+<div className="w-16">
+  <img src="/images/security/21972-312_SOC_NonCPA.png" />
+</div>
+
+</Section>
+<Section icon={<KeyIcon strokeWidth={1}/>}>
+
+### Data Encryption
+
+All customer data is encrypted at REST with AES-256 and in transit via TLS.
+
+Sensitive information like access tokens and keys are encrypted at the application level before they are stored in the database.
+
+</Section>
+
+<Section icon={<IconGitHub size={19} />}>
+
+### Github security integration
+
+We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase service role API keys. If any Supabase API keys are pushed to GitHub, they are automatically revoked.
+
+</Section>
+
+<Section icon={<UserGroupIcon strokeWidth={1}/>}>
+
+### Role-based access control
+
+Members of organizations in Supabase can be granted access to specific resources.
+
+</Section>
+
+<Section icon={<RewindIcon strokeWidth={1}/>}>
+
+### Backups
+
+All customer databases are backed up every day.
+
+Enterprise customers have access to Point in Time Recovery which enables restoring the database to any point in time.
+
+</Section>
+
+<Section icon={<CreditCardIcon strokeWidth={1}/>}>
+
+### Payment processing
+
+Supabase uses [Stripe](https://stripe.com) to process payments and does not store personal credit card information for any of our customers.
+
+Stripe is a certified PCI Service Provider Level 1, which is the highest level of certification in the payments industry.
+
+</Section>
+
+<Section icon={<ClipboardCheckIcon strokeWidth={1}/>}>
+
+### Vulnerability Management
+
+Supabase works with industry experts to conduct regular penetration tests.
+
+In addition to internal security reviews, we use various tools to scan our code for vulnerabilities including [GitHub](https://github.com), [Vanta](https://www.vanta.com/), and [Snyk](https://snyk.io/).
+
+</Section>
+
+</div>
+
+</div>
+
+---
+
+<div className="container mx-auto pb-24 pt-1 px-8 sm:px-16 xl:px-20">
+  <div className="max-w-xl">
+
+<h3 className="text-3xl">Security Portal</h3>
+
+Access Supabase’s security and compliance documents on our Security Portal, such as
+penetration testing and audit reports.
+
+<Link passHref href="https://security.supabase.com">
+  <Button type="default" size="medium" as="a" className="no-underline" target="_blank">
+    Security Portal
+  </Button>
+</Link>
+  </div>
+</div>
+
+export default (context) => <Layout meta={meta} children={context.children} context={context} />

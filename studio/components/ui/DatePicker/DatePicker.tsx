@@ -7,12 +7,12 @@ import {
   IconChevronRight,
   IconArrowRight,
   IconCalendar,
-} from '@supabase/ui'
+} from 'ui'
 
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'
 import dayjs from 'dayjs'
-import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
+import { ButtonProps } from 'ui/src/components/Button/Button'
 import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 
 export interface DatePickerProps {
@@ -21,6 +21,7 @@ export interface DatePickerProps {
   from?: string
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
+  triggerButtonTitle?: string
   renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
 }
 
@@ -36,6 +37,7 @@ function _DatePicker({
   onChange,
   triggerButtonType = 'default',
   triggerButtonClassName = '',
+  triggerButtonTitle,
   renderFooter = () => null,
 }: DatePickerProps) {
   const [open, setOpen] = useState<boolean>(false)
@@ -129,11 +131,11 @@ function _DatePicker({
             </div>
             <div
               className={`
-                      text-scale-900 
                       flex 
                       w-12 
-                      items-center
+                      items-center 
                       justify-center
+                      text-scale-900
                     `}
             >
               <IconArrowRight strokeWidth={1.5} size={14} />
@@ -188,7 +190,7 @@ function _DatePicker({
                     >
                       <IconChevronLeft size={16} strokeWidth={2} />
                     </button>
-                    <span className="text-scale-1100 text-sm">{format(date, 'MMMM yyyy')}</span>
+                    <span className="text-sm text-scale-1100">{format(date, 'MMMM yyyy')}</span>
                     <button
                       onClick={increaseMonth}
                       disabled={nextMonthButtonDisabled}
@@ -220,6 +222,7 @@ function _DatePicker({
       }
     >
       <Button
+        title={triggerButtonTitle}
         type={triggerButtonType}
         as="span"
         icon={<IconCalendar />}

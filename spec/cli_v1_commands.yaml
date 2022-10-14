@@ -1,4 +1,4 @@
-clispec: "001"
+clispec: '001'
 info:
   id: cli
   version: 1.0.0

@@ -196,7 +196,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `styles/globals.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-ts-user-management/styles/globals.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/examples/main/supabase-js-v2/user-management/nextjs-ts-user-management/styles/globals.css).
 
 ### Set up a Login component
 
@@ -214,7 +214,7 @@ export default function Auth() {
   const handleLogin = async (email) => {
     try {
       setLoading(true)
-      const { error } = await supabase.auth.signIn({ email })
+      const { error } = await supabase.auth.signInWithOtp({ email })
       if (error) throw error
       alert('Check your email for the login link!')
     } catch (error) {
@@ -278,10 +278,27 @@ export default function Account({ session }) {
     getProfile()
   }, [session])
 
+  async function getCurrentUser() {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession()
+
+    if (error) {
+      throw error
+    }
+
+    if (!session?.user) {
+      throw new Error('User not logged in')
+    }
+
+    return session.user
+  }
+
   async function getProfile() {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const user = await getCurrentUser()
 
       let { data, error, status } = await supabase
         .from('profiles')
@@ -308,7 +325,7 @@ export default function Account({ session }) {
   async function updateProfile({ username, website, avatar_url }) {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const user = await getCurrentUser()
 
       const updates = {
         id: user.id,
@@ -318,9 +335,7 @@ export default function Account({ session }) {
         updated_at: new Date(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      })
+      let { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
@@ -391,14 +406,40 @@ import Auth from '../components/Auth'
 import Account from '../components/Account'
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true)
   const [session, setSession] = useState(null)
 
   useEffect(() => {
-    setSession(supabase.auth.session())
+    let mounted = true
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
+    async function getInitialSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      // only update the react state if the component is still mounted
+      if (mounted) {
+        if (session) {
+          setSession(session)
+        }
+
+        setIsLoading(false)
+      }
+    }
+
+    getInitialSession()
+
+    const { subscription } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session)
+      }
+    )
+
+    return () => {
+      mounted = false
+
+      subscription?.unsubscribe()
+    }
   }, [])
 
   return (

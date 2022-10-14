@@ -141,7 +141,7 @@ If you want to learn more about Prisma, check out the [docs](https://www.prisma.
 
 ## Troubleshooting
 
-If you run `prisma migrate dev --name init` multiple times, it sometimes asks if you want to recreate the whole schema. If you chose yes, it will delete the public schema and recreates it. The default grants are missing after this. If you run into this problem, add a helper SQL for fixing the grants:
+If you run `prisma migrate dev --name init` multiple times, it sometimes asks if you want to recreate the whole schema. If you chose yes, it will delete the public schema and recreate it. The default grants are missing after this. If you run into this problem, add a helper SQL for fixing the grants:
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS "auth";

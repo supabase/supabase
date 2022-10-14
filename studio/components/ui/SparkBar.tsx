@@ -21,17 +21,17 @@ const SparkBar: FC<Props> = ({
   labelBottom = '',
   labelTop = '',
 }) => {
-  if (type == 'horizontal') {
-    let width = Number((value / max) * 100)
-    if (width < 3) width = 3
-    let widthCss = `${width}%`
+  if (type === 'horizontal') {
+    const width = Number((value / max) * 100)
+    const widthCss = `${width}%`
     const hasLabels = labelBottom || labelTop
+
     return (
       <div className="flex flex-col w-full">
         {hasLabels && (
           <div className="flex align-baseline justify-between pb-1 space-x-8">
-            <span className="text-scale-1200 text-base truncate">{labelBottom}</span>
-            <span className="text-scale-900 text-sm tabular-nums">{labelTop}</span>
+            <span className="text-scale-1200 text-sm truncate">{labelBottom}</span>
+            <span className="text-scale-1100 text-sm tabular-nums">{labelTop}</span>
           </div>
         )}
         <div
@@ -50,6 +50,7 @@ const SparkBar: FC<Props> = ({
     const totalHeight = 35
     let height = Number((value / max) * totalHeight)
     if (height < 2) height = 2
+
     return (
       <div
         className={`relative rounded w-5 overflow-hidden border p-1 ${

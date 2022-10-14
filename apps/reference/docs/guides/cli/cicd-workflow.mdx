@@ -18,7 +18,7 @@ The Supabase CLI also functions as a database migrations tool. In this guide, we
 
 Before you start, here are some prerequisites:
 
-- [Install the Supabase CLI](https://supabase.com/docs/reference/cli/installing-and-updating)
+- [Install the Supabase CLI](/docs/guides/cli)
 - Create a Supabase project
 - Initialise a local Git repository
 
@@ -36,10 +36,10 @@ You should see that a new `supabase` directory is created. Then you need to link
 
 ```sql
 supabase login
-supabase link --project-ref <project-id>
+supabase link --project-ref $PROJECT_ID
 ```
 
-You can get your `<project-id>` from your project’s dashboard URL:
+You can get your `$PROJECT_ID` from your project’s dashboard URL:
 
 ```
 https://app.supabase.com/project/<project-id>
@@ -292,7 +292,7 @@ When configured correctly, your repository should have CI and Release workflows 
 
 ### Open a PR with new migration
 
-Now that your repository is set up, it’s time to create a new migration. Follow our [migration guide](#creating-a-new-migration) to create a file `supabase/migrations/<timestamp>_new_employee.sql`.
+Now that your repository is set up, it’s time to create a new migration. Follow the [migration section](#creating-a-new-migration) to create a file `supabase/migrations/<timestamp>_new_employee.sql`.
 
 Checkout a new branch `feat/employee` from `develop` , commit the migration file, and push to GitHub.
 
@@ -321,7 +321,7 @@ After verifying your staging project has successfully migrated, create another P
 
 The `release` job applies all new migration scripts merged in `supabase/migrations` directory to a linked Supabase project. You can control which project the job links to via `PROJECT_ID` environment variable.
 
-The full example code for this guide is available on our [demo repository](https://github.com/supabase/cli-example).
+The full example code for this guide is available on our [demo repository](https://github.com/supabase/supabase-action-example).
 
 ## Troubleshooting
 
@@ -380,6 +380,6 @@ mv <time>_dev_A.sql <t+2>_dev_A.sql
 supabase db reset
 ```
 
-In case `reset` fails, you can manually resolve conflicts by editing `<t+2>_dev_A.sql` file.
+In case [`reset`](/reference/cli/usage#supabase-db-reset) fails, you can manually resolve conflicts by editing `<t+2>_dev_A.sql` file.
 
 Once validated locally, commit your changes to Git and push to GitHub.

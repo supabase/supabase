@@ -21,7 +21,7 @@ export const TEMPLATES: LogTemplate[] = [
     description: 'Count of commits made by users on the database',
     mode: 'custom',
     searchString: `select
-  p.user_name, 
+  p.user_name,
   count(*) as count
 from postgres_logs
   left join unnest(metadata) as m on true
@@ -38,7 +38,7 @@ group by
     description: 'List all IP addresses that used the Supabase API',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   h.x_real_ip
 from edge_logs
   left join unnest(metadata) as m on true
@@ -52,8 +52,8 @@ where h.x_real_ip is not null
     label: 'Requests by Country',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
-    searchString: `select 
-  cf.country, 
+    searchString: `select
+  cf.country,
   count(*) as count
 from edge_logs
   left join unnest(metadata) as m on true
@@ -71,11 +71,11 @@ order by
     mode: 'custom',
     description: 'List all Supabase API requests that are slow',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.origin_time
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.origin_time > 1000
@@ -90,11 +90,11 @@ limit 100
     description: 'List all Supabase API requests that responded witha 5XX status code',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.status_code
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.status_code >= 500
@@ -113,11 +113,11 @@ limit 100
   r.search as params,
   count(timestamp) as c
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
-group by 
+group by
   path,
-  params 
+  params
 order by
   c desc
 limit 100
@@ -132,7 +132,7 @@ limit 100
   cast(timestamp as datetime) as timestamp,
   event_message
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
 where
   path like '%rest/v1%'
@@ -197,9 +197,9 @@ const _SQL_FILTER_COMMON = {
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadataParsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.noError': `metadataParsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.log': `metadataParsed.error_severity = 'LOG'`,
+    'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.log': `parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
@@ -237,6 +237,9 @@ export const SQL_FILTER_TEMPLATES: any = {
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  storage_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -246,6 +249,7 @@ export enum LogsTableName {
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
   REALTIME = 'realtime_logs',
+  STORAGE = 'storage_logs',
 }
 
 export const LOGS_TABLES = {
@@ -254,7 +258,8 @@ export const LOGS_TABLES = {
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
   auth: LogsTableName.AUTH,
-  realtime: LogsTableName.REALTIME
+  realtime: LogsTableName.REALTIME,
+  storage: LogsTableName.STORAGE,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -264,9 +269,8 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
+  [LogsTableName.STORAGE]: 'Object storage logs',
 }
-
-export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
 export const genQueryParams = (params: { [k: string]: string }) => {
   // remove keys which are empty strings, null, or undefined
@@ -449,14 +453,14 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     calcTo: () => '',
   },
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     default: true,

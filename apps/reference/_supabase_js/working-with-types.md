@@ -31,7 +31,7 @@ interface Database {
 }
 ```
 
-There is a different between `selects`, `inserts`, and `updates`, because often you will set default values in your database for specific columns.
+There is a difference between `selects`, `inserts`, and `updates`, because often you will set default values in your database for specific columns.
 With default values you do not need to send any data over the network, even if that column is a "required" field. Our type system is granular
 enough to handle these situations.
 

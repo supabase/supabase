@@ -1,31 +1,22 @@
-import { HeaderFormmater, SeverityFormatter, TimestampLocalFormatter } from '../LogsFormatters'
+import {
+  RowLayout,
+  SeverityFormatter,
+  TextFormatter,
+  TimestampLocalFormatter,
+} from '../LogsFormatters'
 
 export default [
   {
-    key: 'timestamp',
-    headerRenderer: () => (
-      <div className="flex w-full justify-end h-full">
-        <HeaderFormmater value={'timestamp'} />
-      </div>
-    ),
-    name: 'timestamp',
     formatter: (data: any) => (
-      <TimestampLocalFormatter className="!text-scale-1100" value={data.row.timestamp!} />
+      <RowLayout>
+        <TimestampLocalFormatter value={data.row.timestamp!} />
+        {data.row.event_type === 'uncaughtException' ? (
+          <SeverityFormatter value={data.row.event_type} uppercase={false} />
+        ) : (
+          <SeverityFormatter value={data.row.level} />
+        )}
+        <TextFormatter className="w-full" value={data.row.event_message} />
+      </RowLayout>
     ),
-    width: 128,
-    resizable: true,
-  },
-  {
-    key: 'level',
-    headerRenderer: () => <HeaderFormmater value={'Level'} />,
-    name: 'level',
-    formatter: (data: any) => <SeverityFormatter value={data.row.level} />,
-    width: 24,
-    resizable: true,
-  },
-  {
-    key: 'event_message',
-    headerRenderer: () => <HeaderFormmater value={'Event message'} />,
-    resizable: true,
   },
 ]

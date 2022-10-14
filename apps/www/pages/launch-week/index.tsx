@@ -33,7 +33,7 @@ export default function launchweek() {
       />
       <div className="launch-week-gradientBg"></div>
       <DefaultLayout>
-        <SectionContainer className="flex flex-col gap-8  md:gap-16 lg:gap-32">
+        <SectionContainer className="flex flex-col gap-8 !pb-0 md:gap-16 lg:gap-16">
           <img
             src="/images/launchweek/launchweek-logo--light.svg"
             className="md:40 w-28 dark:hidden lg:w-48"
@@ -56,7 +56,7 @@ export default function launchweek() {
             {days.map((item: WeekDayProps, i) => {
               return (
                 <LaunchSection
-                  key={'launchweek-item ' + item.title}
+                  key={'launchweek-item ' + (item.title || i)}
                   {...item}
                   index={i}
                   shippingHasStarted={shippingHasStarted}

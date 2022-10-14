@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, FC } from 'react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { toPng } from 'html-to-image'
-import { Button, Input, Popover, IconCamera, IconX } from '@supabase/ui'
+import { Button, Input, Popover, IconCamera, IconX } from 'ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -45,7 +45,7 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
     }
 
     toPng(document.body, { filter })
-      .then((dataUrl) => {
+      .then((dataUrl: any) => {
         console.log('Capture screenshot', dataUrl)
         setScreenshot(dataUrl)
       })
@@ -148,14 +148,14 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
             <a>
-              <span className="cursor-pointer transition-colors text-brand-900 hover:text-brand-1200">
+              <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
                 Supabase support
               </span>
             </a>
           </Link>{' '}
           or{' '}
           <a href="https://supabase.com/docs" target="_blank">
-            <span className="cursor-pointer transition-colors text-brand-900 hover:text-brand-1200">
+            <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
               browse our docs
             </span>
           </a>

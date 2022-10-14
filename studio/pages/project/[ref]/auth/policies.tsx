@@ -1,21 +1,22 @@
-import React, { useState, PropsWithChildren, FC } from 'react'
+import React, { useState, FC } from 'react'
 import { isEmpty } from 'lodash'
-import { Button, IconSearch, Input } from '@supabase/ui'
+import { Button, IconSearch, Input, IconHelpCircle } from 'ui'
+import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
+import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { PostgresRole } from '@supabase/postgres-meta'
 import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoTableState from 'components/ui/States/NoTableState'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-
-const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
-  return <div className="p-4">{children}</div>
-}
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import NoPermission from 'components/ui/NoPermission'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import InformationBox from 'components/ui/InformationBox'
 
 /**
  * Filter tables by table name and policy name
@@ -52,43 +53,50 @@ const onFilterTables = (
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
+
   const [policiesFilter, setPoliciesFilter] = useState<string | undefined>(undefined)
   const publicTables = meta.tables.list((table: { schema: string }) => table.schema === 'public')
   const policies = meta.policies.list()
   const filteredTables = onFilterTables(publicTables, policies, policiesFilter)
 
+  const canReadPolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
+
+  if (!canReadPolicies) {
+    return <NoPermission isFullPage resourceText="view this project's RLS policies" />
+  }
+
   return (
-    <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <Input
-            size="small"
-            placeholder="Filter tables and policies"
-            className="block w-64 text-sm placeholder-gray-400"
-            value={policiesFilter}
-            onChange={(e) => setPoliciesFilter(e.target.value)}
-            icon={<IconSearch size="tiny" />}
-          />
-          <Button type="link">
-            <a
-              target="_blank"
-              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-            >
-              What is RLS?
-            </a>
-          </Button>
+    <div className="flex flex-col h-full">
+      {(publicTables || []).length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between">
+            <Input
+              size="small"
+              placeholder="Filter tables and policies"
+              className="block w-64 text-sm placeholder-gray-400"
+              value={policiesFilter}
+              onChange={(e) => setPoliciesFilter(e.target.value)}
+              icon={<IconSearch size="tiny" />}
+            />
+            <Button type="link">
+              <a
+                target="_blank"
+                href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+              >
+                What is RLS?
+              </a>
+            </Button>
+          </div>
         </div>
-      </div>
-      <div>
-        <AuthPoliciesTables hasPublicTables={publicTables.length > 0} tables={filteredTables} />
-      </div>
-    </>
+      )}
+      <AuthPoliciesTables hasPublicTables={publicTables.length > 0} tables={filteredTables} />
+    </div>
   )
 }
 
 AuthPoliciesPage.getLayout = (page) => (
   <AuthLayout title="Auth">
-    <AuthPoliciesLayout>{page}</AuthPoliciesLayout>
+    <div className="h-full p-4">{page}</div>
   </AuthLayout>
 )
 
@@ -99,6 +107,9 @@ interface AuthPoliciesTablesProps {
   tables: any[]
 }
 const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasPublicTables }) => {
+  const router = useRouter()
+  const { ref } = router.query
+
   const { ui, meta } = useStore()
   const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
@@ -194,19 +205,15 @@ const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasP
   }
 
   return (
-    <div>
+    <>
       {tables.length > 0 ? (
         tables.map((table: any) => (
           <section key={table.id}>
             <PolicyTableRow
               table={table}
-              // @ts-ignore
               onSelectToggleRLS={onSelectToggleRLS}
-              // @ts-ignore
               onSelectCreatePolicy={onSelectCreatePolicy}
-              // @ts-ignore
               onSelectEditPolicy={onSelectEditPolicy}
-              // @ts-ignore
               onSelectDeletePolicy={onSelectDeletePolicy}
             />
           </section>
@@ -214,7 +221,39 @@ const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasP
       ) : hasPublicTables ? (
         <NoSearchResults />
       ) : (
-        <NoTableState message="A public schema table is required before you can create a row-level security policy" />
+        <div className="flex-grow">
+          <ProductEmptyState
+            size="large"
+            title="Postgres Policies"
+            ctaButtonLabel="Create a table"
+            infoButtonLabel="What is RLS?"
+            infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
+            onClickCta={() => router.push(`/project/${ref}/editor`)}
+          >
+            <div className="space-y-4">
+              <InformationBox
+                title="What are policies?"
+                icon={<IconHelpCircle strokeWidth={2} />}
+                description={
+                  <div className="space-y-2">
+                    <p className="text-sm">
+                      Policies restrict, on a per-user basis, which rows can be returned by normal
+                      queries, or inserted, updated, or deleted by data modification commands.
+                    </p>
+                    <p className="text-sm">
+                      This is also known as Row-Level Security (RLS). Each policy is attached to a
+                      table, and the policy is executed everytime a time is accessed.
+                    </p>
+                  </div>
+                }
+              />
+              <p className="text-sm text-scale-1100">
+                A table within the public schema is required before you can create a Row-Level
+                Security policy.
+              </p>
+            </div>
+          </ProductEmptyState>
+        </div>
       )}
 
       <PolicyEditorModal
@@ -254,6 +293,6 @@ const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasP
         onSelectCancel={closeConfirmModal}
         onSelectConfirm={onToggleRLS}
       />
-    </div>
+    </>
   )
 })

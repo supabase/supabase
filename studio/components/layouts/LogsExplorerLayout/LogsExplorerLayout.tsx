@@ -1,44 +1,44 @@
-import React, { useEffect } from 'react'
-import BaseLayout from 'components/layouts'
+import { FC, useEffect, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useStore, withAuth } from 'hooks'
-import { Badge, IconList, Loading } from '@supabase/ui'
+import { Badge, IconList, Loading } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions, useStore, withAuth } from 'hooks'
+import BaseLayout from 'components/layouts'
+import NoPermission from 'components/ui/NoPermission'
 import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 
-const PageLayout = ({
-  subtitle,
-  children,
-}: {
-  subtitle?: React.ReactNode
-  children?: React.ReactNode
-}) => {
-  const { content, ui } = useStore()
+interface Props {
+  subtitle?: ReactNode
+  children?: ReactNode
+}
 
-  useEffect(() => {
-    content.load()
-  }, [ui.selectedProject])
+const PageLayout: FC<Props> = ({ subtitle, children }) => {
+  const canUseLogsExplorer = checkPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
 
-  if (!content.isLoaded) {
+  if (!canUseLogsExplorer) {
     return (
       <BaseLayout>
-        <Loading active={true}>{null}</Loading>
+        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+          <NoPermission isFullPage resourceText="access your project's logs explorer" />
+        </main>
       </BaseLayout>
     )
   }
 
   return (
     <BaseLayout>
-      <div className="h-full flex flex-col flex-grow py-6">
+      <div className="flex h-full flex-grow flex-col py-6">
         <div
           className={[
-            'w-full mx-auto flex flex-col transition-all gap-4 px-5',
-            'lg:px-16 xl:px-24 1xl:px-28 2xl:px-32',
+            'mx-auto flex w-full flex-col gap-4 px-5 transition-all',
+            '1xl:px-28 lg:px-16 xl:px-24 2xl:px-32',
           ].join(' ')}
         >
           <div className="flex items-center gap-3">
             <div
-              className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
-            flex items-center justify-center
+              className="flex h-6 w-6 items-center justify-center rounded border
+            border-brand-600 bg-brand-300 text-brand-900
           "
             >
               <IconList size={14} strokeWidth={3} />
@@ -50,8 +50,8 @@ const PageLayout = ({
         </div>
         <div
           className={[
-            'h-full w-full flex flex-col flex-grow mx-auto gap-4 transition-all',
-            'px-5 lg:px-16 1xl:px-28 2xl:px-32',
+            'mx-auto flex h-full w-full flex-grow flex-col gap-4 transition-all',
+            '1xl:px-28 px-5 lg:px-16 2xl:px-32',
           ].join(' ')}
         >
           {children}

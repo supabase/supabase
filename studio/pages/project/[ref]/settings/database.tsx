@@ -7,10 +7,11 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
-import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
+import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
@@ -18,11 +19,10 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from '
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import Panel from 'components/ui/Panel'
-import { ProjectUsageMinimal } from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
-import { NextPageWithLayout } from 'types'
+import ProjectUsageMinimal from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageMinimal'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
@@ -35,7 +35,7 @@ const ProjectSettings: NextPageWithLayout = () => {
     <div>
       <div className="content h-full w-full overflow-y-auto">
         <div className="w-full max-w-5xl px-4 py-4">
-          <Usage project={project} />
+          <DatabaseUsage project={project} />
           <GeneralSettings projectRef={ref} />
           <ConnectionPooling />
         </div>
@@ -48,7 +48,7 @@ ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</S
 
 export default observer(ProjectSettings)
 
-const Usage: FC<any> = ({ project }) => {
+const DatabaseUsage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
   const ref = router.query.ref as string
@@ -59,9 +59,9 @@ const Usage: FC<any> = ({ project }) => {
         <section className="">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Database health
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>
@@ -75,15 +75,15 @@ const Usage: FC<any> = ({ project }) => {
                 />
                 {dateRange && (
                   <div className="flex items-center space-x-2">
-                    <Typography.Text type="secondary">
+                    <p className="text-scale-1000">
                       {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
-                    </Typography.Text>
-                    <Typography.Text type="secondary" className="opacity-50">
+                    </p>
+                    <p className="text-scale-1000">
                       <IconArrowRight size={12} />
-                    </Typography.Text>
-                    <Typography.Text type="secondary">
+                    </p>
+                    <p className="text-scale-1000">
                       {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
-                    </Typography.Text>
+                    </p>
                   </div>
                 )}
               </div>
@@ -129,17 +129,13 @@ const Usage: FC<any> = ({ project }) => {
         <section className="mt-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
-                Database storage
-              </Typography.Title>
+              <h5 key="panel-title" className="mb-0">
+                Database usage
+              </h5>
             }
           >
             <Panel.Content>
-              <ProjectUsageMinimal
-                projectRef={ref}
-                subscription_id={project.subscription_id}
-                filter={'Database'}
-              />
+              <ProjectUsageMinimal projectRef={ref} filter={'Database'} />
             </Panel.Content>
           </Panel>
         </section>
@@ -152,7 +148,10 @@ const ResetDbPassword: FC<any> = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
 
-  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const enablePermissions = useFlag('enablePermissions')
+  const canResetDbPassword = enablePermissions
+    ? checkPermissions(PermissionAction.UPDATE, 'projects')
+    : ui.selectedOrganization?.is_owner
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
@@ -222,7 +221,7 @@ const ResetDbPassword: FC<any> = () => {
         <Panel.Content>
           <div className="grid grid-cols-1 items-center lg:grid-cols-2">
             <div>
-              <Typography.Text className="block">Database password</Typography.Text>
+              <p className="block">Database password</p>
               <div style={{ maxWidth: '420px' }}>
                 <p className="text-sm opacity-50">
                   You can use this password to connect directly to your Postgres database.
@@ -245,11 +244,11 @@ const ResetDbPassword: FC<any> = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                        'border-scale-200 border ', //border
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        'border border-scale-200 ', //border
                       ].join(' ')}
                     >
-                      <span className="text-scale-1200 text-xs">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to reset the database password
                       </span>
                     </div>
@@ -262,7 +261,7 @@ const ResetDbPassword: FC<any> = () => {
       </Panel>
       <Modal
         hideFooter
-        header={<h5 className="text-scale-1200 text-sm">Reset database password</h5>}
+        header={<h5 className="text-sm text-scale-1200">Reset database password</h5>}
         confirmText="Reset password"
         alignFooter="right"
         size="medium"
@@ -320,7 +319,7 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
       <Panel.Content>
         <div className="grid grid-cols-1 items-center lg:grid-cols-2">
           <div>
-            <Typography.Text className="block">SSL Connection</Typography.Text>
+            <p className="block">SSL Connection</p>
             <div style={{ maxWidth: '420px' }}>
               <p className="text-sm opacity-50">
                 Use this certificate when connecting to your database to prevent snooping and
@@ -349,7 +348,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   if (data?.error || error) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Title level={3}>Error loading database settings</Typography.Title>
+        <p className="text-scale-1000">Error loading database settings</p>
       </div>
     )
   }
@@ -357,7 +356,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   if (!data) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Title level={3}>Loading...</Typography.Title>
+        <p className="text-scale-1000">Loading...</p>
       </div>
     )
   }
@@ -387,10 +386,9 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <section className="mt-6 space-y-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Connection info
-              </Typography.Title>
-              // <Title level={4}>Connection info</Title>
+              </h5>
             }
           >
             <Panel.Content className="space-y-6">
@@ -452,9 +450,9 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <section className="mt-6 space-y-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Connection string
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>

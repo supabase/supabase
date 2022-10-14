@@ -1,6 +1,5 @@
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Loading from 'components/ui/Loading'
@@ -11,7 +10,7 @@ import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 
 interface Props {}
 
@@ -37,7 +36,7 @@ const ConnectionPooling: FC<Props> = () => {
   if (poolingConfiguration.error) {
     return (
       <div className="p-4">
-        <Typography.Text type="secondary">Error loading pooling configuration</Typography.Text>
+        <p className="text-scale-1000">Error loading pooling configuration</p>
       </div>
     )
   }
@@ -49,15 +48,13 @@ const ConnectionPooling: FC<Props> = () => {
     return (
       <Panel
         title={
-          <Typography.Title key="panel-title" level={5} className="mb-0">
+          <h5 key="panel-title" className="mb-0">
             Connection Pooling is not available for this project
-          </Typography.Title>
+          </h5>
         }
       >
         <Panel.Content>
-          <Typography.Text type="secondary">
-            Please start a new project to enable this feature.
-          </Typography.Text>
+          <p className="text-scale-1000">Please start a new project to enable this feature.</p>
         </Panel.Content>
       </Panel>
     )
@@ -187,7 +184,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
                 showInlineError
                 errorMessage="You must select one of the three options"
               />
-              <div className="flex !mt-1" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
+              <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
                 <p className="text-sm text-scale-900">
                   Specify when a connection can be returned to the pool. To find out the most
                   suitable mode for your use case,{' '}

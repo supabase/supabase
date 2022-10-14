@@ -1,41 +1,20 @@
 ---
 id: functions
 title: Edge Functions
-description: 'Globally distributed Typescript functions.'
+description: 'Globally distributed TypeScript functions.'
+sidebar_label: Overview
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
-const examples = [
-  {
-    name: 'With supabase-js',
-    description: 'Use the Supabase client inside your Edge Function.',
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions',
-  },
-  {
-    name: 'With CORS headers',
-    description: 'Send CORS headers for invoking from the browser.',
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts',
-  },
-  {
-    name: 'React Native with Stripe',
-    description: 'Full example for using Supabase and Stripe, with Expo.',
-    href: 'https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions',
-  },
-  {
-    name: 'Flutter with Stripe',
-    description: 'Full example for using Supabase and Stripe, with Flutter.',
-    href: 'https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions',
-  },
-]
 
-Edge Functions are server-side Typescript functions, distributed globally at the edge - close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties, like Stripe.
+Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks).
 
 Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
 
 - It is open source.
 - It is portable. Supabase Edge Functions run locally, and on any other Deno-compatible platform (including self-hosted infrastructure).
-- It is Typescript first and supports WASM.
+- It is TypeScript first and supports WASM.
 - Edge Functions are globally distributed for low-latency.
 
 ## Quickstart
@@ -55,10 +34,10 @@ Learn how to develop Edge Functions in less than 7 minutes:
 
 Follow the steps to prepare your Supabase project on your local machine.
 
-- Install the Supabase CLI. [Docs](/docs/reference/cli/installing-and-updating).
-- Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/supabase-login).
-- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/local-development#getting-started).
-- Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/supabase-link).
+- Install the Supabase CLI. [Docs](/docs/guides/cli).
+- Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/usage#supabase-login).
+- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/cli/local-development#getting-started).
+- Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/usage#supabase-link).
 - Optional: Setup your environment: Follow [this setup guide](https://deno.land/manual/getting_started/setup_your_environment) to integrate the Deno language server with your editor.
 
 ## Getting Started
@@ -86,9 +65,9 @@ The command outputs a URL to the Supabase Dashboard which you can open to find v
 
 :::note
 
-By default Edge Functions require a valid JWT to be send in the authorization header. This header is automatically set when invoking your function via a Supabase client library.
+By default, Edge Functions require a valid JWT in the authorization header. This header is automatically set when invoking your function via a Supabase client library.
 
-If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks), or [chat bot webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/telegram-bot) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
+If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
 
 :::
 
@@ -118,7 +97,7 @@ You can debug your deployed Edge Functions using the "Functions" section of the 
 
 ## Developing locally
 
-You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/supabase-functions-serve):
+You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
 
 ```bash
 supabase start # start the supabase stack
@@ -216,7 +195,7 @@ Never check your `.env` files into Git!
 
 :::
 
-Let's push all the secrets from the `.env` file to our remote project using [`supabase secrets set`](/docs/reference/cli/supabase-secrets-set):
+Let's push all the secrets from the `.env` file to our remote project using [`supabase secrets set`](/docs/reference/cli/usage#supabase-secrets-set):
 
 ```bash
 supabase secrets set --env-file ./supabase/.env
@@ -227,30 +206,11 @@ supabase secrets set MY_NAME=Chewbacca
 
 You don't need to re-deploy after setting your secrets.
 
-To see all the secrets which you have set remotely, use [`supabase secrets list`](/docs/reference/cli/supabase-secrets-list):
+To see all the secrets which you have set remotely, use [`supabase secrets list`](/docs/reference/cli/usage#supabase-secrets-list):
 
 ```bash
 supabase secrets list
 ```
-
-## Examples
-
-You can find a list of useful [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
-
-<div class="container" style={{ padding: 0 }}>
-  <div class="row is-multiline">
-    {examples.map((x) => (
-      <div class="col col--6">
-        <a class="card" to={x.href} style={{ height: '100%' }}>
-          <div class="card__body">
-            <h4>{x.name}</h4>
-            <p>{x.description}</p>
-          </div>
-        </a>
-      </div>
-    ))}
-  </div>
-</div>
 
 ## Suggestions
 
@@ -259,7 +219,7 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
 For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database
 and can be called remotely using the [REST and GraphQL API](/docs/guides/api).
 
-For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in Typescript.
+For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in TypeScript.
 
 ### Organizing your Edge Functions
 
@@ -283,6 +243,26 @@ We recommend developing “fat functions”. This means that you should develop 
 
 We recommend using hyphens to name functions because hyphens are the most URL-friendly of all the naming conventions (snake_case, camelCase, PascalCase).
 
+### CORS (Cross-Origin Resource Sharing)
+
+We recommend adding a check to handle [CORS Preflight](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request) requests in your edge function to be able to invoke the function from browsers.
+
+See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts).
+
+```ts
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+  ...
+})
+```
+
 ## Limitations
 
 - Deno Deploy limitations
@@ -290,5 +270,5 @@ We recommend using hyphens to name functions because hyphens are the most URL-fr
   - Cannot write to File System
 - Edge Functions
   - Local development - only one function at a time
-  - Supabase Functions only supports `POST` requests.
-  - Supabase Functions do not support HTML responses.
+  - Supabase Functions only supports `POST`, `OPTIONS`, and `GET` requests.
+  - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).

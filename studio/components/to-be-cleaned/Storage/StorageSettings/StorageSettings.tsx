@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import { FC, useState } from 'react'
-import { Button, Form, Input, Listbox } from '@supabase/ui'
+import { Button, Form, Input, Listbox } from 'ui'
 
 import { useStore } from 'hooks'
 import { patch, get } from 'lib/common/fetch'
@@ -10,7 +10,7 @@ import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
 
 const StorageSettings: FC<any> = ({ projectRef }) => {
-  const { data, error } = useSWR(`${API_URL}/projects/${projectRef}/config?app=storage`, get)
+  const { data, error } = useSWR(`${API_URL}/projects/${projectRef}/config/storage`, get)
 
   if (error || data?.error) {
     return (
@@ -68,7 +68,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
       })
     } else {
       const payload = { fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit) }
-      const res = await patch(`${API_URL}/projects/${projectRef}/config?app=storage`, payload)
+      const res = await patch(`${API_URL}/projects/${projectRef}/config/storage`, payload)
       if (res?.error) {
         ui.setNotification({
           category: 'error',
@@ -105,8 +105,8 @@ const StorageConfig = ({ config, projectRef }: any) => {
           return (
             <>
               <div className="mb-6">
-                <h3 className="text-scale-1200 mb-2 text-xl">Storage settings</h3>
-                <div className="text-scale-900 text-sm">
+                <h3 className="mb-2 text-xl text-scale-1200">Storage settings</h3>
+                <div className="text-sm text-scale-900">
                   Configure your project's storage settings
                 </div>
               </div>
@@ -114,11 +114,11 @@ const StorageConfig = ({ config, projectRef }: any) => {
                 <div
                   className={[
                     'bg-scale-100 dark:bg-scale-300',
-                    'border-scale-400 overflow-hidden',
+                    'overflow-hidden border-scale-400',
                     'rounded-md border shadow',
                   ].join(' ')}
                 >
-                  <div className="divide-scale-400 flex flex-col gap-0 divide-y">
+                  <div className="flex flex-col gap-0 divide-y divide-scale-400">
                     <div className="block grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
                       <div className="relative col-span-12 flex flex-col gap-6 lg:col-span-4">
                         <p className="text-sm">Upload file size limit</p>
@@ -158,7 +158,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                             </Listbox>
                           </div>
                         </div>
-                        <p className="text-scale-1100 text-sm">
+                        <p className="text-sm text-scale-1100">
                           {selectedUnit !== StorageSizeUnits.BYTES &&
                             `Equivalent to ${convertToBytes(
                               values.fileSizeLimit,
@@ -179,7 +179,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                       />
                     </div>
                   )}
-                  <div className="border-scale-400 border-t" />
+                  <div className="border-t border-scale-400" />
                   <div className="flex justify-between py-4 px-8">
                     <div className="flex w-full items-center justify-end gap-2">
                       <div className="flex gap-2">
