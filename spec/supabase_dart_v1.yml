@@ -44,7 +44,7 @@ pages:
       - name: Sign up with third-party providers.
         hideCodeBlock: true
         description: |
-          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider) method available on `supabase_flutter`.
+          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) method available on `supabase_flutter`.
 
   auth.signInWithPassword():
     title: 'signInWithPassword()'
