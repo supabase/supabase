@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Form, Input } from '@supabase/ui'
+import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions, useFlag } from 'hooks'
@@ -59,21 +59,17 @@ const General: FC<Props> = ({}) => {
             <FormPanel
               disabled={!canUpdateProject}
               footer={
-                <div
-                  className={`flex py-4 px-8 ${
-                    canUpdateProject ? 'justify-end' : 'justify-between'
-                  }`}
-                >
-                  {!canUpdateProject && (
-                    <p className="text-sm text-scale-1000">
-                      You need additional permissions to manage this project's settings
-                    </p>
-                  )}
+                <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
+                    helper={
+                      !canUpdateProject
+                        ? "You need additional permissions to manage this project's settings"
+                        : undefined
+                    }
                   />
                 </div>
               }

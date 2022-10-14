@@ -1,15 +1,9 @@
-# This is a basic workflow to help you get started with Actions
 name: Tests
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-
-  # Allows you to run this workflow manually from the Actions tab
+  schedule:
+    - cron: '0 4/6 * * *'
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -41,17 +35,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run infrastructure
-        run: |
-          cp ../docker/.env.example ../docker/.env
-          npm run docker:up
+      - uses: supabase/setup-cli@v1
+      - run: supabase start
 
       - name: Run Test
-        run: npm run test
-        continue-on-error: true
+        run: npm run test:local
+        env:
+          SUPABASE_DB_PORT: 54322
+          SUPABASE_DB_PASS: postgres
+          SUPABASE_DB_HOST: localhost
+          SUPABASE_GOTRUE: http://localhost:54321
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_KEY_ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs
+          SUPABASE_KEY_ADMIN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSJ9.vI9obAHOGyVVKa3pD--kJlyxp-Z2zV9UUMAhKpNLAcU
 
       - name: Stop infrastructure
-        run: npm run docker:down
+        if: always()
+        run: supabase stop
 
       - name: Get Allure history
         uses: actions/checkout@v2
@@ -73,7 +73,7 @@ jobs:
           keep_reports: 50
 
       - name: Deploy report to Github Pages
-        if: ${{ !github.event.pull_request.head.repo.fork }}
+        if: always()
         uses: peaceiris/actions-gh-pages@v2
         env:
           EXTERNAL_REPOSITORY: supabase/test-reports
@@ -82,7 +82,7 @@ jobs:
           PUBLISH_DIR: allure-history
 
       - name: Post the link to the report
-        if: ${{ !github.event.pull_request.head.repo.fork }}
+        if: always()
         uses: Sibz/github-status-action@v1
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}

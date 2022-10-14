@@ -5,7 +5,7 @@ const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
 
-const baseUrl = '/new-docs/'
+const baseUrl = '/docs/'
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -13,11 +13,10 @@ const config = {
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.com',
   baseUrl: baseUrl,
-  onBrokenLinks: 'ignore', // TODO: remove this when going into prod
-  // onBrokenLinks: 'throw',
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/favicon.ico',
-  // themes: ['docusaurus-theme-search-typesense'],
+  themes: ['docusaurus-theme-search-typesense'],
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -41,6 +40,8 @@ const config = {
         routeBasePath: '/reference/api',
         sidebarPath: require.resolve('./nav/api_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -51,6 +52,8 @@ const config = {
         routeBasePath: '/reference/cli',
         sidebarPath: require.resolve('./nav/cli_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -61,6 +64,8 @@ const config = {
         routeBasePath: '/reference/auth',
         sidebarPath: require.resolve('./nav/gotrue_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -71,6 +76,8 @@ const config = {
         routeBasePath: '/reference/storage',
         sidebarPath: require.resolve('./nav/storage_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -81,6 +88,18 @@ const config = {
         routeBasePath: '/reference/dart',
         sidebarPath: require.resolve('./nav/supabase_dart_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        lastVersion: 'v0',
+        versions: {
+          current: {
+            label: 'v1-dev',
+            path: '/next',
+          },
+          v0: {
+            label: 'v0',
+          },
+        },
       },
     ],
     [
@@ -91,23 +110,17 @@ const config = {
         routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
-        // lastVersion: 'current',
-        // versions: {
-        //   current: {
-        //     label: 'v2',
-        //     // path: 'v2',
-        //   },
-        // },
-      },
-    ],
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: '_auth_helpers',
-        path: '_auth_helpers',
-        routeBasePath: '/reference/auth-helpers',
-        sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
-        breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        lastVersion: 'current',
+        versions: {
+          current: {
+            label: 'v2',
+          },
+          v1: {
+            label: 'v1',
+          },
+        },
       },
     ],
   ],
@@ -121,6 +134,8 @@ const config = {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: require.resolve('./nav/_referenceSidebars.js'),
           breadcrumbs: false,
+          editUrl:
+            'https://github.com/supabase/supabase/edit/master/apps/reference',
         },
         blog: false,
         theme: {
@@ -142,6 +157,8 @@ const config = {
         // title: 'Supabase Docs',
         logo: {
           alt: 'Supabase Docs',
+          href: 'https://supabase.com',
+          target: '_self',
           src: '/img/supabase-logo-wordmark--light.svg',
           srcDark: '/img/supabase-logo-wordmark--dark.svg',
         },
@@ -159,6 +176,22 @@ const config = {
               {
                 label: 'Open source',
                 to: '/oss',
+              },
+              {
+                label: 'Terms of Service',
+                to: '/docs/company/terms',
+              },
+              {
+                label: 'Privacy Policy',
+                to: '/docs/company/privacy',
+              },
+              {
+                label: 'Acceptable Use Policy',
+                to: '/docs/company/aup',
+              },
+              {
+                label: 'Service Level Agreement',
+                to: '/docs/company/sla',
               },
               {
                 label: 'Humans.txt',
@@ -199,6 +232,14 @@ const config = {
             title: 'Community',
             items: [
               {
+                label: 'SupaSquad',
+                href: 'https://supabase.com/docs/handbook/supasquad',
+              },
+              {
+                label: 'Contributing',
+                href: 'https://supabase.com/docs/handbook/contributing',
+              },
+              {
                 label: 'GitHub',
                 href: 'https://github.com/supabase/supabase',
               },
@@ -220,15 +261,6 @@ const config = {
               },
             ],
           },
-          {
-            title: 'Beta',
-            items: [
-              {
-                label: 'Join our beta',
-                href: 'https://app.supabase.com',
-              },
-            ],
-          },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Supabase.`,
       },
@@ -239,27 +271,28 @@ const config = {
         darkTheme: darkCodeTheme,
       },
 
-      // typesense: {
-      //   typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
+      typesense: {
+        typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
 
-      //   typesenseServerConfig: {
-      //     nodes: [
-      //       {
-      //         host: 'doc-search.supabase.com',
-      //         port: 443,
-      //         protocol: 'https',
-      //       },
-      //     ],
-      //     apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
-      //   },
+        typesenseServerConfig: {
+          nodes: [
+            {
+              host: 'doc-search.supabase.com',
+              port: 443,
+              protocol: 'https',
+            },
+          ],
+          apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
+        },
 
-      //   // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
-      //   typesenseSearchParameters: {},
+        // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
+        typesenseSearchParameters: {},
 
-      //   // Optional
-      //   contextualSearch: true,
-      // },
+        // Optional
+        contextualSearch: true,
+      },
     }),
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
 }
 
 module.exports = config

@@ -17,7 +17,7 @@
   },
   {
     "question": "Are you going to change your pricing in the future?",
-    "answer": "Our pricing is in Beta. You can read more about our decisions in our blog on pricing [here](/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
+    "answer": "Our pricing is in Beta. You can read more about our decisions in our [pricing blog post](/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
   },
   {
     "question": "What happens if I cancel my subscription?",
@@ -32,8 +32,8 @@
     "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you 2 free projects as part of our free tier. This means you could have a development and a production server as part of your free tier."
   },
   {
-    "question": "Can I self host Supabase for free?",
-    "answer": "Yes, our Docker setup can be found [here](https://github.com/supabase/supabase), or in our [CLI](https://github.com/supabase/cli). Supabase Studio is available in the docker setup, read more about it [here](https://supabase.com/blog/2021/11/30/supabase-studio)."
+    "question": "Can I self-host Supabase for free?",
+    "answer": "Yes, you can use the [Docker setup](https://supabase.com/docs/guides/hosting/docker) or the [Supabase CLI](https://github.com/supabase/cli). [Supabase Studio](https://supabase.com/blog/supabase-studio) is also available in the Docker setup."
   },
   {
     "question": "Can I pause a free project?",

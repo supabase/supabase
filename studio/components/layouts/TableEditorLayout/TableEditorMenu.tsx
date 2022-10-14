@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
+// import { Button } from 'ui'
 import {
   Alert,
   Button,
@@ -17,15 +18,15 @@ import {
   Input,
   Listbox,
   Menu,
-  Typography,
-} from '@supabase/ui'
+} from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
 import { checkPermissions, useStore } from 'hooks'
 import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   selectedSchema?: string
@@ -56,6 +57,7 @@ const TableEditorMenu: FC<Props> = ({
 
   // @ts-ignore
   const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const [searchText, setSearchText] = useState<string>('')
   const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
@@ -103,10 +105,10 @@ const TableEditorMenu: FC<Props> = ({
     <div className="my-6 mx-4 flex flex-grow flex-col space-y-6">
       {/* Schema selection dropdown */}
       <div className="px-3">
-        {meta.schemas.isLoading ? (
-          <div className="flex h-[30px] items-center space-x-3 rounded border border-gray-500 px-3">
+        {!meta.schemas.isInitialized ? (
+          <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
-            <span className="text-scale-900 text-xs">Loading schemas...</span>
+            <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
         ) : (
           <Listbox
@@ -120,17 +122,17 @@ const TableEditorMenu: FC<Props> = ({
             }}
           >
             <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
-              <p className="text-sm">Schemas</p>
+              <p className="text-xs text-scale-1100">Schemas</p>
             </Listbox.Option>
+            {/* @ts-ignore */}
             {openSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
                 value={schema.name}
-                // @ts-ignore
                 label={schema.name}
-                addOnBefore={() => <span className="text-scale-900">schema</span>}
+                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
               >
-                <span className="text-scale-1200 text-sm">{schema.name}</span>
+                <span className="text-scale-1200 text-xs">{schema.name}</span>
               </Listbox.Option>
             ))}
             <Listbox.Option
@@ -139,17 +141,16 @@ const TableEditorMenu: FC<Props> = ({
               value="protected-schemas"
               label="Protected schemas"
             >
-              <p className="text-sm">Protected schemas</p>
+              <p className="text-xs text-scale-1100">Protected schemas</p>
             </Listbox.Option>
             {protectedSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
                 value={schema.name}
-                // @ts-ignore
                 label={schema.name}
-                addOnBefore={() => <span className="text-scale-900">schema</span>}
+                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
               >
-                <span className="text-scale-1200 text-sm">{schema.name}</span>
+                <span className="text-scale-1200 text-xs">{schema.name}</span>
               </Listbox.Option>
             ))}
           </Listbox>
@@ -160,31 +161,48 @@ const TableEditorMenu: FC<Props> = ({
         {!isLocked && (
           <div className="px-3">
             {/* Add new table button */}
-            <Button
-              block
-              size="tiny"
-              icon={
-                <div className="text-scale-900">
-                  <IconEdit size={14} strokeWidth={1.5} />
-                </div>
-              }
-              type="default"
-              style={{ justifyContent: 'start' }}
-              onClick={onAddTable}
-            >
-              New table
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Button
+                  block
+                  as="span"
+                  disabled={!canCreateTables}
+                  size="tiny"
+                  icon={
+                    <div className="text-scale-900">
+                      <IconEdit size={14} strokeWidth={1.5} />
+                    </div>
+                  }
+                  type="default"
+                  style={{ justifyContent: 'start' }}
+                  onClick={onAddTable}
+                >
+                  New table
+                </Button>
+              </Tooltip.Trigger>
+              {!canCreateTables && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to create tables
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         )}
         {/* Table search input */}
         <div className="mb-2 block px-3">
           <Input
-            className="border-none"
-            icon={
-              <div className="text-scale-900">
-                <IconSearch size={12} strokeWidth={1.5} />
-              </div>
-            }
+            className="table-editor-search border-none"
+            icon={<IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />}
             placeholder="Search tables"
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
@@ -228,7 +246,8 @@ const TableEditorMenu: FC<Props> = ({
                   hoverText={table.comment ? table.comment : table.name}
                   isActive={isActive}
                   action={
-                    isActive && (
+                    isActive &&
+                    !isLocked && (
                       <Dropdown
                         size="small"
                         side="bottom"
@@ -258,7 +277,7 @@ const TableEditorMenu: FC<Props> = ({
                           </Dropdown.Item>,
                         ]}
                       >
-                        <div className="text-scale-900 hover:text-scale-1200 transition-colors">
+                        <div className="text-scale-900 transition-colors hover:text-scale-1200">
                           <IconChevronDown size={14} strokeWidth={2} />
                         </div>
                       </Dropdown>
@@ -292,7 +311,7 @@ const TableEditorMenu: FC<Props> = ({
               <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
                 <Menu.Item key={viewId} rounded active={isActive}>
                   <div className="flex justify-between">
-                    <Typography.Text className="truncate">{view.name}</Typography.Text>
+                    <p className="truncate">{view.name}</p>
                   </div>
                 </Menu.Item>
               </Link>
@@ -302,14 +321,18 @@ const TableEditorMenu: FC<Props> = ({
       )}
 
       {searchText.length > 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="px-3">
-          <Alert title="No tables or views found">This schema has no tables or views</Alert>
+        <div className="mx-3 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <p className="text-xs">No results found</p>
+          <p className="text-xs text-scale-1100">
+            There are no tables or views that match your search
+          </p>
         </div>
       )}
 
       {searchText.length === 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="px-3">
-          <Alert title="No tables available">There are no tables in this schema</Alert>
+        <div className="mx-3 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <p className="text-xs">No tables available</p>
+          <p className="text-xs text-scale-1100">This schema has no tables available yet</p>
         </div>
       )}
     </div>

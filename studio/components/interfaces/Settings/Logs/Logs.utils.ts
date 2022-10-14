@@ -1,6 +1,7 @@
-import { Filters, LogData, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
-import dayjs from 'dayjs'
+import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
+import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
+import { StripeSubscription } from 'components/interfaces/Billing'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -120,7 +121,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 
   switch (table) {
     case 'edge_logs':
-      return `select id, timestamp, event_message, request, response, request.method, request.path, response.status_code
+      return `select id, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
@@ -130,10 +131,10 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     case 'postgres_logs':
-      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table} 
-  cross join unnest(metadata) as m 
-  cross join unnest(m.parsed) as parsed 
-  ${where} 
+      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+  ${where}
   limit 100
   `
 
@@ -145,7 +146,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     `
 
     case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request
@@ -156,7 +157,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
-  limit 100          
+  limit 100
   `
   }
 }
@@ -164,4 +165,93 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string) => `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
+export const genSingleLogQuery = (table: LogsTableName, id: string) =>
+  `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
+
+/**
+ * Determine if we should show the user an upgrade prompt while browsing logs
+ */
+export const maybeShowUpgradePrompt = (
+  from: string | null | undefined,
+  tierKey?: StripeSubscription['tier']["key"]
+) => {
+  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+
+  return (day > 1 && tierKey === 'FREE') || (day > 7 && tierKey === 'PRO') || day > 90 && tierKey === 'ENTERPRISE'
+}
+
+export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
+
+/** calculates how much the chart start datetime should be offset given the current datetime filter params */
+export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
+  const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+  // todo @TzeYiing needs typing
+  const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+
+  let trunc = 'minute'
+  let extendValue = 60 * 6
+  const minuteDiff = ite.diff(its, 'minute')
+  const hourDiff = ite.diff(its, 'hour')
+  if (minuteDiff > 60 * 12) {
+    trunc = 'hour'
+    extendValue = 24 * 5
+  } else if (hourDiff > 24 * 3) {
+    trunc = 'day'
+    extendValue = 7
+  }
+  //
+  // @ts-ignore
+  return [its.add(-extendValue, trunc), trunc]
+}
+
+/**
+ *
+ * generates log event chart query
+ */
+export const genChartQuery = (
+  table: LogsTableName,
+  params: LogsEndpointParams,
+  filters: Filters
+) => {
+  const [startOffset, trunc] = calcChartStart(params)
+  const where = _genWhereStatement(table, filters)
+  return `
+SELECT
+  timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
+  count(t.timestamp) as count
+FROM
+  ${table} t
+  cross join unnest(t.metadata) as metadata
+  ${where
+      ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
+      : `where t.timestamp > '${startOffset.toISOString()}'`
+    }
+GROUP BY
+timestamp
+ORDER BY
+  timestamp ASC
+  `
+}
+
+type TsPair = [string | '', string | '']
+export const ensureNoTimestampConflict = (
+  [initialStart, initialEnd]: TsPair,
+  [nextStart, nextEnd]: TsPair
+): TsPair => {
+  if (initialStart && initialEnd && nextEnd && !nextStart) {
+    const resolvedDiff = dayjs(nextEnd).diff(dayjs(initialStart))
+    let start = dayjs(initialStart)
+
+    if (resolvedDiff <= 0) {
+      // start ts is definitely before end ts
+      const currDiff = Math.abs(dayjs(initialEnd).diff(start, 'minute'))
+      // shift start ts backwards by the current ts difference
+      start = dayjs(nextEnd).subtract(currDiff, 'minute')
+    }
+    return [start.toISOString(), nextEnd]
+  } else if (!nextEnd && nextStart) {
+    return [nextStart, initialEnd]
+  } else {
+    return [nextStart, nextEnd]
+  }
+}

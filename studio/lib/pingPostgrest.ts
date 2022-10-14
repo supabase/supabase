@@ -1,4 +1,3 @@
-import { String } from 'lodash'
 import semver from 'semver'
 import { headWithTimeout, getWithTimeout } from './common/fetch'
 import { API_URL } from './constants'
@@ -24,8 +23,8 @@ async function pingPostgrest(
   }
 ) {
   if (projectRef === undefined) return false
-  const serviceApiKey = await getServiceApiKey(projectRef, options?.timeout)
-  if (serviceApiKey === undefined) return false
+  const apiKey = await getApiKey(projectRef, options?.timeout)
+  if (apiKey === undefined) return false
 
   const { kpsVersion, timeout } = options ?? {}
   const healthCheckApiEnable = semver.gte(
@@ -35,20 +34,20 @@ async function pingPostgrest(
   )
   if (healthCheckApiEnable) {
     const healthCheckUrl = `${restUrl.replace('/rest/', '/rest-admin/')}live`
-    return pingHealthCheckApi(healthCheckUrl, serviceApiKey, timeout)
+    return pingHealthCheckApi(healthCheckUrl, apiKey, timeout)
   }
 
-  return pingOpenApi(restUrl, serviceApiKey, timeout)
+  return pingOpenApi(restUrl, apiKey, timeout)
 }
 export default pingPostgrest
 
-const getServiceApiKey = async (
+const getApiKey = async (
   projectRef: string,
   timeout = DEFAULT_TIMEOUT_MILLISECONDS
 ): Promise<string | undefined> => {
   const response = await getWithTimeout(`${API_URL}/props/project/${projectRef}/api`, { timeout })
   if (response.error || response.autoApiService.service_api_keys.length === 0) return undefined
-  return response.autoApiService.serviceApiKey
+  return response.autoApiService.defaultApiKey
 }
 
 const DEFAULT_TIMEOUT_MILLISECONDS = 2000

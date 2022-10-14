@@ -1,9 +1,10 @@
 import ReactMarkdown from 'react-markdown'
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Form } from '@supabase/ui'
+import { Input, Form } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { FormSchema } from 'types'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import CodeEditor from 'components/ui/CodeEditor'
@@ -22,6 +23,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
 
   const formId = `auth-config-email-templates-${id}`
   const INITIAL_VALUES: { [x: string]: string } = {}
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
     if (isLoaded) {
@@ -71,9 +73,9 @@ const TemplateEditor: FC<Props> = ({ template }) => {
           setBodyValue(authConfig?.config?.[messageSlug])
         }, [authConfig.isLoaded])
 
+        const message = authConfig?.config?.[messageSlug]
         const hasChanges =
-          JSON.stringify(values) !== JSON.stringify(initialValues) ||
-          (authConfig?.config?.[messageSlug] && authConfig?.config?.[messageSlug] !== bodyValue)
+          JSON.stringify(values) !== JSON.stringify(initialValues) || message !== bodyValue
 
         return (
           <>
@@ -84,7 +86,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                   if (property.type === 'string') {
                     return (
                       <div className="space-y-3">
-                        <label className="text-scale-1200 col-span-12 text-sm lg:col-span-5">
+                        <label className="col-span-12 text-sm text-scale-1200 lg:col-span-5">
                           {property.title}
                         </label>
                         <Input
@@ -107,6 +109,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                               </ReactMarkdown>
                             ) : null
                           }
+                          disabled={!canUpdateConfig}
                         />
                       </div>
                     )
@@ -138,6 +141,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                         id="code-id"
                         loading={!isLoaded}
                         language="html"
+                        isReadOnly={!canUpdateConfig}
                         className="!mb-0 h-96 overflow-hidden rounded border"
                         onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
                         options={{ wordWrap: 'off', contextmenu: false }}
@@ -146,7 +150,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                     </div>
                   </>
                 )}
-                <div className="col-span-12 flex w-full justify-between">
+                <div className="col-span-12 flex w-full">
                   <FormActions
                     handleReset={() => {
                       resetForm({
@@ -158,6 +162,12 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
+                    disabled={!canUpdateConfig}
+                    helper={
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
+                    }
                   />
                 </div>
               </FormSectionContent>

@@ -23,7 +23,7 @@
   {
     "imgUrl": "images/slack-clone.jpg",
     "title": "Chat app with Next.js",
-    "url": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone",
+    "url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/slack-clone/nextjs-slack-clone",
     "description": "Build a full-stack Slack clone using Next.js and Supabase.",
     "icons": [
       {
@@ -40,7 +40,7 @@
   {
     "imgUrl": "images/to-do-app.jpg",
     "title": "Todo list with Vue.js",
-    "url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list",
+    "url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/vue3-ts-todo-list",
     "description": "Build a simple todo list with Vue and Supabase.",
     "icons": [
       {

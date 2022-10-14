@@ -2,7 +2,7 @@
 id: initializing
 title: 'Initializing'
 slug: initializing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -83,13 +83,6 @@ No description provided.
 
 ### createClient()
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 import { createClient } from '@supabase/supabase-js'
 
@@ -100,18 +93,7 @@ const supabase = createClient(
 )
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With additional parameters
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -130,18 +112,7 @@ const supabase = createClient(
 )
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### API schemas
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -161,18 +132,7 @@ Go to `Settings > API > Schema` and add the schema which you want to expose to t
 
 Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
 
-</TabItem>
-
-</Tabs>
-
 ### Custom `fetch` implementation
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -189,7 +149,3 @@ const supabase = createClient(
 `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
 but an alternative `fetch` implementation can be provided as an option.
 This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
-
-</TabItem>
-
-</Tabs>

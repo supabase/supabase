@@ -5,6 +5,11 @@ export interface Notification {
   error?: any // Optional: Any other errors that needs to be logged out in the console
   progress?: number // Optional: For loading messages to show a progress bar (Out of 100)
   duration?: number // Optional: How long to show the message for (ms)
+  metadata?: NotificationMetadata
+}
+
+interface NotificationMetadata {
+  [key: string]: any
 }
 
 export interface ChartIntervals {

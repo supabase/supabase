@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input } from '@supabase/ui'
+import { Checkbox, SidePanel, Input, Button, IconExternalLink } from 'ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -25,6 +25,7 @@ import {
 } from './ColumnEditor.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
+import Link from 'next/link'
 
 interface Props {
   column?: PostgresColumn
@@ -54,7 +55,6 @@ const ColumnEditor: FC<Props> = ({
   updateEditorDirty = () => {},
 }) => {
   const isNewRecord = isUndefined(column)
-  const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
   const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
@@ -122,7 +122,7 @@ const ColumnEditor: FC<Props> = ({
       if (isEmpty(errors)) {
         const payload = isNewRecord
           ? generateCreateColumnPayload(selectedTable.id, columnFields)
-          : generateUpdateColumnPayload(column!, columnFields)
+          : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const foreignKey = columnFields.foreignKey
           ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
           : undefined
@@ -177,6 +177,16 @@ const ColumnEditor: FC<Props> = ({
             value={columnFields?.comment ?? ''}
             onChange={(event: any) => onUpdateField({ comment: event.target.value })}
           />
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 md:col-span-8 md:col-start-5">
+              <Checkbox
+                label="Is Primary Key"
+                description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table."
+                checked={columnFields?.isPrimaryKey ?? false}
+                onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
+              />
+            </div>
+          </div>
         </div>
       </SidePanel.Content>
 
@@ -184,18 +194,6 @@ const ColumnEditor: FC<Props> = ({
 
       <SidePanel.Content>
         <div className="space-y-10 py-6">
-          {isNewRecord && !hasPrimaryKey && (
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-12 md:col-span-8 md:col-start-5">
-                <Checkbox
-                  label={hasPrimaryKey ? 'Add to composite primary key' : 'Is Primary Key'}
-                  description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table."
-                  checked={columnFields?.isPrimaryKey ?? false}
-                  onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
-                />
-              </div>
-            </div>
-          )}
           <ColumnForeignKey
             column={columnFields}
             originalForeignKey={originalForeignKey}
@@ -212,8 +210,24 @@ const ColumnEditor: FC<Props> = ({
             enumTypes={enumTypes}
             error={errors.format}
             disabled={!isUndefined(columnFields?.foreignKey)}
+            description={
+              <Link href="https://supabase.com/docs/guides/database/tables#data-types">
+                <a>
+                  <Button
+                    as="span"
+                    type="text"
+                    size="small"
+                    className="text-scale-1000 hover:text-scale-1200"
+                    icon={<IconExternalLink size={14} strokeWidth={2} />}
+                  >
+                    Learn more about data types
+                  </Button>
+                </a>
+              </Link>
+            }
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
+
           {isUndefined(columnFields.foreignKey) && (
             <div className="grid grid-cols-12 gap-4">
               {columnFields.format.includes('int') && (

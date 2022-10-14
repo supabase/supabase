@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Input, Space, Typography } from '@supabase/ui'
+import { Modal, Button, Input, Space } from 'ui'
 
 const MoveItemsModal = ({
   bucketName = '',
@@ -57,7 +57,7 @@ const MoveItemsModal = ({
     >
       <Modal.Content>
         <form className="my-4">
-          <div className="flex items-center relative">
+          <div className="relative flex items-center">
             <Input
               autoFocus
               label={`Path to new directory in ${bucketName}`}

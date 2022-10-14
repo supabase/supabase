@@ -6,6 +6,7 @@ import { useFlag } from 'hooks'
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
   const logsRealtime = useFlag('logsRealtime')
+  const reportsOverview = useFlag('reportsOverview')
 
   const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
   const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
@@ -39,7 +40,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
     ...(IS_PLATFORM
       ? [
           {
-            title: 'Logs',
+            title: 'Logs and Usage',
             items: [
               {
                 name: 'API logs',
@@ -47,6 +48,16 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                 url: `/project/${ref}/database/api-logs`,
                 items: [],
               },
+              ...(reportsOverview
+                ? [
+                    {
+                      name: 'API usage',
+                      key: 'api-usage',
+                      url: `/project/${ref}/database/api-usage`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Postgres logs',
                 key: 'postgres-logs',
@@ -71,16 +82,15 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
       ? [
           {
             title: 'Alpha Preview',
-            isPreview: true,
             items: [
               {
-                name: 'Triggers',
+                name: 'Database Triggers',
                 key: 'triggers',
                 url: `/project/${ref}/database/triggers`,
                 items: [],
               },
               {
-                name: 'Functions',
+                name: 'Database Functions',
                 key: 'functions',
                 url: `/project/${ref}/database/functions`,
                 items: [],

@@ -87,13 +87,14 @@ test.each([
   {
     queryType: 'api',
     tableName: undefined,
-    allLog: logDataFixture({
+    tableLog: logDataFixture({
       id: 'some-id',
-      request: { path: 'some-path', method: 'POST' },
+      path: 'some-path',
+      method: 'POST',
       status_code: '400',
       metadata: undefined,
     }),
-    singleLog: {
+    selectionLog: {
       id: 'some-id',
       metadata: [{ request: [{ method: 'POST' }] }],
     },
@@ -103,7 +104,7 @@ test.each([
   // TODO: add more tests for each type of ui
 ])(
   'selection $queryType $tableName , can display log data and metadata',
-  async ({ queryType, tableName, allLog, singleLog, tableTexts, selectionTexts }) => {
+  async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
     get.mockImplementation((url) => {
       // counts
       if (url.includes('count')) {
@@ -111,10 +112,10 @@ test.each([
       }
       // single
       if (url.includes('where+id')) {
-        return { result: [singleLog] }
+        return { result: [selectionLog] }
       }
-      // all
-      return { result: [allLog] }
+      // table
+      return { result: [tableLog] }
     })
     render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 
@@ -193,6 +194,21 @@ test('poll count for new messages', async () => {
   await waitFor(() => screen.queryByText(/125/) === null)
   await screen.findByText(/some-uuid123/)
 })
+test('log event chart', async () => {
+  get.mockImplementation((url) => {
+    // truncate
+    if (url.includes('trunc')) {
+      return { result: [{ timestamp: new Date().toISOString(), count: 125 }] }
+    }
+    return {
+      result: [logDataFixture({ id: 'some-uuid123' })],
+    }
+  })
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+
+  await waitFor(() => screen.queryByText(/some-uuid123/) === null)
+  expect(get).toBeCalledWith(expect.stringContaining('trunc'))
+})
 
 test('s= query param will populate the search bar', async () => {
   const router = defaultRouterMock()
@@ -219,7 +235,7 @@ test('te= query param will populate the timestamp to input', async () => {
       expect.stringContaining(`iso_timestamp_end=${encodeURIComponent(iso)}`)
     )
   })
-  userEvent.click(await screen.findByText('Custom'))
+  userEvent.click(await screen.findByTitle('Custom'))
 })
 test('ts= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
@@ -236,7 +252,7 @@ test('ts= query param will populate the timestamp from input', async () => {
       expect.stringContaining(`iso_timestamp_start=${encodeURIComponent(iso)}`)
     )
   })
-  userEvent.click(await screen.findByText('Custom'))
+  userEvent.click(await screen.findByTitle('Custom'))
   await screen.findByText(new RegExp(newDate.getFullYear()))
 })
 
@@ -289,6 +305,9 @@ test('bug: load older btn does not error out when previous page is empty', async
 })
 
 test('log event chart hide', async () => {
+  get.mockImplementation((url) => {
+    return { result: [] }
+  })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   await screen.findByText('Events')
   const toggle = await screen.findByText(/Chart/)
@@ -332,9 +351,30 @@ test('filters alter generated query', async () => {
   userEvent.click(await screen.findByText(/Save/))
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('599'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+  })
+
+  // should be able to clear the filters
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByRole('button', { name: 'Clear' }))
+  get.mockClear()
+
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByText(/400 codes/))
+  userEvent.click(await screen.findByText(/Save/))
+
+  await waitFor(() => {
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('400'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('499'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
   })
@@ -351,5 +391,30 @@ test('filters accept filterOverride', async () => {
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
+  })
+})
+
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
+        },
+      },
+    })
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(4, 'months').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+    await screen.findByText('Log retention') // assert modal title is present
   })
 })
