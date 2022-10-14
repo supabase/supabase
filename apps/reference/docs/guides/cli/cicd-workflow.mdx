@@ -358,11 +358,13 @@ ERROR: must be owner of table employees (SQLSTATE 42501); while executing migrat
 
 This is because tables created through Supabase dashboard are owned by `supabase_admin` role while the migration scripts executed through CLI are under `postgres` role.
 
-One way to solve this is to grant `postgres` role additional privileges through the SQL Editor available on Supabase dashboard. For example, the following command grants postgres permissions to alter any table in the public schema.
+One way to solve this is to reassign the owner of those tables to `postgres` role. For example, if your table is named `users` in the public schema, you can run the following command to reassign owner.
 
 ```sql
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
+ALTER TABLE users OWNER TO postgres;
 ```
+
+Apart from tables, you also need to reassign owner of other entities using their respective commands, including [types](https://www.postgresql.org/docs/current/sql-alterschema.html), [functions](https://www.postgresql.org/docs/current/sql-alterroutine.html), and [schemas](https://www.postgresql.org/docs/current/sql-altertype.html).
 
 ### Rebasing new migrations
 
