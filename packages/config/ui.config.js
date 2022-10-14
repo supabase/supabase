@@ -296,6 +296,7 @@ const uiConfig = {
           background: 'red',
           animation: 'rotate 0.75s linear infinite',
         },
+
         '.loading-thing::after': {
           content: '',
           boxSizing: 'border-box',
