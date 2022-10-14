@@ -7,6 +7,8 @@ import remarkGfm from 'remark-gfm'
 import rewrites from './lib/rewrites.js'
 import redirects from './lib/redirects.js'
 
+import withTM from 'next-transpile-modules'
+
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
@@ -74,6 +76,6 @@ const nextConfig = {
 
 // next.config.js
 export default () => {
-  const plugins = [withMDX, withBundleAnalyzer]
+  const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common'])]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
