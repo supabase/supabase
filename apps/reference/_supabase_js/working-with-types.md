@@ -79,6 +79,6 @@ async function getMovies() {
 type Actors = Database['public']['Tables']['actors']['Row']
 type MoviesResponse = Awaited<ReturnType<typeof getMovies>>
 type MoviesResponseSuccess = MoviesResponse['data'] & {
-  actors: actors[]
+  actors: Actors[]
 }
 ```
