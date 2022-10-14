@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Input, Modal, Form, Button } from 'ui'
 
-import { useStore } from 'hooks'
+import { useProjectSubscription, useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { NextPageWithLayout, UserContent } from 'types'
 import { uuidv4 } from 'lib/helpers'
@@ -21,8 +21,11 @@ import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LogTable,
   LogTemplate,
+  maybeShowUpgradePrompt,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { StripeProduct } from 'components/interfaces/Billing'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
@@ -33,12 +36,18 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { content } = useStore()
+  const { subscription } = useProjectSubscription(ref as string)
+  const tier = subscription?.tier
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(ref as string, {
       iso_timestamp_start: its ? (its as string) : undefined,
       iso_timestamp_end: ite ? (ite as string) : undefined,
     })
+
+  const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
+    params.iso_timestamp_start as string
+  )
 
   useEffect(() => {
     // on mount, set initial values
@@ -64,6 +73,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
     setWarnings(newWarnings)
   }, [editorValue, params.iso_timestamp_start, params.iso_timestamp_end])
+
+  // Show the prompt on page load based on query params
+  useEffect(() => {
+    if (its) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier?.key)
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      }
+    }
+  }, [its, tier])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setEditorValue(template.searchString)
@@ -110,15 +129,21 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    setParams((prev) => ({
-      ...prev,
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
-    }))
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, its: from || '', ite: to || '' },
-    })
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
+
+    if (shouldShowUpgradePrompt) {
+      setShowUpgradePrompt(!showUpgradePrompt)
+    } else {
+      setParams((prev) => ({
+        ...prev,
+        iso_timestamp_start: from || '',
+        iso_timestamp_end: to || '',
+      }))
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, its: from || '', ite: to || '' },
+      })
+    }
   }
 
   return (
@@ -139,7 +164,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             isLoading={isLoading}
             warnings={warnings}
           />
-
           <div className="h-48 min-h-[7rem]">
             <ShimmerLine active={isLoading} />
             <CodeEditor
@@ -158,7 +182,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             </div>
           </LoadingOpacity>
           <div className="mt-2 flex flex-row justify-end">
-            <UpgradePrompt projectRef={ref as string} from={params.iso_timestamp_start || ''} />
+            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>
         </div>
       </div>

@@ -35,7 +35,7 @@ const StoragePolicies = () => {
 
   // Policies under storage.objects
   const storageObjectsPolicies = filter(policies, { table: 'objects' })
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(storageObjectsPolicies)
+  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
   const ungroupedPolicies = get(
     find(formattedStorageObjectPolicies, { name: 'Ungrouped' }),
     ['policies'],
