@@ -62,7 +62,7 @@ const Chart = () => {
             style={{ fontSize: '14px', marginBottom: '32px', color: 'var(--colors-scale12)'}}
             tick={<CustomizedAxisTick />}
             label={{
-              value: selection === 'latency' ? 'Latency (ms)' : selection  === 'avg_latency' ? 'Average latency (ms)' : 'Number of results',
+              value: selection === 'latency' ? 'Latency (ms)' : selection  === 'avg_latency' ? 'Avg latency per result (ms)' : 'Number of results',
               position: 'insideBottom',
               offset: -32,
               fill: 'var(--colors-scale12)',
