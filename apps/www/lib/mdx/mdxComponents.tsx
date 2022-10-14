@@ -3,7 +3,6 @@ import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import ImageGrid from '~/components/ImageGrid'
 import Quote from '~/components/Quote'
-import { Badge, Tabs } from '@supabase/ui'
 import Chart from '~/components/Charts/PGCharts'
 
 // import all components used in blog articles here
@@ -16,7 +15,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     CodeBlock,
     Quote,
     Avatar,
-    Chart: (props: any) => {
+    PGChart: (props: any) => {
       return <Chart {...props} />
     },
     pre: (props: any) => {
