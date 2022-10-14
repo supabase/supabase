@@ -338,7 +338,7 @@ const Results = ({ results }) => {
 
   const formatter = (column, row) => {
     return (
-      <div className="sb-grid-select-cell__formatter overflow-hidden">
+      <div className="group sb-grid-select-cell__formatter overflow-hidden">
         <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
 
         {row[column] && (
@@ -346,7 +346,7 @@ const Results = ({ results }) => {
             type="outline"
             icon={<IconClipboard size="tiny" />}
             onClick={() => copyToClipboard(formatClipboardValue(row[column]))}
-            className="sb-grid-select-cell__copy-action"
+            className="hidden mr-1 group-hover:block group-hover:opacity-50 hover:opacity-100"
             title="Copy"
           />
         )}
