@@ -18,14 +18,17 @@ import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
+import { DatabaseAddon } from '../AddOns/AddOns.types'
 
 interface Props {
   isRefreshingPreview: boolean
   subscriptionPreview?: SubscriptionPreview
   currentPlan: any
-  currentComputeSize: any
+  currentComputeSize: DatabaseAddon
+  currentPITRDuration: DatabaseAddon
   selectedPlan?: any
-  selectedComputeSize: any
+  selectedComputeSize: DatabaseAddon
+  selectedPITRDuration: DatabaseAddon
   isSpendCapEnabled: boolean
   paymentMethods?: any
   selectedPaymentMethod: any
@@ -45,12 +48,14 @@ interface Props {
 
 const PaymentSummaryPanel: FC<Props> = ({
   isRefreshingPreview,
+  isSpendCapEnabled,
   subscriptionPreview,
   currentPlan,
-  selectedPlan,
-  isSpendCapEnabled,
   currentComputeSize,
+  currentPITRDuration,
+  selectedPlan,
   selectedComputeSize,
+  selectedPITRDuration,
   paymentMethods,
   selectedPaymentMethod,
   isLoadingPaymentMethods,
@@ -78,10 +83,11 @@ const PaymentSummaryPanel: FC<Props> = ({
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
+  const isChangingPITRDuration = currentPITRDuration.id !== selectedPITRDuration.id
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
-    ? isChangingComputeSize
+    ? isChangingComputeSize || isChangingPITRDuration
     : subscriptionPreview?.has_changes ?? false
 
   const getPlanName = (plan: any) => {
@@ -123,32 +129,49 @@ const PaymentSummaryPanel: FC<Props> = ({
         {projectRegion !== 'af-south-1' && (
           <div className="space-y-1">
             <p className="text-sm">Selected add-ons</p>
-            {currentComputeSize === undefined && selectedComputeSize === undefined && (
-              <p className="text-sm text-scale-1100">No add-ons selected</p>
-            )}
-            {currentComputeSize !== undefined && (
-              <div className="flex items-center justify-between">
-                <p
-                  className={`${
-                    isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                  } text-sm`}
-                >
-                  {currentComputeSize.name}
-                </p>
-                <p
-                  className={`${
-                    isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                  } text-sm`}
-                >
-                  ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
-                </p>
-              </div>
-            )}
+            <div className="flex items-center justify-between">
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                {currentComputeSize.name}
+              </p>
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
+              </p>
+            </div>
             {isChangingComputeSize && (
               <div className="flex items-center justify-between">
                 <p className="text-sm">{selectedComputeSize.name}</p>
                 <p className="text-sm">
                   ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+            {currentPITRDuration.id !== 'pitr-disabled' && (
+              <div className="flex items-center justify-between">
+                <p
+                  className={`${
+                    isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  {currentPITRDuration.name}
+                </p>
+                <p
+                  className={`${
+                    isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  ${(getProductPrice(currentPITRDuration).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+            {isChangingPITRDuration && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{selectedPITRDuration.name}</p>
+                <p className="text-sm">
+                  ${(getProductPrice(selectedPITRDuration).unit_amount / 100).toFixed(2)}
                 </p>
               </div>
             )}

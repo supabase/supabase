@@ -12,21 +12,23 @@ import Divider from 'components/ui/Divider'
 import {
   PaymentSummaryPanel,
   ComputeSizeSelection,
+  PITRDurationSelection,
   StripeSubscription,
   AddNewPaymentMethodModal,
 } from './'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { SubscriptionPreview } from './Billing.types'
-import { formSubscriptionUpdatePayload } from './Billing.utils'
 import UpdateSuccess from './UpdateSuccess'
-import { formatComputeSizes } from './AddOns/AddOns.utils'
+import { PaymentMethod, SubscriptionPreview } from './Billing.types'
+import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
+import { DatabaseAddon } from './AddOns/AddOns.types'
+import { formatComputeSizes, formatPITROptions } from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
 
 // Do not allow compute size changes for af-south-1
 
 interface Props {
-  products: { tiers: any[]; addons: any[] }
-  paymentMethods?: any[]
+  products: { tiers: any[]; addons: DatabaseAddon[] }
+  paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
   onSelectBack: () => void
@@ -44,14 +46,12 @@ const ProUpgrade: FC<Props> = ({
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
+  const pitrDurationOptions = formatPITROptions(addons)
+  const { currentComputeSize, currentPITRDuration } = getCurrentAddons(currentSubscription, addons)
 
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
   const projectRegion = ui.selectedProject?.region ?? ''
-
-  const currentComputeSize =
-    computeSizes.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
-    computeSizes.find((option: any) => option.metadata.supabase_prod_id === 'addon_instance_micro')
 
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(
     // If project is currently free, default to enabling spend caps
@@ -66,8 +66,10 @@ const ProUpgrade: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
-  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string>('')
+  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(currentComputeSize)
+  const [selectedPITRDuration, setSelectedPITRDuration] =
+    useState<DatabaseAddon>(currentPITRDuration)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   const selectedTier = isSpendCapEnabled
@@ -82,13 +84,13 @@ const ProUpgrade: FC<Props> = ({
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
-      setSelectedPaymentMethod(paymentMethods[0].id)
+      setSelectedPaymentMethodId(paymentMethods[0].id)
     }
   }, [isLoadingPaymentMethods, paymentMethods])
 
   useEffect(() => {
     getSubscriptionPreview()
-  }, [selectedComputeSize, isSpendCapEnabled])
+  }, [selectedComputeSize, selectedPITRDuration, isSpendCapEnabled])
 
   const getSubscriptionPreview = async () => {
     if (!selectedTier) return
@@ -96,7 +98,8 @@ const ProUpgrade: FC<Props> = ({
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
       selectedComputeSize,
-      selectedPaymentMethod,
+      selectedPITRDuration,
+      selectedPaymentMethodId,
       projectRegion
     )
 
@@ -116,7 +119,8 @@ const ProUpgrade: FC<Props> = ({
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
       selectedComputeSize,
-      selectedPaymentMethod,
+      selectedPITRDuration,
+      selectedPaymentMethodId,
       projectRegion
     )
 
@@ -187,9 +191,9 @@ const ProUpgrade: FC<Props> = ({
                       <h3 className="text-3xl">
                         Managing your <span className="text-brand-900">Pro</span> plan
                       </h3>
-                      <p className="text-base text-scale-1100">
+                      {/* <p className="text-base text-scale-1100">
                         Your billing cycle will reset after payment
-                      </p>
+                      </p> */}
                     </>
                   )}
                 </div>
@@ -216,11 +220,18 @@ const ProUpgrade: FC<Props> = ({
                 {projectRegion !== 'af-south-1' && (
                   <>
                     <Divider light />
+                    <PITRDurationSelection
+                      pitrDurationOptions={pitrDurationOptions || []}
+                      currentPitrDuration={
+                        isManagingProSubscription ? currentPITRDuration : undefined
+                      }
+                      selectedPitrDuration={selectedPITRDuration}
+                      onSelectOption={setSelectedPITRDuration}
+                    />
+                    <Divider light />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}
-                      currentComputeSize={
-                        isManagingProSubscription ? currentComputeSize : undefined
-                      }
+                      currentComputeSize={currentComputeSize}
                       selectedComputeSize={selectedComputeSize}
                       onSelectOption={setSelectedComputeSize}
                     />
@@ -234,15 +245,19 @@ const ProUpgrade: FC<Props> = ({
           <PaymentSummaryPanel
             isRefreshingPreview={isRefreshingPreview}
             subscriptionPreview={subscriptionPreview}
-            currentPlan={currentSubscription.tier}
-            selectedPlan={selectedTier}
             isSpendCapEnabled={isSpendCapEnabled}
+            // Current subscription configuration based on DB
+            currentPlan={currentSubscription.tier}
             currentComputeSize={currentComputeSize}
+            currentPITRDuration={currentPITRDuration}
+            // Selected subscription configuration based on UI
+            selectedPlan={selectedTier}
             selectedComputeSize={selectedComputeSize}
+            selectedPITRDuration={selectedPITRDuration}
             paymentMethods={paymentMethods}
             isLoadingPaymentMethods={isLoadingPaymentMethods}
-            selectedPaymentMethod={selectedPaymentMethod}
-            onSelectPaymentMethod={setSelectedPaymentMethod}
+            selectedPaymentMethod={selectedPaymentMethodId}
+            onSelectPaymentMethod={setSelectedPaymentMethodId}
             onSelectAddNewPaymentMethod={() => {
               setShowAddPaymentMethodModal(true)
             }}
