@@ -4,12 +4,8 @@ import nextMdx from '@next/mdx'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
-/**
- * Rewrites and redirects are handled by
- * apps/www nextjs config
- *
- * Do not add them in this config
- */
+import rewrites from './lib/rewrites.js'
+import redirects from './lib/redirects.js'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
