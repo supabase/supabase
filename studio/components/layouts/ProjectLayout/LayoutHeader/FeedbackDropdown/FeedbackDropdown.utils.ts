@@ -53,9 +53,12 @@ export const uploadAttachment = async (ref: string, image: string) => {
     return undefined
   }
 
-  const { data } = await supportSupabaseClient.storage
-    .from('feedback-attachments')
-    .createSignedUrls([file.path], 10 * 365 * 24 * 60 * 60)
+  if (file) {
+    const { data } = await supportSupabaseClient.storage
+      .from('feedback-attachments')
+      .createSignedUrls([file.path], 10 * 365 * 24 * 60 * 60)
+    return data?.[0].signedUrl
+  }
 
-  return data?.[0].signedUrl
+  return undefined
 }
