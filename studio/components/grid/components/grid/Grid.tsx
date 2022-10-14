@@ -8,7 +8,7 @@ import RowRenderer from './RowRenderer'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 
 function rowKeyGetter(row: SupaRow) {
-  return row.idx
+  return row?.idx ?? -1
 }
 
 interface IGrid extends GridProps {
@@ -39,6 +39,7 @@ export const Grid = memo(
         const changedColumn = Object.keys(rowData).find(
           (name) => rowData[name] !== originRowData![name]
         )
+
         if (changedColumn) {
           const { error } = state.rowService!.update(rowData, changedColumn, (payload) => {
             dispatch({
