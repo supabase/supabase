@@ -8,6 +8,7 @@ import { Button, Input, Popover, IconCamera, IconX } from 'ui'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface Props {
   onClose: () => void
@@ -45,10 +46,7 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
     }
 
     toPng(document.body, { filter })
-      .then((dataUrl: any) => {
-        console.log('Capture screenshot', dataUrl)
-        setScreenshot(dataUrl)
-      })
+      .then((dataUrl: any) => setScreenshot(dataUrl))
       .catch((error: any) => {
         ui.setNotification({
           error,
@@ -63,10 +61,21 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
   }
 
   const sendFeedback = async () => {
-    if (feedback.length) {
+    if (feedback.length === 0 && screenshot !== undefined) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'Please include a message in your feedback.',
+        duration: 4000,
+      })
+    } else if (feedback.length > 0) {
       setSending(true)
+      const attachmentUrl = screenshot
+        ? await uploadAttachment(ref as string, screenshot)
+        : undefined
+      const formattedFeedback =
+        attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
       await post(`${API_URL}/feedback/send`, {
-        message: feedback,
+        message: formattedFeedback,
         pathname: router.asPath,
         category: 'Feedback',
         projectRef: ref,
@@ -101,14 +110,22 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
             {screenshot !== undefined ? (
               <div
                 style={{ backgroundImage: `url("${screenshot}")` }}
-                className="rounded h-[26px] w-[30px] border border-scale-600 relative bg-cover bg-center bg-no-repeat"
+                onClick={() => {
+                  const blob = convertB64toBlob(screenshot)
+                  const blobUrl = URL.createObjectURL(blob)
+                  window.open(blobUrl, '_blank')
+                }}
+                className="cursor-pointer rounded h-[26px] w-[30px] border border-scale-600 relative bg-cover bg-center bg-no-repeat"
               >
                 <div
                   className={[
                     'cursor-pointer rounded-full bg-red-900 h-3 w-3',
                     'flex items-center justify-center absolute -top-1 -right-1',
                   ].join(' ')}
-                  onClick={() => setScreenshot(undefined)}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setScreenshot(undefined)
+                  }}
                 >
                   <IconX size={8} strokeWidth={3} />
                 </div>
@@ -131,10 +148,12 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
                   <div
                     className={[
                       'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                      'border-scale-200 border', //border
+                      'w-[130px] text-center border-scale-200 border', //border
                     ].join(' ')}
                   >
-                    <span className="text-scale-1200 text-xs text-center">Capture screenshot</span>
+                    <span className="text-scale-1200 text-xs">
+                      Capture screenshot of current view
+                    </span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Root>
