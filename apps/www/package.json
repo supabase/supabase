@@ -40,6 +40,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
     "react-transition-group": "^4.4.1",
+    "recharts": "^2.1.15",
     "rehype-slug": "^5.0.1",
     "remark": "^13.0.0",
     "remark-gfm": "^3.0.1",
