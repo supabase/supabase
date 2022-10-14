@@ -50,11 +50,11 @@ async function signInWithEmail() {
 
 <TabItem value="dart">
 
-When your user signs in, call [signIn()](/docs/reference/dart/auth-signin) with their email address:
+When your user signs in, call [signIn()](/docs/reference/dart/auth-signinwithotp) with their email address:
 
 ```dart
 Future<void> signInWithEmail() async {
-  await supabase.auth.signIn(email: 'example@email.com');
+  final AuthResponse res = await supabase.auth.signinwithotp(email: 'example@email.com');
 }
 ```
 
