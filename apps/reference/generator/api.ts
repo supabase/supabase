@@ -10,7 +10,7 @@ export default async function gen(
   apiUrl: string
 ) {
   const specRaw = fs.readFileSync(inputFileName, 'utf8')
-  const spec = JSON.parse(specRaw)
+  const spec = JSON.parse(specRaw) as any
   // console.log('spec', spec)
 
   switch (spec.openapi || spec.swagger) {
