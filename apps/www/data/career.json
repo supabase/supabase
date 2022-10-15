@@ -1,0 +1,110 @@
+{
+  "company": [
+    {
+      "number": "52+",
+      "text": "team members\n\nin 20+ countries"
+    },
+    {
+      "number": "17+",
+      "text": "languages spoken"
+    },
+    {
+      "number": "8500+",
+      "text": "community members"
+    },
+    {
+      "number": "38k+",
+      "text": "GitHub stars"
+    },
+    {
+      "number": "$116M+",
+      "text": "in funding"
+    }
+  ],
+  "benefits": [
+    {
+      "icon": "",
+      "title": "Fully Remote",
+      "text": "Supabase is 100% remote company. We hire globally. We believe you can do your best work from anywhere. There are no Supabase offices, but we provide a WeWork membership if you need it."
+    },
+    {
+      "icon": "",
+      "title": "Flexible Time-off",
+      "text": "Prioritize doing the things you love outside of work. We have a generous time off policy to allow you to take time away from work when you need it."
+    },
+    {
+      "icon": "",
+      "title": "Open Source",
+      "text": "Open Source is core to our culture. We deeply believe in the efficacy of collaboration, and support existing communities and tools before developing anything ourselves.\n\n[Read more about our Open Source](https://supabase.com/docs/oss)"
+    },
+    {
+      "icon": "",
+      "title": "Work from home budget",
+      "text": "We provide everyone with a tech allowance every 3 years. This can be spent on anything needed to set up your work environment."
+    },
+    {
+      "icon": "",
+      "title": "Health benefits",
+      "text": "100% health coverage for employees and 80% for dependants. It's important to us that you & your family have health care covered."
+    },
+    {
+      "icon": "",
+      "title": "Annual off-sites",
+      "text": "We believe in the value of in-person time. We come together for one week a year to connect and each time we pick a different location. You can still make it to our next off-site at Bali."
+    },
+    {
+      "icon": "",
+      "title": "Work Flexibly",
+      "text": "Set your own schedule to keep your personal and professional worlds perfectly in sync. We work in teams, but we work asynchronous. You know what you need to do and when it needs to be done."
+    },
+    {
+      "icon": "",
+      "title": "Professional Development",
+      "text": "We provide everyone an annual allowance to spend on professional development and education. Use this for courses, books or anything that supports your continued learning."
+    }
+  ],
+  "positions": [
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    },
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    },
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    },
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    }
+  ],
+  "hiring": [
+    {
+      "title": "Recruiter Interview",
+      "text": "Chat with our recruiter to tell us about your career journey, professional goals and we'll share more about Supabase, the role & our recruitment process."
+    },
+    {
+      "title": "Technical/skilled-based interview",
+      "text": "Meet with the team lead. In this interview we'll aim to learn about your hard skills and problem solving approach."
+    },
+    {
+      "title": "Another technical/skilled-based interview",
+      "text": "You'll either meet the department lead or peer. This interview will dive deeper into your hard skills and our expectations for this role."
+    },
+    {
+      "title": "Final interview",
+      "text": "Our co-founders meet every candidate as the final step. Learn more about Supabase's values, mission and vision directly from them."
+    }
+  ]
+}
