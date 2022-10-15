@@ -2,23 +2,21 @@
 id: architecture
 title: Architecture
 description: 'Supabase design and architecture'
-hide_table_of_contents: true
 ---
 
-Supabase is open source. We choose open source tools which are scalable and we make them simple to use.
+Supabase is open source. We choose open source tools which are scalable and make them simple to use.
 
 ## Philosophy
 
-Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way.
-
-Our technological choices are quite different from Firebase. Everything we use is open source. Wherever possible, we use and support existing tools rather than developing from scratch.
+Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way:
+our technological choices are quite different; everything we use is open source; and wherever possible, we use and support existing tools rather than developing from scratch.
 
 Most notably, we use Postgres rather than a NoSQL store. This choice was deliberate. We believe that no other database offers the functionality required to compete with Firebase,
 while maintaining the scalability required to go beyond it.
 
 ## Architecture
 
-Each Supabase project consists of several open source tools.
+Each Supabase project consists of several tools:
 
 ![Supabase Architecture](/img/supabase-architecture.png)
 
@@ -32,7 +30,7 @@ tools which makes Firebase as easy to use as Firebase.
 - License: [PostgreSQL Licence](https://www.postgresql.org/about/licence/)
 - Language: C
 
-### Studio
+### Studio (Dashboard)
 
 An open source Dashboard for managing your database and services.
 
@@ -51,6 +49,9 @@ A JWT based API for managing users and issuing JWT tokens. This integrates with 
 - Language: Go
 
 ### PostgREST (API)
+
+A standalone web server that turns your PostgreSQL database directly into a RESTful API.
+We use this with our [pg_graphql](https://github.com/supabase/pg_graphql) extension to provide a GraphQL API.
 
 - Official Docs: [postgrest.org](https://postgrest.org/)
 - Source code: [github.com/PostgREST/postgrest](https://github.com/PostgREST/postgrest)
