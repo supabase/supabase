@@ -212,6 +212,38 @@ export const getServerSideProps = withPageAuth({
 })
 ```
 
+### Server-side redirect when the user is already authenticated
+
+In some situations, when the user has already been authenticated, you may not want for the user to reach the `/login` or `/signup` page again.
+
+You can do this by using the `authRequired` property, like the following:
+
+```js title="pages/login.js"
+import { withPageAuth } from '@supabase/auth-helpers-nextjs'
+
+export default function LoginPage() {
+  return <div>Login page</div>
+}
+
+export const getServerSideProps = withPageAuth({
+  authRequired: false,
+  async getServerSideProps(ctx, supabase) {
+    // Access the user object to check if the user is authenticated.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    
+    // Redirect to the protected route if the user is already authenticated.
+     if (user !== null) {
+      return { props: { email: user.email }, redirect: { destination: "/protected" } };
+    }
+    
+    // Or do nothing and let the user access the `/login` route, so the user can login.
+    return { props: {} }
+  },
+})
+```
+
 ### Server-side data fetching with RLS
 
 Both `withApiAuth` and `withPageAuth` return a supabase client that you can use to run [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
