@@ -265,7 +265,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
         try {
           await loader.present()
-          const { error } = await supabase.auth.signIn({ email: email.value })
+          const { error } = await supabase.auth.signInWithOtp({ email: email.value })
 
           if (error) throw error
 
