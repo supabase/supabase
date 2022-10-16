@@ -66,7 +66,7 @@ Vous pouvez aussi [auto-héberger](https://supabase.com/docs/guides/hosting/over
 
 #### Bibliothèques clients
 
-Notre bibliothèque client est modulaire. Chaque sous-bibliothèque est une implémentation autonome pour un seul système externe. C'est l'une des façons dont nous soutenons les outils existants.
+Notre bibliothèque client est modulaire. Chaque sous-bibliothèque est une implémentation autonome pour un seul système externe. C'est l'une des façons dont nous soutenons les outils existents.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>

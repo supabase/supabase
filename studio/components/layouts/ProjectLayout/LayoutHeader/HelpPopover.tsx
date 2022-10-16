@@ -57,7 +57,7 @@ const HelpPopover: FC<Props> = () => {
               prioritised.
             </p>
           </div>
-          <Popover.Seperator />
+          <Popover.Separator />
           <div className="mb-4 space-y-2">
             <div className="mb-4 px-5">
               <h5 className={'mb-2'}>Reach out to the community</h5>

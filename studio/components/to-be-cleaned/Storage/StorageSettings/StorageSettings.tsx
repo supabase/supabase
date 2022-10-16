@@ -80,7 +80,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
           fileSizeLimit: updatedValue.value,
           unformattedFileSizeLimit: res.fileSizeLimit,
         }
-        ui.setNotification({ category: 'success', message: 'Sucessfully updated settings' })
+        ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
       }
     }
   }
