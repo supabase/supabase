@@ -567,3 +567,17 @@ commands:
       ```sh
         -h, --help   help for create
       ```
+  - id: supabase-completion
+    title: supabase completion
+    summary: Generate shell script for completion. Available for bash, zsh and fish.
+    tags: []
+    links: []
+    usage: |-
+      ```sh
+      supabase completion <shell name> [flags]
+      ```
+    subcommands: []
+    options: |-
+      ```sh
+        -h, --help   help for completion
+      ```
