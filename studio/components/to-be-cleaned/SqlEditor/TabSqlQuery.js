@@ -1,11 +1,12 @@
 import Split from 'react-split'
 import Editor from '@monaco-editor/react'
 import DataGrid from '@supabase/react-data-grid'
+import classNames from 'classnames'
 import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown, IconClipboard } from 'ui'
+import { Button, Dropdown, IconCheck, IconChevronDown, IconClipboard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -306,6 +307,7 @@ const UtilityTabResults = observer(() => {
 
 const Results = ({ results }) => {
   const [cellPosition, setCellPosition] = useState(undefined)
+  const [copiedCell, setCopiedCell] = useState(undefined)
 
   useKeyboardShortcuts(
     {
@@ -336,7 +338,29 @@ const Results = ({ results }) => {
     )
   }
 
-  const formatter = (column, row) => {
+  useEffect(() => {
+    let timeoutId = 0
+
+    if (copiedCell) {
+      timeoutId = setTimeout(() => {
+        setCopiedCell(undefined)
+      }, 1000)
+    }
+
+    return () => {
+      timeoutId && clearTimeout(timeoutId)
+    }
+  }, [copiedCell])
+
+  const handleCopyClick = (column, row, rowIndex) => {
+    copyToClipboard(formatClipboardValue(row[column]), () => {
+      setCopiedCell(`${column},${rowIndex}`)
+    })
+  }
+
+  const formatter = (column, row, rowIndex) => {
+    const isCopied = copiedCell === `${column},${rowIndex}`
+
     return (
       <div className="group sb-grid-select-cell__formatter overflow-hidden">
         <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
@@ -344,9 +368,12 @@ const Results = ({ results }) => {
         {row[column] && (
           <Button
             type="outline"
-            icon={<IconClipboard size="tiny" />}
-            onClick={() => copyToClipboard(formatClipboardValue(row[column]))}
-            className="hidden mr-1 group-hover:block group-hover:opacity-50 hover:opacity-100"
+            icon={isCopied ? <IconCheck size="tiny" /> : <IconClipboard size="tiny" />}
+            onClick={() => handleCopyClick(column, row, rowIndex)}
+            className={classNames(
+              'mx-1 group-hover:block group-hover:opacity-50 hover:opacity-100',
+              !isCopied && 'hidden'
+            )}
             title="Copy"
           />
         )}
@@ -359,7 +386,7 @@ const Results = ({ results }) => {
   const columns = Object.keys(results[0]).map((key) => ({
     key,
     name: key,
-    formatter: ({ row }) => formatter(key, row),
+    formatter: ({ row }) => formatter(key, row, results.indexOf(row)),
     headerRenderer: () => columnRender(key),
     resizable: true,
     width: 120,
