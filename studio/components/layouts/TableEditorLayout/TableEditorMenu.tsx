@@ -267,7 +267,7 @@ const TableEditorMenu: FC<Props> = ({
                           >
                             Duplicate Table
                           </Dropdown.Item>,
-                          <Dropdown.Seperator key="separator" />,
+                          <Dropdown.Separator key="separator" />,
                           <Dropdown.Item
                             key="delete-table"
                             icon={<IconTrash size="tiny" />}

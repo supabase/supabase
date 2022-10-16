@@ -85,7 +85,7 @@ const StoragePolicies = () => {
 
   /*
     Functions that involve the CRUD for policies
-    For each API call within the Promise.all, return true if an error occured, else return false
+    For each API call within the Promise.all, return true if an error occurred, else return false
   */
   const onCreatePolicies = async (payloads) => {
     return await Promise.all(

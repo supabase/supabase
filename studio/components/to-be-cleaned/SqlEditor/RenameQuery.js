@@ -73,7 +73,7 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
             <Modal.Content>
               <Input label="Description" id="desc" placeholder="Describe query" />
             </Modal.Content>
-            <Modal.Seperator />
+            <Modal.Separator />
             <Modal.Content>
               <div className="flex items-center justify-end gap-2">
                 <Button htmlType="reset" type="default" onClick={onCancel}>

@@ -987,7 +987,7 @@ export default {
         data-closed:animate-panel-slide-right-in
       `,
     },
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2
@@ -1222,7 +1222,7 @@ export default {
       px-4 flex items-center space-x-2 py-1.5
       text-xs
     `,
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2
@@ -1303,7 +1303,7 @@ export default {
       transition
       text-scale-900 hover:text-scale-1100
     `,
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2
@@ -1459,7 +1459,7 @@ export default {
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide  
     `,
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2

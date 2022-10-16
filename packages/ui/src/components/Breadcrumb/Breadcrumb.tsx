@@ -11,14 +11,14 @@ interface Props {
 
 const Breadcrumb = ({ className, style, children, spacing = 'small' }: Props) => {
   let classes = [BreadcrumbStyle['sbui-breadcrumb--container']]
-  let seperatorClasses = [BreadcrumbStyle['sbui-breadcrumb--separator']]
+  let separatorClasses = [BreadcrumbStyle['sbui-breadcrumb--separator']]
 
   if (className) {
     classes.push(className)
   }
 
   if (spacing) {
-    seperatorClasses.push(`sbui-breadcrumb--separator-${spacing}`)
+    separatorClasses.push(`sbui-breadcrumb--separator-${spacing}`)
   }
 
   return (
@@ -27,7 +27,7 @@ const Breadcrumb = ({ className, style, children, spacing = 'small' }: Props) =>
         <li className={BreadcrumbStyle['sbui-breadcrumb--item-container']}>
           {child}
           {idx + 1 < children!.length && (
-            <IconChevronRight size={12} className={seperatorClasses.join(' ')} aria-hidden="true" />
+            <IconChevronRight size={12} className={separatorClasses.join(' ')} aria-hidden="true" />
           )}
         </li>
       ))}
