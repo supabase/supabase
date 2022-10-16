@@ -55,19 +55,70 @@ const CareerPage = () => {
           </div>
 
           <SectionContainer>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <h1 className="text-2xl text-[450]">What is Supabase</h1>
-                <p className="text-scale-1100">
-                  Supabase is an open source Firebase alternative, built by developers for
-                  developers. Supabase adds auth, realtime, storage, restful APIs and edge functions
-                  to Postgres without a single line of code. Supabase was born-remote. Having a
-                  globally distributed, open source company is our secret weapon to hiring top-tier
-                  talent.
-                </p>
+            <div className="flex gap-6">
+              <div className="w-1/2">
+                <div>
+                  <h1 className="text-2xl text-[450]">What is Supabase</h1>
+                  <p className="text-scale-1100 text-sm pt-2">
+                    Supabase is an open source Firebase alternative, built by developers for
+                    developers. Supabase adds auth, realtime, storage, restful APIs and edge
+                    functions to Postgres without a single line of code. Supabase was born-remote.
+                    Having a globally distributed, open source company is our secret weapon to
+                    hiring top-tier talent.
+                  </p>
+                </div>
+                <div className="w-full rounded-md mt-40">
+                  <img
+                    className="rounded-md"
+                    src={'/images/career/1.jpg'}
+                    width="100%"
+                    height="100%"
+                  />
+                </div>
+                <div className="w-full rounded-md mt-6">
+                  <img
+                    className="rounded-md"
+                    src={'/images/career/2.jpg'}
+                    width="100%"
+                    height="100%"
+                  />
+                </div>
               </div>
-              <div className="bg-brand-900 p-36">
-                <Image src={'/images/career/globe.png'} width="100" height="100" />
+              <div className="w-1/2">
+                <div className="w-full rounded-md">
+                  <img
+                    className="rounded-md"
+                    src={'/images/career/3.jpg'}
+                    width="100%"
+                    height="100%"
+                  />
+                </div>
+                <div className="flex gap-6 mt-6">
+                  <div className="w-full rounded-md">
+                    <img
+                      className="rounded-md"
+                      src={'/images/career/4.jpg'}
+                      width="100%"
+                      height="100%"
+                    />
+                  </div>
+                  <div className="w-full rounded-md">
+                    <img
+                      className="rounded-md"
+                      src={'/images/career/5.jpg'}
+                      width="100%"
+                      height="100%"
+                    />
+                  </div>
+                </div>
+                <div className="w-full rounded-md mt-6">
+                    <img
+                      className="rounded-md"
+                      src={'/images/career/6.jpg'}
+                      width="100%"
+                      height="100%"
+                    />
+                  </div>
               </div>
             </div>
           </SectionContainer>
@@ -79,6 +130,27 @@ const CareerPage = () => {
               our team effective:
             </p>
             <div className="flex items-center justify-between pt-10">
+              <div>
+                <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
+                <h2 className="text-lg pt-4">Egoless</h2>
+                <p className="text-scale-1100 text-xs">
+                  Willing to do the schlep, the team goals come first.
+                </p>
+              </div>
+              <div>
+                <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
+                <h2 className="text-lg pt-4">Egoless</h2>
+                <p className="text-scale-1100 text-xs">
+                  Willing to do the schlep, the team goals come first.
+                </p>
+              </div>
+              <div>
+                <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
+                <h2 className="text-lg pt-4">Egoless</h2>
+                <p className="text-scale-1100 text-xs">
+                  Willing to do the schlep, the team goals come first.
+                </p>
+              </div>
               <div>
                 <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
                 <h2 className="text-lg pt-4">Egoless</h2>
