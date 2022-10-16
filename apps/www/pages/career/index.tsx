@@ -1,6 +1,6 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import Image from 'next/image'
-import { Button, IconCheck } from '@supabase/ui'
+import { Button, IconCheck, Input } from '@supabase/ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
 import career from '../../data/career.json'
@@ -244,8 +244,8 @@ const CareerPage = () => {
                     <div className="h-[1px] w-full bg-brand-900"></div>
                   </div>
                   <div className="mt-6 w-3/4">
-                    <h2 className="text-lg">{hiring.title}</h2>
-                    <p className="text-scale-1100 text-sm mt-1">{hiring.text}</p>
+                    <h2 className="text-md">{hiring.title}</h2>
+                    <p className="text-scale-1100 text-xs mt-1">{hiring.text}</p>
                   </div>
                 </div>
               )
@@ -253,6 +253,20 @@ const CareerPage = () => {
             <h3 className="bg-brand-700 border-2 border-brand-900 text-brand-900 text-xl w-fit min-h-[40px] px-2 py-1 rounded-md flex items-center">
               <IconCheck />
             </h3>
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="text-center w-fit mx-auto">
+            <h1 className="text-3xl">Stay connected</h1>
+            <p className="text-scale-1100 mt-3 text-sm">
+              Subscribe to our newsletter to recieve updates on open roles.
+            </p>
+            <div className="mt-8 space-y-8">
+              <Input label="Name" placeholder="John Doe" />
+              <Input label="Email" placeholder="janedoe@email.com" />
+              <Button>Subscribe</Button>
+            </div>
           </div>
         </SectionContainer>
       </div>
