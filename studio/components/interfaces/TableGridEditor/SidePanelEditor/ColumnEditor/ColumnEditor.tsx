@@ -190,7 +190,7 @@ const ColumnEditor: FC<Props> = ({
         </div>
       </SidePanel.Content>
 
-      <SidePanel.Seperator />
+      <SidePanel.Separator />
 
       <SidePanel.Content>
         <div className="space-y-10 py-6">
@@ -202,7 +202,7 @@ const ColumnEditor: FC<Props> = ({
           />
         </div>
       </SidePanel.Content>
-      <SidePanel.Seperator />
+      <SidePanel.Separator />
       <SidePanel.Content>
         <div className="space-y-10 py-6">
           <ColumnType

@@ -199,7 +199,7 @@ const JWTSettings: FC<Props> = ({}) => {
                                   >
                                     Generate a random secret
                                   </Dropdown.Item>
-                                  <Dropdown.Seperator />
+                                  <Dropdown.Separator />
                                   <Dropdown.Item
                                     onClick={() => setIsCreatingKey(true)}
                                     icon={<IconPenTool size={16} />}
