@@ -60,7 +60,7 @@ const TextConfirmModal: FC<Props> = ({
               <Modal.Content>
                 <p className="mb-2 block text-sm">{text}</p>
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Input
                   id="confirmValue"
@@ -72,7 +72,7 @@ const TextConfirmModal: FC<Props> = ({
                   placeholder={confirmPlaceholder}
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Button
                   block
