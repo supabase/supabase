@@ -21,6 +21,28 @@
       "text": "in funding"
     }
   ],
+  "humanPowered": [
+    {
+      "icon": "/images/career/icon/supabase.svg",
+      "title": "Egoless",
+      "text": "Willing to do the schlep, the\n\nteam goals come first."
+    },
+    {
+      "icon": "/images/career/icon/eye.svg",
+      "title": "Curious mindset",
+      "text": "Broad skillsets. Growth mindset"
+    },
+    {
+      "icon": "/images/career/icon/kaizen.svg",
+      "title": "Stoic during a crisis",
+      "text": "Like air traffic control."
+    },
+    {
+      "icon": "/images/career/icon/control.svg",
+      "title": "Kaizen",
+      "text": "Continuously improve\n\nall functions."
+    }
+  ],
   "benefits": [
     {
       "icon": "",

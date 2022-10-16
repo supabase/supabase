@@ -129,35 +129,27 @@ const CareerPage = () => {
               As a completely remote and asynchronous team, we focus on these four traits to keep
               our team effective:
             </p>
-            <div className="flex items-center justify-between pt-10">
-              <div>
-                <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
-                <h2 className="text-lg pt-4">Egoless</h2>
-                <p className="text-scale-1100 text-xs">
-                  Willing to do the schlep, the team goals come first.
-                </p>
-              </div>
-              <div>
-                <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
-                <h2 className="text-lg pt-4">Egoless</h2>
-                <p className="text-scale-1100 text-xs">
-                  Willing to do the schlep, the team goals come first.
-                </p>
-              </div>
-              <div>
-                <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
-                <h2 className="text-lg pt-4">Egoless</h2>
-                <p className="text-scale-1100 text-xs">
-                  Willing to do the schlep, the team goals come first.
-                </p>
-              </div>
-              <div>
-                <div className="p-4 bg-brand-800 w-6 h-6 rounded-md"></div>
-                <h2 className="text-lg pt-4">Egoless</h2>
-                <p className="text-scale-1100 text-xs">
-                  Willing to do the schlep, the team goals come first.
-                </p>
-              </div>
+            <div className="flex items-start justify-between pt-10">
+              {career.humanPowered.map(
+                (human: { icon: string; title: string; text: string }, i: number) => {
+                  return (
+                    <div key={i}>
+                      <div className="w-10 h-10 bg-brand-700 rounded-md flex justify-center">
+                        <img
+                          className="rounded-md"
+                          src={human.icon}
+                          width="75%"
+                          height="75%"
+                        />
+                      </div>
+                      <h2 className="text-md pt-4">{human.title}</h2>
+                      <ReactMarkdown className="text-scale-1100 text-xs">
+                        {human.text}
+                      </ReactMarkdown>
+                    </div>
+                  )
+                }
+              )}
             </div>
           </SectionContainer>
         </div>
