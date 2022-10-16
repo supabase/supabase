@@ -112,13 +112,13 @@ const CareerPage = () => {
                   </div>
                 </div>
                 <div className="w-full rounded-md mt-6">
-                    <img
-                      className="rounded-md"
-                      src={'/images/career/6.jpg'}
-                      width="100%"
-                      height="100%"
-                    />
-                  </div>
+                  <img
+                    className="rounded-md"
+                    src={'/images/career/6.jpg'}
+                    width="100%"
+                    height="100%"
+                  />
+                </div>
               </div>
             </div>
           </SectionContainer>
