@@ -135,12 +135,7 @@ const CareerPage = () => {
                   return (
                     <div key={i}>
                       <div className="w-10 h-10 bg-brand-700 rounded-md flex justify-center">
-                        <img
-                          className="rounded-md"
-                          src={human.icon}
-                          width="75%"
-                          height="75%"
-                        />
+                        <img className="rounded-md" src={human.icon} width="75%" height="75%" />
                       </div>
                       <h2 className="text-md pt-4">{human.title}</h2>
                       <ReactMarkdown className="text-scale-1100 text-xs">
