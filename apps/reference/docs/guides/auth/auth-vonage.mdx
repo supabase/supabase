@@ -163,7 +163,7 @@ values={[
 <TabItem value="JS">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithPassword({
   phone: '491512223334444',
   password: 'some-password',
 })
@@ -200,7 +200,7 @@ values={[
 <TabItem value="JS">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithOtp({
   phone: '491512223334444',
 })
 ```

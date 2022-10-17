@@ -113,7 +113,8 @@
     },
     "EXTERNAL_AZURE_SECRET": {
       "title": "Azure secret",
-      "type": "string"
+      "type": "string",
+      "help": "Enter the data from Value, not the Secret ID."
     },
     "EXTERNAL_AZURE_URL": {
       "title": "Azure tenant URL",

@@ -6,7 +6,7 @@ import { writeToDisk } from './helpers'
 import type { SdkSpec } from './types/SdkSpec'
 
 export default async function gen(inputFileName: string, outputDir: string) {
-  const spec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
+  const spec = yaml.load(fs.readFileSync(inputFileName, 'utf8')) as any
   // console.log('spec', spec)
 
   switch (spec.sdkspec) {

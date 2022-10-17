@@ -255,7 +255,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/auth-signin',
-    destination: '/docs/reference/javascript/auth-signin',
+    destination: '/docs/reference/javascript/v1/auth-signin',
   },
   {
     permanent: false,
@@ -1315,8 +1315,23 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/realtime/broadcast',
+    destination: '/docs/guides/realtime#broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/presence',
+    destination: '/docs/guides/realtime#presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/postgres-changes',
+    destination: '/docs/guides/realtime/postgres-cdc',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/javascript/next/migration-guide',
-    destination: '/docs/reference/javascript/next/release-notes',
+    destination: '/docs/reference/javascript/release-notes',
   },
   {
     permanent: true,
@@ -1327,6 +1342,21 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/client-libraries',
     destination: '/docs/reference',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers',
+    destination: '/docs/guides/auth/auth-helpers/',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers/next-js',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers/sveltekit',
+    destination: '/docs/guides/auth/auth-helpers/sveltekit',
   },
 
   // V2 redirects

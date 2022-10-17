@@ -6,8 +6,7 @@ import template from './templates/CliTemplate'
 import type { CliSpec } from './types/CliSpec'
 
 export default async function gen(inputFileName: string, outputDir: string) {
-  const spec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
-  // console.log('spec', spec)
+  const spec = yaml.load(fs.readFileSync(inputFileName, 'utf8')) as any
 
   switch (spec.clispec) {
     case '001':
