@@ -323,6 +323,22 @@ const Results = ({ results }) => {
     ['INPUT', 'TEXTAREA']
   )
 
+  useEffect(() => {
+    let timeoutId = 0
+
+    if (copiedCell) {
+      timeoutId = setTimeout(() => {
+        setCopiedCell(undefined)
+      }, 1000)
+    }
+
+    return () => {
+      // we need to clear previous timeout to prevent checkmark flickering
+      // when clicking `Copy` btn multiple times in a short time
+      timeoutId && clearTimeout(timeoutId)
+    }
+  }, [copiedCell])
+
   if (results?.error) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
@@ -337,20 +353,6 @@ const Results = ({ results }) => {
       </div>
     )
   }
-
-  useEffect(() => {
-    let timeoutId = 0
-
-    if (copiedCell) {
-      timeoutId = setTimeout(() => {
-        setCopiedCell(undefined)
-      }, 1000)
-    }
-
-    return () => {
-      timeoutId && clearTimeout(timeoutId)
-    }
-  }, [copiedCell])
 
   const handleCopyClick = (column, row, rowIndex) => {
     copyToClipboard(formatClipboardValue(row[column]), () => {
