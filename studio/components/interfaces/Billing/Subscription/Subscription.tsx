@@ -1,27 +1,23 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
-import { sum } from 'lodash'
 import { useRouter } from 'next/router'
 import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
+import { checkPermissions, useStore, useFlag, useProjectUsage } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
-import { PaygStats, ProductFeature } from '../PAYGUsage/PAYGUsage.types'
-import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import NoPermission from 'components/ui/NoPermission'
+import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 
 interface Props {
   project: any
   subscription: StripeSubscription
-  paygStats: PaygStats | undefined
   loading?: boolean
   showProjectName?: boolean
   currentPeriodStart: number
@@ -31,7 +27,6 @@ interface Props {
 const Subscription: FC<Props> = ({
   project,
   subscription,
-  paygStats,
   loading = false,
   showProjectName = false,
   currentPeriodStart,
@@ -40,6 +35,7 @@ const Subscription: FC<Props> = ({
   const { ui } = useStore()
   const router = useRouter()
 
+  const { ref } = router.query
   const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
@@ -47,6 +43,8 @@ const Subscription: FC<Props> = ({
   const canUpdateSubscription = enablePermissions
     ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
     : ui.selectedOrganization?.is_owner
+
+  const { usage, isLoading: loadingUsage } = useProjectUsage(ref as string)
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -56,15 +54,24 @@ const Subscription: FC<Props> = ({
   const basePlanCost = subscription?.tier.unit_amount / 100
 
   const deriveTotalCost = (): number => {
-    const totalAddOnCost = sum(addOns.map((addOn) => addOn.unit_amount / 100))
-    const totalUsageCost = isPayg
-      ? Number(sum(chargeableProducts.map((product) => deriveProductCost(paygStats, product))))
-      : 0
+    const totalAddOnCost = addOns
+      .map((addOn) => addOn.unit_amount / 100)
+      .reduce((prev, current) => prev + current, 0)
+
+    const totalUsageCost =
+      usage === undefined
+        ? 0
+        : Object.keys(usage)
+            .map((productKey) => {
+              return usage[productKey].cost
+            })
+            .reduce((prev, current) => prev + current, 0)
+
     return basePlanCost + totalAddOnCost + totalUsageCost
   }
 
   return (
-    <Loading active={loading}>
+    <Loading active={loading || loadingUsage}>
       <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="flex items-center justify-between px-6 pt-4">
@@ -164,8 +171,8 @@ const Subscription: FC<Props> = ({
               <CostBreakdownRow
                 item="Base Plan"
                 amount={1}
-                unitPrice={basePlanCost}
-                price={basePlanCost}
+                unitPrice={basePlanCost.toFixed(2)}
+                price={basePlanCost.toFixed(2)}
               />
               {addOns.map((addOn) => (
                 <CostBreakdownRow
@@ -177,25 +184,40 @@ const Subscription: FC<Props> = ({
                 />
               ))}
               {isPayg &&
-                chargeableProducts.map((product) =>
-                  product.features.map((feature: ProductFeature) => {
-                    const derivedCost = deriveFeatureCost(paygStats, feature)
-                    const cost = derivedCost.toFixed(2)
+                USAGE_BASED_PRODUCTS.map((product) => {
+                  return product.features.map((feature) => {
+                    const amount = usage?.[feature.key]?.usage ?? 0
+                    const limit = usage?.[feature.key]?.limit ?? 0
+                    const cost = (usage?.[feature.key]?.cost ?? 0).toFixed(2)
+
                     return (
                       <CostBreakdownRow
-                        key={feature.attribute}
+                        key={feature.key}
                         item={feature.title}
-                        freeQuota={feature.freeQuota}
-                        amount={formatBytes(
-                          paygStats?.[feature.attribute]?.[feature.pricingModel] ?? 0
-                        )}
-                        unitPrice={`${feature.costPerUnit}/GB`}
+                        amount={
+                          feature.units === 'bytes' ? formatBytes(amount) : amount.toLocaleString()
+                        }
+                        unitPrice={
+                          feature.units === 'bytes'
+                            ? `${feature.costPerUnit}/GB`
+                            : feature.costPerUnit
+                        }
                         price={cost}
+                        note={
+                          feature.units === 'bytes'
+                            ? `${formatBytes(limit)} included`
+                            : `${limit.toLocaleString()} included`
+                        }
                       />
                     )
                   })
-                )}
-              <div className="relative flex items-center border-t border-panel-border-light px-6 py-3 dark:border-panel-border-dark">
+                })}
+              <div
+                className={[
+                  'relative flex items-center border-t px-6 py-3',
+                  'border-panel-border-light dark:border-panel-border-dark',
+                ].join(' ')}
+              >
                 <div className="w-[80%]">
                   <p className="text-sm text-scale-1100">
                     Estimated cost for {dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}{' '}
