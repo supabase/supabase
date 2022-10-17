@@ -1,10 +1,40 @@
-import { Button } from '@supabase/ui'
-import CTABanner from 'components/CTABanner/index'
+import * as Yup from 'yup'
 import Link from 'next/link'
+import { useState } from 'react'
+import { Button, Form, IconDownload, Input } from '@supabase/ui'
+
+import supabase from '~/lib/supabase'
+import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const DPA = () => {
+  const [email, setEmail] = useState<string>('')
+  const [error, setError] = useState<string>()
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
+
+  const INITIAL_VALUES = { email: '' }
+
+  const FormSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('Required'),
+  })
+
+  const handleFormSubmit = async (values: typeof INITIAL_VALUES, { resetForm }: any) => {
+    try {
+      setError(undefined)
+      const { error } = await supabase
+        .from('dpa_downloads')
+        .insert([{ contact_email: values.email, document: 'dpa' }])
+
+      if (error) throw error
+
+      resetForm()
+      setFormSubmitted(true)
+      window.open('https://supabase.com/downloads/docs/Supabase+DPA+220503.pdf', '_blank')
+    } catch (error: any) {
+      setError(error.message)
+    }
+  }
   return (
     <>
       <Layout>
@@ -19,14 +49,52 @@ const DPA = () => {
                   ("DPA").
                 </p>
 
-                <p>You can download the latest DPA document through our security portal.</p>
-                <div>
-                  <Link href="https://security.supabase.com">
-                    <Button size="medium" type="default">
-                      Security portal
-                    </Button>
-                  </Link>
-                </div>
+                <p>
+                  You can download the latest DPA document through our{' '}
+                  <Link href="https://security.supabase.com/">security portal</Link>, or by
+                  submitting your email here.
+                </p>
+
+                {formSubmitted ? (
+                  <p className="text-brand-900">
+                    Thank you for your submission! A new tab should have opened with the DPA
+                    document
+                  </p>
+                ) : (
+                  <Form
+                    initialValues={INITIAL_VALUES}
+                    validationSchema={FormSchema}
+                    onSubmit={handleFormSubmit}
+                  >
+                    {({ isSubmitting }: any) => (
+                      <>
+                        <Input
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          type="email"
+                          name="email"
+                          id="email"
+                          required
+                          descriptionText="We only keep a record of your email so we can update you when the document has been updated."
+                          placeholder="Your email address"
+                          error={error}
+                          actions={
+                            <Button
+                              htmlType="submit"
+                              type="default"
+                              iconRight={<IconDownload />}
+                              className="mr-1"
+                              loading={isSubmitting}
+                            >
+                              Download DPA document
+                            </Button>
+                          }
+                        />
+                        {error && <p>{error}</p>}
+                      </>
+                    )}
+                  </Form>
+                )}
               </div>
             </div>
           </div>
@@ -36,5 +104,4 @@ const DPA = () => {
     </>
   )
 }
-
 export default DPA
