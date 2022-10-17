@@ -206,7 +206,7 @@ We'll focus on the end-user-centric meaning of performance here (query speed).
 
 Postgres is capable of loading CSVs, but since we'll be using other search engines as well, let's convert to format that's much easier to use and process - [Newline Delimited JSON](https://dataprotocols.org/ndjson/).
 
-After a few lines of code and one `[csv2ndjson.mjs` script](https://github.com/VADOSWARE/fts-benchmark/blob/main/src/util/csv2ndjson.mjs) later, we have a `movies.ndjson.json` full of JSON documents that we can easily ingest into any search engine (or other database for that matter!).
+After a few lines of code and one [`csv2ndjson.mjs` script](https://github.com/VADOSWARE/fts-benchmark/blob/main/src/util/csv2ndjson.mjs) later, we have a `movies.ndjson.json` full of JSON documents that we can easily ingest into any search engine (or other database for that matter!).
 
 ### Inserting the data
 
