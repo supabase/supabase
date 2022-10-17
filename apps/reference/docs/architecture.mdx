@@ -94,6 +94,15 @@ A RESTful API for managing your Postgres. Fetch tables, add roles, and run queri
 - License: [Apache 2.0](https://github.com/supabase/postgres-meta/blob/master/LICENSE)
 - Language: NodeJS / Typescript
 
+### PgBouncer
+
+A lightweight connection pooler for PostgreSQL. This is useful for connecting to Postgres when using Serverless functions.
+
+- Official Docs: [pgbouncer.org](http://www.pgbouncer.org/)
+- Source code: [pgbouncer/pgbouncer](https://github.com/pgbouncer/pgbouncer)
+- License: [ISC](https://github.com/pgbouncer/pgbouncer/blob/master/COPYRIGHT)
+- Language: C
+
 ### Kong (API Gateway)
 
 A Cloud-Native API Gateway, built on top of Nginx.
@@ -122,7 +131,7 @@ For integration, each tool should expose an API and Webhooks.
 
 ### Everything is extensible
 
-We're very deliberate about adding a new tool, and prefer instead to extend an existing one.
+We're deliberate about adding a new tool, and prefer instead to extend an existing one.
 This is the opposite of many cloud providers whose product offering expands into niche use-cases. We provide _primitives_ for developers, which allow them to achieve any goal.
 Less, but better.
 
@@ -139,12 +148,21 @@ Instead, we prefer to support efforts to upstream missing functionality so that 
 
 ### Build for developers
 
-"Developer" is a very specific profile of user.
-Developers are _builders_. When we look at their impact vs effort, they are the type of user who can build products and systems with the largest efficiency.
-As the profile of a developer changes, we will continue to evolve the product to suit the evolving profile.
+"Developers" are a specific profile of user: they are _builders_.
+When assessing impact as a function of effort, developers have a large efficiency due to the type of products and systems they can build.
+As the profile of a developer changes over time, Supabase will continue to evolve the product to fit this evolving profile.
+From another perspective, we will not develop a product beyond this profile: we don't aim to become a tool for everyone - only developers.
 
 ### Support existing tools
 
 Supabase supports existing tools and communities wherever possible. Supabase is more like a "community of communities" - each tool typically has it's own community
 which we work with. We take a collabortative approach to open source: we employ maintainers, sponsor projects,
 invest in businesses, and employ developers to build our own open source tools.
+
+## Data Flow
+
+To understand the entire system it helps to understand the flow of data. Let's look at a few different scenarios to understand the components.
+
+### User authentication
+
+The simplest form of user Authentication is email and password logins, which we will use for this example.
