@@ -1359,65 +1359,84 @@ module.exports = [
     destination: '/docs/guides/auth/auth-helpers/sveltekit',
   },
 
-  // V2 redirects
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-update',
-  //   destination: '/docs/reference/javascript/auth-updateuser',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-getuser',
-  //   destination: '/docs/reference/javascript/auth-getuser',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
-  //   destination: '/docs/reference/javascript/auth-resetpasswordforemail',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-verifyotp',
-  //   destination: '/docs/reference/javascript/auth-verifyotp',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-listusers',
-  //   destination: '/docs/reference/javascript/auth-admin-listusers',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-createuser',
-  //   destination: '/docs/reference/javascript/auth-admin-createuser',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-deleteuser',
-  //   destination: '/docs/reference/javascript/auth-admin-deleteuser',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-generatelink',
-  //   destination: '/docs/reference/javascript/auth-admin-generatelink',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
-  //   destination: '/docs/reference/javascript/auth-admin-inviteuserbyemail',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-getuserbyid',
-  //   destination: '/docs/reference/javascript/auth-admin-getuserbyid',
-  // },
-  // {
-  //   permanent: true,
-  //   source: '/docs/reference/javascript/auth-api-updateuserbyid',
-  //   destination: '/docs/reference/javascript/auth-admin-updateuserbyid',
-  // },
-
-  // v1 to v2 redirects
-
+  // supabase-js v1 to v2 redirects
+  // v1: /auth-update
+  // v2: /auth-updateuser
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-update',
+    destination: '/docs/reference/javascript/v1/auth-update',
+  },
+  // v1: /auth-api-get-user
+  // v2: /auth-getuser
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-getuser',
+    destination: '/docs/reference/javascript/v1/auth-api-getuser',
+  },
+  // v1: /auth-api-resetpasswordforemail
+  // v2: /auth-resetpasswordforemail
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
+    destination: '/docs/reference/javascript/v1/auth-api-resetpasswordforemail',
+  },
+  // v1: /auth-api-verifyotp
+  // v2: /auth-verifyotp
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-verifyotp',
+    destination: '/docs/reference/javascript/v1/auth-api-verifyotp',
+  },
+  // v1: /auth-api-listusers
+  // v2: /auth-admin-listusers
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-listusers',
+    destination: '/docs/reference/javascript/v1/auth-api-listusers',
+  },
+  // v1: /auth-api-createuser
+  // v2: /auth-admin-createuser
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-createuser',
+    destination: '/docs/reference/javascript/v1/auth-api-createuser',
+  },
+  // v1: /auth-api-deleteuser
+  // v2: /auth-admin-deleteuser
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-deleteuser',
+    destination: '/docs/reference/javascript/v1/auth-api-deleteuser',
+  },
+  // v1: /auth-api-generatelink
+  // v2: /auth-admin-generatelink
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-generatelink',
+    destination: '/docs/reference/javascript/v1/auth-api-generatelink',
+  },
+  // v1: /auth-api-inviteuserbyemail
+  // v2: /auth-admin-inviteuserbyemail
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
+    destination: '/docs/reference/javascript/v1/auth-api-inviteuserbyemail',
+  },
+  // v1: /auth-api-getuserbyid
+  // v2: /auth-admin-getuserbyid
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-getuserbyid',
+    destination: '/docs/reference/javascript/v1/auth-api-getuserbyid',
+  },
+  // v1: /auth-api-updateuserbyid
+  // v2: /auth-admin-updateuserbyid
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-updateuserbyid',
+    destination: '/docs/reference/javascript/v1/auth-api-updateuserbyid',
+  },
   // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
   // send traffic to v1 docs instead
   {
@@ -1439,12 +1458,7 @@ module.exports = [
     source: '/docs/reference/javascript/auth-api-sendmobileotp',
     destination: '/docs/reference/javascript/auth-signinwithotp',
   },
-  // Replaced update with updateUser
-  {
-    permanent: true,
-    source: '/docs/reference/javascript/auth-update',
-    destination: '/docs/reference/javascript/auth-updateuser',
-  },
+
   // realtime methods been replaced with new names
   {
     permanent: true,
@@ -1460,11 +1474,5 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/javascript/getsubscriptions',
     destination: '/docs/reference/javascript/v1/getsubscriptions',
-  },
-  // v2 changed to /auth-admin-inviteuserbyemail
-  {
-    permanent: true,
-    source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
-    destination: '/docs/reference/javascript/v1/auth-api-inviteuserbyemail',
   },
 ]
