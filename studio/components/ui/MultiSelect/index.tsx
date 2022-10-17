@@ -6,7 +6,6 @@ import {
   IconAlertCircle,
   IconSearch,
   IconPlus,
-  IconArrowDown,
   IconChevronDown,
 } from 'ui'
 
@@ -259,7 +258,7 @@ export default function MultiSelect({
               }
             })}
             <div className="absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center cursor-pointer ">
-              <IconChevronDown className="text-scale-900"/>
+              <IconChevronDown className="text-scale-900" />
             </div>
           </div>
         </Popover>
