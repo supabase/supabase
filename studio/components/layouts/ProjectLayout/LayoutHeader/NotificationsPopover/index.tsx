@@ -19,7 +19,7 @@ interface Props {}
 
 const NotificationsPopover: FC<Props> = () => {
   const router = useRouter()
-  const { app, ui } = useStore()
+  const { app, meta, ui } = useStore()
   const { notifications, refresh } = useNotifications()
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
@@ -99,7 +99,7 @@ const NotificationsPopover: FC<Props> = () => {
     if (!projectToApplyMigration) return
     const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/owner-reassign`, {})
     if (!res.error) {
-      app.projects.fetchDetail(projectToApplyMigration.ref)
+      await app.projects.fetchDetail(projectToApplyMigration.ref, (project) => meta.setProjectDetails(project))
       ui.setNotification({
         category: 'success',
         message: `Succesfully applied migration for project "${projectToApplyMigration.name}"`,
@@ -121,7 +121,7 @@ const NotificationsPopover: FC<Props> = () => {
       {}
     )
     if (!res.error) {
-      app.projects.fetchDetail(projectToRollbackMigration.ref)
+      await app.projects.fetchDetail(projectToRollbackMigration.ref, (project) => meta.setProjectDetails(project))
       ui.setNotification({
         category: 'success',
         message: `Succesfully rolled back migration for project "${projectToRollbackMigration.name}"`,
@@ -143,7 +143,7 @@ const NotificationsPopover: FC<Props> = () => {
       {}
     )
     if (!res.error) {
-      app.projects.fetchDetail(projectToFinalizeMigration.ref)
+      await app.projects.fetchDetail(projectToFinalizeMigration.ref, (project) => meta.setProjectDetails(project))
       ui.setNotification({
         category: 'success',
         message: `Succesfully finalized migration for project "${projectToFinalizeMigration.name}"`,

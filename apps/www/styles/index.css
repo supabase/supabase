@@ -420,3 +420,9 @@ launch week
     --rotate: 360deg;
   }
 }
+
+/* recharts */
+
+.recharts-surface {
+  overflow: visible;
+}

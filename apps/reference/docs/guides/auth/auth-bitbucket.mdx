@@ -17,16 +17,14 @@ Setting up Bitbucket logins for your application consists of 3 parts:
 - Add your Bitbucket OAuth Consumer keys to your [Supabase Project](https://app.supabase.com)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Steps
-
-### Access your Bitbucket account
+## Access your Bitbucket account
 
 - Go to [bitbucket.org](https://bitbucket.org/).
 - Click on `Login` at the top right to log in.
 
 ![Bitbucket Developer Portal.](/img/guides/auth-bitbucket/bitbucket-portal.png)
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
@@ -47,7 +45,7 @@ The next step requires a callback URL, which looks like this:
   />
 </video>
 
-### Create a Bitbucket OAuth app
+## Create a Bitbucket OAuth app
 
 - Click on your profile icon at the bottom left
 - Click on `All Workspaces`
@@ -62,7 +60,7 @@ The next step requires a callback URL, which looks like this:
 - Click on your app name (the name of your new OAuth Consumer)
 - Copy your `Key` (`client_key`) and `Secret` (`client_secret`) codes
 
-### Add your Bitbucket credentials into your Supabase Project
+## Add your Bitbucket credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com)
 - In the left sidebar, click the `Authentication` icon (near the top)
@@ -72,27 +70,19 @@ The next step requires a callback URL, which looks like this:
 - Enter your `client_id` and `client_secret` saved in the previous step
 - Click `Save`
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'bitbucket',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `bitbucket` as the `provider`:
 
 ```js
 async function signInWithBitbucket() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'bitbucket',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

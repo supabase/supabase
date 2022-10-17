@@ -176,7 +176,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       />
       <SidePanelEditor
         sidePanelKey={sidePanelKey}
-        selectedSchema="public"
+        selectedSchema={selectedSchema}
         selectedTable={selectedTable}
         onColumnSaved={onColumnUpdated}
         closePanel={onClosePanel}

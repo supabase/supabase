@@ -38,7 +38,7 @@ Pentru documentația completă vizitați [supabase.com/docs](https://supabase.co
 
 La ora actuală ne aflăm în Beta public. Urmăriți „lansările” acestui repository pentru a putea fi notificat la actualizările majore.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Urmăriți acest repository"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Urmăriți acest repository"/></kbd>
 
 ---
 
@@ -50,7 +50,7 @@ Supabase este o combinație de unelte open source. Construim trăsăturile din F
 
 Supabase este o [platformă găzduită](https://app.supabase.com). Puteți să vă înscrieți și să începeți să folosiți Supabase fără a instala orice. Experiența de developare locală încă mai este în dezvoltare, acesta fiind lucrul la care ne concentrăm cel mai mult, împreună cu stabilitatea platformei.
 
-![Arhitectură](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arhitectură](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) este o bază de date de obiecte relațională cu peste 30 de ani de dezvoltare și o reputație pentru fiabilitate și performanță.
 - [Realtime](https://github.com/supabase/realtime) este un server Elixir care permite ascultarea inserțiilor, actualizărilor și ștergerilor bazei de date PostgreSQL prin intermediul websocket-urilor. Supabase ascultă funcționalitatea de replicare integrată PostgreSQL, convertește fluxul de octeți al replicării în JSON, apoi emite JSON-ul prin intermediul websocket-urilor.
