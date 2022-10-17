@@ -1461,4 +1461,10 @@ module.exports = [
     source: '/docs/reference/javascript/getsubscriptions',
     destination: '/docs/reference/javascript/v1/getsubscriptions',
   },
+  // v2 changed to /auth-admin-inviteuserbyemail
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
+    destination: '/docs/reference/javascript/v1/auth-api-inviteuserbyemail',
+  },
 ]
