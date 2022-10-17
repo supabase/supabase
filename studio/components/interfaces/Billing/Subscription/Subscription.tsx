@@ -57,13 +57,16 @@ const Subscription: FC<Props> = ({
     const totalAddOnCost = addOns
       .map((addOn) => addOn.unit_amount / 100)
       .reduce((prev, current) => prev + current, 0)
-
     const totalUsageCost =
       usage === undefined
         ? 0
         : Object.keys(usage)
             .map((productKey) => {
-              return usage[productKey].cost
+              const productUnitCost = USAGE_BASED_PRODUCTS.find((product) =>
+                product.features.find((feature) => feature.key === productKey)
+              )?.features.find((item) => item.key === productKey)?.costPerUnit as number
+
+              return productUnitCost
             })
             .reduce((prev, current) => prev + current, 0)
 
