@@ -31,11 +31,6 @@ const Benchmark = () => {
             </p>
           </div>
         </div>
-        <div className="col-span-1 rounded-r-md px-12 pb-12 lg:col-span-2 lg:px-0 lg:pb-0">
-          <a href="https://supabasesubscribe.vercel.app/subscription/enterpriseBenchmarks">
-            <Button>Get notified</Button>
-          </a>
-        </div>
       </div>
     </div>
   )
