@@ -1,53 +1,43 @@
-import { useState, useEffect } from "react";
-import {
-  useUser,
-  useSupabaseClient,
-  Session,
-} from "@supabase/auth-helpers-react";
-import Avatar from "./Avatar";
-
+import { useState } from "react";
+import { useSupabaseClient, User } from "@supabase/auth-helpers-react";
+import { withPageAuth } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../utils/database.types";
+import { useRouter } from "next/router";
 type Profiles = Database["public"]["Tables"]["profiles"]["Row"];
 
-export default function Account({ session }: { session: Session }) {
+// Server-side rendering (SSR) example
+export const getServerSideProps = withPageAuth<Database>({
+  async getServerSideProps(ctx, supabaseServerClient) {
+    const {
+      data: { user },
+    } = await supabaseServerClient.auth.getUser();
+
+    const { data: profile } = await supabaseServerClient
+      .from("profiles")
+      .select(`username, website, avatar_url`)
+      .eq("id", user!.id)
+      .single();
+    return { props: { profile } };
+  },
+});
+
+export default function Account({
+  user,
+  profile,
+}: {
+  user: User;
+  profile: Profiles;
+}) {
   const supabase = useSupabaseClient<Database>();
-  const user = useUser();
-  const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState<Profiles["username"]>(null);
-  const [website, setWebsite] = useState<Profiles["website"]>(null);
-  const [avatar_url, setAvatarUrl] = useState<Profiles["avatar_url"]>(null);
-
-  useEffect(() => {
-    getProfile();
-  }, [session]);
-
-  async function getProfile() {
-    try {
-      setLoading(true);
-      if (!user) throw new Error("No user");
-
-      let { data, error, status } = await supabase
-        .from("profiles")
-        .select(`username, website, avatar_url`)
-        .eq("id", user.id)
-        .single();
-
-      if (error && status !== 406) {
-        throw error;
-      }
-
-      if (data) {
-        setUsername(data.username);
-        setWebsite(data.website);
-        setAvatarUrl(data.avatar_url);
-      }
-    } catch (error) {
-      alert("Error loading user data!");
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState<Profiles["username"]>(
+    profile.username
+  );
+  const [website, setWebsite] = useState<Profiles["website"]>(profile.website);
+  const [avatar_url, setAvatarUrl] = useState<Profiles["avatar_url"]>(
+    profile.avatar_url
+  );
 
   async function updateProfile({
     username,
@@ -60,7 +50,6 @@ export default function Account({ session }: { session: Session }) {
   }) {
     try {
       setLoading(true);
-      if (!user) throw new Error("No user");
 
       const updates = {
         id: user.id,
@@ -72,7 +61,7 @@ export default function Account({ session }: { session: Session }) {
 
       let { error } = await supabase.from("profiles").upsert(updates);
       if (error) throw error;
-      alert("Profile updated!");
+      alert("Data updated!");
     } catch (error) {
       alert("Error updating the data!");
       console.log(error);
@@ -83,18 +72,9 @@ export default function Account({ session }: { session: Session }) {
 
   return (
     <div className="form-widget">
-      <Avatar
-        uid={user!.id}
-        url={avatar_url}
-        size={150}
-        onUpload={(url) => {
-          setAvatarUrl(url);
-          updateProfile({ username, website, avatar_url: url });
-        }}
-      />
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
+        <input id="email" type="text" value={user?.email} disabled />
       </div>
       <div>
         <label htmlFor="username">Username</label>
@@ -128,7 +108,10 @@ export default function Account({ session }: { session: Session }) {
       <div>
         <button
           className="button block"
-          onClick={() => supabase.auth.signOut()}
+          onClick={async () => {
+            await supabase.auth.signOut();
+            router.push("/");
+          }}
         >
           Sign Out
         </button>
