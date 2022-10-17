@@ -1,28 +1,18 @@
 {
-  "name": "supabase-nextjs",
-  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "@supabase/auth-helpers-nextjs": "^0.4.1",
-    "@supabase/auth-helpers-react": "^0.3.0",
-    "@supabase/auth-ui-react": "^0.2.2",
-    "@supabase/supabase-js": "^2.0.0",
-    "next": "12.3.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "@supabase/supabase-js": "^1.7.6",
+    "next": "12.0.9",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
   },
   "devDependencies": {
-    "@types/node": "18.8.5",
-    "@types/react": "18.0.21",
-    "@types/react-dom": "18.0.6",
-    "eslint": "8.25.0",
-    "eslint-config-next": "12.3.1",
-    "typescript": "4.8.4"
+    "@types/react": "^17.0.3",
+    "typescript": "^4.2.3"
   }
 }
