@@ -334,7 +334,7 @@ const Results = ({ results }) => {
 
     return () => {
       // we need to clear previous timeout to prevent checkmark flickering
-      // when clicking `Copy` btn multiple times in a short time
+      // when clicking `Copy` button multiple times in a short time
       timeoutId && clearTimeout(timeoutId)
     }
   }, [copiedCell])
