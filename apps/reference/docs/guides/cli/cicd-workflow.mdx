@@ -348,6 +348,24 @@ Once pushed, check that the migration version is up to date for both local and r
 supabase migration list
 ```
 
+### Permission denied on db remote commit
+
+If you have been using Supabase hosted projects for a long time, you might encounter the following permission error when executing `db remote commit`.
+
+```bash
+Error: Error running pg_dump on remote database: pg_dump: error: query failed: ERROR:  permission denied for table _type
+
+pg_dump: error: query was: LOCK TABLE "graphql"."_type" IN ACCESS SHARE MODE
+```
+
+To resolve this error, you need to grant `postgres` role permissions to `graphql` schema. You can do that by running the following query from Supabase dashboard's SQL Editor.
+
+```sql
+grant all on all tables in schema graphql to postgres, anon, authenticated, service_role;
+grant all on all functions in schema graphql to postgres, anon, authenticated, service_role;
+grant all on all sequences in schema graphql to postgres, anon, authenticated, service_role;
+```
+
 ### Permission denied on db push
 
 If you created a table through Supabase dashboard, and your new migration script contains `ALTER TABLE` statements, you might run into permission error when applying them on staging or production databases.
