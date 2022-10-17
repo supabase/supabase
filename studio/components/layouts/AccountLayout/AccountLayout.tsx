@@ -27,6 +27,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
 
   const onClickLogout = async () => {
     await auth.signOut()
+    localStorage.clear();
     router.reload()
   }
 

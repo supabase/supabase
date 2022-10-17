@@ -45,7 +45,7 @@ Katso ohjeet osallistumiseen vierailemalla [Aloitus](./DEVELOPERS.md)
 
 Olemme tällä hetkellä julkisessa betaversiossa. Katso tämän repon "julkaisut", niin saat ilmoituksen tärkeimmistä päivityksistä.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Katso tämä repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Katso tämä repo"/></kbd>
 
 ---
 

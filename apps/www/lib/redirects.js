@@ -255,7 +255,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/auth-signin',
-    destination: '/docs/reference/javascript/auth-signin',
+    destination: '/docs/reference/javascript/v1/auth-signin',
   },
   {
     permanent: false,
@@ -1315,8 +1315,23 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/realtime/broadcast',
+    destination: '/docs/guides/realtime#broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/presence',
+    destination: '/docs/guides/realtime#presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/postgres-changes',
+    destination: '/docs/guides/realtime/postgres-cdc',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/javascript/next/migration-guide',
-    destination: '/docs/reference/javascript/next/release-notes',
+    destination: '/docs/reference/javascript/release-notes',
   },
   {
     permanent: true,
@@ -1327,6 +1342,21 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/client-libraries',
     destination: '/docs/reference',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers',
+    destination: '/docs/guides/auth/auth-helpers/',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers/next-js',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth-helpers/sveltekit',
+    destination: '/docs/guides/auth/auth-helpers/sveltekit',
   },
 
   // V2 redirects
@@ -1385,4 +1415,50 @@ module.exports = [
   //   source: '/docs/reference/javascript/auth-api-updateuserbyid',
   //   destination: '/docs/reference/javascript/auth-admin-updateuserbyid',
   // },
+
+  // v1 to v2 redirects
+
+  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // send traffic to v1 docs instead
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-signin',
+    destination: '/docs/reference/javascript/v1/auth-signin',
+  },
+  // auth.session renamed to auth.getSession
+  // send to new v2 docs version
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-session',
+    destination: '/docs/reference/javascript/auth-getsession',
+  },
+  // Removed sendMobileOTP in favor of signInWithOtp
+  // send traffic to new v2 docs instead
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api-sendmobileotp',
+    destination: '/docs/reference/javascript/auth-signinwithotp',
+  },
+  // Replaced update with updateUser
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-update',
+    destination: '/docs/reference/javascript/auth-updateuser',
+  },
+  // realtime methods been replaced with new names
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/removesubscription',
+    destination: '/docs/reference/javascript/v1/removesubscription',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/removeallsubscriptions',
+    destination: '/docs/reference/javascript/v1/removeallsubscriptions',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/getsubscriptions',
+    destination: '/docs/reference/javascript/v1/getsubscriptions',
+  },
 ]
