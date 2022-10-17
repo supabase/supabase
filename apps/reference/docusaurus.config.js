@@ -14,7 +14,7 @@ const config = {
   url: 'https://supabase.com',
   baseUrl: baseUrl,
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenMarkdownLinks: 'throw',
   favicon: '/favicon.ico',
   themes: ['docusaurus-theme-search-typesense'],
 
