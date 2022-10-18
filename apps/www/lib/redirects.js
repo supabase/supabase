@@ -270,7 +270,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/auth-session',
-    destination: '/docs/reference/javascript/auth-session',
+    destination: '/docs/reference/javascript/v1/auth-session',
   },
   {
     permanent: false,
@@ -325,12 +325,12 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/removesubscription',
-    destination: '/docs/reference/javascript/removesubscription',
+    destination: '/docs/reference/javascript/v1/removesubscription',
   },
   {
     permanent: false,
     source: '/docs/client/getsubscriptions',
-    destination: '/docs/reference/javascript/getsubscriptions',
+    destination: '/docs/reference/javascript/v1/getsubscriptions',
   },
   {
     permanent: false,
@@ -1444,12 +1444,12 @@ module.exports = [
     source: '/docs/reference/javascript/auth-signin',
     destination: '/docs/reference/javascript/v1/auth-signin',
   },
-  // auth.session renamed to auth.getSession
-  // send to new v2 docs version
+  // v1: /auth-session
+  // v2: /auth-getsession
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-session',
-    destination: '/docs/reference/javascript/auth-getsession',
+    destination: '/docs/reference/javascript/v1/auth-session',
   },
   // Removed sendMobileOTP in favor of signInWithOtp
   // send traffic to new v2 docs instead
