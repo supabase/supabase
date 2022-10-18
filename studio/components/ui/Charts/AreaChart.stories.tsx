@@ -27,6 +27,7 @@ export const AreaChart = () => (
       { title: 'Minimal Header', props: { minimalHeader: true } },
       { title: 'Minimal Highlighted Value', props: { minimalHeader: true, highlightedValue: 123 } },
       { title: 'Highlighted Value', props: { highlightedValue: 123, highlightedLabel: "some custom label" } },
+      { title: 'Formatter - Auto 2 Precision for floats', props: { data: DATA.map(d=> ({...d, ram_usage: d.ram_usage + 0.1231233})) } },
       { title: 'UTC Dates', props: { displayDateInUtc: true } },
       { title: 'Custom date format', props: { customDateFormat: 'HH:mm' } },
       { title: 'Value format', props: { format: 'c' } },
