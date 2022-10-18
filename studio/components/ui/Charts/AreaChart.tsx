@@ -13,6 +13,7 @@ import ChartHeader from './ChartHeader'
 import { Datum, CommonChartProps } from './Charts.types'
 import utc from 'dayjs/plugin/utc'
 import ChartNoData from './NoDataPlaceholder'
+import { numberFormatter } from './Charts.utils'
 dayjs.extend(utc)
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
@@ -34,6 +35,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   highlightedLabel,
   displayDateInUtc,
   minimalHeader,
+  className = '',
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -51,15 +53,19 @@ const AreaChart: React.FC<AreaChartProps> = ({
     highlightedLabel
 
   const resolvedHighlightedValue =
-     (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : null) || highlightedValue
+    (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : null) || highlightedValue
 
   return (
-    <>
+    <div className={['flex flex-col gap-3', className].join(' ')}>
       <ChartHeader
         title={title}
         format={format}
         customDateFormat={customDateFormat}
-        highlightedValue={resolvedHighlightedValue}
+        highlightedValue={
+          typeof resolvedHighlightedValue === 'number'
+            ? numberFormatter(resolvedHighlightedValue)
+            : resolvedHighlightedValue
+        }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
       />
@@ -113,7 +119,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
           <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>
       )}
-    </>
+    </div>
   )
 }
 export default AreaChart
