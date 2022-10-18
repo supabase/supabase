@@ -230,13 +230,13 @@ const sidebars = {
         },
         {
           type: 'category',
-          label: 'Offline/Caching',
+          label: 'Caching / Offline-first',
           collapsed: true,
           items: ['guides/integrations/polyscale'],
         },
         {
           type: 'category',
-          label: 'DevTools',
+          label: 'Developer Tools',
           collapsed: true,
           items: [
             'guides/integrations/pgmustard',
@@ -248,7 +248,7 @@ const sidebars = {
         },
         {
           type: 'category',
-          label: 'Low Code',
+          label: 'Low-code',
           collapsed: true,
           items: [
             'guides/integrations/appsmith',
