@@ -15,7 +15,10 @@ import { Route } from 'components/ui/ui.types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
+  const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const homeUrl = `/project/${ref}`
   const buildingUrl = `/project/${ref}/building`
 
   return [
@@ -29,7 +32,9 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
     },
     {
       key: 'sql',
