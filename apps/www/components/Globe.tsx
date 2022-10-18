@@ -46,7 +46,7 @@ const Globe = () => {
         contain: 'layout paint size',
         opacity: 0,
         transition: 'opacity 1s ease',
-        borderRadius: '100%'
+        borderRadius: '100%',
       }}
     />
   )
