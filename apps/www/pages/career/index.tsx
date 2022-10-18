@@ -4,6 +4,7 @@ import { Button, IconCheck, Input } from '@supabase/ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
 import career from '../../data/career.json'
+import Globe from '~/components/Globe'
 
 const CareerPage = () => {
   return (
@@ -20,7 +21,7 @@ const CareerPage = () => {
         </div>
 
         <SectionContainer>
-          <div className="flex items-start justify-between">
+          <div className="md:flex md:items-start justify-between">
             {career.company.map((company: { number: string; text: string }, i: number) => {
               return (
                 <div key={i} className="border-t-2 border-brand-900 min-w-[185px]">
@@ -32,27 +33,29 @@ const CareerPage = () => {
           </div>
         </SectionContainer>
 
-        <div className="border-y-2 border-scale-400 bg-scale-100">
-          <div className="flex items-center gap-40 sm:pb-18 pb-16 md:pb-24 lg:pb-24">
-            <div className="w-[550px] h-[550px]">
-              <img src="/images/career/globe.png" width="100%" height="100%" />
-            </div>
-            <div className="w-[425px]">
-              <h1 className="text-2xl text-[450]">We work together, wherever we are</h1>
-              <p className="text-scale-1100 mt-4 text-sm">
-                We're 100% remote, globally distributed team. Working with a globally distributed
-                team can be challenging and rewarding. We have employees all over the world,
-                spanning 20 countries so we use tools like Notion, Slack, and Discord to stay
-                connected to our team, and our community.
-              </p>
-              <div>
-                <div className="border-t-2 border-brand-900 mt-20"></div>
-                <h1 className="text-2xl text-[450] pt-2">
-                  We deeply believe in the efficacy of collaborative open source
-                </h1>
+        <div className="border-y-2 border-scale-400 bg-scale-100 overflow-clip">
+          <SectionContainer className="!py-0 !pb-16">
+            <div className="">
+              <div className="relative -top-[100px] -left-[200px] w-[525px] h-[525px] spect-square">
+                <Globe />
+              </div>
+              <div className="relative -top-[75px]">
+                <h1 className="text-2xl text-[450]">We work together, wherever we are</h1>
+                <p className="text-scale-1100 mt-4 text-sm">
+                  We're 100% remote, globally distributed team. Working with a globally distributed
+                  team can be challenging and rewarding. We have employees all over the world,
+                  spanning 20 countries so we use tools like Notion, Slack, and Discord to stay
+                  connected to our team, and our community.
+                </p>
+                <div>
+                  <div className="border-t-2 border-brand-900 mt-20"></div>
+                  <h1 className="text-2xl text-[450] pt-2">
+                    We deeply believe in the efficacy of collaborative open source
+                  </h1>
+                </div>
               </div>
             </div>
-          </div>
+          </SectionContainer>
 
           <SectionContainer>
             <div className="flex gap-6">
@@ -233,7 +236,7 @@ const CareerPage = () => {
               answer.
             </p>
           </div>
-          <div className="mt-20 flex items-start">
+          <div className="mt-20 md:flex md:items-start">
             {career.hiring.map((hiring: { title: string; text: string }, i: number) => {
               return (
                 <div key={i + 1}>
