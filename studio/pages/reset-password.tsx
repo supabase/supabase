@@ -1,5 +1,5 @@
 import ResetPasswordForm from 'components/interfaces/Login/ResetPasswordForm'
-import { LoginLayout } from 'components/layouts'
+import { ForgotPasswordLayout } from 'components/layouts'
 import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
 
@@ -23,9 +23,9 @@ const ResetPasswordPage: NextPageWithLayout = () => {
 }
 
 ResetPasswordPage.getLayout = (page) => (
-  <LoginLayout title="Reset Password" showDisclaimer={false}>
+  <ForgotPasswordLayout title="Reset Password" showDisclaimer={false}>
     {page}
-  </LoginLayout>
+  </ForgotPasswordLayout>
 )
 
 export default ResetPasswordPage

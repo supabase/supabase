@@ -7,7 +7,7 @@ import { NextPageWithLayout } from 'types'
 const RegisterPage: NextPageWithLayout = () => {
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         <LoginWithGitHub />
 
         <div className="relative">
@@ -15,25 +15,27 @@ const RegisterPage: NextPageWithLayout = () => {
             <div className="w-full border-t border-scale-700" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-scale-400 px-2">Or</span>
+            <span className="bg-scale-200 px-2">Or</span>
           </div>
         </div>
 
         <RegisterForm />
       </div>
 
-      <div className="w-full border-t border-scale-700 my-4" />
-
-      <div className="mb-4">
-        <span className="text-scale-1000">Already have an account?</span>{' '}
+      <div className="my-8 self-center">
+        <span className="text-scale-1000">Have an account?</span>{' '}
         <Link href="/">
-          <a className="underline hover:text-scale-1100">Login</a>
+          <a className="underline hover:text-scale-1100">Sign In Now</a>
         </Link>
       </div>
     </>
   )
 }
 
-RegisterPage.getLayout = (page) => <LoginLayout title="Create a New Account">{page}</LoginLayout>
+RegisterPage.getLayout = (page) => (
+  <LoginLayout heading="Get Started" subheading="Create a New Account">
+    {page}
+  </LoginLayout>
+)
 
 export default RegisterPage

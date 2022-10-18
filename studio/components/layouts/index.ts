@@ -14,6 +14,7 @@ import VercelIntegrationLayout from './VercelIntegrationLayout'
 import BillingLayout from './BillingLayout'
 import LogsExplorerLayout from './LogsExplorerLayout/LogsExplorerLayout'
 import LoginLayout from './LoginLayout/LoginLayout'
+import ForgotPasswordLayout from './LoginLayout/ForgotPasswordLayout'
 
 export {
   ProjectLayoutWithAuth,
@@ -32,6 +33,7 @@ export {
   BillingLayout,
   LogsExplorerLayout,
   LoginLayout,
+  ForgotPasswordLayout,
 }
 
 export default ProjectLayout

@@ -1,7 +1,7 @@
 import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { useRouter } from 'next/router'
-import { Button, Form, IconLock, Input } from 'ui'
+import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
 const registerSchema = object({
@@ -95,8 +95,7 @@ const RegisterForm = () => {
               block
               form="register-form"
               htmlType="submit"
-              size="medium"
-              icon={<IconLock />}
+              size="large"
               disabled={isSubmitting}
               loading={isSubmitting}
             >
