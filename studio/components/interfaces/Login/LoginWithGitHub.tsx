@@ -17,7 +17,7 @@ const LoginWithGitHub = () => {
   }
 
   return (
-    <Button onClick={handleGithubSignIn} icon={<IconGitHub />} size="medium">
+    <Button block onClick={handleGithubSignIn} icon={<IconGitHub />} size="large" type="default">
       Continue with GitHub
     </Button>
   )

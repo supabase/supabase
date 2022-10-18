@@ -54,7 +54,7 @@ const LoginForm = () => {
     >
       {({ isSubmitting }: { isSubmitting: boolean }) => {
         return (
-          <div className="mb-4 space-y-4 pt-4">
+          <div className="flex flex-col gap-4">
             <Input
               id="email"
               name="email"
@@ -71,13 +71,11 @@ const LoginForm = () => {
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
             />
 
-            <div className="border-overlay-border border-t" />
-
             <Button
               block
               form="login-form"
               htmlType="submit"
-              size="medium"
+              size="large"
               disabled={isSubmitting}
               loading={isSubmitting}
             >

@@ -34,7 +34,7 @@ const LoginPage: NextPageWithLayout = () => {
     <Connecting />
   ) : (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         <LoginWithGitHub />
 
         <div className="relative">
@@ -42,27 +42,18 @@ const LoginPage: NextPageWithLayout = () => {
             <div className="w-full border-t border-scale-700" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-scale-400 px-2">Or</span>
+            <span className="bg-scale-200 px-2">Or</span>
           </div>
         </div>
 
         <LoginForm />
       </div>
 
-      <div className="w-full border-t border-scale-700 my-4" />
-
-      <div className="mb-4">
+      <div className="my-8 self-center">
         <div>
-          <span className="text-scale-1000">Need an account?</span>{' '}
+          <span className="text-scale-1000">Don't have an account?</span>{' '}
           <Link href="/register">
-            <a className="underline hover:text-scale-1100">Register</a>
-          </Link>
-        </div>
-
-        <div>
-          <span className="text-scale-1000">Forgot your password?</span>{' '}
-          <Link href="/forgot-password">
-            <a className="underline hover:text-scale-1100">Reset Password</a>
+            <a className="underline hover:text-scale-1100">Sign Up Now</a>
           </Link>
         </div>
       </div>
@@ -71,7 +62,11 @@ const LoginPage: NextPageWithLayout = () => {
 }
 
 LoginPage.getLayout = (page) => (
-  <LoginLayout title="Login" logoLinkToMarketingSite={true}>
+  <LoginLayout
+    heading="Welcome back"
+    subheading="Sign in to your account"
+    logoLinkToMarketingSite={true}
+  >
     {page}
   </LoginLayout>
 )

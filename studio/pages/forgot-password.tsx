@@ -1,5 +1,5 @@
 import ForgotPasswordForm from 'components/interfaces/Login/ForgotPasswordForm'
-import { LoginLayout } from 'components/layouts'
+import { ForgotPasswordLayout } from 'components/layouts'
 import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
 
@@ -23,9 +23,9 @@ const ForgotPasswordPage: NextPageWithLayout = () => {
 }
 
 ForgotPasswordPage.getLayout = (page) => (
-  <LoginLayout title="Forgot Password" showDisclaimer={false}>
+  <ForgotPasswordLayout title="Forgot Password" showDisclaimer={false}>
     {page}
-  </LoginLayout>
+  </ForgotPasswordLayout>
 )
 
 export default ForgotPasswordPage
