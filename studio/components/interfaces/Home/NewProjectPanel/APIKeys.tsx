@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Input, IconLoader, IconAlertCircle } from '@supabase/ui'
+import { Input, IconLoader, IconAlertCircle } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -17,7 +17,6 @@ const APIKeys = () => {
 
   const availableLanguages = [
     { name: 'Javascript', key: 'js' },
-    { name: 'Python', key: 'python' },
     { name: 'Dart', key: 'dart' },
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])

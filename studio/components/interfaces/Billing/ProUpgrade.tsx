@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
+import { Button, IconHelpCircle, Toggle, Modal } from 'ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
@@ -167,7 +167,7 @@ const ProUpgrade: FC<Props> = ({
           <div className="relative space-y-4 px-5">
             <BackButton onClick={() => onSelectBack()} />
             <div className="space-y-8">
-              <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
+              <h4 className="text-lg text-scale-900">Change your project's subscription</h4>
               <div
                 className="space-y-8 overflow-scroll pb-8"
                 style={{ height: 'calc(100vh - 9rem - 57px)' }}
@@ -178,7 +178,7 @@ const ProUpgrade: FC<Props> = ({
                       <h3 className="text-xl">
                         Welcome to <span className="text-brand-900">Pro</span>
                       </h3>
-                      <p className="text-scale-1100 text-base">
+                      <p className="text-base text-scale-1100">
                         Your new subscription will begin immediately after payment
                       </p>
                     </>
@@ -187,13 +187,13 @@ const ProUpgrade: FC<Props> = ({
                       <h3 className="text-3xl">
                         Managing your <span className="text-brand-900">Pro</span> plan
                       </h3>
-                      <p className="text-scale-1100 text-base">
+                      <p className="text-base text-scale-1100">
                         Your billing cycle will reset after payment
                       </p>
                     </>
                   )}
                 </div>
-                <div className="bg-panel-body-light dark:bg-panel-body-dark border-panel-border-light border-panel-border-dark flex items-center justify-between gap-16 rounded border px-6 py-4 drop-shadow-sm">
+                <div className="flex items-center justify-between gap-16 rounded border border-panel-border-light border-panel-border-dark bg-panel-body-light px-6 py-4 drop-shadow-sm dark:bg-panel-body-dark">
                   <div>
                     <div className="flex items-center space-x-2">
                       <p>Enable spend cap</p>
@@ -204,7 +204,7 @@ const ProUpgrade: FC<Props> = ({
                         onClick={() => setShowSpendCapHelperModal(true)}
                       />
                     </div>
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-sm text-scale-1100">
                       If enabled, additional resources will not be charged on a per-usage basis
                     </p>
                   </div>
@@ -281,11 +281,11 @@ const ProUpgrade: FC<Props> = ({
               </p>
               {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
               {/* Maybe ideate this in Figma first but this is good enough for now */}
-              <div className="border-scale-600 bg-scale-500 rounded border">
+              <div className="rounded border border-scale-600 bg-scale-500">
                 <div className="flex items-center px-4 pt-2 pb-1">
-                  <p className="text-scale-1100 w-[50%] text-sm">Item</p>
-                  <p className="text-scale-1100 w-[25%] text-sm">Limit</p>
-                  <p className="text-scale-1100 w-[25%] text-sm">Rate</p>
+                  <p className="w-[50%] text-sm text-scale-1100">Item</p>
+                  <p className="w-[25%] text-sm text-scale-1100">Limit</p>
+                  <p className="w-[25%] text-sm text-scale-1100">Rate</p>
                 </div>
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">
@@ -315,11 +315,11 @@ const ProUpgrade: FC<Props> = ({
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                              'border-scale-200 border ', //border
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                              'border border-scale-200 ', //border
                             ].join(' ')}
                           >
-                            <span className="text-scale-1200 text-xs">
+                            <span className="text-xs text-scale-1200">
                               Monthly Active Users: A user that has made an API request in the last
                               month
                             </span>

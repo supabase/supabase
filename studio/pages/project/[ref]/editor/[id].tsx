@@ -3,12 +3,12 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Modal } from '@supabase/ui'
+import { Modal } from 'ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
 import { tryParseJson } from 'lib/helpers'
-import { useStore, withAuth } from 'hooks'
+import { useStore, withAuth, useUrlState } from 'hooks'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
@@ -17,6 +17,7 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 const TableEditorPage: NextPage = () => {
   const router = useRouter()
   const { id }: any = router.query
+  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const { meta, ui } = useStore()
   const [selectedSchema, setSelectedSchema] = useState<string>()
@@ -98,10 +99,31 @@ const TableEditorPage: NextPage = () => {
     setSidePanelKey(undefined)
   }
 
+  const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+
+      return {
+        ...prevParams,
+        filter: existingFilters.filter((filter: string) => {
+          const [column] = filter.split(':')
+          if (column !== columnName) return filter
+        }),
+        sort: existingSorts.filter((sort: string) => {
+          const [column] = sort.split(':')
+          if (column !== columnName) return sort
+        }),
+      }
+    })
+  }
+
   const onConfirmDeleteColumn = async () => {
     try {
       const response: any = await meta.columns.del(selectedColumnToDelete!.id)
       if (response.error) throw response.error
+
+      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete!.name)
 
       await meta.tables.loadById(selectedColumnToDelete!.table_id)
     } catch (error: any) {
@@ -177,7 +199,7 @@ const TableEditorPage: NextPage = () => {
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               Are you sure you want to delete the selected column? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -195,7 +217,7 @@ const TableEditorPage: NextPage = () => {
         }
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               Are you sure you want to delete the selected table? This action cannot be undone.
             </p>
           </Modal.Content>

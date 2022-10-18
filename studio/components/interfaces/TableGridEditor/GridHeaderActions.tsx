@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Button, IconAlertCircle, IconLock } from '@supabase/ui'
+import { Button, IconAlertCircle, IconLock } from 'ui'
 import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -15,7 +15,7 @@ const GridHeaderActions: FC<Props> = ({ table }) => {
   const policies = meta.policies.list((policy: PostgresPolicy) => policy.table_id === table.id)
 
   return (
-    <div className="space-x-3 flex items-center">
+    <div className="flex items-center space-x-3">
       <Link href={`/project/${projectRef}/auth/policies#${table.id}`}>
         <a>
           <Button
@@ -29,7 +29,9 @@ const GridHeaderActions: FC<Props> = ({ table }) => {
             }
           >
             {/* RLS {table.rls_enabled ? 'is' : 'not'} enabled */}
-            {!table.rls_enabled ? 'RLS is not enabled' : `${policies.length} active RLS policies`}
+            {!table.rls_enabled
+              ? 'RLS is not enabled'
+              : `${policies.length} active RLS polic${policies.length > 1 ? 'ies' : 'y'}`}
           </Button>
         </a>
       </Link>

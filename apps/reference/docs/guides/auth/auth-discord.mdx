@@ -17,9 +17,7 @@ Setting up Discord logins for your application consists of 3 parts:
 - Add your Discord OAuth Consumer keys to your [Supabase Project](https://app.supabase.com)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Steps
-
-### Access your Discord account
+## Access your Discord account
 
 - Go to [discord.com](https://discord.com/).
 - Click on `Login` at the top right to log in.
@@ -30,7 +28,7 @@ Setting up Discord logins for your application consists of 3 parts:
 
 ![Discord Portal.](/img/guides/auth-discord/discord-developer-portal.png)
 
-### Find your callback URL
+## Find your callback URL
 
 In the next step you require a callback URL, which looks like this:
 
@@ -51,7 +49,7 @@ In the next step you require a callback URL, which looks like this:
   />
 </video>
 
-### Create a Discord Application
+## Create a Discord Application
 
 - Click on `New Application` at the top right.
 - Enter the name of your application and click `Create`.
@@ -61,7 +59,7 @@ In the next step you require a callback URL, which looks like this:
 - Click `Save Changes` at the bottom.
 - Copy your `Client ID` and `Client Secret` under `Client information`.
 
-### Add your Discord credentials into your Supabase Project
+## Add your Discord credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com)
 - In the left sidebar, click the `Authentication` icon (near the top)
@@ -71,33 +69,21 @@ In the next step you require a callback URL, which looks like this:
 - Enter your `client_id` and `client_secret` saved in the previous step
 - Click `Save`
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'discord',
-})
-```
-
-:::note
-
-If you call `signIn()` when already logged in, Discord will prompt the user again for authorization.
-
-:::
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `discord` as the `provider`:
 
 ```js
 async function signInWithDiscord() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'discord',
   })
 }
 ```
 
-To log out:
+If your user is already signed in, Discord prompts the user again for authorization.
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

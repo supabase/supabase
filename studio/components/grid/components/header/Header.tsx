@@ -1,5 +1,5 @@
 import { FC, useState, ReactNode } from 'react'
-import { Button, IconDownload, IconPlus, IconX, IconTrash } from '@supabase/ui'
+import { Button, IconDownload, IconPlus, IconX, IconTrash } from 'ui'
 import { saveAs } from 'file-saver'
 
 import { useStore } from 'hooks'
@@ -30,7 +30,7 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
   const { selectedRows } = state
 
   return (
-    <div className="bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-5 py-1.5">
+    <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
       {selectedRows.size > 0 ? (
         <RowHeader sorts={sorts} filters={filters} />
       ) : (
@@ -82,7 +82,7 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
         <FilterDropdown />
         <SortPopover />
       </div>
-      <div className="bg-scale-600 h-[50%] w-px"></div>
+      <div className="h-[50%] w-px bg-scale-600"></div>
       <div className="flex items-center gap-2">
         {renderNewColumn(onAddColumn)}
         {renderAddRow(onAddRow)}
@@ -112,12 +112,13 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
   }
 
   const onRowsDelete = () => {
+    const numRows = allRowsSelected ? totalRows : selectedRows.size
     confirmAlert({
       title: 'Confirm to delete',
-      message: `Are you sure you want to delete the selected ${selectedRows.size} row${
-        selectedRows.size > 1 ? 's' : ''
+      message: `Are you sure you want to delete the selected ${numRows} row${
+        numRows > 1 ? 's' : ''
       }? This action cannot be undone.`,
-      confirmText: `Delete ${selectedRows.size} rows`,
+      confirmText: `Delete ${numRows} rows`,
       onAsyncConfirm: async () => {
         if (allRowsSelected) {
           const { error } =
@@ -188,7 +189,7 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
           icon={<IconX size="tiny" strokeWidth={2} />}
           onClick={deselectRows}
         />
-        <span className="text-scale-1200 text-xs">
+        <span className="text-xs text-scale-1200">
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1

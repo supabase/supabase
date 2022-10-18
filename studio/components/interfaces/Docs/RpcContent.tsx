@@ -42,11 +42,7 @@ const RpcContent = ({
 
       <div className="doc-section">
         <article className="text ">
-          <Description
-            content={summary}
-            metadata={{ rpc: `${rpcId} (${paramList})` }}
-            onChange={refreshDocs}
-          />
+          <Description content={summary} metadata={{ rpc: rpcId }} onChange={refreshDocs} />
         </article>
         <article className="code">
           <CodeSnippet

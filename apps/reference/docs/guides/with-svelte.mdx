@@ -8,12 +8,6 @@ sidebar_label: Svelte
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-:::note
-
-This guide uses supabase-js v2.0.0 Release Candidate (RC).
-
-:::
-
 ## Intro
 
 This example provides the steps to build a simple user management app (from scratch!) using Supabase and Svelte. It includes:
@@ -160,7 +154,7 @@ npm install
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npm install @supabase/supabase-js@rc
+npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env`.
@@ -192,7 +186,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 ```html title="src/lib/Auth.svelte"
 <script lang="ts">
-  import { supabase } from "src/supabaseClient";
+  import { supabase } from 'src/supabaseClient'
 
   let loading = false
   let email = ''
@@ -217,7 +211,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
   <div class="col-6 form-widget" aria-live="polite">
     <h1 class="header">Supabase + Svelte</h1>
     <p class="description">Sign in via magic link with your email below</p>
-    <form class="form-widget" on:submit|preventDefault={handleLogin}>
+    <form class="form-widget" on:submit|preventDefault="{handleLogin}">
       <div>
         <label for="email">Email</label>
         <input
@@ -225,11 +219,16 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
           class="inputField"
           type="email"
           placeholder="Your email"
-          bind:value={email}
+          bind:value="{email}"
         />
       </div>
       <div>
-        <button type="submit" class="button block" aria-live="polite" disabled={loading}>
+        <button
+          type="submit"
+          class="button block"
+          aria-live="polite"
+          disabled="{loading}"
+        >
           <span>{loading ? 'Loading' : 'Send magic link'}</span>
         </button>
       </div>
@@ -264,13 +263,13 @@ Let's create a new component for that called `Account.svelte`.
     try {
       loading = true
       const { user } = session
-      
+
       const { data, error, status } = await supabase
         .from('profiles')
         .select('username, website, avatar_url')
         .eq('id', user.id)
         .single()
-      
+
       if (error && status !== 406) throw error
 
       if (data) {
@@ -301,7 +300,7 @@ Let's create a new component for that called `Account.svelte`.
       }
 
       let { error } = await supabase.from('profiles').upsert(updates)
-      
+
       if (error) {
         throw error
       }
@@ -342,10 +341,10 @@ Now that we have all the components in place, let's update `App.svelte`:
 
 ```html title="src/App.svelte"
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { supabase } from './supabaseClient';
-  import type { AuthSession } from '@supabase/supabase-js';
-  import Account from './lib/Account.svelte';
+  import { onMount } from 'svelte'
+  import { supabase } from './supabaseClient'
+  import type { AuthSession } from '@supabase/supabase-js'
+  import Account from './lib/Account.svelte'
   import Auth from './lib/Auth.svelte'
 
   let session: AuthSession
@@ -363,9 +362,9 @@ Now that we have all the components in place, let's update `App.svelte`:
 
 <div class="container" style="padding: 50px 0 100px 0">
   {#if !session}
-    <Auth />
+  <Auth />
   {:else}
-    <Account {session} />
+  <Account {session} />
   {/if}
 </div>
 ```
@@ -392,12 +391,12 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 ```html title="src/lib/Avatar.svelte"
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  import { supabase } from "../supabaseClient"
+  import { createEventDispatcher } from 'svelte'
+  import { supabase } from '../supabaseClient'
 
   export let size: number
   export let url: string
-  
+
   let avatarUrl: string = null
   let uploading = false
   let files: FileList
@@ -406,7 +405,9 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
   const downloadImage = async (path: string) => {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .download(path)
 
       if (error) {
         throw error
@@ -436,7 +437,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
       let { error } = await supabase.storage
         .from('avatars')
         .upload(filePath, file)
-      
+
       if (error) {
         throw error
       }
@@ -456,18 +457,9 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 </script>
 
 <div style="width: {size}px" aria-live="polite">
-  {#if avatarUrl}  
-    <img
-      src={avatarUrl}
-      alt={avatarUrl ? 'Avatar' : 'No image'}
-      class="avatar image"
-      style="height: {size}px, width: {size}px"
-    />
-  {:else}
-    <div
-      class="avatar no-image"
-      style="height: {size}px, width: {size}px"
-    />
+  {#if avatarUrl} <img src={avatarUrl} alt={avatarUrl ? 'Avatar' : 'No image'}
+  class="avatar image" style="height: {size}px, width: {size}px" /> {:else}
+  <div class="avatar no-image" style="height: {size}px, width: {size}px" />
   {/if}
   <div style="width: {size}px">
     <label class="button primary block" for="single">
@@ -479,8 +471,8 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
         id="single"
         accept="image/*"
         bind:files
-        on:change={uploadAvatar}
-        disabled={uploading}
+        on:change="{uploadAvatar}"
+        disabled="{uploading}"
       />
     </span>
   </div>
@@ -497,9 +489,9 @@ And then we can add the widget to the Account page:
   import Avatar from './Avatar.svelte'
 </script>
 
-<form on:submit|preventDefault={updateProfile} class="form-widget">
+<form on:submit|preventDefault="{updateProfile}" class="form-widget">
   <!-- Add to body -->
-  <Avatar bind:url={avatarUrl} size={150} on:upload={updateProfile} />
+  <Avatar bind:url="{avatarUrl}" size="{150}" on:upload="{updateProfile}" />
 
   <!-- Other form elements -->
 </form>

@@ -102,12 +102,16 @@ module.exports = ui({
               border: '1px solid ' + theme('borderColor.DEFAULT'),
               borderRadius: theme('borderRadius.lg'),
             },
+            td: {
+              borderBottom: '1px solid ' + theme('colors.scale[400]'),
+            },
             code: {
               fontWeight: '400',
               padding: '0.2rem 0.4rem',
               backgroundColor: theme('colors.scale[400]'),
               border: '1px solid ' + theme('colors.scale[500]'),
               borderRadius: theme('borderRadius.lg'),
+              wordBreak: 'break-all',
             },
             a: {
               transition: 'box-shadow 0.1s ease-in-out',

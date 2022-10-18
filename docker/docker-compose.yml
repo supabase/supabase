@@ -17,6 +17,9 @@ services:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
+      DEFAULT_ORGANIZATION: ${STUDIO_DEFAULT_ORGANIZATION}
+      DEFAULT_PROJECT: ${STUDIO_DEFAULT_PROJECT}
+
       SUPABASE_URL: http://kong:8000
       SUPABASE_REST_URL: ${PUBLIC_REST_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
@@ -35,6 +38,8 @@ services:
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
       - ./volumes/api:/var/lib/kong
 

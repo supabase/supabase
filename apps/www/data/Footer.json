@@ -62,6 +62,10 @@
       {
         "text": "DPA",
         "url": "/legal/dpa"
+      },
+      {
+        "text": "SOC2",
+        "url": "/legal/soc2"
       }
     ]
   },
@@ -79,6 +83,10 @@
       {
         "text": "Guides",
         "url": "/docs/guides/examples"
+      },
+      {
+        "text": "Changelog",
+        "url": "/changelog"
       }
     ]
   },

@@ -1,7 +1,7 @@
 import SVG from 'react-inlinesvg'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconArrowLeft } from '@supabase/ui'
+import { Button, IconArrowLeft } from 'ui'
 
 import { withAuth, useFlag } from 'hooks'
 import Success from 'components/interfaces/Support/Success'
@@ -35,7 +35,7 @@ const SupportPage = () => {
             <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
             <h4 className="m-0 text-lg">Supabase support</h4>
           </div>
-          <div className="bg-panel-body-light dark:bg-panel-body-dark dark:border-dark min-w-full space-y-12 rounded border py-8 shadow-md">
+          <div className="min-w-full space-y-12 rounded border bg-panel-body-light py-8 shadow-md dark:border-dark dark:bg-panel-body-dark">
             {sent ? <Success /> : <SupportForm setSent={setSent} />}
           </div>
         </div>

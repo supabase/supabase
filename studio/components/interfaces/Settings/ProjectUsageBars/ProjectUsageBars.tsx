@@ -1,13 +1,13 @@
 import { FC, useEffect } from 'react'
-import { Badge, IconAlertCircle, Loading } from '@supabase/ui'
+import { Badge, IconAlertCircle, Loading } from 'ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { usageBasedItems } from './ProjectUsageBars.constants'
 import InformationBox from 'components/ui/InformationBox'
+import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 
 interface Props {
   projectRef?: string
@@ -48,7 +48,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     <Loading active={isLoading}>
       {usage && (
         <div>
-          {usageBasedItems.map((product) => {
+          {USAGE_BASED_PRODUCTS.map((product) => {
             const isExceededUsage =
               showUsageExceedMessage &&
               product.features
@@ -65,7 +65,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   'border-panel-border-light dark:border-panel-border-dark',
                 ].join(' ')}
               >
-                <table className="bg-panel-body-light dark:bg-panel-body-dark w-full">
+                <table className="w-full bg-panel-body-light dark:bg-panel-body-dark">
                   {/* Header */}
                   <thead className="bg-panel-header-light dark:bg-panel-header-dark">
                     <tr className="overflow-hidden rounded">
@@ -107,7 +107,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         return (
                           <tr
                             key={feature.title}
-                            className="border-panel-border-light dark:border-panel-border-dark border-t"
+                            className="border-t border-panel-border-light dark:border-panel-border-dark"
                           >
                             <td className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200">
                               {feature.title}
@@ -115,7 +115,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                             {ui.selectedProject?.subscription_tier !== undefined && (
                               <>
                                 {showUsageExceedMessage && (
-                                  <td className="w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell hidden text-scale-1200">
+                                  <td className="hidden w-1/5 whitespace-nowrap p-3 text-sm text-scale-1200 lg:table-cell">
                                     {(usageRatio * 100).toFixed(2)} %
                                   </td>
                                 )}

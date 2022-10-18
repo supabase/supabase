@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { SidePanel } from '@supabase/ui'
+import { SidePanel } from 'ui'
 
 import { useStore } from 'hooks'
 import JsonEditor from './JsonCodeEditor'
@@ -78,7 +78,7 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
         <SidePanel.Content>
           <div className="mt-4 flex flex-auto flex-col space-y-4">
             {view === 'edit' ? (
-              <div className="dark:border-dark h-[500px] w-full flex-grow border">
+              <div className="h-[500px] w-full flex-grow border dark:border-dark">
                 <JsonEditor onInputChange={onInputChange} defaultValue={jsonStr.toString()} />
               </div>
             ) : (
