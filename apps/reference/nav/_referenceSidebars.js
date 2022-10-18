@@ -215,6 +215,7 @@ const sidebars = {
       label: 'Integrations',
       collapsed: true,
       items: [
+        'guides/integrations/integrations',
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
         'guides/integrations/authsignal',
