@@ -92,6 +92,7 @@ function MyApp({ Component, pageProps }) {
     <SessionContextProvider
       supabaseClient={supabaseClient}
       initialSession={pageProps.initialSession}
+    >
       <Component {...pageProps} />
     </SessionContextProvider>
   )
