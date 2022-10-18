@@ -6,8 +6,8 @@ import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { usageBasedItems } from './ProjectUsageBars.constants'
 import InformationBox from 'components/ui/InformationBox'
+import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 
 interface Props {
   projectRef?: string
@@ -48,7 +48,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     <Loading active={isLoading}>
       {usage && (
         <div>
-          {usageBasedItems.map((product) => {
+          {USAGE_BASED_PRODUCTS.map((product) => {
             const isExceededUsage =
               showUsageExceedMessage &&
               product.features

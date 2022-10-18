@@ -17,16 +17,14 @@ Setting up Spotify logins for your application consists of 3 parts:
 - Add your Spotify `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
-## Steps
-
-### Access your Spotify Developer account
+## Access your Spotify Developer account
 
 - Log into [Spotify](https://spotify.com)
 - Access the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
 
 ![Spotify Developer Portal.](/img/guides/auth-spotify/spotify-portal.png)
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
@@ -47,7 +45,7 @@ The next step requires a callback URL, which looks like this:
   />
 </video>
 
-### Create a Spotify OAuth app
+## Create a Spotify OAuth app
 
 - Log into [Spotify](https://spotify.com).
 - Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
@@ -66,7 +64,7 @@ Under `Redirect URIs`:
 - Click `Add`
 - Click `Save` at the bottom
 
-### Enter your Spotify credentials into your Supabase Project
+## Enter your Spotify credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com).
 - In the left sidebar, click the `Authentication` icon (near the top).
@@ -76,27 +74,19 @@ Under `Redirect URIs`:
 - Enter your `Client ID` (`client_id`) and `Client Secret` (`client_secret`) saved in the previous step.
 - Click `Save`.
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'spotify',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `spotify` as the `provider`:
 
 ```js
 async function signInWithSpotify() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'spotify',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {
