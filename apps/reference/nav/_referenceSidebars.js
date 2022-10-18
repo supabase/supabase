@@ -222,6 +222,7 @@ const sidebars = {
         'guides/integrations/dashibase',
         'guides/integrations/directus',
         'guides/integrations/draftbit',
+	'guides/integrations/keyri',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
         'guides/integrations/polyscale',
