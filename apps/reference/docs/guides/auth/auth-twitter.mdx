@@ -17,16 +17,14 @@ Setting up Twitter logins for your application consists of 3 parts:
 - Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
-## Steps
-
-### Access your Twitter Developer account
+## Access your Twitter Developer account
 
 - Go to [developer.twitter.com](https://developer.twitter.com).
 - Click on `Sign in` at the top right to log in.
 
 ![Twitter Developer Portal.](/img/guides/auth-twitter/twitter-portal.png)
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
@@ -47,7 +45,7 @@ The next step requires a callback URL, which looks like this:
   />
 </video>
 
-### Create a Twitter OAuth app
+## Create a Twitter OAuth app
 
 - Click `+ Create Project`.
   - Enter your project name, click `Next`.
@@ -67,7 +65,7 @@ The next step requires a callback URL, which looks like this:
 - Enter your `Privacy policy URL`.
 - Click `Save`.
 
-### Enter your Twitter credentials into your Supabase Project
+## Enter your Twitter credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com).
 - In the left sidebar, click the `Authentication` icon (near the top).
@@ -77,27 +75,19 @@ The next step requires a callback URL, which looks like this:
 - Enter your `API Key` (`client_id`) and `API Secret Key` (`client_secret`) saved in the previous step.
 - Click `Save`.
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'twitter',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitter` as the `provider`:
 
 ```js
 async function signInWithTwitter() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitter',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

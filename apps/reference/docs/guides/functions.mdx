@@ -2,33 +2,11 @@
 id: functions
 title: Edge Functions
 description: 'Globally distributed TypeScript functions.'
+sidebar_label: Overview
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
-import ButtonCard from '@site/src/components/ButtonCard'
-const examples = [
-  {
-    name: 'With supabase-js',
-    description: 'Use the Supabase client inside your Edge Function.',
-    href: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/edge-functions',
-  },
-  {
-    name: 'With CORS headers',
-    description: 'Send CORS headers for invoking from the browser.',
-    href: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/edge-functions/supabase/functions/browser-with-cors',
-  },
-  {
-    name: 'React Native with Stripe',
-    description: 'Full example for using Supabase and Stripe, with Expo.',
-    href: 'https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions',
-  },
-  {
-    name: 'Flutter with Stripe',
-    description: 'Full example for using Supabase and Stripe, with Flutter.',
-    href: 'https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions',
-  },
-]
 
 Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks).
 
@@ -89,7 +67,7 @@ The command outputs a URL to the Supabase Dashboard which you can open to find v
 
 By default, Edge Functions require a valid JWT in the authorization header. This header is automatically set when invoking your function via a Supabase client library.
 
-If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/examples/tree/main/supabase-js-v1/edge-functions/supabase/functions/stripe-webhooks), or [chat bot webhooks](https://github.com/supabase/examples/tree/main/supabase-js-v1/edge-functions/supabase/functions/telegram-bot) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
+If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
 
 :::
 
@@ -234,26 +212,6 @@ To see all the secrets which you have set remotely, use [`supabase secrets list`
 supabase secrets list
 ```
 
-## Examples
-
-You can find a list of useful [Edge Function Examples](https://github.com/supabase/examples/tree/main/supabase-js-v1/edge-functions) in our GitHub repository.
-
-<div class="container" style={{ padding: 0 }}>
-  <div class="row is-multiline">
-    {examples.map((x) => (
-      <div class="col col--6">
-        <ButtonCard
-          class="card"
-          to={x.href}
-          title={x.name}
-          description={x.description}
-          style={{ height: '100%' }}
-        />
-      </div>
-    ))}
-  </div>
-</div>
-
 ## Suggestions
 
 ### Database Functions vs Edge Functions
@@ -289,6 +247,8 @@ We recommend using hyphens to name functions because hyphens are the most URL-fr
 
 We recommend adding a check to handle [CORS Preflight](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request) requests in your edge function to be able to invoke the function from browsers.
 
+See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts).
+
 ```ts
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -310,5 +270,5 @@ serve(async (req) => {
   - Cannot write to File System
 - Edge Functions
   - Local development - only one function at a time
-  - Supabase Functions only supports `POST` requests.
-  - Supabase Functions do not support HTML responses.
+  - Supabase Functions only supports `POST`, `OPTIONS`, and `GET` requests.
+  - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).

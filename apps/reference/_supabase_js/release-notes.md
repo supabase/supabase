@@ -6,9 +6,9 @@ id: release-notes
 
 Supabase.js v2 release notes.
 
-## 2.0.0 Release Candidate
+## 2.0.0
 
-Install the latest with `npm install @supabase/supabase-js@rc`.
+Install the latest with `npm install @supabase/supabase-js`.
 
 ### Explicit constructor options
 

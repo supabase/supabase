@@ -10,6 +10,7 @@ import {
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
 import { Transition } from '@headlessui/react'
+import Link from 'next/link'
 
 const PreviewFile = ({ mimeType, previewUrl }) => {
   if (!mimeType || !previewUrl) {
@@ -92,7 +93,6 @@ const PreviewPane = ({
   file = {},
   width = 400,
   onCopyFileURL = () => {},
-  onDownloadFile = () => {},
   onSelectFileDelete = () => {},
   onClosePreviewPane = () => {},
 }) => {
@@ -168,14 +168,17 @@ const PreviewPane = ({
 
           {/* Actions */}
           <div className="flex space-x-2 border-b border-panel-border-light pb-4 dark:border-panel-border-dark">
-            <Button
-              type="default"
-              icon={<IconDownload size={16} strokeWidth={2} />}
-              onClick={() => onDownloadFile(file)}
-              disabled={file.isCorrupted}
-            >
-              Download
-            </Button>
+            <Link href={`${file.previewUrl}&download`}>
+              <a>
+                <Button
+                  type="default"
+                  icon={<IconDownload size={16} strokeWidth={2} />}
+                  disabled={file.isCorrupted}
+                >
+                  Download
+                </Button>
+              </a>
+            </Link>
             <Button
               type="outline"
               icon={<IconClipboard size={16} strokeWidth={2} />}

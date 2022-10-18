@@ -49,9 +49,9 @@ const TriggerList: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
             </div>
           </Table.td>
           <Table.td className="hidden xl:table-cell">
-            <div className="space-x-2">
+            <div className="flex space-x-2">
               {x.events.map((event: string) => (
-                <Badge key={event}>{event}</Badge>
+                <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}
             </div>
           </Table.td>

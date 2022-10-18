@@ -63,11 +63,20 @@ const SidePanelEditor: FC<Props> = ({
     configuration: { identifiers: any; rowIdx: number },
     onComplete: Function
   ) => {
+    if (selectedTable === undefined) return
+
     let saveRowError = false
+    // @ts-ignore
+    const enumArrayColumns = selectedTable.columns
+      .filter((column) => {
+        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
+
     if (isNewRecord) {
       const insertQuery = new Query()
-        .from(selectedTable!.name, selectedTable!.schema)
-        .insert([payload], { returning: true })
+        .from(selectedTable.name, selectedTable.schema)
+        .insert([payload], { returning: true, enumArrayColumns })
         .toSql()
 
       const res: any = await meta.query(insertQuery)
@@ -80,10 +89,10 @@ const SidePanelEditor: FC<Props> = ({
     } else {
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
-        if (selectedTable!.primary_keys.length > 0) {
+        if (selectedTable.primary_keys.length > 0) {
           const updateQuery = new Query()
-            .from(selectedTable!.name, selectedTable!.schema)
-            .update(payload, { returning: true })
+            .from(selectedTable.name, selectedTable.schema)
+            .update(payload, { returning: true, enumArrayColumns })
             .match(configuration.identifiers)
             .toSql()
 

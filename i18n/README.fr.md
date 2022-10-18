@@ -41,7 +41,7 @@ Pour voir comment Contribuer, visitez [Getting Started](./DEVELOPERS.md)
 
 Nous sommes actuellement en version bêta publique. Surveillez les "releases" de ce repo pour être informé des mises à jour majeures.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -54,7 +54,7 @@ Supabase est une combinaison d'outils open source. Nous développons les fonctio
 Supabase est une [plateforme hébergée](https://app.supabase.com). Vous pouvez vous inscrire et commencer à utiliser Supabase sans rien installer.
 Vous pouvez aussi [auto-héberger](https://supabase.com/docs/guides/hosting/overview) et [développer localement](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) est un système de base de données relationnel-objet dont le développement actif depuis plus de 30 ans lui a valu une solide réputation de fiabilité, de robustesse des fonctionnalités et de performance.
 - [Realtime](https://github.com/supabase/realtime) est un serveur Elixir qui vous permet d'écouter les insertions, mises à jour et suppressions PostgreSQL à l'aide de websockets. Supabase écoute la fonctionnalité de réplication intégrée de Postgres, convertit le flux d'octets de réplication en JSON, puis diffuse le JSON sur des websockets.
