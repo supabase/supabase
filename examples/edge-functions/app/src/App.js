@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
-import { Auth, Button, Typography, Select } from '@supabase/ui'
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
 import { supabase } from './utils/supabaseClient'
 import { functionsList } from './functionsList'
 
-const { Title, Text } = Typography
 const sampleObject = { name: 'world' }
 
 function App() {
@@ -25,29 +24,40 @@ function App() {
 
   return (
     <div className="p-2">
-      <Title level={2} className="mb-2">
-        Supabase Egde Functions Test Client
-      </Title>
+      <h2 className="mb-2 text-4xl">Supabase Egde Functions Test Client</h2>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div className="p-2">
-          <Title level={3} className="mb-2">
-            Request
-          </Title>
-          <Title level={4}>Function</Title>
-          <Select onChange={(e) => setSupaFunction(e.target.value)}>
+          <h3 className="mb-2 text-3xl">Request</h3>
+          <h4 className="text-2xl">Function</h4>
+          <select
+            className="form-select m-0focus:border-green-600
+              block
+              w-full
+              appearance-none
+              rounded
+              border
+              border-solid
+              border-gray-300
+              bg-white bg-clip-padding bg-no-repeat
+              px-3 py-1.5 text-base
+              font-normal
+              text-gray-700
+              transition
+              ease-in-out 
+              focus:bg-white focus:text-gray-700 focus:outline-none"
+            onChange={(e) => setSupaFunction(e.target.value)}
+          >
             {functionsList.map((func) => (
-              <Select.Option value={func} key={func}>
+              <option value={func} key={func}>
                 {func}
-              </Select.Option>
+              </option>
             ))}
-          </Select>
-          <Text className="mb-2">
+          </select>
+          <p className="mb-2">
             Note: when using locally, this selection doesn't have any effect and the function that's
             currently being served via the CLI is called instead.
-          </Text>
-          <Title level={4} className="mb-2">
-            Body
-          </Title>
+          </p>
+          <h4 className="mb-2 text-2xl">Body</h4>
           <JSONInput
             onChange={({ jsObject }) => setRequestJson(jsObject)}
             placeholder={sampleObject}
@@ -55,27 +65,31 @@ function App() {
             height="100"
             width="100%"
           />
-          <Button className="mt-2" onClick={invokeFunction}>
+          <button
+            className="mt-2 rounded bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
+            onClick={invokeFunction}
+          >
             Invoke Function
-          </Button>
+          </button>
         </div>
         <div className="p-2">
-          <Title level={3} className="mb-2">
-            Response
-          </Title>
-          <pre className="p-2 bg-gray-300	">{JSON.stringify(responseJson, null, 2)}</pre>
+          <h3 className="mb-2 text-3xl">Response</h3>
+          <pre className="bg-gray-300 p-2	">{JSON.stringify(responseJson, null, 2)}</pre>
         </div>
         <div className="p-2">
-          <Title level={3} className="mb-2">
-            Log in to see RLS in action
-          </Title>
+          <h3 className="mb-2 text-3xl">Log in to see RLS in action</h3>
           {user ? (
             <div>
-              <Title level={4} className="mb-2">{`Logged in as ${user.email}`}</Title>
-              <Button onClick={() => supabase.auth.signOut()}>Sign out</Button>
+              <h4 className="mb-2 text-2xl">{`Logged in as ${user.email}`}</h4>
+              <button
+                className="rounded bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
+                onClick={() => supabase.auth.signOut()}
+              >
+                Sign out
+              </button>
             </div>
           ) : (
-            <Auth supabaseClient={supabase} />
+            <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
           )}
         </div>
       </div>

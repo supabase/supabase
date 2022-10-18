@@ -8,12 +8,6 @@ sidebar_label: SolidJS
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-:::note
-
-This guide uses supabase-js v2.0.0 Release Candidate (RC).
-
-:::
-
 ## Intro
 
 This example provides the steps to build a simple user management app (from scratch!) using Supabase and Solid JS. It includes:
@@ -176,7 +170,7 @@ cd supabase-solid
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npm install @supabase/supabase-js@rc
+npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env`.
@@ -272,14 +266,14 @@ import { Component, createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
 
 interface Props {
-  session: AuthSession
+  session: AuthSession;
 }
 
 const Account: Component<Props> = ({ session }) => {
   const [loading, setLoading] = createSignal(true)
-  const [username, setUsername] = createSignal<string | null>(null)
-  const [website, setWebsite] = createSignal<string | null>(null)
-  const [avatarUrl, setAvatarUrl] = createSignal<string | null>(null)
+  const [username, setUsername] = (createSignal < string) | (null > null)
+  const [website, setWebsite] = (createSignal < string) | (null > null)
+  const [avatarUrl, setAvatarUrl] = (createSignal < string) | (null > null)
 
   createEffect(() => {
     getProfile()
@@ -366,11 +360,19 @@ const Account: Component<Props> = ({ session }) => {
           />
         </div>
         <div>
-          <button type="submit" class="button primary block" disabled={loading()}>
+          <button
+            type="submit"
+            class="button primary block"
+            disabled={loading()}
+          >
             {loading() ? 'Saving ...' : 'Update profile'}
           </button>
         </div>
-        <button type="button" class="button block" onClick={() => supabase.auth.signOut()}>
+        <button
+          type="button"
+          class="button block"
+          onClick={() => supabase.auth.signOut()}
+        >
           Sign Out
         </button>
       </form>

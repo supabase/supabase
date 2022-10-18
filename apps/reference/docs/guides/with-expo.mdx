@@ -8,12 +8,6 @@ sidebar_label: Expo
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-:::note
-
-This guide uses supabase-js v2.0.0 Release Candidate (RC).
-
-:::
-
 ## Intro
 
 This example provides the steps to build a simple user management app (from scratch!) using Supabase and React Native. It includes:
@@ -155,7 +149,7 @@ cd expo-user-management
 Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npm install @supabase/supabase-js@rc
+npm install @supabase/supabase-js
 npm install react-native-elements @react-native-async-storage/async-storage react-native-url-polyfill
 ```
 
@@ -165,7 +159,7 @@ These variables will be exposed on the browser, and that's completely fine since
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```ts title="lib/supabase.ts"
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
@@ -243,10 +237,18 @@ export default function Auth() {
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+        <Button
+          title="Sign in"
+          disabled={loading}
+          onPress={() => signInWithEmail()}
+        />
       </View>
       <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
+        <Button
+          title="Sign up"
+          disabled={loading}
+          onPress={() => signUpWithEmail()}
+        />
       </View>
     </View>
   )
@@ -360,16 +362,26 @@ export default function Account({ session }: { session: Session }) {
         <Input label="Email" value={session?.user?.email} disabled />
       </View>
       <View style={styles.verticallySpaced}>
-        <Input label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
+        <Input
+          label="Username"
+          value={username || ''}
+          onChangeText={(text) => setUsername(text)}
+        />
       </View>
       <View style={styles.verticallySpaced}>
-        <Input label="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
+        <Input
+          label="Website"
+          value={website || ''}
+          onChangeText={(text) => setWebsite(text)}
+        />
       </View>
 
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
           title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
+          onPress={() =>
+            updateProfile({ username, website, avatar_url: avatarUrl })
+          }
           disabled={loading}
         />
       </View>
@@ -425,7 +437,11 @@ export default function App() {
 
   return (
     <View>
-      {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
+      {session && session.user ? (
+        <Account key={session.user.id} session={session} />
+      ) : (
+        <Auth />
+      )}
     </View>
   )
 }
@@ -461,12 +477,16 @@ We can start by creating a new component:
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
-import DocumentPicker, { isCancel, isInProgress, types } from 'react-native-document-picker'
+import DocumentPicker, {
+  isCancel,
+  isInProgress,
+  types,
+} from 'react-native-document-picker'
 
 interface Props {
   size: number
-	url: string | null
-	onUpload: (filePath: string) => void
+  url: string | null
+  onUpload: (filePath: string) => void
 }
 
 export default function Avatar({ url, size = 150, onUpload }: Props) {
@@ -483,7 +503,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       const { data, error } = await supabase.storage
         .from('avatars')
         .download(path)
-      
+
       if (error) {
         throw error
       }
@@ -508,17 +528,17 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         presentationStyle: 'fullScreen',
         copyTo: 'cachesDirectory',
         type: types.images,
-        mode: 'open'
+        mode: 'open',
       })
 
       const photo = {
         uri: file.fileCopyUri,
         type: file.type,
-        name: file.name
+        name: file.name,
       }
 
       const formData = new FormData()
-      formData.append("file", photo)
+      formData.append('file', photo)
 
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
@@ -537,7 +557,9 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         console.warn('cancelled')
         // User cancelled the picker, exit any dialogs or menus and move on
       } else if (isInProgress(error)) {
-        console.warn('multiple pickers were opened, only the last will be considered')
+        console.warn(
+          'multiple pickers were opened, only the last will be considered'
+        )
       } else if (error instanceof Error) {
         Alert.alert(error.message)
       } else {
@@ -551,12 +573,20 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
   return (
     <View>
       {avatarUrl ? (
-        <Image source={{ uri: avatarUrl }} accessibilityLabel="Avatar" style={[avatarSize, styles.avatar, styles.image]} />
+        <Image
+          source={{ uri: avatarUrl }}
+          accessibilityLabel="Avatar"
+          style={[avatarSize, styles.avatar, styles.image]}
+        />
       ) : (
         <View style={[avatarSize, styles.avatar, styles.noImage]} />
       )}
       <View>
-        <Button title={uploading ? 'Uploading ...' : 'Upload'} onPress={uploadAvatar} disabled={uploading} />
+        <Button
+          title={uploading ? 'Uploading ...' : 'Upload'}
+          onPress={uploadAvatar}
+          disabled={uploading}
+        />
       </View>
     </View>
   )
@@ -566,7 +596,7 @@ const styles = StyleSheet.create({
   avatar: {
     borderRadius: 5,
     overflow: 'hidden',
-    maxWidth: '100%'
+    maxWidth: '100%',
   },
   image: {
     objectFit: 'cover',
@@ -575,7 +605,7 @@ const styles = StyleSheet.create({
   noImage: {
     backgroundColor: '#333',
     border: '1px solid rgb(200, 200, 200)',
-    borderRadius: 5
+    borderRadius: 5,
   },
 })
 ```
@@ -593,13 +623,13 @@ import Avatar from './Avatar'
     <View>
       {/* Add to the body */}
       <View>
-        <Avatar 
+        <Avatar
           size={200}
-          url={avatarUrl} 
+          url={avatarUrl}
           onUpload={(url: string) => {
             setAvatarUrl(url)
             updateProfile({ username, website, avatar_url: url })
-          }} 
+          }}
         />
       </View>
       {/* ... */}

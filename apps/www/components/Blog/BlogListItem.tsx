@@ -51,9 +51,9 @@ const BlogListItem = ({ post }: Props) => {
               <p className="text-scale-1100 max-w-sm text-base">{post.description}</p>
             </div>
             <div className="flex items-center -space-x-2">
-              {author.map((author: any) => {
+              {author.map((author: any, i: number) => {
                 return (
-                  <div className="dark:ring-scale-200 w-10 rounded-full ring-2 ring-white">
+                  <div className="dark:ring-scale-200 w-10 rounded-full ring-2 ring-white" key={i}>
                     {author.author_image_url && (
                       <Image
                         src={author.author_image_url}

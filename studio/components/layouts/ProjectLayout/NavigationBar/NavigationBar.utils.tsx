@@ -7,15 +7,18 @@ import {
   IconList,
   IconSettings,
   IconUsers,
-} from '@supabase/ui'
+} from 'ui'
 import SVG from 'react-inlinesvg'
 
 import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateProductRoutes = (ref: string, project?: ProjectBase): Route[] => {
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+export const generateProductRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
+  const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const homeUrl = `/project/${ref}`
   const buildingUrl = `/project/${ref}/building`
 
   return [
@@ -29,13 +32,21 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/editor`,
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
     },
     {
       key: 'auth',
       label: 'Authentication',
       icon: <IconUsers size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/auth/users`),
     },
     ...(IS_PLATFORM
       ? [
@@ -43,7 +54,13 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
             key: 'storage',
             label: 'Storage',
             icon: <IconArchive size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/storage/buckets`),
           },
         ]
       : []),
@@ -57,13 +74,21 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/sql`,
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
     {
       key: 'database',
       label: 'Database',
       icon: <IconDatabase size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/database/tables`),
     },
     ...(IS_PLATFORM
       ? [
@@ -71,15 +96,24 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
             key: 'functions',
             label: 'Edge Functions',
             icon: <IconCode size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/functions`,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/functions`),
           },
         ]
       : []),
   ]
 }
 
-export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[] => {
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
+  const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const homeUrl = `/project/${ref}`
   const buildingUrl = `/project/${ref}/building`
 
   return [
@@ -89,7 +123,13 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
             key: 'logs-explorer',
             label: 'Logs Explorer',
             icon: <IconList size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/logs-explorer`,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/logs-explorer`),
           },
         ]
       : []),
@@ -99,7 +139,13 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
             key: 'reports',
             label: 'Reports',
             icon: <IconBarChart size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/reports`,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/reports`),
           },
         ]
       : []),
@@ -107,7 +153,9 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
       key: 'api',
       label: 'API',
       icon: <IconFileText size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/api`,
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
     ...(IS_PLATFORM
       ? [
@@ -115,7 +163,7 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
             key: 'settings',
             label: 'Settings',
             icon: <IconSettings size={18} strokeWidth={2} />,
-            link: `/project/${ref}/settings/general`,
+            link: ref && `/project/${ref}/settings/general`,
           },
         ]
       : []),

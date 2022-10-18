@@ -386,7 +386,10 @@
 */
 
 .sb-grid-select-editor {
-  @apply h-full w-full;
+  button {
+    @apply border-none rounded-none shadow-none;
+    box-shadow: none !important
+  }
 }
 
 /*

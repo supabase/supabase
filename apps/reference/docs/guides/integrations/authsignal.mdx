@@ -346,7 +346,7 @@ export default function HomePage({ user, isEnrolled }: Props) {
     <main>
       <section>
         <div> Signed in as: {user?.email}</div>
-        <button 
+        <button
           onClick={async (e) => {
             e.preventDefault();
 
@@ -540,6 +540,7 @@ export default withApiAuth(async function mfa(
   res.send({ mfaUrl });
 });
 ```
+
 Because the user should be authenticated with Supabase to set up or manage MFA, we can use Supabase's `withApiAuth` wrapper to protect this route.
 
 The `redirectToSettings` param specifies whether the user should be redirected to the MFA page settings panel after a challenge, rather than redirecting them immediately back to the application.

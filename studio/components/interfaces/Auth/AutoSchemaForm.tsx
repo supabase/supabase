@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from '@supabase/ui'
+import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'ui'
 
 import { useStore, checkPermissions } from 'hooks'
 import {
@@ -138,7 +138,7 @@ const AutoSchemaForm = observer(() => {
                     size="small"
                     label="JWT expiry limit"
                     descriptionText="How long tokens are valid for. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
-                    actions={<span className="text-scale-900 mr-3">seconds</span>}
+                    actions={<span className="mr-3 text-scale-900">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
@@ -184,7 +184,7 @@ const AutoSchemaForm = observer(() => {
                       min={0}
                       label="Reuse Interval"
                       descriptionText="Time interval where the same refresh token can be used to request for an access token."
-                      actions={<span className="text-scale-900 mr-3">seconds</span>}
+                      actions={<span className="mr-3 text-scale-900">seconds</span>}
                       disabled={!canUpdateConfig}
                     />
                   )}

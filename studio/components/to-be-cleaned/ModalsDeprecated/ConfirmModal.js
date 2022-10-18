@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Modal } from '@supabase/ui'
+import { Button, Modal } from 'ui'
 import { render, unmountComponentAtNode } from 'react-dom'
 
 function ConfirmModal({
@@ -54,7 +54,7 @@ function ConfirmModal({
       children={
         description && (
           <Modal.Content>
-            <p className="text-sm text-scale-1100 py-4">{description}</p>
+            <p className="py-4 text-sm text-scale-1100">{description}</p>
           </Modal.Content>
         )
       }

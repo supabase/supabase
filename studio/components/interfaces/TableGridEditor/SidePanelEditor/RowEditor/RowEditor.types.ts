@@ -17,8 +17,8 @@ export interface RowField {
   comment: string
   format: string
   enums: string[]
-  value: string
-  defaultValue: string
+  value: string | null
+  defaultValue: string | null
   foreignKey?: PostgresRelationship
   isNullable: boolean
   isIdentity: boolean
