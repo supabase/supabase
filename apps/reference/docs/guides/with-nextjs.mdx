@@ -701,7 +701,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
 
       let { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file)
+        .upload(filePath, file, { upsert: true })
 
       if (uploadError) {
         throw uploadError
@@ -812,7 +812,7 @@ export default function Avatar({
 
       let { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file)
+        .upload(filePath, file, { upsert: true })
 
       if (uploadError) {
         throw uploadError
