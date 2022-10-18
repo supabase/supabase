@@ -43,16 +43,6 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Auth audit logs(?)',
-                key: 'logs',
-                url: `/project/${ref}/auth/logs`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM
-          ? [
-              {
                 name: 'Storage logs',
                 key: 'storage-logs',
                 url: `/project/${ref}/logs/storage-logs`,

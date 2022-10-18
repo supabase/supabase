@@ -93,11 +93,6 @@ const StorageMenu: FC<Props> = () => {
 
         <div className="">
           <Menu.Group title="Configuration" />
-          <Link href={`/project/${projectRef}/storage/settings`}>
-            <Menu.Item rounded active={page === 'settings'}>
-              <p className="truncate">Settings</p>
-            </Menu.Item>
-          </Link>
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
               <p className="truncate">Policies</p>
