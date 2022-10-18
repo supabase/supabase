@@ -22,8 +22,7 @@ Each Supabase project consists of several tools:
 
 ### PostgreSQL (Database)
 
-PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database, you can access it and use it with full priveleges. We simply provide
-tools which makes Firebase as easy to use as Firebase.
+PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database—you can access it and use it with full privileges. We simply provide tools which makes PostgreSQL as easy to use as Firebase.
 
 - Official Docs: [postgresql.org/docs](https://www.postgresql.org/docs/current/index.html)
 - Source code: [github.com/postgres/postgres](https://github.com/postgres/postgres) (mirror)
@@ -34,16 +33,16 @@ tools which makes Firebase as easy to use as Firebase.
 
 An open source Dashboard for managing your database and services.
 
-- Official Docs: [supabase.com/docs](https://supabase.com/docs)
+- Official Docs: [supabase.com/docs](/docs)
 - Source code: [github.com/supabase/supabase](https://github.com/supabase/supabase/tree/master/studio)
 - License: [Apache 2](https://github.com/supabase/supabase/blob/master/LICENSE)
-- Language: Typescript
+- Language: TypeScript
 
 ### GoTrue (Auth)
 
-A JWT based API for managing users and issuing JWT tokens. This integrates with PostgreSQL's Row Level Security and the API servers.
+A JWT-based API for managing users and issuing access tokens. This integrates with PostgreSQL's Row Level Security and the API servers.
 
-- Official Docs: [supabase.com/docs/reference/auth](https://supabase.com/docs/reference/auth)
+- Official Docs: [supabase.com/docs/reference/auth](/docs/reference/auth)
 - Source code: [github.com/supabase/gotrue](https://github.com/supabase/gotrue)
 - License: [MIT](https://github.com/supabase/gotrue/blob/master/LICENSE)
 - Language: Go
@@ -62,7 +61,7 @@ We use this with our [pg_graphql](https://github.com/supabase/pg_graphql) extens
 
 A scalable websocket engine for managing user Presence, broadcasting messages, and streaming database changes.
 
-- Official Docs: [supabase.com/docs/guides/realtime](https://supabase.com/docs/guides/realtime)
+- Official Docs: [supabase.com/docs/guides/realtime](/docs/guides/realtime)
 - Source code: [github.com/supabase/realtime](https://github.com/supabase/realtime)
 - License: [Apache 2](https://github.com/supabase/realtime/blob/master/LICENSE)
 - Language: Elixir
@@ -71,10 +70,10 @@ A scalable websocket engine for managing user Presence, broadcasting messages, a
 
 An S3-compatible object storage service that stores metadata in Postgres.
 
-- Official Docs: [supabase.com/docs/reference/storage](https://supabase.com/docs/reference/storage)
+- Official Docs: [supabase.com/docs/reference/storage](/docs/reference/storage)
 - Source code: [github.com/supabase/storage-api](https://github.com/supabase/storage-api)
 - License: [Apache 2.0](https://github.com/supabase/storage-api/blob/master/LICENSE)
-- Language: NodeJS / Typescript
+- Language: NodeJS / TypeScript
 
 ### Deno (Edge Functions)
 
@@ -83,7 +82,7 @@ A modern runtime for JavaScript and TypeScript.
 - Official Docs: [deno.land](https://deno.land/)
 - Source code: [github.com/denoland/deno](https://github.com/denoland/deno)
 - License: [MIT](https://github.com/denoland/deno/blob/main/LICENSE.md)
-- Language: Typescript / Rust
+- Language: TypeScript / Rust
 
 ### postgres-meta (Database management)
 
@@ -92,7 +91,7 @@ A RESTful API for managing your Postgres. Fetch tables, add roles, and run queri
 - Official Docs: [supabase.github.io/postgres-meta](https://supabase.github.io/postgres-meta/)
 - Source code: [github.com/supabase/postgres-meta](https://github.com/supabase/postgres-meta)
 - License: [Apache 2.0](https://github.com/supabase/postgres-meta/blob/master/LICENSE)
-- Language: NodeJS / Typescript
+- Language: NodeJS / TypeScript
 
 ### PgBouncer
 
@@ -105,7 +104,7 @@ A lightweight connection pooler for PostgreSQL. This is useful for connecting to
 
 ### Kong (API Gateway)
 
-A Cloud-Native API Gateway, built on top of Nginx.
+A cloud-native API gateway, built on top of Nginx.
 
 - Official Docs: [docs.konghq.com](https://docs.konghq.com/)
 - Source code: [github.com/kong/kong](https://github.com/kong/kong)
@@ -122,7 +121,7 @@ We use a series of principles to ensure that scalability and usability are never
 ### Everything works in isolation
 
 Each system must work as a standalone tool with as few moving parts as possible.
-The litmus test for this is: “Can a user run this product with nothing but a Postgres database?”.
+The litmus test for this is: "Can a user run this product with nothing but a Postgres database?"
 
 ### Everything is integrated
 
