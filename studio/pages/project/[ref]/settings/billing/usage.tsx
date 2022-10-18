@@ -3,15 +3,14 @@ import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
 import { IconArrowRight, Loading } from 'ui'
 
-import { PAYGUsage } from 'components/interfaces/Billing'
-import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
-import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import { Project, NextPageWithLayout } from 'types'
+import { useProjectSubscription, useStore } from 'hooks'
+import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import LoadingUI from 'components/ui/Loading'
-import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
-import { STRIPE_PRODUCT_IDS, TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { NextPageWithLayout, Project } from 'types'
+import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { PAYGUsage } from 'components/interfaces/Billing'
+import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -39,18 +38,15 @@ interface SettingsProps {
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
 
-  const [dateRange, setDateRange] = useState<any>()
-
   const {
     subscription,
     isLoading: loading,
     error,
   } = useProjectSubscription(ui.selectedProject?.ref)
 
-  const { paygStats }: { paygStats: PaygStats | undefined } = useProjectPaygStatistics(
-    ui.selectedProject?.ref,
-    subscription?.tier?.supabase_prod_id
-  )
+  const [dateRange, setDateRange] = useState<any>()
+  const projectTier = ui.selectedProject?.subscription_tier
+  const isPayg = subscription?.tier?.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
   useEffect(() => {
     if (error) {
@@ -75,7 +71,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
             </div>
           </div>
         </Loading>
-      ) : subscription?.tier?.prod_id === STRIPE_PRODUCT_IDS.PAYG ? (
+      ) : isPayg ? (
         <div>
           <div className="mb-4 flex items-center space-x-3">
             <DateRangePicker
@@ -99,7 +95,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
               </div>
             )}
           </div>
-          {paygStats && dateRange && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
+          {dateRange && <PAYGUsage dateRange={dateRange} />}
         </div>
       ) : (
         <ProjectUsage projectRef={project?.ref} />

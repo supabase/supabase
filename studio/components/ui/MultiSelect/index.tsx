@@ -1,6 +1,13 @@
 import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
-import { Popover, IconCheck, IconAlertCircle, IconSearch } from 'ui'
+import {
+  Popover,
+  IconCheck,
+  IconAlertCircle,
+  IconSearch,
+  IconPlus,
+  IconChevronDown,
+} from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
@@ -12,14 +19,16 @@ export interface MultiSelectOption {
 }
 
 interface Props {
-  options: MultiSelectOption[]
   value: string[]
+  options: MultiSelectOption[]
   label?: string
+  error?: string
   placeholder?: string | ReactNode
   searchPlaceholder?: string
   descriptionText?: string | ReactNode
   emptyMessage?: string | ReactNode
   disabled?: boolean
+  allowDuplicateSelection?: boolean
   onChange?(x: string[]): void
 }
 
@@ -32,11 +41,13 @@ export default function MultiSelect({
   options,
   value,
   label,
+  error,
   descriptionText,
   placeholder,
   searchPlaceholder = 'Search for option',
   emptyMessage,
   disabled,
+  allowDuplicateSelection = false,
   onChange = () => {},
 }: Props) {
   const ref = useRef(null)
@@ -51,7 +62,7 @@ export default function MultiSelect({
   // Calculate width of the Popover
   useEffect(() => {
     setInputWidth(ref.current ? (ref.current as any).offsetWidth : inputWidth)
-  }, [])
+  }, [ref.current])
 
   const width = `${inputWidth}px`
 
@@ -69,11 +80,19 @@ export default function MultiSelect({
     return isOptionSelected !== undefined
   }
 
+  const handleRemove = (idx: number) => {
+    const updatedSelected = selected.filter((x, index) => index !== idx)
+    setSelected(updatedSelected)
+    onChange(updatedSelected)
+  }
+
   const handleChange = (option: MultiSelectOption) => {
     const _selected = selectedOptions
     const isActive = checkIfActive(option)
 
-    const updatedPayload = isActive
+    const updatedPayload = allowDuplicateSelection
+      ? [..._selected.concat([option.value])]
+      : isActive
       ? [...without(_selected, option.value)]
       : [..._selected.concat([option.value])]
 
@@ -81,7 +100,10 @@ export default function MultiSelect({
     const compulsoryOptions = options
       .filter((option) => option.disabled)
       .map((option) => option.name)
-    const formattedPayload = [...new Set(updatedPayload.concat(compulsoryOptions))]
+
+    const formattedPayload = allowDuplicateSelection
+      ? updatedPayload.concat(compulsoryOptions)
+      : [...new Set(updatedPayload.concat(compulsoryOptions))]
 
     setSelected(formattedPayload)
     onChange(formattedPayload)
@@ -103,6 +125,7 @@ export default function MultiSelect({
           'form-control form-control--multi-select',
           'border border-scale-700 bg-scaleA-200',
           'multi-select relative block w-full w-full space-x-1 overflow-auto rounded',
+          `${error !== undefined ? 'border-red-800 bg-red-100' : ''}`,
         ].join(' ')}
         ref={ref}
       >
@@ -131,6 +154,7 @@ export default function MultiSelect({
               {filteredOptions.length >= 1 ? (
                 filteredOptions.map((option) => {
                   const active =
+                    !allowDuplicateSelection &&
                     selectedOptions &&
                     selectedOptions.find((selected) => {
                       return selected === option.value
@@ -140,11 +164,11 @@ export default function MultiSelect({
 
                   return (
                     <div
-                      key={`multiselect-option-${option.value}`}
+                      key={`multiselect-option-${option.id}`}
                       onClick={() => handleChange(option)}
                       className={[
                         'text-typography-body-light dark:text-typography-body-dark',
-                        'flex cursor-pointer items-center justify-between transition',
+                        'group flex cursor-pointer items-center justify-between transition',
                         'space-x-1 rounded bg-transparent p-2 px-4 text-sm hover:bg-gray-600',
                         `${active ? ' dark:bg-green-600 dark:bg-opacity-25' : ''}`,
                       ].join(' ')}
@@ -158,6 +182,12 @@ export default function MultiSelect({
                             active ? ' dark:text-green-500' : ''
                           }`}
                         />
+                      )}
+                      {allowDuplicateSelection && (
+                        <div className="flex items-center opacity-0 group-hover:opacity-100 transition space-x-1">
+                          <IconPlus size={14} />
+                          <p className="text-sm">Add value</p>
+                        </div>
                       )}
                     </div>
                   )
@@ -200,32 +230,36 @@ export default function MultiSelect({
         >
           <div
             className={[
-              'flex w-full flex-wrap items-start items-center gap-1.5 p-1.5',
+              'flex w-full flex-wrap items-start gap-1.5 p-1.5 cursor-default',
               `${selectedOptions.length === 0 ? 'h-9' : ''}`,
             ].join(' ')}
           >
             {selectedOptions.length === 0 && placeholder && (
               <div className="px-2 text-sm text-scale-1000">{placeholder}</div>
             )}
-            {formattedOptions.map((option) => {
-              const active =
-                selectedOptions &&
-                selectedOptions.find((selected) => {
-                  return selected === option.value
-                })
-
-              if (option.disabled) {
-                return <BadgeDisabled key={option.id} name={option.name} />
-              } else if (active) {
+            {selectedOptions.map((value, idx) => {
+              const id = `${value}-${idx}`
+              const option = formattedOptions.find((x) => x.value === value)
+              const isDisabled = option?.disabled ?? false
+              if (!option) {
+                return <></>
+              } else if (isDisabled) {
+                return <BadgeDisabled key={id} name={value} />
+              } else {
                 return (
                   <BadgeSelected
-                    key={option.id}
-                    name={option.name}
-                    handleRemove={() => handleChange(option)}
+                    key={id}
+                    name={value}
+                    handleRemove={() =>
+                      allowDuplicateSelection ? handleRemove(idx) : handleChange(option)
+                    }
                   />
                 )
               }
             })}
+            <div className="absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center cursor-pointer ">
+              <IconChevronDown className="text-scale-900" />
+            </div>
           </div>
         </Popover>
       </div>
@@ -233,6 +267,7 @@ export default function MultiSelect({
       {descriptionText && (
         <span className="form-text text-muted mt-2 text-sm">{descriptionText}</span>
       )}
+      {error && <span className="text-red-900 text-sm mt-2">{error}</span>}
     </div>
   )
 }

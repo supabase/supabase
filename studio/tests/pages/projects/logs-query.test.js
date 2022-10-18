@@ -7,6 +7,8 @@ import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
+import { useProjectSubscription } from 'hooks'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -137,21 +139,6 @@ test('custom sql querying', async () => {
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
-test('datepicker interaction updates query params', async () => {
-  render(<LogsExplorerPage />)
-  clickDropdown(await screen.findByText(/Last day/))
-  userEvent.click(await screen.findByText(/Last 3 days/))
-
-  const router = useRouter()
-  expect(router.push).toBeCalledWith(
-    expect.objectContaining({
-      query: expect.objectContaining({
-        its: expect.any(String),
-      }),
-    })
-  )
-})
-
 test('query warnings', async () => {
   const router = defaultRouterMock()
   router.query = {
@@ -163,4 +150,43 @@ test('query warnings', async () => {
   useRouter.mockReturnValue(router)
   render(<LogsExplorerPage />)
   await screen.findByText('1 warning')
+})
+
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
+        },
+      },
+    })
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(5, 'month').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsExplorerPage />)
+    await screen.findByText(/Log retention/) // assert modal title is present
+  })
+
+  test('based on datepicker helpers', async () => {
+    render(<LogsExplorerPage />)
+    // click on the dropdown
+    clickDropdown(await screen.findByText('Last 24 hours'))
+    userEvent.click(await screen.findByText('Last 3 days'))
+
+    // only free tier will show modal
+    if (key === 'FREE') {
+      await screen.findByText('Log retention') // assert modal title is present
+    } else {
+      await expect(screen.findByText('Log retention')).rejects.toThrow()
+    }
+  })
 })

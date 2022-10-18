@@ -19,7 +19,7 @@ Aside from performance, CDNs also help with security and availability by mitigat
 
 By default, assets are cached both in the CDN and in the user’s browser for 1 hour. After this, the CDN nodes ping the storage server to see if an object has been updated.
 
-You can modify this cache time when you are [uploading](https://supabase.com/docs/reference/javascript/next/storage-from-upload) or [updating](https://supabase.com/docs/reference/javascript/next/storage-from-update) an object by modifying the `cacheControl` parameter.
+You can modify this cache time when you are [uploading](https://supabase.com/docs/reference/javascript/storage-from-upload) or [updating](https://supabase.com/docs/reference/javascript/storage-from-update) an object by modifying the `cacheControl` parameter.
 
 If you expect the object to not change at a given URL, setting a longer cache duration is preferable.
 
