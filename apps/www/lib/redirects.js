@@ -1451,12 +1451,12 @@ module.exports = [
     source: '/docs/reference/javascript/auth-session',
     destination: '/docs/reference/javascript/v1/auth-session',
   },
-  // Removed sendMobileOTP in favor of signInWithOtp
-  // send traffic to new v2 docs instead
+  // v1: /auth-api-sendmobileotp
+  // v2: /auth-signinwithotp
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-sendmobileotp',
-    destination: '/docs/reference/javascript/auth-signinwithotp',
+    destination: '/docs/reference/javascript/v1/auth-api-sendmobileotp',
   },
 
   // realtime methods been replaced with new names
