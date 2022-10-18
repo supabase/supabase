@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.0.0
+  version: 1.8.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -11,8 +11,9 @@ info:
     Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
   options: |-
     ```sh
-          --debug   output debug logs to stderr
-      -h, --help    help for supabase
+          --debug            output debug logs to stderr
+      -h, --help             help for supabase
+          --workdir string   path to a Supabase project directory
     ```
 commands:
   - id: supabase-stop
@@ -27,7 +28,8 @@ commands:
     subcommands: []
     options: |-
       ```sh
-        -h, --help   help for stop
+            --backup   Backs up the current database before stopping.
+        -h, --help     help for stop
       ```
   - id: supabase-status
     title: supabase status
@@ -299,7 +301,7 @@ commands:
     title: supabase gen types typescript
     summary: Generate types for TypeScript
     description: |
-      Generate types for TypeScript. Must specify either --local or --db-url
+      Generate types for TypeScript. Must specify one of --local, --linked, --project-id, or --db-url
     tags: []
     links: []
     usage: |-
@@ -309,9 +311,12 @@ commands:
     subcommands: []
     options: |-
       ```sh
-            --db-url string   Generate types from a database url.
-        -h, --help            help for typescript
-            --local           Generate types from the local dev database.
+            --db-url string        Generate types from a database url.
+        -h, --help                 help for typescript
+            --linked               Generate types from the linked project.
+            --local                Generate types from the local dev database.
+            --project-id string    Generate types from a project ID.
+            --schema stringArray   Schemas to generate types for.
       ```
   - id: supabase-functions
     title: supabase functions
@@ -399,6 +404,7 @@ commands:
     subcommands:
       - supabase-db-branch
       - supabase-db-diff
+      - supabase-db-lint
       - supabase-db-push
       - supabase-db-remote
       - supabase-db-reset
@@ -477,6 +483,22 @@ commands:
             --dry-run           Print the migrations that would be applied, but don't actually apply them.
         -h, --help              help for push
         -p, --password string   Password to your remote Postgres database.
+      ```
+  - id: supabase-db-lint
+    title: supabase db lint
+    summary: Checks local database for typing error
+    tags: []
+    links: []
+    usage: |-
+      ```sh
+      supabase db lint [flags]
+      ```
+    subcommands: []
+    options: |-
+      ```sh
+        -h, --help             help for lint
+            --level string     Error level to emit. (default "warning")
+        -s, --schema strings   List of schema to include. (default [public])
       ```
   - id: supabase-db-diff
     title: supabase db diff
@@ -569,15 +591,143 @@ commands:
       ```
   - id: supabase-completion
     title: supabase completion
-    summary: Generate shell script for completion. Available for bash, zsh and fish.
+    summary: Generate the autocompletion script for the specified shell
+    description: |
+      Generate the autocompletion script for supabase for the specified shell.
+      See each sub-command's help for details on how to use the generated script.
+    tags: []
+    links: []
+    subcommands:
+      - supabase-completion-bash
+      - supabase-completion-fish
+      - supabase-completion-powershell
+      - supabase-completion-zsh
+    options: |-
+      ```sh
+        -h, --help   help for completion
+      ```
+  - id: supabase-completion-zsh
+    title: supabase completion zsh
+    summary: Generate the autocompletion script for zsh
+    description: |
+      Generate the autocompletion script for the zsh shell.
+
+      If shell completion is not already enabled in your environment you will need
+      to enable it.  You can execute the following once:
+
+          echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+      To load completions in your current shell session:
+
+          source <(supabase completion zsh); compdef _supabase supabase
+
+      To load completions for every new session, execute once:
+
+      #### Linux:
+
+          supabase completion zsh > "${fpath[1]}/_supabase"
+
+      #### macOS:
+
+          supabase completion zsh > $(brew --prefix)/share/zsh/site-functions/_supabase
+
+      You will need to start a new shell for this setup to take effect.
     tags: []
     links: []
     usage: |-
       ```sh
-      supabase completion <shell name> [flags]
+      supabase completion zsh [flags]
       ```
     subcommands: []
     options: |-
       ```sh
-        -h, --help   help for completion
+        -h, --help              help for zsh
+            --no-descriptions   disable completion descriptions
+      ```
+  - id: supabase-completion-powershell
+    title: supabase completion powershell
+    summary: Generate the autocompletion script for powershell
+    description: |
+      Generate the autocompletion script for powershell.
+
+      To load completions in your current shell session:
+
+          supabase completion powershell | Out-String | Invoke-Expression
+
+      To load completions for every new session, add the output of the above command
+      to your powershell profile.
+    tags: []
+    links: []
+    usage: |-
+      ```sh
+      supabase completion powershell [flags]
+      ```
+    subcommands: []
+    options: |-
+      ```sh
+        -h, --help              help for powershell
+            --no-descriptions   disable completion descriptions
+      ```
+  - id: supabase-completion-fish
+    title: supabase completion fish
+    summary: Generate the autocompletion script for fish
+    description: |
+      Generate the autocompletion script for the fish shell.
+
+      To load completions in your current shell session:
+
+          supabase completion fish | source
+
+      To load completions for every new session, execute once:
+
+          supabase completion fish > ~/.config/fish/completions/supabase.fish
+
+      You will need to start a new shell for this setup to take effect.
+    tags: []
+    links: []
+    usage: |-
+      ```sh
+      supabase completion fish [flags]
+      ```
+    subcommands: []
+    options: |-
+      ```sh
+        -h, --help              help for fish
+            --no-descriptions   disable completion descriptions
+      ```
+  - id: supabase-completion-bash
+    title: supabase completion bash
+    summary: Generate the autocompletion script for bash
+    description: |
+      Generate the autocompletion script for the bash shell.
+
+      This script depends on the 'bash-completion' package.
+      If it is not installed already, you can install it via your OS's package manager.
+
+      To load completions in your current shell session:
+
+          source <(supabase completion bash)
+
+      To load completions for every new session, execute once:
+
+      #### Linux:
+
+          supabase completion bash > /etc/bash_completion.d/supabase
+
+      #### macOS:
+
+          supabase completion bash > $(brew --prefix)/etc/bash_completion.d/supabase
+
+      You will need to start a new shell for this setup to take effect.
+    tags: []
+    links: []
+    usage: |-
+      ```sh
+      supabase completion bash
+      ```
+    subcommands: []
+    options: |-
+      ```sh
+        -h, --help              help for bash
+            --no-descriptions   disable completion descriptions
       ```
