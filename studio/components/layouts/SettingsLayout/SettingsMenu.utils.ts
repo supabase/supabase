@@ -3,6 +3,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { ProjectBase } from 'types'
 import { checkPermissions } from '../../../hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'lib/constants'
 
 export const generateSettingsMenu = (ref: string, project?: ProjectBase): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
@@ -37,6 +38,16 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
         },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Storage Settings',
+                key: 'storage',
+                url: `/project/${ref}/settings/storage`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
     {
@@ -44,7 +55,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
       items: [
         {
           name: 'Subscription',
-          key: 'billing',
+          key: 'subscription',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/subscription`,
           items: [],
         },
@@ -56,7 +67,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
         },
         {
           name: 'Invoices',
-          key: 'billing/invoices',
+          key: 'invoices',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
           items: [],
         },
