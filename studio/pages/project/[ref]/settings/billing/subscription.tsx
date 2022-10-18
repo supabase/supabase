@@ -1,15 +1,14 @@
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect } from 'react'
 import { Loading } from 'ui'
 
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
 import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
-import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
+import { useProjectSubscription, useStore } from 'hooks'
 import { NextPageWithLayout, Project } from 'types'
 
 import { Subscription } from 'components/interfaces/Billing'
-import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -44,11 +43,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
     error,
   } = useProjectSubscription(ui.selectedProject?.ref)
 
-  const { paygStats }: { paygStats: PaygStats | undefined } = useProjectPaygStatistics(
-    ui.selectedProject?.ref,
-    subscription?.tier?.supabase_prod_id
-  )
-
   useEffect(() => {
     if (error) {
       ui.setNotification({
@@ -69,7 +63,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
         loading={loading}
         project={project}
         subscription={subscription}
-        paygStats={paygStats}
         currentPeriodStart={subscription?.billing.current_period_start}
         currentPeriodEnd={subscription?.billing.current_period_end}
       />
