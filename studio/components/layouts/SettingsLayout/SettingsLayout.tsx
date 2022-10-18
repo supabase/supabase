@@ -18,7 +18,13 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
   const projectBaseInfo = ui.selectedProjectBaseInfo
 
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  let page
+  // billing pages live under /billing/invoices and /billing/subscription, etc
+  // so we need to pass the [5]th part of the url to the menu
+  router.pathname.includes('billing')
+    ? (page = router.pathname.split('/')[5])
+    : (page = router.pathname.split('/')[4])
+
   const menuRoutes = generateSettingsMenu(projectRef, projectBaseInfo)
 
   return (
