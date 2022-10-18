@@ -12,17 +12,6 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           {
             title: 'Configuration',
             items: [
-              ...(IS_PLATFORM
-                ? [
-                    {
-                      name: 'Settings',
-                      key: 'settings',
-                      url: `/project/${ref}/auth/settings`,
-                      items: [],
-                    },
-                  ]
-                : []),
-
               {
                 name: 'Policies',
                 key: 'policies',

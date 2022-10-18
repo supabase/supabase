@@ -33,7 +33,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           items: [],
         },
         {
-          name: 'Connection Settings',
+          name: 'Connections',
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
@@ -41,7 +41,17 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Storage Settings',
+                name: 'Auth',
+                key: 'auth',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Storage',
                 key: 'storage',
                 url: `/project/${ref}/settings/storage`,
                 items: [],
