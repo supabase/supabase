@@ -9,7 +9,8 @@ export interface CommonChartProps<D>
     | 'minimalHeader'
     | 'displayDateInUtc'
   > {
-  title?: string
+  title?: string;
+  className?: string
 }
 
 export type HeaderType<D> = {
