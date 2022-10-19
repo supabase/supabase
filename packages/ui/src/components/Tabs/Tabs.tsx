@@ -56,7 +56,7 @@ function Tabs({
 
   // activeId state can be overriden externally with `active`
   // defaults to use a url #hash if we have one or activeTab if not
-  const active = hash ? hash : activeId ? activeId : activeTab
+  const active = activeId ? activeId : hash ? hash : activeTab
 
   function onTabClick(id: string) {
     const newTabSelected = id !== active
