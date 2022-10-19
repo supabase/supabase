@@ -53,7 +53,7 @@ const Users = () => {
   }
 
   return (
-    <div className="overflow-scroll">
+    <div>
       <div className="justify-between px-6 pt-6 pb-2 md:flex">
         <div className="relative flex space-x-4">
           <Input
@@ -108,8 +108,8 @@ const Users = () => {
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
-      <section className="mt-4 overflow-visible px-6">
-        <div className="section-block--body relative overflow-scroll rounded">
+      <section className="users-table-container mt-4 overflow-visible px-6">
+        <div className="section-block--body relative overflow-x-scroll rounded">
           <div className="inline-block min-w-full align-middle">
             <UsersList />
           </div>
