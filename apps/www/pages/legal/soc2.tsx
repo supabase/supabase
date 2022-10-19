@@ -18,11 +18,7 @@ const SOC2 = () => {
                 getting certified for SOC2 Type 2 and HIPAA next.
               </p>
 
-              <p>
-                You can request for our latest SOC 2 document either through our{' '}
-                <Link href="https://security.supabase.com/">security portal</Link>, or by submitting
-                your request here.
-              </p>
+              <p>You can request for our latest SOC 2 document by submitting your request here.</p>
 
               <SOC2RequestForm />
             </div>
