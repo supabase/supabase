@@ -90,7 +90,7 @@ const NotificationActions: FC<Props> = ({
       })}
       {changelogLink && (
         <Link href={changelogLink}>
-          <a>
+          <a target="_blank" rel="noreferrer">
             <Button as="span" type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
               More info
             </Button>
