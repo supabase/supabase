@@ -26,7 +26,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 18,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L18"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L18"
             }
           ],
           "signatures": [
@@ -94,7 +94,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 16,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L16"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L16"
             }
           ],
           "type": {
@@ -116,7 +116,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 12,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L12"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L12"
             }
           ],
           "type": {
@@ -137,7 +137,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 15,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L15"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L15"
             }
           ],
           "type": {
@@ -235,7 +235,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 10,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L10"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L10"
             }
           ],
           "type": {
@@ -268,7 +268,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 8,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L8"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L8"
             }
           ],
           "type": {
@@ -311,7 +311,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 11,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L11"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L11"
             }
           ],
           "type": {
@@ -332,7 +332,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 13,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L13"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L13"
             }
           ],
           "type": {
@@ -355,7 +355,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 14,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L14"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L14"
             }
           ],
           "type": {
@@ -378,7 +378,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 9,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L9"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L9"
             }
           ],
           "type": {
@@ -399,7 +399,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 48,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L48"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L48"
             }
           ],
           "signatures": [
@@ -470,7 +470,7 @@
                               "fileName": "src/PostgrestBuilder.ts",
                               "line": 50,
                               "character": 9,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L50"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L50"
                             }
                           ],
                           "signatures": [
@@ -559,7 +559,7 @@
                               "fileName": "src/PostgrestBuilder.ts",
                               "line": 53,
                               "character": 18,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L53"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L53"
                             }
                           ],
                           "signatures": [
@@ -658,7 +658,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 43,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L43"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L43"
             }
           ],
           "signatures": [
@@ -717,7 +717,7 @@
           "fileName": "src/PostgrestBuilder.ts",
           "line": 5,
           "character": 30,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L5"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L5"
         }
       ],
       "typeParameters": [
@@ -785,7 +785,7 @@
               "fileName": "src/PostgrestClient.ts",
               "line": 41,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L41"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L41"
             }
           ],
           "signatures": [
@@ -968,7 +968,7 @@
                               "fileName": "src/PostgrestClient.ts",
                               "line": 50,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L50"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L50"
                             }
                           ],
                           "type": {
@@ -1082,7 +1082,7 @@
                               "fileName": "src/PostgrestClient.ts",
                               "line": 48,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L48"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L48"
                             }
                           ],
                           "type": {
@@ -1123,7 +1123,7 @@
                               "fileName": "src/PostgrestClient.ts",
                               "line": 49,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L49"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L49"
                             }
                           ],
                           "type": {
@@ -1144,7 +1144,7 @@
                           "fileName": "src/PostgrestClient.ts",
                           "line": 47,
                           "character": 7,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L47"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L47"
                         }
                       ]
                     }
@@ -1190,7 +1190,7 @@
               "fileName": "src/PostgrestClient.ts",
               "line": 29,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L29"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L29"
             }
           ],
           "type": {
@@ -1286,7 +1286,7 @@
               "fileName": "src/PostgrestClient.ts",
               "line": 27,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L27"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L27"
             }
           ],
           "type": {
@@ -1319,7 +1319,7 @@
               "fileName": "src/PostgrestClient.ts",
               "line": 28,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L28"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L28"
             }
           ],
           "type": {
@@ -1339,7 +1339,7 @@
               "fileName": "src/PostgrestClient.ts",
               "line": 26,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L26"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L26"
             }
           ],
           "type": {
@@ -1358,25 +1358,25 @@
               "fileName": "src/PostgrestClient.ts",
               "line": 64,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L64"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L64"
             },
             {
               "fileName": "src/PostgrestClient.ts",
               "line": 68,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L68"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L68"
             },
             {
               "fileName": "src/PostgrestClient.ts",
               "line": 71,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L71"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L71"
             },
             {
               "fileName": "src/PostgrestClient.ts",
               "line": 72,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L72"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L72"
             }
           ],
           "signatures": [
@@ -1569,7 +1569,7 @@
               "fileName": "src/PostgrestClient.ts",
               "line": 102,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L102"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L102"
             }
           ],
           "signatures": [
@@ -1737,7 +1737,7 @@
                               "fileName": "src/PostgrestClient.ts",
                               "line": 113,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L113"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L113"
                             }
                           ],
                           "type": {
@@ -1795,7 +1795,7 @@
                               "fileName": "src/PostgrestClient.ts",
                               "line": 112,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L112"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L112"
                             }
                           ],
                           "type": {
@@ -1815,7 +1815,7 @@
                           "fileName": "src/PostgrestClient.ts",
                           "line": 111,
                           "character": 7,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L111"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L111"
                         }
                       ]
                     }
@@ -1948,7 +1948,7 @@
           "fileName": "src/PostgrestClient.ts",
           "line": 17,
           "character": 21,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestClient.ts#L17"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestClient.ts#L17"
         }
       ],
       "typeParameters": [
@@ -2118,7 +2118,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 18,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L18"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L18"
             }
           ],
           "signatures": [
@@ -2240,7 +2240,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 16,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L16"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L16"
             }
           ],
           "type": {
@@ -2267,7 +2267,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 12,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L12"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L12"
             }
           ],
           "type": {
@@ -2293,7 +2293,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 15,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L15"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L15"
             }
           ],
           "type": {
@@ -2396,7 +2396,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 10,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L10"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L10"
             }
           ],
           "type": {
@@ -2434,7 +2434,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 8,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L8"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L8"
             }
           ],
           "type": {
@@ -2482,7 +2482,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 11,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L11"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L11"
             }
           ],
           "type": {
@@ -2508,7 +2508,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 13,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L13"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L13"
             }
           ],
           "type": {
@@ -2536,7 +2536,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 14,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L14"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L14"
             }
           ],
           "type": {
@@ -2564,7 +2564,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 9,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L9"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L9"
             }
           ],
           "type": {
@@ -2590,7 +2590,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 130,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L130"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L130"
             }
           ],
           "signatures": [
@@ -2677,19 +2677,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 216,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L216"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L216"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 220,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L220"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L220"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 221,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L221"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L221"
             }
           ],
           "signatures": [
@@ -2931,19 +2931,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 189,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L189"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L189"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 193,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L193"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L193"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 194,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L194"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L194"
             }
           ],
           "signatures": [
@@ -3185,7 +3185,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 161,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L161"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L161"
             }
           ],
           "signatures": [
@@ -3254,19 +3254,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 41,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L41"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L41"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 42,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L42"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L42"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 43,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L43"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L43"
             }
           ],
           "signatures": [
@@ -3468,7 +3468,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 195,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L195"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L195"
             }
           ],
           "signatures": [
@@ -3548,7 +3548,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 203,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L203"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L203"
                             }
                           ],
                           "type": {
@@ -3585,7 +3585,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 206,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L206"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L206"
                             }
                           ],
                           "type": {
@@ -3626,7 +3626,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 208,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L208"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L208"
                             }
                           ],
                           "type": {
@@ -3672,7 +3672,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 205,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L205"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L205"
                             }
                           ],
                           "type": {
@@ -3717,7 +3717,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 204,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L204"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L204"
                             }
                           ],
                           "type": {
@@ -3754,7 +3754,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 207,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L207"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L207"
                             }
                           ],
                           "type": {
@@ -3774,7 +3774,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 202,
                           "character": 5,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L202"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L202"
                         }
                       ]
                     }
@@ -3861,19 +3861,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 441,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L441"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L441"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 446,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L446"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L446"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 447,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L447"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L447"
             }
           ],
           "signatures": [
@@ -4173,7 +4173,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 169,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L169"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L169"
             }
           ],
           "signatures": [
@@ -4254,19 +4254,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 67,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L67"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L67"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 68,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L68"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L68"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 69,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L69"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L69"
             }
           ],
           "signatures": [
@@ -4452,19 +4452,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 80,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L80"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L80"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 81,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L81"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L81"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 82,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L82"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L82"
             }
           ],
           "signatures": [
@@ -4650,19 +4650,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 132,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L132"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L132"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 133,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L133"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L133"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 134,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L134"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L134"
             }
           ],
           "signatures": [
@@ -4839,19 +4839,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 167,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L167"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L167"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 168,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L168"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L168"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 169,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L169"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L169"
             }
           ],
           "signatures": [
@@ -5043,19 +5043,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 151,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L151"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L151"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 155,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L155"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L155"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 156,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L156"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L156"
             }
           ],
           "signatures": [
@@ -5297,19 +5297,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 119,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L119"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L119"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 120,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L120"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L120"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 121,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L121"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L121"
             }
           ],
           "signatures": [
@@ -5486,7 +5486,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 101,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L101"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L101"
             }
           ],
           "signatures": [
@@ -5577,7 +5577,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 101,
                               "character": 43,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L101"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L101"
                             }
                           ],
                           "type": {
@@ -5597,7 +5597,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 101,
                           "character": 41,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L101"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L101"
                         }
                       ]
                     }
@@ -5651,19 +5651,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 93,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L93"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L93"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 94,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L94"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L94"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 95,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L95"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L95"
             }
           ],
           "signatures": [
@@ -5849,19 +5849,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 106,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L106"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L106"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 107,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L107"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L107"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 108,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L108"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L108"
             }
           ],
           "signatures": [
@@ -6047,19 +6047,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 376,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L376"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L376"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 377,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L377"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L377"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 378,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L378"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L378"
             }
           ],
           "signatures": [
@@ -6239,7 +6239,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 152,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L152"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L152"
             }
           ],
           "signatures": [
@@ -6317,19 +6317,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 54,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L54"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L54"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 55,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L55"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L55"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 56,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L56"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L56"
             }
           ],
           "signatures": [
@@ -6515,19 +6515,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 398,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L398"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L398"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 403,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L403"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L403"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 404,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L404"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L404"
             }
           ],
           "signatures": [
@@ -6743,7 +6743,7 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 422,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L422"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L422"
             }
           ],
           "signatures": [
@@ -6834,7 +6834,7 @@
                               "fileName": "src/PostgrestFilterBuilder.ts",
                               "line": 422,
                               "character": 42,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L422"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L422"
                             }
                           ],
                           "type": {
@@ -6854,7 +6854,7 @@
                           "fileName": "src/PostgrestFilterBuilder.ts",
                           "line": 422,
                           "character": 40,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L422"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L422"
                         }
                       ]
                     }
@@ -6898,19 +6898,19 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 65,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L65"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L65"
             },
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 69,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L69"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L69"
             },
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 73,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L73"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L73"
             }
           ],
           "signatures": [
@@ -7024,7 +7024,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 67,
                               "character": 16,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                             }
                           ],
                           "type": {
@@ -7053,7 +7053,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 67,
                               "character": 59,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                             }
                           ],
                           "type": {
@@ -7114,7 +7114,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 67,
                               "character": 37,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                             }
                           ],
                           "type": {
@@ -7134,7 +7134,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 67,
                           "character": 14,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                         }
                       ]
                     }
@@ -7217,7 +7217,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 71,
                               "character": 16,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                             }
                           ],
                           "type": {
@@ -7236,7 +7236,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 71,
                               "character": 59,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                             }
                           ],
                           "type": {
@@ -7257,7 +7257,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 71,
                               "character": 37,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                             }
                           ],
                           "type": {
@@ -7277,7 +7277,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 71,
                           "character": 14,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                         }
                       ]
                     }
@@ -7330,19 +7330,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 315,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L315"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L315"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 319,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L319"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L319"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 320,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L320"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L320"
             }
           ],
           "signatures": [
@@ -7552,7 +7552,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 116,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L116"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L116"
             }
           ],
           "signatures": [
@@ -7670,7 +7670,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 116,
                               "character": 54,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L116"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L116"
                             }
                           ],
                           "type": {
@@ -7690,7 +7690,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 116,
                           "character": 52,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L116"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L116"
                         }
                       ]
                     }
@@ -7744,19 +7744,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 301,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L301"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L301"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 302,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L302"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L302"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 303,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L303"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L303"
             }
           ],
           "signatures": [
@@ -7933,19 +7933,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 242,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L242"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L242"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 243,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L243"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L243"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 244,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L244"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L244"
             }
           ],
           "signatures": [
@@ -8122,19 +8122,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 257,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L257"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L257"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 258,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L258"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L258"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 259,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L259"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L259"
             }
           ],
           "signatures": [
@@ -8319,19 +8319,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 271,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L271"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L271"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 272,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L272"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L272"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 273,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L273"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L273"
             }
           ],
           "signatures": [
@@ -8508,19 +8508,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 286,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L286"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L286"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 287,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L287"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L287"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 288,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L288"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L288"
             }
           ],
           "signatures": [
@@ -8705,7 +8705,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 249,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L249"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L249"
             }
           ],
           "signatures": [
@@ -8794,7 +8794,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 235,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L235"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L235"
             }
           ],
           "signatures": [
@@ -8866,7 +8866,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 24,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L24"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L24"
             }
           ],
           "signatures": [
@@ -9039,7 +9039,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 141,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L141"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L141"
             }
           ],
           "signatures": [
@@ -9117,19 +9117,19 @@
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 341,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L341"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L341"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 346,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L346"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L346"
             },
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
               "line": 351,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L351"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L351"
             }
           ],
           "signatures": [
@@ -9262,7 +9262,7 @@
                               "fileName": "src/PostgrestFilterBuilder.ts",
                               "line": 344,
                               "character": 16,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L344"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L344"
                             }
                           ],
                           "type": {
@@ -9299,7 +9299,7 @@
                               "fileName": "src/PostgrestFilterBuilder.ts",
                               "line": 344,
                               "character": 33,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L344"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L344"
                             }
                           ],
                           "type": {
@@ -9332,7 +9332,7 @@
                           "fileName": "src/PostgrestFilterBuilder.ts",
                           "line": 344,
                           "character": 14,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L344"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L344"
                         }
                       ]
                     }
@@ -9421,7 +9421,7 @@
                               "fileName": "src/PostgrestFilterBuilder.ts",
                               "line": 349,
                               "character": 16,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L349"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L349"
                             }
                           ],
                           "type": {
@@ -9442,7 +9442,7 @@
                               "fileName": "src/PostgrestFilterBuilder.ts",
                               "line": 349,
                               "character": 33,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L349"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L349"
                             }
                           ],
                           "type": {
@@ -9475,7 +9475,7 @@
                           "fileName": "src/PostgrestFilterBuilder.ts",
                           "line": 349,
                           "character": 14,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L349"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L349"
                         }
                       ]
                     }
@@ -9518,7 +9518,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 48,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L48"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L48"
             }
           ],
           "signatures": [
@@ -9589,7 +9589,7 @@
                               "fileName": "src/PostgrestBuilder.ts",
                               "line": 50,
                               "character": 9,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L50"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L50"
                             }
                           ],
                           "signatures": [
@@ -9678,7 +9678,7 @@
                               "fileName": "src/PostgrestBuilder.ts",
                               "line": 53,
                               "character": 18,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L53"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L53"
                             }
                           ],
                           "signatures": [
@@ -9779,7 +9779,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 43,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L43"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L43"
             }
           ],
           "signatures": [
@@ -9862,7 +9862,7 @@
           "fileName": "src/PostgrestFilterBuilder.ts",
           "line": 28,
           "character": 21,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestFilterBuilder.ts#L28"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestFilterBuilder.ts#L28"
         }
       ],
       "typeParameters": [
@@ -9951,7 +9951,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 16,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L16"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L16"
             }
           ],
           "signatures": [
@@ -10036,7 +10036,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 25,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L25"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L25"
                             }
                           ],
                           "type": {
@@ -10134,7 +10134,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 23,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L23"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L23"
                             }
                           ],
                           "type": {
@@ -10167,7 +10167,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 24,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L24"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L24"
                             }
                           ],
                           "type": {
@@ -10187,7 +10187,7 @@
                           "fileName": "src/PostgrestQueryBuilder.ts",
                           "line": 22,
                           "character": 7,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L22"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L22"
                         }
                       ]
                     }
@@ -10227,7 +10227,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 14,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L14"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L14"
             }
           ],
           "type": {
@@ -10323,7 +10323,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 11,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L11"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L11"
             }
           ],
           "type": {
@@ -10356,7 +10356,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 12,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L12"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L12"
             }
           ],
           "type": {
@@ -10377,7 +10377,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 13,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L13"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L13"
             }
           ],
           "type": {
@@ -10398,7 +10398,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 10,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L10"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L10"
             }
           ],
           "type": {
@@ -10419,7 +10419,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 299,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L299"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L299"
             }
           ],
           "signatures": [
@@ -10523,7 +10523,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 302,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L302"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L302"
                             }
                           ],
                           "type": {
@@ -10556,7 +10556,7 @@
                           "fileName": "src/PostgrestQueryBuilder.ts",
                           "line": 301,
                           "character": 5,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L301"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L301"
                         }
                       ]
                     }
@@ -10606,7 +10606,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 120,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L120"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L120"
             }
           ],
           "signatures": [
@@ -10768,7 +10768,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 125,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L125"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L125"
                             }
                           ],
                           "type": {
@@ -10801,7 +10801,7 @@
                           "fileName": "src/PostgrestQueryBuilder.ts",
                           "line": 124,
                           "character": 7,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L124"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L124"
                         }
                       ]
                     }
@@ -10851,7 +10851,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 55,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L55"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L55"
             }
           ],
           "signatures": [
@@ -11021,7 +11021,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 65,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L65"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L65"
                             }
                           ],
                           "type": {
@@ -11079,7 +11079,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 64,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L64"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L64"
                             }
                           ],
                           "type": {
@@ -11099,7 +11099,7 @@
                           "fileName": "src/PostgrestQueryBuilder.ts",
                           "line": 63,
                           "character": 7,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L63"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L63"
                         }
                       ]
                     }
@@ -11150,7 +11150,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 250,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L250"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L250"
             }
           ],
           "signatures": [
@@ -11299,7 +11299,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 255,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L255"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L255"
                             }
                           ],
                           "type": {
@@ -11332,7 +11332,7 @@
                           "fileName": "src/PostgrestQueryBuilder.ts",
                           "line": 254,
                           "character": 7,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L254"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L254"
                         }
                       ]
                     }
@@ -11382,7 +11382,7 @@
               "fileName": "src/PostgrestQueryBuilder.ts",
               "line": 192,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L192"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L192"
             }
           ],
           "signatures": [
@@ -11584,7 +11584,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 201,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L201"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L201"
                             }
                           ],
                           "type": {
@@ -11642,7 +11642,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 200,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L200"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L200"
                             }
                           ],
                           "type": {
@@ -11679,7 +11679,7 @@
                               "fileName": "src/PostgrestQueryBuilder.ts",
                               "line": 199,
                               "character": 6,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L199"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L199"
                             }
                           ],
                           "type": {
@@ -11699,7 +11699,7 @@
                           "fileName": "src/PostgrestQueryBuilder.ts",
                           "line": 198,
                           "character": 7,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L198"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L198"
                         }
                       ]
                     }
@@ -11758,7 +11758,7 @@
           "fileName": "src/PostgrestQueryBuilder.ts",
           "line": 6,
           "character": 21,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestQueryBuilder.ts#L6"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestQueryBuilder.ts#L6"
         }
       ],
       "typeParameters": [
@@ -11813,7 +11813,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 18,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L18"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L18"
             }
           ],
           "signatures": [
@@ -11935,7 +11935,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 16,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L16"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L16"
             }
           ],
           "type": {
@@ -11962,7 +11962,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 12,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L12"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L12"
             }
           ],
           "type": {
@@ -11988,7 +11988,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 15,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L15"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L15"
             }
           ],
           "type": {
@@ -12091,7 +12091,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 10,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L10"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L10"
             }
           ],
           "type": {
@@ -12129,7 +12129,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 8,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L8"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L8"
             }
           ],
           "type": {
@@ -12177,7 +12177,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 11,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L11"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L11"
             }
           ],
           "type": {
@@ -12203,7 +12203,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 13,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L13"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L13"
             }
           ],
           "type": {
@@ -12231,7 +12231,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 14,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L14"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L14"
             }
           ],
           "type": {
@@ -12259,7 +12259,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 9,
               "character": 12,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L9"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L9"
             }
           ],
           "type": {
@@ -12285,7 +12285,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 130,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L130"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L130"
             }
           ],
           "signatures": [
@@ -12362,7 +12362,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 161,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L161"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L161"
             }
           ],
           "signatures": [
@@ -12421,7 +12421,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 195,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L195"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L195"
             }
           ],
           "signatures": [
@@ -12501,7 +12501,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 203,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L203"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L203"
                             }
                           ],
                           "type": {
@@ -12538,7 +12538,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 206,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L206"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L206"
                             }
                           ],
                           "type": {
@@ -12579,7 +12579,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 208,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L208"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L208"
                             }
                           ],
                           "type": {
@@ -12625,7 +12625,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 205,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L205"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L205"
                             }
                           ],
                           "type": {
@@ -12670,7 +12670,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 204,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L204"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L204"
                             }
                           ],
                           "type": {
@@ -12707,7 +12707,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 207,
                               "character": 4,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L207"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L207"
                             }
                           ],
                           "type": {
@@ -12727,7 +12727,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 202,
                           "character": 5,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L202"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L202"
                         }
                       ]
                     }
@@ -12804,7 +12804,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 169,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L169"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L169"
             }
           ],
           "signatures": [
@@ -12875,7 +12875,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 101,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L101"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L101"
             }
           ],
           "signatures": [
@@ -12966,7 +12966,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 101,
                               "character": 43,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L101"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L101"
                             }
                           ],
                           "type": {
@@ -12986,7 +12986,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 101,
                           "character": 41,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L101"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L101"
                         }
                       ]
                     }
@@ -13030,7 +13030,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 152,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L152"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L152"
             }
           ],
           "signatures": [
@@ -13098,19 +13098,19 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 65,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L65"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L65"
             },
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 69,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L69"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L69"
             },
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 73,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L73"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L73"
             }
           ],
           "signatures": [
@@ -13224,7 +13224,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 67,
                               "character": 16,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                             }
                           ],
                           "type": {
@@ -13253,7 +13253,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 67,
                               "character": 59,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                             }
                           ],
                           "type": {
@@ -13314,7 +13314,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 67,
                               "character": 37,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                             }
                           ],
                           "type": {
@@ -13334,7 +13334,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 67,
                           "character": 14,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L67"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L67"
                         }
                       ]
                     }
@@ -13412,7 +13412,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 71,
                               "character": 16,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                             }
                           ],
                           "type": {
@@ -13431,7 +13431,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 71,
                               "character": 59,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                             }
                           ],
                           "type": {
@@ -13452,7 +13452,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 71,
                               "character": 37,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                             }
                           ],
                           "type": {
@@ -13472,7 +13472,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 71,
                           "character": 14,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L71"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L71"
                         }
                       ]
                     }
@@ -13515,7 +13515,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 116,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L116"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L116"
             }
           ],
           "signatures": [
@@ -13633,7 +13633,7 @@
                               "fileName": "src/PostgrestTransformBuilder.ts",
                               "line": 116,
                               "character": 54,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L116"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L116"
                             }
                           ],
                           "type": {
@@ -13653,7 +13653,7 @@
                           "fileName": "src/PostgrestTransformBuilder.ts",
                           "line": 116,
                           "character": 52,
-                          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L116"
+                          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L116"
                         }
                       ]
                     }
@@ -13697,7 +13697,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 249,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L249"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L249"
             }
           ],
           "signatures": [
@@ -13776,7 +13776,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 235,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L235"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L235"
             }
           ],
           "signatures": [
@@ -13838,7 +13838,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 24,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L24"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L24"
             }
           ],
           "signatures": [
@@ -14001,7 +14001,7 @@
               "fileName": "src/PostgrestTransformBuilder.ts",
               "line": 141,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L141"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L141"
             }
           ],
           "signatures": [
@@ -14069,7 +14069,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 48,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L48"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L48"
             }
           ],
           "signatures": [
@@ -14140,7 +14140,7 @@
                               "fileName": "src/PostgrestBuilder.ts",
                               "line": 50,
                               "character": 9,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L50"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L50"
                             }
                           ],
                           "signatures": [
@@ -14229,7 +14229,7 @@
                               "fileName": "src/PostgrestBuilder.ts",
                               "line": 53,
                               "character": 18,
-                              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L53"
+                              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L53"
                             }
                           ],
                           "signatures": [
@@ -14330,7 +14330,7 @@
               "fileName": "src/PostgrestBuilder.ts",
               "line": 43,
               "character": 2,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestBuilder.ts#L43"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestBuilder.ts#L43"
             }
           ],
           "signatures": [
@@ -14409,7 +14409,7 @@
           "fileName": "src/PostgrestTransformBuilder.ts",
           "line": 10,
           "character": 21,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/PostgrestTransformBuilder.ts#L10"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/PostgrestTransformBuilder.ts#L10"
         }
       ],
       "typeParameters": [
@@ -14502,7 +14502,7 @@
           "fileName": "src/types.ts",
           "line": 8,
           "character": 12,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L8"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L8"
         }
       ],
       "type": {
@@ -14525,7 +14525,7 @@
                   "fileName": "src/types.ts",
                   "line": 12,
                   "character": 2,
-                  "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L12"
+                  "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L12"
                 }
               ],
               "type": {
@@ -14544,7 +14544,7 @@
                   "fileName": "src/types.ts",
                   "line": 10,
                   "character": 2,
-                  "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L10"
+                  "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L10"
                 }
               ],
               "type": {
@@ -14563,7 +14563,7 @@
                   "fileName": "src/types.ts",
                   "line": 11,
                   "character": 2,
-                  "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L11"
+                  "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L11"
                 }
               ],
               "type": {
@@ -14582,7 +14582,7 @@
                   "fileName": "src/types.ts",
                   "line": 9,
                   "character": 2,
-                  "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L9"
+                  "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L9"
                 }
               ],
               "type": {
@@ -14602,7 +14602,7 @@
               "fileName": "src/types.ts",
               "line": 8,
               "character": 29,
-              "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L8"
+              "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L8"
             }
           ]
         }
@@ -14619,7 +14619,7 @@
           "fileName": "src/types.ts",
           "line": 45,
           "character": 12,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L45"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L45"
         }
       ],
       "typeParameters": [
@@ -14664,7 +14664,7 @@
           "fileName": "src/types.ts",
           "line": 35,
           "character": 12,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L35"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L35"
         }
       ],
       "typeParameters": [
@@ -14708,7 +14708,7 @@
           "fileName": "src/types.ts",
           "line": 42,
           "character": 12,
-          "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/types.ts#L42"
+          "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/types.ts#L42"
         }
       ],
       "typeParameters": [
@@ -14757,7 +14757,7 @@
       "fileName": "src/index.ts",
       "line": 1,
       "character": 0,
-      "url": "https://github.com/supabase/postgrest-js/blob/4aa24d5/src/index.ts#L1"
+      "url": "https://github.com/supabase/postgrest-js/blob/709f245/src/index.ts#L1"
     }
   ]
 }
