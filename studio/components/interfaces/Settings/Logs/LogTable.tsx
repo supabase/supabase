@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff } from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff } from 'ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'
@@ -70,7 +70,7 @@ const LogTable = ({
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
-  const DEFAULT_COLUMNS = columnNames.map((v) => {
+  const DEFAULT_COLUMNS = columnNames.map((v, idx: number) => {
     let formatter = undefined
 
     formatter = (received: FormatterArg) => {
@@ -83,7 +83,14 @@ const LogTable = ({
         return String(value)
       }
     }
-    return { key: v, name: v, resizable: true, formatter, header: v, minWidth: 128 }
+    return {
+      key: `logs-column-${idx}`,
+      name: v,
+      resizable: true,
+      formatter,
+      header: v,
+      minWidth: 128,
+    }
   })
 
   let columns

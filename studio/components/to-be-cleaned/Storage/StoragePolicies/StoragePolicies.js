@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconLoader } from '@supabase/ui'
+import { IconLoader } from 'ui'
 import { find, get, isEmpty, filter } from 'lodash'
 
 import { useStore } from 'hooks'
@@ -35,7 +35,7 @@ const StoragePolicies = () => {
 
   // Policies under storage.objects
   const storageObjectsPolicies = filter(policies, { table: 'objects' })
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(storageObjectsPolicies)
+  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
   const ungroupedPolicies = get(
     find(formattedStorageObjectPolicies, { name: 'Ungrouped' }),
     ['policies'],
@@ -144,7 +144,7 @@ const StoragePolicies = () => {
   return (
     <div className="flex min-h-full w-full flex-col">
       <h3 className="text-xl">Storage policies</h3>
-      <p className="text-scale-1100 text-sm mt-2">
+      <p className="mt-2 text-sm text-scale-1100">
         Safeguard your files with policies that define the operations allowed for your users at the
         bucket level.
       </p>
@@ -179,7 +179,7 @@ const StoragePolicies = () => {
           })}
 
           <div className="!mb-4 w-full border-b border-gray-600" />
-          <p className="text-scale-1000 text-sm">
+          <p className="text-sm text-scale-1000">
             You may also write policies for the tables under the storage schema directly for greater
             control
           </p>

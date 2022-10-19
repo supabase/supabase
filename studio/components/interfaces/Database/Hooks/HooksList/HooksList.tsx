@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { includes, uniqBy, map as lodashMap } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Input, IconSearch, IconLoader } from '@supabase/ui'
+import { Button, Input, IconSearch, IconLoader } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -38,7 +38,7 @@ const HooksList: FC<any> = ({
     return (
       <>
         {schemas.length === 0 ? (
-          <span className="text-scale-1100 px-6 py-4">Checking if hooks are enabled...</span>
+          <span className="px-6 py-4 text-scale-1100">Checking if hooks are enabled...</span>
         ) : (
           <ProductEmptyState
             title="Hooks"
@@ -48,7 +48,7 @@ const HooksList: FC<any> = ({
             disabledMessage="You need additional permissions to enable hooks"
           >
             <AlphaPreview />
-            <p className="text-scale-1100 text-sm">Enable hooks on your project.</p>
+            <p className="text-sm text-scale-1100">Enable hooks on your project.</p>
           </ProductEmptyState>
         )}
       </>
@@ -85,7 +85,7 @@ const HooksList: FC<any> = ({
             disabledMessage="You need additional permissions to create webhooks"
           >
             <AlphaPreview />
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               Database Webhooks can be used to trigger serverless functions or send requests to an
               HTTP endpoint.
             </p>
@@ -112,11 +112,11 @@ const HooksList: FC<any> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                      'border-scale-200 border',
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-scale-1200 text-xs">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to create webhooks
                     </span>
                   </div>
@@ -125,7 +125,7 @@ const HooksList: FC<any> = ({
             </Tooltip.Root>
           </div>
           {filteredHooks.length <= 0 && (
-            <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
+            <div className="mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md dark:border-dark">
               <p>No results match your filter query</p>
               <Button type="outline" onClick={() => setFilterString('')}>
                 Reset filter

@@ -6,15 +6,18 @@ sidebar_label: Firebase Storage
 ---
 
 Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/storage) to convert storage files from Firebase Storage to Supabase Storage. Conversion is a two-step process:
+
 1. Files are downloaded from a Firebase storage bucket to a local filesystem.
 2. Files are uploaded from the local filesystem to a Supabase storage bucket.
 
 ## Set up the migration tool {#set-up-migration-tool}
 
 1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
-  ```
-  git clone https://github.com/supabase-community/firebase-to-supabase.git
-  ```
+
+```
+git clone https://github.com/supabase-community/firebase-to-supabase.git
+```
+
 1. In the `/storage` directory, rename [supabase-keys-sample.js](https://github.com/supabase-community/firebase-to-supabase/blob/main/storage/supabase-keys-sample.js) to `supabase-keys.js`.
 1. Go to your Supabase project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard.
 1. Copy the **Project URL** and update the `SUPABASE_URL` value in `supabase-keys.js`.
@@ -45,6 +48,7 @@ To process in batches using multiple command-line executions, you must use the s
 ### Upload files to Supabase Storage bucket {#upload-to-supabase-storage-bucket}
 
 `node upload.js <prefix> <folder> <bucket>`
+
 - `<prefix>`: The prefix of the files to download. To process all files, use an empty prefix: "".
 - `<folder>`: Name of subfolder of files to upload. The selected folder is read as a subfolder of the current folder (e.g., `./downloads/`). The default is `downloads`.
 - `<bucket>`: Name of the bucket to upload to.

@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input, Button, IconExternalLink } from '@supabase/ui'
+import { Checkbox, SidePanel, Input, Button, IconExternalLink } from 'ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -212,7 +212,7 @@ const ColumnEditor: FC<Props> = ({
             disabled={!isUndefined(columnFields?.foreignKey)}
             description={
               <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-                <a>
+                <a target="_blank" rel="noreferrer">
                   <Button
                     as="span"
                     type="text"

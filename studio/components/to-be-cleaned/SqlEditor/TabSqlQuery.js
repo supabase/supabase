@@ -5,7 +5,7 @@ import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -358,7 +358,10 @@ const Results = ({ results }) => {
   function onCopyCell() {
     if (columns && cellPosition) {
       const { idx, rowIdx } = cellPosition
-      const colKey = columns[idx].key
+      const column = columns[idx]
+      if (!column) return
+
+      const colKey = column.key
       const cellValue = results[rowIdx]?.[colKey] ?? ''
       const value = formatClipboardValue(cellValue)
       copyToClipboard(value)

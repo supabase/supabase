@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, IconHeart } from '@supabase/ui'
+import { Button, IconHeart } from 'ui'
+
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'

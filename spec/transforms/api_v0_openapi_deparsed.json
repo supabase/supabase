@@ -527,7 +527,7 @@
         ]
       },
       "patch": {
-        "operationId": "UpdateFunction",
+        "operationId": "updateFunction",
         "summary": "Update a function",
         "description": "Updates a function with the specified slug and project.",
         "parameters": [
