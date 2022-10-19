@@ -61,7 +61,11 @@ const UnauthorizedLanding = () => {
       auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?${params.toString()}`,
+          redirectTo: `${
+            process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+              ? process.env.NEXT_PUBLIC_VERCEL_URL
+              : process.env.NEXT_PUBLIC_SITE_URL
+          }?${params.toString()}`,
         },
       })
     }
