@@ -3711,6 +3711,13 @@ pages:
 
   not():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
+    notes: |
+      not() expects you to use the raw PostgREST syntax for the filter values.
+
+      ```ts
+      .not('id', 'in', '(5,6,7)')  // Use `()` for `in` filter
+      .not('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
+      ```
     examples:
       - name: With `select()`
         description: |
@@ -3768,6 +3775,13 @@ pages:
 
   or():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
+    notes: |
+      or() expects you to use the raw PostgREST syntax for the filter names and values.
+
+      ```ts
+      .or('id.in.(5,6,7), arraycol.cs.{"a","b"}')  // Use `()` for `in` filter, `{}` for array values and `cs` for `contains()`.
+      .or('id.in.(5,6,7), arraycol.cd.{"a","b"}')  // Use `cd` for `containedBy()`
+      ```
     examples:
       - name: With `select()`
         description: |
@@ -3939,6 +3953,13 @@ pages:
 
   filter():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
+    notes: |
+      filter() expects you to use the raw PostgREST syntax for the filter values.
+
+      ```ts
+      .filter('id', 'in', '(5,6,7)')  // Use `()` for `in` filter
+      .filter('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
+      ```
     examples:
       - name: With `select()`
         description: |

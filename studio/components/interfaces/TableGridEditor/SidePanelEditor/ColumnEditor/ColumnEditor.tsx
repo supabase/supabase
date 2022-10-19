@@ -212,7 +212,7 @@ const ColumnEditor: FC<Props> = ({
             disabled={!isUndefined(columnFields?.foreignKey)}
             description={
               <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-                <a>
+                <a target="_blank" rel="noreferrer">
                   <Button
                     as="span"
                     type="text"
