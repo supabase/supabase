@@ -129,7 +129,7 @@ export const formatNotificationText = (
                 {upgrade.changelog_link && (
                   <div className="!ml-4">
                     <Link href={upgrade.changelog_link}>
-                      <a>
+                      <a target="_blank" rel="noreferrer">
                         <IconExternalLink
                           className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
                           size={12}
