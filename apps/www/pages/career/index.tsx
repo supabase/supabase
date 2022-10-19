@@ -1,6 +1,7 @@
 import DefaultLayout from '~/components/Layouts/Default'
-import Image from 'next/image'
-import { Button, IconCheck, Input } from '@supabase/ui'
+// import Image from 'next/image'
+import Link from 'next/link'
+import { Button, IconCheck } from '@supabase/ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
 import career from '../../data/career.json'
@@ -12,21 +13,27 @@ const CareerPage = () => {
       <div className="text-scale-1200">
         <div className="container relative mx-auto px-6 py-10 lg:px-16 xl:px-20 text-center space-y-4">
           <span className="text-sm text-brand-900">Careers</span>
-          <h1 className="text-4xl text-[450]">Help build software developers love</h1>
-          <p className="text-scale-1000">
-            Explore remote opportunities and join our mission to help devs <br /> streamline the
-            creation of modern apps
+          <h1 className="text-3xl md:text-4xl">Help build software developers love</h1>
+          <p className="text-sm md:text-base text-scale-1000 sm:w-3/4 md:w-3/5 sm:mx-auto">
+            Explore remote opportunities and join our mission to help devs streamline the creation
+            of modern apps
           </p>
           <Button>Open positions</Button>
         </div>
 
         <SectionContainer>
-          <div className="md:flex md:items-start justify-between">
+          <div className="space-y-10 md:space-y-0 ml-4 md:ml-0 md:flex md:items-start justify-around">
             {career.company.map((company: { number: string; text: string }, i: number) => {
               return (
-                <div key={i} className="border-t-2 border-brand-900 min-w-[185px]">
-                  <h1 className="text-4xl text-[450] pt-3">{company.number}</h1>
-                  <ReactMarkdown>{company.text}</ReactMarkdown>
+                <div
+                  key={i}
+                  className="border-t-[1px] md:border-0 md:pt-2 border-brand-900 max-w-[134px] md:max-w-none"
+                >
+                  <div className="hidden md:block border-t-[1px] border-brand-900 w-[60px] lg:w-[100px]"></div>
+                  <h1 className="text-3xl lg:text-4xl pt-3">{company.number}</h1>
+                  <ReactMarkdown className="text-scale-1100 text-sm lg:text-base">
+                    {company.text}
+                  </ReactMarkdown>
                 </div>
               )
             })}
@@ -34,22 +41,22 @@ const CareerPage = () => {
         </SectionContainer>
 
         <div className="border-y-2 border-scale-400 bg-scale-100 overflow-clip">
-          <SectionContainer className="!py-0 !pb-16">
-            <div className="">
-              <div className="relative -top-[100px] -left-[200px] w-[525px] h-[525px] spect-square">
+          <SectionContainer className="!py-0 !pb-16 lg:!pt-16">
+            <div className="lg:flex lg:h-[500px]">
+              <div className="relative aspect-square -top-[110px] -left-[200px] w-[575px] sm:-top-[150px] sm:-left-[300px] sm:w-[850px] lg:-top-[225px] lg:-left-[330px] lg:w-[800px] lg:h-[800px] xl:-left-[300px] xl:-top-[210px] xl:w-[1000px]">
                 <Globe />
               </div>
-              <div className="relative -top-[75px]">
-                <h1 className="text-2xl text-[450]">We work together, wherever we are</h1>
-                <p className="text-scale-1100 mt-4 text-sm">
+              <div className="relative -top-[75px] lg:top-0 lg:-left-[325px] xl:-left-[150px] 2xl:-left-[50px] lg:min-w-[400px] lg:h-fit xl:mt-10">
+                <h1 className="text-2xl sm:text-3xl lg:w-3/4">We work together, wherever we are</h1>
+                <p className="text-scale-1100 mt-4 text-xs sm:text-sm md:w-5/6 lg:w-full">
                   We're 100% remote, globally distributed team. Working with a globally distributed
                   team can be challenging and rewarding. We have employees all over the world,
                   spanning 20 countries so we use tools like Notion, Slack, and Discord to stay
                   connected to our team, and our community.
                 </p>
                 <div>
-                  <div className="border-t-2 border-brand-900 mt-20"></div>
-                  <h1 className="text-2xl text-[450] pt-2">
+                  <div className="border-t-2 border-brand-900 w-2/5 sm:w-1/5 mt-20"></div>
+                  <h1 className="text-2xl sm:text-3xl pt-2 sm:w-3/5 md:w-4/5 lg:w-full">
                     We deeply believe in the efficacy of collaborative open source
                   </h1>
                 </div>
@@ -58,11 +65,11 @@ const CareerPage = () => {
           </SectionContainer>
 
           <SectionContainer>
-            <div className="flex gap-6">
-              <div className="w-1/2">
+            <div className="md:flex md:gap-6">
+              <div className="md:w-1/2">
                 <div>
-                  <h1 className="text-2xl text-[450]">What is Supabase</h1>
-                  <p className="text-scale-1100 text-sm pt-2">
+                  <h1 className="text-2xl sm:text-3xl">What is Supabase</h1>
+                  <p className="text-scale-1100 text-xs sm:text-sm pt-2">
                     Supabase is an open source Firebase alternative, built by developers for
                     developers. Supabase adds auth, realtime, storage, restful APIs and edge
                     functions to Postgres without a single line of code. Supabase was born-remote.
@@ -70,7 +77,7 @@ const CareerPage = () => {
                     hiring top-tier talent.
                   </p>
                 </div>
-                <div className="w-full rounded-md mt-40">
+                <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
                   <img
                     className="rounded-md"
                     src={'/images/career/1.jpg'}
@@ -78,16 +85,18 @@ const CareerPage = () => {
                     height="100%"
                   />
                 </div>
-                <div className="w-full rounded-md mt-6">
-                  <img
-                    className="rounded-md"
-                    src={'/images/career/2.jpg'}
-                    width="100%"
-                    height="100%"
-                  />
+                <div className="grid justify-items-end">
+                  <div className="w-5/6 md:w-full rounded-md mt-6">
+                    <img
+                      className="rounded-md"
+                      src={'/images/career/2.jpg'}
+                      width="100%"
+                      height="100%"
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="w-1/2">
+              <div className="mt-6 md:mt-0 md:w-1/2">
                 <div className="w-full rounded-md">
                   <img
                     className="rounded-md"
@@ -114,7 +123,7 @@ const CareerPage = () => {
                     />
                   </div>
                 </div>
-                <div className="w-full rounded-md mt-6">
+                <div className="w-5/6 md:w-full rounded-md mt-6">
                   <img
                     className="rounded-md"
                     src={'/images/career/6.jpg'}
@@ -127,23 +136,30 @@ const CareerPage = () => {
           </SectionContainer>
 
           <SectionContainer>
-            <h1 className="text-3xl text-[450]">Human powered</h1>
-            <p>
+            <h1 className="text-2xl sm:text-3xl">Human powered</h1>
+            <p className="text-scale-1100 text-xs sm:text-sm pt-3 sm:w-3/5">
               As a completely remote and asynchronous team, we focus on these four traits to keep
               our team effective:
             </p>
-            <div className="flex items-start justify-between pt-10">
+            <div className="sm:flex items-start justify-between pt-10 space-y-6 sm:space-y-0">
               {career.humanPowered.map(
                 (human: { icon: string; title: string; text: string }, i: number) => {
                   return (
-                    <div key={i}>
-                      <div className="w-10 h-10 bg-brand-700 rounded-md flex justify-center">
+                    <div
+                      key={i}
+                      className="flex sm:block items-center space-x-6 sm:space-x-0 sm:space-y-4 min-w-[150px]"
+                    >
+                      <div className="w-12 h-12 sm:w-10 sm:h-10 bg-brand-700 rounded-md flex justify-center">
                         <img className="rounded-md" src={human.icon} width="75%" height="75%" />
                       </div>
-                      <h2 className="text-md pt-4">{human.title}</h2>
-                      <ReactMarkdown className="text-scale-1100 text-xs">
-                        {human.text}
-                      </ReactMarkdown>
+                      <div>
+                        <h2 className="text-md sm:text-sm lg:text-md md:pt-4 lg:pt-0">
+                          {human.title}
+                        </h2>
+                        <ReactMarkdown className="text-scale-1100 text-xs">
+                          {human.text}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   )
                 }
@@ -153,28 +169,32 @@ const CareerPage = () => {
         </div>
 
         <SectionContainer>
-          <div className="flex items-start justify-between">
-            <div className="max-w-sm">
-              <h1 className="text-2xl text-[450] w-40">Great people deserve great benefits</h1>
-              <p className="text-scale-1100 text-sm pt-2">
+          <div className="xl:flex lg:items-start xl:gap-10 justify-between">
+            <div className="xl:min-w-[300px] xl:max-w-[360px]">
+              <h1 className="text-2xl sm:text-3xl md:w-1/2 lg:w-2/5 xl:w-full">
+                Great people deserve great benefits
+              </h1>
+              <p className="text-scale-1100 text-xs md:w-3/4 lg:w-3/5 xl:w-full sm:text-sm pt-3">
                 We offer competitive and comprehensive benefits, though lots of companies can offer
                 you those. We also have a rarer opportunity: The impact you can make from being at a
                 nimble startup, working on a platform that operates at a significant (and quickly
                 growing) scale.
               </p>
             </div>
-            <div className="">
+            <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-6">
               {career.benefits.map(
                 (benefits: { icon: string; title: string; text: string }, i: number) => {
                   return (
                     <div
-                      className="h-fit bg-scale-300 border-scale-400 border-[1px] p-8 rounded-lg flex max-w-md"
+                      className="h-full bg-scale-300 border-scale-400 border-[1px] p-8 rounded-lg flex max-w-md"
                       key={i}
                     >
                       <div>{benefits.icon}</div>
                       <div className="h-fit">
-                        <h2>{benefits.title}</h2>
-                        <ReactMarkdown className="prose text-sm">{benefits.text}</ReactMarkdown>
+                        <h2 className="sm:text-lg">{benefits.title}</h2>
+                        <ReactMarkdown className="prose text-xs sm:text-sm">
+                          {benefits.text}
+                        </ReactMarkdown>
                       </div>
                     </div>
                   )
@@ -185,9 +205,9 @@ const CareerPage = () => {
         </SectionContainer>
 
         <SectionContainer>
-          <div className="w-1/2">
-            <h1 className="text-3xl text-[450]">Open positions</h1>
-            <p className="text-sm text-scale-1100 pt-2">
+          <div className="md:w-3/4 lg:w-1/2">
+            <h1 className="text-2xl sm:text-3xl">Open positions</h1>
+            <p className="text-xs sm:text-sm text-scale-1100 pt-2">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
               incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
               exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
@@ -205,20 +225,23 @@ const CareerPage = () => {
                 i: number
               ) => {
                 return (
-                  <div
-                    key={i}
-                    className="flex items-center justify-around bg-scale-400 py-4 rounded-md"
-                  >
-                    <h2 className="text-2xl font-medium">{position.title}</h2>
-                    <div className="bg-brand-700 text-brand-900 border-brand-900 border-[1px] text-xs px-2.5 py-1 rounded-md flex items-center">
-                      <div>
-                        <img src="/images/career/icon/globe.svg" />
+                  <div className="cursor-pointer md:cursor-default" key={i}>
+                    <Link href={'#'}>
+                      <div className="text-xs bg-scale-400 p-4 rounded-md sm:flex sm:items-center">
+                        <h2 className="text-2xl min-w-max mr-4">{position.title}</h2>
+                        <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
+                          <div className="flex items-center space-x-4">
+                            <div className="bg-brand-700 text-brand-900 border-brand-900 border-[1px] px-2.5 py-1 rounded-md flex items-center">
+                              <img src="/images/career/icon/globe.svg" />
+                              <span className="ml-1">{position.location}</span>
+                            </div>
+                            <span className="hidden md:block">{position.employment}</span>
+                          </div>
+                          <p className="hidden lg:block lg:text-sm">{position.description}</p>
+                          <Button>Apply for position</Button>
+                        </div>
                       </div>
-                      <span className="ml-1">{position.location}</span>
-                    </div>
-                    <span className="text-sm text-scale-1100">{position.employment}</span>
-                    <p className="text-sm text-scale-1100">{position.description}</p>
-                    <Button>Apply for position</Button>
+                    </Link>
                   </div>
                 )
               }
@@ -227,49 +250,40 @@ const CareerPage = () => {
         </SectionContainer>
 
         <SectionContainer>
-          <div className="text-center w-1/2 mx-auto">
-            <h1 className="text-2xl">How we hire</h1>
-            <p className="text-sm text-scale-1100 pt-3">
+          <div className="text-center md:w-3/4 mx-auto">
+            <h1 className="text-2xl sm:text-3xl">How we hire</h1>
+            <p className="text-xs sm:text-sm text-scale-1100 pt-3">
               The entire process is fully remote and all communication happen over email or via
               video chat in Google. Meet. The calls are all 1:1 and usually take between 20-45
               minutes. We know you are interviewing us too, SO please ask questions. We are happy to
               answer.
             </p>
           </div>
-          <div className="mt-20 md:flex md:items-start">
+          <div className="mt-16 md:ml-36 lg:flex lg:items-start lg:w-fit lg:mx-auto">
             {career.hiring.map((hiring: { title: string; text: string }, i: number) => {
               return (
-                <div key={i + 1}>
-                  <div className="flex items-center">
-                    <h3 className="bg-brand-700 border-2 border-brand-900 text-brand-900 text-xl w-fit px-3.5 py-1 rounded-md">
+                <div
+                  key={i + 1}
+                  className="flex lg:block items-start space-x-6 lg:space-x-0 lg:max-w-[220px]"
+                >
+                  <div className="lg:flex items-center">
+                    <h3 className="bg-brand-700 border-2 border-brand-900 text-brand-900 text-xl text-center w-[44px] px-3.5 py-1 rounded-md">
                       {i + 1}
                     </h3>
-                    <div className="h-[1px] w-full bg-brand-900"></div>
+                    <div className="h-[150px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-900 lg:pr-6"></div>
                   </div>
-                  <div className="mt-6 w-3/4">
-                    <h2 className="text-md">{hiring.title}</h2>
-                    <p className="text-scale-1100 text-xs mt-1">{hiring.text}</p>
+                  <div className="lg:mt-6">
+                    <h2 className="text-lg sm:text-xl">{hiring.title}</h2>
+                    <p className="text-scale-1100 text-xs sm:text-sm mt-1 md:w-3/4">
+                      {hiring.text}
+                    </p>
                   </div>
                 </div>
               )
             })}
-            <h3 className="bg-brand-700 border-2 border-brand-900 text-brand-900 text-xl w-fit min-h-[40px] px-2 py-1 rounded-md flex items-center">
+            <h3 className="bg-brand-700 border-2 border-brand-900 text-brand-900 text-xl w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
               <IconCheck />
             </h3>
-          </div>
-        </SectionContainer>
-
-        <SectionContainer>
-          <div className="text-center w-fit mx-auto">
-            <h1 className="text-3xl">Stay connected</h1>
-            <p className="text-scale-1100 mt-3 text-sm">
-              Subscribe to our newsletter to recieve updates on open roles.
-            </p>
-            <div className="mt-8 space-y-8">
-              <Input label="Name" placeholder="John Doe" />
-              <Input label="Email" placeholder="janedoe@email.com" />
-              <Button>Subscribe</Button>
-            </div>
           </div>
         </SectionContainer>
       </div>

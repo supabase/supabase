@@ -31,10 +31,6 @@
       "text": "community members"
     },
     {
-      "number": "38k+",
-      "text": "GitHub stars"
-    },
-    {
       "number": "$116M+",
       "text": "in funding"
     }
@@ -42,8 +38,8 @@
   "humanPowered": [
     {
       "icon": "/images/career/icon/supabase.svg",
-      "title": "Egoless",
-      "text": "Willing to do the schlep, the\n\nteam goals come first."
+      "title": "Time to value",
+      "text": "Delight the user as fast as we can."
     },
     {
       "icon": "/images/career/icon/eye.svg",
@@ -58,7 +54,7 @@
     {
       "icon": "/images/career/icon/control.svg",
       "title": "Kaizen",
-      "text": "Continuously improve\n\nall functions."
+      "text": "Continuous improvement."
     }
   ],
   "benefits": [
@@ -75,7 +71,7 @@
     {
       "icon": "",
       "title": "Open Source",
-      "text": "Open Source is core to our culture. We deeply believe in the efficacy of collaboration, and support existing communities and tools before developing anything ourselves.\n\n[Read more about our Open Source](https://supabase.com/docs/oss)"
+      "text": "Open Source is core to our culture. We deeply believe in the efficacy of collaboration, and support existing communities and tools before developing anything ourselves. [Read more about our Open Source](https://supabase.com/docs/oss)"
     },
     {
       "icon": "",
@@ -139,7 +135,7 @@
       "text": "Meet with the team lead. In this interview we'll aim to learn about your hard skills and problem solving approach."
     },
     {
-      "title": "Another technical/skilled-based interview",
+      "title": "technical/skilled-based interview #2",
       "text": "You'll either meet the department lead or peer. This interview will dive deeper into your hard skills and our expectations for this role."
     },
     {
