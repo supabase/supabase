@@ -7,6 +7,9 @@ description: 'Learn how to upgrade to supabase-js v2.'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+supabase-js v2 focuses on "quality-of-life" improvements for developers and addresses some of the largest pain points in v1. v2 includes type support, a rebuilt Auth library with async methods, improved errors, and more.
+
+No new features will be added to supabase-js v1 , but we'll continuing merging security fixes to v1, with maintenance patches for the next 3 months.
 
 ## Upgrade the client library
 
@@ -15,7 +18,7 @@ import TabItem from '@theme/TabItem'
 npm install @supabase/supabase-js@2
 ```
 
-2. *Optionally* if you are using custom configuration with `createClient` then follow below:
+*Optionally* if you are using custom configuration with `createClient` then follow below:
 
 <Tabs
   groupId="version"
@@ -264,7 +267,7 @@ const { data: { user }, error } = await supabase.auth.updateUser({ attributes })
 </TabItem>
 </Tabs>
 
-### Use a custom `access_token` JWT with Supabase
+#### Use a custom `access_token` JWT with Supabase
 
 <Tabs
   groupId="version"
@@ -294,9 +297,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 </TabItem>
 </Tabs>
 
-## Data methods
+### Data methods
 
-### Insert and return data
+#### Insert and return data
 
 <Tabs
   groupId="version"
@@ -320,7 +323,7 @@ const { data, error } = await supabase.auth.insert({ new_data }).select()
 </TabItem>
 </Tabs>
 
-### Update and return data
+#### Update and return data
 
 <Tabs
   groupId="version"
@@ -344,9 +347,9 @@ const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).se
 </TabItem>
 </Tabs>
 
-## Realtime methods
+### Realtime methods
 
-### Subscribe
+#### Subscribe
 
 <Tabs
   groupId="version"
@@ -380,7 +383,7 @@ const userListener = supabase.channel('public:user')
 </TabItem>
 </Tabs>
 
-### Unsubscribe
+#### Unsubscribe
 
 <Tabs
   groupId="version"
