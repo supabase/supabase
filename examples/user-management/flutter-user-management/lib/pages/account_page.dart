@@ -35,7 +35,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occured');
+      context.showErrorSnackBar(message: 'Unexpected exception occurred');
     }
 
     setState(() {
@@ -65,7 +65,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occured');
+      context.showErrorSnackBar(message: 'Unexpeted error occurred');
     }
     setState(() {
       _loading = false;
@@ -78,7 +78,7 @@ class _AccountPageState extends State<AccountPage> {
     } on GoTrueException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/');
@@ -99,7 +99,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error has occured');
+      context.showErrorSnackBar(message: 'Unexpected error has occurred');
     }
     if (!mounted) {
       return;
