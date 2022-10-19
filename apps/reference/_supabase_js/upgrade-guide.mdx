@@ -1,0 +1,407 @@
+---
+id: upgrade-guide
+title: Upgrade guide
+description: Use Supabase to store and serve files.
+sidebar_label: Upgrade guide
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+# Upgrade guide
+
+Supabase.js upgrade guide.
+
+## Upgrading from version 1 to 2
+
+Supabase-js v2 is a major upgrade to the library with new api methods and a number of breaking changes.
+
+1. Update to the latest version:
+
+```sh
+npm install @supabase/supabase-js@2
+```
+
+2. *Optionally* if you are using custom configuration with `createClient` then follow below:
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts title="src/supabaseClient.ts"
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  schema: 'custom',
+  persistSession: false
+})
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts title="src/supabaseClient.ts"
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  db: {
+    schema: 'custom'
+  },
+  auth: {
+    persistSession: true
+  }
+})
+```
+</TabItem>
+</Tabs>
+
+You can read more about the constructor options in the [release notes](http://localhost:3010/docs/reference/javascript/release-notes#explicit-constructor-options).
+
+### Auth methods
+
+#### Signing in with email and password
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { user, error } = await supabase.auth.signIn({ email, password })
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password })
+```
+</TabItem>
+</Tabs>
+
+#### Sign in with magic link
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { error } = await supabase.auth.signIn({ email })
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { error } = await supabase.auth.signInWithOtp({ email })
+```
+</TabItem>
+</Tabs>
+
+#### Sign in with third party provider
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { error } = await supabase.auth.signIn({ provider })
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { error } = await supabase.auth.signInWithOAuth({ provider })
+```
+</TabItem>
+</Tabs>
+
+#### Sign in with phone
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { error } = await supabase.auth.signIn({ phone, password })
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { error } = await supabase.auth.signInWithPassword({ phone, password })
+```
+</TabItem>
+</Tabs>
+
+#### Sign in with phone using OTP
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { error } = await supabase.auth.api.sendMobileOTP(phone)
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data, error } = await supabase.auth.signInWithOtp({ phone })
+
+// After receiving a SMS with a OTP.
+const { data, error } = await supabase.auth.verifyOtp({ phone, token })
+```
+</TabItem>
+</Tabs>
+
+#### Resetting password for email
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data, error } = await supabase.auth.resetPasswordForEmail(email)
+```
+</TabItem>
+</Tabs>
+
+#### Get user current session
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const session = supabase.auth.session()
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data: { session } } = await supabase.auth.getSession()
+```
+</TabItem>
+</Tabs>
+
+#### Get logged in user
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const user = supabase.auth.user()
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data: { session } } = await supabase.auth.getSession()
+const { user } = session
+```
+</TabItem>
+</Tabs>
+
+#### Update user data for a logged in user
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { user, error } = await supabase.auth.update({ attributes })
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data: { user }, error } = await supabase.auth.updateUser({ attributes })
+```
+</TabItem>
+</Tabs>
+
+#### Using custom `access_token` jwt with supabase
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { user, error } = supabase.auth.setAuth(access_token)
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  global: { 
+    headers: {
+      Authorization: `Bearer ${access_token}`
+    }
+  }
+})
+```
+</TabItem>
+</Tabs>
+
+### Data methods
+
+#### Insert and return data
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { data, error } = await supabase.auth.insert({ new_data })
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data, error } = await supabase.auth.insert({ new_data }).select()
+```
+</TabItem>
+</Tabs>
+
+#### Update and return data
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const { data, error } = await supabase.auth.update({ new_data }).eq('id', id)
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).select()
+```
+</TabItem>
+</Tabs>
+
+### Realtime
+
+#### Realtime subscription
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+const userListener = supabase.from('users')
+  .on('*', 
+    (payload) => handleAllEventsPayload(payload.new)
+  )
+  .subscribe()
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+const userListener = supabase.channel('public:user')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'user' }
+    (payload) => handleAllEventsPayload()
+  )
+  .subscribe()
+```
+</TabItem>
+</Tabs>
+
+#### Realtime unsubscribe
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+userListener.unsubscribe()
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+supabase.removeChannel('public:users')
+```
+</TabItem>
+</Tabs>
