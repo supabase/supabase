@@ -224,6 +224,7 @@ const sidebars = {
             'guides/integrations/auth0',
             'guides/integrations/authsignal',
             'guides/integrations/clerk',
+            'guides/integrations/keyri',
             'guides/integrations/stytch',
             'guides/integrations/supertokens',
           ],
