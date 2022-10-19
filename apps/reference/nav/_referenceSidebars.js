@@ -80,6 +80,7 @@ const sidebars = {
             'guides/auth/row-level-security',
             'guides/auth/managing-user-data',
             'guides/auth/auth-captcha',
+            'guides/auth/server-side-rendering',
           ],
         },
         {
