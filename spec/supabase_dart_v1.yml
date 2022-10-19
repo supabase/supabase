@@ -1474,7 +1474,7 @@ pages:
   .like():
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
