@@ -17,16 +17,14 @@ Setting up Zoom logins for your application consists of 3 parts:
 - Add your Zoom OAuth keys to your [Supabase Project](https://app.supabase.com)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Steps
-
-### Access your Zoom Developer account
+## Access your Zoom Developer account
 
 - Go to [marketplace.zoom.us](https://marketplace.zoom.us/).
 - Click on `Sign In` at the top right to log in.
 
 ![Zoom Developer Portal.](/img/guides/auth-zoom/zoom-portal.png)
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
@@ -47,7 +45,7 @@ The next step requires a callback URL, which looks like this:
   />
 </video>
 
-### Create a Zoom Oauth App
+## Create a Zoom Oauth App
 
 - Go to [marketplace.zoom.us](https://marketplace.zoom.us/).
 - Click on `Sign In` at the top right to log in.
@@ -67,7 +65,7 @@ Under `Redirect URL for OAuth`
 - Paste your `Callback URL`
 - Click `Continue`
 
-### Enter your Zoom credentials into your Supabase Project
+## Enter your Zoom credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com)
 - In the left sidebar, click the `Authentication` icon (near the top)
@@ -77,27 +75,19 @@ Under `Redirect URL for OAuth`
 - Enter your `Zoom Client ID` and `Zoom Client Secret` saved in the previous step
 - Click `Save`
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'zoom',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `zoom` as the `provider`:
 
 ```js
 async function signInWithZoom() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'zoom',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

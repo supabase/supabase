@@ -1,15 +1,8 @@
 import Link from 'next/link'
 import React, { FC, useState } from 'react'
 import { partition, isEmpty, isUndefined } from 'lodash'
-import {
-  Alert,
-  Button,
-  IconEdit,
-  IconExternalLink,
-  IconHelpCircle,
-  IconKey,
-  IconTrash,
-} from '@supabase/ui'
+import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
+
 import {
   PostgresTable,
   PostgresColumn,
@@ -205,17 +198,17 @@ const ColumnManagement: FC<Props> = ({
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%]">
-              <h5 className="text-scale-900 text-xs">Name</h5>
+              <h5 className="text-xs text-scale-900">Name</h5>
             </div>
             <div className="w-[25%]">
-              <h5 className="text-scale-900 text-xs">Type</h5>
+              <h5 className="text-xs text-scale-900">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <h5 className="text-scale-900 text-xs">Default Value</h5>
+              <h5 className="text-xs text-scale-900">Default Value</h5>
 
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-scale-900 text-xs">
+                  <h5 className="text-xs text-scale-900">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -223,11 +216,11 @@ const ColumnManagement: FC<Props> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                      'border-scale-200 border ', //border
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                      'border border-scale-200 ', //border
                     ].join(' ')}
                   >
-                    <span className="text-scale-1200 text-xs">
+                    <span className="text-xs text-scale-1200">
                       Can be either a value or a SQL expression
                     </span>
                   </div>
@@ -235,7 +228,7 @@ const ColumnManagement: FC<Props> = ({
               </Tooltip.Root>
             </div>
             <div className="w-[10%]">
-              <h5 className="text-scale-900 text-xs">Primary</h5>
+              <h5 className="text-xs text-scale-900">Primary</h5>
             </div>
             {/* Empty space */}
             <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />
@@ -326,7 +319,7 @@ const ColumnManagement: FC<Props> = ({
             </Button>
           )}
           <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-            <a>
+            <a target="_blank" rel="noreferrer">
               <Button
                 type="text"
                 className="text-scale-1000 hover:text-scale-1200"

@@ -10,7 +10,7 @@ import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { Badge } from '@supabase/ui'
+import { Badge } from 'ui'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
@@ -33,7 +33,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   return (
     <div
       className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
-        headerBorder ? 'dark:border-dark border-b' : ''
+        headerBorder ? 'border-b dark:border-dark' : ''
       }`}
     >
       <div className="-ml-2 flex items-center text-sm">
@@ -78,7 +78,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         ) : (
           <Link href="/">
             <a
-              className={`text-scale-1200 cursor-pointer px-2 py-1 text-xs focus:bg-transparent focus:outline-none`}
+              className={`cursor-pointer px-2 py-1 text-xs text-scale-1200 focus:bg-transparent focus:outline-none`}
             >
               Supabase
             </a>

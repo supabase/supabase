@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isEqual } from 'lodash'
-import { Input, Button, IconPlus, Select, IconX } from '@supabase/ui'
+import { Input, Button, IconPlus, Select, IconX } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'

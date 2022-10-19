@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isUndefined, includes } from 'lodash'
-import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from '@supabase/ui'
+import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from 'ui'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
@@ -24,26 +24,53 @@ const InputField: FC<Props> = ({
   onViewForeignKey = () => {},
 }) => {
   if (field.enums.length > 0) {
-    return (
-      <Select
-        size="medium"
-        layout="horizontal"
-        value={field.value ?? ''}
-        label={field.name}
-        labelOptional={field.format}
-        descriptionText={field.comment}
-        disabled={!isEditable}
-        error={errors[field.name]}
-        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-      >
-        <Select.Option value="">---</Select.Option>
-        {field.enums.map((value: string) => (
-          <Select.Option key={value} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
-    )
+    const isArray = field.format[0] === '_'
+    if (isArray) {
+      return (
+        <div className="text-area-text-sm">
+          <Input.TextArea
+            layout="horizontal"
+            label={field.name}
+            className="text-sm"
+            descriptionText={field.comment}
+            labelOptional={field.format}
+            disabled={!isEditable}
+            error={errors[field.name]}
+            rows={5}
+            value={field.value ?? ''}
+            placeholder={
+              field.defaultValue === null
+                ? ''
+                : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+                ? 'Default: Empty string'
+                : `Default: ${field.defaultValue}`
+            }
+            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          />
+        </div>
+      )
+    } else {
+      return (
+        <Select
+          size="medium"
+          layout="horizontal"
+          value={field.value ?? ''}
+          label={field.name}
+          labelOptional={field.format}
+          descriptionText={field.comment}
+          disabled={!isEditable}
+          error={errors[field.name]}
+          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+        >
+          <Select.Option value="">---</Select.Option>
+          {field.enums.map((value: string) => (
+            <Select.Option key={value} value={value}>
+              {value}
+            </Select.Option>
+          ))}
+        </Select>
+      )
+    }
   }
 
   if (!isUndefined(field.foreignKey)) {
@@ -144,7 +171,12 @@ const InputField: FC<Props> = ({
         name={field.name}
         format={field.format}
         value={field.value ?? ''}
-        description={field.comment}
+        description={
+          <>
+            {field.defaultValue && <p>Default: {field.defaultValue}</p>}
+            {field.comment && <p>{field.comment}</p>}
+          </>
+        }
         onChange={(value: any) => onUpdateField({ [field.name]: value })}
       />
     )

@@ -89,7 +89,20 @@ export class SqlRowService implements IRowService {
     const pageFromZero = page > 0 ? page - 1 : page
     const from = pageFromZero * rowsPerPage
     const to = (pageFromZero + 1) * rowsPerPage - 1
-    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).select()
+
+    const enumArrayColumns = this.table.columns
+      .filter((column) => {
+        return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
+
+    let queryChains =
+      enumArrayColumns.length > 0
+        ? this.query
+            .from(this.table.name, this.table.schema ?? undefined)
+            .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
+        : this.query.from(this.table.name, this.table.schema ?? undefined).select()
+
     filters
       .filter((x) => x.value && x.value != '')
       .forEach((x) => {
@@ -174,6 +187,11 @@ export class SqlRowService implements IRowService {
       // remove primary key from updated value object
       delete value[key]
     })
+    const enumArrayColumns = this.table.columns
+      .filter((column) => {
+        return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
     const query = this.query
       .from(this.table.name, this.table.schema ?? undefined)
       .update(
@@ -182,7 +200,7 @@ export class SqlRowService implements IRowService {
               [changedColumn]: value[changedColumn],
             }
           : value,
-        { returning: true }
+        { returning: true, enumArrayColumns }
       )
       .match(matchValues)
       .toSql()

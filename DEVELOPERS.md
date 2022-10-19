@@ -195,6 +195,15 @@ The monorepo has a set of shared components under `/packages`:
 - `/packages/config`: All shared config
 - `/packages/spec`: Generates documentation using spec files.
 - `/packages/tsconfig`: Shared Typescript settings
+- `/packages/ui`: Shared UI components (formerly @supabase/ui)
+
+To use these 'packages', or any of their components from a Next.JS app, you must use `next-transpile-modules` in the `next.config.js` file. This looks like:
+
+```tsx
+// next.config.js
+const withTM = require('next-transpile-modules')(['ui', 'common'])
+module.exports = withTM({})
+```
 
 ### Installing packages
 
