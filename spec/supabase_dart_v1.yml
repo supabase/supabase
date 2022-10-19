@@ -7,7 +7,7 @@ info:
 
     Supabase Dart.
 
-  definition: ../../spec/enrichments/tsdoc_v1/combined.json
+  definition: ../../spec/enrichments/tsdoc_v2/combined.json
   slugPrefix: '/'
   specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1.yml
   libraries:
@@ -750,7 +750,7 @@ pages:
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -769,7 +769,7 @@ pages:
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.getBucket'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -859,7 +859,7 @@ pages:
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.upload'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
