@@ -34,8 +34,8 @@ const headerNames = {
     icon: 'javascript-icon',
   },
   dart: {
-    name: 'Dart',
-    icon: 'dart-icon',
+    name: 'Flutter',
+    icon: 'flutter-icon',
   },
   'auth-helpers': {
     name: 'Auth Helpers',
