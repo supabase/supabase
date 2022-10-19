@@ -12,7 +12,6 @@ import UpdateSuccess from './UpdateSuccess'
 import Invoices from './Invoices'
 
 export * from './Subscription/Subscription.types'
-export * from './PAYGUsage/PAYGUsage.constants'
 export {
   PAYGUsage,
   Subscription,
