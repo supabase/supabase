@@ -78,7 +78,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                   </a>
                 </Link>
                 <Link href="https://supabase.com/docs/guides/database">
-                  <a>
+                  <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink size={14} />}>
                       About Database
                     </Button>
@@ -120,7 +120,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                       </a>
                     </Link>
                     <Link href="https://supabase.com/docs/guides/auth">
-                      <a>
+                      <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
                           icon={<IconExternalLink size={14} />}
@@ -154,7 +154,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                       </a>
                     </Link>
                     <Link href="https://supabase.com/docs/guides/storage">
-                      <a>
+                      <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
                           icon={<IconExternalLink size={14} />}
@@ -189,7 +189,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                       </a>
                     </Link>
                     <Link href="https://supabase.com/docs/guides/functions">
-                      <a>
+                      <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
                           icon={<IconExternalLink size={14} />}
@@ -217,7 +217,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Link href="https://supabase.com/docs/guides/realtime">
-                      <a>
+                      <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
                           icon={<IconExternalLink size={14} />}
@@ -258,7 +258,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
               </a>
             </Link>
             <Link href="https://supabase.com/docs/guides/api">
-              <a>
+              <a target="_blank" rel="noreferrer">
                 <Button className="translate-y-[1px]" type="default" icon={<IconExternalLink />}>
                   About APIs
                 </Button>

@@ -103,12 +103,27 @@ const OrgSettingsLayout = withAuth(
 )
 
 const OrganizationSettings: NextPageWithLayout = () => {
+  const router = useRouter()
   const PageState: any = useContext(PageContext)
   const { ui, app } = useStore()
   const [selectedTab, setSelectedTab] = useState('GENERAL')
-  const { members, isError: isOrgDetailError } = useOrganizationDetail(
-    ui.selectedOrganization?.slug || ''
-  )
+  const slug = ui.selectedOrganization?.slug || ''
+  const { members, isError: isOrgDetailError } = useOrganizationDetail(slug || '')
+  const hash = router.asPath.split('#')[1]?.toUpperCase()
+
+  useEffect(() => {
+    if (hash) {
+      setSelectedTab(hash)
+    }
+  }, [hash])
+
+  function handleChangeTab(id: string) {
+    setSelectedTab(id)
+    router.push({
+      pathname: `/org/${slug}/settings`,
+      hash: id.toLowerCase(),
+    })
+  }
 
   useEffect(() => {
     if (!isOrgDetailError) {
@@ -128,7 +143,7 @@ const OrganizationSettings: NextPageWithLayout = () => {
           <h1 className="text-3xl">{organization?.name || 'Organization'} settings</h1>
         </section>
         <nav className="">
-          <Tabs onChange={(id: any) => setSelectedTab(id)} type="underlined">
+          <Tabs onChange={(id: string) => handleChangeTab(id)} type="underlined">
             <Tabs.Panel id="GENERAL" label="General" />
             <Tabs.Panel id="TEAM" label="Team" />
             <Tabs.Panel id="BILLING" label="Billing" />

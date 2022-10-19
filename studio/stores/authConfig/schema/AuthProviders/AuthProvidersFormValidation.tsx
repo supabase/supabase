@@ -356,7 +356,8 @@ const EXTERNAL_PROVIDER_AZURE = {
     },
     EXTERNAL_AZURE_SECRET: {
       // [TODO] Change docs
-      title: 'Secret ID',
+      title: 'Secret Value',
+      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/auth-azure#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
