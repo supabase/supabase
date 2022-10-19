@@ -1,5 +1,6 @@
 import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSWRConfig } from 'swr'
 import { Button, Form, Input } from 'ui'
@@ -69,6 +70,11 @@ const LoginForm = () => {
               type="password"
               label="Password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+              labelOptional={
+                <Link href="/forgot-password">
+                  <a>Forgot Password?</a>
+                </Link>
+              }
             />
 
             <Button
