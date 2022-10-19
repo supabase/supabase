@@ -16,7 +16,11 @@ const Landing = () => {
       const { error } = await auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?auth=true`,
+          redirectTo: `${
+            process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+              ? process.env.NEXT_PUBLIC_VERCEL_URL
+              : process.env.NEXT_PUBLIC_SITE_URL
+          }?auth=true`,
         },
       })
       if (error) throw error

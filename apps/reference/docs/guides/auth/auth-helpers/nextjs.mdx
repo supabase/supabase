@@ -31,7 +31,8 @@ This library supports the following tooling versions:
 - Node.js: `^10.13.0 || >=12.0.0`
 - Next.js: `>=10`
 
-Optionally, install **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
+Additionally, install the **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
+
 ```sh
 npm install @supabase/auth-helpers-react
 ```
@@ -48,7 +49,7 @@ This library supports the following tooling versions:
 - Node.js: `^10.13.0 || >=12.0.0`
 - Next.js: `>=10`
 
-Optionally, install **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
+Additionally, install the **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
 
 ```sh
 yarn add @supabase/auth-helpers-react
@@ -61,23 +62,30 @@ yarn add @supabase/auth-helpers-react
 
 Retrieve your project URL and anon key in your project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```bash title=".env.local"
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
 ## Basic Setup
 
+<Tabs
+  defaultValue="js"
+  values={[
+    {label: 'JavaScript', value: 'js'},
+    {label: 'TypeScript', value: 'ts'},
+  ]}>
+<TabItem value="js">
+
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
 ```jsx title="pages/_app.js"
-import React from 'react'
-import { useRouter } from 'next/router'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }) {
   const router = useRouter()
+  // Create a new supabase browser client on every first render.
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
 
   return (
@@ -85,20 +93,45 @@ function MyApp({ Component, pageProps }: AppProps) {
       supabaseClient={supabaseClient}
       initialSession={pageProps.initialSession}
     >
-      <button
-        onClick={async () => {
-          await supabaseClient.auth.signOut()
-          router.push('/')
-        }}
-      >
-        Logout
-      </button>
-
       <Component {...pageProps} />
     </SessionContextProvider>
   )
 }
 ```
+
+</TabItem>
+<TabItem value="ts">
+
+Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
+
+```jsx title="pages/_app.tsx"
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+// highlight-next-line
+import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
+
+function MyApp({
+  Component,
+  pageProps,
+}: AppProps<{
+  // highlight-next-line
+  initialSession: Session,
+}>) {
+  // Create a new supabase browser client on every first render.
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient())
+
+  return (
+    <SessionContextProvider
+      supabaseClient={supabaseClient}
+      initialSession={pageProps.initialSession}
+    >
+      <Component {...pageProps} />
+    </SessionContextProvider>
+  )
+}
+```
+
+</TabItem>
+</Tabs>
 
 You can now determine if a user is authenticated by checking that the `user` object returned by the `useUser()` hook is defined.
 
@@ -106,37 +139,59 @@ You can now determine if a user is authenticated by checking that the `user` obj
 
 You can pass types that were [generated with the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types) to the Supabase Client to get enhanced type safety and auto completion:
 
-```js
-// Creating a new supabase client object:
-import { Database } from '../db_types';
+### Browser client
 
-const [supabaseClient] = useState(() =>
-    createBrowserSupabaseClient<Database>()
-  );
+```ts
+// Creating a new supabase client object:
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { Database } from '../database.types'
+
+const supabaseClient = createBrowserSupabaseClient<Database>()
 ```
 
-```js
+```ts
 // Retrieving a supabase client object from the SessionContext:
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { Database } from '../db_types';
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { Database } from '../database.types'
 
-const supabaseClient = useSupabaseClient<Database>();
+const supabaseClient = useSupabaseClient<Database>()
+```
+
+### Server client
+
+```ts
+// Creating a new supabase server client object (e.g. in API route):
+import type { NextApiRequest, NextApiResponse } from 'next'
+import type { Database } from 'types_db'
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const supabaseServerClient = createServerSupabaseClient<Database>({
+    req,
+    res,
+  })
+  const {
+    data: { user },
+  } = await supabaseServerClient.auth.getUser()
+
+  res.status(200).json({ name: user?.name ?? '' })
+}
 ```
 
 ## Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSessionContext` hook and only run your query once the user is defined client-side in the `useUser()` hook:
+For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSupabaseClient` hook and only run your query once the user is defined client-side in the `useUser()` hook:
 
 ```js
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import { useUser, useSessionContext } from '@supabase/auth-helpers-react'
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 
 const LoginPage = () => {
-  const { isLoading, session, error, supabaseClient } = useSessionContext()
+  const supabaseClient = useSupabaseClient()
   const user = useUser()
   const [data, setData] = useState()
 
+  // highlight-start
   useEffect(() => {
     async function loadData() {
       const { data } = await supabaseClient.from('test').select('*')
@@ -145,19 +200,17 @@ const LoginPage = () => {
     // Only run query once user is logged in.
     if (user) loadData()
   }, [user])
+  // highlight-end
 
   if (!user)
     return (
-      <>
-        {error && <p>{error.message}</p>}
-        <Auth
-          redirectTo="http://localhost:3000/"
-          appearance={{ theme: ThemeSupa }}
-          supabaseClient={supabaseClient}
-          providers={['google', 'github']}
-          socialLayout="horizontal"
-        />
-      </>
+      <Auth
+        redirectTo="http://localhost:3000/"
+        appearance={{ theme: ThemeSupa }}
+        supabaseClient={supabaseClient}
+        providers={['google', 'github']}
+        socialLayout="horizontal"
+      />
     )
 
   return (
@@ -174,7 +227,7 @@ const LoginPage = () => {
 export default LoginPage
 ```
 
-### Server-side rendering (SSR) - withPageAuth
+## Server-side rendering (SSR) - withPageAuth
 
 If you wrap your `getServerSideProps` with `withPageAuth` your props object will be augmented with the user object.
 
@@ -191,7 +244,7 @@ export const getServerSideProps = withPageAuth({ redirectTo: '/login' })
 If there is no authenticated user, they will be redirect to your home page, unless you specify the `redirectTo` option.
 
 You can pass in your own `getServerSideProps` method, the props returned from this will be merged with the
-user props. You can also access the user session data by calling `getUser` inside of this method, eg:
+user props. You can also access the user session data by calling `supabase.auth.getUser()` inside of this method, eg:
 
 ```js title="pages/protected-page.js"
 import { withPageAuth } from '@supabase/auth-helpers-nextjs'
@@ -212,7 +265,7 @@ export const getServerSideProps = withPageAuth({
 })
 ```
 
-### Server-side data fetching with RLS
+## Server-side data fetching with RLS
 
 Both `withApiAuth` and `withPageAuth` return a supabase client that you can use to run [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
 
@@ -245,44 +298,62 @@ export const getServerSideProps = withPageAuth({
 })
 ```
 
-### Server-side data fetching to OAuth APIs using `provider_token`
+## Server-side data fetching to OAuth APIs using `provider_token`
 
 When using third-party auth providers, sessions are initiated with an additional `provider_token` field which is persisted as an HTTPOnly cookie upon logging in to enabled usage on the server side. The `provider_token` can be used to make API requests to the OAuth provider's API endpoints on behalf of the logged-in user. In the following example, we fetch the user's full profile from the third-party API during SSR using their id and auth token:
 
 ```js
-import { User, withPageAuth, getUser } from '@supabase/auth-helpers-nextjs'
-
-interface Profile {
-  /* ... */
-}
+import { User, withPageAuth } from '@supabase/auth-helpers-nextjs'
 
 export default function ProtectedPage({
   user,
-  data,
+  allRepos,
 }: {
   user: User,
-  profile: Profile,
+  allRepos: any,
 }) {
-  return <div>Protected content</div>
+  return (
+    <>
+      <div>Protected content for {user.email}</div>
+      <p>Data fetched with provider token:</p>
+      <pre>{JSON.stringify(allRepos, null, 2)}</pre>
+      <p>user:</p>
+      <pre>{JSON.stringify(user, null, 2)}</pre>
+    </>
+  )
 }
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/',
-  async getServerSideProps(ctx) {
-    // Retrieve provider_token from cookies
-    const provider_token = ctx.req.cookies['sb-provider-token']
-    // Get logged in user's third-party id from metadata
-    const { user } = await getUser(ctx)
-    const userId = user?.user_metadata.provider_id
-    const profile: Profile = await (
-      await fetch(`https://api.example.com/users/${userId}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${provider_token}`,
-        },
-      })
+  async getServerSideProps(ctx, supabase) {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession()
+    if (error) {
+      throw error
+    }
+    if (!session) {
+      return { props: {} }
+    }
+
+    // Retrieve provider_token & logged in user's third-party id from metadata
+    const { provider_token, user } = session
+    const userId = user.user_metadata.user_name
+
+    const allRepos = await (
+      await fetch(
+        `https://api.github.com/search/repositories?q=user:${userId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `token ${provider_token}`,
+          },
+        }
+      )
     ).json()
-    return { props: { profile } }
+
+    return { props: { allRepos, user } }
   },
 })
 ```
@@ -355,6 +426,7 @@ export const config = {
   </button>
   ```
 - The `supabaseClient` and `supabaseServerClient` have been removed in favor of the `createBrowserSupabaseClient` and `createServerSupabaseClient` methods. This allows you to provide the CLI-generated types to the client:
+
   ```js
   // client-side
   import type { Database } from 'types_db';
@@ -373,12 +445,14 @@ export const config = {
     res.status(200).json({ name: user?.name ?? '' })
   }
   ```
+
 - The `UserProvider` has been replaced by the `SessionContextProvider`. Make sure to wrap your `pages/_app.js` componenent with the `SessionContextProvider`. Then, throughout your application you can use the `useSessionContext` hook to get the `session` and the `useSupabaseClient` hook to get an authenticated `supabaseClient`.
 - The `useUser` hook now returns the `user` object or `null`.
 - Usage with TypeScript: You can pass types that were [generated with the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types) to the Supabase Client to get enhanced type safety and auto completion:
+
   ```js
   // Creating a new supabase client object:
-  import { Database } from '../db_types';
+  import { Database } from '../database.types';
 
   const [supabaseClient] = useState(() =>
       createBrowserSupabaseClient<Database>()
@@ -388,7 +462,7 @@ export const config = {
   ```js
   // Retrieving a supabase client object from the SessionContext:
   import { useSupabaseClient } from '@supabase/auth-helpers-react';
-  import { Database } from '../db_types';
+  import { Database } from '../database.types';
 
   const supabaseClient = useSupabaseClient<Database>();
   ```

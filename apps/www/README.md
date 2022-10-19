@@ -16,7 +16,6 @@ cd supabase
 npm install
 npm run dev
 
-
 # visit website
 http://localhost:3000
 ```
