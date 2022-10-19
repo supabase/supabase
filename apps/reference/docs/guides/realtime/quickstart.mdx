@@ -103,7 +103,7 @@ const channel = supabase.channel('calc-latency', {
 })
 
 channel.subscribe(async (status) => {
-    if (status === 'SUBSCRIBED) {
+    if (status === 'SUBSCRIBED') {
       const begin = performance.now()
 
       await channel.send({

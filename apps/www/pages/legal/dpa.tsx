@@ -49,11 +49,7 @@ const DPA = () => {
                   ("DPA").
                 </p>
 
-                <p>
-                  You can download the latest DPA document through our{' '}
-                  <Link href="https://security.supabase.com/">security portal</Link>, or by
-                  submitting your email here.
-                </p>
+                <p>You can download our latest DPA document by submitting your email here.</p>
 
                 {formSubmitted ? (
                   <p className="text-brand-900">
