@@ -1,5 +1,4 @@
 import { Project } from 'types'
-import { IS_PLATFORM } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { useFlag } from 'hooks'
 
@@ -30,37 +29,27 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/logs/postgrest-logs`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Auth logs',
-                key: 'auth-logs',
-                url: `/project/${ref}/logs/auth-logs`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Storage logs',
-                key: 'storage-logs',
-                url: `/project/${ref}/logs/storage-logs`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(logsRealtime
-          ? [
-              {
-                name: 'Realtime logs',
-                key: 'realtime-logs',
-                url: `/project/${ref}/logs/realtime-logs`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && reportsOverview
+        {
+          name: 'Auth logs',
+          key: 'auth-logs',
+          url: `/project/${ref}/logs/auth-logs`,
+          items: [],
+        },
+        {
+          name: 'Storage logs',
+          key: 'storage-logs',
+          url: `/project/${ref}/logs/storage-logs`,
+          items: [],
+        },
+
+        {
+          name: 'Realtime logs',
+          key: 'realtime-logs',
+          url: `/project/${ref}/logs/realtime-logs`,
+          items: [],
+        },
+
+        ...(reportsOverview
           ? [
               {
                 name: 'API usage',
