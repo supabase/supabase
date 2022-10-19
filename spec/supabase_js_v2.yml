@@ -4808,7 +4808,7 @@ pages:
     title: 'invoke()'
     description: |
       Invoke a Supabase Function.
-    $ref: '@supabase/functions-js.index.FunctionsClient.invoke'
+    $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
