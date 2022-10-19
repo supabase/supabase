@@ -5,14 +5,6 @@ import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
 const registerSchema = object({
-  username: string()
-    .max(39, 'Username is too long (maximum is 39 characters)')
-    .matches(
-      // Username regex is 'borrowed' from GitHub
-      /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i,
-      'Username may only contain alphanumeric characters or single hyphens, and cannot begin or end with a hyphen'
-    )
-    .required('Username is required'),
   email: string().email('Must be a valid email').required('Email is required'),
   password: string()
     .required('Password is required')
@@ -23,21 +15,13 @@ const RegisterForm = () => {
   const { ui } = useStore()
   const router = useRouter()
 
-  const onRegister = async ({
-    username,
-    email,
-    password,
-  }: {
-    username: string
-    email: string
-    password: string
-  }) => {
+  const onRegister = async ({ email, password }: { email: string; password: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Registering...`,
     })
 
-    const { error } = await auth.signUp({ email, password, options: { data: { username } } })
+    const { error } = await auth.signUp({ email, password })
 
     if (!error) {
       ui.setNotification({
@@ -67,14 +51,6 @@ const RegisterForm = () => {
       {({ isSubmitting }: { isSubmitting: boolean }) => {
         return (
           <div className="flex flex-col gap-4">
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              label="Username"
-              placeholder="your-username"
-            />
-
             <Input
               id="email"
               name="email"
