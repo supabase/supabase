@@ -5,6 +5,21 @@ on:
     branches:
       - master
 jobs:
+  boost-codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run CodeQL
+        uses: boostsecurityio/boostsec-scanner-github@v4
+        with:
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          registry_module: boostsecurityio/codeql
+        env:
+          CODEQL_LANGUAGE: javascript
+              
+
   boost-native:
     name: Native Scanner
     runs-on: ubuntu-latest
