@@ -1,21 +1,26 @@
+import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 
-import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
 import rewrites from './lib/rewrites.js'
 import redirects from './lib/redirects.js'
-import withTmInitializer from 'next-transpile-modules'
-import withPlugins from 'next-compose-plugins'
 
-const withTM = withTmInitializer(['ui', 'common'])
+import withTM from 'next-transpile-modules'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],
+    // This is required for `MDXProvider` component
+    providerImportSource: '@mdx-js/react',
   },
+})
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
 })
 
 const nextConfig = {
@@ -69,4 +74,8 @@ const nextConfig = {
   },
 }
 
-export default withPlugins([withTM, withMDX], nextConfig)
+// next.config.js
+export default () => {
+  const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common'])]
+  return plugins.reduce((acc, next) => next(acc), nextConfig)
+}
