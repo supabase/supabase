@@ -3,7 +3,7 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.0.0-rc.12'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.0.0'
 import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "select-from-table-with-auth-rls" up and running!`)
