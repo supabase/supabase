@@ -65,12 +65,14 @@ async function signInWithWorkOS() {
   const { data, error } = await supabase.auth.signInWithOAuth(
     {
       provider: 'workos',
+      options: {
+        queryParams: {
+          connection: '<your_connection>',
+          organization: '<your_organization',
+          provider: '<your_provider>',
+        }
+      }
     },
-    {
-      connection: '<your_connection>',
-      organization: '<your_organization',
-      provider: '<your_provider>',
-    }
   )
 }
 ```

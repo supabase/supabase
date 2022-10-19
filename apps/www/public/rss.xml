@@ -5,14 +5,21 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 04 Oct 2022 02:02:30 +0000</lastBuildDate>
+      <lastBuildDate>Tue, 11 Oct 2022 16:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</guid>
+  <title>Postgres FTS vs the rest</title>
+  <link>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</link>
+  <description>Comparing one of the most popular Postgres features against alternatives</description>
+  <pubDate>Tue, 11 Oct 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-beta-update-september-2022</guid>
   <title>Supabase Beta September 2022</title>
   <link>https://supabase.com/blog/supabase-beta-update-september-2022</link>
   <description>We were too focused on clearing out the backlog so we didn't ship anything new last month... or did we?!</description>
-  <pubDate>Tue, 04 Oct 2022 02:02:30 +0000</pubDate>
+  <pubDate>Tue, 04 Oct 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-wasm</guid>
