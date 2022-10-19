@@ -61,7 +61,7 @@ class CreateHookFormState {
       enabled_mode: this.enabledMode.value,
       events: this.events.value,
       function_args: [
-        this.serviceUrl.value,
+        this.serviceUrl.value.replaceAll(' ', ''),
         this.serviceMethod.value,
         JSON.stringify(mapValues(keyBy(this.serviceHeaders.value, 'name'), 'value')),
         formatArguments(this.serviceParams.value),
