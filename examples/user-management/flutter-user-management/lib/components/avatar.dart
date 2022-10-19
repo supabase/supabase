@@ -80,7 +80,7 @@ class _AvatarState extends State<Avatar> {
       }
     } catch (error) {
       if (mounted) {
-        context.showErrorSnackBar(message: 'Unexpected error occured');
+        context.showErrorSnackBar(message: 'Unexpected error occurred');
       }
     }
 
