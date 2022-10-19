@@ -61,7 +61,7 @@ final appTheme = ThemeData.dark().copyWith(
 );
 
 extension ShowSnackBar on BuildContext {
-  /// Extension method to easily display error snack bar.
+  /// Extention method to easily display error snack bar.
   void showErrorSnackbar(String text) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
