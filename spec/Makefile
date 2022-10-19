@@ -33,14 +33,13 @@ download.tsdoc.v1:
 	curl -sS https://supabase.github.io/storage-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/storage.json
 	curl -sS https://supabase.github.io/functions-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/functions.json
 
-
 download.tsdoc.v2:
-	@echo ""
-	@echo "WARNING ............................................................"
-	@echo "WARNING: tsdoc v2 is not yet available for download"
-	@echo "WARNING: files should be updated manually"
-	@echo "WARNING ............................................................"
-	@echo ""
+	curl -sS https://supabase.github.io/supabase-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/supabase.json
+	curl -sS https://supabase.github.io/gotrue-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json
+	curl -sS https://supabase.github.io/postgrest-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json
+	curl -sS https://supabase.github.io/realtime-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/realtime.json
+	curl -sS https://supabase.github.io/storage-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/storage.json
+	curl -sS https://supabase.github.io/functions-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/functions.json
 
 ###############################################################################
 # Transform docs into working files
