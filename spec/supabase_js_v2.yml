@@ -81,6 +81,23 @@ pages:
           `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
           but an alternative `fetch` implementation can be provided as an option.
           This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
+      - name: React Native options
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+          import AsyncStorage from "@react-native-async-storage/async-storage";
+
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key" {
+            auth: {
+              storage: AsyncStorage,
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: false,
+            },
+          });
+          ```
+
+          For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
   auth.signUp():
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
