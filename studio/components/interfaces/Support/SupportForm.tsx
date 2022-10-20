@@ -21,17 +21,17 @@ const MAX_ATTACHMENTS = 5
 
 // [Joshen] Note to self - need to double check that this will work with the actual ticket submission to Hubspot too
 // Remaining
-// - Github issues link for problems
-// - Github discussions/discord link for best practices
+// - [x] Github issues link for problems
+// - [x] Github discussions/discord link for best practices
+// - Improve success state of submission
+// - Integrate with API and Hubspot
 // Do a screen grab, get approval from Ant/Jonny
-// Integrate with API
-// Improve success state of submission
 
 interface Props {
-  setSent: (value: boolean) => void
+  setSentCategory: (value: string) => void
 }
 
-const SupportForm: FC<Props> = ({ setSent }) => {
+const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const { ui, app } = useStore()
   const router = useRouter()
   const { ref, category } = router.query
@@ -127,39 +127,42 @@ const SupportForm: FC<Props> = ({ setSent }) => {
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
-    const attachments = uploadedFiles
-      ? await uploadAttachments(values.projectRef, uploadedFiles)
-      : []
-    const payload = {
-      ...values,
-      message: formatMessage(values.body, attachments),
-      verified: true,
-      tags: ['dashboard-support-form'],
-      siteUrl: '',
-      additionalRedirectUrls: '',
-    }
+    setSentCategory(values.category)
+    return
 
-    if (values.projectRef !== 'no-project') {
-      const URL = `${API_URL}/auth/${values.projectRef}/config`
-      const authConfig = await get(URL)
-      if (!authConfig.error) {
-        payload.siteUrl = authConfig.SITE_URL
-        payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
-      }
-    }
+    // setSubmitting(true)
+    // const attachments = uploadedFiles
+    //   ? await uploadAttachments(values.projectRef, uploadedFiles)
+    //   : []
+    // const payload = {
+    //   ...values,
+    //   message: formatMessage(values.body, attachments),
+    //   verified: true,
+    //   tags: ['dashboard-support-form'],
+    //   siteUrl: '',
+    //   additionalRedirectUrls: '',
+    // }
 
-    const response = await post(`${API_URL}/feedback/send`, payload)
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to submit support ticket: ${response.error.message}`,
-      })
-    } else {
-      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-      setSent(true)
-    }
-    setSubmitting(false)
+    // if (values.projectRef !== 'no-project') {
+    //   const URL = `${API_URL}/auth/${values.projectRef}/config`
+    //   const authConfig = await get(URL)
+    //   if (!authConfig.error) {
+    //     payload.siteUrl = authConfig.SITE_URL
+    //     payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+    //   }
+    // }
+
+    // const response = await post(`${API_URL}/feedback/send`, payload)
+    // if (response.error) {
+    //   ui.setNotification({
+    //     category: 'error',
+    //     message: `Failed to submit support ticket: ${response.error.message}`,
+    //   })
+    // } else {
+    //   ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+    //   setSentCategory(values.category)
+    // }
+    // setSubmitting(false)
   }
 
   return (
@@ -266,7 +269,7 @@ const SupportForm: FC<Props> = ({ setSent }) => {
               </>
             )}
 
-            {values.category === 'Best-practices' && (
+            {values.category === 'Best_practices' && (
               <>
                 <BestPracticesGuidance />
                 <Divider light />
@@ -370,7 +373,7 @@ const SupportForm: FC<Props> = ({ setSent }) => {
                   </div>
                 </div>
               </>
-            ) : ['Problem', 'Best-practices', 'Performance'].includes(values.category) ? (
+            ) : ['Problem', 'Best_practices', 'Performance'].includes(values.category) ? (
               <DisabledStateForFreeTier
                 category={selectedCategory?.label ?? ''}
                 projectRef={values.projectRef}

@@ -3,41 +3,49 @@ export const CATEGORY_OPTIONS = [
     value: 'Problem',
     label: 'Issues with APIs / client libraries',
     description: "Issues with your project's API and client libraries",
+    query: undefined,
   },
   {
-    value: 'Unresponseive',
+    value: 'Unresponsive',
     label: 'Database unresponsive',
     description: 'Issues with connecting to your database',
+    query: 'Unable to connect',
+  },
+  {
+    value: 'Best_practices',
+    label: 'Questions on best practices',
+    description: 'Enquire on how best practices developing with Supabase',
+    query: 'Best practices',
   },
   {
     value: 'Performance',
     label: 'Performance issues',
     description: 'Reporting of performance issues is only available on the Pro tier',
-  },
-  {
-    value: 'Best-practices',
-    label: 'Questions on best practices',
-    description: 'Enquire on how best practices developing with Supabase',
+    query: 'Performance',
   },
   {
     value: 'Sales',
     label: 'Sales enquiry',
     description: 'Questions about pricing, paid plans and Enterprise plans',
+    query: undefined,
   },
   {
     value: 'Billing',
     label: 'Billing',
     description: 'Issues with credit card charges | invoices | overcharing',
+    query: undefined,
   },
   {
     value: 'Abuse',
     label: 'Abuse report',
     description: 'Report abuse of a Supabase project or Supabase brand',
+    query: undefined,
   },
   {
     value: 'Refund',
     label: 'Refund enquiry',
     description: 'Formal enquiry form for requesting refunds',
+    query: undefined,
   },
 ]
 

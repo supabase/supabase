@@ -1,14 +1,15 @@
 import SVG from 'react-inlinesvg'
+import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconArrowLeft } from 'ui'
+import { Button, IconActivity } from 'ui'
 
 import { withAuth, useFlag } from 'hooks'
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
 
 const SupportPage = () => {
-  const [sent, setSent] = useState<boolean>(false)
+  const [sentCategory, setSentCategory] = useState<string>()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
@@ -20,12 +21,33 @@ const SupportPage = () => {
     >
       <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
         <div className="space-y-12 py-8">
-          <div className="flex items-center space-x-3">
-            <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
-            <h4 className="m-0 text-lg">Supabase support</h4>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
+              <h4 className="m-0 text-lg">Supabase support</h4>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Link href="https://status.supabase.com/">
+                <a target="_blank">
+                  <Button type="default" icon={<IconActivity />}>
+                    Supabase Status
+                  </Button>
+                </a>
+              </Link>
+            </div>
           </div>
-          <div className="min-w-full space-y-12 rounded border bg-panel-body-light py-8 shadow-md dark:border-dark dark:bg-panel-body-dark">
-            {sent ? <Success /> : <SupportForm setSent={setSent} />}
+          <div
+            className={[
+              'min-w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+              `${sentCategory === undefined ? 'py-8' : 'pt-8'}`,
+              'dark:border-dark dark:bg-panel-body-dark',
+            ].join(' ')}
+          >
+            {sentCategory !== undefined ? (
+              <Success sentCategory={sentCategory} />
+            ) : (
+              <SupportForm setSentCategory={setSentCategory} />
+            )}
           </div>
         </div>
       </div>
