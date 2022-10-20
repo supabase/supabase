@@ -80,7 +80,6 @@ const sidebars = {
             'guides/auth/row-level-security',
             'guides/auth/managing-user-data',
             'guides/auth/auth-captcha',
-            'guides/auth/server-side-rendering',
           ],
         },
         {
@@ -186,6 +185,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/hosting/platform',
+        'guides/platform/custom-domains',
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
@@ -279,7 +279,7 @@ const sidebars = {
         },
         {
           type: 'link',
-          label: 'Supabase Flutter Library',
+          label: 'Supabase Dart Library',
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
