@@ -279,7 +279,7 @@ const sidebars = {
         },
         {
           type: 'link',
-          label: 'Supabase Dart Library',
+          label: 'Supabase Flutter Library',
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
