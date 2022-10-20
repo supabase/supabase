@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconX } from 'ui'
+import { Button, Divider, IconX } from 'ui'
 
 import { LogData, QueryType } from './Logs.types'
 
@@ -9,9 +9,15 @@ import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionI
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import { isDefaultLogPreviewFormat, LogsEndpointParams } from '.'
+import {
+  isDefaultLogPreviewFormat,
+  isUnixMicro,
+  LogsEndpointParams,
+  unixMicroToIsoTimestamp,
+} from '.'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import Connecting from 'components/ui/Loading/Loading'
+import CopyButton from 'components/ui/CopyButton'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -62,6 +68,23 @@ const LogSelection: FC<LogSelectionProps> = ({
         if (!partialLog) return null
         return <DefaultExplorerSelectionRenderer log={partialLog} />
     }
+  }
+
+  const selectionText = () => {
+    if (!fullLog) return ''
+    if (queryType) {
+      return `Log ID
+${fullLog.id}\n
+Log Timestamp (UTC)
+${isUnixMicro(fullLog.timestamp) ? unixMicroToIsoTimestamp(fullLog.timestamp) : fullLog.timestamp}\n
+Log Event Message
+${fullLog.event_message}\n
+Log Metadata
+${JSON.stringify(fullLog.metadata, null, 2)}
+`
+    }
+
+    return JSON.stringify(fullLog, null, 2)
   }
 
   return (
@@ -123,22 +146,22 @@ const LogSelection: FC<LogSelectionProps> = ({
           </div>
         </div>
       </div>
-      <div
-        className=" 
-          relative
-          h-px
-          flex-grow
-          bg-scale-300
-        "
-      >
-        <div
-          className="absolute top-6 right-6 cursor-pointer text-scale-900 transition hover:text-scale-1200"
-          onClick={onClose}
-        >
-          <IconX size={14} strokeWidth={2} />
+      <div className="relative h-px flex-grow bg-scale-300">
+        <div className="pt-4 px-4 flex flex-col gap-4">
+          <div className="flex flex-row justify-between items-center">
+            <CopyButton text={selectionText()} type="default" />
+            <Button
+              type="text"
+              className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
+              onClick={onClose}
+            >
+              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+            </Button>
+          </div>
+          <div className="h-px w-full bg-scale-600 rounded " />
         </div>
         {isLoading && <Connecting />}
-        <div className="flex flex-col space-y-6 bg-scale-300 py-8">
+        <div className="flex flex-col space-y-6 bg-scale-300 py-4">
           {!isLoading && <Formatter />}
         </div>
       </div>
