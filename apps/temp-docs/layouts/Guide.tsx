@@ -16,9 +16,13 @@ export default function ContentsLayout({ context }: any) {
     <>
       <NextSeo {...context.meta} />
       <Layout
-        meta={context.meta}
         // toc={toc}
-        menuItems={menuItems[page]}
+        meta={context.meta}
+        // @ts-ignore
+        menuItems={
+          // @ts-ignore
+          menuItems[page]
+        }
         currentPage={page}
       >
         <MDXProvider components={getComponents(context.type)}>
