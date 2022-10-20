@@ -1,4 +1,4 @@
-import { Menu } from '@supabase/ui'
+import { Menu } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -7,15 +7,15 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
   return (
     <div
       className="
-        dark:bg-scale-200 
-        dark:border-scale-400 
-        sidebar-width 
-        sticky 
-        top-0 
-        flex 
-        h-screen 
-        overflow-y-scroll 
-        border-r 
+        dark:bg-scale-200
+        dark:border-scale-400
+        sidebar-width
+        sticky
+        top-0
+        flex
+        h-screen
+        overflow-y-scroll
+        border-r
         py-10
         px-6"
     >
