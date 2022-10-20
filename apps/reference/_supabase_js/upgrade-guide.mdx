@@ -56,7 +56,9 @@ Read more about the [constructor options](/docs/reference/javascript/release-not
 
 ### Auth methods
 
-#### Signing in with email and password
+The signIn() method has been deprecated in favor of more explicit method signatures to help with type hinting. Previously it was difficult for developers to know what they were missing (e.g., a lot of developers didn't realize they could use passwordless magic links).
+
+#### Sign in with email and password
 <Tabs
   groupId="version"
   values={[
@@ -102,7 +104,7 @@ const { error } = await supabase.auth.signInWithOtp({ email })
 </TabItem>
 </Tabs>
 
-#### Sign in with third party provider
+#### Sign in with a third-party provider
 <Tabs
   groupId="version"
   values={[
@@ -174,7 +176,7 @@ const { data, error } = await supabase.auth.verifyOtp({ phone, token })
 </TabItem>
 </Tabs>
 
-#### Resetting password for email
+#### Reset password for email
 <Tabs
   groupId="version"
   values={[
@@ -197,7 +199,7 @@ const { data, error } = await supabase.auth.resetPasswordForEmail(email)
 </TabItem>
 </Tabs>
 
-#### Get user current session
+#### Get the user's current session
 <Tabs
   groupId="version"
   values={[
@@ -220,7 +222,7 @@ const { data: { session } } = await supabase.auth.getSession()
 </TabItem>
 </Tabs>
 
-#### Get logged in user
+#### Get the logged-in user
 <Tabs
   groupId="version"
   values={[
@@ -244,7 +246,7 @@ const { user } = session
 </TabItem>
 </Tabs>
 
-#### Update user data for a logged in user
+#### Update user data for a logged-in user
 <Tabs
   groupId="version"
   values={[
@@ -298,6 +300,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 </Tabs>
 
 ### Data methods
+
+`.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
+
+Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
 
 #### Insert and return data
 
