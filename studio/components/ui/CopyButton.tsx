@@ -5,8 +5,16 @@ import { useEffect, useState } from 'react'
 
 export interface CopyButtonProps extends ButtonProps {
   text: string
+  // used for text-less feedback
+  bounceIconOnCopy?: boolean
 }
-const CopyButton: React.FC<CopyButtonProps> = ({ text, children, onClick, ...props }) => {
+const CopyButton: React.FC<CopyButtonProps> = ({
+  text,
+  children,
+  onClick,
+  bounceIconOnCopy,
+  ...props
+}) => {
   const [showCopied, setShowCopied] = useState(false)
 
   useEffect(() => {
@@ -22,7 +30,14 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text, children, onClick, ...pro
         copyToClipboard(text)
         onClick?.(e)
       }}
-      icon={<IconClipboard size="tiny" />}
+      icon={
+        <IconClipboard
+          size="tiny"
+          className={[showCopied && bounceIconOnCopy ? 'animate-bounce' : '', 'transition'].join(
+            ' '
+          )}
+        />
+      }
       {...props}
     >
       {children ?? (showCopied ? 'Copied' : 'Copy')}
