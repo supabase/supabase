@@ -1,14 +1,7 @@
 import Link from 'next/link'
 import { FC, useState } from 'react'
-import {
-  Button,
-  IconCheck,
-  IconCheckCircle,
-  IconExternalLink,
-  IconMail,
-  IconSearch,
-  Input,
-} from 'ui'
+import { Button, IconCheck, IconExternalLink, IconMail, IconSearch, Input } from 'ui'
+
 import Divider from 'components/ui/Divider'
 import { CATEGORY_OPTIONS } from './Support.constants'
 
@@ -38,7 +31,7 @@ const Success: FC<Props> = ({ sentCategory = 'Best_practices' }) => {
       <div className="flex items-center flex-col space-y-2">
         <h3 className="text-xl">Support request successfully sent!</h3>
         <p className="text-sm text-scale-1100">
-          We will reach out to you using your GitHub email address
+          We will reach out to you using your account's email address
         </p>
       </div>
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
@@ -60,6 +53,7 @@ const Success: FC<Props> = ({ sentCategory = 'Best_practices' }) => {
               icon={<IconSearch size={16} strokeWidth={1.5} />}
               actions={[
                 <Link
+                  key="search"
                   href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}
                 >
                   <a target="_blank">
@@ -85,23 +79,6 @@ const Success: FC<Props> = ({ sentCategory = 'Best_practices' }) => {
           <Button>Go back to dashboard</Button>
         </Link>
       </div>
-    </div>
-  )
-
-  return (
-    <div className="relative my-10 mx-32 space-y-4">
-      <div className="absolute -left-14 -top-2.5">
-        <IconCheckCircle strokeWidth={2} size={24} background="brand" />
-      </div>
-      <div>
-        <h5 className="block">Support request successfully sent!</h5>
-        <p className="text-sm text-scale-1100">
-          We will email you back using your GitHub email address
-        </p>
-      </div>
-      <Link href="/">
-        <Button>Go back to dashboard</Button>
-      </Link>
     </div>
   )
 }
