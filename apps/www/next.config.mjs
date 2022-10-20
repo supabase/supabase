@@ -74,7 +74,7 @@ const nextConfig = {
   },
 }
 
-// next.config.js
+// next.config.js.
 export default () => {
   const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common'])]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
