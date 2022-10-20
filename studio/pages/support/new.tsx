@@ -19,17 +19,6 @@ const SupportPage = () => {
       style={{ height: maxHeight, maxHeight }}
     >
       <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
-        <Button
-          type="text"
-          className="opacity-50 hover:opacity-100"
-          style={{ background: 'none', padding: 0 }}
-          onClick={function goBack() {
-            window.history.back()
-          }}
-          icon={<IconArrowLeft />}
-        >
-          Go back
-        </Button>
         <div className="space-y-12 py-8">
           <div className="flex items-center space-x-3">
             <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
