@@ -56,7 +56,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.2",
+    "@tailwindcss/typography": "^0.5.7",
     "@types/classnames": "^2.3.1",
     "@types/jest": "^25.2.2",
     "@types/marked": "^4.0.3",
@@ -68,10 +68,10 @@
     "@types/react-copy-to-clipboard": "^4.3.0",
     "@types/react-dom": "^17.0.11",
     "@types/react-syntax-highlighter": "^13.5.2",
-    "autoprefixer": "^10.4.2",
+    "autoprefixer": "^10.4.12",
     "config": "*",
     "file-loader": "^6.2.0",
-    "postcss": "^8.4.16",
+    "postcss": "^8.4.18",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.2.1",
     "tailwindcss": "^3.1.8",

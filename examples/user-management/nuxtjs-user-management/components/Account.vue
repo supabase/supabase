@@ -1,5 +1,5 @@
 <template>
-  <div class="account-container">
+  <div class="account">
     <div>
       <label for="email">Email</label>
       <input id="email" type="text" v-model="state.propSession.user.email" disabled />
@@ -20,7 +20,7 @@
     </div>
 
     <div>
-      <button @click="signOut" className="button block">Sign Out</button>
+      <button @click="signOut" class="button block">Sign Out</button>
     </div>
   </div>
 </template>
@@ -86,9 +86,7 @@ export default {
           updated_at: new Date(),
         }
 
-        const { error } = await supabase.from('profiles').upsert(updates, {
-          returning: 'minimal', // Don't return the value after inserting
-        })
+        const { error } = await supabase.from('profiles').upsert(updates)
 
         if (error) {
           throw error
