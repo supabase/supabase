@@ -7,135 +7,18 @@ sidebar_label: 'Vue 3'
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import QuickstartIntro from './_components/quickstart_intro.md'
+import ProjectSetup from './_components/project_setup.mdx'
 
-## Intro
-
-This example provides the steps to build a simple user management app (from scratch!) using Supabase and Vue 3. It includes:
-
-- Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
-- Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
-- Supabase [Storage](/docs/guides/storage): users can upload a photo.
-- [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
-- Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
-
-By the end of this guide you'll have an app which allows users to login and update some basic profile details:
+<QuickstartIntro />
 
 ![Supabase User Management example](/img/user-management-demo.png)
 
 ### GitHub
 
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/supabase/examples/tree/main/supabase-js-v2/user-management/vue3-user-management).
+Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/vue3-user-management).
 
-## Project set up
-
-Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
-and then creating a "schema" inside the database.
-
-### Create a project
-
-1. Go to [app.supabase.com](https://app.supabase.com).
-1. Click on "New Project".
-1. Enter your project details.
-1. Wait for the new database to launch.
-
-### Set up the database schema
-
-Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
-or you can just copy/paste the SQL from below and run it yourself.
-
-<Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-<TabItem value="dashboard">
-
-1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
-2. Click **User Management Starter**.
-3. Click **Run**.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/sql-user-management-starter.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
-
-</TabItem>
-<TabItem value="sql">
-
-```sql
--- Create a table for public "profiles"
-create table profiles (
-  id uuid references auth.users not null,
-  updated_at timestamp with time zone,
-  username text unique,
-  avatar_url text,
-  website text,
-
-  primary key (id),
-  unique(username),
-  constraint username_length check (char_length(username) >= 3)
-);
-
-alter table profiles enable row level security;
-
-create policy "Public profiles are viewable by everyone."
-  on profiles for select
-  using ( true );
-
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
-
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime add table profiles;
-
--- Set up Storage!
-insert into storage.buckets (id, name)
-values ('avatars', 'avatars');
-
-create policy "Avatar images are publicly accessible."
-  on storage.objects for select
-  using ( bucket_id = 'avatars' );
-
-create policy "Anyone can upload an avatar."
-  on storage.objects for insert
-  with check ( bucket_id = 'avatars' );
-
-```
-
-</TabItem>
-</Tabs>
-
-### Get the API Keys
-
-Now that you've created some database tables, you are ready to insert data using the auto-generated API.
-We just need to get the URL and `anon` key from the API settings.
-
-1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/api/api-url-and-key.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
+<ProjectSetup />
 
 ## Building the App
 
@@ -190,26 +73,28 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
 ```html title="/src/components/Auth.vue"
 <script setup>
-import { ref } from 'vue'
-import { supabase } from '../supabase'
+  import { ref } from 'vue'
+  import { supabase } from '../supabase'
 
-const loading = ref(false)
-const email = ref('')
+  const loading = ref(false)
+  const email = ref('')
 
-const handleLogin = async () => {
-  try {
-    loading.value = true
-    const { error } = await supabase.auth.signInWithOtp({ email: email.value })
-    if (error) throw error
-    alert('Check your email for the login link!')
-  } catch (error) {
-    if (error instanceof Error) {
-      alert(error.message)
+  const handleLogin = async () => {
+    try {
+      loading.value = true
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.value,
+      })
+      if (error) throw error
+      alert('Check your email for the login link!')
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+      }
+    } finally {
+      loading.value = false
     }
-  } finally {
-    loading.value = false
   }
-}
 </script>
 
 <template>
@@ -218,11 +103,20 @@ const handleLogin = async () => {
       <h1 class="header">Supabase + Vue 3</h1>
       <p class="description">Sign in via magic link with your email below</p>
       <div>
-        <input class="inputField" type="email" placeholder="Your email" v-model="email" />
+        <input
+          class="inputField"
+          type="email"
+          placeholder="Your email"
+          v-model="email"
+        />
       </div>
       <div>
-        <input type="submit" class="button block" :value="loading ? 'Loading' : 'Send magic link'"
-          :disabled="loading" />
+        <input
+          type="submit"
+          class="button block"
+          :value="loading ? 'Loading' : 'Send magic link'"
+          :disabled="loading"
+        />
       </div>
     </div>
   </form>
@@ -236,80 +130,80 @@ Let's create a new component for that called `Account.vue`.
 
 ```html title="src/components/Account.vue"
 <script setup>
-import { supabase } from '../supabase'
-import { onMounted, ref, toRefs } from 'vue'
+  import { supabase } from '../supabase'
+  import { onMounted, ref, toRefs } from 'vue'
 
-const props = defineProps(['session'])
-const { session } = toRefs(props)
+  const props = defineProps(['session'])
+  const { session } = toRefs(props)
 
-const loading = ref(true)
-const username = ref('')
-const website = ref('')
-const avatar_url = ref('')
+  const loading = ref(true)
+  const username = ref('')
+  const website = ref('')
+  const avatar_url = ref('')
 
-onMounted(() => {
-  getProfile()
-})
+  onMounted(() => {
+    getProfile()
+  })
 
-async function getProfile() {
-  try {
-    loading.value = true
-    const { user } = session.value
+  async function getProfile() {
+    try {
+      loading.value = true
+      const { user } = session.value
 
-    let { data, error, status } = await supabase
-      .from('profiles')
-      .select(`username, website, avatar_url`)
-      .eq('id', user.id)
-      .single()
+      let { data, error, status } = await supabase
+        .from('profiles')
+        .select(`username, website, avatar_url`)
+        .eq('id', user.id)
+        .single()
 
-    if (error && status !== 406) throw error
+      if (error && status !== 406) throw error
 
-    if (data) {
-      username.value = data.username
-      website.value = data.website
-      avatar_url.value = data.avatar_url
+      if (data) {
+        username.value = data.username
+        website.value = data.website
+        avatar_url.value = data.avatar_url
+      }
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      loading.value = false
     }
-  } catch (error) {
-    alert(error.message)
-  } finally {
-    loading.value = false
   }
-}
 
-async function updateProfile() {
-  try {
-    loading.value = true
-    const { user } = session.value
+  async function updateProfile() {
+    try {
+      loading.value = true
+      const { user } = session.value
 
-    const updates = {
-      id: user.id,
-      username: username.value,
-      website: website.value,
-      avatar_url: avatar_url.value,
-      updated_at: new Date(),
+      const updates = {
+        id: user.id,
+        username: username.value,
+        website: website.value,
+        avatar_url: avatar_url.value,
+        updated_at: new Date(),
+      }
+
+      let { error } = await supabase.from('profiles').upsert(updates)
+
+      if (error) throw error
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      loading.value = false
     }
-
-    let { error } = await supabase.from('profiles').upsert(updates)
-
-    if (error) throw error
-  } catch (error) {
-    alert(error.message)
-  } finally {
-    loading.value = false
   }
-}
 
-async function signOut() {
-  try {
-    loading.value = true
-    let { error } = await supabase.auth.signOut()
-    if (error) throw error
-  } catch (error) {
-    alert(error.message)
-  } finally {
-    loading.value = false
+  async function signOut() {
+    try {
+      loading.value = true
+      let { error } = await supabase.auth.signOut()
+      if (error) throw error
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      loading.value = false
+    }
   }
-}
 </script>
 
 <template>
@@ -328,8 +222,12 @@ async function signOut() {
     </div>
 
     <div>
-      <input type="submit" class="button primary block" :value="loading ? 'Loading ...' : 'Update'"
-        :disabled="loading" />
+      <input
+        type="submit"
+        class="button primary block"
+        :value="loading ? 'Loading ...' : 'Update'"
+        :disabled="loading"
+      />
     </div>
 
     <div>
@@ -347,22 +245,22 @@ Now that we have all the components in place, let's update `App.vue`:
 
 ```html title="src/App.vue"
 <script setup>
-import { onMounted, ref } from 'vue'
-import Account from './components/Account.vue'
-import Auth from './components/Auth.vue'
-import { supabase } from './supabase'
+  import { onMounted, ref } from 'vue'
+  import Account from './components/Account.vue'
+  import Auth from './components/Auth.vue'
+  import { supabase } from './supabase'
 
-const session = ref()
+  const session = ref()
 
-onMounted(() => {
-  supabase.auth.getSession().then(({ data }) => {
-    session.value = data.session
+  onMounted(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      session.value = data.session
+    })
+
+    supabase.auth.onAuthStateChange((_, _session) => {
+      session.value = _session
+    })
   })
-
-  supabase.auth.onAuthStateChange((_, _session) => {
-    session.value = _session
-  })
-})
 </script>
 
 <template>
@@ -393,72 +291,87 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 ```html title="src/components/Avatar.vue"
 <script setup>
-import { ref, toRefs, watch } from 'vue'
-import { supabase } from '../supabase'
+  import { ref, toRefs, watch } from 'vue'
+  import { supabase } from '../supabase'
 
-const prop = defineProps(['path', 'size'])
-const { path, size } = toRefs(prop)
+  const prop = defineProps(['path', 'size'])
+  const { path, size } = toRefs(prop)
 
-const emit = defineEmits(['upload', 'update:path'])
-const uploading = ref(false)
-const src = ref('')
-const files = ref()
+  const emit = defineEmits(['upload', 'update:path'])
+  const uploading = ref(false)
+  const src = ref('')
+  const files = ref()
 
-const downloadImage = async () => {
-  try {
-    const { data, error } = await supabase.storage
-      .from('avatars')
-      .download(path.value)
-    if (error) throw error
-    src.value = URL.createObjectURL(data)
-  } catch (error) {
-    console.error('Error downloading image: ', error.message)
-  }
-}
-
-const uploadAvatar = async (evt) => {
-  files.value = evt.target.files
-  try {
-    uploading.value = true
-    if (!files.value || files.value.length === 0) {
-      throw new Error('You must select an image to upload.')
+  const downloadImage = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .download(path.value)
+      if (error) throw error
+      src.value = URL.createObjectURL(data)
+    } catch (error) {
+      console.error('Error downloading image: ', error.message)
     }
-
-    const file = files.value[0]
-    const fileExt = file.name.split('.').pop()
-    const filePath = `${Math.random()}.${fileExt}`
-
-    let { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file)
-
-    if (uploadError) throw uploadError
-    emit('update:path', filePath)
-    emit('upload')
-  } catch (error) {
-    alert(error.message)
-  } finally {
-    uploading.value = false
   }
-}
 
-watch(path, () => {
-  if (path.value) downloadImage()
-})
+  const uploadAvatar = async (evt) => {
+    files.value = evt.target.files
+    try {
+      uploading.value = true
+      if (!files.value || files.value.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = files.value[0]
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${Math.random()}.${fileExt}`
+
+      let { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+      emit('update:path', filePath)
+      emit('upload')
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      uploading.value = false
+    }
+  }
+
+  watch(path, () => {
+    if (path.value) downloadImage()
+  })
 </script>
 
 <template>
   <div>
-    <img v-if="src" :src="src" alt="Avatar" class="avatar image"
-      :style="{ height: size + 'em', width: size + 'em' }" />
-    <div v-else class="avatar no-image" :style="{ height: size + 'em', width: size + 'em' }" />
+    <img
+      v-if="src"
+      :src="src"
+      alt="Avatar"
+      class="avatar image"
+      :style="{ height: size + 'em', width: size + 'em' }"
+    />
+    <div
+      v-else
+      class="avatar no-image"
+      :style="{ height: size + 'em', width: size + 'em' }"
+    />
 
     <div :style="{ width: size + 'em' }">
       <label class="button primary block" for="single">
         {{ uploading ? "Uploading ..." : "Upload" }}
       </label>
-      <input style="visibility: hidden; position: absolute" type="file" id="single" accept="image/*"
-        @change="uploadAvatar" :disabled="uploading" />
+      <input
+        style="visibility: hidden; position: absolute"
+        type="file"
+        id="single"
+        accept="image/*"
+        @change="uploadAvatar"
+        :disabled="uploading"
+      />
     </div>
   </div>
 </template>
@@ -470,8 +383,8 @@ And then we can add the widget to the Account page:
 
 ```html title="src/components/Account.vue"
 <script>
-// Import the new component
-import Avatar from './Avatar.vue'
+  // Import the new component
+  import Avatar from './Avatar.vue'
 </script>
 
 <template>
