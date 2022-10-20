@@ -1,7 +1,18 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState, FC, ChangeEvent, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconMail, IconPlus, IconX, Input, Listbox, Form, IconLoader } from 'ui'
+import {
+  Button,
+  IconMail,
+  IconPlus,
+  IconX,
+  Input,
+  Listbox,
+  Form,
+  IconLoader,
+  IconAlertCircle,
+  IconExternalLink,
+} from 'ui'
 
 import { Project } from 'types'
 import { useStore, useFlag } from 'hooks'
@@ -16,16 +27,10 @@ import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.c
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import BestPracticesGuidance from './BestPracticesGuidance'
 import ClientLibrariesGuidance from './ClientLibrariesGuidance'
+import InformationBox from 'components/ui/InformationBox'
+import Link from 'next/link'
 
 const MAX_ATTACHMENTS = 5
-
-// [Joshen] Note to self - need to double check that this will work with the actual ticket submission to Hubspot too
-// Remaining
-// - [x] Github issues link for problems
-// - [x] Github discussions/discord link for best practices
-// - Improve success state of submission
-// - Integrate with API and Hubspot
-// Do a screen grab, get approval from Ant/Jonny
 
 interface Props {
   setSentCategory: (value: string) => void
@@ -89,7 +94,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         ? sortedProjects[0].ref
         : 'no-project',
     subject: '',
-    body: '',
+    message: '',
   }
 
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +127,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const onValidate = (values: any) => {
     const errors: any = {}
     if (!values.subject) errors.subject = 'Please add a subject heading'
-    if (!values.body) errors.body = 'Please type in a message'
+    if (!values.message) errors.message = 'Please type in a message'
     return errors
   }
 
@@ -132,39 +137,36 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
       uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
     const payload = {
       ...values,
-      message: formatMessage(values.body, attachments),
+      message: formatMessage(values.message, attachments),
       verified: true,
       tags: ['dashboard-support-form'],
       siteUrl: '',
       additionalRedirectUrls: '',
-      affectedServices: selectedServices.map((service) => service.replace(/ /g, '_').toLowerCase()),
+      affectedServices: selectedServices
+        .map((service) => service.replace(/ /g, '_').toLowerCase())
+        .join(';'),
     }
 
-    console.log('payload', payload)
-    setSentCategory(values.category)
-    return
+    if (values.projectRef !== 'no-project') {
+      const URL = `${API_URL}/auth/${values.projectRef}/config`
+      const authConfig = await get(URL)
+      if (!authConfig.error) {
+        payload.siteUrl = authConfig.SITE_URL
+        payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+      }
+    }
 
-    // [Joshen] Need to test this
-    // if (values.projectRef !== 'no-project') {
-    //   const URL = `${API_URL}/auth/${values.projectRef}/config`
-    //   const authConfig = await get(URL)
-    //   if (!authConfig.error) {
-    //     payload.siteUrl = authConfig.SITE_URL
-    //     payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
-    //   }
-    // }
-
-    // const response = await post(`${API_URL}/feedback/send`, payload)
-    // if (response.error) {
-    //   ui.setNotification({
-    //     category: 'error',
-    //     message: `Failed to submit support ticket: ${response.error.message}`,
-    //   })
-    // } else {
-    //   ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-    //   setSentCategory(values.category)
-    // }
-    // setSubmitting(false)
+    const response = await post(`${API_URL}/feedback/send`, payload)
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to submit support ticket: ${response.error.message}`,
+      })
+      setSubmitting(false)
+    } else {
+      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+      setSentCategory(values.category)
+    }
   }
 
   return (
@@ -190,6 +192,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
         return (
           <div className="space-y-8 w-[620px]">
+            <div className="px-6">
+              <h3 className="text-xl">How can we help?</h3>
+            </div>
             <div className="px-6">
               <Listbox
                 id="category"
@@ -251,16 +256,52 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                 <p className="text-sm text-scale-1000 mt-2">
                   This project is on the{' '}
                   <span className="text-scale-1100">
-                    {planNames[selectedProject?.subscription_tier]} plan
+                    {planNames[selectedProject?.subscription_tier]} tier
                   </span>
                 </p>
-              ) : (
+              ) : selectedProject?.ref !== 'no-project' ? (
                 <div className="flex items-center space-x-2 mt-2">
                   <IconLoader size={14} className="animate-spin" />
-                  <p className="text-sm text-scale-1000">Checking project's plan</p>
+                  <p className="text-sm text-scale-1000">Checking project's tier</p>
                 </div>
+              ) : (
+                <></>
               )}
             </div>
+
+            {selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.FREE && (
+              <div className="px-6">
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title="Expected response times are based on your project's tier"
+                  // description="Upgrade to the Pro tier for guaranteed response times, or ask about SLAs available on our enterprise plan"
+                  description={
+                    <div className="space-y-4 mb-1">
+                      <p>
+                        Upgrade to the Pro tier for guaranteed response times, or ask about SLAs
+                        available on our enterprise plan
+                      </p>
+                      <div className="flex items-center space-x-2">
+                        <Link href={`/project/${values.projectRef}/settings/billing/update`}>
+                          <a>
+                            <Button>Upgrade project</Button>
+                          </a>
+                        </Link>
+                        <Link href="https://supabase.com/contact/enterprise">
+                          <a target="_blank">
+                            <Button type="default" icon={<IconExternalLink size={14} />}>
+                              Enquire about Enterprise
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
+            )}
 
             <Divider light />
 
@@ -301,7 +342,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
                 <div className="text-area-text-sm px-6">
                   <Input.TextArea
-                    id="body"
+                    id="message"
                     label="Message"
                     placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
                     limit={500}

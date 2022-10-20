@@ -2,9 +2,10 @@ import SVG from 'react-inlinesvg'
 import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconActivity } from 'ui'
+import { Button, IconLoader } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { withAuth, useFlag } from 'hooks'
+import { withAuth, useFlag, usePlatformStatus } from 'hooks'
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
 
@@ -13,6 +14,8 @@ const SupportPage = () => {
 
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
+
+  const { isHealthy, isLoading } = usePlatformStatus()
 
   return (
     <div
@@ -27,13 +30,43 @@ const SupportPage = () => {
               <h4 className="m-0 text-lg">Supabase support</h4>
             </div>
             <div className="flex items-center space-x-3">
-              <Link href="https://status.supabase.com/">
-                <a target="_blank">
-                  <Button type="default" icon={<IconActivity />}>
-                    Supabase Status
-                  </Button>
-                </a>
-              </Link>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Link href="https://status.supabase.com/">
+                    <a target="_blank">
+                      <Button
+                        type="default"
+                        icon={
+                          isLoading ? (
+                            <IconLoader className="animate-spin" />
+                          ) : isHealthy ? (
+                            <div className="h-2 w-2 bg-brand-900 rounded-full" />
+                          ) : (
+                            <div className="h-2 w-2 bg-yellow-900 rounded-full" />
+                          )
+                        }
+                      >
+                        {isLoading
+                          ? 'Checking status'
+                          : isHealthy
+                          ? 'All systems operational'
+                          : 'Active incident ongoing'}
+                      </Button>
+                    </a>
+                  </Link>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">Check Supabase status page</span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Root>
             </div>
           </div>
           <div
