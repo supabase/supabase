@@ -81,6 +81,7 @@ const sidebars = {
             'guides/auth/managing-user-data',
             'guides/auth/auth-captcha',
             'guides/auth/server-side-rendering',
+            'guides/auth/auth-mfa',
           ],
         },
         {
