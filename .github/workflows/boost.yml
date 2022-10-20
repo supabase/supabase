@@ -56,5 +56,5 @@ jobs:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           registry_module: boostsecurityio/semgrep
         env:
-          SEMGREP_RULES: p/javascript p/typescript
+          SEMGREP_RULES: p/nodejs p/javascript p/typescript p/expressjs p/xss p/react
               
