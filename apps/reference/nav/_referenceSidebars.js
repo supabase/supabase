@@ -187,6 +187,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/hosting/platform',
+        'guides/platform/custom-domains',
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
