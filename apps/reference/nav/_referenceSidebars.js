@@ -4,7 +4,7 @@ const sidebars = {
       type: 'category',
       label: 'Overview',
       collapsed: true,
-      items: ['about', 'architecture', 'guides/examples'],
+      items: ['about', 'guides/features', 'architecture', 'guides/examples'],
     },
     {
       type: 'category',
@@ -80,6 +80,7 @@ const sidebars = {
             'guides/auth/row-level-security',
             'guides/auth/managing-user-data',
             'guides/auth/auth-captcha',
+            'guides/auth/server-side-rendering',
           ],
         },
         {
@@ -224,6 +225,7 @@ const sidebars = {
             'guides/integrations/auth0',
             'guides/integrations/authsignal',
             'guides/integrations/clerk',
+            'guides/integrations/keyri',
             'guides/integrations/stytch',
             'guides/integrations/supertokens',
           ],
@@ -277,7 +279,7 @@ const sidebars = {
         },
         {
           type: 'link',
-          label: 'Supabase Dart Library',
+          label: 'Supabase Flutter Library',
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
