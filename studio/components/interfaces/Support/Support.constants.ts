@@ -6,7 +6,7 @@ export const CATEGORY_OPTIONS = [
     query: undefined,
   },
   {
-    value: 'Unresponsive',
+    value: 'Database_unresponsive',
     label: 'Database unresponsive',
     description: 'Issues with connecting to your database',
     query: 'Unable to connect',

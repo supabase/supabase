@@ -127,22 +127,24 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
+    setSubmitting(true)
+    const attachments =
+      uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
+    const payload = {
+      ...values,
+      message: formatMessage(values.body, attachments),
+      verified: true,
+      tags: ['dashboard-support-form'],
+      siteUrl: '',
+      additionalRedirectUrls: '',
+      affectedServices: selectedServices.map((service) => service.replace(/ /g, '_').toLowerCase()),
+    }
+
+    console.log('payload', payload)
     setSentCategory(values.category)
     return
 
-    // setSubmitting(true)
-    // const attachments = uploadedFiles
-    //   ? await uploadAttachments(values.projectRef, uploadedFiles)
-    //   : []
-    // const payload = {
-    //   ...values,
-    //   message: formatMessage(values.body, attachments),
-    //   verified: true,
-    //   tags: ['dashboard-support-form'],
-    //   siteUrl: '',
-    //   additionalRedirectUrls: '',
-    // }
-
+    // [Joshen] Need to test this
     // if (values.projectRef !== 'no-project') {
     //   const URL = `${API_URL}/auth/${values.projectRef}/config`
     //   const authConfig = await get(URL)
