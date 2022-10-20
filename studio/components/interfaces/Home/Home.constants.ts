@@ -14,11 +14,11 @@ export const CLIENT_LIBRARIES = [
     gitUrl: 'https://github.com/supabase/supabase-py',
   },
   {
-    language: 'Dart',
+    language: 'Flutter',
     officialSupport: false,
-    releaseState: 'Beta',
+    releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/dart/installing',
-    gitUrl: 'https://github.com/supabase/supabase-dart',
+    gitUrl: 'https://github.com/supabase/supabase-flutter',
   },
 ]
 

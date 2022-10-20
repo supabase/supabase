@@ -90,7 +90,7 @@ pages:
       - name: Sign up with third-party providers.
         hideCodeBlock: true
         description: |
-          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider) method available on `supabase_flutter`.
+          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/v0/auth-signinwithprovider) method available on `supabase_flutter`.
 
   auth.signIn():
     description: |
@@ -100,7 +100,7 @@ pages:
       - If you provide `email` without a `password`, the user will be sent a magic link.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
       - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password. 
-      - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
+      - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/v0/auth-signinwithprovider).
     examples:
       - name: Sign in with email.
         isSpotlight: true
@@ -122,7 +122,7 @@ pages:
       - name: Get OAuth sign in URL.
         description: |
           Passing provider parameter to `signIn()` will return a URL to sign your user in via OAuth. 
-          If you are looking to sign in a user via OAuth on Flutter app, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
+          If you are looking to sign in a user via OAuth on Flutter app, go to [`signInWithProvider()`](/docs/reference/dart/v0/auth-signinwithprovider).
         dart: |
           ```dart
           final res = await supabase.auth.signIn(provider: Provider.github);
