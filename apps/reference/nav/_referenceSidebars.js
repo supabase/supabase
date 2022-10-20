@@ -81,6 +81,7 @@ const sidebars = {
             'guides/auth/managing-user-data',
             'guides/auth/auth-captcha',
             'guides/auth/server-side-rendering',
+            'guides/auth/auth-mfa',
           ],
         },
         {
@@ -279,7 +280,7 @@ const sidebars = {
         },
         {
           type: 'link',
-          label: 'Supabase Dart Library',
+          label: 'Supabase Flutter Library',
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
