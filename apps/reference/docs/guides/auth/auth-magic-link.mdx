@@ -15,7 +15,7 @@ Magic links only work with email addresses. By default, a user can only request 
 Setting up Magic Link logins for your Supabase application.
 
 - Add Magic Link authenticator to your [Supabase Project](https://app.supabase.com)
-- Add the login code to your application - [JavaScript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
+- Add the login code to your application - [JavaScript](https://github.com/supabase/supabase-js) | [Flutter](https://github.com/supabase/supabase-flutter)
 
 ## Add Magic Link into your Supabase Project
 
@@ -50,11 +50,11 @@ async function signInWithEmail() {
 
 <TabItem value="dart">
 
-When your user signs in, call [signIn()](/docs/reference/dart/auth-signin) with their email address:
+When your user signs in, call [signIn()](/docs/reference/dart/auth-signinwithotp) with their email address:
 
 ```dart
 Future<void> signInWithEmail() async {
-  await supabase.auth.signIn(email: 'example@email.com');
+  final AuthResponse res = await supabase.auth.signinwithotp(email: 'example@email.com');
 }
 ```
 
@@ -98,4 +98,4 @@ Future<void> signOut() async {
 
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Supabase Dart Client](https://github.com/supabase/supabase-dart)
+- [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)
