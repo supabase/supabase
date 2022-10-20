@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, Space } from '@supabase/ui'
+import { Button, IconBookOpen, Space } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'
@@ -22,7 +22,7 @@ const Hero = () => {
                     <div>
                       <h1
                         className="
-                        text-scale-1200 
+                        text-scale-1200
                         text-2xl sm:text-3xl sm:leading-none lg:text-4xl
                         xl:text-5xl
                         "
