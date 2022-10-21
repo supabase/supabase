@@ -11,9 +11,7 @@ date: '2022-10-21'
 toc_depth: 3
 ---
 
-# supabase-flutter v1 Released
-
-A few months ago, we announced a [developer preview version of supabase-flutter SDK](https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview). Since then, we have heard a lot of amazing feedback from the community, and have been improving it. Today, we are happy to announce the stable v1 of [supabase-flutter](https://pub.dev/packages/supabase_flutter). You can also find the updated [quick start guide](https://www.notion.so/Request-for-blog-thumbnail-Flutter-v1-0-official-release-af540023c599420fa88c870528afbd97), [documentation](https://supabase.com/docs/reference/dart) and a [migration guide from v0](https://supabase.com/docs/reference/dart/upgrade-guide).
+A few months ago, we announced a [developer preview version of supabase-flutter SDK](https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview). Since then, we have heard a lot of amazing feedback from the community, and have been improving it. Today, we are happy to announce the stable v1 of [supabase-flutter](https://pub.dev/packages/supabase_flutter). You can also find the updated [quick start guide](https://supabase.com/docs/guides/with-flutter), [documentation](https://supabase.com/docs/reference/dart) and a [migration guide from v0](https://supabase.com/docs/reference/dart/upgrade-guide).
 
 ## What is new in v1?
 
@@ -42,7 +40,7 @@ await supabase.auth.signInWithPassword(email: email, password: password);
 await supabase.auth.signInWithOAuth(Provider.github)
 ```
 
-Also `onAuthStateChange` returns stream, which feels more natural for anyone coding in Dart.
+Also, `onAuthStateChange` returns stream, which feels more natural for anyone coding in Dart.
 
 ```dart
 supabase.auth.onAuthStateChange.listen((data) {
@@ -53,7 +51,7 @@ supabase.auth.onAuthStateChange.listen((data) {
 
 ### Realtime Multiplayer edition support
 
-Supabase introduced realtime multiplayer edition two launch weeks ago. supabase-flutter now has first class support for the two newly introduced realtime methods, broadcast and presence. Broadcast can be used to share realtime data to all connected clients with low latency. Presence is a way to let other connected clients know the status of the client. You can visit [multiplayer.dev](http://multiplayer.dev) to see a quick demo of the feature.
+During the last launch week, we announced the [general availability of Realtime Multiplayer](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability). supabase-flutter now has first class support for the two newly introduced realtime methods, broadcast and presence. Broadcast can be used to share realtime data to all connected clients with low latency. Presence is a way to let other connected clients know the status of the client. You can visit [multiplayer.dev](http://multiplayer.dev) to see a quick demo of the feature.
 
 ```dart
 final channel = Supabase.instance.client.channel('my_channel');
@@ -89,11 +87,11 @@ channel.subscribe((status) async {
 });
 ```
 
-These are just tip of the iceberg of all the updates that we shipped in v1. Check out the [documentation](https://supabase.com/docs/reference/dart/) to see the full list of what updates supabase-flutter can do.
+These are just tip of the iceberg of all the updates that we shipped in v1. Check out the [documentation](https://supabase.com/docs/reference/dart/) to see the full list.
 
 ## Acknowledgements
 
-It required a massive support from the community to bring the supabase-flutter library to where it is today. I thank anyone who has contributed to the library, and I would like to give a special thanks to [Bruno](https://github.com/bdlukaa) and [Vinzent](https://github.com/Vinzent03), who have been working very hard to bringing all the updates that we released in v1. We really could not do it without all of you!
+It required massive support from the community to bring the supabase-flutter to where it is today. I would like to thank everyone who has contributed to the library, and a special thanks to [Bruno](https://github.com/bdlukaa) and [Vinzent](https://github.com/Vinzent03), who have been key for this release. We really could not have done it without you!
 
 ## Resources
 
