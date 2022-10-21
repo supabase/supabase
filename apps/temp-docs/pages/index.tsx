@@ -3,7 +3,7 @@ import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components'
 import menuItems from '~/components/nav/menu-items.json'
-import Layout from '~/layouts/DocsLayout'
+import Layout from '~/layouts/Default'
 import { getDocsBySlug } from '../lib/docs'
 export default function Home({
   meta,
