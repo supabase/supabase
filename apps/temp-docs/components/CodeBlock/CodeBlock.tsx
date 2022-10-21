@@ -1,6 +1,6 @@
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy } from '@supabase/ui'
+import { Button, IconCheck, IconCopy } from 'ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
