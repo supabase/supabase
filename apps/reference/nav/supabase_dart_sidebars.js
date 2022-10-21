@@ -23,7 +23,7 @@ const sidebars = {
         'generated/auth-currentuser',
         'generated/auth-updateuser',
         'generated/auth-onauthstatechange',
-        'generated/reset-password-email',
+        'generated/auth-resetpasswordforemail',
       ],
       collapsed: true,
     },

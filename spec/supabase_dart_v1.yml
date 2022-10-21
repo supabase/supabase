@@ -100,7 +100,7 @@ pages:
         dart: |
           ```dart
           await supabase.auth.signInWithOtp(
-            phone: 'example@email.com',
+            phone: '+13334445555',
           );
           ```
   auth.signInWithOAuth():
@@ -115,7 +115,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          await supabase.auth.signInWithProvider(Provider.github);
+          await supabase.auth.signInWithOAuth(Provider.github);
           ```
       - name: With `redirectTo`
         description: |
@@ -123,11 +123,9 @@ pages:
           Note that `redirectTo` should be null for Flutter Web.
         dart: |
           ```dart
-          await supabase.auth.signInWithProvider(
+          await supabase.auth.signInWithOAuth(
             Provider.github,
-            options: const AuthOptions(
-              redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
-            ),
+            redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
       - name: With scopes
@@ -136,8 +134,10 @@ pages:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
         dart: |
           ```dart
-          await supabase.auth.signInWithProvider(Provider.github,
-              options: const AuthOptions(scopes: 'repo gist notifications'));
+          await supabase.auth.signInWithOAuth(
+            Provider.github,
+            scopes: 'repo gist notifications'
+          );
           ...
           // after user comes back from signin flow
 
@@ -263,70 +263,51 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final subscription = supabase.auth.onAuthStateChange(
-            (event, session) {
-              print(session?.user.id);
-              // handle auth state change
-            },
-          );
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+            final AuthChangeEvent event = data.event;
+            final Session? session = data.session;
+          });
           ```
       - name: Listen to a specific event
         dart: |
           ```dart
-          final subscription = supabase.auth.onAuthStateChange(
-            (event, session) {
-              if (event == AuthChangeEvent.signedIn) {
-                print(session?.user.id);
-                // handle signIn
-              }
-            },
-          );
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+            final AuthChangeEvent event = data.event;
+            if (event == AuthChangeEvent.signedIn) {
+              // handle signIn
+            }
+          });
           ```
       - name: Unsubscribe from auth subscription
         dart: |
           ```dart
-          final subscription = supabase.auth.onAuthStateChange((event, session) {});
+          final authSubscription = supabase.auth.onAuthStateChange((event, session) {});
 
-          subscription.data?.unsubscribe();
+          authSubscription.cancel();
           ```
-  Reset Password (Email):
+  auth.resetPasswordForEmail:
+    title: 'resetPasswordForEmail()'
     description: |
       Sends a reset request to an email address.
     notes: |
-      Sends a reset request to an email address.
-
-      When the user clicks the reset link in the email they will be forwarded to:
-
-      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
-
-      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
-
-      You should then use the access_token in the url and new password to update the user as follows:
+      Sends a password reset request to an email address. When the user clicks the reset link in the email they are redirected back to your application. Prompt the user for a new password and call auth.updateUser():
 
       ```dart
-      final res = await supabase.auth.api.updateUser(
-        accessToken,
-        UserAttributes(password: 'NEW_PASSWORD'),
+      await supabase.auth.resetPasswordForEmail(
+        'sample@email.com',
+        redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
       );
       ```
     examples:
       - name: Reset password for Flutter
         isSpotlight: true
         dart: |
-          You can pass `redirectTo` to open the app via deeplink when user opens the password reset email. 
+          `redirectTo` is used to open the app via deeplink when user opens the password reset email. 
           ```dart
-          final res = await supabase.auth.api.resetPasswordForEmail(
-            'user@example.com',
-            options: AuthOptions(redirectTo: kIsWeb
-                ? null
-                : 'io.supabase.flutter://reset-callback/'),
+          await supabase.auth.resetPasswordForEmail(
+            'sample@email.com',
+            redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
-          ```
-      - name: Reset password
-        isSpotlight: true
-        dart: |
-          ```dart
-          final res = await supabase.auth.api.resetPasswordForEmail('user@example.com');
           ```
   invoke():
     title: 'invoke()'
