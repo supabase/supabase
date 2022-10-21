@@ -1,13 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  IconMenu,
-  IconGitHub,
-  IconTwitter,
-  IconSearch,
-  Input,
-  IconCommand,
-  Button,
-} from '@supabase/ui'
+import { IconMenu, IconGitHub, IconTwitter, IconSearch, Input, IconCommand, Button } from 'ui'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from '../Providers'

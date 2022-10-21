@@ -1,12 +1,15 @@
 import React from 'react'
 import type { AppProps } from 'next/app'
 import { ThemeProvider } from '../components/Providers'
-import '../styles/main.css'
+import { SearchProvider } from '~/components/Search'
+import '../styles/main.scss'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider>
-      <Component {...pageProps} />
+      <SearchProvider>
+        <Component {...pageProps} />
+      </SearchProvider>
     </ThemeProvider>
   )
 }
