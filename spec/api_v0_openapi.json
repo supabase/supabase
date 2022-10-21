@@ -96,37 +96,6 @@
       }
     },
     "/v1/projects/{ref}/functions": {
-      "get": {
-        "operationId": "getFunctions",
-        "summary": "List all functions",
-        "description": "Returns all functions you've previously added to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
-                }
-              }
-            }
-          },
-          "403": { "description": "" },
-          "500": { "description": "Failed to retrieve project's functions" }
-        },
-        "tags": ["projects"],
-        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
-      },
       "post": {
         "operationId": "createFunction",
         "summary": "Create a function",
@@ -157,7 +126,48 @@
           "500": { "description": "Failed to create project's function" }
         },
         "tags": ["projects"],
-        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+        "security": [
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] },
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] }
+        ]
+      },
+      "get": {
+        "operationId": "getFunctions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's functions" }
+        },
+        "tags": ["projects"],
+        "security": [
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] },
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] }
+        ]
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}": {
@@ -270,6 +280,201 @@
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/custom-hostname": {
+      "get": {
+        "operationId": "getCustomHostnameConfig",
+        "summary": "Gets project's custom hostname config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to retrieve project's custom hostname config" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "remove",
+        "summary": "Deletes a project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "500": { "description": "Failed to delete project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/initialize": {
+      "post": {
+        "operationId": "createCustomHostnameConfig",
+        "summary": "Updates project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to update project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/reverify": {
+      "post": {
+        "operationId": "reverify",
+        "summary": "Attempts to verify the DNS configuration for project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to verify project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/activate": {
+      "post": {
+        "operationId": "activate",
+        "summary": "Activates a custom hostname for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to activate project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/pgsodium": {
+      "get": {
+        "operationId": "getConfig",
+        "summary": "Gets project's pgsodium config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's pgsodium config" }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "updateConfig",
+        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePgsodiumConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's pgsodium config" }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/secrets": {
       "get": {
         "operationId": "getSecrets",
@@ -365,11 +570,18 @@
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
-    "/v1/projects/{ref}/pgsodium": {
+    "/v1/projects/{ref}/types/typescript": {
       "get": {
-        "operationId": "getConfig",
-        "summary": "Gets project's pgsodium config",
+        "operationId": "getTypescriptTypes",
+        "summary": "Generate TypeScript types",
+        "description": "Returns the TypeScript types of your schema for use with supabase-js.",
         "parameters": [
+          {
+            "name": "included_schemas",
+            "required": false,
+            "in": "query",
+            "schema": { "default": "public", "type": "string" }
+          },
           {
             "name": "ref",
             "required": true,
@@ -381,44 +593,17 @@
         "responses": {
           "200": {
             "description": "",
-            "content": { "application/json": { "schema": { "type": "object" } } }
-          },
-          "403": { "description": "" },
-          "500": { "description": "Failed to retrieve project's pgsodium config" }
-        },
-        "tags": ["pgsodium (beta)"],
-        "security": [{ "bearer": [] }]
-      },
-      "put": {
-        "operationId": "updateConfig",
-        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdatePgsodiumConfigBody" }
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TypescriptResponse" }
+              }
             }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": { "application/json": { "schema": { "type": "object" } } }
           },
           "403": { "description": "" },
-          "500": { "description": "Failed to update project's pgsodium config" }
+          "500": { "description": "Failed to generate TypeScript types" }
         },
-        "tags": ["pgsodium (beta)"],
-        "security": [{ "bearer": [] }]
+        "tags": ["projects"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     }
   },
@@ -480,6 +665,16 @@
         "properties": { "name": { "type": "string" } },
         "required": ["name"]
       },
+      "CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
+          "name": { "type": "string" },
+          "body": { "type": "string" },
+          "verify_jwt": { "type": "boolean" }
+        },
+        "required": ["slug", "name", "body"]
+      },
       "FunctionResponse": {
         "type": "object",
         "properties": {
@@ -493,16 +688,6 @@
           "verify_jwt": { "type": "boolean" }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
-      },
-      "CreateFunctionBody": {
-        "type": "object",
-        "properties": {
-          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
-          "name": { "type": "string" },
-          "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
-        },
-        "required": ["slug", "name", "body"]
       },
       "FunctionSlugResponse": {
         "type": "object",
@@ -527,6 +712,34 @@
           "verify_jwt": { "type": "boolean" }
         }
       },
+      "UpdateCustomHostnameResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "1_not_started",
+              "2_initiated",
+              "3_challenge_verified",
+              "4_origin_setup_completed",
+              "5_services_reconfigured"
+            ],
+            "type": "string"
+          },
+          "custom_hostname": { "type": "string" },
+          "data": { "type": "object" }
+        },
+        "required": ["status", "custom_hostname", "data"]
+      },
+      "UpdateCustomHostnameBody": {
+        "type": "object",
+        "properties": { "custom_hostname": { "type": "string" } },
+        "required": ["custom_hostname"]
+      },
+      "UpdatePgsodiumConfigBody": {
+        "type": "object",
+        "properties": { "root_key": { "type": "string" } },
+        "required": ["root_key"]
+      },
       "SecretResponse": {
         "type": "object",
         "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
@@ -540,10 +753,10 @@
         },
         "required": ["name", "value"]
       },
-      "UpdatePgsodiumConfigBody": {
+      "TypescriptResponse": {
         "type": "object",
-        "properties": { "root_key": { "type": "string" } },
-        "required": ["root_key"]
+        "properties": { "types": { "type": "string" } },
+        "required": ["types"]
       }
     }
   }
