@@ -7,131 +7,18 @@ sidebar_label: Flutter
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import QuickstartIntro from './_partials/quickstart_intro.md'
+import ProjectSetup from './_partials/project_setup.mdx'
 
-## Intro
-
-This example provides the steps to build a simple user management app (from scratch!) using Supabase and Flutter. It includes:
-
-- Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
-- Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
-<!-- - Supabase [Storage](/docs/guides/storage): users can upload a photo. -->
-- [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
-- Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
-
-By the end of this guide you'll have an app which allows users to login and update some basic profile details:
+<QuickstartIntro />
 
 ![Supabase User Management example](/img/supabase-flutter-demo.png)
 
 ### GitHub
 
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/supasquad/supabase-flutter-quickstart).
+Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management).
 
-## Project set up
-
-Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
-and then creating a "schema" inside the database.
-
-### Create a project
-
-1. Go to [app.supabase.com](https://app.supabase.com).
-1. Click on "New Project".
-1. Enter your project details.
-1. Wait for the new database to launch.
-
-### Set up the database schema
-
-Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
-or you can just copy/paste the SQL from below and run it yourself.
-
-<Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-<TabItem value="dashboard">
-
-1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
-2. Click **User Management Starter**.
-3. Click **Run**.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/sql-user-management-starter.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
-
-</TabItem>
-<TabItem value="sql">
-
-```sql
--- Create a table for public "profiles"
-create table profiles (
-  id uuid references auth.users not null,
-  updated_at timestamp with time zone,
-  username text unique,
-  avatar_url text,
-  website text,
-
-  primary key (id),
-  unique(username),
-  constraint username_length check (char_length(username) >= 3)
-);
-
-alter table profiles enable row level security;
-
-create policy "Public profiles are viewable by everyone."
-  on profiles for select
-  using ( true );
-
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
-
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime add table profiles;
-
--- Set up Storage!
-insert into storage.buckets (id, name, public)
-values ('avatars', 'avatars', true);
-
-create policy "Anyone can upload an avatar."
-  on storage.objects for insert
-  with check ( bucket_id = 'avatars' );
-
-```
-
-</TabItem>
-</Tabs>
-
-### Get the API Keys
-
-Now that you've created some database tables, you are ready to insert data using the auto-generated API.
-We just need to get the URL and `anon` key from the API settings.
-
-1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/api/api-url-and-key.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
+<ProjectSetup />
 
 ## Building the App
 
@@ -146,12 +33,12 @@ an app called `supabase_quickstart`:
 flutter create supabase_quickstart
 ```
 
-Then let's install the only additional dependency: [`supabase_flutter`](https://github.com/supabase/supabase-flutter)
+Then let's install the only additional dependency: [`supabase_flutter`](https://pub.dev/packages/supabase_flutter)
 
-Run the following command to get the newest version of `supabase_flutter` to your project.
+Copy and paste the following line in your pubspec.yaml to install the package:
 
-```bash
-flutter pub add supabase_flutter
+```yaml
+supabase_flutter: ^1.0.0
 ```
 
 Run `flutter pub get` to install the dependencies.
@@ -236,77 +123,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: '[YOUR_SUPABASE_URL]',
-    anonKey: '[YOUR_SUPABASE_ANON_KEY]',
+    url: 'YOUR_SUPABASE_URL',
+    anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
   runApp(MyApp());
 }
 ```
 
-### Set up AuthState
-
-In order to handle deep links for Android and iOS, let's create a class that will do just that.
-`supabase_flutter` plugin comes with `SupabaseAuthState` class where we can inherit from to react to various deep link events.
-
-```dart title="lib/components/auth_state.dart"
-import 'package:flutter/material.dart';
-import 'package:supabase/supabase.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_quickstart/utils/constants.dart';
-
-class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
-  @override
-  void onUnauthenticated() {
-    if (mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-    }
-  }
-
-  @override
-  void onAuthenticated(Session session) {
-    if (mounted) {
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil('/account', (route) => false);
-    }
-  }
-
-  @override
-  void onPasswordRecovery(Session session) {}
-
-  @override
-  void onErrorAuthenticating(String message) {
-    context.showErrorSnackBar(message: message);
-  }
-}
-```
-
-### Set up AuthRequiredState
-
-We might want to show certain pages to the users only if they are signed in.
-For that we can create a handy `AuthRequiredState` class that we can inherit from for pages where the users need to be authenticated.
-`AuthRequiredState` will inherit `SupabaseAuthRequiredState` which is provided by `supabase_flutter` package.
-
-```dart title="lib/components/auth_required_state.dart"
-import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-class AuthRequiredState<T extends StatefulWidget>
-    extends SupabaseAuthRequiredState<T> {
-  @override
-  void onUnauthenticated() {
-    /// Users will be sent back to the LoginPage if they sign out.
-    if (mounted) {
-      /// Users will be sent back to the LoginPage if they sign out.
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-    }
-  }
-}
-```
+### Setting up some constants and handy functions
 
 Let's also create a constant file to make it easier to use Supabase client.
 We will also include an extension method declaration to call `showSnackBar` with one line of code.
 
-```dart title="lib/utils/constants.dart"
+```dart title="lib/constants.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -332,24 +161,40 @@ extension ShowSnackBar on BuildContext {
 ### Set up Splash Screen
 
 Let's create a splash screen that will be shown to users right after they open the app.
-This splash screen inherits `AuthState` to redirect users to the appropriate pages depending on their authentication state.
+This screen retrieves the current session and redirects the user accordingly.
 
 ```dart title="lib/pages/splash_page.dart"
 import 'package:flutter/material.dart';
-import 'package:supabase_quickstart/components/auth_state.dart';
+import 'package:supabase_quickstart/constants.dart';
 
 class SplashPage extends StatefulWidget {
-  const SplashPage({Key? key}) : super(key: key);
+  const SplashPage({super.key});
 
   @override
   _SplashPageState createState() => _SplashPageState();
 }
 
-class _SplashPageState extends AuthState<SplashPage> {
+class _SplashPageState extends State<SplashPage> {
+  bool _redicrectCalled = false;
   @override
-  void initState() {
-    recoverSupabaseSession();
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _redirect();
+  }
+
+  Future<void> _redirect() async {
+    await Future.delayed(Duration.zero);
+    if (_redicrectCalled || !mounted) {
+      return;
+    }
+
+    _redicrectCalled = true;
+    final session = supabase.auth.currentSession;
+    if (session != null) {
+      Navigator.of(context).pushReplacementNamed('/account');
+    } else {
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
   }
 
   @override
@@ -359,48 +204,56 @@ class _SplashPageState extends AuthState<SplashPage> {
     );
   }
 }
+
 ```
 
 ### Set up a Login page
 
 Let's create a Flutter widget to manage logins and sign ups.
 We'll use Magic Links, so users can sign in with their email without using passwords.
-This page will also inherit `AuthState` as it will handle user login.
+Notice that this page sets up a listener on the user's auth state using `onAuthStateChange`.
+A new event will fire when the user comes back to the app by clicking their magic link, which this page can catch and redirect the user accordingly.
 
 ```dart title="lib/pages/login_page.dart"
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase/supabase.dart';
-import 'package:supabase_quickstart/components/auth_state.dart';
-import 'package:supabase_quickstart/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:supabase_quickstart/constants.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends AuthState<LoginPage> {
+class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
+  bool _redirecting = false;
   late final TextEditingController _emailController;
+  late final StreamSubscription<AuthState> _authStateSubscription;
 
   Future<void> _signIn() async {
     setState(() {
       _isLoading = true;
     });
-    final response = await supabase.auth.signIn(
+    try {
+      await supabase.auth.signInWithOtp(
         email: _emailController.text,
-        options: AuthOptions(
-            redirectTo: kIsWeb
-                ? null
-                : 'io.supabase.flutterquickstart://login-callback/'));
-    final error = response.error;
-    if (error != null) {
+        emailRedirectTo:
+            kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
+      );
+      if (mounted) {
+        context.showSnackBar(message: 'Check your email for login link!');
+        _emailController.clear();
+      }
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
-    } else {
-      context.showSnackBar(message: 'Check your email for login link!');
-      _emailController.clear();
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpected error occured');
     }
 
     setState(() {
@@ -410,13 +263,22 @@ class _LoginPageState extends AuthState<LoginPage> {
 
   @override
   void initState() {
-    super.initState();
     _emailController = TextEditingController();
+    _authStateSubscription = supabase.auth.onAuthStateChange.listen((data) {
+      if (_redirecting) return;
+      final session = data.session;
+      if (session != null) {
+        _redirecting = true;
+        Navigator.of(context).pushReplacementNamed('/account');
+      }
+    });
+    super.initState();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
+    _authStateSubscription.cancel();
     super.dispose();
   }
 
@@ -449,46 +311,48 @@ class _LoginPageState extends AuthState<LoginPage> {
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new widget called `account_page.dart` for that.
-Note that this page will inherit `AuthRequiredState` as user needs to be authenticated to view this page.
 
 ```dart title="lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
-import 'package:supabase/supabase.dart';
-import 'package:supabase_quickstart/components/auth_required_state.dart';
-import 'package:supabase_quickstart/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_quickstart/components/avatar.dart';
+import 'package:supabase_quickstart/constants.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({Key? key}) : super(key: key);
+  const AccountPage({super.key});
 
   @override
   _AccountPageState createState() => _AccountPageState();
 }
 
-class _AccountPageState extends AuthRequiredState<AccountPage> {
+class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
   final _websiteController = TextEditingController();
+  String? _avatarUrl;
   var _loading = false;
 
   /// Called once a user id is received within `onAuthenticated()`
-  Future<void> _getProfile(String userId) async {
+  Future<void> _getProfile() async {
     setState(() {
       _loading = true;
     });
-    final response = await supabase
-        .from('profiles')
-        .select()
-        .eq('id', userId)
-        .single()
-        .execute();
-    final error = response.error;
-    if (error != null && response.status != 406) {
-      context.showErrorSnackBar(message: error.message);
-    }
-    final data = response.data;
-    if (data != null) {
+
+    try {
+      final userId = supabase.auth.currentUser!.id;
+      final data = await supabase
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .single() as Map;
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
+      _avatarUrl = (data['avatar_url'] ?? '') as String;
+    } on PostgrestException catch (error) {
+      context.showErrorSnackBar(message: error.message);
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpected exception occured');
     }
+
     setState(() {
       _loading = false;
     });
@@ -508,12 +372,15 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
       'website': website,
       'updated_at': DateTime.now().toIso8601String(),
     };
-    final response = await supabase.from('profiles').upsert(updates).execute();
-    final error = response.error;
-    if (error != null) {
+    try {
+      await supabase.from('profiles').upsert(updates);
+      if (mounted) {
+        context.showSnackBar(message: 'Successfully updated profile!');
+      }
+    } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
-    } else {
-      context.showSnackBar(message: 'Successfully updated profile!');
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpeted error occured');
     }
     setState(() {
       _loading = false;
@@ -521,19 +388,22 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
   }
 
   Future<void> _signOut() async {
-    final response = await supabase.auth.signOut();
-    final error = response.error;
-    if (error != null) {
+    try {
+      await supabase.auth.signOut();
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpected error occured');
+    }
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 
   @override
-  void onAuthenticated(Session session) {
-    final user = session.user;
-    if (user != null) {
-      _getProfile(user.id);
-    }
+  void initState() {
+    super.initState();
+    _getProfile();
   }
 
   @override
@@ -561,10 +431,11 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
           ),
           const SizedBox(height: 18),
           ElevatedButton(
-              onPressed: _updateProfile,
-              child: Text(_loading ? 'Saving...' : 'Update')),
+            onPressed: _updateProfile,
+            child: Text(_loading ? 'Saving...' : 'Update'),
+          ),
           const SizedBox(height: 18),
-          ElevatedButton(onPressed: _signOut, child: const Text('Sign Out')),
+          TextButton(onPressed: _signOut, child: const Text('Sign Out')),
         ],
       ),
     );
@@ -584,12 +455,10 @@ import 'package:supabase_quickstart/pages/login_page.dart';
 import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
   await Supabase.initialize(
     // TODO: Replace credentials with your own
-    url: '[YOUR_SUPABASE_URL]',
-    anonKey: '[YOUR_SUPABASE_ANNON_KEY]',
+    url: 'YOUR_SUPABASE_URL',
+    anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
   runApp(MyApp());
 }
@@ -601,10 +470,15 @@ class MyApp extends StatelessWidget {
       title: 'Supabase Flutter',
       theme: ThemeData.dark().copyWith(
         primaryColor: Colors.green,
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.green,
+          ),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            onPrimary: Colors.white,
-            primary: Colors.green,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
           ),
         ),
       ),
@@ -650,10 +524,10 @@ You should see an orange `Public` badge next to your bucket name if your bucket 
 
 We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to select an image from the device.
 
-Run the following command to install it.
+Add the following line in your pubspec.yaml file to install `image_picker`:
 
-```bash
-flutter pub add image_picker
+```yaml
+image_picker: ^0.8.4
 ```
 
 Using [`image_picker`](https://pub.dev/packages/image_picker) requires some additional preparation depending on the platform.
@@ -669,14 +543,15 @@ We can start by creating a new component:
 ```dart title="lib/components/avatar.dart"
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_quickstart/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_quickstart/constants.dart';
 
 class Avatar extends StatefulWidget {
   const Avatar({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.onUpload,
-  }) : super(key: key);
+  });
 
   final String? imageUrl;
   final void Function(String) onUpload;
@@ -692,7 +567,7 @@ class _AvatarState extends State<Avatar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (widget.imageUrl == null)
+        if (widget.imageUrl == null || widget.imageUrl!.isEmpty)
           Container(
             width: 150,
             height: 150,
@@ -717,8 +592,8 @@ class _AvatarState extends State<Avatar> {
   }
 
   Future<void> _upload() async {
-    final _picker = ImagePicker();
-    final imageFile = await _picker.pickImage(
+    final picker = ImagePicker();
+    final imageFile = await picker.pickImage(
       source: ImageSource.gallery,
       maxWidth: 300,
       maxHeight: 300,
@@ -728,23 +603,31 @@ class _AvatarState extends State<Avatar> {
     }
     setState(() => _isLoading = true);
 
-    final bytes = await imageFile.readAsBytes();
-    final fileExt = imageFile.path.split('.').last;
-    final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
-    final filePath = fileName;
-    final response =
-        await supabase.storage.from('avatars').uploadBinary(filePath, bytes);
+    try {
+      final bytes = await imageFile.readAsBytes();
+      final fileExt = imageFile.path.split('.').last;
+      final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
+      final filePath = fileName;
+      await supabase.storage.from('avatars').uploadBinary(
+            filePath,
+            bytes,
+            fileOptions: FileOptions(contentType: imageFile.mimeType),
+          );
+      final imageUrlResponse = await supabase.storage
+          .from('avatars')
+          .createSignedUrl(filePath, 60 * 60 * 24 * 365 * 10);
+      widget.onUpload(imageUrlResponse);
+    } on StorageException catch (error) {
+      if (mounted) {
+        context.showErrorSnackBar(message: error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        context.showErrorSnackBar(message: 'Unexpected error occured');
+      }
+    }
 
     setState(() => _isLoading = false);
-
-    final error = response.error;
-    if (error != null) {
-      context.showErrorSnackBar(message: error.message);
-      return;
-    }
-    final imageUrlResponse =
-        supabase.storage.from('avatars').getPublicUrl(filePath);
-    widget.onUpload(imageUrlResponse.data!);
   }
 }
 ```
@@ -755,46 +638,45 @@ And then we can add the widget to the Account page as well as some logic to upda
 
 ```dart title="lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
-import 'package:supabase/supabase.dart';
-import 'package:supabase_quickstart/components/auth_required_state.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
-import 'package:supabase_quickstart/utils/constants.dart';
+import 'package:supabase_quickstart/constants.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({Key? key}) : super(key: key);
+  const AccountPage({super.key});
 
   @override
   _AccountPageState createState() => _AccountPageState();
 }
 
-class _AccountPageState extends AuthRequiredState<AccountPage> {
+class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
   final _websiteController = TextEditingController();
-  String? _userId;
   String? _avatarUrl;
   var _loading = false;
 
   /// Called once a user id is received within `onAuthenticated()`
-  Future<void> _getProfile(String userId) async {
+  Future<void> _getProfile() async {
     setState(() {
       _loading = true;
     });
-    final response = await supabase
-        .from('profiles')
-        .select()
-        .eq('id', userId)
-        .single()
-        .execute();
-    final error = response.error;
-    if (error != null && response.status != 406) {
-      context.showErrorSnackBar(message: error.message);
-    }
-    final data = response.data;
-    if (data != null) {
+
+    try {
+      final userId = supabase.auth.currentUser!.id;
+      final data = await supabase
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .single() as Map;
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
+    } on PostgrestException catch (error) {
+      context.showErrorSnackBar(message: error.message);
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpected exception occured');
     }
+
     setState(() {
       _loading = false;
     });
@@ -814,12 +696,15 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
       'website': website,
       'updated_at': DateTime.now().toIso8601String(),
     };
-    final response = await supabase.from('profiles').upsert(updates).execute();
-    final error = response.error;
-    if (error != null) {
+    try {
+      await supabase.from('profiles').upsert(updates);
+      if (mounted) {
+        context.showSnackBar(message: 'Successfully updated profile!');
+      }
+    } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
-    } else {
-      context.showSnackBar(message: 'Successfully updated profile!');
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpeted error occured');
     }
     setState(() {
       _loading = false;
@@ -827,42 +712,47 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
   }
 
   Future<void> _signOut() async {
-    final response = await supabase.auth.signOut();
-    final error = response.error;
-    if (error != null) {
+    try {
+      await supabase.auth.signOut();
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpected error occured');
     }
-    Navigator.of(context).pushReplacementNamed('/login');
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed('/');
+    }
   }
 
   /// Called when image has been uploaded to Supabase storage from within Avatar widget
   Future<void> _onUpload(String imageUrl) async {
-    final response = await supabase.from('profiles').upsert({
-      'id': _userId,
-      'avatar_url': imageUrl,
-    }).execute();
-    final error = response.error;
-    if (error != null) {
+    try {
+      final userId = supabase.auth.currentUser!.id;
+      await supabase.from('profiles').upsert({
+        'id': userId,
+        'avatar_url': imageUrl,
+      });
+      if (mounted) {
+        context.showSnackBar(message: 'Updated your profile image!');
+      }
+    } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
+    } catch (error) {
+      context.showErrorSnackBar(message: 'Unexpected error has occured');
     }
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       _avatarUrl = imageUrl;
     });
-    context.showSnackBar(message: 'Updated your profile image!');
   }
 
   @override
-  void onAuthenticated(Session session) {
-    final user = session.user;
-    if (user != null) {
-      _userId = user.id;
-      _getProfile(user.id);
-    }
-  }
-
-  @override
-  void onUnauthenticated() {
-    Navigator.of(context).pushReplacementNamed('/login');
+  void initState() {
+    super.initState();
+    _getProfile();
   }
 
   @override
@@ -895,10 +785,11 @@ class _AccountPageState extends AuthRequiredState<AccountPage> {
           ),
           const SizedBox(height: 18),
           ElevatedButton(
-              onPressed: _updateProfile,
-              child: Text(_loading ? 'Saving...' : 'Update')),
+            onPressed: _updateProfile,
+            child: Text(_loading ? 'Saving...' : 'Update'),
+          ),
           const SizedBox(height: 18),
-          ElevatedButton(onPressed: _signOut, child: const Text('Sign Out')),
+          TextButton(onPressed: _signOut, child: const Text('Sign Out')),
         ],
       ),
     );

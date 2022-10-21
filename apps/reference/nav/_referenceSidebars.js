@@ -4,7 +4,7 @@ const sidebars = {
       type: 'category',
       label: 'Overview',
       collapsed: true,
-      items: ['about', 'guides/features', 'architecture', 'guides/examples'],
+      items: ['about', 'guides/features', 'architecture'],
     },
     {
       type: 'category',
@@ -34,7 +34,7 @@ const sidebars = {
       items: [
         'guides/cli',
         'guides/cli/local-development',
-        'guides/cli/cicd-workflow',
+        'guides/cli/managing-environments',
       ],
     },
     {

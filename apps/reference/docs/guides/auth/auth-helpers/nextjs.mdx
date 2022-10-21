@@ -290,9 +290,9 @@ export default function ProtectedPage({
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/',
-  async getServerSideProps(ctx, supabaseServerClient) {
+  async getServerSideProps(ctx, supabase) {
     // Run queries with RLS on the server
-    const { data } = await supabaseServerClient(ctx).from('test').select('*')
+    const { data } = await supabase.from('test').select('*')
     return { props: { data } }
   },
 })
@@ -366,13 +366,9 @@ Wrap an API Route to check that the user has a valid session. If they're not log
 ```js title="pages/api/protected-route.js"
 import { withApiAuth } from '@supabase/auth-helpers-nextjs'
 
-export default withApiAuth(async function ProtectedRoute(
-  req,
-  res,
-  supabaseServerClient
-) {
+export default withApiAuth(async function ProtectedRoute(req, res, supabase) {
   // Run queries with RLS on the server
-  const { data } = await supabaseServerClient.from('test').select('*')
+  const { data } = await supabase.from('test').select('*')
   res.json(data)
 })
 ```
