@@ -2,7 +2,7 @@ import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import menuItems from '~/components/nav/menu-items.json'
-import Layout from '~/layouts/DocsLayout'
+import Layout from '~/layouts/Default'
 import { getPageType } from '~/lib/helpers'
 import getComponents from '~/lib/mdx/getComponents'
 
