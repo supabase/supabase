@@ -16,7 +16,7 @@ const components = {
   // TabsPanel: (props: any) => {
   //   return <Tabs.Panel {...props} />
   // },
-  // code: (props: any) => <CodeBlock {...props} />,
+  code: (props: any) => <CodeBlock {...props} />,
 }
 
 export default components

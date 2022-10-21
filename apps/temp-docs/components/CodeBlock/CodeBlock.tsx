@@ -7,6 +7,7 @@ import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import { useState } from 'react'
+import { useTheme } from '../Providers'
 
 interface Props {
   lang: 'js' | 'sql' | 'py'
@@ -16,8 +17,10 @@ interface Props {
   children?: string
   size?: 'small' | 'medium' | 'large'
 }
-
 function CodeBlock(props: Props) {
+  const { isDarkMode } = useTheme()
+  const monokaiTheme = monokaiCustomTheme(isDarkMode)
+
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -42,26 +45,31 @@ function CodeBlock(props: Props) {
   // const large = props.size === 'large' ? true : false
   const large = false
 
+  // don't show line numbers if bash == lang
+  const showLineNumbers = lang !== 'bash'
+
   return (
     <div className="relative">
       <SyntaxHighlighter
         language={lang}
-        style={monokaiCustomTheme}
-        className={'code-block border-scale-600 rounded-lg border'}
+        style={monokaiTheme}
+        className={`code-block  rounded-lg border p-4 ${!showLineNumbers && 'pl-6'}`}
         customStyle={{
-          padding: 0,
           fontSize: large ? 18 : 12,
-          lineHeight: large ? 1.2 : 1.2,
-          borderTop: '1px solid #393939',
-          background: '#181818',
+          lineHeight: large ? 1.4 : 1.2,
+          // borderTop: '1px solid #393939',
+          //background: isDarkMode ? 'bg-scale-700' : 'bg-scale-300',
+          //background: isDarkMode ? '#444' : '#F1F3F5',
+          // we really should support proper light mode, not just show dark in both modes
+          background: isDarkMode ? '#444' : '#F1F3F5',
         }}
-        showLineNumbers={lang === 'cli' ? false : true}
+        showLineNumbers={showLineNumbers}
         lineNumberContainerStyle={{
           paddingTop: '128px',
         }}
         lineNumberStyle={{
           minWidth: '44px',
-          background: '#1e1e1e',
+          background: isDarkMode ? '#444' : '#F1F3F5',
           paddingLeft: '4px',
           paddingRight: '4px',
           marginRight: '12px',
@@ -75,7 +83,7 @@ function CodeBlock(props: Props) {
         {props.children?.trimEnd()}
       </SyntaxHighlighter>
       {!props.hideCopy && props.children ? (
-        <div className="dark absolute right-2 top-2">
+        <div className={`${isDarkMode ?? 'dark'} absolute right-2 top-2`}>
           <CopyToClipboard text={props.children}>
             <Button
               type="default"
