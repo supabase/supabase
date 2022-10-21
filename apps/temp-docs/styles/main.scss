@@ -572,3 +572,8 @@ article h1 {
 .small:not(.prose *):not(.overwrite) {
   @apply text-scale-900 text-xs;
 }
+
+code[class*='language-'],
+pre[class*='language-'] {
+  text-shadow: none !important;
+}
