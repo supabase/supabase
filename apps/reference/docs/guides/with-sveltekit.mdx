@@ -45,24 +45,22 @@ And finally we want to save the environment variables in a `.env`.
 All we need are the `SUPABASE_URL` and the `SUPABASE_KEY` key that you copied [earlier](#get-the-api-keys).
 
 ```bash title=".env"
-VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
-VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
+PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
+PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 ```
 
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title="lib/supabaseClient.js"
-import { createClient } from '@supabase/supabase-js'
+```js title="lib/supabaseClient.ts"
+import { createClient } from '@supabase/auth-helpers-sveltekit'
+import { env } from '$env/dynamic/public'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
 ```
 
 And one optional step is to update the CSS file `public/global.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/examples/main/supabase-js-v2/user-management/svelte-user-management/src/app.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
 
 ### Set up a Login component
 

@@ -4,7 +4,14 @@ import { useRouter } from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 import { Member, NextPageWithLayout, Organization, Project, Role, User } from 'types'
-import { useFlag, useOrganizationDetail, useOrganizationRoles, useStore, withAuth } from 'hooks'
+import {
+  useFlag,
+  useOrganizationDetail,
+  useOrganizationRoles,
+  useStore,
+  withAuth,
+  useParams,
+} from 'hooks'
 import { AccountLayoutWithoutAuth } from 'components/layouts'
 import {
   GeneralSettings,
@@ -19,8 +26,7 @@ const OrgSettingsLayout = withAuth(
   observer(({ children }) => {
     const { app, ui } = useStore()
     const router = useRouter()
-
-    const slug = ui.selectedOrganization?.slug || ''
+    const { slug } = useParams()
 
     const { roles: allRoles } = useOrganizationRoles(slug)
     const enableBillingOnlyReadOnly = useFlag('enableBillingOnlyReadOnlyRoles')
@@ -104,10 +110,10 @@ const OrgSettingsLayout = withAuth(
 
 const OrganizationSettings: NextPageWithLayout = () => {
   const router = useRouter()
+  const { slug } = useParams()
   const PageState: any = useContext(PageContext)
   const { ui, app } = useStore()
   const [selectedTab, setSelectedTab] = useState('GENERAL')
-  const slug = ui.selectedOrganization?.slug || ''
   const { members, isError: isOrgDetailError } = useOrganizationDetail(slug || '')
   const hash = router.asPath.split('#')[1]?.toUpperCase()
 
@@ -118,6 +124,16 @@ const OrganizationSettings: NextPageWithLayout = () => {
   }, [hash])
 
   function handleChangeTab(id: string) {
+    if (!slug) {
+      // The user should not see this error as the page should
+      // be rerendered with the value of slug before they can click.
+      // It is just here in case they are the flash.
+      return ui.setNotification({
+        category: 'error',
+        message: 'Please try again',
+      })
+    }
+
     setSelectedTab(id)
     router.push({
       pathname: `/org/${slug}/settings`,
