@@ -149,7 +149,9 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
       <div className="relative h-px flex-grow bg-scale-300">
         <div className="pt-4 px-4 flex flex-col gap-4">
           <div className="flex flex-row justify-between items-center">
-            <CopyButton text={selectionText()} type="default" title="Copy log to clipboard" />
+            <div className={`transition ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
+              <CopyButton text={selectionText()} type="default" title="Copy log to clipboard" />
+            </div>
             <Button
               type="text"
               className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
