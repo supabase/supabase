@@ -6,6 +6,7 @@ description: How to use Supabase on your local development machine.
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import { IconArrowUp, IconCheckCircle, Alert } from 'ui'
 
 Learn how to use the Supabase CLI to develop your project locally and deploy to the Supabase Platform.
 
@@ -22,6 +23,15 @@ Make sure you have these installed on your local machine:
 ```bash
 supabase login
 ```
+
+<Alert withIcon variant="warning" title="Successfully generated a new token!">
+  <div className="w-full space-y-2">
+    <p className="text-sm">
+      To access the database from an edge function in your local Supabase setup, replace `localhost`
+      with `host.docker.internal`.
+    </p>
+  </div>
+</Alert>
 
 ## Initialize your project
 
