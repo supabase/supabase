@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
-import 'package:supabase_quickstart/utils/constants.dart';
+import 'package:supabase_quickstart/constants.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -75,7 +75,7 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _signOut() async {
     try {
       await supabase.auth.signOut();
-    } on GoTrueException catch (error) {
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
       context.showErrorSnackBar(message: 'Unexpected error occurred');

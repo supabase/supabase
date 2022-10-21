@@ -7,7 +7,7 @@ info:
 
     Supabase Dart.
 
-  definition: ../../spec/enrichments/tsdoc_v1/combined.json
+  definition: ../../spec/enrichments/tsdoc_v2/combined.json
   slugPrefix: '/'
   specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1.yml
   libraries:
@@ -100,7 +100,7 @@ pages:
         dart: |
           ```dart
           await supabase.auth.signInWithOtp(
-            phone: 'example@email.com',
+            phone: '+13334445555',
           );
           ```
   auth.signInWithOAuth():
@@ -115,7 +115,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          await supabase.auth.signInWithProvider(Provider.github);
+          await supabase.auth.signInWithOAuth(Provider.github);
           ```
       - name: With `redirectTo`
         description: |
@@ -123,11 +123,9 @@ pages:
           Note that `redirectTo` should be null for Flutter Web.
         dart: |
           ```dart
-          await supabase.auth.signInWithProvider(
+          await supabase.auth.signInWithOAuth(
             Provider.github,
-            options: const AuthOptions(
-              redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
-            ),
+            redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
       - name: With scopes
@@ -136,8 +134,10 @@ pages:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
         dart: |
           ```dart
-          await supabase.auth.signInWithProvider(Provider.github,
-              options: const AuthOptions(scopes: 'repo gist notifications'));
+          await supabase.auth.signInWithOAuth(
+            Provider.github,
+            scopes: 'repo gist notifications'
+          );
           ...
           // after user comes back from signin flow
 
@@ -263,70 +263,51 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final subscription = supabase.auth.onAuthStateChange(
-            (event, session) {
-              print(session?.user.id);
-              // handle auth state change
-            },
-          );
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+            final AuthChangeEvent event = data.event;
+            final Session? session = data.session;
+          });
           ```
       - name: Listen to a specific event
         dart: |
           ```dart
-          final subscription = supabase.auth.onAuthStateChange(
-            (event, session) {
-              if (event == AuthChangeEvent.signedIn) {
-                print(session?.user.id);
-                // handle signIn
-              }
-            },
-          );
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+            final AuthChangeEvent event = data.event;
+            if (event == AuthChangeEvent.signedIn) {
+              // handle signIn
+            }
+          });
           ```
       - name: Unsubscribe from auth subscription
         dart: |
           ```dart
-          final subscription = supabase.auth.onAuthStateChange((event, session) {});
+          final authSubscription = supabase.auth.onAuthStateChange((event, session) {});
 
-          subscription.data?.unsubscribe();
+          authSubscription.cancel();
           ```
-  Reset Password (Email):
+  auth.resetPasswordForEmail:
+    title: 'resetPasswordForEmail()'
     description: |
       Sends a reset request to an email address.
     notes: |
-      Sends a reset request to an email address.
-
-      When the user clicks the reset link in the email they will be forwarded to:
-
-      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
-
-      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
-
-      You should then use the access_token in the url and new password to update the user as follows:
+      Sends a password reset request to an email address. When the user clicks the reset link in the email they are redirected back to your application. Prompt the user for a new password and call auth.updateUser():
 
       ```dart
-      final res = await supabase.auth.api.updateUser(
-        accessToken,
-        UserAttributes(password: 'NEW_PASSWORD'),
+      await supabase.auth.resetPasswordForEmail(
+        'sample@email.com',
+        redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
       );
       ```
     examples:
       - name: Reset password for Flutter
         isSpotlight: true
         dart: |
-          You can pass `redirectTo` to open the app via deeplink when user opens the password reset email. 
+          `redirectTo` is used to open the app via deeplink when user opens the password reset email. 
           ```dart
-          final res = await supabase.auth.api.resetPasswordForEmail(
-            'user@example.com',
-            options: AuthOptions(redirectTo: kIsWeb
-                ? null
-                : 'io.supabase.flutter://reset-callback/'),
+          await supabase.auth.resetPasswordForEmail(
+            'sample@email.com',
+            redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
-          ```
-      - name: Reset password
-        isSpotlight: true
-        dart: |
-          ```dart
-          final res = await supabase.auth.api.resetPasswordForEmail('user@example.com');
           ```
   invoke():
     title: 'invoke()'
@@ -782,7 +763,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
           });
@@ -794,7 +775,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .eq('id', '120')
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
@@ -804,7 +785,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .order('name', ascending: true)
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
@@ -814,7 +795,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .order('name', ascending: true)
             .limit(10)
             .listen((List<Map<String, dynamic>> data) {
@@ -837,7 +818,7 @@ pages:
 
           class _MyWidgetState extends State<MyWidget> {
             // Persist the stream in a local variable to prevent refetching upon rebuilds
-            final _stream = supabase.from('countries').stream(['id']);
+            final _stream = supabase.from('countries').stream(primaryKey: ['id']);
 
             @override
             Widget build(BuildContext context) {
@@ -855,7 +836,7 @@ pages:
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -874,7 +855,7 @@ pages:
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.getBucket'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -964,7 +945,7 @@ pages:
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.upload'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1579,7 +1560,7 @@ pages:
   .like():
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
