@@ -1,6 +1,6 @@
 import LinkCard from './LinkCard'
 import LinkCardsWrapper from './LinkCardsWrapper'
-import { Tabs } from 'ui'
+import { Tabs } from '@supabase/ui'
 import Sponsor from './Sponsor'
 import SponsorsWrapper from './SponsorsWrapper'
 import CodeBlock from './CodeBlock/CodeBlock'

@@ -1,5 +1,5 @@
 import authProviders from '../data/authProviders'
-import { Card } from 'ui'
+import { Card } from '@supabase/ui'
 import Link from 'next/link'
 
 export default function AuthProviders() {
