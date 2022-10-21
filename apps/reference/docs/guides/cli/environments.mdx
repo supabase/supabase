@@ -16,10 +16,10 @@ test and release schema changes to staging and production Supabase projects.
 To get started:
 
 - [Install the Supabase CLI](/docs/guides/cli)
-- Create a Supabase project, or use an existing one
-- Initialise a local Git repository
+- Create a [Supabase project](https://app.supabase.com) or use an existing one
+- Initialize a local Git repository
 
-## Setting up a local environment
+## Set up a local environment
 
 The first step is to set up your local repository with the Supabase CLI:
 
@@ -40,8 +40,8 @@ You can get your `$PROJECT_ID` from your project's dashboard URL:
 https://app.supabase.com/project/<project-id>
 ```
 
-If you're using an existing Supabase project, you might have made schema changes through the dashboard.
-You need to pull these changes before making local schema changes from the CLI. You can do this by running:
+If you're using an existing Supabase project, you might have made schema changes through the Dashboard.
+Run the following command to pull these changes before making local schema changes from the CLI:
 
 ```sql
 supabase db remote commit
@@ -85,7 +85,7 @@ create table public.employees (
 );
 ```
 
-Next, you can apply the new migration to your local database:
+Apply the new migration to your local database:
 
 ```bash
 supabase db reset
@@ -107,7 +107,7 @@ Unlike manual migrations, auto schema diff creates a new migration script from c
 
 <!-- ![Auto schema diff](/img/guides/cli/diff-auto.png) -->
 
-Start by creating an `employees` table under the `public` schema using Studio UI, accessible at [localhost:54323](http://localhost:54323/) by default.
+Create an `employees` table under the `public` schema using Studio UI, accessible at [localhost:54323](http://localhost:54323/) by default.
 
 Next, generate a schema diff by running the following command:
 
@@ -144,32 +144,32 @@ GRANT ALL ON TABLE public.employees TO postgres;
 GRANT ALL ON TABLE public.employees TO service_role;
 ```
 
-You may notice that the auto generated migration script is more verbose than the manually written one.
-This is because the default schema diff tool does not take into account of default privileges added by the initial schema.
+You may notice that the auto-generated migration script is more verbose than the manually written one.
+This is because the default schema diff tool does not account for default privileges added by the initial schema.
 
-Finally, commit the new migration script to git and you are ready to deploy.
+Commit the new migration script to git and you are ready to deploy.
 
 :::tip
 
 Alternatively, you may pass in the `--use-migra` experimental flag to generate a more concise migration using [migra](https://github.com/djrobstep/migra).
-Without the `-f` file flag, the output will be written to stdout by default.
+Without the `-f` file flag, the output is written to stdout by default.
 
 `supabase db diff --use-migra`
 
 :::
 
-## Deploying a migration
+## Deploy a migration
 
-In a production environment, we recommend use a CI/CD pipeline to deploy new migrations, rather than deploying from your local machine. We can achieve this by using GitHub Actions.
+In a production environment, we recommend using a CI/CD pipeline to deploy new migrations with GitHub Actions rather than deploying from your local machine.
 
 ![Deploy migration](/img/guides/cli/cicd-github.png)
 
-This example will use two Supabase projects, one for production and one for staging.
+This example uses two Supabase projects, one for production and one for staging.
 
 Prepare your environments by:
 
 - Creating separate Supabase projects for staging and production
-- Pushing your git repository to GitHub and enable GitHub Actions
+- Pushing your git repository to GitHub and enabling GitHub Actions
 
 :::caution
 
@@ -184,7 +184,7 @@ The Supabase CLI requires a few environment variables to run in non-interactive 
 - `SUPABASE_ACCESS_TOKEN` is your personal access token
 - `SUPABASE_DB_PASSWORD` is your project specific database password
 
-We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Action runners.
+We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
 
 Create the following files inside the `.github/workflows` directory:
 
@@ -296,9 +296,9 @@ jobs:
 </TabItem>
 </Tabs>
 
-The full example code is available on our [demo repository](https://github.com/supabase/supabase-action-example).
+The full example code is available in the [demo repository](https://github.com/supabase/supabase-action-example).
 
-Commit these files to git and push to your `main` branch on GitHub. Finally, update these environment variables to match your Supabase projects:
+Commit these files to git and push to your `main` branch on GitHub. Update these environment variables to match your Supabase projects:
 
 - `SUPABASE_ACCESS_TOKEN`
 - `PRODUCTION_PROJECT_ID`
@@ -312,7 +312,7 @@ When configured correctly, your repository will have CI and Release workflows th
 
 ### Open a PR with new migration
 
-Follow the [migration section](#creating-a-new-migration) to create a file `supabase/migrations/<timestamp>_new_employee.sql`.
+Follow the [migration steps](#create-a-new-migration) to create a `supabase/migrations/<timestamp>_new_employee.sql` file.
 
 Checkout a new branch `feat/employee` from `develop` , commit the migration file, and push to GitHub.
 
@@ -323,9 +323,9 @@ git commit -m "Add employee table"
 git push --set-upstream origin feat/employee
 ```
 
-Then open a PR from `feat/employee` to `develop` branch and you will see that the CI workflow has been triggered.
+Open a PR from `feat/employee` to the `develop` branch to see that the CI workflow has been triggered.
 
-Once the test error are resolved, merge this PR, and watch the deployment in action.
+Once the test error is resolved, merge this PR and watch the deployment in action.
 
 ### Release to production
 
