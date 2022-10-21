@@ -3,7 +3,6 @@ import { IconMenu, IconGitHub, IconTwitter, IconSearch, Input, IconCommand, Butt
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from '../Providers'
-import ThemeToggle from '../ThemeToggle'
 
 const NavBar = ({ currentPage }: { currentPage: string }) => {
   const [mounted, setMounted] = useState(false)
@@ -73,7 +72,6 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
               <IconTwitter className="text-scale-1100 stroke-2" />
             </a>
           </Link>
-          <ThemeToggle />
         </div>
         <Input
           placeholder="Search"
