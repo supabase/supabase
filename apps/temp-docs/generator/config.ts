@@ -32,9 +32,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
 async function gen_v001(spec: ConfigSpec, dest: string) {
   const specLayout = spec.info.tags
   const sections = specLayout.map((section: Section) => {
-    const parameters = spec.parameters.filter(
-      (parameter) => parameter.tags[0] === section.id
-    )
+    const parameters = spec.parameters.filter((parameter) => parameter.tags[0] === section.id)
     return { ...section, parameters }
   })
 
