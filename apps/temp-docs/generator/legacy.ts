@@ -11,11 +11,7 @@
 import Example from './legacy/components/Example'
 import Page from './legacy/components/Page'
 import Tab from './legacy/components/Tab'
-import {
-  slugify,
-  tsDocCommentToMdComment,
-  writeToDisk,
-} from './legacy/lib/helpers'
+import { slugify, tsDocCommentToMdComment, writeToDisk } from './legacy/lib/helpers'
 import { TsDoc, OpenRef } from './legacy/definitions'
 import { uniqBy } from 'lodash'
 import * as fs from 'fs'
@@ -23,19 +19,15 @@ import * as yaml from 'js-yaml'
 
 export default async function gen(inputFileName: string, outputDir: string) {
   const docSpec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
-  const defRef = docSpec.info.definition
-    ? fs.readFileSync(docSpec.info.definition, 'utf8')
-    : '{}'
+  const defRef = docSpec.info.definition ? fs.readFileSync(docSpec.info.definition, 'utf8') : '{}'
 
   const definition = JSON.parse(defRef)
   const id = docSpec.info.id
   const allLanguages = docSpec.info.libraries
-  const pages = Object.entries(docSpec.pages).map(
-    ([name, x]: [string, OpenRef.Page]) => ({
-      ...x,
-      pageName: name,
-    })
-  )
+  const pages = Object.entries(docSpec.pages).map(([name, x]: [string, OpenRef.Page]) => ({
+    ...x,
+    pageName: name,
+  }))
 
   // Index Page
   const indexFilename = outputDir + `/index.mdx`
@@ -49,12 +41,10 @@ export default async function gen(inputFileName: string, outputDir: string) {
       const slug = slugify(pageSpec.pageName)
       const hasTsRef = pageSpec['$ref'] || null
       const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, definition)
-      if (hasTsRef && !tsDefinition)
-        throw new Error('Definition not found: ' + hasTsRef)
+      if (hasTsRef && !tsDefinition) throw new Error('Definition not found: ' + hasTsRef)
 
       const description =
-        pageSpec.description ||
-        tsDocCommentToMdComment(getDescriptionFromDefintion(tsDefinition))
+        pageSpec.description || tsDocCommentToMdComment(getDescriptionFromDefintion(tsDefinition))
 
       // Create page
       const content = Page({
@@ -64,16 +54,8 @@ export default async function gen(inputFileName: string, outputDir: string) {
         title: pageSpec.title || pageSpec.pageName,
         description,
         parameters: hasTsRef ? generateParameters(tsDefinition) : '',
-        spotlight: generateSpotlight(
-          id,
-          pageSpec['examples'] || [],
-          allLanguages
-        ),
-        examples: generateExamples(
-          id,
-          pageSpec['examples'] || [],
-          allLanguages
-        ),
+        spotlight: generateSpotlight(id, pageSpec['examples'] || [], allLanguages),
+        examples: generateExamples(id, pageSpec['examples'] || [], allLanguages),
         notes: pageSpec.notes,
       })
 
@@ -96,33 +78,24 @@ function generateParameters(tsDefinition: any) {
   } else functionDeclaration = tsDefinition?.type?.declaration
   if (!functionDeclaration) return ''
 
-  const paramDefinitions: TsDoc.TypeDefinition[] =
-    functionDeclaration.signatures[0].parameters // PMC: seems flaky.. why the [0]?
+  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures[0].parameters // PMC: seems flaky.. why the [0]?
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
-  let parameters = paramDefinitions
-    .map((x) => recurseThroughParams(x))
-    .join(`\n`)
+  let parameters = paramDefinitions.map((x) => recurseThroughParams(x)).join(`\n`)
   return methodListGroup(parameters)
 }
 
 function getDescriptionFromDefintion(tsDefinition) {
   if (!tsDefinition) return null
-  if (
-    ['Method', 'Constructor', 'Constructor signature'].includes(
-      tsDefinition.kindString
-    )
-  )
+  if (['Method', 'Constructor', 'Constructor signature'].includes(tsDefinition.kindString))
     return tsDefinition?.signatures[0].comment
   else return tsDefinition?.comment || ''
 }
 
 function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
   // If this is a reference to another Param, let's use the reference instead
-  let param = isDereferenced(paramDefinition)
-    ? paramDefinition.type?.dereferenced
-    : paramDefinition
+  let param = isDereferenced(paramDefinition) ? paramDefinition.type?.dereferenced : paramDefinition
   const labelParams = generateLabelParam(param)
   let subContent = ''
 
@@ -131,9 +104,7 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
     children = param.type?.declaration?.children
   } else if (isUnion(param)) {
     // We don't want to show the union types if it's a literal
-    const nonLiteralVariants = param.type.types.filter(
-      ({ type }) => type !== 'literal'
-    )
+    const nonLiteralVariants = param.type.types.filter(({ type }) => type !== 'literal')
 
     if (nonLiteralVariants.length === 0) {
       children = null
@@ -158,10 +129,7 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
 }
 
 const isDereferenced = (paramDefinition: TsDoc.TypeDefinition) => {
-  return (
-    paramDefinition.type?.type == 'reference' &&
-    paramDefinition.type?.dereferenced?.id
-  )
+  return paramDefinition.type?.type == 'reference' && paramDefinition.type?.dereferenced?.id
 }
 
 const isUnion = (paramDefinition: TsDoc.TypeDefinition) => {
@@ -183,10 +151,7 @@ const methodListGroup = (items) => `
 </ul>
 `
 
-const methodListItemLabel = (
-  { name, isOptional, type, description },
-  subContent
-) => `
+const methodListItemLabel = ({ name, isOptional, type, description }, subContent) => `
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -210,9 +175,7 @@ ${description ? description : 'No description provided. '}
 
 function generateExamples(id: string, specExamples: any, allLanguages: any) {
   return specExamples.map((example) => {
-    let allTabs = example.hideCodeBlock
-      ? ''
-      : generateCodeBlocks(allLanguages, example)
+    let allTabs = example.hideCodeBlock ? '' : generateCodeBlocks(allLanguages, example)
     return Example({
       name: example.name,
       description: example.description,
@@ -225,21 +188,12 @@ function generateExamples(id: string, specExamples: any, allLanguages: any) {
 /**
  * A spotlight is an example which appears at the top of the page.
  */
-function generateSpotlight(
-  id: string,
-  specExamples: any | any[],
-  allLanguages: any
-) {
+function generateSpotlight(id: string, specExamples: any | any[], allLanguages: any) {
   if (!Array.isArray(specExamples)) {
-    throw new Error(
-      `Examples for each spec should be an array, received: \n${specExamples}`
-    )
+    throw new Error(`Examples for each spec should be an array, received: \n${specExamples}`)
   }
-  const spotlight =
-    (specExamples && specExamples.find((x) => x.isSpotlight)) || null
-  const spotlightContent = !spotlight
-    ? ''
-    : generateCodeBlocks(allLanguages, spotlight)
+  const spotlight = (specExamples && specExamples.find((x) => x.isSpotlight)) || null
+  const spotlightContent = !spotlight ? '' : generateCodeBlocks(allLanguages, spotlight)
   return spotlightContent
 }
 
@@ -274,18 +228,14 @@ function generateLabelParam(param: any) {
       name: param.name ?? param.value,
       isOptional: !!param.flags?.isOptional,
       type: param.type,
-      description: param.comment
-        ? tsDocCommentToMdComment(param.comment)
-        : null,
+      description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
     }
   } else {
     labelParams = {
       name: param.name ?? extractParamTypeAsString(param),
       isOptional: !!param.flags?.isOptional,
       type: extractParamTypeAsString(param),
-      description: param.comment
-        ? tsDocCommentToMdComment(param.comment)
-        : null,
+      description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
     }
   }
   return labelParams
@@ -322,14 +272,9 @@ function extractTsDocNode(nodeToFind: string, definition: any) {
   let currentNode = definition
   while (i < nodePath.length) {
     previousNode = currentNode
-    currentNode =
-      previousNode.children.find((x) => x.name == nodePath[i]) || null
+    currentNode = previousNode.children.find((x) => x.name == nodePath[i]) || null
     if (currentNode == null) {
-      console.log(
-        `Cant find ${nodePath[i]} in ${previousNode.children.map(
-          (x) => '\n' + x.name
-        )}`
-      )
+      console.log(`Cant find ${nodePath[i]} in ${previousNode.children.map((x) => '\n' + x.name)}`)
       break
     }
     i++

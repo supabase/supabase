@@ -4,11 +4,7 @@ import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 import * as fs from 'fs'
 import * as ejs from 'ejs'
 
-export default async function gen(
-  inputFileName: string,
-  outputDir: string,
-  apiUrl: string
-) {
+export default async function gen(inputFileName: string, outputDir: string, apiUrl: string) {
   const specRaw = fs.readFileSync(inputFileName, 'utf8')
   const spec = JSON.parse(specRaw) as any
   // console.log('spec', spec)
@@ -42,11 +38,7 @@ type enrichedOperation = OpenAPIV3.OperationObject & {
   fullPath: string
   operationId: string
 }
-async function gen_v3(
-  spec: OpenAPIV3.Document,
-  dest: string,
-  { apiUrl }: { apiUrl: string }
-) {
+async function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
   const specLayout = spec.tags || []
   const operations: enrichedOperation[] = []
   Object.entries(spec.paths).forEach(([key, val]) => {
@@ -60,8 +52,7 @@ async function gen_v3(
         fullPath,
         operationId: slugify(operation.summary!),
 
-        responseList:
-          toArrayWithKey(operation.responses!, 'responseCode') || [],
+        responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
       operations.push(enriched)
     })
@@ -72,9 +63,7 @@ async function gen_v3(
       ...section,
       title: toTitle(section.name),
       id: slugify(section.name),
-      operations: operations.filter((operation) =>
-        operation.tags?.includes(section.name)
-      ),
+      operations: operations.filter((operation) => operation.tags?.includes(section.name)),
     }
   })
 
@@ -90,11 +79,7 @@ async function gen_v3(
 }
 
 // OPENAPI-SPEC-VERSION: 2.0
-async function gen_v2(
-  spec: OpenAPIV2.Document,
-  dest: string,
-  { apiUrl }: { apiUrl: string }
-) {
+async function gen_v2(spec: OpenAPIV2.Document, dest: string, { apiUrl }: { apiUrl: string }) {
   const specLayout = spec.tags || []
   const operations: enrichedOperation[] = []
   Object.entries(spec.paths).forEach(([key, val]) => {
@@ -108,8 +93,7 @@ async function gen_v2(
         fullPath,
         operationId: slugify(operation.summary!),
 
-        responseList:
-          toArrayWithKey(operation.responses!, 'responseCode') || [],
+        responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
       operations.push(enriched)
     })
@@ -120,9 +104,7 @@ async function gen_v2(
       ...section,
       title: toTitle(section.name),
       id: slugify(section.name),
-      operations: operations.filter((operation) =>
-        operation.tags?.includes(section.name)
-      ),
+      operations: operations.filter((operation) => operation.tags?.includes(section.name)),
     }
   })
 
