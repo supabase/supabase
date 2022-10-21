@@ -900,7 +900,792 @@
                             "name": "T"
                           }
                         ],
-                        "name": "PostgrestBuilder"
+                        "name": "PostgrestBuilder",
+                        "dereferenced": {
+                          "id": 27,
+                          "name": "PostgrestBuilder",
+                          "kind": 128,
+                          "kindString": "Class",
+                          "flags": {
+                            "isExported": true,
+                            "isAbstract": true
+                          },
+                          "typeParameter": [
+                            {
+                              "id": 28,
+                              "name": "T",
+                              "kind": 131072,
+                              "kindString": "Type parameter",
+                              "flags": {
+                                "isExported": true
+                              }
+                            }
+                          ],
+                          "children": [
+                            {
+                              "id": 41,
+                              "name": "constructor",
+                              "kind": 512,
+                              "kindString": "Constructor",
+                              "flags": {
+                                "isExported": true
+                              },
+                              "signatures": [
+                                {
+                                  "id": 42,
+                                  "name": "new PostgrestBuilder",
+                                  "kind": 16384,
+                                  "kindString": "Constructor signature",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "parameters": [
+                                    {
+                                      "id": 43,
+                                      "name": "builder",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "type": {
+                                        "type": "reference",
+                                        "id": 27,
+                                        "typeArguments": [
+                                          {
+                                            "type": "typeParameter",
+                                            "name": "T"
+                                          }
+                                        ],
+                                        "name": "PostgrestBuilder",
+                                        "dereferenced": "[Circular ~.children.2.children.0.children.0.signatures.0.parameters.0.type.dereferenced]"
+                                      }
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 27,
+                                    "name": "PostgrestBuilder"
+                                  }
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 60,
+                                  "character": 31
+                                }
+                              ]
+                            },
+                            {
+                              "id": 40,
+                              "name": "allowEmpty",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 60,
+                                  "character": 22
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 36,
+                              "name": "body",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 56,
+                                  "character": 16
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "reference",
+                                    "typeArguments": [
+                                      {
+                                        "type": "typeParameter",
+                                        "name": "T"
+                                      }
+                                    ],
+                                    "name": "Partial"
+                                  },
+                                  {
+                                    "type": "array",
+                                    "elementType": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "typeParameter",
+                                          "name": "T"
+                                        }
+                                      ],
+                                      "name": "Partial"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 39,
+                              "name": "fetch",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 59,
+                                  "character": 17
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 59,
+                                "name": "Fetch"
+                              }
+                            },
+                            {
+                              "id": 31,
+                              "name": "headers",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 54,
+                                  "character": 19
+                                }
+                              ],
+                              "type": {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 32,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 33,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 34,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "lib/types.ts",
+                                      "line": 54,
+                                      "character": 21
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "id": 29,
+                              "name": "method",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 52,
+                                  "character": 18
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "GET"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "HEAD"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "POST"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "PATCH"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "DELETE"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 35,
+                              "name": "schema",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 55,
+                                  "character": 18
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 37,
+                              "name": "shouldThrowOnError",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 57,
+                                  "character": 30
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 38,
+                              "name": "signal",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 58,
+                                  "character": 18
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "name": "AbortSignal"
+                              }
+                            },
+                            {
+                              "id": 30,
+                              "name": "url",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 53,
+                                  "character": 15
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "name": "URL"
+                              }
+                            },
+                            {
+                              "id": 47,
+                              "name": "then",
+                              "kind": 2048,
+                              "kindString": "Method",
+                              "flags": {
+                                "isExported": true
+                              },
+                              "signatures": [
+                                {
+                                  "id": 48,
+                                  "name": "then",
+                                  "kind": 4096,
+                                  "kindString": "Call signature",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "typeParameter": [
+                                    {
+                                      "id": 49,
+                                      "name": "TResult1",
+                                      "kind": 131072,
+                                      "kindString": "Type parameter",
+                                      "flags": {
+                                        "isExported": true
+                                      }
+                                    },
+                                    {
+                                      "id": 50,
+                                      "name": "TResult2",
+                                      "kind": 131072,
+                                      "kindString": "Type parameter",
+                                      "flags": {
+                                        "isExported": true
+                                      }
+                                    }
+                                  ],
+                                  "parameters": [
+                                    {
+                                      "id": 51,
+                                      "name": "onfulfilled",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true,
+                                        "isOptional": true
+                                      },
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "reflection",
+                                            "declaration": {
+                                              "id": 52,
+                                              "name": "__type",
+                                              "kind": 65536,
+                                              "kindString": "Type literal",
+                                              "flags": {
+                                                "isExported": true
+                                              },
+                                              "signatures": [
+                                                {
+                                                  "id": 53,
+                                                  "name": "__call",
+                                                  "kind": 4096,
+                                                  "kindString": "Call signature",
+                                                  "flags": {
+                                                    "isExported": true
+                                                  },
+                                                  "parameters": [
+                                                    {
+                                                      "id": 54,
+                                                      "name": "value",
+                                                      "kind": 32768,
+                                                      "kindString": "Parameter",
+                                                      "flags": {
+                                                        "isExported": true
+                                                      },
+                                                      "type": {
+                                                        "type": "reference",
+                                                        "id": 66,
+                                                        "typeArguments": [
+                                                          {
+                                                            "type": "typeParameter",
+                                                            "name": "T"
+                                                          }
+                                                        ],
+                                                        "name": "PostgrestResponse"
+                                                      }
+                                                    }
+                                                  ],
+                                                  "type": {
+                                                    "type": "union",
+                                                    "types": [
+                                                      {
+                                                        "type": "typeParameter",
+                                                        "name": "TResult1",
+                                                        "default": {
+                                                          "type": "reference",
+                                                          "typeArguments": [
+                                                            {
+                                                              "type": "typeParameter",
+                                                              "name": "T"
+                                                            }
+                                                          ],
+                                                          "name": "PostgrestResponse"
+                                                        }
+                                                      },
+                                                      {
+                                                        "type": "reference",
+                                                        "typeArguments": [
+                                                          {
+                                                            "type": "typeParameter",
+                                                            "name": "TResult1",
+                                                            "default": {
+                                                              "type": "reference",
+                                                              "typeArguments": [
+                                                                {
+                                                                  "type": "typeParameter",
+                                                                  "name": "T"
+                                                                }
+                                                              ],
+                                                              "name": "PostgrestResponse"
+                                                            }
+                                                          }
+                                                        ],
+                                                        "name": "PromiseLike"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ],
+                                              "sources": [
+                                                {
+                                                  "fileName": "lib/types.ts",
+                                                  "line": 93,
+                                                  "character": 9
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "undefined"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "null"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 55,
+                                      "name": "onrejected",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true,
+                                        "isOptional": true
+                                      },
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "reflection",
+                                            "declaration": {
+                                              "id": 56,
+                                              "name": "__type",
+                                              "kind": 65536,
+                                              "kindString": "Type literal",
+                                              "flags": {
+                                                "isExported": true
+                                              },
+                                              "signatures": [
+                                                {
+                                                  "id": 57,
+                                                  "name": "__call",
+                                                  "kind": 4096,
+                                                  "kindString": "Call signature",
+                                                  "flags": {
+                                                    "isExported": true
+                                                  },
+                                                  "parameters": [
+                                                    {
+                                                      "id": 58,
+                                                      "name": "reason",
+                                                      "kind": 32768,
+                                                      "kindString": "Parameter",
+                                                      "flags": {
+                                                        "isExported": true
+                                                      },
+                                                      "type": {
+                                                        "type": "intrinsic",
+                                                        "name": "any"
+                                                      }
+                                                    }
+                                                  ],
+                                                  "type": {
+                                                    "type": "union",
+                                                    "types": [
+                                                      {
+                                                        "type": "typeParameter",
+                                                        "name": "TResult2",
+                                                        "default": {
+                                                          "type": "intrinsic",
+                                                          "name": "never"
+                                                        }
+                                                      },
+                                                      {
+                                                        "type": "reference",
+                                                        "typeArguments": [
+                                                          {
+                                                            "type": "typeParameter",
+                                                            "name": "TResult2",
+                                                            "default": {
+                                                              "type": "intrinsic",
+                                                              "name": "never"
+                                                            }
+                                                          }
+                                                        ],
+                                                        "name": "PromiseLike"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ],
+                                              "sources": [
+                                                {
+                                                  "fileName": "lib/types.ts",
+                                                  "line": 96,
+                                                  "character": 18
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "undefined"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "typeArguments": [
+                                      {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "typeParameter",
+                                            "name": "TResult1",
+                                            "default": {
+                                              "type": "reference",
+                                              "typeArguments": [
+                                                {
+                                                  "type": "typeParameter",
+                                                  "name": "T"
+                                                }
+                                              ],
+                                              "name": "PostgrestResponse"
+                                            }
+                                          },
+                                          {
+                                            "type": "typeParameter",
+                                            "name": "TResult2",
+                                            "default": {
+                                              "type": "intrinsic",
+                                              "name": "never"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    ],
+                                    "name": "PromiseLike"
+                                  }
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 91,
+                                  "character": 6
+                                }
+                              ]
+                            },
+                            {
+                              "id": 44,
+                              "name": "throwOnError",
+                              "kind": 2048,
+                              "kindString": "Method",
+                              "flags": {
+                                "isExported": true
+                              },
+                              "signatures": [
+                                {
+                                  "id": 45,
+                                  "name": "throwOnError",
+                                  "kind": 4096,
+                                  "kindString": "Call signature",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "comment": {
+                                    "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
+                                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                                  },
+                                  "parameters": [
+                                    {
+                                      "id": 46,
+                                      "name": "throwOnError",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true,
+                                        "isOptional": true
+                                      },
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "undefined"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "false"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "true"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "this"
+                                  }
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 83,
+                                  "character": 14
+                                }
+                              ]
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Constructors",
+                              "kind": 512,
+                              "children": [41]
+                            },
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [40, 36, 39, 31, 29, 35, 37, 38, 30]
+                            },
+                            {
+                              "title": "Methods",
+                              "kind": 2048,
+                              "children": [47, 44]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/types.ts",
+                              "line": 51,
+                              "character": 38
+                            }
+                          ],
+                          "extendedBy": [
+                            {
+                              "type": "reference",
+                              "id": 73,
+                              "name": "PostgrestTransformBuilder"
+                            },
+                            {
+                              "type": "reference",
+                              "id": 363,
+                              "name": "PostgrestQueryBuilder"
+                            },
+                            {
+                              "type": "reference",
+                              "id": 449,
+                              "name": "PostgrestRpcBuilder"
+                            }
+                          ],
+                          "implementedTypes": [
+                            {
+                              "type": "reference",
+                              "typeArguments": [
+                                {
+                                  "type": "reference",
+                                  "id": 66,
+                                  "typeArguments": [
+                                    {
+                                      "type": "typeParameter",
+                                      "name": "T"
+                                    }
+                                  ],
+                                  "name": "PostgrestResponse"
+                                }
+                              ],
+                              "name": "PromiseLike"
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -2186,7 +2971,205 @@
                       "type": {
                         "type": "reference",
                         "id": 361,
-                        "name": "FilterOperator"
+                        "name": "FilterOperator",
+                        "dereferenced": {
+                          "id": 361,
+                          "name": "FilterOperator",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "comment": {
+                            "shortText": "Filters"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/PostgrestFilterBuilder.ts",
+                              "line": 7,
+                              "character": 19
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "stringLiteral",
+                                "value": "eq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "neq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "gt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "gte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "lt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "lte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "like"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "ilike"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "is"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "in"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "cs"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "cd"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "sl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "sr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "nxl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "nxr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "adj"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "ov"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "fts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "plfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "phfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "wfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.eq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.neq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.gt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.gte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.lt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.lte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.like"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.ilike"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.is"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.in"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.cs"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.cd"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.sl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.sr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.nxl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.nxr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.adj"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.ov"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.fts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.plfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.phfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.wfts"
+                              }
+                            ]
+                          }
+                        }
                       }
                     },
                     {
@@ -3469,7 +4452,205 @@
                       "type": {
                         "type": "reference",
                         "id": 361,
-                        "name": "FilterOperator"
+                        "name": "FilterOperator",
+                        "dereferenced": {
+                          "id": 361,
+                          "name": "FilterOperator",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "comment": {
+                            "shortText": "Filters"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/PostgrestFilterBuilder.ts",
+                              "line": 7,
+                              "character": 19
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "stringLiteral",
+                                "value": "eq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "neq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "gt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "gte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "lt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "lte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "like"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "ilike"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "is"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "in"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "cs"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "cd"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "sl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "sr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "nxl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "nxr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "adj"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "ov"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "fts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "plfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "phfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "wfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.eq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.neq"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.gt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.gte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.lt"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.lte"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.like"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.ilike"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.is"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.in"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.cs"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.cd"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.sl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.sr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.nxl"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.nxr"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.adj"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.ov"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.fts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.plfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.phfts"
+                              },
+                              {
+                                "type": "stringLiteral",
+                                "value": "not.wfts"
+                              }
+                            ]
+                          }
+                        }
                       }
                     },
                     {
@@ -9370,7 +10551,792 @@
                             "name": "T"
                           }
                         ],
-                        "name": "PostgrestBuilder"
+                        "name": "PostgrestBuilder",
+                        "dereferenced": {
+                          "id": 27,
+                          "name": "PostgrestBuilder",
+                          "kind": 128,
+                          "kindString": "Class",
+                          "flags": {
+                            "isExported": true,
+                            "isAbstract": true
+                          },
+                          "typeParameter": [
+                            {
+                              "id": 28,
+                              "name": "T",
+                              "kind": 131072,
+                              "kindString": "Type parameter",
+                              "flags": {
+                                "isExported": true
+                              }
+                            }
+                          ],
+                          "children": [
+                            {
+                              "id": 41,
+                              "name": "constructor",
+                              "kind": 512,
+                              "kindString": "Constructor",
+                              "flags": {
+                                "isExported": true
+                              },
+                              "signatures": [
+                                {
+                                  "id": 42,
+                                  "name": "new PostgrestBuilder",
+                                  "kind": 16384,
+                                  "kindString": "Constructor signature",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "parameters": [
+                                    {
+                                      "id": 43,
+                                      "name": "builder",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "type": {
+                                        "type": "reference",
+                                        "id": 27,
+                                        "typeArguments": [
+                                          {
+                                            "type": "typeParameter",
+                                            "name": "T"
+                                          }
+                                        ],
+                                        "name": "PostgrestBuilder",
+                                        "dereferenced": "[Circular ~.children.5.children.0.children.0.signatures.0.parameters.0.type.dereferenced]"
+                                      }
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "id": 27,
+                                    "name": "PostgrestBuilder"
+                                  }
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 60,
+                                  "character": 31
+                                }
+                              ]
+                            },
+                            {
+                              "id": 40,
+                              "name": "allowEmpty",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 60,
+                                  "character": 22
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 36,
+                              "name": "body",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 56,
+                                  "character": 16
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "reference",
+                                    "typeArguments": [
+                                      {
+                                        "type": "typeParameter",
+                                        "name": "T"
+                                      }
+                                    ],
+                                    "name": "Partial"
+                                  },
+                                  {
+                                    "type": "array",
+                                    "elementType": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "typeParameter",
+                                          "name": "T"
+                                        }
+                                      ],
+                                      "name": "Partial"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 39,
+                              "name": "fetch",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 59,
+                                  "character": 17
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 59,
+                                "name": "Fetch"
+                              }
+                            },
+                            {
+                              "id": 31,
+                              "name": "headers",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 54,
+                                  "character": 19
+                                }
+                              ],
+                              "type": {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 32,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 33,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 34,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "lib/types.ts",
+                                      "line": 54,
+                                      "character": 21
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "id": 29,
+                              "name": "method",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 52,
+                                  "character": 18
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "GET"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "HEAD"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "POST"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "PATCH"
+                                  },
+                                  {
+                                    "type": "stringLiteral",
+                                    "value": "DELETE"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 35,
+                              "name": "schema",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 55,
+                                  "character": 18
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 37,
+                              "name": "shouldThrowOnError",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 57,
+                                  "character": 30
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 38,
+                              "name": "signal",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 58,
+                                  "character": 18
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "name": "AbortSignal"
+                              }
+                            },
+                            {
+                              "id": 30,
+                              "name": "url",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isProtected": true,
+                                "isExported": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 53,
+                                  "character": 15
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "name": "URL"
+                              }
+                            },
+                            {
+                              "id": 47,
+                              "name": "then",
+                              "kind": 2048,
+                              "kindString": "Method",
+                              "flags": {
+                                "isExported": true
+                              },
+                              "signatures": [
+                                {
+                                  "id": 48,
+                                  "name": "then",
+                                  "kind": 4096,
+                                  "kindString": "Call signature",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "typeParameter": [
+                                    {
+                                      "id": 49,
+                                      "name": "TResult1",
+                                      "kind": 131072,
+                                      "kindString": "Type parameter",
+                                      "flags": {
+                                        "isExported": true
+                                      }
+                                    },
+                                    {
+                                      "id": 50,
+                                      "name": "TResult2",
+                                      "kind": 131072,
+                                      "kindString": "Type parameter",
+                                      "flags": {
+                                        "isExported": true
+                                      }
+                                    }
+                                  ],
+                                  "parameters": [
+                                    {
+                                      "id": 51,
+                                      "name": "onfulfilled",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true,
+                                        "isOptional": true
+                                      },
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "reflection",
+                                            "declaration": {
+                                              "id": 52,
+                                              "name": "__type",
+                                              "kind": 65536,
+                                              "kindString": "Type literal",
+                                              "flags": {
+                                                "isExported": true
+                                              },
+                                              "signatures": [
+                                                {
+                                                  "id": 53,
+                                                  "name": "__call",
+                                                  "kind": 4096,
+                                                  "kindString": "Call signature",
+                                                  "flags": {
+                                                    "isExported": true
+                                                  },
+                                                  "parameters": [
+                                                    {
+                                                      "id": 54,
+                                                      "name": "value",
+                                                      "kind": 32768,
+                                                      "kindString": "Parameter",
+                                                      "flags": {
+                                                        "isExported": true
+                                                      },
+                                                      "type": {
+                                                        "type": "reference",
+                                                        "id": 66,
+                                                        "typeArguments": [
+                                                          {
+                                                            "type": "typeParameter",
+                                                            "name": "T"
+                                                          }
+                                                        ],
+                                                        "name": "PostgrestResponse"
+                                                      }
+                                                    }
+                                                  ],
+                                                  "type": {
+                                                    "type": "union",
+                                                    "types": [
+                                                      {
+                                                        "type": "typeParameter",
+                                                        "name": "TResult1",
+                                                        "default": {
+                                                          "type": "reference",
+                                                          "typeArguments": [
+                                                            {
+                                                              "type": "typeParameter",
+                                                              "name": "T"
+                                                            }
+                                                          ],
+                                                          "name": "PostgrestResponse"
+                                                        }
+                                                      },
+                                                      {
+                                                        "type": "reference",
+                                                        "typeArguments": [
+                                                          {
+                                                            "type": "typeParameter",
+                                                            "name": "TResult1",
+                                                            "default": {
+                                                              "type": "reference",
+                                                              "typeArguments": [
+                                                                {
+                                                                  "type": "typeParameter",
+                                                                  "name": "T"
+                                                                }
+                                                              ],
+                                                              "name": "PostgrestResponse"
+                                                            }
+                                                          }
+                                                        ],
+                                                        "name": "PromiseLike"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ],
+                                              "sources": [
+                                                {
+                                                  "fileName": "lib/types.ts",
+                                                  "line": 93,
+                                                  "character": 9
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "undefined"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "null"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 55,
+                                      "name": "onrejected",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true,
+                                        "isOptional": true
+                                      },
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "reflection",
+                                            "declaration": {
+                                              "id": 56,
+                                              "name": "__type",
+                                              "kind": 65536,
+                                              "kindString": "Type literal",
+                                              "flags": {
+                                                "isExported": true
+                                              },
+                                              "signatures": [
+                                                {
+                                                  "id": 57,
+                                                  "name": "__call",
+                                                  "kind": 4096,
+                                                  "kindString": "Call signature",
+                                                  "flags": {
+                                                    "isExported": true
+                                                  },
+                                                  "parameters": [
+                                                    {
+                                                      "id": 58,
+                                                      "name": "reason",
+                                                      "kind": 32768,
+                                                      "kindString": "Parameter",
+                                                      "flags": {
+                                                        "isExported": true
+                                                      },
+                                                      "type": {
+                                                        "type": "intrinsic",
+                                                        "name": "any"
+                                                      }
+                                                    }
+                                                  ],
+                                                  "type": {
+                                                    "type": "union",
+                                                    "types": [
+                                                      {
+                                                        "type": "typeParameter",
+                                                        "name": "TResult2",
+                                                        "default": {
+                                                          "type": "intrinsic",
+                                                          "name": "never"
+                                                        }
+                                                      },
+                                                      {
+                                                        "type": "reference",
+                                                        "typeArguments": [
+                                                          {
+                                                            "type": "typeParameter",
+                                                            "name": "TResult2",
+                                                            "default": {
+                                                              "type": "intrinsic",
+                                                              "name": "never"
+                                                            }
+                                                          }
+                                                        ],
+                                                        "name": "PromiseLike"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ],
+                                              "sources": [
+                                                {
+                                                  "fileName": "lib/types.ts",
+                                                  "line": 96,
+                                                  "character": 18
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "undefined"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reference",
+                                    "typeArguments": [
+                                      {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "typeParameter",
+                                            "name": "TResult1",
+                                            "default": {
+                                              "type": "reference",
+                                              "typeArguments": [
+                                                {
+                                                  "type": "typeParameter",
+                                                  "name": "T"
+                                                }
+                                              ],
+                                              "name": "PostgrestResponse"
+                                            }
+                                          },
+                                          {
+                                            "type": "typeParameter",
+                                            "name": "TResult2",
+                                            "default": {
+                                              "type": "intrinsic",
+                                              "name": "never"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    ],
+                                    "name": "PromiseLike"
+                                  }
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 91,
+                                  "character": 6
+                                }
+                              ]
+                            },
+                            {
+                              "id": 44,
+                              "name": "throwOnError",
+                              "kind": 2048,
+                              "kindString": "Method",
+                              "flags": {
+                                "isExported": true
+                              },
+                              "signatures": [
+                                {
+                                  "id": 45,
+                                  "name": "throwOnError",
+                                  "kind": 4096,
+                                  "kindString": "Call signature",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "comment": {
+                                    "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
+                                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                                  },
+                                  "parameters": [
+                                    {
+                                      "id": 46,
+                                      "name": "throwOnError",
+                                      "kind": 32768,
+                                      "kindString": "Parameter",
+                                      "flags": {
+                                        "isExported": true,
+                                        "isOptional": true
+                                      },
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "undefined"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "false"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "true"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "this"
+                                  }
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 83,
+                                  "character": 14
+                                }
+                              ]
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Constructors",
+                              "kind": 512,
+                              "children": [41]
+                            },
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [40, 36, 39, 31, 29, 35, 37, 38, 30]
+                            },
+                            {
+                              "title": "Methods",
+                              "kind": 2048,
+                              "children": [47, 44]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/types.ts",
+                              "line": 51,
+                              "character": 38
+                            }
+                          ],
+                          "extendedBy": [
+                            {
+                              "type": "reference",
+                              "id": 73,
+                              "name": "PostgrestTransformBuilder"
+                            },
+                            {
+                              "type": "reference",
+                              "id": 363,
+                              "name": "PostgrestQueryBuilder"
+                            },
+                            {
+                              "type": "reference",
+                              "id": 449,
+                              "name": "PostgrestRpcBuilder"
+                            }
+                          ],
+                          "implementedTypes": [
+                            {
+                              "type": "reference",
+                              "typeArguments": [
+                                {
+                                  "type": "reference",
+                                  "id": 66,
+                                  "typeArguments": [
+                                    {
+                                      "type": "typeParameter",
+                                      "name": "T"
+                                    }
+                                  ],
+                                  "name": "PostgrestResponse"
+                                }
+                              ],
+                              "name": "PromiseLike"
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -11290,7 +13256,89 @@
                             "name": "T"
                           }
                         ],
-                        "name": "PostgrestBuilder"
+                        "name": "PostgrestBuilder",
+                        "dereferenced": {
+                          "id": 27,
+                          "name": "PostgrestBuilder",
+                          "kind": 128,
+                          "kindString": "Class",
+                          "flags": {
+                            "isExported": true,
+                            "isAbstract": true
+                          },
+                          "typeParameter": [
+                            {
+                              "id": 28,
+                              "name": "T",
+                              "kind": 131072,
+                              "kindString": "Type parameter",
+                              "flags": {
+                                "isExported": true
+                              }
+                            }
+                          ],
+                          "children": "[Circular ~.children.7.children.0.children]",
+                          "groups": [
+                            {
+                              "title": "Constructors",
+                              "kind": 512,
+                              "children": [41]
+                            },
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [40, 36, 39, 31, 29, 35, 37, 38, 30]
+                            },
+                            {
+                              "title": "Methods",
+                              "kind": 2048,
+                              "children": [47, 44]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/types.ts",
+                              "line": 51,
+                              "character": 38
+                            }
+                          ],
+                          "extendedBy": [
+                            {
+                              "type": "reference",
+                              "id": 73,
+                              "name": "PostgrestTransformBuilder"
+                            },
+                            {
+                              "type": "reference",
+                              "id": 363,
+                              "name": "PostgrestQueryBuilder"
+                            },
+                            {
+                              "type": "reference",
+                              "id": 449,
+                              "name": "PostgrestRpcBuilder"
+                            }
+                          ],
+                          "implementedTypes": [
+                            {
+                              "type": "reference",
+                              "typeArguments": [
+                                {
+                                  "type": "reference",
+                                  "id": 66,
+                                  "typeArguments": [
+                                    {
+                                      "type": "typeParameter",
+                                      "name": "T"
+                                    }
+                                  ],
+                                  "name": "PostgrestResponse"
+                                }
+                              ],
+                              "name": "PromiseLike"
+                            }
+                          ]
+                        }
                       }
                     }
                   ],

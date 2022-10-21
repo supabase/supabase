@@ -547,7 +547,273 @@
                   "type": {
                     "type": "reference",
                     "id": 539,
-                    "name": "AdminUserAttributes"
+                    "name": "AdminUserAttributes",
+                    "dereferenced": {
+                      "id": 539,
+                      "name": "AdminUserAttributes",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 541,
+                          "name": "app_metadata",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for app_metadata that.",
+                            "text": "Only a service role can modify.\n\nCan be any JSON that includes app-specific info, such as identity providers, roles, and other\naccess control information.\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 137,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          }
+                        },
+                        {
+                          "id": 548,
+                          "name": "data",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for user_metadata that a user can modify. Can be any JSON."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 112,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 538,
+                            "name": "UserAttributes.data"
+                          }
+                        },
+                        {
+                          "id": 544,
+                          "name": "email",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's email."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 92,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 534,
+                            "name": "UserAttributes.email"
+                          }
+                        },
+                        {
+                          "id": 547,
+                          "name": "email_change_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "An email change token."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 107,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 537,
+                            "name": "UserAttributes.email_change_token"
+                          }
+                        },
+                        {
+                          "id": 542,
+                          "name": "email_confirm",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "Sets if a user has confirmed their email address.",
+                            "text": "Only a service role can modify.\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 144,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
+                          }
+                        },
+                        {
+                          "id": 546,
+                          "name": "password",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's password."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 102,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 536,
+                            "name": "UserAttributes.password"
+                          }
+                        },
+                        {
+                          "id": 545,
+                          "name": "phone",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's phone."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 97,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 535,
+                            "name": "UserAttributes.phone"
+                          }
+                        },
+                        {
+                          "id": 543,
+                          "name": "phone_confirm",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "Sets if a user has confirmed their phone number.",
+                            "text": "Only a service role can modify.\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 151,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
+                          }
+                        },
+                        {
+                          "id": 540,
+                          "name": "user_metadata",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for user_metadata.",
+                            "text": "Can be any JSON.\n\nOnly a service role can modify.\n\nNote: When using the GoTrueAdminApi and wanting to modify a user's user_metadata,\nthis attribute is used instead of UserAttributes data.\n\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 127,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [541, 548, 544, 547, 542, 546, 545, 543, 540]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 115,
+                          "character": 17
+                        }
+                      ],
+                      "extendedTypes": [
+                        {
+                          "type": "reference",
+                          "id": 533,
+                          "name": "UserAttributes"
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -1336,7 +1602,90 @@
                   "type": {
                     "type": "reference",
                     "id": 481,
-                    "name": "Provider"
+                    "name": "Provider",
+                    "dereferenced": {
+                      "id": 481,
+                      "name": "Provider",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 1,
+                          "character": 12
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": "apple"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "azure"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "bitbucket"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "discord"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "facebook"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "github"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "gitlab"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "google"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "keycloak"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "linkedin"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "notion"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "slack"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "spotify"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "twitch"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "twitter"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "workos"
+                          }
+                        ]
+                      }
+                    }
                   }
                 },
                 {
@@ -3355,7 +3704,127 @@
                   "type": {
                     "type": "reference",
                     "id": 583,
-                    "name": "OpenIDConnectCredentials"
+                    "name": "OpenIDConnectCredentials",
+                    "dereferenced": {
+                      "id": 583,
+                      "name": "OpenIDConnectCredentials",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 587,
+                          "name": "client_id",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 211,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 584,
+                          "name": "id_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 208,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 588,
+                          "name": "issuer",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 212,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 585,
+                          "name": "nonce",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 209,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 586,
+                          "name": "provider",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 210,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "id": 481,
+                            "name": "Provider"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [587, 584, 588, 585, 586]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 207,
+                          "character": 17
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -4221,7 +4690,152 @@
                   "type": {
                     "type": "reference",
                     "id": 533,
-                    "name": "UserAttributes"
+                    "name": "UserAttributes",
+                    "dereferenced": {
+                      "id": 533,
+                      "name": "UserAttributes",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 538,
+                          "name": "data",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for user_metadata that a user can modify. Can be any JSON."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 112,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          }
+                        },
+                        {
+                          "id": 534,
+                          "name": "email",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's email."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 92,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 537,
+                          "name": "email_change_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "An email change token."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 107,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 536,
+                          "name": "password",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's password."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 102,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 535,
+                          "name": "phone",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's phone."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 97,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [538, 534, 537, 536, 535]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 88,
+                          "character": 17
+                        }
+                      ],
+                      "extendedBy": [
+                        {
+                          "type": "reference",
+                          "id": 539,
+                          "name": "AdminUserAttributes"
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -4386,7 +5000,273 @@
                   "type": {
                     "type": "reference",
                     "id": 539,
-                    "name": "AdminUserAttributes"
+                    "name": "AdminUserAttributes",
+                    "dereferenced": {
+                      "id": 539,
+                      "name": "AdminUserAttributes",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 541,
+                          "name": "app_metadata",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for app_metadata that.",
+                            "text": "Only a service role can modify.\n\nCan be any JSON that includes app-specific info, such as identity providers, roles, and other\naccess control information.\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 137,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          }
+                        },
+                        {
+                          "id": 548,
+                          "name": "data",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for user_metadata that a user can modify. Can be any JSON."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 112,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 538,
+                            "name": "UserAttributes.data"
+                          }
+                        },
+                        {
+                          "id": 544,
+                          "name": "email",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's email."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 92,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 534,
+                            "name": "UserAttributes.email"
+                          }
+                        },
+                        {
+                          "id": 547,
+                          "name": "email_change_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "An email change token."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 107,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 537,
+                            "name": "UserAttributes.email_change_token"
+                          }
+                        },
+                        {
+                          "id": 542,
+                          "name": "email_confirm",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "Sets if a user has confirmed their email address.",
+                            "text": "Only a service role can modify.\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 144,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
+                          }
+                        },
+                        {
+                          "id": 546,
+                          "name": "password",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's password."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 102,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 536,
+                            "name": "UserAttributes.password"
+                          }
+                        },
+                        {
+                          "id": 545,
+                          "name": "phone",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's phone."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 97,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "inheritedFrom": {
+                            "type": "reference",
+                            "id": 535,
+                            "name": "UserAttributes.phone"
+                          }
+                        },
+                        {
+                          "id": 543,
+                          "name": "phone_confirm",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "Sets if a user has confirmed their phone number.",
+                            "text": "Only a service role can modify.\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 151,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
+                          }
+                        },
+                        {
+                          "id": 540,
+                          "name": "user_metadata",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for user_metadata.",
+                            "text": "Can be any JSON.\n\nOnly a service role can modify.\n\nNote: When using the GoTrueAdminApi and wanting to modify a user's user_metadata,\nthis attribute is used instead of UserAttributes data.\n\n"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 127,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [541, 548, 544, 547, 542, 546, 545, 543, 540]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 115,
+                          "character": 17
+                        }
+                      ],
+                      "extendedTypes": [
+                        {
+                          "type": "reference",
+                          "id": 533,
+                          "name": "UserAttributes"
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -4733,7 +5613,36 @@
                   "type": {
                     "type": "reference",
                     "id": 570,
-                    "name": "VerifyOTPParams"
+                    "name": "VerifyOTPParams",
+                    "dereferenced": {
+                      "id": 570,
+                      "name": "VerifyOTPParams",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 191,
+                          "character": 12
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "reference",
+                            "id": 571,
+                            "name": "VerifyMobileOTPParams"
+                          },
+                          {
+                            "type": "reference",
+                            "id": 576,
+                            "name": "VerifyEmailOTPParams"
+                          }
+                        ]
+                      }
+                    }
                   }
                 },
                 {
@@ -6113,7 +7022,127 @@
                   "type": {
                     "type": "reference",
                     "id": 583,
-                    "name": "OpenIDConnectCredentials"
+                    "name": "OpenIDConnectCredentials",
+                    "dereferenced": {
+                      "id": 583,
+                      "name": "OpenIDConnectCredentials",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 587,
+                          "name": "client_id",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 211,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 584,
+                          "name": "id_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 208,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 588,
+                          "name": "issuer",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 212,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 585,
+                          "name": "nonce",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 209,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 586,
+                          "name": "provider",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 210,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "id": 481,
+                            "name": "Provider"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [587, 584, 588, 585, 586]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 207,
+                          "character": 17
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -6568,7 +7597,90 @@
                   "type": {
                     "type": "reference",
                     "id": 481,
-                    "name": "Provider"
+                    "name": "Provider",
+                    "dereferenced": {
+                      "id": 481,
+                      "name": "Provider",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 1,
+                          "character": 12
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": "apple"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "azure"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "bitbucket"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "discord"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "facebook"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "github"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "gitlab"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "google"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "keycloak"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "linkedin"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "notion"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "slack"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "spotify"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "twitch"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "twitter"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "workos"
+                          }
+                        ]
+                      }
+                    }
                   }
                 },
                 {
@@ -7043,7 +8155,50 @@
                   "type": {
                     "type": "reference",
                     "id": 482,
-                    "name": "AuthChangeEvent"
+                    "name": "AuthChangeEvent",
+                    "dereferenced": {
+                      "id": 482,
+                      "name": "AuthChangeEvent",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 19,
+                          "character": 12
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": "PASSWORD_RECOVERY"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "SIGNED_IN"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "SIGNED_OUT"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "TOKEN_REFRESHED"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "USER_UPDATED"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "USER_DELETED"
+                          }
+                        ]
+                      }
+                    }
                   }
                 }
               ],
@@ -7086,7 +8241,189 @@
                   "type": {
                     "type": "reference",
                     "id": 486,
-                    "name": "Session"
+                    "name": "Session",
+                    "dereferenced": {
+                      "id": 486,
+                      "name": "Session",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 488,
+                          "name": "access_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 34,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 490,
+                          "name": "expires_at",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A timestamp of when the token will expire. Returned when a login is confirmed."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 42,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "number"
+                          }
+                        },
+                        {
+                          "id": 489,
+                          "name": "expires_in",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The number of seconds until the token expires (since it was issued). Returned when a login is confirmed."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 38,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "number"
+                          }
+                        },
+                        {
+                          "id": 487,
+                          "name": "provider_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 33,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": null
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 491,
+                          "name": "refresh_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 43,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 492,
+                          "name": "token_type",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 44,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 493,
+                          "name": "user",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 45,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": null
+                              },
+                              {
+                                "type": "reference",
+                                "id": 505,
+                                "name": "User"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [488, 490, 489, 487, 491, 492, 493]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 32,
+                          "character": 17
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -7259,7 +8596,189 @@
                   "type": {
                     "type": "reference",
                     "id": 486,
-                    "name": "Session"
+                    "name": "Session",
+                    "dereferenced": {
+                      "id": 486,
+                      "name": "Session",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 488,
+                          "name": "access_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 34,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 490,
+                          "name": "expires_at",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A timestamp of when the token will expire. Returned when a login is confirmed."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 42,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "number"
+                          }
+                        },
+                        {
+                          "id": 489,
+                          "name": "expires_in",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The number of seconds until the token expires (since it was issued). Returned when a login is confirmed."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 38,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "number"
+                          }
+                        },
+                        {
+                          "id": 487,
+                          "name": "provider_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 33,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": null
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 491,
+                          "name": "refresh_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 43,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 492,
+                          "name": "token_type",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 44,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 493,
+                          "name": "user",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 45,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": null
+                              },
+                              {
+                                "type": "reference",
+                                "id": 505,
+                                "name": "User"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [488, 490, 489, 487, 491, 492, 493]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 32,
+                          "character": 17
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -8031,7 +9550,152 @@
                   "type": {
                     "type": "reference",
                     "id": 563,
-                    "name": "UserCredentials"
+                    "name": "UserCredentials",
+                    "dereferenced": {
+                      "id": 563,
+                      "name": "UserCredentials",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 564,
+                          "name": "email",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 182,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 569,
+                          "name": "oidc",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 188,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "id": 583,
+                            "name": "OpenIDConnectCredentials"
+                          }
+                        },
+                        {
+                          "id": 566,
+                          "name": "password",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 184,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 565,
+                          "name": "phone",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 183,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 568,
+                          "name": "provider",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 187,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "id": 481,
+                            "name": "Provider"
+                          }
+                        },
+                        {
+                          "id": 567,
+                          "name": "refreshToken",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 185,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [564, 569, 566, 565, 568, 567]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 181,
+                          "character": 17
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -8470,7 +10134,152 @@
                   "type": {
                     "type": "reference",
                     "id": 563,
-                    "name": "UserCredentials"
+                    "name": "UserCredentials",
+                    "dereferenced": {
+                      "id": 563,
+                      "name": "UserCredentials",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 564,
+                          "name": "email",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 182,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 569,
+                          "name": "oidc",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 188,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "id": 583,
+                            "name": "OpenIDConnectCredentials"
+                          }
+                        },
+                        {
+                          "id": 566,
+                          "name": "password",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 184,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 565,
+                          "name": "phone",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 183,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 568,
+                          "name": "provider",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 187,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "id": 481,
+                            "name": "Provider"
+                          }
+                        },
+                        {
+                          "id": 567,
+                          "name": "refreshToken",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 185,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [564, 569, 566, 565, 568, 567]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 181,
+                          "character": 17
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -8708,7 +10517,152 @@
                   "type": {
                     "type": "reference",
                     "id": 533,
-                    "name": "UserAttributes"
+                    "name": "UserAttributes",
+                    "dereferenced": {
+                      "id": 533,
+                      "name": "UserAttributes",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {},
+                      "children": [
+                        {
+                          "id": 538,
+                          "name": "data",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "A custom data object for user_metadata that a user can modify. Can be any JSON."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 112,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "object"
+                          }
+                        },
+                        {
+                          "id": 534,
+                          "name": "email",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's email."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 92,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 537,
+                          "name": "email_change_token",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "An email change token."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 107,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 536,
+                          "name": "password",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's password."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 102,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "id": 535,
+                          "name": "phone",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "The user's phone."
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 97,
+                              "character": 2
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [538, 534, 537, 536, 535]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 88,
+                          "character": 17
+                        }
+                      ],
+                      "extendedBy": [
+                        {
+                          "type": "reference",
+                          "id": 539,
+                          "name": "AdminUserAttributes"
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -8900,7 +10854,36 @@
                   "type": {
                     "type": "reference",
                     "id": 570,
-                    "name": "VerifyOTPParams"
+                    "name": "VerifyOTPParams",
+                    "dereferenced": {
+                      "id": 570,
+                      "name": "VerifyOTPParams",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 191,
+                          "character": 12
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "reference",
+                            "id": 571,
+                            "name": "VerifyMobileOTPParams"
+                          },
+                          {
+                            "type": "reference",
+                            "id": 576,
+                            "name": "VerifyEmailOTPParams"
+                          }
+                        ]
+                      }
+                    }
                   }
                 },
                 {
@@ -9905,7 +11888,50 @@
                   "type": {
                     "type": "reference",
                     "id": 482,
-                    "name": "AuthChangeEvent"
+                    "name": "AuthChangeEvent",
+                    "dereferenced": {
+                      "id": 482,
+                      "name": "AuthChangeEvent",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 19,
+                          "character": 12
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": "PASSWORD_RECOVERY"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "SIGNED_IN"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "SIGNED_OUT"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "TOKEN_REFRESHED"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "USER_UPDATED"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "USER_DELETED"
+                          }
+                        ]
+                      }
+                    }
                   }
                 },
                 {
