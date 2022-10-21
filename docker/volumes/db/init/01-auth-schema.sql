@@ -22,7 +22,7 @@ CREATE TABLE auth.users (
 	last_sign_in_at timestamptz NULL,
 	raw_app_meta_data jsonb NULL,
 	raw_user_meta_data jsonb NULL,
-	is_super_admin bool NULL,
+	is_super_admin bool NOT NULL DEFAULT FALSE,
 	created_at timestamptz NULL,
 	updated_at timestamptz NULL,
 	CONSTRAINT users_pkey PRIMARY KEY (id)
