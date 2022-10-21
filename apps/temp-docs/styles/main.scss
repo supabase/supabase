@@ -563,3 +563,12 @@ article h1 {
 .DocSearch-Hit-action + .DocSearch-Hit-action {
   // @apply ml-3 border-l border-slate-200 pl-3 dark:border-slate-200;
 }
+
+.p:not(.prose *):not(.overwrite) {
+  @apply text-scale-1100;
+  margin-bottom: 16px;
+}
+
+.small:not(.prose *):not(.overwrite) {
+  @apply text-scale-900 text-xs;
+}
