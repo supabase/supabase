@@ -1526,7 +1526,7 @@ pages:
   .lte():
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1569,7 +1569,7 @@ pages:
   .like():
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1940,7 +1940,7 @@ pages:
           ```
 
   .rangeLte():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.rangeLte'
     examples:
       - name: With `select()`
         isSpotlight: true

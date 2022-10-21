@@ -7,9 +7,8 @@ import 'package:supabase_quickstart/pages/splash_page.dart';
 Future<void> main() async {
   await Supabase.initialize(
     // TODO: Replace credentials with your own
-    url: 'https://ualrvfiametspbkkntpo.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhbHJ2ZmlhbWV0c3Bia2tudHBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTk1ODU0MDIsImV4cCI6MTk3NTE2MTQwMn0.sMZmPO3ZKRK2-4J6SBc2k9ymoGYQPY7DxyYXxychX8I',
+    url: 'YOUR_SUPABASE_URL',
+    anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
   runApp(MyApp());
 }
@@ -23,13 +22,13 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.green,
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            primary: Colors.green,
+            foregroundColor: Colors.green,
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            onPrimary: Colors.white,
-            primary: Colors.green,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
           ),
         ),
       ),

@@ -135,9 +135,9 @@ const sidebars = {
           collapsed: true,
           items: [
             'guides/database/extensions',
-            // 'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
+            'guides/database/extensions/pgtap',
             'guides/database/extensions/uuid-ossp',
           ],
         },
@@ -187,6 +187,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/hosting/platform',
+        'guides/platform/custom-domains',
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
