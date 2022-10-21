@@ -1475,4 +1475,9 @@ module.exports = [
     source: '/docs/reference/javascript/getsubscriptions',
     destination: '/docs/reference/javascript/v1/getsubscriptions',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/cicd-workflows',
+    destination: '/docs/guides/cli/managing-environments',
+  },
 ]
