@@ -31,7 +31,7 @@
   "dependencies": {
     "@apollo/client": "^3.6.6",
     "@docsearch/react": "1.0.0-alpha.27",
-    "@mdx-js/loader": "^1.6.22",
+    "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^12.0.4",
     "@supabase/ui": "v0.37.0-alpha.50",
@@ -46,7 +46,7 @@
     "markdown-toc": "^1.2.0",
     "next": "12.1.0",
     "next-compose-plugins": "^2.2.1",
-    "next-mdx-remote": "^3.0.8",
+    "next-mdx-remote": "^4.1.0",
     "next-themes": "0.0.15",
     "next-transpile-modules": "^9.0.0",
     "react": "17.0.2",
