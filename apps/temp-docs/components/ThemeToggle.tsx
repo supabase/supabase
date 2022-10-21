@@ -1,5 +1,5 @@
 import { useTheme } from './Providers'
-import { IconSun, IconMoon } from 'ui'
+import { IconSun, IconMoon } from '@supabase/ui'
 
 function DarkModeToggle() {
   const { isDarkMode, toggleTheme } = useTheme()
