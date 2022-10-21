@@ -7,7 +7,15 @@ function Upload({ label, children }: any) {
   return <h1>WIP</h1>
 }
 
-function Dragger({ label, afterLabel, beforeLabel, layout, children, files, setFiles }: any) {
+function Dragger({
+  label,
+  afterLabel,
+  beforeLabel,
+  layout,
+  children,
+  files,
+  setFiles,
+}: any) {
   // const [classes, setClasses] = useState([UploadStyles['sbui-upload-dragger']])
 
   // const draggedCssClass = UploadStyles['sbui-upload-dragger--dragged']
@@ -55,13 +63,22 @@ function Dragger({ label, afterLabel, beforeLabel, layout, children, files, setF
   const fileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
     const newFiles = e.target.files || []
-    // @ts-ignore
     setFiles([...files, ...newFiles])
   }
 
   return (
-    <div onDragOver={dragOver} onDragEnter={dragEnter} onDragLeave={dragLeave} onDrop={fileDrop}>
-      <FormLayout label={label} afterLabel={afterLabel} beforeLabel={beforeLabel} layout={layout}>
+    <div
+      onDragOver={dragOver}
+      onDragEnter={dragEnter}
+      onDragLeave={dragLeave}
+      onDrop={fileDrop}
+    >
+      <FormLayout
+        label={label}
+        afterLabel={afterLabel}
+        beforeLabel={beforeLabel}
+        layout={layout}
+      >
         <label
           htmlFor="file-upload"
           // className={classes.join(' ')}
