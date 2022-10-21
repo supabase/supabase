@@ -135,9 +135,9 @@ const sidebars = {
           collapsed: true,
           items: [
             'guides/database/extensions',
-            // 'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
+            'guides/database/extensions/pgtap',
             'guides/database/extensions/uuid-ossp',
           ],
         },

@@ -126,7 +126,30 @@
                       "type": {
                         "type": "reference",
                         "id": 15,
-                        "name": "Fetch"
+                        "name": "Fetch",
+                        "dereferenced": {
+                          "id": 15,
+                          "name": "Fetch",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 1,
+                              "character": 17
+                            }
+                          ],
+                          "type": {
+                            "type": "query",
+                            "queryType": {
+                              "type": "reference",
+                              "name": "fetch"
+                            }
+                          }
+                        }
                       }
                     }
                   ],
@@ -1743,7 +1766,30 @@
                       "type": {
                         "type": "reference",
                         "id": 15,
-                        "name": "Fetch"
+                        "name": "Fetch",
+                        "dereferenced": {
+                          "id": 15,
+                          "name": "Fetch",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 1,
+                              "character": 17
+                            }
+                          ],
+                          "type": {
+                            "type": "query",
+                            "queryType": {
+                              "type": "reference",
+                              "name": "fetch"
+                            }
+                          }
+                        }
                       }
                     }
                   ],
@@ -3139,7 +3185,30 @@
                       "type": {
                         "type": "reference",
                         "id": 15,
-                        "name": "Fetch"
+                        "name": "Fetch",
+                        "dereferenced": {
+                          "id": 15,
+                          "name": "Fetch",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 1,
+                              "character": 17
+                            }
+                          ],
+                          "type": {
+                            "type": "query",
+                            "queryType": {
+                              "type": "reference",
+                              "name": "fetch"
+                            }
+                          }
+                        }
                       }
                     }
                   ],
@@ -4492,7 +4561,156 @@
                       "type": {
                         "type": "reference",
                         "id": 99,
-                        "name": "SearchOptions"
+                        "name": "SearchOptions",
+                        "dereferenced": {
+                          "id": 99,
+                          "name": "SearchOptions",
+                          "kind": 256,
+                          "kindString": "Interface",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "children": [
+                            {
+                              "id": 100,
+                              "name": "limit",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "The number of files you want to be returned."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 35,
+                                  "character": 7
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 101,
+                              "name": "offset",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "The starting position."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 38,
+                                  "character": 8
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 103,
+                              "name": "search",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "The search string to filter files by."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 44,
+                                  "character": 8
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 102,
+                              "name": "sortBy",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "The column to sort by. Can be any column inside a FileObject."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 41,
+                                  "character": 8
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 92,
+                                "name": "SortBy"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [100, 101, 103, 102]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/types.ts",
+                              "line": 33,
+                              "character": 30
+                            }
+                          ]
+                        }
                       }
                     },
                     {
@@ -4510,7 +4728,53 @@
                       "type": {
                         "type": "reference",
                         "id": 13,
-                        "name": "FetchParameters"
+                        "name": "FetchParameters",
+                        "dereferenced": {
+                          "id": 13,
+                          "name": "FetchParameters",
+                          "kind": 256,
+                          "kindString": "Interface",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "children": [
+                            {
+                              "id": 14,
+                              "name": "signal",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/fetch.ts",
+                                  "line": 11,
+                                  "character": 8
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "name": "AbortSignal"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [14]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 10,
+                              "character": 32
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -5082,7 +5346,126 @@
                       "type": {
                         "type": "reference",
                         "id": 95,
-                        "name": "FileOptions"
+                        "name": "FileOptions",
+                        "dereferenced": {
+                          "id": 95,
+                          "name": "FileOptions",
+                          "kind": 256,
+                          "kindString": "Interface",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "children": [
+                            {
+                              "id": 96,
+                              "name": "cacheControl",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 28,
+                                  "character": 14
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 97,
+                              "name": "contentType",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 29,
+                                  "character": 13
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 98,
+                              "name": "upsert",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 30,
+                                  "character": 8
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "false"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "true"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [96, 97, 98]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/types.ts",
+                              "line": 27,
+                              "character": 28
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -5347,7 +5730,126 @@
                       "type": {
                         "type": "reference",
                         "id": 95,
-                        "name": "FileOptions"
+                        "name": "FileOptions",
+                        "dereferenced": {
+                          "id": 95,
+                          "name": "FileOptions",
+                          "kind": 256,
+                          "kindString": "Interface",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "children": [
+                            {
+                              "id": 96,
+                              "name": "cacheControl",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 28,
+                                  "character": 14
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 97,
+                              "name": "contentType",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 29,
+                                  "character": 13
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 98,
+                              "name": "upsert",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 30,
+                                  "character": 8
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "false"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "true"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [96, 97, 98]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/types.ts",
+                              "line": 27,
+                              "character": 28
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -5638,7 +6140,126 @@
                       "type": {
                         "type": "reference",
                         "id": 95,
-                        "name": "FileOptions"
+                        "name": "FileOptions",
+                        "dereferenced": {
+                          "id": 95,
+                          "name": "FileOptions",
+                          "kind": 256,
+                          "kindString": "Interface",
+                          "flags": {
+                            "isExported": true
+                          },
+                          "children": [
+                            {
+                              "id": 96,
+                              "name": "cacheControl",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 28,
+                                  "character": 14
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 97,
+                              "name": "contentType",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 29,
+                                  "character": 13
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 98,
+                              "name": "upsert",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isExported": true,
+                                "isOptional": true
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "lib/types.ts",
+                                  "line": 30,
+                                  "character": 8
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "false"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "true"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [96, 97, 98]
+                            }
+                          ],
+                          "sources": [
+                            {
+                              "fileName": "lib/types.ts",
+                              "line": 27,
+                              "character": 28
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -6445,7 +7066,44 @@
                   "type": {
                     "type": "reference",
                     "id": 16,
-                    "name": "RequestMethodType"
+                    "name": "RequestMethodType",
+                    "dereferenced": {
+                      "id": 16,
+                      "name": "RequestMethodType",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 14,
+                          "character": 29
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "stringLiteral",
+                            "value": "GET"
+                          },
+                          {
+                            "type": "stringLiteral",
+                            "value": "POST"
+                          },
+                          {
+                            "type": "stringLiteral",
+                            "value": "PUT"
+                          },
+                          {
+                            "type": "stringLiteral",
+                            "value": "DELETE"
+                          }
+                        ]
+                      }
+                    }
                   }
                 },
                 {
@@ -6459,7 +7117,134 @@
                   "type": {
                     "type": "reference",
                     "id": 7,
-                    "name": "FetchOptions"
+                    "name": "FetchOptions",
+                    "dereferenced": {
+                      "id": 7,
+                      "name": "FetchOptions",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 8,
+                          "name": "headers",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 4,
+                              "character": 9
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 9,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 10,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 11,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 12,
+                          "name": "noResolveJson",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 7,
+                              "character": 15
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "false"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "true"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [8, 12]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 3,
+                          "character": 29
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -6473,7 +7258,53 @@
                   "type": {
                     "type": "reference",
                     "id": 13,
-                    "name": "FetchParameters"
+                    "name": "FetchParameters",
+                    "dereferenced": {
+                      "id": 13,
+                      "name": "FetchParameters",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 14,
+                          "name": "signal",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 11,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "name": "AbortSignal"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [14]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 10,
+                          "character": 32
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -6568,7 +7399,30 @@
                   "type": {
                     "type": "reference",
                     "id": 15,
-                    "name": "Fetch"
+                    "name": "Fetch",
+                    "dereferenced": {
+                      "id": 15,
+                      "name": "Fetch",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 1,
+                          "character": 17
+                        }
+                      ],
+                      "type": {
+                        "type": "query",
+                        "queryType": {
+                          "type": "reference",
+                          "name": "fetch"
+                        }
+                      }
+                    }
                   }
                 },
                 {
@@ -6580,7 +7434,44 @@
                   "type": {
                     "type": "reference",
                     "id": 16,
-                    "name": "RequestMethodType"
+                    "name": "RequestMethodType",
+                    "dereferenced": {
+                      "id": 16,
+                      "name": "RequestMethodType",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 14,
+                          "character": 29
+                        }
+                      ],
+                      "type": {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "stringLiteral",
+                            "value": "GET"
+                          },
+                          {
+                            "type": "stringLiteral",
+                            "value": "POST"
+                          },
+                          {
+                            "type": "stringLiteral",
+                            "value": "PUT"
+                          },
+                          {
+                            "type": "stringLiteral",
+                            "value": "DELETE"
+                          }
+                        ]
+                      }
+                    }
                   }
                 },
                 {
@@ -6605,7 +7496,134 @@
                   "type": {
                     "type": "reference",
                     "id": 7,
-                    "name": "FetchOptions"
+                    "name": "FetchOptions",
+                    "dereferenced": {
+                      "id": 7,
+                      "name": "FetchOptions",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 8,
+                          "name": "headers",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 4,
+                              "character": 9
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 9,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 10,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 11,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 12,
+                          "name": "noResolveJson",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 7,
+                              "character": 15
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "false"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "true"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [8, 12]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 3,
+                          "character": 29
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -6619,7 +7637,53 @@
                   "type": {
                     "type": "reference",
                     "id": 13,
-                    "name": "FetchParameters"
+                    "name": "FetchParameters",
+                    "dereferenced": {
+                      "id": 13,
+                      "name": "FetchParameters",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 14,
+                          "name": "signal",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 11,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "name": "AbortSignal"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [14]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 10,
+                          "character": 32
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -6694,7 +7758,30 @@
                   "type": {
                     "type": "reference",
                     "id": 15,
-                    "name": "Fetch"
+                    "name": "Fetch",
+                    "dereferenced": {
+                      "id": 15,
+                      "name": "Fetch",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 1,
+                          "character": 17
+                        }
+                      ],
+                      "type": {
+                        "type": "query",
+                        "queryType": {
+                          "type": "reference",
+                          "name": "fetch"
+                        }
+                      }
+                    }
                   }
                 },
                 {
@@ -6722,7 +7809,134 @@
                   "type": {
                     "type": "reference",
                     "id": 7,
-                    "name": "FetchOptions"
+                    "name": "FetchOptions",
+                    "dereferenced": {
+                      "id": 7,
+                      "name": "FetchOptions",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 8,
+                          "name": "headers",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 4,
+                              "character": 9
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 9,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 10,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 11,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 12,
+                          "name": "noResolveJson",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 7,
+                              "character": 15
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "false"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "true"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [8, 12]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 3,
+                          "character": 29
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -6737,7 +7951,53 @@
                   "type": {
                     "type": "reference",
                     "id": 13,
-                    "name": "FetchParameters"
+                    "name": "FetchParameters",
+                    "dereferenced": {
+                      "id": 13,
+                      "name": "FetchParameters",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 14,
+                          "name": "signal",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 11,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "name": "AbortSignal"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [14]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 10,
+                          "character": 32
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -6843,7 +8103,30 @@
                   "type": {
                     "type": "reference",
                     "id": 15,
-                    "name": "Fetch"
+                    "name": "Fetch",
+                    "dereferenced": {
+                      "id": 15,
+                      "name": "Fetch",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 1,
+                          "character": 17
+                        }
+                      ],
+                      "type": {
+                        "type": "query",
+                        "queryType": {
+                          "type": "reference",
+                          "name": "fetch"
+                        }
+                      }
+                    }
                   }
                 },
                 {
@@ -6884,7 +8167,134 @@
                   "type": {
                     "type": "reference",
                     "id": 7,
-                    "name": "FetchOptions"
+                    "name": "FetchOptions",
+                    "dereferenced": {
+                      "id": 7,
+                      "name": "FetchOptions",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 8,
+                          "name": "headers",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 4,
+                              "character": 9
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 9,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 10,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 11,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 12,
+                          "name": "noResolveJson",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 7,
+                              "character": 15
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "false"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "true"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [8, 12]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 3,
+                          "character": 29
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -6899,7 +8309,53 @@
                   "type": {
                     "type": "reference",
                     "id": 13,
-                    "name": "FetchParameters"
+                    "name": "FetchParameters",
+                    "dereferenced": {
+                      "id": 13,
+                      "name": "FetchParameters",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 14,
+                          "name": "signal",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 11,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "name": "AbortSignal"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [14]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 10,
+                          "character": 32
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -6952,7 +8408,30 @@
                   "type": {
                     "type": "reference",
                     "id": 15,
-                    "name": "Fetch"
+                    "name": "Fetch",
+                    "dereferenced": {
+                      "id": 15,
+                      "name": "Fetch",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 1,
+                          "character": 17
+                        }
+                      ],
+                      "type": {
+                        "type": "query",
+                        "queryType": {
+                          "type": "reference",
+                          "name": "fetch"
+                        }
+                      }
+                    }
                   }
                 },
                 {
@@ -6993,7 +8472,134 @@
                   "type": {
                     "type": "reference",
                     "id": 7,
-                    "name": "FetchOptions"
+                    "name": "FetchOptions",
+                    "dereferenced": {
+                      "id": 7,
+                      "name": "FetchOptions",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 8,
+                          "name": "headers",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 4,
+                              "character": 9
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 9,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 10,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 11,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 12,
+                          "name": "noResolveJson",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 7,
+                              "character": 15
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "false"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "true"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [8, 12]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 3,
+                          "character": 29
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -7008,7 +8614,53 @@
                   "type": {
                     "type": "reference",
                     "id": 13,
-                    "name": "FetchParameters"
+                    "name": "FetchParameters",
+                    "dereferenced": {
+                      "id": 13,
+                      "name": "FetchParameters",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 14,
+                          "name": "signal",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 11,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "name": "AbortSignal"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [14]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 10,
+                          "character": 32
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -7061,7 +8713,30 @@
                   "type": {
                     "type": "reference",
                     "id": 15,
-                    "name": "Fetch"
+                    "name": "Fetch",
+                    "dereferenced": {
+                      "id": 15,
+                      "name": "Fetch",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 1,
+                          "character": 17
+                        }
+                      ],
+                      "type": {
+                        "type": "query",
+                        "queryType": {
+                          "type": "reference",
+                          "name": "fetch"
+                        }
+                      }
+                    }
                   }
                 },
                 {
@@ -7102,7 +8777,134 @@
                   "type": {
                     "type": "reference",
                     "id": 7,
-                    "name": "FetchOptions"
+                    "name": "FetchOptions",
+                    "dereferenced": {
+                      "id": 7,
+                      "name": "FetchOptions",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 8,
+                          "name": "headers",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 4,
+                              "character": 9
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "reflection",
+                                "declaration": {
+                                  "id": 9,
+                                  "name": "__type",
+                                  "kind": 65536,
+                                  "kindString": "Type literal",
+                                  "flags": {
+                                    "isExported": true
+                                  },
+                                  "indexSignature": [
+                                    {
+                                      "id": 10,
+                                      "name": "__index",
+                                      "kind": 8192,
+                                      "kindString": "Index signature",
+                                      "flags": {
+                                        "isExported": true
+                                      },
+                                      "parameters": [
+                                        {
+                                          "id": 11,
+                                          "name": "key",
+                                          "kind": 32768,
+                                          "kindString": "Parameter",
+                                          "flags": {
+                                            "isExported": true
+                                          },
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": 12,
+                          "name": "noResolveJson",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 7,
+                              "character": 15
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "intrinsic",
+                                "name": "undefined"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "false"
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "true"
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [8, 12]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 3,
+                          "character": 29
+                        }
+                      ]
+                    }
                   }
                 },
                 {
@@ -7117,7 +8919,53 @@
                   "type": {
                     "type": "reference",
                     "id": 13,
-                    "name": "FetchParameters"
+                    "name": "FetchParameters",
+                    "dereferenced": {
+                      "id": 13,
+                      "name": "FetchParameters",
+                      "kind": 256,
+                      "kindString": "Interface",
+                      "flags": {
+                        "isExported": true
+                      },
+                      "children": [
+                        {
+                          "id": 14,
+                          "name": "signal",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isExported": true,
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "lib/fetch.ts",
+                              "line": 11,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "name": "AbortSignal"
+                          }
+                        }
+                      ],
+                      "groups": [
+                        {
+                          "title": "Properties",
+                          "kind": 1024,
+                          "children": [14]
+                        }
+                      ],
+                      "sources": [
+                        {
+                          "fileName": "lib/fetch.ts",
+                          "line": 10,
+                          "character": 32
+                        }
+                      ]
+                    }
                   }
                 }
               ],
@@ -7229,7 +9077,28 @@
                   "type": {
                     "type": "reference",
                     "id": 69,
-                    "name": "Fetch"
+                    "name": "Fetch",
+                    "dereferenced": {
+                      "id": 69,
+                      "name": "Fetch",
+                      "kind": 4194304,
+                      "kindString": "Type alias",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "lib/helpers.ts",
+                          "line": 1,
+                          "character": 10
+                        }
+                      ],
+                      "type": {
+                        "type": "query",
+                        "queryType": {
+                          "type": "reference",
+                          "name": "fetch"
+                        }
+                      }
+                    }
                   }
                 }
               ],

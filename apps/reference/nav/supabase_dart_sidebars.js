@@ -6,7 +6,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['intro', 'installing', 'initializing'],
+      items: ['intro', 'installing', 'initializing', 'upgrade-guide'],
       collapsed: true,
     },
     {
@@ -23,7 +23,7 @@ const sidebars = {
         'generated/auth-currentuser',
         'generated/auth-updateuser',
         'generated/auth-onauthstatechange',
-        'generated/reset-password-email',
+        'generated/auth-resetpasswordforemail',
       ],
       collapsed: true,
     },
