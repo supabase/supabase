@@ -142,7 +142,8 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
     const payload = {
       ...values,
-      library: selectedLibrary !== undefined ? selectedLibrary.key : '',
+      library:
+        values.category === 'Problem' && selectedLibrary !== undefined ? selectedLibrary.key : '',
       message: formatMessage(values.message, attachments),
       verified: true,
       tags: ['dashboard-support-form'],
