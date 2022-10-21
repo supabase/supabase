@@ -34,7 +34,7 @@ const sidebars = {
       items: [
         'guides/cli',
         'guides/cli/local-development',
-        'guides/cli/cicd-workflow',
+        'guides/cli/managing-environments',
       ],
     },
     {
