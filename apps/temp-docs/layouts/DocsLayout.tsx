@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react'
+import { useEffect } from 'react'
 import Head from 'next/head'
 import NavBar from '../components/nav/NavBar'
 import SideBar from '../components/nav/SideBar'
@@ -18,6 +18,16 @@ const DocsLayout = ({
   currentPage: string
 }) => {
   const theme = 'okaidia'
+
+  useEffect(() => {
+    const key = localStorage.getItem('supabaseDarkMode')
+    if (!key) {
+      // Default to dark mode if no preference config
+      document.documentElement.className = 'dark'
+    } else {
+      document.documentElement.className = key === 'true' ? 'dark' : ''
+    }
+  }, [])
 
   return (
     <>
