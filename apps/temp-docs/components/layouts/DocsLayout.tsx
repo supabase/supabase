@@ -1,8 +1,8 @@
 import { ReactElement, useState } from 'react'
 import Head from 'next/head'
-import NavBar from '../components/nav/NavBar'
-import SideBar from '../components/nav/SideBar'
-import Footer from '../components/Footer'
+import NavBar from '../nav/NavBar'
+import SideBar from '../nav/SideBar'
+import Footer from '../Footer'
 
 const DocsLayout = ({
   meta,
