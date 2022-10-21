@@ -6,7 +6,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['intro', 'installing', 'initializing'],
+      items: ['intro', 'installing', 'initializing', 'upgrade-guide'],
       collapsed: true,
     },
     {
