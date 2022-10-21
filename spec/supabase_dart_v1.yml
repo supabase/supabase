@@ -763,7 +763,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
           });
@@ -775,7 +775,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .eq('id', '120')
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
@@ -785,7 +785,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .order('name', ascending: true)
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
@@ -795,7 +795,7 @@ pages:
         dart: |
           ```dart
           supabase.from('countries')
-            .stream(['id'])
+            .stream(primaryKey: ['id'])
             .order('name', ascending: true)
             .limit(10)
             .listen((List<Map<String, dynamic>> data) {
@@ -818,7 +818,7 @@ pages:
 
           class _MyWidgetState extends State<MyWidget> {
             // Persist the stream in a local variable to prevent refetching upon rebuilds
-            final _stream = supabase.from('countries').stream(['id']);
+            final _stream = supabase.from('countries').stream(primaryKey: ['id']);
 
             @override
             Widget build(BuildContext context) {
