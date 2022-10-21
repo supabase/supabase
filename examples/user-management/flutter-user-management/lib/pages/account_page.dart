@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
-import 'package:supabase_quickstart/utils/constants.dart';
+import 'package:supabase_quickstart/constants.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
