@@ -13,6 +13,7 @@ import {
   IconAlertCircle,
   IconExternalLink,
 } from 'ui'
+import { CLIENT_LIBRARIES } from 'common/constants'
 
 import { Project } from 'types'
 import { useStore, useFlag } from 'hooks'
@@ -26,7 +27,6 @@ import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.constants'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import BestPracticesGuidance from './BestPracticesGuidance'
-import ClientLibrariesGuidance from './ClientLibrariesGuidance'
 import InformationBox from 'components/ui/InformationBox'
 import Link from 'next/link'
 
@@ -93,6 +93,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         : sortedProjects.length > 0
         ? sortedProjects[0].ref
         : 'no-project',
+    library: 'no-library',
     subject: '',
     message: '',
   }
@@ -127,7 +128,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const onValidate = (values: any) => {
     const errors: any = {}
     if (!values.subject) errors.subject = 'Please add a subject heading'
-    if (!values.message) errors.message = 'Please type in a message'
+    if (!values.message) errors.message = "Please add a message about the issue that you're facing"
+    if (values.category === 'Problem' && values.library === 'no-library')
+      errors.library = "Please select the library that you're facing issues with"
     return errors
   }
 
@@ -135,8 +138,11 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     setSubmitting(true)
     const attachments =
       uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
+    const selectedLibrary = CLIENT_LIBRARIES.find((library) => library.language === values.library)
+
     const payload = {
       ...values,
+      library: selectedLibrary !== undefined ? selectedLibrary.key : '',
       message: formatMessage(values.message, attachments),
       verified: true,
       tags: ['dashboard-support-form'],
@@ -175,6 +181,14 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         const selectedCategory = CATEGORY_OPTIONS.find(
           (category) => category.value === values.category
         )
+
+        const selectedLibrary = CLIENT_LIBRARIES.find(
+          (library) => library.language === values.library
+        )
+        const selectedClientLibraries = selectedLibrary?.libraries.filter((library) =>
+          library.name.includes('supabase-')
+        )
+
         const selectedProject = projects.find((project) => project.ref === values.projectRef)
         const isFreeProject =
           (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) ===
@@ -272,16 +286,15 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
             {selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.FREE && (
               <div className="px-6">
                 <InformationBox
-                  hideCollapse
-                  defaultVisibility
                   icon={<IconAlertCircle strokeWidth={2} />}
                   title="Expected response times are based on your project's tier"
-                  // description="Upgrade to the Pro tier for guaranteed response times, or ask about SLAs available on our enterprise plan"
                   description={
                     <div className="space-y-4 mb-1">
                       <p>
-                        Upgrade to the Pro tier for guaranteed response times, or ask about SLAs
-                        available on our enterprise plan
+                        Free tier support is available within the community and officially by the
+                        team on a best efforts basis, though we cannot guarantee a response time.
+                        For a guaranteed response time we recommend upgrading to the Pro tier.
+                        Enhanced SLAs for support are available on our Enterprise Tier.
                       </p>
                       <div className="flex items-center space-x-2">
                         <Link href={`/project/${values.projectRef}/settings/billing/update`}>
@@ -305,12 +318,12 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
             <Divider light />
 
-            {values.category === 'Problem' && (
+            {/* {values.category === 'Problem' && (
               <>
                 <ClientLibrariesGuidance />
                 <Divider light />
               </>
-            )}
+            )} */}
 
             {values.category === 'Best_practices' && (
               <>
@@ -328,6 +341,103 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                     placeholder="Summary of the problem you have"
                   />
                 </div>
+                {values.category === 'Problem' && (
+                  <div className="px-6">
+                    <Listbox
+                      id="library"
+                      layout="vertical"
+                      label="Which library are you having issues with?"
+                    >
+                      <Listbox.Option
+                        disabled
+                        label="Please select a library"
+                        value="no-library"
+                        className="min-w-[500px]"
+                      >
+                        <span>Please select a library</span>
+                      </Listbox.Option>
+                      {CLIENT_LIBRARIES.map((option, i) => {
+                        return (
+                          <Listbox.Option
+                            key={`option-${option.key}`}
+                            label={option.language}
+                            value={option.language}
+                            className="min-w-[500px]"
+                          >
+                            <span>{option.language}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  </div>
+                )}
+
+                {selectedLibrary !== undefined && (
+                  <div className="px-6 space-y-4 !mt-4">
+                    <div className="space-y-2">
+                      <p className="text-sm text-scale-1100">
+                        Found an issue or a bug? Try searching our Github issues or submit a new
+                        one.
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-4 overflow-x-auto">
+                      {selectedClientLibraries?.map((library) => {
+                        const libraryLanguage =
+                          values.library === 'Dart (Flutter)'
+                            ? library.name.split('-')[1]
+                            : values.library
+                        return (
+                          <div
+                            key={library.name}
+                            className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-scale-600 bg-scale-300 space-y-3 px-4 py-3"
+                          >
+                            <div className="space-y-1">
+                              <p className="text-sm">{library.name}</p>
+                              <p className="text-sm text-scale-1100">
+                                For issues regarding the {libraryLanguage} client library
+                              </p>
+                            </div>
+                            <div>
+                              <Link href={library.url}>
+                                <a target="_blank">
+                                  <Button
+                                    type="default"
+                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                  >
+                                    View Github issues
+                                  </Button>
+                                </a>
+                              </Link>
+                            </div>
+                          </div>
+                        )
+                      })}
+                      <div
+                        className={[
+                          'px-4 py-3 rounded border border-scale-600 bg-scale-300',
+                          'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3',
+                        ].join(' ')}
+                      >
+                        <div className="space-y-1">
+                          <p className="text-sm">supabase</p>
+                          <p className="text-sm text-scale-1100">For any issues about our API</p>
+                        </div>
+                        <div>
+                          <Link href="https://github.com/supabase/supabase">
+                            <a target="_blank">
+                              <Button
+                                type="default"
+                                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                              >
+                                View Github issues
+                              </Button>
+                            </a>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="px-6 space-y-2">
                   <p className="text-sm text-scale-1100">Which services are affected?</p>
@@ -339,7 +449,6 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                     onChange={setSelectedServices}
                   />
                 </div>
-
                 <div className="text-area-text-sm px-6">
                   <Input.TextArea
                     id="message"
@@ -349,7 +458,6 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                     labelOptional="500 character limit"
                   />
                 </div>
-
                 <div className="space-y-4 px-6">
                   <div className="space-y-1">
                     <p className="block text-sm text-scale-1100">Attachments</p>
