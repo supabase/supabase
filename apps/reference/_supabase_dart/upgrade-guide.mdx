@@ -25,11 +25,11 @@ The way supabase-flutter throws error has changed in v1. In v0, errors were retu
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
 ```dart
 final res = await supabase.from('my_table').select().execute();
@@ -41,7 +41,7 @@ final data = res.data;
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
 ```dart
 try {
@@ -59,23 +59,61 @@ try {
 
 The signIn() method has been deprecated in favor of more explicit method signatures to help with type hinting. Previously it was difficult for developers to know what they were missing (e.g., a lot of developers didn't realize they could use passwordless magic links).
 
+### Listening to auth state change
+
+`onAuthStateChange` now returns a `Stream`.
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
+  ]}>
+
+<TabItem value="0.x">
+
+```dart
+final authSubscription = supabase.auth.onAuthStateChange((event, session) {
+  // handle auth state change
+});
+
+// Unsubscribe when no longer needed
+authSubscription.data?.unsubscribe();
+```
+</TabItem>
+
+<TabItem value="1.x">
+
+```dart
+final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+      final AuthChangeEvent event = data.event;
+      final Session? session = data.session;
+      // handle auth state change
+    });
+
+// Unsubscribe when no longer needed
+authSubscription.cancel();
+```
+</TabItem>
+</Tabs>
+
 ### Sign in with email and password
 
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
 ```dart
 await supabase.auth.signIn(email: email, password: password);
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
 ```dart
 await supabase.auth.signInWithPassword(email: email, password: password);
@@ -87,18 +125,18 @@ await supabase.auth.signInWithPassword(email: email, password: password);
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
 ```dart
 await supabase.auth.signIn(email: email);
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
 ```dart
 await supabase.auth.signInWithOtp(email: email);
@@ -110,11 +148,11 @@ await supabase.auth.signInWithOtp(email: email);
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
 ```dart
 await supabase.auth.signInWithProvider(
@@ -127,7 +165,7 @@ await supabase.auth.signInWithProvider(
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
 ```dart
 await supabase.auth.signInWithOAuth(
@@ -142,11 +180,11 @@ await supabase.auth.signInWithOAuth(
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
 ```dart
 await supabase.auth.signIn(
@@ -156,7 +194,7 @@ await supabase.auth.signIn(
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
 ```dart
 await supabase.auth.signInWithPassword(
@@ -171,20 +209,20 @@ await supabase.auth.signInWithPassword(
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
 final res = await supabase.auth.signIn(phone: phone);
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 await supabase.auth.signInWithOtp(
   phone: phone,
 );
@@ -203,13 +241,13 @@ await supabase.auth.verifyOTP(
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
 await supabase.auth.api.resetPasswordForEmail(
   email,
   options:
@@ -218,9 +256,9 @@ await supabase.auth.api.resetPasswordForEmail(
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 await supabase.auth.resetPasswordForEmail(
   email,
   redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
@@ -233,68 +271,68 @@ await supabase.auth.resetPasswordForEmail(
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
  final session = supabase.auth.session();
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 final Session? session = supabase.auth.currentSession;
 ```
 </TabItem>
 </Tabs>
 
-#### Get the logged-in user
+### Get the logged-in user
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
 final user = supabase.auth.user();
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 final User? user = supabase.auth.currentUser;
 ```
 </TabItem>
 </Tabs>
 
-#### Update user data for a logged-in user
+### Update user data for a logged-in user
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
 await supabase.auth.update(
   UserAttributes(data: {'hello': 'world'})
 );
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 await supabase.updateUser(
   UserAttributes(
     data: { 'hello': 'world' },
@@ -317,13 +355,13 @@ Also, calling `.execute()` at the end of the query was a requirement in v0, but 
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
 await supabase
     .from('my_table')
     .insert(data, returning: ReturningOption.minimal)
@@ -332,9 +370,9 @@ await supabase
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 await supabase.from('my_table').insert(data);
 ```
 </TabItem>
@@ -345,13 +383,13 @@ await supabase.from('my_table').insert(data);
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
 final res = await supabase
     .from('my_table')
     .insert(data)
@@ -359,9 +397,9 @@ final res = await supabase
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 final insertedData = await supabase.from('my_table').insert(data).select();
 ```
 </TabItem>
@@ -369,29 +407,29 @@ final insertedData = await supabase.from('my_table').insert(data).select();
 
 ## Realtime methods
 
-#### Stream
+### Stream
 
 `.stream()` no longer needs the `.execute()` at the end. Also, filtering by `eq` is a lot easier now. `primaryKey` is now a named parameter to make it more obvious what to pass.
 
 <Tabs
   groupId="version"
   values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
   ]}>
 
-<TabItem value="1.x">
+<TabItem value="0.x">
 
-```ts
+```dart
 supabase.from('my_table:id=eq.120')
   .stream(['id'])
   .listen();
 ```
 </TabItem>
 
-<TabItem value="2.x">
+<TabItem value="1.x">
 
-```ts
+```dart
 supabase.from('my_table')
   .stream(primaryKey: ['id'])
   .eq('id', '120')
@@ -400,3 +438,62 @@ supabase.from('my_table')
 </TabItem>
 </Tabs>
 
+### Subscribe
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
+  ]}>
+
+<TabItem value="0.x">
+
+```dart
+final subscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.all, (payload) {
+    // Handle realtime payload
+  })
+  .subscribe();
+```
+</TabItem>
+
+<TabItem value="1.x">
+
+```dart
+final channel = supabase.channel('*');
+channel.on(
+  RealtimeListenTypes.postgresChanges,
+  ChannelFilter(event: '*', schema: '*'),
+  (payload, [ref]) {
+    // Handle realtime payload
+  },
+).subscribe();
+```
+</TabItem>
+</Tabs>
+
+### Unsubscribe
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
+  ]}>
+
+<TabItem value="0.x">
+
+```dart
+supabase.removeSubscription(subscription);
+```
+</TabItem>
+
+<TabItem value="1.x">
+
+```dart
+await supabase.removeChannel(channel);
+```
+</TabItem>
+</Tabs>
