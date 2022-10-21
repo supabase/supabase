@@ -75,7 +75,7 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _signOut() async {
     try {
       await supabase.auth.signOut();
-    } on GoTrueException catch (error) {
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
       context.showErrorSnackBar(message: 'Unexpected error occured');
