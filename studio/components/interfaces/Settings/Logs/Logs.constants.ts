@@ -183,6 +183,21 @@ limit 100
 `,
     for: ['database'],
   },
+  {
+    label: 'Auth Endpoint Events',
+    description: 'Endpoint events filtered by path',
+    mode: 'custom',
+    searchString: `select
+  t.timestamp,
+  event_message
+from auth_logs as t
+where
+  regexp_contains(event_message,"level.{3}(info|warning||error|fatal)")
+  -- and regexp_contains(event_message,"path.{3}(/token|/recover|/signup|/otp)")
+limit 100
+`,
+    for: ['database'],
+  },
 ]
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
