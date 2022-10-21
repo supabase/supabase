@@ -128,12 +128,10 @@ const OrganizationSettings: NextPageWithLayout = () => {
       // The user should not see this error as the page should
       // be rerendered with the value of slug before they can click.
       // It is just here in case they are the flash.
-      ui.setNotification({
+      return ui.setNotification({
         category: 'error',
         message: 'Please try again',
       })
-
-      return
     }
 
     setSelectedTab(id)
