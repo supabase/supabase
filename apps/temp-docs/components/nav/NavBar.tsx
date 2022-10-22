@@ -5,21 +5,20 @@ import Link from 'next/link'
 import { useTheme } from '../Providers'
 
 const NavBar = ({ currentPage }: { currentPage: string }) => {
-  const [mounted, setMounted] = useState(false)
   const { isDarkMode } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [isDarkMode])
 
   const pageLinks = [
-    { text: 'Guides', active: currentPage == 'Guides', link: '/guides' },
+    { text: 'Guides', link: '/guides' },
     {
       text: 'Reference',
-      active: currentPage == 'Reference',
       link: '/reference/javascript/supabase-client',
     },
-    { text: 'Discussions', active: currentPage == 'Discussions', link: '/discussions' },
+    { text: 'Discussions', link: '/discussions' },
   ]
 
   return (
@@ -46,7 +45,11 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             {pageLinks.map((p) => (
               <li key={`${p.text}-${p.link}`}>
                 <Link href={p.link}>
-                  <a className={`text-sm ${p.active ? 'text-brand-900' : 'text-scale-1100'}`}>
+                  <a
+                    className={`text-sm ${
+                      currentPage === p.text ? 'text-brand-900' : 'text-scale-1100'
+                    }`}
+                  >
                     {p.text}
                   </a>
                 </Link>
