@@ -7,7 +7,7 @@ import CodeBlock from './CodeBlock/CodeBlock'
 const components = {
   Alert,
   Tabs,
-  // TabItem,
+  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
   code: (props: any) => <CodeBlock {...props} />,
 }
 
