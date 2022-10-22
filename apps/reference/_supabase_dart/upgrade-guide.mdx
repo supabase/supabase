@@ -54,10 +54,50 @@ try {
 </Tabs>
 
 
+## Auth classes / methods
 
-## Auth methods
+### Usage of `AuthState` and `AuthRequiredState` classes
 
-The signIn() method has been deprecated in favor of more explicit method signatures to help with type hinting. Previously it was difficult for developers to know what they were missing (e.g., a lot of developers didn't realize they could use passwordless magic links).
+In v0, `AuthState` and `AuthRequiredState` were required to handle automatic token refresh and to listen to auth state change. In v1, `AuthState` and `AuthRequiredState` are deprecated, and token refresh will happen automatically just by initializing Supabase. [`onAuthStateChange`](/docs/reference/dart/upgrade-guide#listening-to-auth-state-change) can be used to action on auth state change.
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '0.x'},
+    {label: 'After', value: '1.x'},
+  ]}>
+
+<TabItem value="0.x">
+
+```dart
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+);
+...
+
+class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
+  ...
+}
+
+...
+
+class AuthRequiredState<T extends StatefulWidget> extends SupabaseAuthState<T> {
+  ...
+}
+```
+</TabItem>
+
+<TabItem value="1.x">
+
+```dart
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+);
+```
+</TabItem>
+</Tabs>
 
 ### Listening to auth state change
 
@@ -98,6 +138,8 @@ authSubscription.cancel();
 </Tabs>
 
 ### Sign in with email and password
+
+The signIn() method has been deprecated in favor of more explicit method signatures to help with type hinting. Previously it was difficult for developers to know what they were missing (e.g., a lot of developers didn't realize they could use passwordless magic links).
 
 <Tabs
   groupId="version"
