@@ -56,9 +56,9 @@ try {
 
 ## Auth classes / methods
 
-### Usage of `AuthState` and `AuthRequiredState` classes
+### Usage of `SupabaseAuthState` and `SupabaseAuthRequiredState` classes
 
-In v0, `AuthState` and `AuthRequiredState` were required to handle automatic token refresh and to listen to auth state change. In v1, `AuthState` and `AuthRequiredState` are deprecated, and token refresh will happen automatically just by initializing Supabase. [`onAuthStateChange`](/docs/reference/dart/upgrade-guide#listening-to-auth-state-change) can be used to action on auth state change.
+In v0, `SupabaseAuthState` and `SupabaseAuthRequiredState` were required to handle automatic token refresh and to listen to auth state change. In v1, `SupabaseAuthState` and `SupabaseAuthRequiredState` are deprecated, and token refresh will happen automatically just by initializing Supabase. [`onAuthStateChange`](/docs/reference/dart/upgrade-guide#listening-to-auth-state-change) can be used to action on auth state change.
 
 <Tabs
   groupId="version"
