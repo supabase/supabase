@@ -47,7 +47,7 @@ Note: when testing locally, the select dropdown doesn't have any effect, and inv
   - You can run `supabase secrets list` to check that it worked and also to see what other env vars are set by default.
 - Deploy the function
   - Within your project root run `supabase functions deploy payment-sheet`
-- In youre [`./app/.env`](./app/.env) file remove the `SUPA_FUNCTION_LOCALHOST` variable and restart your Expo app.
+- In your [`./app/.env`](./app/.env) file remove the `SUPA_FUNCTION_LOCALHOST` variable and restart your Expo app.
 
 ### Test deployed functions
 
