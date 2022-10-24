@@ -35,6 +35,31 @@ const nextConfig = {
         destination: '/project/:ref/settings/general',
         permanent: true,
       },
+      {
+        source: '/sign-up',
+        destination: '/register',
+        permanent: false,
+      },
+      {
+        source: '/signup',
+        destination: '/register',
+        permanent: false,
+      },
+      {
+        source: '/sign-in',
+        destination: '/',
+        permanent: false,
+      },
+      {
+        source: '/signin',
+        destination: '/',
+        permanent: false,
+      },
+      {
+        source: '/log-in',
+        destination: '/',
+        permanent: false,
+      },
     ]
   },
   async headers() {
