@@ -101,7 +101,7 @@ Update your `src/routes/+layout.svelte`:
 </div>
 ```
 
-Create a new file called `src/routes/+layout.ts` which will take care of handling the session on the client-side.
+Create a new `src/routes/+layout.ts` file to handle the session on the client-side.
 
 ```ts title="src/routes/+layout.ts"
 import type { LayoutLoad } from './$types';
@@ -113,7 +113,7 @@ export const load: LayoutLoad = async (event) => {
 };
 ```
 
-Create another new file called `src/routes/+layout.server.ts` which will take care of handling the session on the server-side.
+Create a new `src/routes/+layout.server.ts` file to handle the session on the server-side.
 
 ```ts title="src/routes/+layout.server.ts"
 import type { LayoutServerLoad } from './$types';
@@ -184,8 +184,8 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 ### Account component
 
-After a user is signed in we can allow them to edit their profile details and manage their account.
-Let's create a new component for that called `Account.svelte`.
+After a user is signed in, they need to be able to edit their profile details and manage their account.
+Create a new `Account.svelte` component to handle this functionality.
 
 ```html title="src/routes/Account.svelte"
 <script lang="ts">
