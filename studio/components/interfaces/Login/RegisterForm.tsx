@@ -1,5 +1,6 @@
 import { useStore } from 'hooks'
-import { auth } from 'lib/gotrue'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
@@ -21,13 +22,14 @@ const RegisterForm = () => {
       message: `Registering...`,
     })
 
-    const { error } = await auth.signUp({ email, password })
+    const response = await post(`${API_URL}/signup`, { email, password, username: email })
+    const error = response.error
 
     if (!error) {
       ui.setNotification({
         id: toastId,
         category: 'success',
-        message: `Logged in successfully!`,
+        message: `Registered successfully! Please confirm your email before logging in.`,
       })
 
       await router.push('/projects')
