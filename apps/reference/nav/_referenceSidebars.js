@@ -111,12 +111,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'APIs',
-      collapsed: true,
-      items: ['guides/api', 'guides/api/generating-types'],
-    },
-    {
-      type: 'category',
       label: 'Database',
       collapsed: true,
       items: [
@@ -129,6 +123,12 @@ const sidebars = {
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Auto-generated APIs',
+          collapsed: true,
+          items: ['guides/api', 'guides/api/generating-types'],
+        },        
         {
           type: 'category',
           label: 'Extensions',
