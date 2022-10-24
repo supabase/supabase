@@ -1,3 +1,4 @@
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
 // import Image from 'next/image'
 import Link from 'next/link'
@@ -7,7 +8,26 @@ import ReactMarkdown from 'react-markdown'
 import career from '../../data/career.json'
 import Globe from '~/components/Globe'
 
-const CareerPage = () => {
+export const getServerSideProps: GetServerSideProps = async () => {
+  const res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
+  const data = await res.json()
+
+  if (!data) {
+    return {
+      props: {
+        notFound: true,
+      },
+    }
+  }
+
+  return {
+    props: {
+      data,
+    },
+  }
+}
+
+const CareerPage: NextPage = ({ data }: InferGetServerSidePropsType<typeof GetServerSideProps>) => {
   return (
     <DefaultLayout>
       <div className="text-scale-1200">
@@ -214,30 +234,30 @@ const CareerPage = () => {
             </p>
           </div>
           <div className="mt-10 space-y-6">
-            {career.positions.map(
+            {data.jobs.map(
               (
-                position: {
+                job: {
                   title: string
-                  location: string
                   employment: string
                   description: string
+                  absolute_url: string
                 },
                 i: number
               ) => {
                 return (
                   <div className="cursor-pointer md:cursor-default" key={i}>
-                    <Link href={'#'}>
+                    <Link href={job.absolute_url}>
                       <div className="text-xs bg-scale-400 p-4 rounded-md sm:flex sm:items-center">
-                        <h2 className="text-2xl min-w-max mr-4">{position.title}</h2>
+                        <h2 className="text-2xl min-w-max mr-4">{job.title}</h2>
                         <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
                           <div className="flex items-center space-x-4">
                             <div className="bg-brand-700 text-brand-900 border-brand-900 border-[1px] px-2.5 py-1 rounded-md flex items-center">
                               <img src="/images/career/icon/globe.svg" />
-                              <span className="ml-1">{position.location}</span>
+                              <span className="ml-1">{job.location.name}</span>
                             </div>
-                            <span className="hidden md:block">{position.employment}</span>
+                            <span className="hidden md:block">{job.employment}</span>
                           </div>
-                          <p className="hidden lg:block lg:text-sm">{position.description}</p>
+                          <p className="hidden lg:block lg:text-sm">{job.description}</p>
                           <Button>Apply for position</Button>
                         </div>
                       </div>
