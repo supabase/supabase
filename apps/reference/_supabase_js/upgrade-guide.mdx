@@ -381,7 +381,7 @@ const userListener = supabase.from('users')
 const userListener = supabase.channel('public:user')
   .on(
     'postgres_changes',
-    { event: '*', schema: 'public', table: 'user' }
+    { event: '*', schema: 'public', table: 'user' },
     (payload) => handleAllEventsPayload()
   )
   .subscribe()
@@ -408,7 +408,7 @@ userListener.unsubscribe()
 <TabItem value="2.x">
 
 ```ts
-supabase.removeChannel('public:users')
+supabase.removeChannel(userListener)
 ```
 </TabItem>
 </Tabs>
