@@ -5,21 +5,21 @@ import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
-const registerSchema = object({
+const signUpSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
   password: string()
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters long'),
 })
 
-const RegisterForm = () => {
+const SignUpForm = () => {
   const { ui } = useStore()
   const router = useRouter()
 
-  const onRegister = async ({ email, password }: { email: string; password: string }) => {
+  const onSignUp = async ({ email, password }: { email: string; password: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
-      message: `Registering...`,
+      message: `Signing up...`,
     })
 
     const response = await post(`${API_URL}/signup`, { email, password, username: email })
@@ -29,10 +29,10 @@ const RegisterForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'success',
-        message: `Registered successfully! Please confirm your email before logging in.`,
+        message: `Signed successfully! Please confirm your email before logging in.`,
       })
 
-      await router.push('/projects')
+      await router.push('/sign-in')
     } else {
       ui.setNotification({
         id: toastId,
@@ -45,10 +45,10 @@ const RegisterForm = () => {
   return (
     <Form
       validateOnBlur
-      id="register-form"
+      id="signUp-form"
       initialValues={{ email: '', password: '' }}
-      validationSchema={registerSchema}
-      onSubmit={onRegister}
+      validationSchema={signUpSchema}
+      onSubmit={onSignUp}
     >
       {({ isSubmitting }: { isSubmitting: boolean }) => {
         return (
@@ -71,13 +71,13 @@ const RegisterForm = () => {
 
             <Button
               block
-              form="register-form"
+              form="signUp-form"
               htmlType="submit"
               size="large"
               disabled={isSubmitting}
               loading={isSubmitting}
             >
-              Register
+              Sign Up
             </Button>
           </div>
         )
@@ -86,4 +86,4 @@ const RegisterForm = () => {
   )
 }
 
-export default RegisterForm
+export default SignUpForm

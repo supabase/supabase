@@ -76,7 +76,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
             )}
           </>
         ) : (
-          <Link href="/">
+          <Link href="/projects">
             <a
               className={`cursor-pointer px-2 py-1 text-xs text-scale-1200 focus:bg-transparent focus:outline-none`}
             >

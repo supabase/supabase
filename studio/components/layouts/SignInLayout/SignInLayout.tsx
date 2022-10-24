@@ -6,20 +6,20 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
-type LoginLayoutProps = {
+type SignInLayoutProps = {
   heading: string
   subheading: string
   showDisclaimer?: boolean
   logoLinkToMarketingSite?: boolean
 }
 
-const LoginLayout = ({
+const SignInLayout = ({
   heading,
   subheading,
   showDisclaimer = true,
   logoLinkToMarketingSite = false,
   children,
-}: PropsWithChildren<LoginLayoutProps>) => {
+}: PropsWithChildren<SignInLayoutProps>) => {
   const {
     ui: { theme },
   } = useStore()
@@ -39,7 +39,7 @@ const LoginLayout = ({
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
               <div className="flex w-full items-center justify-between md:w-auto">
-                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/'}>
+                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
                   <a>
                     <Image
                       src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
@@ -124,4 +124,4 @@ const LoginLayout = ({
   )
 }
 
-export default observer(LoginLayout)
+export default observer(SignInLayout)

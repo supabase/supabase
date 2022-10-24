@@ -1,14 +1,14 @@
-import LoginWithGitHub from 'components/interfaces/Login/LoginWithGitHub'
-import RegisterForm from 'components/interfaces/Login/RegisterForm'
-import { LoginLayout } from 'components/layouts'
+import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
+import SignUpForm from 'components/interfaces/SignIn/SignUpForm'
+import { SignInLayout } from 'components/layouts'
 import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
 
-const RegisterPage: NextPageWithLayout = () => {
+const SignUpPage: NextPageWithLayout = () => {
   return (
     <>
       <div className="flex flex-col gap-5">
-        <LoginWithGitHub />
+        <SignInWithGitHub />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -19,12 +19,12 @@ const RegisterPage: NextPageWithLayout = () => {
           </div>
         </div>
 
-        <RegisterForm />
+        <SignUpForm />
       </div>
 
       <div className="my-8 self-center">
         <span className="text-scale-1000">Have an account?</span>{' '}
-        <Link href="/">
+        <Link href="/sign-in">
           <a className="underline hover:text-scale-1100">Sign In Now</a>
         </Link>
       </div>
@@ -32,10 +32,10 @@ const RegisterPage: NextPageWithLayout = () => {
   )
 }
 
-RegisterPage.getLayout = (page) => (
-  <LoginLayout heading="Get Started" subheading="Create a New Account">
+SignUpPage.getLayout = (page) => (
+  <SignInLayout heading="Get Started" subheading="Create a New Account">
     {page}
-  </LoginLayout>
+  </SignInLayout>
 )
 
-export default RegisterPage
+export default SignUpPage

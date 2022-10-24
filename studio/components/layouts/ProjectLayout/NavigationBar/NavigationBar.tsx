@@ -34,7 +34,7 @@ const NavigationBar: FC<Props> = ({}) => {
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
-        <Link href={'/'}>
+        <Link href="/projects">
           <a className="block">
             <img
               src="/img/supabase-logo.svg"

@@ -1,4 +1,4 @@
-import ForgotPasswordForm from 'components/interfaces/Login/ForgotPasswordForm'
+import ForgotPasswordForm from 'components/interfaces/SignIn/ForgotPasswordForm'
 import { ForgotPasswordLayout } from 'components/layouts'
 import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
@@ -14,8 +14,8 @@ const ForgotPasswordPage: NextPageWithLayout = () => {
 
       <div className="mb-4">
         <span className="text-scale-1000">Already have an account?</span>{' '}
-        <Link href="/">
-          <a className="underline hover:text-scale-1100">Login</a>
+        <Link href="/sign-in">
+          <a className="underline hover:text-scale-1100">Sign In</a>
         </Link>
       </div>
     </>

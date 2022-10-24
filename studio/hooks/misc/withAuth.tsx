@@ -80,7 +80,7 @@ export function withAuth<T>(
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
           <script
             dangerouslySetInnerHTML={{
-              __html: `if (!window.localStorage.getItem('${STORAGE_KEY}')) {window.location.replace('/?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash))}`,
+              __html: `if (!window.localStorage.getItem('${STORAGE_KEY}') && !window.location.hash) {window.location.replace('/?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash))}`,
             }}
           />
         </Head>

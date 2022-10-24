@@ -1,6 +1,6 @@
-import LoginForm from 'components/interfaces/Login/LoginForm'
-import LoginWithGitHub from 'components/interfaces/Login/LoginWithGitHub'
-import { LoginLayout } from 'components/layouts'
+import SignInForm from 'components/interfaces/SignIn/SignInForm'
+import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
+import { SignInLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading'
 import { auth } from 'lib/gotrue'
 import Link from 'next/link'
@@ -11,12 +11,12 @@ import { NextPageWithLayout } from 'types'
 // detect for redirect from 3rd party service like vercel, aws...
 const isRedirectFromThirdPartyService = (router: NextRouter) => router.query.next !== undefined
 
-const LoginPage: NextPageWithLayout = () => {
+const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const autoLogin = isRedirectFromThirdPartyService(router)
+  const autoSignIn = isRedirectFromThirdPartyService(router)
 
   useEffect(() => {
-    if (autoLogin) {
+    if (autoSignIn) {
       const queryParams = (router.query as any) || {}
       const params = new URLSearchParams(queryParams)
 
@@ -34,12 +34,12 @@ const LoginPage: NextPageWithLayout = () => {
     }
   }, [])
 
-  return autoLogin ? (
+  return autoSignIn ? (
     <Connecting />
   ) : (
     <>
       <div className="flex flex-col gap-5">
-        <LoginWithGitHub />
+        <SignInWithGitHub />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -50,13 +50,13 @@ const LoginPage: NextPageWithLayout = () => {
           </div>
         </div>
 
-        <LoginForm />
+        <SignInForm />
       </div>
 
       <div className="my-8 self-center">
         <div>
           <span className="text-scale-1000">Don't have an account?</span>{' '}
-          <Link href="/register">
+          <Link href="/sign-up">
             <a className="underline hover:text-scale-1100">Sign Up Now</a>
           </Link>
         </div>
@@ -65,14 +65,14 @@ const LoginPage: NextPageWithLayout = () => {
   )
 }
 
-LoginPage.getLayout = (page) => (
-  <LoginLayout
+SignInPage.getLayout = (page) => (
+  <SignInLayout
     heading="Welcome back"
     subheading="Sign in to your account"
     logoLinkToMarketingSite={true}
   >
     {page}
-  </LoginLayout>
+  </SignInLayout>
 )
 
-export default LoginPage
+export default SignInPage
