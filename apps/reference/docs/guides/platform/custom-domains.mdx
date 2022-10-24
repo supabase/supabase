@@ -25,7 +25,7 @@ To get started:
 
 This example assumes your Supabase project is `foobar` with a corresponding API URL `foobar.supabase.co` and configures a custom domain at `api.example.com`.
 
-### Configure a CNAME
+### <a id="cname-configure"></a>Configure a CNAME
 
 Set up a CNAME record for `api.example.com`, resolving to `foobarbaz.supabase.co.`, with as low a TTL as possible.
 
@@ -37,7 +37,7 @@ Use the `create` subcommand of the CLI to notify Supabase of your domain and ret
 supabase custom-hostname create --project-ref foobar --custom-hostname api.example.com --experimental
 ```
 
-The output of the `create` command includes two TXT records you will need to set up, in order to verify your control over the domain in question,
+The output of the `create` command includes two TXT records[^1] you will need to set up, in order to verify your control over the domain in question,
 and for us to issue SSL certificates for it. For example:
 
 ```
@@ -46,6 +46,8 @@ Required outstanding validation records:
         _cf-custom-hostname.api.example.com TXT -> 46BBC14D-D50A-409C-8DB5-F862CF5BA660
         api.example.com TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
 ```
+
+[^1] One of the records requires you to *replace* the CNAME record set up in [the first step](#cname-configure) with a TXT record. You'll be able to restore it back to the CNAME after the verification process has been completed.
 
 ### Verify your domain
 
@@ -72,3 +74,13 @@ Finally, you can use the `activate` subcommand to reconfigure your project:
 ```bash
 supabase custom-hostname activate --project-ref foobarbaz --experimental
 ```
+
+## Remove a Custom Domain
+
+If you have a custom domain (`api.example.com`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
+
+```bash
+supabase custom-hostname delete --project-ref foobarbaz --experimental
+```
+
+As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.

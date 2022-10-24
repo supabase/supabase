@@ -1475,4 +1475,64 @@ module.exports = [
     source: '/docs/reference/javascript/getsubscriptions',
     destination: '/docs/reference/javascript/v1/getsubscriptions',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/cicd-workflows',
+    destination: '/docs/guides/cli/managing-environments',
+  },
+
+  // supabase-flutter v0 to v1 redirects
+  // v0: /auth-update
+  // v1: /auth-updateuser
+  {
+    permanent: true,
+    source: '/docs/reference/dart/auth-update',
+    destination: '/docs/reference/dart/auth-updateuser',
+  },
+  // v0: /auth-api-resetpasswordforemail
+  // v1: /auth-resetpasswordforemail
+  {
+    permanent: true,
+    source: '/docs/reference/dart/reset-password-email',
+    destination: '/docs/reference/dart/auth-resetpasswordforemail',
+  },
+  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // send traffic to v0 docs instead
+  {
+    permanent: true,
+    source: '/docs/reference/dart/auth-signin',
+    destination: '/docs/reference/dart/v0/auth-signin',
+  },
+  // v0: /auth-session
+  // v1: /auth-currentsession
+  {
+    permanent: true,
+    source: '/docs/reference/dart/auth-session',
+    destination: '/docs/reference/dart/auth-currentsession',
+  },
+  // v0: /auth-user
+  // v1: /auth-currentuser
+  {
+    permanent: true,
+    source: '/docs/reference/dart/auth-user',
+    destination: '/docs/reference/dart/auth-currentuser',
+  },
+  // v0: /auth-signinwithprovider
+  // v1: /auth-signinwithoauth
+  {
+    permanent: true,
+    source: '/docs/reference/dart/v0/auth-signinwithprovider',
+    destination: '/docs/reference/dart/auth-signinwithoauth',
+  },
+  // realtime methods been replaced with new names
+  {
+    permanent: true,
+    source: '/docs/reference/dart/removesubscription',
+    destination: '/docs/reference/dart/v0/removesubscription',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/dart/getsubscriptions',
+    destination: '/docs/reference/dart/v0/getsubscriptions',
+  },
 ]

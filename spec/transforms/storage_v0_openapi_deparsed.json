@@ -1345,7 +1345,7 @@
                         "example": "folder/cat.png"
                       },
                       "signedURL": {
-                        "type": ["string", "null"],
+                        "type": ["null", "string"],
                         "example": "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
                       }
                     },
@@ -1774,6 +1774,114 @@
     "/object/public/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve an object from a public bucket",
+        "tags": ["object"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/render/authenticated/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Render an authenticated image with the given transformations",
+        "tags": ["object"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/render/public/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Render a public image with the given transformations",
         "tags": ["object"],
         "parameters": [
           {
