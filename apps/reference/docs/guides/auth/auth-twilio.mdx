@@ -145,7 +145,7 @@ values={[
 let { session, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456',
-  type:"sms"
+  type: 'sms',
 })
 ```
 
@@ -261,6 +261,7 @@ values={[
 let { session, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456',
+  type: 'sms',
 })
 ```
 
