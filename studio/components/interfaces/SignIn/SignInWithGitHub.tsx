@@ -1,7 +1,7 @@
 import { auth } from 'lib/gotrue'
 import { Button, IconGitHub } from 'ui'
 
-const LoginWithGitHub = () => {
+const SignInWithGitHub = () => {
   async function handleGithubSignIn() {
     try {
       const { error } = await auth.signInWithOAuth({
@@ -11,7 +11,7 @@ const LoginWithGitHub = () => {
             process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
               ? process.env.NEXT_PUBLIC_VERCEL_URL
               : process.env.NEXT_PUBLIC_SITE_URL
-          }/projects?auth=true`,
+          }/projects`,
         },
       })
       if (error) throw error
@@ -27,4 +27,4 @@ const LoginWithGitHub = () => {
   )
 }
 
-export default LoginWithGitHub
+export default SignInWithGitHub

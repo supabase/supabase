@@ -1,4 +1,5 @@
 import { useStore } from 'hooks'
+import { useParams } from 'hooks/misc/useParams'
 import { auth } from 'lib/gotrue'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -6,17 +7,18 @@ import { useSWRConfig } from 'swr'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
-const loginSchema = object({
+const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
   password: string().required('Password is required'),
 })
 
-const LoginForm = () => {
+const SignInForm = () => {
   const { ui } = useStore()
   const router = useRouter()
+  const { returnTo } = useParams()
   const { cache } = useSWRConfig()
 
-  const onLogin = async ({ email, password }: { email: string; password: string }) => {
+  const onSignIn = async ({ email, password }: { email: string; password: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Logging in...`,
@@ -28,14 +30,14 @@ const LoginForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'success',
-        message: `Logged in successfully!`,
+        message: `Signed in successfully!`,
       })
 
       // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
       // @ts-ignore
       cache.clear()
 
-      await router.push('/projects')
+      await router.push(returnTo ?? '/projects')
     } else {
       ui.setNotification({
         id: toastId,
@@ -48,10 +50,10 @@ const LoginForm = () => {
   return (
     <Form
       validateOnBlur
-      id="login-form"
+      id="signIn-form"
       initialValues={{ email: '', password: '' }}
-      validationSchema={loginSchema}
-      onSubmit={onLogin}
+      validationSchema={signInSchema}
+      onSubmit={onSignIn}
     >
       {({ isSubmitting }: { isSubmitting: boolean }) => {
         return (
@@ -79,13 +81,13 @@ const LoginForm = () => {
 
             <Button
               block
-              form="login-form"
+              form="signIn-form"
               htmlType="submit"
               size="large"
               disabled={isSubmitting}
               loading={isSubmitting}
             >
-              Login
+              Sign In
             </Button>
           </div>
         )
@@ -94,4 +96,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default SignInForm

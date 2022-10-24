@@ -220,7 +220,7 @@ const Wizard: NextPageWithLayout = () => {
       }
       footer={
         <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => Router.push('/')}>
+          <Button type="default" onClick={() => Router.push('/projects')}>
             Cancel
           </Button>
           <div className="items-center space-x-3">

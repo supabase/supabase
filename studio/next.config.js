@@ -36,28 +36,33 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/sign-up',
-        destination: '/register',
+        source: '/',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/register',
+        destination: '/sign-up',
         permanent: false,
       },
       {
         source: '/signup',
-        destination: '/register',
-        permanent: false,
-      },
-      {
-        source: '/sign-in',
-        destination: '/',
+        destination: '/sign-up',
         permanent: false,
       },
       {
         source: '/signin',
-        destination: '/',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/login',
+        destination: '/sign-in',
         permanent: false,
       },
       {
         source: '/log-in',
-        destination: '/',
+        destination: '/sign-in',
         permanent: false,
       },
     ]

@@ -13,7 +13,7 @@ const Success = () => {
           We will email you back using your GitHub email address
         </p>
       </div>
-      <Link href="/">
+      <Link href="/projects">
         <Button>Go back to dashboard</Button>
       </Link>
     </div>
