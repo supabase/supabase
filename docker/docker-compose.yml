@@ -98,7 +98,7 @@ services:
 
   realtime:
     container_name: supabase-realtime
-    image: supabase/realtime:v0.22.4
+    image: supabase/realtime:v0.25.1
     depends_on:
       - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
@@ -161,8 +161,13 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.21
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    image: supabase/postgres:14.1.0.77
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+      - -c
+      - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432
