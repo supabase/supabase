@@ -128,7 +128,7 @@ const sidebars = {
           label: 'Auto-generated APIs',
           collapsed: true,
           items: ['guides/api', 'guides/api/generating-types'],
-        },        
+        },
         {
           type: 'category',
           label: 'Extensions',
