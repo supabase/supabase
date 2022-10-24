@@ -23,6 +23,10 @@ test('can display log data', async () => {
   userEvent.click(row)
   await screen.findByText(/my_key/)
   await screen.findByText(/something_value/)
+
+  // render copy button
+  userEvent.click(await screen.findByText(/Copy/))
+  await screen.findByText(/Copied/)
 })
 
 test('dedupes log lines with exact id', async () => {
