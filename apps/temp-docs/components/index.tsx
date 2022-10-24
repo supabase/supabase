@@ -1,23 +1,15 @@
-import LinkCard from './LinkCard'
-import LinkCardsWrapper from './LinkCardsWrapper'
-import { Tabs } from 'ui'
-import Sponsor from './Sponsor'
-import SponsorsWrapper from './SponsorsWrapper'
+import { Tabs, Alert } from 'ui'
+// import Tabs from '@theme/Tabs'
+// import TabItem from '@theme/TabItem'
+
 import CodeBlock from './CodeBlock/CodeBlock'
 import ButtonCard from './ButtonCard'
-import AuthProviders from './AuthProviders'
 
 const components = {
+  Alert,
   ButtonCard,
-  // LinkCard,
-  // LinkCardsWrapper,
-  // SponsorsWrapper,
-  // Sponsor,
-  // AuthProviders,
-  // Tabs: (props: any) => <Tabs {...props} type="underlined" size="small" />,
-  // TabsPanel: (props: any) => {
-  //   return <Tabs.Panel {...props} />
-  // },
+  Tabs,
+  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
   code: (props: any) => <CodeBlock {...props} />,
 }
 

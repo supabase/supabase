@@ -1,4 +1,5 @@
 import { Menu } from 'ui'
+import { Fragment } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -22,36 +23,34 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
       <Menu className="w-full flex-col gap-12" type="pills">
         {Object.keys(menuItems).map((key) => {
           return (
-            <div className="mb-8">
+            <div className="mb-8" key={key}>
               <Menu.Group title={key} />
-              {menuItems[key].map((item: { link: string; text: string; sections: Array<any> }) => (
-                <span key={item.link}>
-                  {Array.isArray(item.sections) ? (
-                    <>
-                      <Menu.Group title={item.text} />
-                      {item.sections.map((section) => (
-                        <Link href={section.link} key={`${item.text}-${section.text}`}>
-                          <a>
-                            <Menu.Item active={asPath == section.link}>{section.text}</Menu.Item>
-                          </a>
-                        </Link>
-                      ))}
-                    </>
-                  ) : (
-                    <Link href={item.link}>
-                      <a>
-                        <Menu.Item active={asPath === item.link}>
-                          {/* <div
-                          // className={asPath === item.link ? 'text-brand-900' : 'text-scale-1000'}
-                          > */}
-                          {item.text}
-                          {/* </div> */}
-                        </Menu.Item>
-                      </a>
-                    </Link>
-                  )}
-                </span>
-              ))}
+              {menuItems[key].map((item: { link: string; text: string; sections: Array<any> }) => {
+                return Array.isArray(item.sections) ? (
+                  <Fragment key={item.text}>
+                    <Menu.Group title={item.text} />
+                    {item.sections.map((section) => (
+                      <Link href={section.link} key={`${item.text}-${section.text}`}>
+                        <a>
+                          <Menu.Item active={asPath == section.link}>{section.text}</Menu.Item>
+                        </a>
+                      </Link>
+                    ))}
+                  </Fragment>
+                ) : (
+                  <Link href={item.link} key={item.text}>
+                    <a>
+                      <Menu.Item active={asPath === item.link}>
+                        {/* <div
+                        // className={asPath === item.link ? 'text-brand-900' : 'text-scale-1000'}
+                        > */}
+                        {item.text}
+                        {/* </div> */}
+                      </Menu.Item>
+                    </a>
+                  </Link>
+                )
+              })}
             </div>
           )
         })}
