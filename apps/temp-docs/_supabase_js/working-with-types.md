@@ -43,7 +43,10 @@ You can enrich the supabase client with the types you generated with Supabase.
 import { createClient } from '@supabase/supabase-js'
 import { Database } from 'lib/database.types'
 
-const supabase = createClient<Database>(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+const supabase = createClient<Database>(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+)
 ```
 
 ## Type hints

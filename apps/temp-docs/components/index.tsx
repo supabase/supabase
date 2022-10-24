@@ -4,9 +4,11 @@ import { Tabs } from 'ui'
 import Sponsor from './Sponsor'
 import SponsorsWrapper from './SponsorsWrapper'
 import CodeBlock from './CodeBlock/CodeBlock'
+import ButtonCard from './ButtonCard'
 import AuthProviders from './AuthProviders'
 
 const components = {
+  ButtonCard,
   // LinkCard,
   // LinkCardsWrapper,
   // SponsorsWrapper,
