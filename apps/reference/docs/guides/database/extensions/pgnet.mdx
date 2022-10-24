@@ -4,9 +4,50 @@ title: 'pg_net: Async Networking'
 description: 'pg_net: an async networking extension for PostgreSQL.'
 ---
 
-pg_net is a PostgreSQL extension exposing a SQL interface for async networking with a focus on scalability and UX.
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+[pg_net](https://github.com/supabase/pg_net/) is a PostgreSQL extension exposing a SQL interface for async networking with a focus on scalability and UX.
 
 It differs from the `http` extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
+
+## Usage
+
+### Enable the extension
+
+<Tabs
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pg_net" and enable the extension.
+
+</TabItem>
+<TabItem value="sql">
+
+```sql
+-- Example: enable the "pg_net" extension
+create schema if not exists net;
+create extension pg_net with schema net;
+
+-- Example: disable the "plv8" extension
+drop extension if exists pg_net;
+drop schema net;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension, call `drop extension`.
+
+Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
+
+</TabItem>
+</Tabs>
 
 ## `http_get` {#http_get}
 
