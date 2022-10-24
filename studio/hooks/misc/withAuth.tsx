@@ -1,6 +1,8 @@
 import { ComponentType, useEffect } from 'react'
+import Head from 'next/head'
 import { NextRouter, useRouter } from 'next/router'
 
+import { STORAGE_KEY } from 'lib/gotrue'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile, useStore, usePermissions } from 'hooks'
 
@@ -71,7 +73,20 @@ export function withAuth<T>(
       }
     }, [isLoading, router.isReady, ref, slug])
 
-    return <WrappedComponent {...props} />
+    return (
+      <>
+        <Head>
+          {/* This script will quickly (before the main JS loads) redirect the user
+          to the login page if they are guaranteed (no token at all) to not be logged in. */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `if (!window.localStorage.getItem('${STORAGE_KEY}')) {window.location.replace('/?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash))}`,
+            }}
+          />
+        </Head>
+        <WrappedComponent {...props} />
+      </>
+    )
   }
 }
 
