@@ -10,8 +10,6 @@ export default function ContentsLayout({ context }: any) {
   const { asPath } = useRouter()
   const page = getPageType(asPath)
 
-  console.log('page', page)
-
   return (
     <>
       <NextSeo {...context.meta} />

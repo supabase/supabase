@@ -11,14 +11,12 @@ const Layout = ({
   menuItems,
   currentPage,
 }: {
-  meta: { title: string; description: string }
+  meta: { title: string; description: string; hide_table_of_contents?: boolean }
   children: JSX.Element
   toc?: any
   menuItems: any
   currentPage: string
 }) => {
-  const theme = 'okaidia'
-  console.log('Layout')
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -52,13 +50,16 @@ const Layout = ({
         <NavBar currentPage={currentPage} />
         <div className="flex w-full flex-row">
           <SideBar menuItems={menuItems} />
-          <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8">
-            <div className="col-span-8 p-4">
-              <article className="prose dark:prose-dark dark:bg-scale-200 width-full">
+          <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
+            <div
+              className={`${meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-8'} py-4 px-8`}
+            >
+              <h1 className="text-5xl">{meta?.title}</h1>
+              <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
                 {children}
               </article>
             </div>
-            {toc && (
+            {toc && !meta?.hide_table_of_contents && (
               <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-4 border-l px-4">
                 <h5>On this page</h5>
                 <ul className="list-none pl-2 text-[0.8rem]">

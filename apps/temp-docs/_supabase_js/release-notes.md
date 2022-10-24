@@ -82,7 +82,9 @@ Previously `nullsFirst` defaults to `false` , meaning `null`s are ordered last. 
 Storage key name in the Auth library has changed to include project reference which means that existing websites that had their JWT expiry set to a longer time could find their users logged out with this upgrade.
 
 ```jsx
-const defaultStorageKey = `sb-${new URL(this.authUrl).hostname.split('.')[0]}-auth-token`
+const defaultStorageKey = `sb-${
+  new URL(this.authUrl).hostname.split('.')[0]
+}-auth-token`
 ```
 
 ### New Auth Types
