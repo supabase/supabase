@@ -173,7 +173,13 @@ const sidebars = {
         'guides/realtime',
         'guides/realtime/quickstart',
         'guides/realtime/postgres-cdc',
-      ],
+          {
+            type: 'doc',
+            id: 'guides/realtime/limits', // document ID
+            label: 'Limits', // sidebar label
+          }
+        
+      ]
     },
     {
       type: 'category',
