@@ -142,6 +142,7 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
         ...state,
         rows: state.rows.filter((x) => !action.payload.rowIdxs.includes(x.idx)),
         totalRows: totalRows,
+        refreshPageFlag: Number(state.totalRows > state.page),
       }
     }
     case 'REMOVE_ALL_ROWS': {
