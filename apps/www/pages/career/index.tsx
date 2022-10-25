@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 const CareerPage: NextPage = ({
   job_data,
   contributor_data,
-}: InferGetServerSidePropsType<typeof GetServerSideProps>) => {
+}: any) => {
   return (
     <DefaultLayout>
       <div className="text-scale-1200">
@@ -307,6 +307,7 @@ const CareerPage: NextPage = ({
               (
                 job: {
                   title: string
+                  location: any
                   employment: string
                   description: string
                   absolute_url: string
