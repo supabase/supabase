@@ -1,5 +1,10 @@
 Pricing Changelog
 
+### 24 October 2022
+----
+
+Realtime pricing announced
+
 ### 16 June 2022
 ----
 

@@ -21,7 +21,7 @@
         }
       },
       {
-        "title": "Realtime functionality",
+        "title": "Realtime Change Data Capture",
         "tiers": {
           "free": true,
           "pro": true,
@@ -376,6 +376,36 @@
           "free": false,
           "pro": false,
           "enterprise": true
+        }
+      }
+    ]
+  },
+  "realtime": {
+    "title": "Realtime",
+    "icon": "M18.87,12.07l-6,9.47A1,1,0,0,1,12,22a.9.9,0,0,1-.28,0A1,1,0,0,1,11,21V15H6.82a2,2,0,0,1-1.69-3.07l6-9.47A1,1,0,0,1,12.28,2,1,1,0,0,1,13,3V9h4.18a2,2,0,0,1,1.69,3.07Z",
+    "features": [
+      {
+        "title": "Max concurrent connections",
+        "tiers": {
+          "free": "200",
+          "pro": "500",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Total messages",
+        "tiers": {
+          "free": "2 million per month",
+          "pro": "5 million per month",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Max message payload",
+        "tiers": {
+          "free": "250 KB",
+          "pro": "1 MB",
+          "enterprise": "1 MB"
         }
       }
     ]
