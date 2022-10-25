@@ -19,16 +19,6 @@ const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
   },
 })
 
-export function formReducer(state: any, action: any) {
-  return {
-    ...state,
-    [action.name]: {
-      value: action.value,
-      error: action.error,
-    },
-  }
-}
-
 export const uploadAttachments = async (ref: string, files: File[]) => {
   const filesToUpload = Array.from(files)
   const uploadedFiles = await Promise.all(

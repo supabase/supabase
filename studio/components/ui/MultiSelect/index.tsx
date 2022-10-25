@@ -1,13 +1,6 @@
 import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
-import {
-  Popover,
-  IconCheck,
-  IconAlertCircle,
-  IconSearch,
-  IconPlus,
-  IconChevronDown,
-} from 'ui'
+import { Popover, IconCheck, IconAlertCircle, IconSearch, IconPlus, IconChevronDown } from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
@@ -235,7 +228,9 @@ export default function MultiSelect({
             ].join(' ')}
           >
             {selectedOptions.length === 0 && placeholder && (
-              <div className="px-2 text-sm text-scale-1000">{placeholder}</div>
+              <div className="px-2 text-sm text-scale-1000 h-full flex items-center">
+                {placeholder}
+              </div>
             )}
             {selectedOptions.map((value, idx) => {
               const id = `${value}-${idx}`
@@ -257,8 +252,8 @@ export default function MultiSelect({
                 )
               }
             })}
-            <div className="absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center cursor-pointer ">
-              <IconChevronDown className="text-scale-900" />
+            <div className="absolute inset-y-0 right-0 pl-3 pr-2 flex space-x-1 items-center cursor-pointer ">
+              <IconChevronDown size={16} strokeWidth={2} className="text-scale-900" />
             </div>
           </div>
         </Popover>
