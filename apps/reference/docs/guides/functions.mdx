@@ -263,6 +263,10 @@ serve(async (req) => {
 })
 ```
 
+### Using HTTP Methods
+
+Edge Functions supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE` and `OPTIONS`. A function can be designed to perform different actions based on request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your function.
+
 ## Limitations
 
 - Deno Deploy limitations
@@ -270,5 +274,4 @@ serve(async (req) => {
   - Cannot write to File System
 - Edge Functions
   - Local development - only one function at a time
-  - Supabase Functions only supports `POST`, `OPTIONS`, and `GET` requests.
   - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
