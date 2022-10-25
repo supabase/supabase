@@ -11,7 +11,9 @@ id: typescript-support
 You can use the [Supabase CLI](/docs/guides/cli) to generate types directly from your Postgres database’s schema:
 
 ### For databases hosted in the Supabase Cloud
+
 Install the [Supabase CLI](/docs/guides/cli#installation) locally, and then run:
+
 ```bash
 supabase login
 supabase projects list
@@ -19,7 +21,9 @@ supabase gen types typescript --project-id <project_id> > lib/database.types.ts
 ```
 
 ### For databases running in a Supabase local development environment
+
 Set up your [local development environment](/docs/guides/cli/local-development), and then run:
+
 ```bash
 supabase start
 supabase gen types typescript --local > lib/database.types.ts
