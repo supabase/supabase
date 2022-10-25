@@ -32,10 +32,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 }
 
-const CareerPage: NextPage = ({
-  job_data,
-  contributor_data,
-}: any) => {
+const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
   return (
     <DefaultLayout>
       <div className="text-scale-1200">
