@@ -5,7 +5,10 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 
 import withTM from 'next-transpile-modules'
-import withPlugins from 'next-compose-plugins'
+
+// import { remarkCodeHike } from '@code-hike/mdx'
+// import theme from 'shiki/themes/dark-plus.json' assert { type: 'json' }
+// import codeHikeTheme from './codeHikeTheme.js'
 
 /**
  * Rewrites and redirects are handled by
@@ -13,6 +16,29 @@ import withPlugins from 'next-compose-plugins'
  *
  * Do not add them in this config
  */
+
+const withMDX = nextMdx({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [
+      // [
+      //   remarkCodeHike,
+      //   {
+      //     theme: codeHikeTheme,
+      //     autoImport: false,
+      //   },
+      // ],
+      remarkGfm,
+    ],
+    rehypePlugins: [rehypeSlug],
+    // This is required for `MDXProvider` component
+    providerImportSource: '@mdx-js/react',
+  },
+})
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
 
 // /** @type {NextConfig} */
 const nextConfig = {
@@ -22,18 +48,8 @@ const nextConfig = {
   swcMinify: true,
 }
 
-const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })
-
-const withMDX = nextMdx({
-  extension: /\.mdx?$/,
-  options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypeSlug],
-    providerImportSource: '@mdx-js/react',
-  },
-})
-
-export default withPlugins(
-  [[withBundleAnalyzer({})], withMDX(), withTM(['ui', 'common'])],
-  nextConfig
-)
+// next.config.js
+export default () => {
+  const plugins = [withMDX, withTM(['ui', 'common'])]
+  return plugins.reduce((acc, next) => next(acc), nextConfig)
+}
