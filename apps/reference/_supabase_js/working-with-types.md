@@ -10,7 +10,7 @@ id: typescript-support
 
 You can use the [Supabase CLI](/docs/guides/cli) to generate types directly from your Postgres database’s schema:
 
-### For databases hosted in the Supabase Cloud
+### Generate types from a remote database
 
 Install the [Supabase CLI](/docs/guides/cli#installation) locally, and then run:
 
@@ -20,7 +20,7 @@ supabase projects list
 supabase gen types typescript --project-id <project_id> > lib/database.types.ts
 ```
 
-### For databases running in a Supabase local development environment
+### Generate types from a local database
 
 Set up your [local development environment](/docs/guides/cli/local-development), and then run:
 
@@ -29,7 +29,7 @@ supabase start
 supabase gen types typescript --local > lib/database.types.ts
 ```
 
-For additional ways to generate types, see the [CLI Reference Docs](/docs/reference/cli/usage#supabase-gen-types).
+For additional methods, see the [CLI Reference Docs](/docs/reference/cli/usage#supabase-gen-types).
 
 These types are generated directly from your database. Given a table `public.movies`, the definition will provide the following data:
 
