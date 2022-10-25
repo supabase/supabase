@@ -1,0 +1,39 @@
+configspec: '001'
+
+# This section outlines the general information for the tool.
+info:
+  id: 'storage' # {string} A unique ID for this tool.
+  version: 'next' # {string} The current version number of the tool.
+  title: 'Storage' # {string} A readable name.
+  source: 'https://github.com/supabase/realtime' # {string} Where developers can find the source code.
+  bugs: 'https://github.com/supabase/realtime/issues' # {string} Where developers can file bugs.
+  spec: 'https://github.com/supabase/supabase/blob/master/spec/realtime_v0_config.yml' # {string} Where developers can find this spec (to link directly in the docs).
+  description: |
+    You can use Environment Variables to configure your Realtime Server.
+  tags:
+    - id: general
+      title: General Settings
+      description: General server settings.
+    - id: database
+      title: Database Settings
+      description: Connecting to your database.
+
+# This section is an array of public functions which a user might need to execute.
+parameters:
+  - id: 'PORT' # {string} A unique identifier for this param.
+    title: 'PORT' # {string} Any a name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    links: [] # {string[]} These tags are useful for grouping parameters
+    required: true
+    default: '4000'
+    description: |
+      Port which you can connect your client/listeners
+
+  - id: 'DB_HOST' # {string} A unique identifier for this param.
+    title: 'DB_HOST' # {string} Any a name.
+    tags: ['database'] # {string[]} These tags are useful for grouping parameters
+    links: [] # {string[]} These tags are useful for grouping parameters
+    required: true
+    default: 'localhost'
+    description: |
+      Database host URL
