@@ -10,6 +10,7 @@ import pingPostgrest from 'lib/pingPostgrest'
 
 export interface IProjectStore extends IPostgresMetaInterface<Project> {
   fetchDetail: (projectRef: string, callback?: (project: Project) => void) => Promise<void>
+  fetchSubscriptionTier: (project: Project) => Promise<void>
 }
 
 export default class ProjectStore extends PostgresMetaInterface<Project> {
