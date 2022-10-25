@@ -16,7 +16,7 @@ import ProjectSetup from './_partials/project_setup.mdx'
 
 ### Github
 
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase-community/nuxt3-quickstarter).
+Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/nuxt3-user-management).
 
 <ProjectSetup />
 
@@ -103,7 +103,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
   const handleLogin = async () => {
     try {
       loading.value = true
-      const { error } = await supabase.auth.signIn({ email: email.value })
+      const { error } = await supabase.auth.signInWithOtp({ email: email.value })
       if (error) throw error
       alert('Check your email for the login link!')
     } catch (error) {
@@ -207,6 +207,7 @@ Let's create a new component for that called `Account.vue`.
           loading.value = true
           let { error } = await supabase.auth.signOut()
           if (error) throw error
+          user.value = null
       } catch (error) {
           alert(error.message)
       } finally {
