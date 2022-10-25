@@ -54,7 +54,6 @@ const Layout = ({
             <div
               className={`${meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-8'} py-4 px-8`}
             >
-              <h1 className="text-5xl">{meta?.title}</h1>
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
                 {children}
               </article>
