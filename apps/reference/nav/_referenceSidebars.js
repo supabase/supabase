@@ -4,7 +4,7 @@ const sidebars = {
       type: 'category',
       label: 'Overview',
       collapsed: true,
-      items: ['about', 'architecture', 'guides/examples'],
+      items: ['about', 'guides/features', 'architecture'],
     },
     {
       type: 'category',
@@ -34,7 +34,7 @@ const sidebars = {
       items: [
         'guides/cli',
         'guides/cli/local-development',
-        'guides/cli/cicd-workflow',
+        'guides/cli/managing-environments',
       ],
     },
     {
@@ -80,6 +80,8 @@ const sidebars = {
             'guides/auth/row-level-security',
             'guides/auth/managing-user-data',
             'guides/auth/auth-captcha',
+            'guides/auth/server-side-rendering',
+            'guides/auth/auth-mfa',
           ],
         },
         {
@@ -133,9 +135,9 @@ const sidebars = {
           collapsed: true,
           items: [
             'guides/database/extensions',
-            // 'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
+            'guides/database/extensions/pgtap',
             'guides/database/extensions/uuid-ossp',
           ],
         },
@@ -185,6 +187,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/hosting/platform',
+        'guides/platform/custom-domains',
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
@@ -224,6 +227,7 @@ const sidebars = {
             'guides/integrations/auth0',
             'guides/integrations/authsignal',
             'guides/integrations/clerk',
+            'guides/integrations/keyri',
             'guides/integrations/stytch',
             'guides/integrations/supertokens',
           ],
@@ -277,7 +281,7 @@ const sidebars = {
         },
         {
           type: 'link',
-          label: 'Supabase Dart Library',
+          label: 'Supabase Flutter Library',
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
