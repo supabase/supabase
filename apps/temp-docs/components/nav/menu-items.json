@@ -2,12 +2,21 @@
   "Docs": {
     "Overview": [
       { "text": "Introduction", "link": "/" },
+      { "text": "Features", "link": "/features" },
       { "text": "Architecture", "link": "/architecture" },
-      { "text": "Database", "link": "/guides/database" },
-      { "text": "Auth", "link": "/guides/auth" },
-      { "text": "Storage", "link": "/guides/storage" },
-      { "text": "APIs", "link": "/guides/apis" },
-      { "text": "Examples and Resources", "link": "/guides/examples" }
+      {
+        "text": "Grandchildren",
+        "sections": [
+          {
+            "text": "Grandchild1",
+            "link": "/guides/database/extensions"
+          },
+          {
+            "text": "Grandchild2",
+            "link": "/guides/database/extensions/plv8"
+          }
+        ]
+      }
     ],
     "Tutorials": [
       { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
@@ -31,8 +40,9 @@
   },
   "Guides": {
     "Guides": [
-      { "text": "Overview", "link": "/guides" },
-      { "text": "Local Development", "link": "/guides/local-development" }
+      { "text": "Introduction", "link": "/guides" },
+      { "text": "Features", "link": "/features" },
+      { "text": "Architecture", "link": "/architecture" }
     ],
     "Database": [
       { "text": "Introduction", "link": "/guides/database/introduction" },
