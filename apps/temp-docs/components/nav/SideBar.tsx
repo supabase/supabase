@@ -1,11 +1,17 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { IconChevronRight } from '~/../../packages/ui'
 
 const SideBar = ({ menuItems }: { menuItems: any }) => {
   console.log(Object.keys(menuItems))
 
+  // The currently active second-level item in menuItems
+  // ie: ['Overview', 'Tutorials', 'See Also', 'etc']
+  // derive the state on the first run based on the asPath in the router
+  //const [activeParentMenuItem, setActiveParentMenuItem] = useState()
+
   const { asPath } = useRouter()
-  console.log('asPath -> ', asPath)
 
   function handleParentMenuToggle(e) {
     const toggleButton = e.target
@@ -15,8 +21,13 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
     const parentMenus = sidebarMenu.querySelectorAll('.parent-menu')
     parentMenus.forEach((menu) => menu.classList.add('hidden'))
 
+    // Remove all active buttons
+    const activeButtons = sidebarMenu.querySelectorAll('button.active')
+    activeButtons.forEach((menu) => menu.classList.remove('active'))
+
     // Open the parent menu that's just been clicked
     const closestGroup = toggleButton.closest('.parent-menu-container')
+    toggleButton.classList.add('active')
     const subMenu = closestGroup.querySelector('.parent-menu')
     subMenu.classList.contains('hidden')
       ? subMenu.classList.remove('hidden')
@@ -25,7 +36,13 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
 
   function handleSubMenuToggle(e) {
     const toggleButton = e.target
-    const closestGroup = toggleButton.closest('.menu-group')
+    const closestGroup = toggleButton.closest('.sub-menu-group')
+    // Remove all active buttons
+    const activeButtons = closestGroup.querySelectorAll('button.active')
+    activeButtons.forEach((menu) => menu.classList.remove('active'))
+
+    // Open the parent menu that's just been clicked
+    toggleButton.classList.add('active')
     const subMenu = closestGroup.querySelector('.sub-menu')
     subMenu.classList.contains('hidden')
       ? subMenu.classList.remove('hidden')
@@ -58,23 +75,32 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
       <ul className="w-full flex-col gap-12 mb-8">
         {Object.keys(menuItems).map((key, i) => (
           <li key={key} className="mb-8 bg-gray-200 parent-menu-container">
-            <button onClick={(e) => handleParentMenuToggle(e)} className="uppercase bg-gray-500">
+            <button
+              onClick={(e) => handleParentMenuToggle(e)}
+              className={[
+                'parent-menu-toggle text-sm bg-gray-500 flex items-center gap-1',
+                isMenuActive(key) ? 'active' : '',
+              ].join(' ')}
+            >
+              <IconChevronRight size="tiny" strokeWidth="0.75" />
               {key}
             </button>
-            <ul className={['parent-menu', isMenuActive(key) ? '' : 'hidden'].join(' ')}>
+            <ul className={['parent-menu mt-4', isMenuActive(key) ? '' : 'hidden'].join(' ')}>
               {menuItems[key].map((item) =>
                 Array.isArray(item.sections) ? (
-                  <div className="menu-group ml-4">
+                  <div className="sub-menu-group ml-4">
                     <button
                       onClick={(e) => handleSubMenuToggle(e)}
-                      className="uppercase bg-gray-500"
+                      className="parent-menu-toggle text-sm bg-gray-500 flex items-center gap-1"
                     >
+                      <IconChevronRight size="tiny" strokeWidth="0.75" />
                       {item.text}
                     </button>
                     <ul
-                      className={['bg-gray-300 sub-menu', isMenuActive(key) ? '' : 'hidden'].join(
-                        ' '
-                      )}
+                      className={[
+                        'bg-gray-300 sub-menu ml-5',
+                        isMenuActive(key) ? 'hidden' : '',
+                      ].join(' ')}
                     >
                       {item.sections.map((menuItem) => (
                         <li>
@@ -91,9 +117,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
                   <p>
                     <li>
                       <Link href={item.link}>
-                        <a className={item.link === asPath ? 'text-brand-800' : 'not'}>
-                          {item.text}
-                        </a>
+                        <a className={item.link === asPath ? 'text-brand-800' : ''}>{item.text}</a>
                       </Link>
                     </li>
                   </p>
