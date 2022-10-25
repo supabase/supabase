@@ -1,10 +1,10 @@
 import { useStore } from 'hooks'
-import { STORAGE_KEY } from 'lib/gotrue'
+import { auth, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
 type SignInLayoutProps = {
   heading: string
@@ -20,9 +20,22 @@ const SignInLayout = ({
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
-  const {
-    ui: { theme },
-  } = useStore()
+  const { ui } = useStore()
+
+  const { theme } = ui
+
+  useEffect(() => {
+    ;(async () => {
+      const { error } = await auth.initialize()
+
+      if (error) {
+        ui.setNotification({
+          category: 'error',
+          message: error.message,
+        })
+      }
+    })()
+  }, [])
 
   return (
     <>
@@ -64,7 +77,7 @@ const SignInLayout = ({
         </div>
 
         <div className="flex-1 flex">
-          <main className="max-w-[40%] flex-1 flex flex-col items-center bg-scale-200 px-5 pt-16 pb-8 border-r border-scale-500 shadow-lg">
+          <main className="flex-1 flex-shrink-0 flex flex-col items-center bg-scale-200 px-5 pt-16 pb-8 border-r border-scale-500 shadow-lg">
             <div className="flex-1 flex flex-col justify-center w-[384px]">
               <div className="mb-10">
                 <h1 className="text-4xl mt-8 mb-2">{heading}</h1>
@@ -91,7 +104,7 @@ const SignInLayout = ({
             )}
           </main>
 
-          <aside className="flex-1 flex flex-col justify-center items-center">
+          <aside className="hidden flex-1 flex-shrink basis-1/4 xl:flex flex-col justify-center items-center">
             <div className="relative flex flex-col gap-6">
               <div className="absolute -top-12 -left-11 select-none">
                 <span className="text-[160px] leading-none text-scale-600">{'“'}</span>
