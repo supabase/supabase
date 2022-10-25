@@ -5,8 +5,7 @@ import { useFlag } from 'hooks'
 
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const logsRealtime = useFlag('logsRealtime')
-  const reportsOverview = useFlag('reportsOverview')
+  const productReports = useFlag('productReports')
 
   const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
   const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
@@ -48,7 +47,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                 url: `/project/${ref}/database/api-logs`,
                 items: [],
               },
-              ...(reportsOverview
+              ...(productReports
                 ? [
                     {
                       name: 'API usage',
@@ -64,16 +63,12 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                 url: `/project/${ref}/database/postgres-logs`,
                 items: [],
               },
-              ...(logsRealtime
-                ? [
-                    {
-                      name: 'Realtime logs',
-                      key: 'realtime-logs',
-                      url: `/project/${ref}/database/realtime-logs`,
-                      items: [],
-                    },
-                  ]
-                : []),
+              {
+                name: 'Realtime logs',
+                key: 'realtime-logs',
+                url: `/project/${ref}/database/realtime-logs`,
+                items: [],
+              },
             ],
           },
         ]
