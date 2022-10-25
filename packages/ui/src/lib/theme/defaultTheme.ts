@@ -414,7 +414,7 @@ export default {
     type: {
       primary: `
         bg-brand-fixed-800 hover:bg-brand-fixed-900
-        text-lo-contrast
+        text-white
         bordershadow-brand-fixed-800 hover:bordershadow-brand-fixed-1000
         focus-visible:outline-brand-600
       `,
@@ -542,10 +542,8 @@ export default {
       ...default__padding_and_text,
     },
     disabled: 'opacity-50',
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-    textarea_actions_container:
-      'absolute inset-y-1.5 right-0 pl-3 pr-1 flex space-x-1 items-start',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
+    textarea_actions_container: 'absolute inset-y-1.5 right-0 pl-3 pr-1 flex space-x-1 items-start',
     textarea_actions_container_items: 'flex items-center',
   },
 
@@ -590,10 +588,8 @@ export default {
       ...default__padding_and_text,
     },
     disabled: 'opacity-50',
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
-    chevron_container:
-      'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
+    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
     chevron: 'h-5 w-5 text-scale-600',
   },
 
@@ -638,8 +634,7 @@ export default {
     size: {
       ...default__padding_and_text,
     },
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
   },
 
   /*
@@ -1091,8 +1086,7 @@ export default {
     responsive: 'md:grid md:grid-cols-12 md:gap-x-4',
     non_responsive: 'grid grid-cols-12 gap-2',
 
-    labels_horizontal_layout:
-      'flex flex-row space-x-2 justify-between col-span-12',
+    labels_horizontal_layout: 'flex flex-row space-x-2 justify-between col-span-12',
     labels_vertical_layout: 'flex flex-col space-y-2 col-span-4',
 
     data_input_horizontal_layout: 'col-span-12',
@@ -1533,10 +1527,8 @@ export default {
       ...default__padding_and_text,
     },
     disabled: `opacity-50`,
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-    chevron_container:
-      'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
+    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
     chevron: 'h-5 w-5 text-scale-600',
     option: `
       w-listbox
