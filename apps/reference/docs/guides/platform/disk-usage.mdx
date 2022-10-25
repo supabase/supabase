@@ -14,6 +14,33 @@ SELECT SUM(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb 
 
 This value is also reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
 
+## Full disk prevention
+
+Running out of disk space will cause Postgres to become unstable, and operations such as backups and automatic service optimization to be disrupted.
+
+In order to prevent this your project will go into read-only mode once it reaches 95% disk usage, preventing writes to the database.
+In read-only mode clients will start encountering errors such as `cannot execute INSERT in a read-only transaction`.
+
+Regular operation (read-write mode) will be automatically enabled once disk usage falls under 95%.
+
+### Increasing available disk space
+
+1. Upgrading ensures your project's disk is expanded, increasing the amount of available disk space.
+
+   This can be done using your project's [billing page](https://app.supabase.com/project/_/settings/billing).
+
+2. You can delete data from your project's database to lower its disk usage.
+
+    As the database is now in read-only mode, deletes will also be prevented.
+
+    To work around this, you can change the transaction mode to read-write for your session by running the following:
+
+    ```sql
+    SET default_transaction_read_only = 'off';
+    ```
+    
+    Then you are able to delete data from within the session.
+
 ## Vacuum operations
 
 Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. Instead, they are internally marked as removed until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed. As a result, deleting data from your DB may not immediately reduce the reported disk usage.
