@@ -4,7 +4,7 @@ const sidebars = {
       type: 'category',
       label: 'Overview',
       collapsed: true,
-      items: ['about', 'guides/features', 'architecture', 'guides/examples'],
+      items: ['about', 'guides/features', 'architecture'],
     },
     {
       type: 'category',
@@ -34,7 +34,7 @@ const sidebars = {
       items: [
         'guides/cli',
         'guides/cli/local-development',
-        'guides/cli/cicd-workflow',
+        'guides/cli/managing-environments',
       ],
     },
     {
@@ -81,6 +81,7 @@ const sidebars = {
             'guides/auth/managing-user-data',
             'guides/auth/auth-captcha',
             'guides/auth/server-side-rendering',
+            'guides/auth/auth-mfa',
           ],
         },
         {
@@ -134,9 +135,9 @@ const sidebars = {
           collapsed: true,
           items: [
             'guides/database/extensions',
-            // 'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
+            'guides/database/extensions/pgtap',
             'guides/database/extensions/uuid-ossp',
           ],
         },
@@ -186,6 +187,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/hosting/platform',
+        'guides/platform/custom-domains',
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
