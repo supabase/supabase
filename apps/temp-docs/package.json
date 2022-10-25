@@ -26,7 +26,7 @@
     "gen:supabase-js:v1": "npm-run-all gen:supabase-js:v1:ref",
     "gen:supabase-js:v1:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v1.yml --output ./_supabase_js_versioned_docs/version-v1/generated",
     "gen:supabase-js:v2": "npm-run-all gen:supabase-js:v2:ref",
-    "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./_supabase_js/generated"
+    "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./docs/reference/javascript/generated"
   },
   "dependencies": {
     "@apollo/client": "^3.6.6",
