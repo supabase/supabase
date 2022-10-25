@@ -20,6 +20,8 @@ export default function Doc({
   toc: any
 }) {
   const { asPath } = useRouter()
+
+  // get the current kind of page
   let page
   switch (asPath) {
     case '/guides':
