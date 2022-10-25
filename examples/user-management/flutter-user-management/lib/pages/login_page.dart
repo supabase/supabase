@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:supabase_quickstart/utils/constants.dart';
+import 'package:supabase_quickstart/constants.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,24 +17,23 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _redirecting = false;
   late final TextEditingController _emailController;
+  late final StreamSubscription<AuthState> _authStateSubscription;
 
   Future<void> _signIn() async {
     setState(() {
       _isLoading = true;
     });
     try {
-      await supabase.auth.signIn(
+      await supabase.auth.signInWithOtp(
         email: _emailController.text,
-        options: const AuthOptions(
-          redirectTo:
-              kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
-        ),
+        emailRedirectTo:
+            kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
       );
       if (mounted) {
         context.showSnackBar(message: 'Check your email for login link!');
         _emailController.clear();
       }
-    } on GoTrueException catch (error) {
+    } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
       context.showErrorSnackBar(message: 'Unexpected error occured');
@@ -46,8 +47,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     _emailController = TextEditingController();
-    supabase.auth.onAuthStateChange((event, session) {
+    _authStateSubscription = supabase.auth.onAuthStateChange.listen((data) {
       if (_redirecting) return;
+      final session = data.session;
       if (session != null) {
         _redirecting = true;
         Navigator.of(context).pushReplacementNamed('/account');
@@ -59,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     _emailController.dispose();
+    _authStateSubscription.cancel();
     super.dispose();
   }
 
