@@ -7,12 +7,16 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
 import career from '../../data/career.json'
 import Globe from '~/components/Globe'
+import Styles from './career.module.css'
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
-  const data = await res.json()
+  const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
+  const job_data = await job_res.json()
 
-  if (!data) {
+  const contributor_res = await fetch('https://api.github.com/repos/supabase/supabase/contributors')
+  const contributor_data = await contributor_res.json()
+
+  if (!job_data && contributor_data) {
     return {
       props: {
         notFound: true,
@@ -22,12 +26,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   return {
     props: {
-      data,
+      job_data,
+      contributor_data,
     },
   }
 }
 
-const CareerPage: NextPage = ({ data }: InferGetServerSidePropsType<typeof GetServerSideProps>) => {
+const CareerPage: NextPage = ({ job_data, contributor_data }: InferGetServerSidePropsType<typeof GetServerSideProps>) => {
   return (
     <DefaultLayout>
       <div className="text-scale-1200">
@@ -186,6 +191,60 @@ const CareerPage: NextPage = ({ data }: InferGetServerSidePropsType<typeof GetSe
               )}
             </div>
           </SectionContainer>
+
+          <SectionContainer className="!pb-0">
+            <div className="text-center">
+              <h1 className="text-2xl sm:text-3xl">1,000 + Contributors building Supabase</h1>
+              <p className="text-scale-1100 text-xs sm:text-sm pt-3 w-3/4 mx-auto">
+                Just as versatile as our platform, we're building a community of communities,
+                bringing together developers from many different backgrounds, as well as new
+                developers looking to get involved with open source. We love celebrating everyone
+                who contributes their time to the Supabase mission.
+              </p>
+            </div>
+            <div className="w-[1080px] h-[370px] mx-auto -mt-16 sm:mt-10 lg:mt-16 xl:mt-20 2xl:mt-60">
+            {contributor_data.map((contributor: any, i: number) => {
+                return (
+                  <div
+                    className={`${
+                      Styles[`contributors-${i}`]
+                    } absolute z-10 w-12 h-12 md:w-14 md:h-14 xl:w-16 xl:h-16 bg-brand-900 rounded-full border-[1px] border-scale-600`}
+                    key={i}
+                  ><img className="rounded-full" src={contributor.avatar_url} width="100%" height="100%" /></div>
+                )
+              })}
+              {/*[...Array(19)].map((x: any, i: number) => {
+                return (
+                  <div
+                    className={`${
+                      Styles[`contributors-${i}`]
+                    } absolute z-10 w-12 h-12 md:w-14 md:h-14 xl:w-16 xl:h-16 bg-brand-900 rounded-full border-[0.5px] border-scale-600`}
+                    key={i}
+                  ></div>
+                )
+              })*/}
+              <div
+                className={`${Styles['contributors-bg-circle']} w-[100%] lg:w-[80%] left-[0%] lg:left-[10%] -bottom-[30%] sm:-bottom-[52%] md:-bottom-[68%] lg:-bottom-[80%] xl:-bottom-[100%]`}
+              >
+                <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+              </div>
+              <div
+                className={`${Styles['contributors-bg-circle']} w-[80%] lg:w-[60%] left-[10%] lg:left-[20%] -bottom-[25%] sm:-bottom-[44%] md:-bottom-[56%] lg:-bottom-[60%] xl:-bottom-[75%]`}
+              >
+                <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+              </div>
+              <div
+                className={`${Styles['contributors-bg-circle']} w-[60%] lg:w-[40%] left-[20%] lg:left-[30%] -bottom-[20%] sm:-bottom-[38%] md:-bottom-[48%] lg:-bottom-[40%] xl:-bottom-[50%]`}
+              >
+                <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+              </div>
+              <div
+                className={`${Styles['contributors-bg-circle']} w-[40%] lg:w-[20%] left-[30%] lg:left-[40%] -bottom-[15%] sm:-bottom-[30%] md:-bottom-[38%] lg:-bottom-[20%] xl:-bottom-[25%]`}
+              >
+                <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
+              </div>
+            </div>
+          </SectionContainer>
         </div>
 
         <SectionContainer>
@@ -234,7 +293,7 @@ const CareerPage: NextPage = ({ data }: InferGetServerSidePropsType<typeof GetSe
             </p>
           </div>
           <div className="mt-10 space-y-6">
-            {data.jobs.map(
+            {job_data.jobs.map(
               (
                 job: {
                   title: string
