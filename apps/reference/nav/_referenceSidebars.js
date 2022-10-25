@@ -124,7 +124,7 @@ const sidebars = {
         'guides/database/connecting-to-postgres',
         'guides/database/tables',
         'guides/database/functions',
-        'guides/database/database-webhooks',
+        'guides/database/webhooks',
         'guides/database/full-text-search',
         'guides/database/migrating-between-projects',
         // 'guides/database/json',
