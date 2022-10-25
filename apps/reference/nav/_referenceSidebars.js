@@ -137,8 +137,8 @@ const sidebars = {
           items: [
             'guides/database/extensions',
             'guides/database/extensions/http',
-            'guides/database/extensions/pgnet',
             'guides/database/extensions/pgcron',
+            'guides/database/extensions/pgnet',
             'guides/database/extensions/pgtap',
             'guides/database/extensions/plv8',
             'guides/database/extensions/uuid-ossp',
