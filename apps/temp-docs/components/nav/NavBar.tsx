@@ -21,7 +21,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
   ]
 
   return (
-    <nav className="dark:border-scale-400 dark:bg-scale-200 sticky top-0 z-10 flex h-[72px] items-center justify-between border-b bg-white p-4 backdrop-blur backdrop-filter font-semibold">
+    <nav className="dark:border-scale-400 dark:bg-scale-200 sticky top-0 z-10 flex h-[72px] items-center justify-between border-b bg-white p-4 backdrop-blur backdrop-filter">
       <div className="flex items-center">
         <button className="mr-4 block stroke-2 lg:hidden">
           <IconMenu className="text-scale-1100" />
@@ -63,7 +63,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             <li>
               <a
                 href="https://app.supabase.com"
-                className="text-scale-1100 text-sm font-semibold"
+                className="text-scale-1100 text-sm"
                 target="_blank"
                 rel="noreferrer noopener"
               >
