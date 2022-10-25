@@ -32,7 +32,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 }
 
-const CareerPage: NextPage = ({ job_data, contributor_data }: InferGetServerSidePropsType<typeof GetServerSideProps>) => {
+const CareerPage: NextPage = ({
+  job_data,
+  contributor_data,
+}: InferGetServerSidePropsType<typeof GetServerSideProps>) => {
   return (
     <DefaultLayout>
       <div className="text-scale-1200">
@@ -203,14 +206,21 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: InferGetServerSide
               </p>
             </div>
             <div className="w-[1080px] h-[370px] mx-auto -mt-16 sm:mt-10 lg:mt-16 xl:mt-20 2xl:mt-60">
-            {contributor_data.map((contributor: any, i: number) => {
+              {contributor_data.map((contributor: any, i: number) => {
                 return (
                   <div
                     className={`${
                       Styles[`contributors-${i}`]
                     } absolute z-10 w-12 h-12 md:w-14 md:h-14 xl:w-16 xl:h-16 bg-brand-900 rounded-full border-[1px] border-scale-600`}
                     key={i}
-                  ><img className="rounded-full" src={contributor.avatar_url} width="100%" height="100%" /></div>
+                  >
+                    <img
+                      className="rounded-full"
+                      src={contributor.avatar_url}
+                      width="100%"
+                      height="100%"
+                    />
+                  </div>
                 )
               })}
               {/*[...Array(19)].map((x: any, i: number) => {
