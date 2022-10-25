@@ -125,7 +125,7 @@ const sidebars = {
         // 'guides/database/sql-to-api',
         {
           type: 'category',
-          label: 'Auto-generated APIs',
+          label: 'Data APIs',
           collapsed: true,
           items: ['guides/api', 'guides/api/generating-types'],
         },
@@ -285,7 +285,7 @@ const sidebars = {
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
+        { type: 'link', label: 'Management API', href: '/reference/api' },
       ],
     },
     // TODO: add back in with typedocs
