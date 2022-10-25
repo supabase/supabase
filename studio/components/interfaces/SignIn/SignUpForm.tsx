@@ -22,7 +22,7 @@ const SignUpForm = () => {
       message: `Signing up...`,
     })
 
-    const response = await post(`${API_URL}/signup`, { email, password, username: email })
+    const response = await post(`${API_URL}/signup`, { email, password })
     const error = response.error
 
     if (!error) {
