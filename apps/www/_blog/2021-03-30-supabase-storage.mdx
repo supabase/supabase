@@ -24,13 +24,13 @@ There are three key components to Supabase Storage:
 - Middleware (access and permissions). This consists of an API Server and Postgres.
 - Frontend (a nice UI).
 
-![Storage Infrastructure](/images/blog/storage/infra.png)
-
 The Storage API server sits behind Kong, an API Gateway. It talks to different storage backends like S3, Backblaze, etc to retrieve and store objects.
 
 Object metadata and security rules are stored in your Postgres database.
 
 We have built a powerful file explorer right into the dashboard, and using our Client libraries you can integrate Storage into your applications.
+
+![Storage Infrastructure](/images/blog/storage/infra.png)
 
 ## Frontend
 
