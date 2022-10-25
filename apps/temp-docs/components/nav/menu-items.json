@@ -174,9 +174,10 @@
       {
         "text": "Getting Started",
         "sections": [
-          { "text": "Getting Started", "link": "/reference/javascript/index" },
+          { "text": "Supabase JavaScript Library", "link": "/reference/javascript/index" },
           { "text": "Installing", "link": "/reference/javascript/installing" },
           { "text": "Initializing", "link": "/reference/javascript/initializing" },
+          { "text": "Typescript Support", "link": "/reference/javascript/typescript-support" },
           { "text": "Generating Types", "link": "/reference/javascript/generating-types" }
         ]
       },
@@ -188,7 +189,7 @@
           { "text": "signOut()", "link": "/reference/javascript/auth-signout" },
           { "text": "session()", "link": "/reference/javascript/auth-session" },
           { "text": "user()", "link": "/reference/javascript/auth-user" },
-          { "text": "update()", "link": "/reference/javascript/auth-update" },
+          { "text": "update()", "link": "/reference/javascript/generated/update" },
           { "text": "setAuth()", "link": "/reference/javascript/auth-setauth" },
           { "text": "onAuthStateChange()", "link": "/reference/javascript/auth-onauthstatechange" },
           { "text": "getUser()", "link": "/reference/javascript/auth-api-getuser" },
