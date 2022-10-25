@@ -16,9 +16,8 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
     { text: 'Guides', link: '/guides' },
     {
       text: 'Reference',
-      link: '/reference/javascript/supabase-client',
+      link: '/reference',
     },
-    { text: 'Discussions', link: '/discussions' },
   ]
 
   return (
