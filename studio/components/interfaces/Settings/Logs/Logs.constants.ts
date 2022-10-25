@@ -215,7 +215,9 @@ export const SQL_FILTER_TEMPLATES: any = {
 
     'method.get': `request.method = 'GET'`,
     'method.post': `request.method = 'POST'`,
-    'method.del': `request.method = 'DEL'`,
+    'method.put': `request.method = 'PUT'`,
+    'method.patch': `request.method = 'PATCH'`,
+    'method.delete': `request.method = 'DELETE'`,
     'method.options': `request.method = 'OPTIONS'`,
   },
   function_edge_logs: {
@@ -374,8 +376,23 @@ export const FILTER_OPTIONS: FilterTableSet = {
           description: '',
         },
         {
+          key: 'put',
+          label: 'PUT',
+          description: '',
+        },
+        {
           key: 'post',
           label: 'POST',
+          description: '',
+        },
+        {
+          key: 'patch',
+          label: 'PATCH',
+          description: '',
+        },
+        {
+          key: 'delete',
+          label: 'DELETE',
           description: '',
         },
       ],

@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { filterFunctionsRequestResponse } from 'lib/logs'
 import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight, ResponseCodeFormatter } from '../LogsFormatters'
+import { jsonSyntaxHighlight, ResponseCodeFormatter, SelectionDetailedRow } from '../LogsFormatters'
 
 const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => {
   const metadata = log.metadata?.[0]
@@ -15,39 +15,22 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
   const deploymentId = metadata.deployment_id
   const timestamp = dayjs(log.timestamp / 1000)
 
-  const DetailedRow = ({
-    label,
-    value,
-    code,
-  }: {
-    label: string
-    value: string | React.ReactNode
-    code?: boolean
-  }) => {
-    return (
-      <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
-        <span
-          className={`text-scale-1200 text-sm col-span-8 whitespace-pre-wrap ${
-            code && 'text-xs font-mono'
-          }`}
-        >
-          {value}
-        </span>
-      </div>
-    )
-  }
-
   return (
     <>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
-        <DetailedRow label="Status" value={<ResponseCodeFormatter value={status} />} />
-        <DetailedRow label="Method" value={method} />
-        <DetailedRow label="Timestamp" value={dayjs(timestamp).format('DD MMM, YYYY HH:mm')} />
-        <DetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
-        <DetailedRow label="Deployment ID" value={deploymentId} />
-        <DetailedRow label="Log ID" value={log.id} />
-        <DetailedRow label="Request Path" value={requestUrl.pathname + requestUrl.search} />
+        <SelectionDetailedRow label="Status" value={status} valueRender={<ResponseCodeFormatter value={status} />} />
+        <SelectionDetailedRow label="Method" value={method} />
+        <SelectionDetailedRow
+          label="Timestamp"
+          value={dayjs(timestamp).format('DD MMM, YYYY HH:mm')}
+        />
+        <SelectionDetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
+        <SelectionDetailedRow label="Deployment ID" value={deploymentId} />
+        <SelectionDetailedRow label="Log ID" value={log.id} />
+        <SelectionDetailedRow
+          label="Request Path"
+          value={requestUrl.pathname + requestUrl.search}
+        />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">Request body</h3>

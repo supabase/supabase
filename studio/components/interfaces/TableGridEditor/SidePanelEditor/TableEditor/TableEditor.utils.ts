@@ -29,7 +29,7 @@ export const generateTableField = (): TableField => {
     name: '',
     comment: '',
     columns: DEFAULT_COLUMNS,
-    isRLSEnabled: false,
+    isRLSEnabled: true,
     isRealtimeEnabled: false,
   }
 }
