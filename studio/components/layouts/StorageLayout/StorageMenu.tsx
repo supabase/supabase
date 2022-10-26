@@ -24,7 +24,12 @@ interface Props {}
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
   const { ref, bucketId } = router.query
-  const page = router.pathname.split('/')[4] as undefined | 'policies' | 'settings' | 'usage'
+  const page = router.pathname.split('/')[4] as
+    | undefined
+    | 'policies'
+    | 'settings'
+    | 'usage'
+    | 'logs'
 
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
@@ -96,6 +101,11 @@ const StorageMenu: FC<Props> = () => {
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
               <p className="truncate">Policies</p>
+            </Menu.Item>
+          </Link>
+          <Link href={`/project/${projectRef}/storage/logs`}>
+            <Menu.Item rounded active={page === 'logs'}>
+              <p className="truncate">Logs</p>
             </Menu.Item>
           </Link>
         </div>

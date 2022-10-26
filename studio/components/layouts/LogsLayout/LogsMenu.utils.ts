@@ -4,8 +4,7 @@ import { useFlag } from 'hooks'
 
 export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const logsRealtime = useFlag('logsRealtime')
-  const reportsOverview = useFlag('reportsOverview')
+  const productReports = useFlag('productReports')
 
   return [
     {
@@ -49,7 +48,7 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
           items: [],
         },
 
-        ...(reportsOverview
+        ...(productReports
           ? [
               {
                 name: 'API usage',

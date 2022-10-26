@@ -1,6 +1,6 @@
 {
   "name": "nuxtjs-user-management",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "nuxt",
@@ -10,9 +10,8 @@
   },
   "dependencies": {
     "@nuxtjs/dotenv": "^1.4.1",
-    "@supabase/supabase-js": "^1.7.1",
+    "@supabase/supabase-js": "^2.0.0-rc.9",
     "core-js": "^3.9.1",
-    "nuxt": "^2.15.3"
-  },
-  "devDependencies": {}
+    "nuxt": "^2.15.8"
+  }
 }
