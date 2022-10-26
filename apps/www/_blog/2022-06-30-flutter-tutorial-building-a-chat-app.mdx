@@ -58,7 +58,7 @@ You should be able to now see the default counter app that every Flutter project
 Open pubspec.yaml file and let's install a few dependencies of this app.
 
 ```yaml
-supabase_flutter: ^0.2.12
+supabase_flutter: ^1.0.0
 timeago: ^3.1.0
 ```
 
@@ -151,6 +151,9 @@ const formSpacer = SizedBox(width: 16, height: 16);
 /// Some padding for all the forms to use
 const formPadding = EdgeInsets.symmetric(vertical: 20, horizontal: 16);
 
+/// Error message to display the user when unexpected error occurs.
+const unexpectedErrorMessage = 'Unexpected error occured.';
+
 /// Basic theme to change the look and feel of the app
 final appTheme = ThemeData.light().copyWith(
   primaryColorDark: Colors.orange,
@@ -166,13 +169,13 @@ final appTheme = ThemeData.light().copyWith(
   primaryColor: Colors.orange,
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      primary: Colors.orange,
+      foregroundColor: Colors.orange,
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      onPrimary: Colors.white,
-      primary: Colors.orange,
+      foregroundColor: Colors.white,
+      backgroundColor: Colors.orange,
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
@@ -259,14 +262,15 @@ class MyApp extends StatelessWidget {
 
 ### Step 3: Redirect users depending on auth state using splash page
 
-When the user launches the app, we want to redirect those who have already signed in to the Chat page and those who have not signed in yet to the register page. In order to achieve this, we will create a splash page, which is just a page with a preloader at the middle from the user, but takes care of fetching auth state and redirects users accordingly behind the scenes. We are using the `onAuthenticated` and `onUnauthenticated` to redirect the user to the proper pages. 
+When a user launches the app, we want to redirect those who have already signed in to the Chat page and those who have not signed in yet to the register page.
+In order to achieve this, we will create a splash page, which is just a page with a preloader at the middle from the user, but takes care of fetching auth state and redirects users accordingly behind the scenes.
+Within the `_redirect()` method, we are fetching the auth state and navigating the user accordingly. 
 
 ```dart title="lib/pages/splash_page.dart"
 import 'package:flutter/material.dart';
 import 'package:my_chat_app/pages/chat_page.dart';
 import 'package:my_chat_app/pages/register_page.dart';
 import 'package:my_chat_app/utils/constants.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Page to redirect users to the appropriate page depending on the initial auth state
 class SplashPage extends StatefulWidget {
@@ -276,34 +280,31 @@ class SplashPage extends StatefulWidget {
   SplashPageState createState() => SplashPageState();
 }
 
-class SplashPageState extends SupabaseAuthState<SplashPage> {
+class SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    recoverSupabaseSession();
+    _redirect();
+  }
+
+  Future<void> _redirect() async {
+    // await for for the widget to mount
+    await Future.delayed(Duration.zero);
+
+    final session = supabase.auth.currentSession;
+    if (session == null) {
+      Navigator.of(context)
+          .pushAndRemoveUntil(RegisterPage.route(), (route) => false);
+    } else {
+      Navigator.of(context)
+          .pushAndRemoveUntil(ChatPage.route(), (route) => false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: preloader);
   }
-
-  @override
-  void onAuthenticated(Session session) {
-    Navigator.of(context).pushAndRemoveUntil(ChatPage.route(), (_) => false);
-  }
-
-  @override
-  void onUnauthenticated() {
-    Navigator.of(context)
-        .pushAndRemoveUntil(RegisterPage.route(), (_) => false);
-  }
-
-  @override
-  void onErrorAuthenticating(String message) {}
-
-  @override
-  void onPasswordRecovery(Session session) {}
 }
 ```
 
