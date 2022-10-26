@@ -357,7 +357,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: { user, session }, error } = supabase.auth.refreshSession()
+          const { data: { user, session }, error } = await supabase.auth.refreshSession()
           ```
       - name: Server-side refresh
         isSpotlight: true
