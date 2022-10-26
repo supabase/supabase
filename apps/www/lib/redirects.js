@@ -1358,6 +1358,11 @@ module.exports = [
     source: '/docs/reference/auth-helpers/sveltekit',
     destination: '/docs/guides/auth/auth-helpers/sveltekit',
   },
+  {
+    permanent: true,
+    source: '/guides/database/migrating-between-projects',
+    destination: '/guides/platform/migrating-and-upgrading',
+  },
 
   // supabase-js v1 to v2 redirects
   // v1: /auth-update

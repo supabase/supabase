@@ -125,7 +125,6 @@ const sidebars = {
         'guides/database/tables',
         'guides/database/functions',
         'guides/database/full-text-search',
-        'guides/database/migrating-between-projects',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
@@ -194,6 +193,7 @@ const sidebars = {
         'guides/platform/performance',
         'guides/platform/permissions',
         'going-into-prod',
+        'guides/platform/migrating-and-upgrading',
       ],
     },
     {
