@@ -25,12 +25,10 @@ const ProjectSettings: NextPageWithLayout = () => {
   const { ref } = router.query
 
   return (
-    <div>
+    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto">
-        <div className="w-full max-w-5xl px-4 py-4">
-          <GeneralSettings projectRef={ref} />
-          <ConnectionPooling />
-        </div>
+        <GeneralSettings projectRef={ref} />
+        <ConnectionPooling />
       </div>
     </div>
   )
@@ -278,7 +276,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   return (
     <>
-      <div className="mx-auto max-w-4xl px-12 pt-8 pb-8">
+      <div className="mb-8">
         <section className="space-y-6">
           <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
           <Panel
@@ -343,7 +341,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <ResetDbPassword />
         <DownloadCertificate createdAt={connectionInfo.inserted_at} />
       </div>
-      <div className="mx-auto max-w-4xl px-12 -mt-8">
+      <div className="mt-8">
         <section className="space-y-6">
           <Panel
             title={
