@@ -4,7 +4,8 @@ import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import { tweets } from 'shared-data'
 
 type SignInLayoutProps = {
   heading: string
@@ -35,6 +36,19 @@ const SignInLayout = ({
         })
       }
     })()
+  }, [])
+
+  const [quote, setQuote] = useState<{
+    text: string
+    url: string
+    handle: string
+    img_url: string
+  } | null>(null)
+
+  useEffect(() => {
+    const randomQuote = tweets[Math.floor(Math.random() * tweets.length)]
+
+    setQuote(randomQuote)
   }, [])
 
   return (
@@ -105,31 +119,34 @@ const SignInLayout = ({
           </main>
 
           <aside className="hidden flex-1 flex-shrink basis-1/4 xl:flex flex-col justify-center items-center">
-            <div className="relative flex flex-col gap-6">
-              <div className="absolute -top-12 -left-11 select-none">
-                <span className="text-[160px] leading-none text-scale-600">{'“'}</span>
-              </div>
-
-              <blockquote className="text-3xl z-10">
-                This is something I really like.
-                <br />
-                It's speeding things up so much!
-              </blockquote>
-
-              <div className="flex gap-4">
-                <img
-                  src="https://pbs.twimg.com/profile_images/1086183037069549569/wUlAfmEd_400x400.jpg"
-                  alt="Jonathan Summers Muir (@jsummersmuir)"
-                  className="rounded-full w-12 h-12"
-                />
-
-                <div className="flex flex-col">
-                  <cite className="font-medium not-italic">Jonathan Summers Muir</cite>
-                  <span className="text-scale-1000 leading-tight">@jsummersmuir</span>
-                  <span className="mt-0.5">Developer at Supabase</span>
+            {quote !== null && (
+              <div className="relative flex flex-col gap-6">
+                <div className="absolute -top-12 -left-11 select-none">
+                  <span className="text-[160px] leading-none text-scale-600">{'“'}</span>
                 </div>
+
+                <blockquote className="text-3xl z-10 max-w-lg">{quote.text}</blockquote>
+
+                <a
+                  href={quote.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4"
+                >
+                  <img
+                    src={`https://supabase.com${quote.img_url}`}
+                    alt={quote.handle}
+                    className="rounded-full w-12 h-12"
+                  />
+
+                  <div className="flex flex-col">
+                    <cite className="font-medium not-italic text-scale-1100 whitespace-nowrap">
+                      @{quote.handle}
+                    </cite>
+                  </div>
+                </a>
               </div>
-            </div>
+            )}
           </aside>
         </div>
       </div>
