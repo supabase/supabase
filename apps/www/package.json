@@ -56,6 +56,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "config": "*",
     "@tailwindcss/typography": "^0.5.7",
     "@types/classnames": "^2.3.1",
     "@types/jest": "^25.2.2",

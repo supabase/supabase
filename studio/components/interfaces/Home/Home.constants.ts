@@ -33,7 +33,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'NextJS',
     title: 'Next.js Realtime chat app',
     description: 'Next.js Slack clone app using Supabase realtime subscriptions',
-    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/slack-clone/nextjs-slack-clone',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone',
   },
   {
     framework: 'NextJS',
@@ -87,7 +87,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'Svelte',
     title: 'Svelte todo list app',
     description: 'Sveltejs todo with TailwindCSS and Snowpack',
-    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/sveltejs-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list',
   },
   {
     framework: 'VueJS',

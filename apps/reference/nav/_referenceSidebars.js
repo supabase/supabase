@@ -4,7 +4,7 @@ const sidebars = {
       type: 'category',
       label: 'Overview',
       collapsed: true,
-      items: ['about', 'guides/features', 'architecture', 'guides/examples'],
+      items: ['about', 'guides/features', 'architecture'],
     },
     {
       type: 'category',
@@ -34,7 +34,7 @@ const sidebars = {
       items: [
         'guides/cli',
         'guides/cli/local-development',
-        'guides/cli/cicd-workflow',
+        'guides/cli/managing-environments',
       ],
     },
     {
@@ -124,6 +124,7 @@ const sidebars = {
         'guides/database/connecting-to-postgres',
         'guides/database/tables',
         'guides/database/functions',
+        'guides/database/webhooks',
         'guides/database/full-text-search',
         'guides/database/migrating-between-projects',
         // 'guides/database/json',
@@ -135,9 +136,11 @@ const sidebars = {
           collapsed: true,
           items: [
             'guides/database/extensions',
-            // 'guides/database/extensions/pgtap',
-            'guides/database/extensions/plv8',
             'guides/database/extensions/http',
+            'guides/database/extensions/pgcron',
+            'guides/database/extensions/pgnet',
+            'guides/database/extensions/pgtap',
+            'guides/database/extensions/plv8',
             'guides/database/extensions/uuid-ossp',
           ],
         },
@@ -187,6 +190,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'guides/hosting/platform',
+        'guides/platform/custom-domains',
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
