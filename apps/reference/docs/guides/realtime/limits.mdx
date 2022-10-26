@@ -48,7 +48,7 @@ If your project is being rate limited, check your [Realtime logs](https://app.su
 
 ### WebSocket Errors
 
-- `tenant_events`: Clients will be disconnected if your project is generating too many messages per second. `supabase-js` should reconnect automatically if the message rate decreases appropriately.
+- `tenant_events`: Clients will be disconnected if your project is generating too many messages per second. `supabase-js` should reconnect automatically when the message rate decreases below your plan limit.
 
 Some limits can cause a Channel join to be refused. Realtime will reply with one of the following WebSocket messages:
 
