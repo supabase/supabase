@@ -20,14 +20,14 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           key: 'triggers',
           url: `/project/${ref}/database/triggers`,
           items: [],
-          isPreview: true,
+          isPreview: false,
         },
         {
           name: 'Functions',
           key: 'functions',
           url: `/project/${ref}/database/functions`,
           items: [],
-          isPreview: true,
+          isPreview: false,
         },
         {
           name: 'Extensions',
@@ -42,13 +42,17 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/database/replication`,
           items: [],
         },
-        {
-          name: 'Webhooks',
-          key: 'hooks',
-          url: `/project/${ref}/database/hooks`,
-          items: [],
-          isPreview: true,
-        },
+        ...(showHooksRoute
+          ? [
+              {
+                name: 'Webhooks',
+                key: 'hooks',
+                url: `/project/${ref}/database/hooks`,
+                items: [],
+                isPreview: true,
+              },
+            ]
+          : []),
         {
           name: 'Backups',
           key: 'backups',

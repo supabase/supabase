@@ -66,7 +66,11 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
       icon: <IconDatabase size={18} strokeWidth={2} />,
       link:
         ref &&
-        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/database/tables`),
     },
     {
       key: 'auth',

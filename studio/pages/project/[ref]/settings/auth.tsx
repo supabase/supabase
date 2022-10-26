@@ -23,10 +23,10 @@ const PageLayout: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access your project's authentication settings" />
   } else if (authConfig) {
     return (
-      <FormsContainer>
+      <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
         <AutoSchemaForm />
         <SmtpForm />
-      </FormsContainer>
+      </div>
     )
   } else {
     return <div />

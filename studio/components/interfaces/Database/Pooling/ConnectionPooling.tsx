@@ -162,7 +162,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
     }
 
     return (
-      <div className="mx-auto max-w-4xl px-12 pb-8">
+      <div>
         <SchemaFormPanel
           title="Connection Pooling"
           schema={formSchema}
