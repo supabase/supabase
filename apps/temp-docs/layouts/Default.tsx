@@ -27,6 +27,8 @@ const Layout = ({
     }
   }, [])
 
+  console.log('default')
+
   return (
     <>
       <Head>

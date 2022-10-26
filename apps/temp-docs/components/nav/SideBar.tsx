@@ -3,68 +3,27 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { IconChevronRight } from '~/../../packages/ui'
 
-const SideBar = ({ menuItems }: { menuItems: any }) => {
-  console.log(Object.keys(menuItems))
-
-  // The currently active second-level item in menuItems
-  // ie: ['Overview', 'Tutorials', 'See Also', 'etc']
-  // derive the state on the first run based on the asPath in the router
-  //const [activeParentMenuItem, setActiveParentMenuItem] = useState()
+const SideBar = ({ menuItems: passedMenuItems }: { menuItems: any }) => {
+  const [menuItems, setMenuItems] = useState(passedMenuItems)
+  console.log('sidebar', menuItems)
 
   const { asPath } = useRouter()
 
-  function handleParentMenuToggle(e) {
-    const toggleButton = e.target
-    const sidebarMenu = document.querySelector('.sidebar-menu-container')
+  function toggleMenuItem(label: string) {
+    const newMenuItems = menuItems.map((item: any) => {
+      // see if the item has grandchildren
 
-    // Close all parent menus
-    const parentMenus = sidebarMenu.querySelectorAll('.parent-menu')
-    parentMenus.forEach((menu) => menu.classList.add('hidden'))
+      // collapse all first
+      item.collapsed = true
 
-    // Remove all active buttons
-    const activeButtons = sidebarMenu.querySelectorAll('button.active')
-    activeButtons.forEach((menu) => menu.classList.remove('active'))
-
-    // Open the parent menu that's just been clicked
-    const closestGroup = toggleButton.closest('.parent-menu-container')
-    toggleButton.classList.add('active')
-    const subMenu = closestGroup.querySelector('.parent-menu')
-    subMenu.classList.contains('hidden')
-      ? subMenu.classList.remove('hidden')
-      : subMenu.classList.add('hidden')
-  }
-
-  function handleSubMenuToggle(e) {
-    const toggleButton = e.target
-    const closestGroup = toggleButton.closest('.sub-menu-group')
-    // Remove all active buttons
-    const activeButtons = closestGroup.querySelectorAll('button.active')
-    activeButtons.forEach((menu) => menu.classList.remove('active'))
-
-    // Open the parent menu that's just been clicked
-    toggleButton.classList.add('active')
-    const subMenu = closestGroup.querySelector('.sub-menu')
-    subMenu.classList.contains('hidden')
-      ? subMenu.classList.remove('hidden')
-      : subMenu.classList.add('hidden')
-  }
-
-  const isMenuActive = (key) => {
-    // check if main items have .some()
-    if (menuItems[key].some((item) => item.link === asPath)) {
-      return true
-    }
-
-    // check if sub items (sections) have .some()
-    if (menuItems[key].some((item) => item.sections?.length > 0)) {
-      if (
-        menuItems[key].some((item) => item.sections?.some((section) => section.link === asPath))
-      ) {
-        return true
+      // then grab the one that matches the label and invert it
+      if (item.label === label) {
+        return { ...item, collapsed: !item.collapsed }
       }
-    }
 
-    return false
+      return item
+    })
+    setMenuItems(newMenuItems)
   }
 
   return (
@@ -73,35 +32,61 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
         h-screen overflow-y-scroll border-r py-10 px-6 sidebar-menu-container"
     >
       <ul className="w-full flex-col gap-12 mb-8">
-        {Object.keys(menuItems).map((key, i) => (
+        {menuItems.map((item) => (
+          <li className="mt-1">
+            <button onClick={(e) => toggleMenuItem(item.label)} className="flex items-center">
+              <IconChevronRight /> {item.label}
+            </button>
+            <ul className={`mb-8 ml-5 text-sm ${item.collapsed ? 'hidden' : ''}`}>
+              {item.items.map((child) => (
+                <li>
+                  {child.items ? (
+                    <div>
+                      <button
+                        className="flex items-center"
+                        onClick={(e) => toggleMenuItem(child.label)}
+                      >
+                        <IconChevronRight />
+                        {child.label}
+                      </button>
+                      <ul className={`mb-4 mt-2 ml-2 ${child.collapsed ? 'hidden' : ''}`}>
+                        {child.items.map((grandchild) => (
+                          <li>{grandchild}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    child
+                  )}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+        {/* {Object.keys(menuItems).map((key, i) => (
           <li key={key} className="mb-8 bg-gray-200 parent-menu-container">
             <button
-              onClick={(e) => handleParentMenuToggle(e)}
+              onClick={(e) => console.log('hay')}
               className={[
                 'parent-menu-toggle text-sm bg-gray-500 flex items-center gap-1',
-                isMenuActive(key) ? 'active' : '',
+                2 > 1 ? 'active' : '',
               ].join(' ')}
             >
               <IconChevronRight size="tiny" strokeWidth="0.75" />
               {key}
             </button>
-            <ul className={['parent-menu mt-4', isMenuActive(key) ? '' : 'hidden'].join(' ')}>
+            <ul className={['parent-menu mt-4', 2 > 1 ? '' : 'hidden'].join(' ')}>
               {menuItems[key].map((item) =>
                 Array.isArray(item.sections) ? (
                   <div className="sub-menu-group ml-4">
                     <button
-                      onClick={(e) => handleSubMenuToggle(e)}
+                      onClick={(e) => console.log()}
                       className="parent-menu-toggle text-sm bg-gray-500 flex items-center gap-1"
                     >
                       <IconChevronRight size="tiny" strokeWidth="0.75" />
                       {item.text}
                     </button>
-                    <ul
-                      className={[
-                        'bg-gray-300 sub-menu ml-5',
-                        isMenuActive(key) ? 'hidden' : '',
-                      ].join(' ')}
-                    >
+                    <ul className={['bg-gray-300 sub-menu ml-5', 2 > 1 ? 'hidden' : ''].join(' ')}>
                       {item.sections.map((menuItem) => (
                         <li>
                           <Link href={menuItem.link}>
@@ -125,7 +110,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
               )}
             </ul>
           </li>
-        ))}
+        ))} */}
       </ul>
     </div>
   )
