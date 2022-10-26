@@ -11,38 +11,38 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
       title: 'Logs',
       items: [
         {
-          name: 'Explorer',
+          name: 'Logs Explorer',
           key: 'explorer',
           url: `/project/${ref}/logs/explorer`,
           items: [],
         },
         {
-          name: 'Postgres logs',
+          name: 'Postgres',
           key: 'postgres-logs',
           url: `/project/${ref}/logs/postgres-logs`,
           items: [],
         },
         {
-          name: 'PostgREST logs',
+          name: 'PostgREST',
           key: 'postgrest-logs',
           url: `/project/${ref}/logs/postgrest-logs`,
           items: [],
         },
         {
-          name: 'Auth logs',
+          name: 'Auth',
           key: 'auth-logs',
           url: `/project/${ref}/logs/auth-logs`,
           items: [],
         },
         {
-          name: 'Storage logs',
+          name: 'Storage',
           key: 'storage-logs',
           url: `/project/${ref}/logs/storage-logs`,
           items: [],
         },
 
         {
-          name: 'Realtime logs',
+          name: 'Realtime',
           key: 'realtime-logs',
           url: `/project/${ref}/logs/realtime-logs`,
           items: [],
@@ -51,7 +51,7 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
         ...(productReports
           ? [
               {
-                name: 'API usage',
+                name: 'Usage (used to be "API usage") move to reports',
                 key: 'api-usage',
                 url: `/project/${ref}/logs/api-usage`,
                 items: [],

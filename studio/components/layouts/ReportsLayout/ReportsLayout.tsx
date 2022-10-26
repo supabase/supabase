@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useStore, withAuth } from 'hooks'
 import BaseLayout from '..'
 import ProductMenu from 'components/ui/ProductMenu'
+import { generateReportsMenu } from './ReportsMenu.utils'
 
 interface Props {
   title: string
@@ -12,7 +13,7 @@ interface Props {
 
 const ReportsLayout: FC<Props> = ({ title, children }) => {
   const { ui } = useStore()
-  const projectRef = ui.selectedProjectRef as string
+  const project = ui.selectedProject
 
   const router = useRouter()
   const page = router.pathname.split('/')[4] || ''
@@ -22,7 +23,7 @@ const ReportsLayout: FC<Props> = ({ title, children }) => {
         {
           name: 'Overview',
           key: '',
-          url: `/project/${projectRef}/reports`,
+          url: `/project/${project}/reports`,
           items: [],
         },
       ],
@@ -32,7 +33,7 @@ const ReportsLayout: FC<Props> = ({ title, children }) => {
         {
           name: 'Dashboard',
           key: 'dashboard',
-          url: `/project/${projectRef}/reports/dashboard`,
+          url: `/project/${project}/reports/dashboard`,
           items: [],
         },
       ],
@@ -42,7 +43,7 @@ const ReportsLayout: FC<Props> = ({ title, children }) => {
     <BaseLayout
       title={title}
       product="Reports"
-      productMenu={<ProductMenu page={page} menu={menuRoutes} />}
+      productMenu={<ProductMenu page={page} menu={generateReportsMenu(project)} />}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
