@@ -258,62 +258,18 @@ export const menuItems = {
       ],
     },
   ],
-  reference: [
+  Reference: [
     {
       type: 'category',
       label: 'Official',
-      // link: { type: 'doc', id: 'reference' },
-      collapsed: false,
-      items: [
-        { type: 'doc', id: 'reference' },
-        {
-          type: 'link',
-          label: 'Supabase JavaScript Library',
-          href: '/reference/javascript/',
-        },
-        {
-          type: 'link',
-          label: 'Supabase Flutter Library',
-          href: '/reference/dart',
-        },
-        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
-      ],
+      collapsed: true,
+      items: ['reference-documentation', 'js library', 'flutter library', 'cli', 'api'],
     },
-    // TODO: add back in with typedocs
-    // {
-    //   type: 'category',
-    //   label: 'Community',
-    //   // link: { type: 'doc', id: 'about' },
-    //   collapsed: false,
-    //   items: [
-    //     {
-    //       type: 'link',
-    //       label: 'Supabase Auth Helpers',
-    //       href: '/reference/auth-helpers',
-    //     },
-    //   ],
-    // },
     {
       type: 'category',
       label: 'Self-hosting',
-      collapsed: false,
-      items: [
-        { type: 'link', label: 'Auth Server', href: '/reference/auth' },
-        { type: 'link', label: 'Storage Server', href: '/reference/storage' },
-      ],
+      collapsed: true,
+      items: ['auth-server', 'storage-server'],
     },
-    // {
-    //   type: 'category',
-    //   label: 'Postgres Extensions',
-    //   link: { type: 'doc', id: 'postgres/extensions/intro' },
-    //   collapsed: true,
-    //   items: [
-    //     'postgres/extensions/http',
-    //     'postgres/extensions/pgtap',
-    //     'postgres/extensions/plv8',
-    //     'postgres/extensions/uuid-ossp',
-    //   ],
-    // },
   ],
 }
