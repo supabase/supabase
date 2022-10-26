@@ -1,11 +1,11 @@
-// [Joshen] Ideally this should be generated or automated but will do for now
-// Previously, docusaurus only needed the path in reference/nav/_referenceNavbar
-// as they could parse the MDX file to extract the title (?), so we need the "name"
-// for now until we can do that. The only downside now is that we're manually inputing the
-// title here, instead of reading from the MDX files. Let's figure out the parsing
-// after getting the MVP out
-
-// Also best to have a consistent JSON structure in an array - rather than mix of strings and objects
+import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
+import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
+import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
+import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
+import SupabaseCLINav from 'data/nav/supabase-cli'
+import SupabaseAPINav from 'data/nav/supabase-api'
+import AuthServerNav from 'data/nav/auth-server'
+import StorageServerNav from 'data/nav/storage-server'
 
 export interface NavMenu {
   [key: string]: NavMenuGroup[]
@@ -23,7 +23,7 @@ export interface NavMenuSection {
 }
 
 export const menuItems: NavMenu = {
-  Docs: [
+  docs: [
     {
       label: 'Overview',
       items: [
@@ -283,7 +283,7 @@ export const menuItems: NavMenu = {
       ],
     },
   ],
-  Reference: [
+  reference: [
     {
       label: 'Official',
       items: [
@@ -302,4 +302,12 @@ export const menuItems: NavMenu = {
       ],
     },
   ],
+  'reference/javascript': SupabaseJsV2Nav,
+  'reference/javascript/v1': SupabaseJsV1Nav,
+  'reference/dart': SupabaseDartV1Nav,
+  'reference/dart/v0': SupabaseDartV0Nav,
+  'reference/cli': SupabaseCLINav,
+  'reference/api': SupabaseAPINav,
+  'reference/auth': AuthServerNav,
+  'reference/storage': StorageServerNav,
 }

@@ -15,7 +15,7 @@ export default function Home({
 }) {
   console.log({ menuItems }, 'index')
   return (
-    <Layout meta={meta} menuItems={menuItems['Docs']} currentPage="Guides">
+    <Layout meta={meta} menuItems={menuItems['docs']} currentPage="docs">
       <MDXProvider components={components}>
         <MDXRemote {...content} />
       </MDXProvider>
