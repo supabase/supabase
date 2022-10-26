@@ -1,11 +1,13 @@
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { auth, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
+import { useSWRConfig } from 'swr'
 
 type SignInLayoutProps = {
   heading: string
@@ -21,8 +23,10 @@ const SignInLayout = ({
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
+  const { returnTo } = useParams()
+  const router = useRouter()
+  const { cache } = useSWRConfig()
   const { ui } = useStore()
-
   const { theme } = ui
 
   useEffect(() => {
@@ -34,6 +38,25 @@ const SignInLayout = ({
           category: 'error',
           message: error.message,
         })
+
+        return
+      }
+
+      const {
+        data: { session },
+      } = await auth.getSession()
+
+      if (session) {
+        ui.setNotification({
+          category: 'success',
+          message: `Signed in successfully!`,
+        })
+
+        // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
+        // @ts-ignore
+        cache.clear()
+
+        await router.push(returnTo ?? '/projects')
       }
     })()
   }, [])
