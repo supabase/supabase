@@ -4,7 +4,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote } from 'next-mdx-remote'
 import { MDXProvider } from '@mdx-js/react'
 import components from '../components/index'
-import menuItems from '../components/nav/menu-items.json'
+import { menuItems } from '../components/nav/Nav.constants'
 import { useRouter } from 'next/router'
 
 // table of contents extractor
@@ -20,6 +20,8 @@ export default function Doc({
   toc: any
 }) {
   const { asPath } = useRouter()
+
+  // get the current kind of page
   let page
   switch (asPath) {
     case '/guides':
@@ -34,6 +36,7 @@ export default function Doc({
       page = 'Docs'
       break
   }
+  console.log('slug')
 
   return (
     // @ts-ignore

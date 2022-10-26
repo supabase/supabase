@@ -683,3 +683,11 @@ h4.method-list-item-label .method-list-item-validation {
 .method-list-group .method-list-group li h4 {
   margin-bottom: 4px;
 }
+
+// These should move to their own components
+// wasn't able to get an import path working
+.parent-menu-toggle.active {
+  svg {
+    transform: rotate(90deg);
+  }
+}
