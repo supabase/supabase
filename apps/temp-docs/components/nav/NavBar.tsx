@@ -13,8 +13,8 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
   }, [isDarkMode])
 
   const pageLinks = [
-    { text: 'Guides', link: '/' },
-    { text: 'Reference', link: '/reference' },
+    { text: 'Guides', key: 'docs', link: '/' },
+    { text: 'Reference', key: 'reference', link: '/reference' },
   ]
 
   const toggleDarkMode = () => {
@@ -57,7 +57,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
                 <Link href={p.link}>
                   <a
                     className={`text-sm ${
-                      currentPage === p.text ? 'text-brand-900' : 'text-scale-1100'
+                      currentPage.includes(p.key) ? 'text-brand-900' : 'text-scale-1100'
                     }`}
                   >
                     {p.text}
