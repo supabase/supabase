@@ -17,28 +17,7 @@ const ReportsLayout: FC<Props> = ({ title, children }) => {
 
   const router = useRouter()
   const page = router.pathname.split('/')[4] || ''
-  const menuRoutes = [
-    {
-      items: [
-        {
-          name: 'Overview',
-          key: '',
-          url: `/project/${project}/reports`,
-          items: [],
-        },
-      ],
-    },
-    {
-      items: [
-        {
-          name: 'Dashboard',
-          key: 'dashboard',
-          url: `/project/${project}/reports/dashboard`,
-          items: [],
-        },
-      ],
-    },
-  ]
+
   return (
     <BaseLayout
       title={title}

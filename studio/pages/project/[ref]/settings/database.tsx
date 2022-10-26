@@ -278,8 +278,9 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   return (
     <>
-      <div className="">
-        <section className="mt-6 space-y-6">
+      <div className="mx-auto max-w-4xl px-12 pt-8 pb-8">
+        <section className="space-y-6">
+          <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
           <Panel
             title={
               <h5 key="panel-title" className="mb-0">
@@ -342,8 +343,8 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <ResetDbPassword />
         <DownloadCertificate createdAt={connectionInfo.inserted_at} />
       </div>
-      <div>
-        <section className="mt-6 space-y-6">
+      <div className="mx-auto max-w-4xl px-12 -mt-8">
+        <section className="space-y-6">
           <Panel
             title={
               <h5 key="panel-title" className="mb-0">
