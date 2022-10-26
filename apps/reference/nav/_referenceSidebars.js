@@ -111,12 +111,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'APIs',
-      collapsed: true,
-      items: ['guides/api', 'guides/api/generating-types'],
-    },
-    {
-      type: 'category',
       label: 'Database',
       collapsed: true,
       items: [
@@ -130,6 +124,12 @@ const sidebars = {
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Data APIs',
+          collapsed: true,
+          items: ['guides/api', 'guides/api/generating-types'],
+        },
         {
           type: 'category',
           label: 'Extensions',
@@ -288,7 +288,7 @@ const sidebars = {
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
+        { type: 'link', label: 'Management API', href: '/reference/api' },
       ],
     },
     // TODO: add back in with typedocs
