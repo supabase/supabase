@@ -10,16 +10,17 @@ import { useRouter } from 'next/router'
 // table of contents extractor
 const toc = require('markdown-toc')
 
-export default function Doc({
-  meta,
-  content,
-  toc,
-}: {
-  meta: { title: string; description: string }
-  content: any
-  toc: any
-}) {
+interface Meta {
+  id: string
+  title: string
+  sidebar_label: string
+  hide_table_of_contents: boolean
+}
+
+export default function Doc({ meta, content, toc }: { meta: Meta; content: any; toc: any }) {
   const { asPath } = useRouter()
+
+  console.log('[slug]', { meta })
 
   // get the current kind of page
   let page
@@ -36,7 +37,6 @@ export default function Doc({
       page = 'Docs'
       break
   }
-  console.log('slug')
 
   return (
     // @ts-ignore
