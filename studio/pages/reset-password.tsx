@@ -10,10 +10,8 @@ const ResetPasswordPage: NextPageWithLayout = () => {
         <ResetPasswordForm />
       </div>
 
-      <div className="w-full border-t border-scale-700 my-4" />
-
-      <div className="mb-4">
-        <span className="text-scale-1000">Already have an account?</span>{' '}
+      <div className="my-8 self-center">
+        <span className="text-scale-1100">Already have an account?</span>{' '}
         <Link href="/sign-in">
           <a className="underline hover:text-scale-1100">Sign In</a>
         </Link>
@@ -23,7 +21,10 @@ const ResetPasswordPage: NextPageWithLayout = () => {
 }
 
 ResetPasswordPage.getLayout = (page) => (
-  <ForgotPasswordLayout title="Reset Password" showDisclaimer={false}>
+  <ForgotPasswordLayout
+    heading="Reset Your Password"
+    subheading="Type in a new secure password and press save to update your password"
+  >
     {page}
   </ForgotPasswordLayout>
 )

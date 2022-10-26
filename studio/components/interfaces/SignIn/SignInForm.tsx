@@ -66,18 +66,20 @@ const SignInForm = () => {
               placeholder="you@example.com"
             />
 
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-              labelOptional={
-                <Link href="/forgot-password">
-                  <a>Forgot Password?</a>
-                </Link>
-              }
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                label="Password"
+                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+              />
+
+              {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
+              <Link href="/forgot-password">
+                <a className="text-scale-900 text-sm absolute top-0 right-0">Forgot Password?</a>
+              </Link>
+            </div>
 
             <Button
               block

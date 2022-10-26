@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
 type ForgotPasswordLayoutProps = {
-  title: string
-  showDisclaimer?: boolean
+  heading: string
+  subheading: string
   logoLinkToMarketingSite?: boolean
 }
 
 const ForgotPasswordLayout = ({
-  title,
-  showDisclaimer = true,
+  heading,
+  subheading,
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
@@ -21,7 +21,7 @@ const ForgotPasswordLayout = ({
   } = useStore()
 
   return (
-    <div className="flex flex-col gap-8 mb-5">
+    <div className="flex-1 bg-scale-200 flex flex-col gap-8 lg:gap-16 xl:gap-32">
       <div className="sticky top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
@@ -50,35 +50,16 @@ const ForgotPasswordLayout = ({
         </nav>
       </div>
 
-      <h1 className="text-2xl self-center mt-8">{title}</h1>
-
       <div className="flex flex-col justify-center items-center">
-        <main className="min-w-[448px] flex flex-col bg-scale-400 px-5 rounded-lg shadow-lg">
-          <img
-            src="/supabase-logo.svg"
-            alt="Supabase Logo"
-            className="block w-20 mt-8 mb-10 self-center"
-          />
+        <main className="max-w-[448px] w-full flex flex-col px-5">
+          <div className="mb-6">
+            <h1 className="text-3xl mt-8 mb-2">{heading}</h1>
+            <h2 className="text-scale-1100">{subheading}</h2>
+          </div>
 
           {children}
         </main>
       </div>
-
-      {showDisclaimer && (
-        <div className="sm:text-center">
-          <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
-            By continuing, you agree to Supabase's{' '}
-            <Link href="https://supabase.com/docs/company/terms">
-              <a className="underline hover:text-scale-1100">Terms of Service</a>
-            </Link>{' '}
-            and{' '}
-            <Link href="https://supabase.com/docs/company/privacy">
-              <a className="underline hover:text-scale-1100">Privacy Policy</a>
-            </Link>
-            , and to receive periodic emails with updates.
-          </p>
-        </div>
-      )}
     </div>
   )
 }

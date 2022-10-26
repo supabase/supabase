@@ -49,7 +49,7 @@ const ResetPasswordForm = () => {
     >
       {({ isSubmitting }: { isSubmitting: boolean }) => {
         return (
-          <div className="mb-4 space-y-4 pt-4">
+          <div className="space-y-4 pt-4">
             <Input
               id="password"
               name="password"
