@@ -44,7 +44,6 @@ const sidebars = {
         'generated/auth-getuser',
         'generated/auth-updateuser',
         'generated/auth-setsession',
-        'generated/auth-refreshsession',
         'generated/auth-onauthstatechange',
         'generated/auth-resetpasswordforemail',
       ],
