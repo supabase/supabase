@@ -10,7 +10,7 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
       items: [
         {
           name: 'Custom reports',
-          key: 'reports',
+          key: '',
           url: `/project/${ref}/reports`,
           items: [],
         },
