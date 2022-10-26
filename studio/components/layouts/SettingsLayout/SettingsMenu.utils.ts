@@ -60,28 +60,34 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           : []),
       ],
     },
-    {
-      title: 'Billing',
-      items: [
-        {
-          name: 'Subscription',
-          key: 'subscription',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/subscription`,
-          items: [],
-        },
-        {
-          name: 'Usage',
-          key: 'usage',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
-          items: [],
-        },
-        {
-          name: 'Invoices',
-          key: 'invoices',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
-          items: [],
-        },
-      ],
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            title: 'Billing',
+            items: [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: isProjectBuilding
+                  ? buildingUrl
+                  : `/project/${ref}/settings/billing/subscription`,
+                items: [],
+              },
+              {
+                name: 'Usage',
+                key: 'usage',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
+                items: [],
+              },
+              {
+                name: 'Invoices',
+                key: 'invoices',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 }
