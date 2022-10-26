@@ -7,7 +7,7 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 
 const PageLayout: NextPageWithLayout = () => (
   <>
-    <div className="mx-auto my-8 w-full max-w-7xl h-full">
+    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <Reports />
     </div>
     <EditReportModal />
