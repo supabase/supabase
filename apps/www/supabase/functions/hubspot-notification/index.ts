@@ -40,7 +40,6 @@ serve(async (req) => {
         form_note,
         company,
         company_size,
-        email,
         phone,
         lastName,
         firstName,
