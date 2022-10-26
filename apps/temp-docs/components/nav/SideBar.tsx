@@ -66,7 +66,7 @@ const SideBar = ({ menuItems: passedMenuItems }: { menuItems: any }) => {
         {/* {Object.keys(menuItems).map((key, i) => (
           <li key={key} className="mb-8 bg-gray-200 parent-menu-container">
             <button
-              onClick={(e) => console.log('hay')}
+              onClick={(e) => console.log('hay ')}
               className={[
                 'parent-menu-toggle text-sm bg-gray-500 flex items-center gap-1',
                 2 > 1 ? 'active' : '',
