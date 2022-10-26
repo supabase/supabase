@@ -149,7 +149,7 @@ export const menuItems: NavMenu = {
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
         {
           name: 'Migrating Between Projects',
-          url: '/guides/platform/migrating-and-upgrading',
+          url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
         {
