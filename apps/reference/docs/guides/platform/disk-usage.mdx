@@ -16,12 +16,10 @@ This value is also reported in the [database settings page](https://app.supabase
 
 ## Disk space management
 
-Running out of disk space will cause Postgres to become unstable, and operations such as backups and automatic service optimization to be disrupted.
+Running out of disk space causes operations such as backups and automatic service optimization to be disrupted.
+To prevent this, your project goes into read-only mode once it reaches 95% disk usage, preventing writes to the database. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
 
-In order to prevent this your project will go into read-only mode once it reaches 95% disk usage, preventing writes to the database.
-In read-only mode clients will start encountering errors such as `cannot execute INSERT in a read-only transaction`.
-
-Regular operation (read-write mode) will be automatically enabled once disk usage falls under 95%.
+Regular operation (read-write mode) is automatically enabled once disk usage falls under 95%.
 
 ### Increasing available disk space
 
