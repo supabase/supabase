@@ -4,21 +4,17 @@ title: 'Migrating and Upgrading'
 description: Upgrading your project to the latest version of Supabase.
 ---
 
-Supabase ships fast, and we endeavor to add all new features to existing projects wherever possible. In some cases, where we feel it might be unsafe to add features
-to running databases, you have two options to get access to the latest features: upgrading and migrating.
+Supabase ships fast and we endeavor to add all new features to existing projects wherever possible. 
+In some cases, access to new features require upgrading or migrating your Supabase project.
 
-## Upgrading
+## Upgrade your project
 
-When you pause and restore a database, the restored database will be running with the latest features. This method _does_ include downtime, so be aware that your project
-will be inaccessible for a short period of time. The steps are:
+When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
-1. In the Project settings, go to "General" and click "Pause project".
-1. Wait for the database to pause, it could take several minutes. You will be redirected to the home screen.
-1. After the pausing activity has completed, click the "Restore Project".
+1. On the [General Settings](https://app.supabase.com/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
+1. After your project is paused, click **Restore project**. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
 
-The restoration can take several minutes. If your database has a lot of data, then the restore process will take a longer. You will receive an email once the restoration is complete.
-
-## Migrating
+## Migrate your project
 
 Migrating projects can be achieved using standard PostgreSQL tooling. This is particularly useful for older projects (e.g. to use a newer Postgres version).
 
