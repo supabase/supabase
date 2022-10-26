@@ -4,23 +4,10 @@ title: Local Development
 description: How to use Supabase on your local development machine.
 ---
 
-## Local Development
-
-// import Tabs from '@theme/Tabs'
-// import TabItem from '@theme/TabItem'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Learn how to use the Supabase CLI to develop your project locally and deploy to the Supabase Platform.
-
-{/* This is just my experimentation to use the Tabs component from the UI library but looks odd */}
-
-<Tabs scrollable size="small" type="underlined" listClassNames="px-8 pt-4" defaultActiveId="kong">
-  <TabPanel id="postgres" label="Postgres">
-    Hello
-  </TabPanel>
-  <TabPanel id="kong" label="API Gateway">
-    World
-  </TabPanel>
-</Tabs>
 
 ## Prerequisites
 
@@ -36,15 +23,6 @@ Make sure you have these installed on your local machine:
 supabase login
 ```
 
-<Alert withIcon variant="warning" title="Successfully generated a new token!">
-  <div className="w-full space-y-2">
-    <p className="text-sm">
-      To access the database from an edge function in your local Supabase setup, replace `localhost`
-      with `host.docker.internal`.
-    </p>
-  </div>
-</Alert>
-
 ## Initialize your project
 
 Create a new folder for your project and start a new git repository:
@@ -58,12 +36,6 @@ cd your-project
 
 # start a new git repository
 git init
-```
-
-```js
-function create() {
-  console.log('hay')
-}
 ```
 
 ## Start Supabase services

@@ -4,7 +4,7 @@ title: Managing User Data
 description: Securing your user data with Row Level Security.
 ---
 
-For security purposes, the `auth` schema is not exposed on the auto-generated API. 
+For security purposes, the `auth` schema is not exposed on the auto-generated API.
 
 Even though Supabase provides an `auth.users` table, it can be helpful to create tables in the `public` schema for storing user data that you want to access via the API.
 
@@ -26,10 +26,9 @@ create table public.profiles (
 alter table public.profiles enable row level security;
 ```
 
-
 ## Public access
 
-Since Row Level Security is enabled, this table is accessible via the API but no data will be returned unless we set up some Policies. 
+Since Row Level Security is enabled, this table is accessible via the API but no data will be returned unless we set up some Policies.
 If we wanted the data to be _readable_ by everyone but only allow logged-in users to update their own data, the Policies would look like this:
 
 ```sql
@@ -64,7 +63,7 @@ const { data } = await supabase
   .from('profiles')
   .select('id, username, avatar_url, website')
 
-// After the user is logged in, this will only return 
+// After the user is logged in, this will only return
 // the logged-in user's data - in this case a single row
 const { error } = await supabase.auth.signIn({ email })
 const { data: profile } = await supabase
@@ -72,27 +71,26 @@ const { data: profile } = await supabase
   .select('id, username, avatar_url, website')
 ```
 
-## Bypassing Row Level Security 
+## Bypassing Row Level Security
 
-If you need to fetch a full list of user profiles, we supply a `service_key` which you can use with your API and Client Libraries to bypass Row Level Security. 
+If you need to fetch a full list of user profiles, we supply a `service_key` which you can use with your API and Client Libraries to bypass Row Level Security.
 
 Make sure you _NEVER_ expose this publicly. But it can be used on the server-side to fetch all of the profiles.
-
 
 ## Advanced techniques
 
 ### Using triggers
 
-If you want to add a row to your `public.profiles` table every time a user signs up, you can use triggers. 
+If you want to add a row to your `public.profiles` table every time a user signs up, you can use triggers.
 If the trigger fails however, it could block the user sign ups - so make sure that the code is well-tested.
 
 For example:
 
 ```sql
 -- inserts a row into public.users
-create function public.handle_new_user() 
-returns trigger 
-language plpgsql 
+create function public.handle_new_user()
+returns trigger
+language plpgsql
 security definer set search_path = public
 as $$
 begin
