@@ -18,7 +18,13 @@ const ForgotPasswordForm = () => {
       message: `Sending password reset email...`,
     })
 
-    const { error } = await auth.resetPasswordForEmail(email)
+    const { error } = await auth.resetPasswordForEmail(email, {
+      redirectTo: `${
+        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+          ? process.env.NEXT_PUBLIC_VERCEL_URL
+          : process.env.NEXT_PUBLIC_SITE_URL
+      }/reset-password`,
+    })
 
     if (!error) {
       ui.setNotification({
