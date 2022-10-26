@@ -13,7 +13,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
   }, [isDarkMode])
 
   const pageLinks = [
-    { text: 'Guides', link: '/docs' },
+    { text: 'Guides', link: '/' },
     { text: 'Reference', link: '/reference' },
   ]
 

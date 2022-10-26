@@ -4,8 +4,11 @@ import { Tabs, Alert } from 'ui'
 
 import CodeBlock from './CodeBlock/CodeBlock'
 import ButtonCard from './ButtonCard'
+import { H3, H4 } from './CustomMDX'
 
 const components = {
+  h3: H3,
+  h4: H4,
   Alert,
   ButtonCard,
   Tabs,

@@ -27,7 +27,7 @@ export default function Doc({
     case '/guides':
     case '/guides/local-development':
     case /\/guides\/[a-zA-Z]*\/[a-zA-Z\-]*/.test(asPath) && asPath:
-      page = 'Guides'
+      page = 'Docs'
       break
     case asPath.includes('/reference') && asPath:
       page = 'Reference'

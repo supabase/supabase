@@ -4,8 +4,35 @@ import { IconChevronRight } from '~/../../packages/ui'
 import { NavMenuGroup, NavMenuSection } from './Nav.constants'
 import * as Accordion from '@radix-ui/react-accordion'
 
-const SideBar = ({ menuItems }: { menuItems: any }) => {
+const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
   const { asPath } = useRouter()
+
+  const currentSection: NavMenuGroup = menuItems.find((group) => {
+    const foundItem = group.items.find((section) => {
+      if (section.items.length > 0) {
+        const foundSubItem = section.items.find((item) => {
+          if (item.url === asPath) return item
+        })
+        if (foundSubItem) return section
+      } else {
+        if (section.url === asPath) return section
+      }
+    })
+    if (foundItem) return group
+  })
+
+  const currentSubSection: NavMenuSection =
+    currentSection !== undefined
+      ? currentSection.items.find((section) => {
+          if (section.items.length === 0) {
+            return undefined
+          } else {
+            return section.items.find((item) => {
+              if (item.url === asPath) return item
+            })
+          }
+        })
+      : undefined
 
   return (
     <div
@@ -15,7 +42,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
       <Accordion.Root
         collapsible
         type="single"
-        defaultValue={menuItems[0].label}
+        defaultValue={currentSection?.label}
         className="w-full space-y-0.5"
       >
         {menuItems.map((group: NavMenuGroup) => (
@@ -39,7 +66,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
                         <div
                           key={section.name}
                           className={[
-                            'py-1.5 px-5 rounded text-sm',
+                            'py-1.5 px-5 rounded text-sm transition',
                             `${
                               section.url === asPath
                                 ? 'bg-scale-400 text-brand-900'
@@ -59,6 +86,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
                       key={section.name}
                       type="single"
                       className="space-y-0.5"
+                      defaultValue={currentSubSection?.name}
                     >
                       <Accordion.Item value={section.name}>
                         <Accordion.Trigger className="flex items-center space-x-2 px-4 py-1.5">
@@ -77,7 +105,14 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
                               <a>
                                 <div
                                   key={item.name}
-                                  className="py-1.5 px-9 text-sm text-scale-1100 hover:text-scale-1200 transition"
+                                  className={[
+                                    'py-1.5 ml-4 px-5 rounded text-sm transition',
+                                    `${
+                                      item.url === asPath
+                                        ? 'bg-scale-400 text-brand-900'
+                                        : 'text-scale-1100 hover:text-scale-1200'
+                                    }`,
+                                  ].join(' ')}
                                 >
                                   {item.name}
                                 </div>
