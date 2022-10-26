@@ -27,6 +27,8 @@ const Layout = ({
     }
   }, [])
 
+  console.log('default', currentPage)
+
   return (
     <>
       <Head>
@@ -52,9 +54,10 @@ const Layout = ({
           <SideBar menuItems={menuItems} />
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
-              className={`${meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-8'} py-4 px-8`}
+              className={`${
+                meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-10 xl:col-span-8'
+              } py-4 px-8`}
             >
-              <h1 className="text-5xl">{meta?.title}</h1>
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
                 {children}
               </article>

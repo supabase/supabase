@@ -4,28 +4,31 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote } from 'next-mdx-remote'
 import { MDXProvider } from '@mdx-js/react'
 import components from '../components/index'
-import menuItems from '../components/nav/menu-items.json'
+import { menuItems } from '../components/nav/Nav.constants'
 import { useRouter } from 'next/router'
 
 // table of contents extractor
 const toc = require('markdown-toc')
 
-export default function Doc({
-  meta,
-  content,
-  toc,
-}: {
-  meta: { title: string; description: string }
-  content: any
-  toc: any
-}) {
+interface Meta {
+  id: string
+  title: string
+  sidebar_label: string
+  hide_table_of_contents: boolean
+}
+
+export default function Doc({ meta, content, toc }: { meta: Meta; content: any; toc: any }) {
   const { asPath } = useRouter()
+
+  console.log('[slug]', { meta })
+
+  // get the current kind of page
   let page
   switch (asPath) {
     case '/guides':
     case '/guides/local-development':
     case /\/guides\/[a-zA-Z]*\/[a-zA-Z\-]*/.test(asPath) && asPath:
-      page = 'Guides'
+      page = 'Docs'
       break
     case asPath.includes('/reference') && asPath:
       page = 'Reference'

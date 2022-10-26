@@ -2,6 +2,7 @@ import nextMdx from '@next/mdx'
 import bundleAnalyzer from '@next/bundle-analyzer'
 
 import remarkGfm from 'remark-gfm'
+import admonitions from 'remark-admonitions'
 import rehypeSlug from 'rehype-slug'
 
 import withTM from 'next-transpile-modules'
@@ -23,12 +24,10 @@ const withMDX = nextMdx({
     remarkPlugins: [
       // [
       //   remarkCodeHike,
-      //   {
-      //     theme: codeHikeTheme,
-      //     autoImport: false,
-      //   },
+      //   { theme: codeHikeTheme, autoImport: false },
       // ],
       remarkGfm,
+      [admonitions, {}],
     ],
     rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
@@ -46,6 +45,7 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   reactStrictMode: true,
   swcMinify: true,
+  basePath: '/docs',
 }
 
 // next.config.js
