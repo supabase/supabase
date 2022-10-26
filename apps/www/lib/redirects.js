@@ -1361,7 +1361,7 @@ module.exports = [
   {
     permanent: true,
     source: '/guides/database/migrating-between-projects',
-    destination: '/guides/platform/migrating-and-upgrading',
+    destination: '/guides/platform/migrating-and-upgrading-projects',
   },
 
   // supabase-js v1 to v2 redirects
