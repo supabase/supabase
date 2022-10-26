@@ -11,6 +11,7 @@ export const removeAnchor = (text: any) => {
   if (typeof text !== 'string') {
     return text
   } else {
-    return text.slice(0, text.indexOf('{#'))
+    if (text.indexOf('{#') > 0) return text.slice(0, text.indexOf('{#'))
+    else return text
   }
 }
