@@ -91,7 +91,7 @@ const Nav = [
           { name: 'rangeLte()', url: '/reference/javascript/rangelte', items: [] },
           { name: 'rangeAdjacent()', url: '/reference/javascript/rangeadjacent', items: [] },
           { name: 'overlaps()', url: '/reference/javascript/overlaps', items: [] },
-          { name: 'textSearch()', url: '/reference/javascript/overlaps', items: [] },
+          { name: 'textSearch()', url: '/reference/javascript/textsearch', items: [] },
           { name: 'match()', url: '/reference/javascript/match', items: [] },
           { name: 'not()', url: '/reference/javascript/not', items: [] },
           { name: 'or()', url: '/reference/javascript/or', items: [] },
