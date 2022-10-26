@@ -21,7 +21,13 @@ const SignInWithGitHub = () => {
   }
 
   return (
-    <Button block onClick={handleGithubSignIn} icon={<IconGitHub />} size="large" type="default">
+    <Button
+      block
+      onClick={handleGithubSignIn}
+      icon={<IconGitHub width={18} height={18} />}
+      size="large"
+      type="default"
+    >
       Continue with GitHub
     </Button>
   )
