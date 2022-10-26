@@ -1,4 +1,4 @@
-import FooterLinks from 'data/Footer.json'
+import FooterLinks from 'data/footer.json'
 import SectionContainer from './SectionContainer'
 import DarkModeToggle from './DarkModeToggle'
 import Link from 'next/link'
