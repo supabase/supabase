@@ -1,117 +1,99 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 import { IconChevronRight } from '~/../../packages/ui'
+import { NavMenuGroup, NavMenuSection } from './Nav.constants'
+import * as Accordion from '@radix-ui/react-accordion'
 
-const SideBar = ({ menuItems: passedMenuItems }: { menuItems: any }) => {
-  const [menuItems, setMenuItems] = useState(passedMenuItems)
-  console.log('sidebar', menuItems)
-
+const SideBar = ({ menuItems }: { menuItems: any }) => {
   const { asPath } = useRouter()
-
-  function toggleMenuItem(label: string) {
-    const newMenuItems = menuItems.map((item: any) => {
-      // see if the item has grandchildren
-
-      // collapse all first
-      item.collapsed = true
-
-      // then grab the one that matches the label and invert it
-      if (item.label === label) {
-        return { ...item, collapsed: !item.collapsed }
-      }
-
-      return item
-    })
-    setMenuItems(newMenuItems)
-  }
 
   return (
     <div
       className="dark:bg-scale-200 dark:border-scale-400 sidebar-width sticky top-0 flex
-        h-screen overflow-y-scroll border-r py-10 px-6 sidebar-menu-container"
+      h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container"
     >
-      <ul className="w-full flex-col gap-12 mb-8">
-        {menuItems.map((item) => (
-          <li className="mt-1">
-            <button onClick={(e) => toggleMenuItem(item.label)} className="flex items-center">
-              <IconChevronRight /> {item.label}
-            </button>
-            <ul className={`mb-8 ml-5 text-sm ${item.collapsed ? 'hidden' : ''}`}>
-              {item.items.map((child) => (
-                <li>
-                  {child.items ? (
-                    <div>
-                      <button
-                        className="flex items-center"
-                        onClick={(e) => toggleMenuItem(child.label)}
-                      >
-                        <IconChevronRight />
-                        {child.label}
-                      </button>
-                      <ul className={`mb-4 mt-2 ml-2 ${child.collapsed ? 'hidden' : ''}`}>
-                        {child.items.map((grandchild) => (
-                          <li>{grandchild}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    child
-                  )}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-        {/* {Object.keys(menuItems).map((key, i) => (
-          <li key={key} className="mb-8 bg-gray-200 parent-menu-container">
-            <button
-              onClick={(e) => console.log('hay ')}
-              className={[
-                'parent-menu-toggle text-sm bg-gray-500 flex items-center gap-1',
-                2 > 1 ? 'active' : '',
-              ].join(' ')}
-            >
-              <IconChevronRight size="tiny" strokeWidth="0.75" />
-              {key}
-            </button>
-            <ul className={['parent-menu mt-4', 2 > 1 ? '' : 'hidden'].join(' ')}>
-              {menuItems[key].map((item) =>
-                Array.isArray(item.sections) ? (
-                  <div className="sub-menu-group ml-4">
-                    <button
-                      onClick={(e) => console.log()}
-                      className="parent-menu-toggle text-sm bg-gray-500 flex items-center gap-1"
+      <Accordion.Root
+        collapsible
+        type="single"
+        defaultValue="Overview"
+        className="w-full space-y-0.5"
+      >
+        {menuItems.map((group: NavMenuGroup) => (
+          <Accordion.Item key={group.label} value={group.label}>
+            <Accordion.Trigger className="w-full flex items-center space-x-2 py-1.5">
+              <IconChevronRight
+                className="transition text-scale-1000 data-open-parent:rotate-90"
+                size={14}
+                strokeWidth={2}
+              />
+              <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                {group.label}
+              </span>
+            </Accordion.Trigger>
+            <Accordion.Content className="transition my-2 data-open:animate-slide-down data-closed:animate-slide-up">
+              {group.items.map((section: NavMenuSection) => {
+                if (section.items.length === 0) {
+                  return (
+                    <Link href={section.url}>
+                      <a>
+                        <div
+                          key={section.name}
+                          className={[
+                            'py-1.5 px-5 rounded text-sm',
+                            `${
+                              section.url === asPath
+                                ? 'bg-scale-400 text-brand-900'
+                                : 'text-scale-1100 hover:text-scale-1200'
+                            }`,
+                          ].join(' ')}
+                        >
+                          {section.name}
+                        </div>
+                      </a>
+                    </Link>
+                  )
+                } else {
+                  return (
+                    <Accordion.Root
+                      collapsible
+                      key={section.name}
+                      type="single"
+                      className="space-y-0.5"
                     >
-                      <IconChevronRight size="tiny" strokeWidth="0.75" />
-                      {item.text}
-                    </button>
-                    <ul className={['bg-gray-300 sub-menu ml-5', 2 > 1 ? 'hidden' : ''].join(' ')}>
-                      {item.sections.map((menuItem) => (
-                        <li>
-                          <Link href={menuItem.link}>
-                            <a className={menuItem.link === asPath ? 'text-brand-800' : ''}>
-                              {menuItem.text}
-                            </a>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <p>
-                    <li>
-                      <Link href={item.link}>
-                        <a className={item.link === asPath ? 'text-brand-800' : ''}>{item.text}</a>
-                      </Link>
-                    </li>
-                  </p>
-                )
-              )}
-            </ul>
-          </li>
-        ))} */}
-      </ul>
+                      <Accordion.Item value={section.name}>
+                        <Accordion.Trigger className="flex items-center space-x-2 px-4 py-1.5">
+                          <IconChevronRight
+                            className="transition text-scale-1000 data-open-parent:rotate-90"
+                            size={14}
+                            strokeWidth={2}
+                          />
+                          <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                            {section.name}
+                          </span>
+                        </Accordion.Trigger>
+                        <Accordion.Content className="my-2">
+                          {section.items.map((item: NavMenuSection) => (
+                            <Link href={item.url}>
+                              <a>
+                                <div
+                                  key={item.name}
+                                  className="py-1.5 px-9 text-sm text-scale-1100 hover:text-scale-1200 transition"
+                                >
+                                  {item.name}
+                                </div>
+                              </a>
+                            </Link>
+                          ))}
+                        </Accordion.Content>
+                      </Accordion.Item>
+                    </Accordion.Root>
+                  )
+                }
+              })}
+            </Accordion.Content>
+          </Accordion.Item>
+        ))}
+      </Accordion.Root>
     </div>
   )
 }
