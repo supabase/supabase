@@ -3,7 +3,7 @@ import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
-import { auth } from 'lib/gotrue'
+import { auth, STORAGE_KEY } from 'lib/gotrue'
 import { useStore, withAuth, useFlag } from 'hooks'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import WithSidebar from './WithSidebar'
@@ -27,7 +27,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
 
   const onClickLogout = async () => {
     await auth.signOut()
-    localStorage.clear()
+    localStorage.removeItem(STORAGE_KEY)
     await router.push('/sign-in')
     router.reload()
   }
