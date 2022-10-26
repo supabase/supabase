@@ -7,143 +7,18 @@ sidebar_label: Angular
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import QuickstartIntro from './_partials/quickstart_intro.md'
+import ProjectSetup from './_partials/project_setup.mdx'
 
-## Intro
-
-This example provides the steps to build a simple user management app (from scratch!) using Supabase and Angular. It includes:
-
-- Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
-- Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
-- Supabase [Storage](/docs/guides/storage): users can upload a photo.
-- [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
-- Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
-
-By the end of this guide you'll have an app which allows users to login and update some basic profile details:
+<QuickstartIntro />
 
 ![Supabase User Management example](/img/user-management-demo.png)
 
-Clicking this button the application will:
-
-- Launch and prepare the Postgres database in Supabase.
-- Launch the app in Vercel.
-- Fork the example into your own GitHub account.
-- Prepare the deployed application with all the necessary environment variables.
-
-If you want to do it yourself, let's get started!
-
 ### GitHub
 
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
+Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
 
-## Project set up
-
-Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
-and then creating a "schema" inside the database.
-
-### Create a project
-
-1. Go to [app.supabase.com](https://app.supabase.com).
-1. Click on "New Project".
-1. Enter your project details.
-1. Wait for the new database to launch.
-
-### Set up the database schema
-
-Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
-or you can just copy/paste the SQL from below and run it yourself.
-
-<Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-<TabItem value="dashboard">
-
-1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
-2. Click **User Management Starter**.
-3. Click **Run**.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/sql-user-management-starter.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
-
-</TabItem>
-<TabItem value="sql">
-
-```sql
--- Create a table for public "profiles"
-create table profiles (
-  id uuid references auth.users not null,
-  updated_at timestamp with time zone,
-  username text unique,
-  avatar_url text,
-  website text,
-
-  primary key (id),
-  unique(username),
-  constraint username_length check (char_length(username) >= 3)
-);
-
-alter table profiles enable row level security;
-
-create policy "Public profiles are viewable by everyone."
-  on profiles for select
-  using ( true );
-
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
-
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime add table profiles;
-
--- Set up Storage!
-insert into storage.buckets (id, name)
-values ('avatars', 'avatars');
-
-create policy "Avatar images are publicly accessible."
-  on storage.objects for select
-  using ( bucket_id = 'avatars' );
-
-create policy "Anyone can upload an avatar."
-  on storage.objects for insert
-  with check ( bucket_id = 'avatars' );
-```
-
-</TabItem>
-</Tabs>
-
-### Get the API Keys
-
-Now that you've created some database tables, you are ready to insert data using the auto-generated API.
-We just need to get the URL and `anon` key from the API settings.
-
-1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/api/api-url-and-key.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
+<ProjectSetup />
 
 ## Building the App
 
@@ -180,7 +55,7 @@ export const environment = {
 Now that we have the API credentials in place, let's create a **SupabaseService** with `ng g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
 ```ts title="src/app/supabase.service.ts"
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core'
 import {
   AuthChangeEvent,
   AuthSession,
@@ -188,36 +63,36 @@ import {
   Session,
   SupabaseClient,
   User,
-} from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
-import { Database } from 'src/schema';
+} from '@supabase/supabase-js'
+import { environment } from 'src/environments/environment'
+import { Database } from 'src/schema'
 
 export interface Profile {
-  id?: string;
-  username: string;
-  website: string;
-  avatar_url: string;
+  id?: string
+  username: string
+  website: string
+  avatar_url: string
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class SupabaseService {
-  private supabase: SupabaseClient;
-  _session: AuthSession | null = null;
+  private supabase: SupabaseClient
+  _session: AuthSession | null = null
 
   constructor() {
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
-    );
+    )
   }
 
   get session() {
     this.supabase.auth.getSession().then(({ data }) => {
-      this._session = data.session;
+      this._session = data.session
     })
-    return this._session;
+    return this._session
   }
 
   profile(user: User) {
@@ -225,38 +100,38 @@ export class SupabaseService {
       .from('profiles')
       .select(`username, website, avatar_url`)
       .eq('id', user.id)
-      .single();
+      .single()
   }
 
   authChanges(
     callback: (event: AuthChangeEvent, session: Session | null) => void
   ) {
-    return this.supabase.auth.onAuthStateChange(callback);
+    return this.supabase.auth.onAuthStateChange(callback)
   }
 
   signIn(email: string) {
-    return this.supabase.auth.signInWithOtp({ email });
+    return this.supabase.auth.signInWithOtp({ email })
   }
 
   signOut() {
-    return this.supabase.auth.signOut();
+    return this.supabase.auth.signOut()
   }
 
   updateProfile(profile: Profile) {
     const update = {
       ...profile,
       updated_at: new Date(),
-    };
+    }
 
-    return this.supabase.from('profiles').upsert(update);
+    return this.supabase.from('profiles').upsert(update)
   }
 
   downLoadImage(path: string) {
-    return this.supabase.storage.from('avatars').download(path);
+    return this.supabase.storage.from('avatars').download(path)
   }
 
   uploadAvatar(filePath: string, file: File) {
-    return this.supabase.storage.from('avatars').upload(filePath, file);
+    return this.supabase.storage.from('avatars').upload(filePath, file)
   }
 }
 ```
@@ -269,9 +144,9 @@ Let's set up an Angular component to manage logins and sign ups. We'll use Magic
 Create an **AuthComponent** with `ng g c auth` Angular CLI command.
 
 ```ts title="src/app/auth/auth.component.ts"
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { SupabaseService } from '../supabase.service';
+import { Component, OnInit } from '@angular/core'
+import { FormBuilder } from '@angular/forms'
+import { SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-auth',
@@ -279,11 +154,11 @@ import { SupabaseService } from '../supabase.service';
   styleUrls: ['./auth.component.css'],
 })
 export class AuthComponent implements OnInit {
-  loading = false;
+  loading = false
 
   signInForm = this.formBuilder.group({
     email: '',
-  });
+  })
 
   constructor(
     private readonly supabase: SupabaseService,
@@ -294,18 +169,18 @@ export class AuthComponent implements OnInit {
 
   async onSubmit(): Promise<void> {
     try {
-      this.loading = true;
-      const email = this.signInForm.value.email as string;
-      const { error } = await this.supabase.signIn(email);
-      if (error) throw error;
-      alert('Check your email for the login link!');
+      this.loading = true
+      const email = this.signInForm.value.email as string
+      const { error } = await this.supabase.signIn(email)
+      if (error) throw error
+      alert('Check your email for the login link!')
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message);
+        alert(error.message)
       }
     } finally {
-      this.signInForm.reset();
-      this.loading = false;
+      this.signInForm.reset()
+      this.loading = false
     }
   }
 }
@@ -347,10 +222,10 @@ Users also need a way to edit their profile details and manage their accounts af
 Create an **AccountComponent** with the `ng g c account` Angular CLI command.
 
 ```ts title="src/app/account/account.component.ts"
-import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { AuthSession } from '@supabase/supabase-js';
-import { Profile, SupabaseService } from '../supabase.service';
+import { Component, Input, OnInit } from '@angular/core'
+import { FormBuilder } from '@angular/forms'
+import { AuthSession } from '@supabase/supabase-js'
+import { Profile, SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-account',
@@ -358,17 +233,17 @@ import { Profile, SupabaseService } from '../supabase.service';
   styleUrls: ['./account.component.css'],
 })
 export class AccountComponent implements OnInit {
-  loading = false;
-  profile!: Profile;
+  loading = false
+  profile!: Profile
 
   @Input()
-  session!: AuthSession;
+  session!: AuthSession
 
   updateProfileForm = this.formBuilder.group({
     username: '',
     website: '',
     avatar_url: '',
-  });
+  })
 
   constructor(
     private readonly supabase: SupabaseService,
@@ -376,98 +251,90 @@ export class AccountComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.getProfile();
+    await this.getProfile()
 
-    const { username, website, avatar_url } = this.profile;
+    const { username, website, avatar_url } = this.profile
     this.updateProfileForm.patchValue({
       username,
       website,
       avatar_url,
-    });
+    })
   }
 
   async getProfile() {
     try {
-      this.loading = true;
-      const { user } = this.session;
-      let { data: profile, error, status } = await this.supabase.profile(user);
+      this.loading = true
+      const { user } = this.session
+      let { data: profile, error, status } = await this.supabase.profile(user)
 
       if (error && status !== 406) {
-        throw error;
+        throw error
       }
 
       if (profile) {
-        this.profile = profile;
+        this.profile = profile
       }
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message);
+        alert(error.message)
       }
     } finally {
-      this.loading = false;
+      this.loading = false
     }
   }
 
   async updateProfile(): Promise<void> {
     try {
-      this.loading = true;
-      const { user } = this.session;
+      this.loading = true
+      const { user } = this.session
 
-      const username = this.updateProfileForm.value.username as string;
-      const website = this.updateProfileForm.value.website as string;
-      const avatar_url = this.updateProfileForm.value.avatar_url as string;
+      const username = this.updateProfileForm.value.username as string
+      const website = this.updateProfileForm.value.website as string
+      const avatar_url = this.updateProfileForm.value.avatar_url as string
 
       const { error } = await this.supabase.updateProfile({
         id: user.id,
         username,
         website,
         avatar_url,
-      });
-      if (error) throw error;
+      })
+      if (error) throw error
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message);
+        alert(error.message)
       }
     } finally {
-      this.loading = false;
+      this.loading = false
     }
   }
 
   async signOut() {
-    await this.supabase.signOut();
+    await this.supabase.signOut()
   }
 }
 ```
 
 ```html title="src/app/account/account.component.html"
-<form [formGroup]="updateProfileForm" (ngSubmit)="updateProfile()" class="form-widget">
+<form
+  [formGroup]="updateProfileForm"
+  (ngSubmit)="updateProfile()"
+  class="form-widget"
+>
   <div>
     <label for="email">Email</label>
     <input id="email" type="text" [value]="session.user.email" disabled />
   </div>
   <div>
     <label for="username">Name</label>
-    <input
-      formControlName="username"
-      id="username"
-      type="text"
-    />
+    <input formControlName="username" id="username" type="text" />
   </div>
   <div>
     <label for="website">Website</label>
-    <input
-      formControlName="website"
-      id="website"
-      type="url"
-    />
+    <input formControlName="website" id="website" type="url" />
   </div>
 
   <div>
-    <button
-      type="submit"
-      class="button primary block"
-      [disabled]="loading"
-    >
+    <button type="submit" class="button primary block" [disabled]="loading">
       {{ loading ? 'Loading ...' : 'Update' }}
     </button>
   </div>
@@ -483,8 +350,8 @@ export class AccountComponent implements OnInit {
 Now that we have all the components in place, let's update **AppComponent**:
 
 ```ts title="src/app/app.component.ts"
-import { Component, OnInit } from '@angular/core';
-import { SupabaseService } from './supabase.service';
+import { Component, OnInit } from '@angular/core'
+import { SupabaseService } from './supabase.service'
 
 @Component({
   selector: 'app-root',
@@ -492,14 +359,14 @@ import { SupabaseService } from './supabase.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  title = 'angular-user-management';
+  title = 'angular-user-management'
 
-  session = this.supabase.session;
+  session = this.supabase.session
 
   constructor(private readonly supabase: SupabaseService) {}
 
   ngOnInit() {
-    this.supabase.authChanges((_, session) => (this.session = session));
+    this.supabase.authChanges((_, session) => (this.session = session))
   }
 }
 ```
@@ -516,14 +383,14 @@ export class AppComponent implements OnInit {
 `app.module.ts` also needs to be modified to include the `ReactiveFormsModule` from the `@angular/forms` package.
 
 ```ts title="src/app/app.module.ts"
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core'
+import { BrowserModule } from '@angular/platform-browser'
 
-import { AppComponent } from './app.component';
-import { AuthComponent } from './auth/auth.component';
-import { AccountComponent } from './account/account.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { AvatarComponent } from './avatar/avatar.component';
+import { AppComponent } from './app.component'
+import { AuthComponent } from './auth/auth.component'
+import { AccountComponent } from './account/account.component'
+import { ReactiveFormsModule } from '@angular/forms'
+import { AvatarComponent } from './avatar/avatar.component'
 
 @NgModule({
   declarations: [
@@ -559,9 +426,9 @@ Let's create an avatar for the user so that they can upload a profile photo.
 Create an **AvatarComponent** with `ng g c avatar` Angular CLI command.
 
 ```ts title="src/app/avatar/avatar.component.ts"
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
-import { SupabaseService } from '../supabase.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
+import { SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-avatar',
@@ -569,17 +436,17 @@ import { SupabaseService } from '../supabase.service';
   styleUrls: ['./avatar.component.css'],
 })
 export class AvatarComponent implements OnInit {
-  _avatarUrl: SafeResourceUrl | undefined;
-  uploading = false;
+  _avatarUrl: SafeResourceUrl | undefined
+  uploading = false
 
   @Input()
   set avatarUrl(url: string | null) {
     if (url) {
-      this.downloadImage(url);
+      this.downloadImage(url)
     }
   }
 
-  @Output() upload = new EventEmitter<string>();
+  @Output() upload = new EventEmitter<string>()
 
   constructor(
     private readonly supabase: SupabaseService,
@@ -590,38 +457,38 @@ export class AvatarComponent implements OnInit {
 
   async downloadImage(path: string) {
     try {
-      const { data } = await this.supabase.downLoadImage(path);
+      const { data } = await this.supabase.downLoadImage(path)
       if (data instanceof Blob) {
         this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(
           URL.createObjectURL(data)
-        );
+        )
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error('Error downloading image: ', error.message);
+        console.error('Error downloading image: ', error.message)
       }
     }
   }
 
   async uploadAvatar(event: any) {
     try {
-      this.uploading = true;
+      this.uploading = true
       if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('You must select an image to upload.');
+        throw new Error('You must select an image to upload.')
       }
 
-      const file = event.target.files[0];
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${Math.random()}.${fileExt}`;
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${Math.random()}.${fileExt}`
 
-      await this.supabase.uploadAvatar(filePath, file);
-      this.upload.emit(filePath);
+      await this.supabase.uploadAvatar(filePath, file)
+      this.upload.emit(filePath)
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message);
+        alert(error.message)
       }
     } finally {
-      this.uploading = false;
+      this.uploading = false
     }
   }
 }
@@ -662,10 +529,12 @@ export class AvatarComponent implements OnInit {
 And then we can add the widget on top of the **AccountComponent** html template:
 
 ```html title="src/app/account.component.html"
-<form [formGroup]="updateProfileForm" (ngSubmit)="updateProfile()" class="form-widget">
-  <app-avatar
-    [avatarUrl]="this.avatarUrl"
-    (upload)="updateAvatar($event)">
+<form
+  [formGroup]="updateProfileForm"
+  (ngSubmit)="updateProfile()"
+  class="form-widget"
+>
+  <app-avatar [avatarUrl]="this.avatarUrl" (upload)="updateAvatar($event)">
   </app-avatar>
   <!-- input fields -->
 </form>
@@ -682,14 +551,14 @@ And add an `updateAvatar` function along with an `avatarUrl` getter to the **Acc
 export class AccountComponent implements OnInit {
   // ...
   get avatarUrl() {
-    return this.updateProfileForm.value.avatar_url as string;
+    return this.updateProfileForm.value.avatar_url as string
   }
 
   async updateAvatar(event: string): Promise<void> {
     this.updateProfileForm.patchValue({
       avatar_url: event,
-    });
-    await this.updateProfile();
+    })
+    await this.updateProfile()
   }
   // ...
 }

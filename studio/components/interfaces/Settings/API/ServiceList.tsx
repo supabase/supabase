@@ -1,11 +1,8 @@
-import useSWR from 'swr'
 import { FC, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { IconAlertCircle, Input } from 'ui'
 
-import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
 import {
   useStore,
   useProjectSettings,
