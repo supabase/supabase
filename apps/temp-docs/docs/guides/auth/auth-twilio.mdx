@@ -5,16 +5,16 @@ description: How to set up and use Mobile OTP with Twilio and Supabase.
 ---
 
 import Tabs from '@theme/Tabs'
-import TabsPanel from '@theme/TabsPanel'
+import TabItem from '@theme/TabItem'
 
 ## Overview
 
-In this guide we'll show you how to authenticate your users with SMS based OTP (One-Time Password) tokens.
+In this guide we'll show you how to authenticate your users with SMS based One-Time Password (OTP) tokens.
 
 There are two reasons to use Supabase SMS OTP tokens:
 
-- You want users to log in with mobile + password, and the mobile should be verified via SMS
-- You want users to log in with mobile ONLY (i.e. passwordless login)
+- You want users to log in with mobile number + password, and the mobile number should be verified via SMS
+- You want users to log in with mobile number ONLY (i.e. passwordless login)
 
 We'll cover:
 
@@ -24,21 +24,20 @@ We'll cover:
 
 What you'll need:
 
-- A twilio account (sign up here: https://www.twilio.com/try-twilio)
+- A Twilio account (sign up here: https://www.twilio.com/try-twilio)
 - A Supabase project (create one here: https://app.supabase.com)
 - A mobile phone capable of receiving SMS
 
 ## Video
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/akScoPO01bc"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/akScoPO01bc"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Steps
 
@@ -48,18 +47,18 @@ Start by logging into your Twilio account and starting a new project: https://ww
 
 Give your project a name and verify the mobile number you'll be using to test with. This is the number that will be receiving the SMS OTPs.
 
-![Name your twilio project](/docs/img/guides/auth-twilio/1.png)
-![verify your own phone number](/docs/img/guides/auth-twilio/2.png)
+![Name your twilio project](/img/guides/auth-twilio/1.png)
+![verify your own phone number](/img/guides/auth-twilio/2.png)
 
 Select 'SMS', 'Identity & Verification', and 'With code' as options on the welcome form.
 
-![Form Fields](/docs/img/guides/auth-twilio/3.png)
+![Form Fields](/img/guides/auth-twilio/3.png)
 
-When you're back on the https://www.twilio.com/console screen, you need to scroll down and click 'Get a trial phone number' - this is the number that you'll be sending SMSs from.
+When you're back on the [Twilio console screen](https://www.twilio.com/console), you need to scroll down and click 'Get a trial phone number' - this is the number that you'll be sending SMSs from.
 
-![Get a trial phone number](/docs/img/guides/auth-twilio/4.png)
+![Get a trial phone number](/img/guides/auth-twilio/4.png)
 
-![Successful phone number](/docs/img/guides/auth-twilio/5.png)
+![Successful phone number](/img/guides/auth-twilio/5.png)
 
 You should now be able to see all three values you'll need to get started:
 
@@ -67,19 +66,19 @@ You should now be able to see all three values you'll need to get started:
 - Auth Token
 - Sender Phone Number
 
-![All the credentials you'll need](/docs/img/guides/auth-twilio/6.png)
+![All the credentials you'll need](/img/guides/auth-twilio/6.png)
 
 Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/settings).
 
-You should see an option to enable Phone Signup.
+You should see an option to enable Phone Signup:
 
-![Enable Phone Sign-Up](/docs/img/guides/auth-twilio/7.png)
+![Enable Phone Sign-Up](/img/guides/auth-twilio/7.png)
 
 Toggle it on, and copy the 3 values over from the twilio dashboard. Click save.
 
 Note: for "Twilio Message Service SID" you can use the Sender Phone Number generated above.
 
-![Plug in Twilio credentials](/docs/img/guides/auth-twilio/8.png)
+![Plug in Twilio credentials](/img/guides/auth-twilio/8.png)
 
 Now the backend should be setup, we can proceed to add our client-side code!
 
@@ -89,21 +88,23 @@ The SMS message sent to a phone containing an OTP code can be customized. This i
 
 Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/templates).
 
-Use the variable `.Code` in the template to display the code.
+Use the variable `.Code` in the template to display the OTP code. Here's an example in the SMS template.
+
+![example in the SMS template](/img/guides/auth-twilio/9.png)
 
 ### Using OTP with password based logins
 
-In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whoever takes over the phone number in the future. Soon we'll add multi-factor auth, which will mitigate this risk, but for now you may want to give some thought to allowing your users to recover their account by some other means in an emergency.
+In this scenario we'll be using the user's mobile phone number and a corresponding password as an alternative to signing up with an email address. Note: please thoroughly consider potential security implications when signing up with a combination of phone number and password. Phone numbers are sometimes recycled by phone networks when users cancel their phone contracts or move countries, thereby granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor authentication, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
 
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
 <Tabs
-defaultActiveId="JS"
+defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
-<TabsPanel id="JS" label="JS">
+<TabItem value="JS">
 
 ```js
 let { user, error } = await supabase.auth.signUp({
@@ -112,8 +113,8 @@ let { user, error } = await supabase.auth.signUp({
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabItem>
+<TabItem value="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
@@ -125,7 +126,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 }'
 ```
 
-</TabsPanel>
+</TabItem>
 </Tabs>
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
@@ -133,22 +134,23 @@ The user will now receive an SMS with a 6-digit pin that you will need to receiv
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
 
 <Tabs
-defaultActiveId="JS"
+defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
-<TabsPanel id="JS" label="JS">
+<TabItem value="JS">
 
 ```js
 let { session, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456',
+  type: 'sms',
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabItem>
+<TabItem value="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
@@ -161,7 +163,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
 }'
 ```
 
-</TabsPanel>
+</TabItem>
 </Tabs>
 
 If successful the user will now be logged in and you should receive a valid session like:
@@ -180,22 +182,22 @@ The access token can be sent in the Authorization header as a Bearer token for a
 Also now that the mobile has been verified, the user can use the number and password to sign in without needing to verify their number each time:
 
 <Tabs
-defaultActiveId="JS"
+defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
-<TabsPanel id="JS" label="JS">
+<TabItem value="JS">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithPassword({
   phone: '+13334445555',
   password: 'some-password',
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabItem>
+<TabItem value="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=password' \
@@ -207,7 +209,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=
 }'
 ```
 
-</TabsPanel>
+</TabItem>
 </Tabs>
 
 ### Using OTP as a passwordless sign-in mechanism
@@ -217,21 +219,21 @@ In this scenario you are granting your user's the ability to login to their acco
 In javascript we can use the `signIn` method with a single parameter: `phone`
 
 <Tabs
-defaultActiveId="JS"
+defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
-<TabsPanel id="JS" label="JS">
+<TabItem value="JS">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555',
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabItem>
+<TabItem value="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
@@ -242,28 +244,29 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
 }'
 ```
 
-</TabsPanel>
+</TabItem>
 </Tabs>
 
 The second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
 
 <Tabs
-defaultActiveId="JS"
+defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
-<TabsPanel id="JS" label="JS">
+<TabItem value="JS">
 
 ```js
 let { session, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456',
+  type: 'sms',
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabItem>
+<TabItem value="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
@@ -276,7 +279,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
 }'
 ```
 
-</TabsPanel>
+</TabItem>
 </Tabs>
 
 and the response should also be the same as above:

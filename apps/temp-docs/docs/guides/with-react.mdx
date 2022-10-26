@@ -2,164 +2,23 @@
 id: with-react
 title: 'Quickstart: React'
 description: Learn how to use Supabase in your React App.
+sidebar_label: React
 ---
 
-# Quickstart: React
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import QuickstartIntro from './_partials/quickstart_intro.md'
+import ProjectSetup from './_partials/project_setup.mdx'
 
-## Intro
+<QuickstartIntro />
 
-This example provides the steps to build a simple user management app (from scratch!) using Supabase and React. It includes:
+![Supabase User Management example](/img/user-management-demo.png)
 
-- Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
-- Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
-- Supabase [Storage](/docs/guides/storage): users can upload a photo.
-- [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
-- Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
+### GitHub
 
-By the end of this guide you'll have an app which allows users to login and update some basic profile details:
+Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/react-user-management).
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
-
-<!-- ## Video demo
-
-Coming soon.
-
-Use the annotated timeline to step through this tutorial.
-
-## Instant deploy
-
-Want to deploy a completed version of this example without following the guide?
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Freact-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-react-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
-
-Clicking this button the application will:
-
-- Launch and prepare the Postgres database in Supabase.
-- Launch the app in Vercel.
-- Fork the example into your own GitHub account.
-- Prepare the deployed application with all the necessary environment variables.
-
-If you want to do it yourself, let's get started: -->
-
-## Project set up
-
-Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
-and then creating a "schema" inside the database.
-
-### Create a project
-
-1. Go to [app.supabase.com](https://app.supabase.com).
-1. Click on "New Project".
-1. Enter your project details.
-1. Wait for the new database to launch.
-
-### Set up the database schema
-
-Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
-or you can just copy/paste the SQL from below and run it yourself.
-
-<Tabs defaultActiveId="UI">
-<TabsPanel id="UI" label="Dashboard UI">
-
-```sh
-1. Go to the "SQL Editor" section.
-2. Click "User Management Starter".
-3. Click "Run".
-```
-
-<video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
-</video>
-</TabsPanel>
-<TabsPanel id="SQL" label="SQL Code">
-
-```sql
--- Create a table for public "profiles"
-create table profiles (
-  id uuid references auth.users not null,
-  updated_at timestamp with time zone,
-  username text unique,
-  avatar_url text,
-  website text,
-
-  primary key (id),
-  unique(username),
-  constraint username_length check (char_length(username) >= 3)
-);
-
-alter table profiles enable row level security;
-
-create policy "Public profiles are viewable by everyone."
-  on profiles for select
-  using ( true );
-
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
-
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime add table profiles;
-
--- Set up Storage!
-insert into storage.buckets (id, name)
-values ('avatars', 'avatars');
-
-create policy "Avatar images are publicly accessible."
-  on storage.objects for select
-  using ( bucket_id = 'avatars' );
-
-create policy "Anyone can upload an avatar."
-  on storage.objects for insert
-  with check ( bucket_id = 'avatars' );
-
-```
-
-</TabsPanel>
-</Tabs>
-
-### Get the API Keys
-
-Now that you've created some database tables, you are ready to insert data using the auto-generated API.
-We just need to get the URL and `anon` key from the API settings.
-
-<Tabs defaultActiveId="UI">
-<TabsPanel id="UI" label="UI">
-
-```sh
-1. Go to the "Settings" section.
-2. Click "API" in the sidebar.
-3. Find your API URL in this page.
-4. Find your "anon" and "service_role" keys on this page.
-```
-
-<video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
-</video>
-
-</TabsPanel>
-<TabsPanel id="second" label="second">
-
-```sh
-1. Go to the "Settings" section.
-2. Click "API" in the sidebar.
-3. Find your API URL in this page.
-4. Find your "anon" and "service_role" keys on this page.
-```
-
-<video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
-</video>
-
-</TabsPanel>
-</Tabs>
+<ProjectSetup />
 
 ## Building the App
 
@@ -171,11 +30,11 @@ We can use [Create React App](https://create-react-app.dev/docs/getting-started/
 an app called `supabase-react`:
 
 ```bash
-npx create-react-app supabase-react --use-npm
+npx create-react-app supabase-react
 cd supabase-react
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js).
 
 ```bash
 npm install @supabase/supabase-js
@@ -202,7 +61,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/react-user-management/src/index.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Set up a Login component
 
@@ -216,10 +75,12 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleLogin = async (email) => {
+  const handleLogin = async (e) => {
+    e.preventDefault()
+
     try {
       setLoading(true)
-      const { error } = await supabase.auth.signIn({ email })
+      const { error } = await supabase.auth.signInWithOtp({ email })
       if (error) throw error
       alert('Check your email for the login link!')
     } catch (error) {
@@ -231,30 +92,29 @@ export default function Auth() {
 
   return (
     <div className="row flex-center flex">
-      <div className="col-6 form-widget">
+      <div className="col-6 form-widget" aria-live="polite">
         <h1 className="header">Supabase + React</h1>
-        <p className="description">Sign in via magic link with your email below</p>
-        <div>
-          <input
-            className="inputField"
-            type="email"
-            placeholder="Your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              handleLogin(email)
-            }}
-            className={'button block'}
-            disabled={loading}
-          >
-            {loading ? <span>Loading</span> : <span>Send magic link</span>}
-          </button>
-        </div>
+        <p className="description">
+          Sign in via magic link with your email below
+        </p>
+        {loading ? (
+          'Sending magic link...'
+        ) : (
+          <form onSubmit={handleLogin}>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              className="inputField"
+              type="email"
+              placeholder="Your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <button className="button block" aria-live="polite">
+              Send magic link
+            </button>
+          </form>
+        )}
       </div>
     </div>
   )
@@ -271,7 +131,7 @@ Let's create a new component for that called `Account.js`.
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
-export default function Account({ session }) {
+const Account = ({ session }) => {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
@@ -281,10 +141,10 @@ export default function Account({ session }) {
     getProfile()
   }, [session])
 
-  async function getProfile() {
+  const getProfile = async () => {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const { user } = session
 
       let { data, error, status } = await supabase
         .from('profiles')
@@ -308,10 +168,12 @@ export default function Account({ session }) {
     }
   }
 
-  async function updateProfile({ username, website, avatar_url }) {
+  const updateProfile = async (e) => {
+    e.preventDefault()
+
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const { user } = session
 
       const updates = {
         id: user.id,
@@ -321,9 +183,7 @@ export default function Account({ session }) {
         updated_at: new Date(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      })
+      let { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
@@ -336,48 +196,49 @@ export default function Account({ session }) {
   }
 
   return (
-    <div className="form-widget">
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="username">Name</label>
-        <input
-          id="username"
-          type="text"
-          value={username || ''}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="website"
-          value={website || ''}
-          onChange={(e) => setWebsite(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <button
-          className="button primary block"
-          onClick={() => updateProfile({ username, website, avatar_url })}
-          disabled={loading}
-        >
-          {loading ? 'Loading ...' : 'Update'}
-        </button>
-      </div>
-
-      <div>
-        <button className="button block" onClick={() => supabase.auth.signOut()}>
-          Sign Out
-        </button>
-      </div>
+    <div aria-live="polite">
+      {loading ? (
+        'Saving ...'
+      ) : (
+        <form onSubmit={updateProfile} className="form-widget">
+          <div>Email: {session.user.email}</div>
+          <div>
+            <label htmlFor="username">Name</label>
+            <input
+              id="username"
+              type="text"
+              value={username || ''}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="website">Website</label>
+            <input
+              id="website"
+              type="url"
+              value={website || ''}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+          </div>
+          <div>
+            <button className="button primary block" disabled={loading}>
+              Update profile
+            </button>
+          </div>
+        </form>
+      )}
+      <button
+        type="button"
+        className="button block"
+        onClick={() => supabase.auth.signOut()}
+      >
+        Sign Out
+      </button>
     </div>
   )
 }
+
+export default Account
 ```
 
 ### Launch!
@@ -391,11 +252,13 @@ import { supabase } from './supabaseClient'
 import Auth from './Auth'
 import Account from './Account'
 
-export default function Home() {
+export default function App() {
   const [session, setSession] = useState(null)
 
   useEffect(() => {
-    setSession(supabase.auth.session())
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
 
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
@@ -404,7 +267,11 @@ export default function Home() {
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
+      {!session ? (
+        <Auth />
+      ) : (
+        <Account key={session.user.id} session={session} />
+      )}
     </div>
   )
 }
@@ -418,7 +285,7 @@ npm start
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase React](/docs/img/supabase-react-demo.png)
+![Supabase React](/img/supabase-react-demo.png)
 
 ## Bonus: Profile photos
 
@@ -440,9 +307,11 @@ export default function Avatar({ url, size, onUpload }) {
     if (url) downloadImage(url)
   }, [url])
 
-  async function downloadImage(path) {
+  const downloadImage = async (path) => {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .download(path)
       if (error) {
         throw error
       }
@@ -453,7 +322,7 @@ export default function Avatar({ url, size, onUpload }) {
     }
   }
 
-  async function uploadAvatar(event) {
+  const uploadAvatar = async (event) => {
     try {
       setUploading(true)
 
@@ -466,7 +335,9 @@ export default function Avatar({ url, size, onUpload }) {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      let { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -481,33 +352,31 @@ export default function Avatar({ url, size, onUpload }) {
   }
 
   return (
-    <div>
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt="Avatar"
-          className="avatar image"
-          style={{ height: size, width: size }}
-        />
+    <div style={{ width: size }} aria-live="polite">
+      <img
+        src={avatarUrl ? avatarUrl : `https://place-hold.it/${size}x${size}`}
+        alt={avatarUrl ? 'Avatar' : 'No image'}
+        className="avatar image"
+        style={{ height: size, width: size }}
+      />
+      {uploading ? (
+        'Uploading...'
       ) : (
-        <div className="avatar no-image" style={{ height: size, width: size }} />
+        <>
+          <label className="button primary block" htmlFor="single">
+            Upload an avatar
+          </label>
+          <div className="visually-hidden">
+            <input
+              type="file"
+              id="single"
+              accept="image/*"
+              onChange={uploadAvatar}
+              disabled={uploading}
+            />
+          </div>
+        </>
       )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
-          {uploading ? 'Uploading ...' : 'Upload'}
-        </label>
-        <input
-          style={{
-            visibility: 'hidden',
-            position: 'absolute',
-          }}
-          type="file"
-          id="single"
-          accept="image/*"
-          onChange={uploadAvatar}
-          disabled={uploading}
-        />
-      </div>
     </div>
   )
 }

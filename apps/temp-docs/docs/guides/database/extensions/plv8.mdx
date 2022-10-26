@@ -1,107 +1,104 @@
 ---
 id: plv8
-title: "plv8: Javascript Language"
-description: Javascript language for PostgreSQL.
+title: 'plv8: JavaScript Language'
+description: JavaScript language for PostgreSQL.
 ---
 
-# plv8: Javascript Language
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
-The `plv8` extension allows you use Javascript within Postgres. 
+The `plv8` extension allows you use JavaScript within Postgres.
 
 ## Overview
 
-While Postgres natively runs SQL, it can also run other "procedural languages". 
-`plv8` allows you to run Javascript code - specifically any code that runs on the [V8 Javascript engine](https://v8.dev).
+While Postgres natively runs SQL, it can also run other "procedural languages".
+`plv8` allows you to run JavaScript code - specifically any code that runs on the [V8 JavaScript engine](https://v8.dev).
 
 It can be used for database functions, triggers, queries and more.
 
 ## Usage
 
-
-### Enabling
-
+### Enable the extension
 
 <Tabs
-defaultActiveId="UI"
->
-<TabPanel id="UI" label="Dashboard UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the Database page.
-2. Click on "Extensions" in the sidebar.
-3. Search for "plv8".
-4. Click the toggle.
-```
+<TabItem value="dashboard">
 
-</TabPanel>
-<TabPanel id="SQL" label="SQL">
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "plv8" and enable the extension.
 
-```sql 
+</TabItem>
+<TabItem value="sql">
 
--- Example: enable the "plv8" extension 
+```sql
+-- Example: enable the "plv8" extension
 create extension plv8;
 
--- Example: disable the "plv8" extension 
+-- Example: disable the "plv8" extension
 drop extension if exists plv8;
-
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
-To disable an extension you can call `drop extension`.
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension, call `drop extension`.
 
 Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
 
-</TabPanel>
+</TabItem>
 </Tabs>
 
-### Creating `plv8` functions
+### Create `plv8` functions
 
 Functions written in `plv8` are written just like any other PostgreSQL functions, only
 with the `language` identifier set to `plv8`.
 
 ```sql
-create or replace function function_name() 
+create or replace function function_name()
 returns void as $$
-    // V8 Javascript
+    // V8 JavaScript
     // code
     // here
 $$ language plv8;
 ```
 
-You can call `plv8` functions like any other Postgres function: 
-
-
+You can call `plv8` functions like any other Postgres function:
 
 <Tabs
-defaultActiveId="SQL"
->
-<TabPanel id="SQL" label="SQL">
+  defaultValue="sql"
+  values={[
+    {label: 'SQL', value: 'sql'},
+    {label: 'JavaScript', value: 'javascript'},
+  ]}>
 
+<TabItem value="sql">
 
 ```sql
 select function_name();
 ```
 
-</TabPanel>
-<TabPanel id="JS" label="Javascript">
+</TabItem>
+<TabItem value="javascript">
 
-```js 
-
+```js
 const { data, error } = supabase.rpc('function_name')
-
 ```
 
-</TabPanel>
+</TabItem>
 </Tabs>
 
 ## Examples
 
-### Scalar Functions
+### Scalar functions
 
 A [scalar function](https://plv8.github.io/#scalar-function-calls) is anything that takes in some user input and returns a single result.
 
 ```sql
-create or replace function hello_world(name text) 
+create or replace function hello_world(name text)
 returns text as $$
 
     let output = `Hello, ${name}!`;
@@ -110,16 +107,16 @@ returns text as $$
 $$ language plv8;
 ```
 
-### Executing SQL 
+### Executing SQL
 
 You can execute SQL within `plv8` code using the [`plv8.execute` function](https://plv8.github.io/#plv8-execute).
 
 ```sql
-create or replace function update_user(id bigint, first_name text) 
+create or replace function update_user(id bigint, first_name text)
 returns smallint as $$
 
     var num_affected = plv8.execute(
-        'update profiles set first_name = $1 where id = $2', 
+        'update profiles set first_name = $1 where id = $2',
         [first_name, id]
     );
 
@@ -127,12 +124,12 @@ returns smallint as $$
 $$ language plv8;
 ```
 
-### Set-returning Functions
+### Set-returning functions
 
 A [set-returning function](https://plv8.github.io/#set-returning-function-calls) is anything that returns a full set of results - for example, rows in a table.
 
 ```sql
-create or replace function get_messages() 
+create or replace function get_messages()
 returns setof messages as $$
 
     var json_result = plv8.execute(
@@ -143,8 +140,7 @@ returns setof messages as $$
 $$ language plv8;
 ```
 
+## Resources
 
-## Resources 
-
-- Official [`plv8` documentation](https://plv8.github.io/).
-- [plv8 Github Repository](https://github.com/plv8/plv8).
+- Official [`plv8` documentation](https://plv8.github.io/)
+- [plv8 GitHub Repository](https://github.com/plv8/plv8)
