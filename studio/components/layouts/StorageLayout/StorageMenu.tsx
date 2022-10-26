@@ -95,7 +95,7 @@ const StorageMenu: FC<Props> = () => {
             )}
           </div>
         </div>
-
+        <div className="h-px w-full bg-scale-500"></div>
         <div className="">
           <Menu.Group title="Configuration" />
           <Link href={`/project/${projectRef}/storage/policies`}>
