@@ -26,6 +26,7 @@ const sidebars = {
         'generated/initializing',
         'typescript-support',
         'release-notes',
+        'upgrade-guide',
       ],
       collapsed: false,
     },

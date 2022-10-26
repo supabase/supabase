@@ -20,6 +20,7 @@ const supabase = createClient(apiURL, apiKey, {
     schema: 'public',
   },
   auth: {
+    storage: AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
