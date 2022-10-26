@@ -5,8 +5,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { NextPageWithLayout } from 'types'
 import { checkPermissions, useStore } from 'hooks'
 import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
-import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
-import { AuthLayout, SettingsLayout } from 'components/layouts'
+import { SettingsLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 
@@ -25,7 +24,6 @@ const PageLayout: NextPageWithLayout = () => {
     return (
       <FormsContainer>
         <AutoSchemaForm />
-        <RedirectDomains />
       </FormsContainer>
     )
   } else {

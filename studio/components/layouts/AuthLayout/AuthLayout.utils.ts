@@ -4,7 +4,7 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
-      title: 'Users',
+      title: 'Manage',
       items: [{ name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] }],
     },
     ...(IS_PLATFORM

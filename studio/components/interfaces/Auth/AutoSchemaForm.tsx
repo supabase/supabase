@@ -87,7 +87,7 @@ const AutoSchemaForm = observer(() => {
         return (
           <>
             <FormHeader
-              title="General settings"
+              title="Auth settings"
               description="Configure authentication sessions for your users"
             />
             <FormPanel
