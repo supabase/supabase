@@ -1,43 +1,42 @@
 ---
-id: limits
+id: rate-limits
 title: Realtime Rate Limits
-description: Realtime Rate Limiting
+description: Understanding Realtime rate limiting
+sidebar_label: Rate Limits
 ---
 
-Since deploying a global multi-tenant cluster for Supabase Realtime, we've implimented some rate limits to protect our infrastructure.
+Supabase Realtime is a global cluster. We've implemented some rate limits to help ensure high availability for all customers.
 
-Rate limits are mostly configurable per project and our cluster can support millions of concurrent connections if needed. If you're running into any rate limiting and it's causing issues, please [contact support](https://app.supabase.com/support/new).
+Rate limits are configurable per project and our cluster supports millions of concurrent connections. [Contact support](https://app.supabase.com/support/new) if these limits are causing issues.
 
 ## Limits by Plan
 
 Limits are set on the Free and Pro plans accordingly. See our [pricing page](https://supabase.com/pricing) for more information.
 
-Above the Pro plan Realtime is billed on a usage basis. We still employ limiting above the Pro plan to protect our infrastructure. If you're on an Enterprise plan simply contact support and we'll increase your limits as needed.
+Enterprise plans are billed on a usage basis. We still employ limiting on Enterprise plans. If you're on an Enterprise plan simply contact support and we'll increase your limits as needed.
 
 Enterprise plan limits start at:
 
-- 500 concurrent users
+- 500 concurrent clients
 - 1,000 messages per second
 - 500 concurrent Channels
 
 ## System Limits
 
-Some limits apply to all projects and are not currently configurable per project.
+The following limits apply to all projects.
 
 - 500 Channel joins per second
-- 100 Channels per connected user
+- 100 Channels per connected client
 
-## Client-side Limiting
+## Client-Side Limiting
 
-Some basic WebSocket message rate limiting has been implimented client-side.
+Some basic WebSocket message rate limiting is implemented client-side.
 
-See the [Cursor Positions Quickstart](/docs/guides/realtime/quickstart#cursor-positions) section where a `eventsPerSecond` parameter is passed in when instantiating the Supabase client.
-
-- Default: `10` events per second
+For example, the [multiplayer.dev demo](/docs/guides/realtime/quickstart#cursor-positions) instantiates the Supabase client with an `eventsPerSecond` parameter.
 
 ## Rate Limiting Errors
 
-Rate limiting errors can appear in backend logs and messages in a WebSocket.
+Rate limiting errors can appear in backend logs and messages in the WebSocket connection.
 
 :::note
 Use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to reproduce an error and share those connection details with Supabase support.
@@ -49,18 +48,18 @@ If your project is being rate limited, check your [Realtime logs](https://app.su
 
 ### WebSocket Errors
 
-- `tenant_events`: In the event your project is generating too many messages per second clients will be disconnected. `supabase-js` will attempt to reconnect automatically. It should reconnect successfully if the rate limit decreases appropriately.
+- `tenant_events`: Clients will be disconnected if your project is generating too many messages per second. `supabase-js` should reconnect automatically if the message rate decreases appropriately.
 
-Some limits will cause a Channel join to be refused. In this case a reply in the WebSocket will be one of:
+Some limits can cause a Channel join to be refused. Realtime will reply with one of the following WebSocket messages:
 
 - `too_many_channels`: Too many channels currently joined for a single user.
 - `too_many_connections`: Too many total concurrent connections for a project.
 - `too_many_joins`: Too many Channel joins per second.
 
 :::note
-Use Chroms DevTools to find the WebSocket initiation request and view individual messages.
+Use your browser's developer tools to find the WebSocket initiation request and view individual messages.
 :::
 
 ## Payload Limits
 
-Realtime has a PubSub message payload size limit of 1 megabyte.
+Realtime has a message byte size limit of 1 megabyte.
