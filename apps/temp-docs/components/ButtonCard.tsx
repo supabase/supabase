@@ -2,10 +2,10 @@ import React from 'react'
 import Link from 'next/link'
 
 export default function ButtonCard({
-  children,
-  icon,
+  children = undefined,
+  icon = undefined,
   title,
-  description,
+  description = '',
   to,
   layout = 'vertical',
 }) {
