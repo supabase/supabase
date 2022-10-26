@@ -63,3 +63,12 @@ Use your browser's developer tools to find the WebSocket initiation request and 
 ## Payload Limits
 
 Realtime has a message byte size limit of 1 megabyte.
+
+## Presence Limits
+
+Realtime Presence is a CRDT backed in-memory key value store based on Phoenix Presence. It's more expensive to update a Presence than Broadcast a message.
+
+The following limits apply to Presence messages:
+
+- 10 keys per object
+- Message rate limit is 10% of your Realtime message rate limit
