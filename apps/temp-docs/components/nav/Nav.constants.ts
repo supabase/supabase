@@ -289,6 +289,7 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Reference Documentation', url: '/reference', items: [] },
         { name: 'Supabase Javascript Library', url: '/reference/javascript', items: [] },
+        { name: 'Supabase Flutter Library', url: '/reference/dart', items: [] },
         { name: 'Supabase CLI', url: '/reference/cli', items: [] },
         { name: 'Supabase API', url: '/reference/api', items: [] },
       ],
