@@ -17,7 +17,9 @@ The function examples are located in [`./supabase/functions`](./supabase/functio
 ## Develop locally
 
 - Run `supabase start` (make sure your Docker daemon is running.)
-- Run `supabase functions serve your-function-name`
+- Run `mv ./supabase/.env.local.example ./supabase/.env.local` to rename the local `.env` file.
+- Set the required variables to run the desired edge functions in the `.env.local` file.
+- Run `supabase functions serve your-function-name --env-file ./supabase/.env.local`
 - Run the CURL command in the example function, or use the [invoke method](https://supabase.com/docs/reference/javascript/invoke) on the Supabase client or use the test client [app](./app/).
 
 ## Test
@@ -43,7 +45,9 @@ Note: when testing locally, the select dropdown doesn't have any effect, and inv
 - Link your project
   - Within your project root run `supabase link --project-ref your-project-ref`
 - Set up your secrets
-  - Run `supabase secrets set --from-stdin < .env` to set the env vars from your `.env` file.
+  - Run `supabase secrets set --env-file ./supabase/.env.local` to set the environment variables.
+  
+  (This is assuming your local and production secrets are the same. The recommended way is to create a separate `.env` file for storing production secrets, and then use it to set the environment variables while deploying.)
   - You can run `supabase secrets list` to check that it worked and also to see what other env vars are set by default.
 - Deploy the function
   - Within your project root run `supabase functions deploy payment-sheet`
