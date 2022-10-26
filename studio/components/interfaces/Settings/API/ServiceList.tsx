@@ -62,6 +62,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   return (
     <>
       <div className="">
+        <h3 className="text-scale-1200 mb-6 text-xl">API Settings</h3>
         <section>
           <Panel title={<h5 className="mb-0">Project URL</h5>}>
             <Panel.Content>

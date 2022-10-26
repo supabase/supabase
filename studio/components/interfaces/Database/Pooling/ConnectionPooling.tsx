@@ -162,72 +162,74 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
     }
 
     return (
-      <SchemaFormPanel
-        title="Connection Pooling"
-        schema={formSchema}
-        model={updates}
-        submitLabel="Save"
-        cancelLabel="Cancel"
-        onChangeModel={(model: any) => setUpdates(model)}
-        onSubmit={(model: any) => updateConfig(model)}
-        onReset={() => setUpdates(bouncerInfo)}
-      >
-        <div className="space-y-6 py-4">
-          <ToggleField name="pgbouncer_enabled" />
+      <div className="mx-auto max-w-4xl px-12 pb-8">
+        <SchemaFormPanel
+          title="Connection Pooling"
+          schema={formSchema}
+          model={updates}
+          submitLabel="Save"
+          cancelLabel="Cancel"
+          onChangeModel={(model: any) => setUpdates(model)}
+          onSubmit={(model: any) => updateConfig(model)}
+          onReset={() => setUpdates(bouncerInfo)}
+        >
+          <div className="space-y-6 py-4">
+            <ToggleField name="pgbouncer_enabled" />
 
-          <Divider light />
+            <Divider light />
 
-          {updates.pgbouncer_enabled && (
-            <>
-              <AutoField
-                name="pool_mode"
-                showInlineError
-                errorMessage="You must select one of the three options"
-              />
-              <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                <p className="text-sm text-scale-900">
-                  Specify when a connection can be returned to the pool. To find out the most
-                  suitable mode for your use case,{' '}
-                  <a
-                    className="text-green-900"
-                    target="_blank"
-                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
-                  >
-                    click here
-                  </a>
-                  .
-                </p>
-              </div>
-              <Divider light />
-              <AutoField name="ignore_startup_parameters" />
-            </>
-          )}
-          <Divider light />
-          <Input
-            className="input-mono"
-            layout="horizontal"
-            readOnly
-            copy
-            disabled
-            value={connectionInfo.db_port}
-            label="Port"
-          />
-          <Divider light />
-          <Input
-            className="input-mono"
-            layout="vertical"
-            readOnly
-            copy
-            disabled
-            label="Connection string"
-            value={
-              `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
-              `${connectionInfo.db_host}:${connectionInfo.db_port}` +
-              `/${connectionInfo.db_name}`
-            }
-          />
-        </div>
-      </SchemaFormPanel>
+            {updates.pgbouncer_enabled && (
+              <>
+                <AutoField
+                  name="pool_mode"
+                  showInlineError
+                  errorMessage="You must select one of the three options"
+                />
+                <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
+                  <p className="text-sm text-scale-900">
+                    Specify when a connection can be returned to the pool. To find out the most
+                    suitable mode for your use case,{' '}
+                    <a
+                      className="text-green-900"
+                      target="_blank"
+                      href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
+                    >
+                      click here
+                    </a>
+                    .
+                  </p>
+                </div>
+                <Divider light />
+                <AutoField name="ignore_startup_parameters" />
+              </>
+            )}
+            <Divider light />
+            <Input
+              className="input-mono"
+              layout="horizontal"
+              readOnly
+              copy
+              disabled
+              value={connectionInfo.db_port}
+              label="Port"
+            />
+            <Divider light />
+            <Input
+              className="input-mono"
+              layout="vertical"
+              readOnly
+              copy
+              disabled
+              label="Connection string"
+              value={
+                `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
+                `${connectionInfo.db_host}:${connectionInfo.db_port}` +
+                `/${connectionInfo.db_name}`
+              }
+            />
+          </div>
+        </SchemaFormPanel>
+      </div>
     )
   }
 )
