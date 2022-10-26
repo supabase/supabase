@@ -77,6 +77,7 @@
     "sass": "^1.43.4",
     "scheduler": "^0.20.2",
     "semver": "^6.3.0",
+    "shared-data": "*",
     "sqlstring": "^2.3.2",
     "swr": "^1.2.1",
     "ui": "*",
