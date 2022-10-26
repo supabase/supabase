@@ -13,7 +13,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
   }, [isDarkMode])
 
   const pageLinks = [
-    { text: 'Guides', link: '/' },
+    { text: 'Guides', link: '/docs' },
     { text: 'Reference', link: '/reference' },
   ]
 
@@ -42,7 +42,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             <a className="flex items-center">
               <Image
                 className="cursor-pointer"
-                src={isDarkMode ? `/supabase-dark.svg` : `/supabase-light.svg`}
+                src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
                 width={124}
                 height={24}
                 alt="Supabase Logo"
