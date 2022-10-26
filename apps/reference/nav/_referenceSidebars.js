@@ -190,10 +190,10 @@ const sidebars = {
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
+        'guides/platform/migrating-and-upgrading-projects',
         'guides/platform/performance',
         'guides/platform/permissions',
         'going-into-prod',
-        'guides/platform/migrating-and-upgrading',
       ],
     },
     {
