@@ -8,7 +8,6 @@ import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
 import { useProjectSubscription } from 'hooks'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 const defaultRouterMock = () => {
   const router = jest.fn()

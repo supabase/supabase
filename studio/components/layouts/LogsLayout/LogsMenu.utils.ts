@@ -1,14 +1,10 @@
 import { Project } from 'types'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { useFlag } from 'hooks'
 
 export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const productReports = useFlag('productReports')
-
   return [
     {
-      title: 'Logs',
       items: [
         {
           name: 'Logs Explorer',
@@ -47,17 +43,6 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/logs/realtime-logs`,
           items: [],
         },
-
-        ...(productReports
-          ? [
-              {
-                name: 'Usage (used to be "API usage") move to reports',
-                key: 'api-usage',
-                url: `/project/${ref}/logs/api-usage`,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
   ]

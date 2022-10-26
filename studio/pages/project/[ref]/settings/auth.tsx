@@ -8,6 +8,7 @@ import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
 import { SettingsLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
+import { SmtpForm } from 'components/interfaces'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ui, authConfig } = useStore()
@@ -24,6 +25,7 @@ const PageLayout: NextPageWithLayout = () => {
     return (
       <FormsContainer>
         <AutoSchemaForm />
+        <SmtpForm />
       </FormsContainer>
     )
   } else {

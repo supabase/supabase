@@ -1,39 +1,25 @@
 import dayjs from 'dayjs'
-import useSWR from 'swr'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { FC, useState, useRef, useEffect } from 'react'
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { debounce } from 'lodash'
-import generator from 'generate-password'
-import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { FC, useState } from 'react'
+import { IconArrowRight } from 'ui'
 
+import { useStore } from 'hooks'
+import { TIME_PERIODS_INFRA } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useFlag, useStore } from 'hooks'
-import { get, patch } from 'lib/common/fetch'
-import { pluckObjectFields, passwordStrength } from 'lib/helpers'
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
 
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import Panel from 'components/ui/Panel'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import ProjectUsageMinimal from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageMinimal'
+import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import Panel from 'components/ui/Panel'
 
-const ProjectSettings: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
-
+const DatabaseReport: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
   return (
-    <div>
+    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto">
-        <div className="w-full max-w-5xl px-4 py-4">
+        <div className="w-full">
           <DatabaseUsage project={project} />
         </div>
       </div>
@@ -41,26 +27,18 @@ const ProjectSettings: NextPageWithLayout = () => {
   )
 }
 
-ProjectSettings.getLayout = (page) => <ReportsLayout title="Database">{page}</ReportsLayout>
+DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</ReportsLayout>
 
-export default observer(ProjectSettings)
+export default observer(DatabaseReport)
 
-const DatabaseUsage: FC<any> = ({ project }) => {
+const DatabaseUsage: FC<any> = () => {
   const [dateRange, setDateRange] = useState<any>(undefined)
-  const router = useRouter()
-  const ref = router.query.ref as string
 
   return (
     <>
       <div>
         <section className="">
-          <Panel
-            title={
-              <h5 key="panel-title" className="mb-0">
-                Database health
-              </h5>
-            }
-          >
+          <Panel>
             <Panel.Content>
               <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
