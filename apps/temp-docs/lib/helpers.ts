@@ -1,3 +1,5 @@
+// [Joshen] I think this can be done better, as its mostly used to choose what
+// menus to render in the SideBar.js (Ref Nav.constants.ts)
 export function getPageType(asPath: string) {
   let page
   if (!asPath) return ''
@@ -12,6 +14,10 @@ export function getPageType(asPath: string) {
     page = 'reference/dart'
   } else if (asPath.includes('/reference/dart/v0')) {
     page = 'reference/dart/v0'
+  } else if (asPath.includes('/reference/api')) {
+    page = 'reference/api'
+  } else if (asPath.includes('/reference/cli')) {
+    page = 'reference/cli'
   } else if (asPath.includes('/reference')) {
     page = 'reference'
   } else {

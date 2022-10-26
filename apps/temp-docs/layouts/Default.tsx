@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import Head from 'next/head'
-import NavBar from '../components/nav/NavBar'
-import SideBar from '../components/nav/SideBar'
+import NavBar from '../components/Navigation/NavBar'
+import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
 
 const Layout = ({
