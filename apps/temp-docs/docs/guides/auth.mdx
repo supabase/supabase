@@ -8,7 +8,7 @@ sidebar_label: Overview
 import Link from '@docusaurus/Link'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
-import providers from '@site/src/data/authProviders'
+import providers from '../../data/authProviders'
 import ButtonCard from '@site/src/components/ButtonCard'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 
@@ -50,12 +50,7 @@ We provide a suite of Providers and login methods, as well as [Auth helpers](/do
   <div class="row is-multiline">
     {providers.map((x) => (
       <div key={x.name} class="col col--6">
-        <ButtonCard
-          class="card"
-          to={useBaseUrl(x.href)}
-          title={x.name}
-          style={{ height: '100%' }}
-        >
+        <ButtonCard class="card" to={useBaseUrl(x.href)} title={x.name} style={{ height: '100%' }}>
           <div class="button-card__inner">
             <div
               class=""
@@ -135,12 +130,7 @@ Authentication only gets you so far. When you need granular authorization rules,
 [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
 
 <video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/policies-zoom2.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+  <source src="/docs/videos/policies-zoom2.mp4" type="video/mp4" muted playsInline />
 </video>
 
 With policies, your database becomes the rules engine. Instead of repetitively filtering your queries, like this ...
@@ -178,6 +168,7 @@ Supabase provides a special function in Postgres, `auth.uid()`, which extracts t
 ## User Management
 
 Supabase provides multiple endpoints to authenticate and manage your users:
+
 - [Sign up](/docs/reference/javascript/auth-signup)
 - [Sign in with password](/docs/reference/javascript/auth-signinwithpassword)
 - [Sign in with passwordless / one-time password (OTP)](/docs/reference/javascript/auth-signinwithotp)
@@ -187,10 +178,5 @@ Supabase provides multiple endpoints to authenticate and manage your users:
 When users sign up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing `id` in the `auth.users` table using a `user_id` field.
 
 <video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/auth-zoom2.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+  <source src="/docs/videos/auth-zoom2.mp4" type="video/mp4" muted playsInline />
 </video>
