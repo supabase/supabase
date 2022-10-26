@@ -126,13 +126,6 @@ const AutoSchemaForm = observer(() => {
                 <FormSectionContent loading={!isLoaded}>
                   {/* Permitted redirects for anything on that domain */}
                   {/* Check with @kangming about this */}
-                  <Input
-                    id="SITE_URL"
-                    size="small"
-                    label="Site URL"
-                    descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
-                    disabled={!canUpdateConfig}
-                  />
                   <InputNumber
                     id="JWT_EXP"
                     size="small"
