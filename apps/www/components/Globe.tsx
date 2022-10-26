@@ -24,7 +24,7 @@ const Globe = () => {
       mapBrightness: 4,
       baseColor: [1, 1, 1],
       markerColor: [62 / 255, 207 / 255, 142 / 255],
-      glowColor: [62 / 255, 207 / 255, 142 / 255],
+      glowColor: [255 / 255, 255 / 255, 255 / 255],
       markers: [
         { location: [53.4084, 2.9916], size: 0.06 },
         { location: [1.3521, 103.8198], size: 0.06 },
@@ -43,7 +43,7 @@ const Globe = () => {
       ],
       onRender: (state) => {
         state.phi = rotation
-        rotation += 0.005
+        rotation += 0.0025
         state.width = width * 2
         state.height = width * 2
       },
