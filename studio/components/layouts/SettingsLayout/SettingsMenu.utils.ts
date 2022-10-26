@@ -33,7 +33,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           items: [],
         },
         {
-          name: 'Connections',
+          name: 'API',
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],

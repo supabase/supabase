@@ -3,6 +3,7 @@ import { NextPageWithLayout } from 'types'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import Reports from 'components/interfaces/Reports/Reports'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 
 const PageLayout: NextPageWithLayout = () => (
   <>
@@ -13,6 +14,6 @@ const PageLayout: NextPageWithLayout = () => (
   </>
 )
 
-PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+PageLayout.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
 export default observer(PageLayout)
