@@ -9,13 +9,17 @@
 
 [Supabase](https://supabase.com) একটি ওপেন সোর্স ফায়ারবেস বিকল্প। আমরা এন্টারপ্রাইজ-গ্রেড ওপেন সোর্স টুল ব্যবহার করে Firebase-এর বৈশিষ্ট্য তৈরি করছি।
 
-- [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস
-- [x] রিয়েলটাইম সদস্যতা
-- [x] প্রমাণীকরণ এবং অনুমোদন
-- [x] স্বয়ংক্রিয়ভাবে তৈরি APIs
+- [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database)
+- [x] অথেনটিকেশন এবং অথরাইজড . [ডক্স](https://supabase.com/docs/guides/auth)
+- [x] স্বয়ংক্রিয়ভাবে তৈরি APIs.
+  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/api#rest-api)
+  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/api#realtime-api)
+  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/api#graphql-api)
+- [x] ফাংশনস.
+  - [x] ডাটাবেস ফাংশনস. [ডক্স](https://supabase.com/docs/guides/database/functions)
+  - [x] এজ ফাংশনস. [ডক্স](https://supabase.com/docs/guides/functions)
+- [x] ফাইল স্টোরেজ. [ডক্স](https://supabase.com/docs/guides/storage)
 - [x] ড্যাশবোর্ড
-- [x] স্টোরেজ
-- [x] ফাংশন
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
@@ -23,7 +27,7 @@
 
 সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs)
 
-কিভাবে অবদান রাখতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](../DEVELOPERS.md)
+কিভাবে কন্ট্রিবিউট করতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](../DEVELOPERS.md)
 
 ## কমিউনিটি ও সাপোর্ট
 
@@ -34,12 +38,12 @@
 
 ## স্ট্যাটাস
 
-- [x] আলফা: আমরা গ্রাহকদের একটি বন্ধ সেটের সাথে সুপাবেস পরীক্ষা করছি
+- [x] আলফা: আমরা কাছের গ্রাহকদের সাথে Supabase পরীক্ষা করছি
 - [x] পাবলিক আলফা: যে কেউ [app.supabase.com](https://app.supabase.com) এ সাইন আপ করতে পারেন। কিন্তু আমাদের উপর সহজ যান, কয়েক kinks আছে
-- [x] পাবলিক বিটা: বেশিরভাগ নন-এন্টারপ্রাইজ ব্যবহারের ক্ষেত্রে যথেষ্ট স্থিতিশীল
-- [ ] পাবলিক: উত্পাদন প্রস্তুত
+- [x] পাবলিক বেটা: বেশিরভাগ নন-এন্টারপ্রাইজ ব্যবহারের ক্ষেত্রে যথেষ্ট স্থিতিশীল
+- [ ] পাবলিক: প্রোডাকশন রেডি
 
-আমরা বর্তমানে পাবলিক বিটাতে আছি। বড় আপডেটের বিজ্ঞপ্তি পেতে এই রেপোর "রিলিজ" দেখুন।
+আমরা বর্তমানে পাবলিক বেটাতে আছি। বড় আপডেটের বিজ্ঞপ্তি পেতে এই রেপোর "রিলিজ" দেখুন।
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="এই রেপো দেখুন"/></kbd>
 
@@ -47,12 +51,12 @@
 
 ## কিভাবে এটা কাজ করে
 
-সুপাবেস হল ওপেন সোর্স টুলের সংমিশ্রণ। আমরা এন্টারপ্রাইজ-গ্রেড, ওপেন সোর্স পণ্য ব্যবহার করে Firebase-এর বৈশিষ্ট্য তৈরি করছি। যদি MIT, Apache 2, বা সমতুল্য ওপেন লাইসেন্স সহ টুল এবং সম্প্রদায়গুলি বিদ্যমান থাকে, আমরা সেই টুলটি ব্যবহার করব এবং সমর্থন করব। যদি টুলটি বিদ্যমান না থাকে, তাহলে আমরা নিজেরাই এটি তৈরি এবং ওপেন সোর্স করি। সুপাবেস ফায়ারবেসের 1-থেকে-1 ম্যাপিং নয়। ওপেন সোর্স টুল ব্যবহার করে ডেভেলপারদের ফায়ারবেসের মতো ডেভেলপার অভিজ্ঞতা দেওয়াই আমাদের লক্ষ্য।
+Supabase হল ওপেন সোর্স টুলের সংমিশ্রণ। আমরা এন্টারপ্রাইজ-গ্রেড, ওপেন সোর্স পণ্য ব্যবহার করে Firebase-এর বৈশিষ্ট্য তৈরি করছি। যদি MIT, Apache 2, বা সমতুল্য ওপেন লাইসেন্স সহ টুল এবং সম্প্রদায়গুলি বিদ্যমান থাকে, আমরা সেই টুলটি ব্যবহার করব এবং সমর্থন করব। যদি টুলটি বিদ্যমান না থাকে, তাহলে আমরা নিজেরাই এটি তৈরি এবং ওপেন সোর্স করি। Supabase Firebase-এর 1-থেকে-1 ম্যাপিং নয়। ওপেন সোর্স টুল ব্যবহার করে ডেভেলপারদের ফায়ারবেসের মতো ডেভেলপার অভিজ্ঞতা দেওয়াই আমাদের লক্ষ্য।
 
 **স্থাপত্য**
 
 সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://app.supabase.com)। আপনি সাইন আপ করতে পারেন এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
-এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [স্থানীয়ভাবে বিকাশ](https://supabase.com/docs/guides/local-development) করতে পারেন।
+এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [ডেভেলপ লোকালি](https://supabase.com/docs/guides/local-development) করতে পারেন।
 
 ![আর্কিটেকচার](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
@@ -66,7 +70,7 @@
 
 #### ক্লায়েন্ট লাইব্রেরি
 
-ক্লায়েন্ট লাইব্রেরির জন্য আমাদের পদ্ধতি মডুলার। প্রতিটি উপ-লাইব্রেরি একটি একক বহিরাগত সিস্টেমের জন্য একটি স্বতন্ত্র বাস্তবায়ন। এটি এমন একটি উপায় যা আমরা বিদ্যমান সরঞ্জামগুলিকে সমর্থন করি৷
+ক্লায়েন্ট লাইব্রেরির জন্য আমাদের পদ্ধতি মডুলার। প্রতিটি উপ-লাইব্রেরি একটি একক বহিরাগত সিস্টেমের জন্য একটি স্বতন্ত্র বাস্তবায়ন। এটি আমাদের উপায় গুলোর মধ্যে একটি যেভাবে বিদ্যমান সরঞ্জামগুলিকে সমর্থন করি৷
 
 <table style="table-layout:fixed; white-space: nowrap;">৷
   <tr>
@@ -113,7 +117,7 @@
   </tr>
   <tr>
     <td>ডার্ট (ফ্লাটার)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td><a href="https://github.com/supabase/supabase-Flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">রিয়েলটাইম-ডার্ট</a></td>
