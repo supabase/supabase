@@ -5,7 +5,7 @@ description: Add Apple OAuth to your Supabase project
 ---
 
 import Tabs from '@theme/Tabs'
-import TabsPanel from '@theme/TabsPanel'
+import TabItem from '@theme/TabItem'
 
 To enable Apple Auth for your project, you need to set up an Apple OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -17,19 +17,17 @@ Apple OAuth consists of six broad steps:
 - Obtaining a `Services Id` - this will serve as the `client_id`.
 - Obtaining a `secret key` that will be used to get our `client_secret`.
 - Generating the `client_secret` using the `secret key`.
-- Add your `client id` and `client secret` keys to your [Supabase Project](https://supabase.com).
+- Add your `client id` and `client secret` keys to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
-## Steps
-
-### Access your Apple Developer account
+## Access your Apple Developer account
 
 - Go to [developer.apple.com](https://developer.apple.com).
 - Click on `Account` at the top right to log in.
 
-![Apple Developer Portal.](/docs/img/guides/apple-developer-portal.png)
+![Apple Developer Portal.](/img/guides/auth-apple/apple-developer-portal.png)
 
-### Obtain an App ID
+## Obtain an App ID
 
 - Go to `Certificates, Identifiers & Profiles`.
 - Click on `Identifiers` at the left.
@@ -43,7 +41,7 @@ Apple OAuth consists of six broad steps:
   - Click `Continue` at the top right.
   - Click `Register` at the top right.
 
-### Obtain a Services ID
+## Obtain a Services ID
 
 This will serve as the `client_id` when you make API calls to authenticate the user.
 
@@ -58,23 +56,28 @@ This will serve as the `client_id` when you make API calls to authenticate the u
   - Click `Continue` at the top right.
   - Click `Register` at the top right.
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
 `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Go to your [Supabase Project Dashboard](https://supabase.com).
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
 - Click on the `Settings` icon at the bottom of the left sidebar.
 - Click on `API` in the list.
 - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
 - Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
-### Configure your Services ID
+## Configure your Services ID
 
 - Under `Identifiers`, click on your newly-created Services ID.
 - Check the box next to `Sign In With Apple` to enable it.
@@ -86,7 +89,7 @@ The next step requires a callback URL, which looks like this:
 - Click `Continue` at the top right.
 - Click `Save` at the top right.
 
-### Download your secret key
+## Download your secret key
 
 Now you'll need to download a `secret key` file from Apple that will be used to generate your `client_secret`.
 
@@ -104,7 +107,7 @@ Now you'll need to download a `secret key` file from Apple that will be used to 
 - Save the downloaded file -- this contains your "secret key" that will be used to generate your `client_secret`.
 - Click `Done` at the top right.
 
-### Generate a `client_secret`
+## Generate a `client_secret`
 
 The `secret key` you downloaded is used to create the `client_secret` string you'll need to authenticate your users.
 
@@ -168,9 +171,9 @@ puts token
 2. From the command line, run: `ruby secret_gen.rb > client_secret.txt`.
 3. Your `client_secret` is now stored in this `client_secret.txt` file.
 
-### Add your OAuth credentials to Supabase
+## Add your OAuth credentials to Supabase
 
-- Go to your [Supabase Dashboard](https://supabase.com).
+- Go to your [Supabase Dashboard](https://app.supabase.com).
 - In the left sidebar, click the `Authentication` icon (near the top).
 - Click `Settings` from the list to go to the `Authentication Settings` page.
 - Enter the final (hosted) URL of your app under `Site URL` (this is important).
@@ -178,27 +181,19 @@ puts token
 - Enter your `client_id` and `client_secret` saved in the previous steps.
 - Click `Save`.
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'apple',
-})
-```
-
-Add a function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `apple` as the `provider`:
 
 ```js
 async function signInWithApple() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {
