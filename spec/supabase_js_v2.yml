@@ -363,7 +363,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: { user, session }, error } = supabase.auth.refreshSession({ refresh_token })
+          const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
           ```
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
