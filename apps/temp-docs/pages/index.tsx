@@ -2,7 +2,7 @@ import { MDXProvider } from '@mdx-js/react'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components'
-import { menuItems } from '~/components/nav/Nav.constants'
+import { menuItems } from '~/components/Navigation/Nav.constants'
 
 import Layout from '~/layouts/Default'
 import { getDocsBySlug } from '../lib/docs'
