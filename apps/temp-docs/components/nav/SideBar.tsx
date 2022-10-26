@@ -15,7 +15,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
       <Accordion.Root
         collapsible
         type="single"
-        defaultValue="Overview"
+        defaultValue={menuItems[0].label}
         className="w-full space-y-0.5"
       >
         {menuItems.map((group: NavMenuGroup) => (
