@@ -27,7 +27,7 @@ const Layout = ({
     }
   }, [])
 
-  console.log('default')
+  console.log('default', currentPage)
 
   return (
     <>
