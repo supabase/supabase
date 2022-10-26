@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import useSWR from 'swr'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, useState, useRef, useEffect } from 'react'
@@ -7,14 +6,14 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
-import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from 'ui'
+import { Input, Button, IconDownload, Tabs, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
+import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -24,8 +23,6 @@ import ConnectionPooling from 'components/interfaces/Database/Pooling/Connection
 const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
-
-  const { ui } = useStore()
 
   return (
     <div>
