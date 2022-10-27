@@ -175,6 +175,7 @@ const sidebars = {
         'guides/realtime',
         'guides/realtime/quickstart',
         'guides/realtime/postgres-cdc',
+        'guides/realtime/rate-limits',
       ],
     },
     {
