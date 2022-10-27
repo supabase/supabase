@@ -555,24 +555,9 @@ commands:
       - supabase-db-push
       - supabase-db-remote
       - supabase-db-reset
-      - supabase-db-test
     options: |-
       ```sh
         -h, --help   help for db
-      ```
-  - id: supabase-db-test
-    title: supabase db test
-    summary: Tests local database with pgTAP
-    tags: []
-    links: []
-    usage: |-
-      ```sh
-      supabase db test [flags]
-      ```
-    subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for test
       ```
   - id: supabase-db-reset
     title: supabase db reset
