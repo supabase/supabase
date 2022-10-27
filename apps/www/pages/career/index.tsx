@@ -16,9 +16,20 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const job_data = await job_res.json()
 
   const contributor_res = await fetch('https://api.github.com/repos/supabase/supabase/contributors')
-  const contributor_data = await contributor_res.json()
+  const contributor_arr = await contributor_res.json()
 
-  if (!job_data && contributor_data) {
+  const contributor_data = contributor_arr.filter((object) => {
+    return (
+      object.login !== 'saltcod' &&
+      object.login !== 'inian' &&
+      object.login !== 'thorwebdev' &&
+      object.login !== 'dependabot[bot]' &&
+      object.login !== 'soedirgo' &&
+      object.login !== 'dragarcia'
+    )
+  })
+
+  if (!job_data && !contributor_data) {
     return {
       props: {
         notFound: true,
@@ -230,7 +241,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                 </p>
               </div>
               <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
-                {contributor_data.map((contributor: any, i: number) => {
+                {contributor_data.slice(0, 19).map((contributor: any, i: number) => {
                   return (
                     <div
                       className={`${
