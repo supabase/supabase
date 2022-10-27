@@ -111,12 +111,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'APIs',
-      collapsed: true,
-      items: ['guides/api', 'guides/api/generating-types'],
-    },
-    {
-      type: 'category',
       label: 'Database',
       collapsed: true,
       items: [
@@ -126,10 +120,15 @@ const sidebars = {
         'guides/database/functions',
         'guides/database/webhooks',
         'guides/database/full-text-search',
-        'guides/database/migrating-between-projects',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Data APIs',
+          collapsed: true,
+          items: ['guides/api', 'guides/api/generating-types'],
+        },
         {
           type: 'category',
           label: 'Extensions',
@@ -194,6 +193,7 @@ const sidebars = {
         'guides/platform/disk-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
+        'guides/platform/migrating-and-upgrading-projects',
         'guides/platform/performance',
         'guides/platform/permissions',
         'going-into-prod',
@@ -288,7 +288,7 @@ const sidebars = {
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
+        { type: 'link', label: 'Management API', href: '/reference/api' },
       ],
     },
     // TODO: add back in with typedocs
