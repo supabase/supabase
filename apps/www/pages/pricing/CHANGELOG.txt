@@ -5,14 +5,19 @@ Pricing Changelog
 
 Database
 - guidance on backups > 1TB in size
+- Removed "Realtime functionality" as it is redundant with new realtime section
 Auth
 - added “advanced security features”
 - MAUs changed to unlimited for Enterprise
 Realtime
-— Added new realtime section and pricing
+— Added new realtime section
+- Concurrent Peak Connections
+- Max Messages Per Month
+- Max Message Size
 Edge Functions
-- Added extra functions cost for Pro tier
 - Runtime hours removed
+- Number of functions, usage pricing added after limit on Pro
+- Invocations, usage pricing added after limit on Pro
 Support
 - Security features moved to own section
 Platform Security and Compliance
