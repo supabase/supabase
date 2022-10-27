@@ -18,4 +18,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-**/*/generated
+**/*/generated/**/*
+!**/*/generated/.gitkeep
+!**/*/generated/**/.gitkeep
