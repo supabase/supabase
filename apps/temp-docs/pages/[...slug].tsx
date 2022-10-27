@@ -5,7 +5,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import components from '../components/index'
 import { menuItems } from '../components/Navigation/Navigation.constants'
 import { getPageType } from '../lib/helpers'
-import { getAllDocs, getDocsBySlug, getLibraryVersions } from '../lib/docs'
+import { getAllDocs, getDocsBySlug } from '../lib/docs'
 import Layout from '~/layouts/Default'
 
 // table of contents extractor
@@ -21,7 +21,6 @@ interface Meta {
 interface Props {
   meta: Meta
   content: any
-  // versions: string[]
   toc: any
 }
 
@@ -50,13 +49,11 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
   let doc = getDocsBySlug(slug)
   const content = await serialize(doc.content || '')
-  // const versions = getLibraryVersions(slug)
 
   return {
     props: {
       ...doc,
       content,
-      // versions,
       toc: toc(doc.content, { maxdepth: 2 }),
     },
   }

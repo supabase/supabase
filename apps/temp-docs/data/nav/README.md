@@ -1,11 +1,13 @@
 # [WIP] Adding navigation for a new section
 
+[Note] This isn't the best way for versioning in my opinion, but this is the current way to do it while we're migrating to Next.js
+
 This folder holds the structure for the side navigation menu in the reference documentation pages. Each reference section (as well as their individual versions where applicable) have its own set of navigation.
 
 The following are relevant to adding navigation for a new section:
 
 - `getPageType()` from `lib/helpers`
-- `menuItems` from `components/Navigation/Navigation.constants`
+- `menuItems` and `REFERENCES` from `components/Navigation/Navigation.constants`
 - `NavMenu` from `components/Navigation/Navigation.types`
 
 ## Adding navigation for a section that doesn't require versioning
@@ -18,9 +20,9 @@ Finally, add the menu to `menuItems` under a new key - the key should be what yo
 
 ## Adding navigation for a section that requires versioning
 
-This is more applicable for client libraries (e.g supabase-js and supabase-dart). Versions will all sit within their own folder - if the folder doesn't exist yet, just create one.
+This is more applicable for client libraries (e.g supabase-js and supabase-dart). Versions will all sit within their own folder - if the folder doesn't exist yet, just create one. The navigation for each section will then be named as 'v1', 'v2', and so on.
 
-The navigation for each section will then be named as 'v1', 'v2', and so on. The version selector in `NavBar` will pick up what available versions there are from here.
+Then, update `REFERENCES` accordingly.
 
 Thereafter, update `getPageType` to be able to get the page type based on the URL path - preferably follow the syntax of `reference/{section_name}/{version}`. Typically the latest version available will not have the `/{version}` in it.
 
