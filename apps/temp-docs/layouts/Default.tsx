@@ -13,7 +13,14 @@ interface Props {
   versions: string[]
 }
 
-const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage, versions }) => {
+const Layout: FC<Props> = ({
+  meta,
+  children,
+  toc,
+  menuItems,
+  currentPage,
+  versions = ['v2', 'v1'],
+}) => {
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {

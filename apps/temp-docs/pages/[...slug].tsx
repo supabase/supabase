@@ -18,29 +18,20 @@ interface Meta {
   hide_table_of_contents: boolean
 }
 
-export default function Doc({
-  meta,
-  content,
-  versions,
-  toc,
-}: {
+interface Props {
   meta: Meta
   content: any
-  versions: string[]
+  // versions: string[]
   toc: any
-}) {
+}
+
+export default function Doc({ meta, content, toc }: Props) {
   const { asPath } = useRouter()
   const page = getPageType(asPath)
 
   return (
     // @ts-ignore
-    <Layout
-      meta={meta}
-      toc={toc}
-      menuItems={menuItems[page]}
-      currentPage={page}
-      versions={versions}
-    >
+    <Layout meta={meta} toc={toc} menuItems={menuItems[page]} currentPage={page}>
       <MDXProvider components={components}>
         <MDXRemote {...content} components={components} />
       </MDXProvider>
@@ -59,13 +50,13 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
   let doc = getDocsBySlug(slug)
   const content = await serialize(doc.content || '')
-  const versions = getLibraryVersions(slug)
+  // const versions = getLibraryVersions(slug)
 
   return {
     props: {
       ...doc,
       content,
-      versions,
+      // versions,
       toc: toc(doc.content, { maxdepth: 2 }),
     },
   }
