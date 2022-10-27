@@ -1,12 +1,25 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { IconMenu, IconSearch, Input, IconCommand, Button, IconMoon, IconSun } from 'ui'
+import { useRouter } from 'next/router'
+import { useState, useEffect, FC } from 'react'
+import { IconMenu, IconSearch, Input, IconCommand, Button, IconMoon, IconSun, Listbox } from 'ui'
 import { useTheme } from '../Providers'
 
-const NavBar = ({ currentPage }: { currentPage: string }) => {
+interface Props {
+  currentPage: string
+  versions: string[]
+}
+
+const NavBar: FC<Props> = ({ currentPage, versions }) => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+
+  const { asPath, push } = useRouter()
+  const pathSegments = asPath.split('/')
+  const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
+  const version = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
+    ? pathSegments[pathSegments.indexOf(library) + 1]
+    : versions[0]
 
   useEffect(() => {
     setMounted(true)
@@ -23,6 +36,16 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
 
     const key = localStorage.getItem('supabaseDarkMode')
     document.documentElement.className = key === 'true' ? 'dark' : ''
+  }
+
+  const onSelectVersion = (version: string) => {
+    // [Joshen] Ideally we use <Link> but this works for now
+    if (!library) return
+    if (version === versions[0]) {
+      push(`/reference/${library}`)
+    } else {
+      push(`/reference/${library}/${version}`)
+    }
   }
 
   return (
@@ -67,6 +90,22 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             ))}
           </ul>
         </nav>
+        {versions.length > 0 && (
+          <div className="ml-8">
+            <Listbox
+              size="small"
+              defaultValue={version}
+              style={{ width: '70px' }}
+              onChange={onSelectVersion}
+            >
+              {versions.map((version) => (
+                <Listbox.Option key={version} label={version} value={version}>
+                  {version}
+                </Listbox.Option>
+              ))}
+            </Listbox>
+          </div>
+        )}
       </div>
       <div className="flex items-center space-x-4">
         <div className="hidden items-center md:flex">
