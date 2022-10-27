@@ -1,6 +1,6 @@
 ---
 title: 'What is PostgreSQL commitfest and how to contribute'
-description: 'Comparing one of the most popular Postgres features against alternatives'
+description: 'A time-tested method for contributing to the core Postgres code'
 author: pavel
 image: what-is-postgres-commitfest/what-is-postgres-commitfest.jpg 
 thumb: what-is-postgres-commitfest/what-is-postgres-commitfest.jpg
@@ -95,7 +95,7 @@ It’s encouraged to split complicated patches into several independently workin
 
 After you have created a patch, you can attach it to a Commitfest thread:
 
--   Make sure that you have sent email with your patch to the <pgsql-hackers@postgresql.org> mailing list
+-   Make sure that you have sent email with your patch to the pgsql-hackers@postgresql.org mailing list
 -   Open commitfests page [commitfest.postgresql.org](https://commitfest.postgresql.org/) and choose the nearest commitfest with the status "Open"
 -   Click "New patch" button.
 -   Create a concise description, chose the relevant topic, and fill in the msgid in the hackers mailing list to attach a thread (which can be found in a full header of a mail message e.g.`Message-ID: <CANbhV-FG-1ZNMBuwhUF7AxxJz3u5137dYL-o6hchK1V_dMw86g@mail.gmail.com>`)
@@ -114,8 +114,8 @@ After you have a submitted your patch, several things will happen:
 
 The commit process is a two-step:
 
-1.  Preliminary review. It could be done by anyone (including you). A detailed guide on how to do this [](https://wiki.postgresql.org/wiki/Reviewing_a_Patch)<https://wiki.postgresql.org/wiki/Reviewing_a_Patch> If there are no doubts reviewer sets the status to "Ready for committer". If the patch needs some changes a reviewer can set "Waiting on author". Reviewers can leave a favorable review but that's only a signal. After other reviewers join the conversation, if there are no objections then one of them will make it "Ready for committer". It's pretty normal if there is more than one reviewer. In fact the more reviewers, the better.
-2.  Final review by a committer. Committers are the most senior members of a community and it's a formal status. The list of committers: [](https://wiki.postgresql.org/wiki/Committers)<https://wiki.postgresql.org/wiki/Committers> As a result a committer can commit it or push back to "Waiting on author", or "Need review".
+1.  Preliminary review. It could be done by anyone (including you). A detailed guide on how to do this [https://wiki.postgresql.org/wiki/Reviewing_a_Patch](https://wiki.postgresql.org/wiki/Reviewing_a_Patch) If there are no doubts reviewer sets the status to "Ready for committer". If the patch needs some changes a reviewer can set "Waiting on author". Reviewers can leave a favorable review but that's only a signal. After other reviewers join the conversation, if there are no objections then one of them will make it "Ready for committer". It's pretty normal if there is more than one reviewer. In fact the more reviewers, the better.
+2.  Final review by a committer. Committers are the most senior members of a community and it's a formal status. The list of committers: [https://wiki.postgresql.org/wiki/Committers](https://wiki.postgresql.org/wiki/Committers) As a result a committer can commit it or push back to "Waiting on author", or "Need review".
 
 The time and attention of committers are limited, which is why there is a two-step process. Some patches that pass the initial review won't receive reviewers' attention. In that case, they will be transferred to the next commitfest automatically.
 
@@ -138,7 +138,7 @@ For that reason, the March Commitfest takes **10-15 days longer** than the usual
 
 ## Important tips
 
--   If you want to discuss something with hackers without a thread overhead (which makes it more difficult to read by other hackers) you can wipe out <pgsql-hackers@postgresql.org> from the reply list and leave only the participants you want. If you do this, you should add `[offlist]` to the message subject to prevent confusion.
+-   If you want to discuss something with hackers without a thread overhead (which makes it more difficult to read by other hackers) you can wipe out pgsql-hackers@postgresql.org from the reply list and leave only the participants you want. If you do this, you should add `[offlist]` to the message subject to prevent confusion.
 -   The hackers mail list receives *a lot* of messages. It's advisable to set up mail filtering so that hackers' messages are sorted into separate places and shown as threads. But ensure that all messages that contain **your address** will NOT go into this place so that you can read all answers to your proposal among your prioritized emails.
 -   Patches that need minor rework like rebase or comments refine are pushed back to "Waiting on author". Therefore, almost-ready patch very often stall, waiting for a new review, during which it will need another rebase and it goes into a vicious circle. If you are certain that the change is minor and doesn't affect functionality, you can return the patch to the same state it had before (if it was "Ready-for-committer" it should be ready for committer even after rebase). It's good manners to mention this change in a hacker's thread to remove suspicions that you want to hijack the patch status.
 
