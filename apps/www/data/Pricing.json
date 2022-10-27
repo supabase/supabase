@@ -234,7 +234,7 @@
   },
   "realtime": {
     "title": "Realtime",
-    "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
+    "icon": "M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59",
     "features": [
       {
         "title": "Concurrent Peak Connections",
@@ -373,8 +373,8 @@
         "tooltip": "Contact us to access this feature",
         "tiers": {
           "free": false,
-          "pro": true,
-          "enterprise": true
+          "pro": "$10 per domain per month per project add on",
+          "enterprise": "1 included, additional custom domains $10 per custom domain per month. Volume discounts available. "
         }
       }
     ]
