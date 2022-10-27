@@ -18,6 +18,10 @@ export function getPageType(asPath: string) {
     page = 'reference/api'
   } else if (asPath.includes('/reference/cli')) {
     page = 'reference/cli'
+  } else if (asPath.includes('/reference/auth')) {
+    page = 'reference/auth'
+  } else if (asPath.includes('/reference/storage')) {
+    page = 'reference/storage'
   } else if (asPath.includes('/reference')) {
     page = 'reference'
   } else {
