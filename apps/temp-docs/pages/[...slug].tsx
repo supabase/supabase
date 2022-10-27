@@ -1,11 +1,12 @@
+import { MDXProvider } from '@mdx-js/react'
+import { useRouter } from 'next/router'
+import { MDXRemote } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
+import components from '../components/index'
+import { menuItems } from '../components/Navigation/Nav.constants'
+import { getPageType } from '../lib/helpers'
 import { getAllDocs, getDocsBySlug } from '../lib/docs'
 import Layout from '~/layouts/Default'
-import { serialize } from 'next-mdx-remote/serialize'
-import { MDXRemote } from 'next-mdx-remote'
-import { MDXProvider } from '@mdx-js/react'
-import components from '../components/index'
-import { menuItems } from '../components/nav/Nav.constants'
-import { useRouter } from 'next/router'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -19,24 +20,9 @@ interface Meta {
 
 export default function Doc({ meta, content, toc }: { meta: Meta; content: any; toc: any }) {
   const { asPath } = useRouter()
+  const page = getPageType(asPath)
 
-  console.log('[slug]', { meta })
-
-  // get the current kind of page
-  let page
-  switch (asPath) {
-    case '/guides':
-    case '/guides/local-development':
-    case /\/guides\/[a-zA-Z]*\/[a-zA-Z\-]*/.test(asPath) && asPath:
-      page = 'Docs'
-      break
-    case asPath.includes('/reference') && asPath:
-      page = 'Reference'
-      break
-    default:
-      page = 'Docs'
-      break
-  }
+  console.log('[slug]', { meta, asPath, page })
 
   return (
     // @ts-ignore

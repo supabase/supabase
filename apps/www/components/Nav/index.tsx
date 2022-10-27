@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
-import { Button, Badge, IconStar, IconChevronDown } from '@supabase/ui'
+import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -153,10 +153,10 @@ const Nav = () => {
     <div
       className={
         `
-        text-scale-1200 hover:text-brand-900 
-        inline-flex cursor-pointer items-center 
-        border-b-2 
-        border-transparent 
+        text-scale-1200 hover:text-brand-900
+        inline-flex cursor-pointer items-center
+        border-b-2
+        border-transparent
         px-1
         text-sm font-medium
         transition-colors
@@ -247,15 +247,15 @@ const Nav = () => {
                   icon={
                     <div className="text-brand-800 flex h-4  w-4 items-center justify-center">
                       <div
-                        className="text-scale-900 flex h-3 w-3 items-center justify-center 
-                      
-                      transition-all  
-                      group-hover:h-4 
-                      group-hover:w-4 
-                      group-hover:text-yellow-900  
-                      group-focus:h-4 
-                      group-focus:w-4 
-                      
+                        className="text-scale-900 flex h-3 w-3 items-center justify-center
+
+                      transition-all
+                      group-hover:h-4
+                      group-hover:w-4
+                      group-hover:text-yellow-900
+                      group-focus:h-4
+                      group-focus:w-4
+
                       group-focus:text-yellow-900"
                       >
                         <IconStar strokeWidth={2} />
