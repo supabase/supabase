@@ -378,7 +378,7 @@ const userListener = supabase.from('users')
 <TabItem value="2.x">
 
 ```ts
-const userListener = supabase.channel('public:user')
+const userListener = supabase.channel('all-users-changes')
   .on(
     'postgres_changes',
     { event: '*', schema: 'public', table: 'user' },
@@ -409,6 +409,35 @@ userListener.unsubscribe()
 
 ```ts
 supabase.removeChannel(userListener)
+```
+</TabItem>
+</Tabs>
+
+#### onOpen
+
+<Tabs
+  groupId="version"
+  values={[
+    {label: 'Before', value: '1.x'},
+    {label: 'After', value: '2.x'},
+  ]}>
+
+<TabItem value="1.x">
+
+```ts
+supabase.realtime.onOpen(() => console.log('Connected to socket'))
+```
+</TabItem>
+
+<TabItem value="2.x">
+
+```ts
+supabase.channel('any')
+  .subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      console.log('Connected to channel')
+    }
+  })
 ```
 </TabItem>
 </Tabs>
