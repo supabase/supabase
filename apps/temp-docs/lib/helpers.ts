@@ -6,18 +6,22 @@ export function getPageType(asPath: string) {
 
   if (asPath.includes('/guides')) {
     page = 'docs'
-  } else if (asPath.includes('/reference/javascript')) {
-    page = 'reference/javascript'
   } else if (asPath.includes('/reference/javascript/v1')) {
     page = 'reference/javascript/v1'
-  } else if (asPath.includes('/reference/dart')) {
-    page = 'reference/dart'
+  } else if (asPath.includes('/reference/javascript')) {
+    page = 'reference/javascript'
   } else if (asPath.includes('/reference/dart/v0')) {
     page = 'reference/dart/v0'
+  } else if (asPath.includes('/reference/dart')) {
+    page = 'reference/dart'
   } else if (asPath.includes('/reference/api')) {
     page = 'reference/api'
   } else if (asPath.includes('/reference/cli')) {
     page = 'reference/cli'
+  } else if (asPath.includes('/reference/auth')) {
+    page = 'reference/auth'
+  } else if (asPath.includes('/reference/storage')) {
+    page = 'reference/storage'
   } else if (asPath.includes('/reference')) {
     page = 'reference'
   } else {
