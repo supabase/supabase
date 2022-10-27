@@ -7,6 +7,7 @@
     "build": "npm run generate:all && next build",
     "start": "next start",
     "lint": "next lint",
+    "postbuild": "node ./scripts/build-search.js",
     "generate:all": "npm-run-all --parallel gen:api gen:cli gen:gotrue gen:storage gen:supabase-dart:v0 gen:supabase-dart:v1 gen:supabase-js:v1 gen:supabase-js:v2",
     "gen:api": "npm-run-all gen:api:usage",
     "gen:api:usage": "ts-node ./generator/index.ts gen --type api --url https://api.supabase.com --input ../../spec/transforms/api_v0_openapi_deparsed.json --output  ./docs/reference/api/generated/usage.mdx",
@@ -29,6 +30,8 @@
     "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./docs/reference/javascript/generated"
   },
   "dependencies": {
+    "@algolia/autocomplete-js": "^1.7.2",
+    "@algolia/autocomplete-theme-classic": "^1.7.2",
     "@apollo/client": "^3.6.6",
     "@docsearch/react": "1.0.0-alpha.27",
     "@mdx-js/loader": "^1.6.22",
@@ -36,9 +39,11 @@
     "@next/mdx": "^12.0.4",
     "@radix-ui/react-accordion": "^1.0.1",
     "@tailwindcss/typography": "^0.4.1",
+    "algoliasearch": "^4.14.2",
     "babel": "^6.23.0",
     "common": "*",
     "config": "*",
+    "dotenv": "^16.0.3",
     "graphql": "^16.5.0",
     "gray-matter": "^4.0.3",
     "jsrsasign": "^10.5.26",
