@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Input, Modal, Form, Button, Badge, IconList } from 'ui'
+import { Input, Modal, Form, Button } from 'ui'
 
 import { useProjectSubscription, useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
@@ -25,9 +25,7 @@ import {
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { StripeProduct } from 'components/interfaces/Billing'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
