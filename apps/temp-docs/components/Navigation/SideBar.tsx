@@ -2,7 +2,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
-import { NavMenuGroup, NavMenuSection } from './Nav.constants'
+import { REFERENCES } from './Navigation.constants'
+import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
 
 const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
@@ -10,13 +11,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
   const pathSegments = asPath.split('/')
 
   const isInReferencePages = pathSegments.includes('reference') && pathSegments.length >= 3
-  const references = {
-    javascript: { name: 'supabase-js', icon: '/docs/img/libraries/javascript-icon.svg' },
-    dart: { name: 'Flutter', icon: '/docs/img/libraries/dart-icon.svg' },
-    cli: { name: 'CLI', icon: '/docs/img/libraries/cli-icon.svg' },
-    api: { name: 'API', icon: '/docs/img/libraries/api-icon.svg' },
-  }
-  const referenceMeta = pathSegments.length >= 3 ? references[pathSegments[2]] : undefined
+  const referenceMeta = pathSegments.length >= 3 ? REFERENCES[pathSegments[2]] : undefined
 
   const currentSection: NavMenuGroup = menuItems.find((group) => {
     const foundItem = group.items.find((section) => {
@@ -44,8 +39,6 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
           }
         })
       : undefined
-
-  console.log({ currentSection, currentSubSection })
 
   return (
     <div
@@ -80,6 +73,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
       )}
       {menuItems.length === 1 ? (
         <div className="my-2">
+          <h4 className="text-scale-1200 pt-2 pb-3">{menuItems[0].label}</h4>
           {menuItems[0].items.map((item) => (
             <Link href={item.url}>
               <a>
