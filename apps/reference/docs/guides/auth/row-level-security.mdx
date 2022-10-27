@@ -49,42 +49,6 @@ Returns the ID of the user making the request.
 
 Returns the JWT of the user making the request.
 
-### `auth.role()`
-
-:::caution
-
-Deprecated
-
-:::
-
-The `auth.role()` function has been deprecated in favour of using the `TO` field, natively supported within Postgres.
-
-```sql
--- DEPRECATED
-create policy "Public profiles are viewable by everyone."
-on profiles for select using (
-  auth.role() = 'authenticated' or auth.role() = 'anon'
-);
-
--- RECOMMENDED
-create policy "Public profiles are viewable by everyone."
-on profiles for select
-to authenticated, anon
-using (
-  true
-);
-```
-
-### `auth.email()`
-
-:::caution
-
-Deprecated. Use `auth.jwt() ->> 'email'` instead.
-
-:::
-
-Returns the email of the user making the request.
-
 ## Examples
 
 Here are some examples to show you the power of PostgreSQL's RLS.
@@ -361,3 +325,41 @@ Tip: Make sure to enable RLS for all your tables, so that your tables are inacce
 
 Supabase provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
+
+## Deprecated features
+
+We have deprecate some functions to ensure better performance and extensibilty of RLS policies.
+
+### `auth.role()`
+
+:::caution
+
+Deprecated: The `auth.role()` function has been deprecated in favour of using the `TO` field, natively supported within Postgres.
+
+:::
+
+```sql
+-- DEPRECATED
+create policy "Public profiles are viewable by everyone."
+on profiles for select using (
+  auth.role() = 'authenticated' or auth.role() = 'anon'
+);
+
+-- RECOMMENDED
+create policy "Public profiles are viewable by everyone."
+on profiles for select
+to authenticated, anon
+using (
+  true
+);
+```
+
+### `auth.email()`
+
+:::caution
+
+Deprecated. Use `auth.jwt() ->> 'email'` instead.
+
+:::
+
+Returns the email of the user making the request.
