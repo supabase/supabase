@@ -22,7 +22,6 @@ export default function ContentsLayout({ context }: any) {
           menuItems[page]
         }
         currentPage={page}
-        versions={[]}
       >
         <MDXProvider components={getComponents(context.type)}>
           <div className="prose max-w-none">{context.children}</div>
