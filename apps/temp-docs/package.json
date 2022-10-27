@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "next build",
+    "build": "npm run generate:all && next build",
     "start": "next start",
     "lint": "next lint",
     "generate:all": "npm-run-all --parallel gen:api gen:cli gen:gotrue gen:storage gen:supabase-dart:v0 gen:supabase-dart:v1 gen:supabase-js:v1 gen:supabase-js:v2",
