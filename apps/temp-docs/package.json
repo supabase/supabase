@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "next build",
+    "build": "npm run generate:all && next build",
     "start": "next start",
     "lint": "next lint",
 
@@ -29,7 +29,7 @@
     "gen:supabase-dart:v0:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_dart_v0.yml --output ./docs/reference/dart/v0/generated",
     "gen:supabase-dart:v1": "npm-run-all gen:supabase-dart:v1:ref",
     "gen:supabase-dart:v1:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_dart_v1.yml --output ./docs/reference/dart/generated",
-    
+
     "gen:supabase-js:v1": "npm-run-all gen:supabase-js:v1:ref",
     "gen:supabase-js:v1:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v1.yml --output ./docs/reference/javascript/v1/generated",
     "gen:supabase-js:v2": "npm-run-all gen:supabase-js:v2:ref",
