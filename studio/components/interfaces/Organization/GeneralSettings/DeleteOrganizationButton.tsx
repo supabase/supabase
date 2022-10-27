@@ -105,7 +105,7 @@ const DeleteOrganizationButton = observer(() => {
                   }
                   onChange={(e) => setValue(e.target.value)}
                   value={value}
-                  placeholder="Type in the orgnaization name"
+                  placeholder="Enter the string above"
                   className="w-full"
                 />
               </Modal.Content>
