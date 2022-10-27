@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const contributor_res = await fetch('https://api.github.com/repos/supabase/supabase/contributors')
   const contributor_arr = await contributor_res.json()
 
-  const contributor_data = contributor_arr.filter((object) => {
+  const contributor_data = contributor_arr.filter((object: any) => {
     return (
       object.login !== 'saltcod' &&
       object.login !== 'inian' &&
