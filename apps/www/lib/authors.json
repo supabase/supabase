@@ -221,5 +221,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/burggraf",
     "author_image_url": "https://github.com/burggraf.png"
+  },
+  {
+    "author_id": "pavel",
+    "author": "Pavel Borisov",
+    "username": "pavel",
+    "position": "Postgres Engineer",
+    "author_url": "https://github.com/pashkinelfe",
+    "author_image_url": "https://avatars.githubusercontent.com/u/63344111?v=4"
   }
 ]
