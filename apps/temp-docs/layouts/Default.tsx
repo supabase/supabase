@@ -3,6 +3,7 @@ import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
+import { Modal } from 'ui'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
