@@ -73,6 +73,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
       )}
       {menuItems.length === 1 ? (
         <div className="my-2">
+          <h4 className="text-scale-1200 pt-2 pb-3">{menuItems[0].label}</h4>
           {menuItems[0].items.map((item) => (
             <Link href={item.url}>
               <a>
