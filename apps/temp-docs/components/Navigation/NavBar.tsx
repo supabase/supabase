@@ -4,19 +4,23 @@ import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
 import { IconMenu, IconSearch, Input, IconCommand, Button, IconMoon, IconSun, Listbox } from 'ui'
 import { useTheme } from '../Providers'
+import { REFERENCES } from './Navigation.constants'
 
 interface Props {
   currentPage: string
-  versions: string[]
 }
 
-const NavBar: FC<Props> = ({ currentPage, versions }) => {
+const NavBar: FC<Props> = ({ currentPage }) => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   const { asPath, push } = useRouter()
   const pathSegments = asPath.split('/')
+
   const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
+  const libraryMeta = REFERENCES?.[library] ?? undefined
+  const versions = libraryMeta?.versions ?? []
+
   const version = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
     ? pathSegments[pathSegments.indexOf(library) + 1]
     : versions[0]

@@ -63,19 +63,6 @@ export function getAllDocs() {
   return docs
 }
 
-export function getLibraryVersions(slug: string) {
-  const paths = slug.split('/')
-  if (paths.includes('reference') && paths.length >= 3) {
-    const reference = REFERENCES[paths[2]]
-    if (reference?.library !== undefined) {
-      const path = `data/nav/${reference.library}`
-      const list = fs.readdirSync(path).map((file) => file.split('.')[0])
-      return list.reverse()
-    }
-  }
-  return []
-}
-
 function walk(dir: string) {
   let results: string[] = []
   const list = fs.readdirSync(dir)
@@ -91,4 +78,19 @@ function walk(dir: string) {
     })
   })
   return results
+}
+
+// [Joshen] Initially tried to simplify the NavBar versioning by reading the directory
+// but caused some issues on Vercel. Just gonna park this for now.
+export function getLibraryVersions(slug: string) {
+  const paths = slug.split('/')
+  if (paths.includes('reference') && paths.length >= 3) {
+    const reference = REFERENCES[paths[2]]
+    if (reference?.library !== undefined) {
+      const path = `data/nav/${reference.library}`
+      const list = fs.readdirSync(path).map((file) => file.split('.')[0])
+      return list.reverse()
+    }
+  }
+  return []
 }

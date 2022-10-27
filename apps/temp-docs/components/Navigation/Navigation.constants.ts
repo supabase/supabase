@@ -13,21 +13,25 @@ export const REFERENCES: References = {
   javascript: {
     name: 'supabase-js',
     library: 'supabase-js',
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/javascript-icon.svg',
   },
   dart: {
     name: 'Flutter',
     library: 'supabase-dart',
+    versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/dart-icon.svg',
   },
   cli: {
     name: 'CLI',
     library: undefined,
+    versions: [],
     icon: '/docs/img/libraries/cli-icon.svg',
   },
   api: {
     name: 'API',
     library: undefined,
+    versions: [],
     icon: '/docs/img/libraries/api-icon.svg',
   },
 }

@@ -10,17 +10,9 @@ interface Props {
   toc?: any
   menuItems: any
   currentPage: string
-  versions: string[]
 }
 
-const Layout: FC<Props> = ({
-  meta,
-  children,
-  toc,
-  menuItems,
-  currentPage,
-  versions = ['v2', 'v1'],
-}) => {
+const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -53,7 +45,7 @@ const Layout: FC<Props> = ({
       </Head>
 
       <main>
-        <NavBar currentPage={currentPage} versions={versions} />
+        <NavBar currentPage={currentPage} />
         <div className="flex w-full flex-row">
           <SideBar menuItems={menuItems} />
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
