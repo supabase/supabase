@@ -2,7 +2,7 @@ import { MDXProvider } from '@mdx-js/react'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components'
-import { menuItems } from '~/components/Navigation/Nav.constants'
+import { menuItems } from '~/components/Navigation/Navigation.constants'
 
 import Layout from '~/layouts/Default'
 import { getDocsBySlug } from '../lib/docs'
@@ -15,7 +15,7 @@ export default function Home({
 }) {
   console.log({ menuItems }, 'index')
   return (
-    <Layout meta={meta} menuItems={menuItems['docs']} currentPage="docs">
+    <Layout meta={meta} menuItems={menuItems['docs']} currentPage="docs" versions={[]}>
       <MDXProvider components={components}>
         <MDXRemote {...content} />
       </MDXProvider>

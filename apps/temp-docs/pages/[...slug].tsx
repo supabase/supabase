@@ -3,9 +3,9 @@ import { useRouter } from 'next/router'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '../components/index'
-import { menuItems } from '../components/Navigation/Nav.constants'
+import { menuItems } from '../components/Navigation/Navigation.constants'
 import { getPageType } from '../lib/helpers'
-import { getAllDocs, getDocsBySlug } from '../lib/docs'
+import { getAllDocs, getDocsBySlug, getLibraryVersions } from '../lib/docs'
 import Layout from '~/layouts/Default'
 
 // table of contents extractor
@@ -18,15 +18,29 @@ interface Meta {
   hide_table_of_contents: boolean
 }
 
-export default function Doc({ meta, content, toc }: { meta: Meta; content: any; toc: any }) {
+export default function Doc({
+  meta,
+  content,
+  versions,
+  toc,
+}: {
+  meta: Meta
+  content: any
+  versions: string[]
+  toc: any
+}) {
   const { asPath } = useRouter()
   const page = getPageType(asPath)
 
-  console.log('[slug]', { meta, asPath, page })
-
   return (
     // @ts-ignore
-    <Layout meta={meta} toc={toc} menuItems={menuItems[page]} currentPage={page}>
+    <Layout
+      meta={meta}
+      toc={toc}
+      menuItems={menuItems[page]}
+      currentPage={page}
+      versions={versions}
+    >
       <MDXProvider components={components}>
         <MDXRemote {...content} components={components} />
       </MDXProvider>
@@ -44,13 +58,14 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   }
 
   let doc = getDocsBySlug(slug)
-
   const content = await serialize(doc.content || '')
+  const versions = getLibraryVersions(slug)
 
   return {
     props: {
       ...doc,
       content,
+      versions,
       toc: toc(doc.content, { maxdepth: 2 }),
     },
   }

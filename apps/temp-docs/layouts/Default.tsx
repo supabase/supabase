@@ -1,22 +1,19 @@
-import { useEffect } from 'react'
+import { useEffect, FC } from 'react'
 import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
 
-const Layout = ({
-  meta,
-  children,
-  toc,
-  menuItems,
-  currentPage,
-}: {
-  meta: { title: string; description: string; hide_table_of_contents?: boolean }
+interface Props {
+  meta: { title: string; description?: string; hide_table_of_contents?: boolean }
   children: any
   toc?: any
   menuItems: any
   currentPage: string
-}) => {
+  versions: string[]
+}
+
+const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage, versions }) => {
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -27,7 +24,7 @@ const Layout = ({
     }
   }, [])
 
-  console.log('default', currentPage)
+  console.log('Default:Layout', { currentPage })
 
   return (
     <>
@@ -49,7 +46,7 @@ const Layout = ({
       </Head>
 
       <main>
-        <NavBar currentPage={currentPage} />
+        <NavBar currentPage={currentPage} versions={versions} />
         <div className="flex w-full flex-row">
           <SideBar menuItems={menuItems} />
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
