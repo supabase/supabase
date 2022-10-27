@@ -12,7 +12,6 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
 
   return [
     {
-      title: 'Database',
       items: [
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
         {
