@@ -20,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  width: fit-content;
 }
 
 body {
