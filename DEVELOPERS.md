@@ -163,7 +163,7 @@ Did you have an issue, like a merge conflict, or don't know how to open a pull r
 
 ### Add a redirect
 
-Create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
+Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
 
 ## Monorepo
 
