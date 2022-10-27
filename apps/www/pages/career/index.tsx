@@ -72,14 +72,14 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
         <div className="text-scale-1200">
           <div className="container relative mx-auto px-6 py-10 lg:pt-12 lg:px-16 xl:px-20 text-center space-y-4">
             <span className="text-sm text-brand-900 md:text-base">Careers</span>
-            <h1 className="text-3xl md:text-4xl xl:text-5xl">
-              Help build software developers love
+            <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-3xl lg:mx-auto">
+              Help us build the best developer platform in the world
             </h1>
             <p className="text-sm md:text-base text-scale-1000 max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-              Explore remote opportunities and join our mission to help devs streamline the creation
-              of modern apps
+              Explore remote opportunities and join our mission to become the world's most
+              productive developer platform.
             </p>
-            <Button>Open positions</Button>
+            <Button className="text-white xl:text-sm">Open positions</Button>
           </div>
 
           <SectionContainer>
@@ -112,14 +112,13 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     We work together, wherever we are
                   </h1>
                   <p className="text-scale-1100 mt-4 text-xs sm:text-sm lg:text-base md:w-5/6 lg:w-full">
-                    We're 100% remote, globally distributed team. Working with a globally
-                    distributed team can be challenging and rewarding. We have employees all over
-                    the world, spanning 20 countries so we use tools like Notion, Slack, and Discord
-                    to stay connected to our team, and our community.
+                    Working in a globally distributed team is rewarding but has its challenges. We
+                    are across many different timezones, so we use tools like Notion, Slack, and
+                    Discord to stay connected to our team, and our community.
                   </p>
-                  <div className="max-w-[300px] sm:max-w-md lg:max-w-sm mt-20">
+                  <div className="max-w-[300px] sm:max-w-md lg:max-w-md mt-20">
                     <div className="border-t-2 border-brand-900 w-4/12"></div>
-                    <h1 className="text-2xl sm:text-3xl pt-2">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl pt-2">
                       We deeply believe in the efficacy of collaborative open source
                     </h1>
                   </div>
@@ -134,8 +133,8 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     <h1 className="text-2xl sm:text-3xl xl:text-4xl">What is Supabase</h1>
                     <p className="text-scale-1100 text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
                       Supabase is an open source Firebase alternative, built by developers for
-                      developers. Supabase adds auth, realtime, storage, restful APIs and edge
-                      functions to Postgres without a single line of code. Supabase was born-remote.
+                      developers. Supabase adds auth, realtime, storage, restful APIs, and edge
+                      functions to Postgres without a single line of code. Supabase was orn-remote.
                       Having a globally distributed, open source company is our secret weapon to
                       hiring top-tier talent.
                     </p>
@@ -215,8 +214,8 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                         <div className="w-12 h-12 sm:w-10 sm:h-10 bg-brand-700 rounded-md flex justify-center">
                           <img className="rounded-md" src={human.icon} width="75%" height="75%" />
                         </div>
-                        <div className="sm:max-w-[120px] md:max-w-[150px] xl:max-w-none">
-                          <h2 className="text-sm md:text-md xl:text-xl md:pt-4 lg:pt-0">
+                        <div className="sm:max-w-[120px] md:max-w-[150px] lg:max-w-[230px]">
+                          <h2 className="text-sm md:text-md xl:text-lg md:pt-4 lg:pt-0">
                             {human.title}
                           </h2>
                           <p className="text-scale-1100 text-xs lg:text-base">{human.text}</p>
@@ -233,11 +232,11 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                 <h1 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto">
                   1,000 + Contributors building Supabase
                 </h1>
-                <p className="text-scale-1100 text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-xl mx-auto pt-3">
-                  Just as versatile as our platform, we're building a community of communities,
-                  bringing together developers from many different backgrounds, as well as new
-                  developers looking to get involved with open source. We love celebrating everyone
-                  who contributes their time to the Supabase mission.
+                <p className="text-scale-1100 text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
+                  We're building a community of communities, bringing together developers from many
+                  different backgrounds, t woll as new developers looking to get involved with open
+                  source. We love celebrating everyone who contributes their time to the Supabase
+                  mission. to
                 </p>
               </div>
               <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
@@ -288,12 +287,6 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                 <h1 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-none">
                   Great people deserve great benefits
                 </h1>
-                <p className="text-scale-1100 text-xs sm:max-w-md md:w-3/4 lg:w-3/5 xl:w-full sm:text-sm lg:text-base lg:max-w-xl pt-3">
-                  We offer competitive and comprehensive benefits, though lots of companies can
-                  offer you those. We also have a rarer opportunity: The impact you can make from
-                  being at a nimble startup, working on a platform that operates at a significant
-                  (and quickly growing) scale.
-                </p>
               </div>
               <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-6">
                 {career.benefits.map(
@@ -319,58 +312,12 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
           </SectionContainer>
 
           <SectionContainer>
-            <div className="max-w-md md:w-3/4 lg:w-1/2 xl:w-full xl:max-w-xl">
-              <h1 className="text-2xl sm:text-3xl xl:text-4xl">Open positions</h1>
-              <p className="text-xs sm:text-sm lg:text-base text-scale-1100 pt-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-              </p>
-            </div>
-            <div className="mt-10 space-y-6">
-              {job_data.jobs.map(
-                (
-                  job: {
-                    title: string
-                    location: any
-                    employment: string
-                    description: string
-                    absolute_url: string
-                  },
-                  i: number
-                ) => {
-                  return (
-                    <div className="cursor-pointer md:cursor-default" key={i}>
-                      <Link href={job.absolute_url}>
-                        <div className="text-xs bg-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center">
-                          <h2 className="text-2xl min-w-[316px] mr-6">{job.title}</h2>
-                          <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
-                            <div className="flex items-center space-x-4">
-                              <Badge className="rounded-md flex items-center lg:text-sm">
-                                <img src="/images/career/icon/globe.svg" />
-                                <span className="ml-1">{job.location.name}</span>
-                              </Badge>
-                              <span className="hidden md:block">{job.employment}</span>
-                            </div>
-                            <p className="hidden lg:block lg:text-sm">{job.description}</p>
-                            <Button>Apply for position</Button>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  )
-                }
-              )}
-            </div>
-          </SectionContainer>
-
-          <SectionContainer>
             <div className="text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
               <h1 className="text-2xl sm:text-3xl xl:text-4xl">How we hire</h1>
               <p className="text-xs sm:text-sm lg:text-base text-scale-1100 pt-3">
-                The entire process is fully remote and all communication happen over email or via
+                The entire process is fully remote and all communication happens over email or via
                 video chat in Google. Meet. The calls are all 1:1 and usually take between 20-45
-                minutes. We know you are interviewing us too, SO please ask questions. We are happy
+                minutes. We know you are interviewing us too, so please ask questions. We are happy
                 to answer.
               </p>
             </div>
@@ -401,6 +348,45 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
               <h3 className="bg-brand-700 border-2 border-brand-900 text-brand-900 text-xl w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
                 <IconCheck />
               </h3>
+            </div>
+          </SectionContainer>
+
+          <SectionContainer>
+            <h1 className="text-2xl sm:text-3xl xl:text-4xl">Open positions</h1>
+            <div className="mt-10 space-y-6">
+              {job_data.jobs.map(
+                (
+                  job: {
+                    title: string
+                    location: any
+                    employment: string
+                    description: string
+                    absolute_url: string
+                  },
+                  i: number
+                ) => {
+                  return (
+                    <div className="cursor-pointer md:cursor-default" key={i}>
+                      <Link href={job.absolute_url}>
+                        <div className="text-xs bg-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center">
+                          <h2 className="text-2xl min-w-[316px] mr-6">{job.title}</h2>
+                          <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
+                            <div className="flex items-center space-x-4">
+                              <Badge className="rounded-md flex items-center lg:text-sm">
+                                <img src="/images/career/icon/globe.svg" />
+                                <span className="ml-1">{job.location.name}</span>
+                              </Badge>
+                              <span className="hidden md:block">{job.employment}</span>
+                            </div>
+                            <p className="hidden lg:block lg:text-sm">{job.description}</p>
+                            <Button className="text-white">Apply for position</Button>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  )
+                }
+              )}
             </div>
           </SectionContainer>
         </div>

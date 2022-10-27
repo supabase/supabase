@@ -9,76 +9,75 @@
       "text": "languages spoken"
     },
     {
+      "number": "$116M",
+      "text": "in funding"
+    },
+    {
       "number": "8500+",
       "text": "community members"
     },
     {
-      "number": "$116M",
-      "text": "in funding"
+      "number": "1000+",
+      "text": "memes posted\n\n(and counting)"
     }
   ],
   "humanPowered": [
     {
       "icon": "/images/career/icon/supabase.svg",
-      "title": "Time to value",
-      "text": "Delight the user as fast as we can."
+      "title": "Egoless",
+      "text": "Willing to do the schlep, the team goals come first."
     },
     {
       "icon": "/images/career/icon/eye.svg",
-      "title": "Curious mindset",
-      "text": "Broad skillsets. Growth mindset"
+      "title": "Polyglot",
+      "text": "Broad skillets. Growth mindset."
     },
     {
       "icon": "/images/career/icon/kaizen.svg",
-      "title": "Stoic during a crisis",
-      "text": "Like air traffic control."
+      "title": "Process Driven",
+      "text": "Engineer yourself out of the job."
     },
     {
       "icon": "/images/career/icon/control.svg",
-      "title": "Kaizen",
-      "text": "Continuous improvement."
+      "title": "Intellectual Honesty",
+      "text": "Put our own biases aside."
+    },
+    {
+      "icon": "/images/career/icon/control.svg",
+      "title": "Kaizen mindset",
+      "text": "Continuously improve all functions."
     }
   ],
   "benefits": [
     {
       "icon": "",
       "title": "Fully Remote",
-      "text": "Supabase is 100% remote company. We hire globally. We believe you can do your best work from anywhere. There are no Supabase offices, but we provide a WeWork membership if you need it."
+      "text": "We hire globally. We believe you can do your best work from anywhere. There are no Supabase offices, but we provide a co-working membership that you can use anywhere in the world."
     },
     {
       "icon": "",
-      "title": "Flexible Time-off",
-      "text": "Prioritize doing the things you love outside of work. We have a generous time off policy to allow you to take time away from work when you need it."
+      "title": "Hardware Budget",
+      "text": "Use this budget for anything you need to set up your work environment from tech to office setup."
     },
     {
       "icon": "",
-      "title": "Open Source",
-      "text": "Open Source is core to our culture. We deeply believe in the efficacy of collaboration, and support existing communities and tools before developing anything ourselves. [Read more about our Open Source](https://supabase.com/docs/oss)"
+      "title": "Health Benefits",
+      "text": "We provide 100% health coverage for employees and 80% for dependants. It's important to us that you & your family have health care covered."
     },
     {
       "icon": "",
-      "title": "Work from home budget",
-      "text": "We provide everyone with a tech allowance every 3 years. This can be spent on anything needed to set up your work environment."
+      "title": "Annual Off-Sites",
+      "text": "We believe in the value of in-person time, so we all come together annually for a week. Each year we pick somewhere different in the world. It's a highlight of the year!"
     },
     {
       "icon": "",
-      "title": "Health benefits",
-      "text": "100% health coverage for employees and 80% for dependants. It's important to us that you & your family have health care covered."
-    },
-    {
-      "icon": "",
-      "title": "Annual off-sites",
-      "text": "We believe in the value of in-person time. We come together for one week a year to connect and each time we pick a different location. You can still make it to our next off-site at Bali."
-    },
-    {
-      "icon": "",
-      "title": "Work Flexibly",
-      "text": "Set your own schedule to keep your personal and professional worlds perfectly in sync. We work in teams, but we work asynchronous. You know what you need to do and when it needs to be done."
+      "title": "Flexible Work",
+      "text": "Work remotely from anywhere in the world. We work in teams, but we work asynchronously. You know what you need to do and when it needs to be done."
     },
     {
       "icon": "",
       "title": "Professional Development",
-      "text": "We provide everyone an annual allowance to spend on professional development and education. Use this for courses, books or anything that supports your continued learning."
+      "text": "An annual allowance to spend on professional development and education. Use this for courses, books, conferences, or anything that supports your continuous learning."
     }
   ],
   "positions": [
@@ -113,15 +112,15 @@
       "text": "Chat with our recruiter to tell us about your career journey, professional goals and we'll share more about Supabase, the role & our recruitment process."
     },
     {
-      "title": "Technical/skilled-based interview",
+      "title": "Technical / Skill-based Interview",
       "text": "Meet with the team lead. In this interview we'll aim to learn about your hard skills and problem solving approach."
     },
     {
-      "title": "technical/skilled-based interview #2",
+      "title": "Another Technical / Skill-based Interview",
       "text": "You'll either meet the department lead or peer. This interview will dive deeper into your hard skills and our expectations for this role."
     },
     {
-      "title": "Final interview",
+      "title": "Final Founders Interview",
       "text": "Our co-founders meet every candidate as the final step. Learn more about Supabase's values, mission and vision directly from them."
     }
   ]
