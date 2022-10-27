@@ -5,6 +5,7 @@ import { useState, useEffect, FC } from 'react'
 import { IconMenu, IconSearch, Input, IconCommand, Button, IconMoon, IconSun, Listbox } from 'ui'
 import { useTheme } from '../Providers'
 import { REFERENCES } from './Navigation.constants'
+import Search from './Search'
 
 interface Props {
   currentPage: string
@@ -111,6 +112,9 @@ const NavBar: FC<Props> = ({ currentPage }) => {
           </div>
         )}
       </div>
+
+      <Search />
+
       <div className="flex items-center space-x-4">
         <div className="hidden items-center md:flex">
           <ul className="flex items-center">
