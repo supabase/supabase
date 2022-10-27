@@ -357,8 +357,8 @@
         "tooltip": "We currently screen vanity URLs to ensure they are non-offensive. Please email growth@supabase.io with your project details to request your vanity URL. We process requests in batches once every 14 days.",
         "tiers": {
           "free": false,
-          "pro": "$10 per custom domain",
-          "enterprise": "$10 per custom domain"
+          "pro": true,
+          "enterprise": true
         }
       },
       {
@@ -367,7 +367,7 @@
         "tiers": {
           "free": false,
           "pro": "$10 per domain per month per project add on",
-          "enterprise": "1 included, additional custom domains $10 per custom domain per month. Volume discounts available. "
+          "enterprise": "1 included, additional custom domains $10 per custom domain per month. Volume discounts available."
         }
       }
     ]
