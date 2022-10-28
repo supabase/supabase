@@ -140,11 +140,6 @@ h6 { */
   transform-origin: 100% 0;
   transform: skewY(-2deg);
   overflow: hidden;
-  /* transform-origin: var(--sectionTransformOrigin);
-    transform: skewY(var(--sectionAngle));
-    background: var(--backgroundColor);
-    overflow: 
-    hidden; */
 }
 
 .section-container {
@@ -156,7 +151,7 @@ h6 { */
 
 /* Database page */
 
-.dashboard-tabs div[role='seperator'] {
+.dashboard-tabs div[role='separator'] {
   @apply border border-gray-50 dark:border-gray-700;
 }
 

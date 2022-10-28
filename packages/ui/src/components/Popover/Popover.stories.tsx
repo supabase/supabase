@@ -41,7 +41,7 @@ export const Default = (args: any) => (
               descriptionText="Set the width of something"
               layout="horizontal"
             />
-            <Popover.Seperator />
+            <Popover.Separator />
             <Input
               className="px-3"
               size="tiny"
@@ -50,7 +50,7 @@ export const Default = (args: any) => (
               descriptionText="Set the width of something"
               layout="horizontal"
             />
-            <Popover.Seperator />
+            <Popover.Separator />
             <Input
               className="px-3"
               size="tiny"

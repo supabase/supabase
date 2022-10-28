@@ -51,7 +51,7 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
             </div>
           </div>
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <div className="flex justify-between">
             <Button type="default" onClick={() => setShowUpgradePrompt(false)}>

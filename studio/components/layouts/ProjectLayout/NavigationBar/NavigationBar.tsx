@@ -96,7 +96,7 @@ const NavigationBar: FC<Props> = ({}) => {
                       Account Preferences
                     </Dropdown.Item>
                   </Link>
-                  <Dropdown.Seperator />
+                  <Dropdown.Separator />
                 </>
               )}
               <Dropdown.Label>Theme</Dropdown.Label>
