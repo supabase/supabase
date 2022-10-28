@@ -1,45 +1,55 @@
 ---
-id: disk-usage
-title: Disk space usage
-description: Learn how database disk space usage is reported.
+id: database-usage
+title: Database usage
+description: Understanding how database usage applies to your subscription.
 ---
 
-Database disk space usage refers to the _monthly average disk usage_, as reported by Postgres. This metric is reported in your project's [billing page](https://app.supabase.com/project/_/settings/billing) and is updated daily.
+Database storage refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing page](https://app.supabase.com/project/_/settings/billing) and is updated daily.
 
-For an instantaneous live view of the DB disk space being used by your project, you can execute in Postgres:
+For an instantaneous live view of the DB storage usage, you can execute in Postgres:
 
 ```sql
-SELECT SUM(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb FROM pg_database;
+select sum(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb
+from pg_database;
 ```
 
 This value is also reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
 
-## Disk space management
+## Database storage management
 
-Running out of disk space causes the database service to become unresponsive. Operations such as backups and automatic service optimization are also disrupted.
+Your project will be changed to read-only mode once it reaches 95% of your subscrption quota, preventing further writes to your project.
+In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
 
-To prevent this, your project goes into read-only mode once it reaches 95% disk usage, preventing writes to the database. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
+Regular operation (read-write mode) is automatically re-enabled once database storage usage falls under 95%.
 
-Regular operation (read-write mode) is automatically enabled once disk usage falls under 95%.
+If you are on Pro or Enterprise, database storage expands automatically, however you may also encounter this error if fill the database faster than it can expand.
 
-### Increasing available disk space
+Supabase uses network-attached storage, which balances performance with scalability. Pro projects can store up to 1024TB.
+If you intend to grow beyond this, reach out to our team to learn more about our Enterprise tier.
 
-1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing) to increase the amount of available disk space.
+### Increasing available database storage
+
+1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing) to increase your storage quota.
 
 2. Delete data from your project's database to lower its disk usage. If your database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
 
-    ```sql
-    SET default_transaction_read_only = 'off';
-    ```
-    
-    This allows you to delete data from within the session.
+   ```sql
+   SET default_transaction_read_only = 'off';
+   ```
+
+   This allows you to delete data from within the session.
 
 ## Vacuum operations
 
-Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. Instead, they are internally marked as removed until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed. As a result, deleting data from your DB may not immediately reduce the reported disk usage.
+Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. Instead, they are internally marked as removed until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed.
+As a result, deleting data from your database may not immediately reduce the reported disk usage.
 
 :::note
-Vacuum operations can temporarily increase resource utilization, which can adversely impact the observed performance of your project until the maintenance is completed.
+Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed.
 :::
 
-Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant. However, it can be necessary to either [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/) [the autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips), or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations. For example, running a manual vacuum after deleting large amounts of data from your DB could help reduce the reported disk usage by Postgres.
+Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
+However, it can be necessary to either [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/)
+the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips),
+or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
+For example, running a manual vacuum after deleting large amounts of data from your DB could help reduce the reported disk usage by Postgres.
