@@ -1,13 +1,15 @@
 ---
 id: testing
-title: Testing Database
+title: Testing Your Database
 description: Test your database schema, tables, functions, and policies.
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-You can use the Supabase CLI to test your database. Make sure you have [installed the CLI](https://github.com/supabase/cli#getting-started) on your local machine and [linked](https://supabase.com/docs/reference/cli/usage#supabase-link) your Supabase project.
+You can use the Supabase CLI to test your database. To get started:
+
+- [Install the Supabase CLI](/docs/guides/cli) on your local machine
 
 ## Creating a test
 
@@ -25,7 +27,7 @@ touch ./supabase/tests/database/hello_world.test.sql
 
 ## Writing tests
 
-All `sql` files use [pgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) as the test runner.
+All `sql` files use [pgTAP](/docs/guides/database/extensions/pgtap) as the test runner.
 
 Let’s write a simple test to check that our `auth.users` table has an ID column. Open `hello_world.test.sql` and add the following code:
 
