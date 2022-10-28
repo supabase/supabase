@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@nuxtjs/dotenv": "^1.4.1",
-    "@supabase/supabase-js": "^2.0.0-rc.9",
+    "@supabase/supabase-js": "^2.0.0",
     "core-js": "^3.9.1",
     "nuxt": "^2.15.8"
   }
