@@ -612,6 +612,7 @@ pages:
             newEmail: 'new.email@example.com'
           })
 
+          // generate an email change link to be sent to the new email address
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'email_change_new',
             email: 'current.email@example.com',
