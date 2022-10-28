@@ -191,7 +191,7 @@ const sidebars = {
       items: [
         'guides/hosting/platform',
         'guides/platform/custom-domains',
-        'guides/platform/disk-usage',
+        'guides/platform/database-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
         'guides/platform/migrating-and-upgrading-projects',
