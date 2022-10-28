@@ -79,6 +79,7 @@ async function signOut() {
         loading.value = true
         let { error } = await supabase.auth.signOut()
         if (error) throw error
+        user.value = null
     } catch (error) {
         alert(error.message)
     } finally {
