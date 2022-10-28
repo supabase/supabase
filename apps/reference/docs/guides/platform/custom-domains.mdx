@@ -23,7 +23,7 @@ To get started:
 
 ## Configure a Custom Domain
 
-This example assumes your Supabase project is `foobar` with a corresponding API URL `foobar.supabase.co` and configures a custom domain at `api.example.com`.
+This example assumes your Supabase project is `foobar` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
 
 ### <a id="cname-configure"></a>Configure a CNAME
 
@@ -47,7 +47,7 @@ Required outstanding validation records:
         api.example.com TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
 ```
 
-[^1] One of the records requires you to *replace* the CNAME record set up in [the first step](#cname-configure) with a TXT record. You'll be able to restore it back to the CNAME after the verification process has been completed.
+[^1] One of the records requires you to _replace_ the CNAME record set up in [the first step](#cname-configure) with a TXT record. You'll be able to restore it back to the CNAME after the verification process has been completed.
 
 ### Verify your domain
 
@@ -84,3 +84,7 @@ supabase domains delete --project-ref foobarbaz --experimental
 ```
 
 As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.
+
+## Limitations
+
+Edge functions do not honor the custom domain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
