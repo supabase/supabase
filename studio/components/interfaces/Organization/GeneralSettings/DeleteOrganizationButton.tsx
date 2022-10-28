@@ -94,7 +94,7 @@ const DeleteOrganizationButton = observer(() => {
                   organization and remove all of its projects.
                 </p>
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Input
                   id="orgName"
@@ -109,7 +109,7 @@ const DeleteOrganizationButton = observer(() => {
                   className="w-full"
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Button
                   block
