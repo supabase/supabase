@@ -126,10 +126,10 @@ interface CheckboxProps {
   ItemIndicator?: React.ReactNode
 }
 
-export function Seperator() {
+export function Separator() {
   let __styles = styleHandler('dropdown')
 
-  return <RadixDropdown.Separator className={__styles.seperator} />
+  return <RadixDropdown.Separator className={__styles.separator} />
 }
 
 export function Checkbox({
@@ -220,7 +220,7 @@ Dropdown.Checkbox = Checkbox
 Dropdown.Radio = Radio
 Dropdown.RadioGroup = RadioGroup
 Dropdown.Label = Label
-Dropdown.Seperator = Seperator
+Dropdown.Separator = Separator
 Dropdown.RightSlot = RightSlot
 Dropdown.TriggerItem = TriggerItem
 export default Dropdown

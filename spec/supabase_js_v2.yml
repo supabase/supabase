@@ -87,7 +87,7 @@ pages:
           import { createClient } from '@supabase/supabase-js'
           import AsyncStorage from "@react-native-async-storage/async-storage";
 
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key" {
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
             auth: {
               storage: AsyncStorage,
               autoRefreshToken: true,
@@ -344,6 +344,25 @@ pages:
         js: |
           ```js
             const { data, error } = supabase.auth.setSession(refresh_token)
+          ```
+  auth.refreshSession():
+    title: 'refreshSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
+    notes: |
+      - This method will refresh the session whether the current one is expired or not.
+      - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
+    examples:
+      - name: Refresh session using the current session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: { user, session }, error } = await supabase.auth.refreshSession()
+          ```
+      - name: Refresh session using a passed-in session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
           ```
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'

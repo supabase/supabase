@@ -1,61 +1,141 @@
 ---
-title: 'Auth'
-description: 'Supabase auth'
+id: auth
+title: Auth
+description: Use Supabase to Authenticate and Authorize your users.
+sidebar_label: Overview
 ---
 
-# Auth
+import Link from '@docusaurus/Link'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import providers from '../../data/authProviders'
+import ButtonCard from '@site/src/components/ButtonCard'
+import useBaseUrl from '@docusaurus/useBaseUrl'
 
-<iframe
-  width="560"
-  height="315"
-  src="https://www.youtube.com/embed/6ow_jW4epf8"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
+## Overview
 
-## User Management
+There are two parts to every Auth system:
 
-Supabase makes it simple to manage your users.
+- **Authentication:** should this person be allowed in? If yes, who are they?
+- **Authorization:** once they are in, what are they allowed to do?
 
-<video width="99%" playsinline controls>
-  <source src="/docs/videos/auth-zoom2.mp4" type="video/mp4" playsInline />
-</video>
+Supabase Auth is designed to work either as a standalone product, or deeply integrated with the other Supabase products.
+Postgres is at the heart of everything we do, and the Auth system follows this principle. We leverage Postgres' built-in Auth functionality wherever possible.
 
-When users sign up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a '`profiles`' table referencing id in the `auth.users` table using a `user_id` field.
+Here's a quick, 2 minute tour of the Auth features built-in to Supabase:
 
-Supabase provides the routes to [sign up](https://supabase.com/docs/reference/javascript/auth-signup), [log in](https://supabase.com/docs/reference/javascript/auth-signin), [log out](https://supabase.com/docs/reference/javascript/auth-signout), and manage users in your apps and websites.
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/6ow_jW4epf8"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
-## Third Party Logins
+## Authentication
 
-We currently support the following OAuth providers:
+You can authenticate your users in several ways:
 
-<AuthProviders />
+- Email & password.
+- Magic links (one-click logins).
+- Social providers.
+- Phone logins.
 
-You can enable providers by navigating to Authentication > Settings > External OAuth Providers and inputting your `Client ID` and `Secret` for each.
+### Providers
 
-<img src="https://supabase.com/docs/assets/images/supabase-oauth-logins-465421be6d56c5d1bedf19df6786c520.png" />
+We provide a suite of Providers and login methods, as well as [Auth helpers](/docs/guides/auth/auth-helpers/).
 
-## Row Level Security
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {providers.map((x) => (
+      <div key={x.name} class="col col--6">
+        <ButtonCard class="card" to={useBaseUrl(x.href)} title={x.name} style={{ height: '100%' }}>
+          <div class="button-card__inner">
+            <div
+              class=""
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: 10,
+              }}
+            >
+              {x.logo && <img src={x.logo} alt={x.name} width="20" />}
+              <p>{x.name}</p>
+              <p>
+                {x.official ? (
+                  <span class={`badge badge--official`}>Official</span>
+                ) : (
+                  <span class={`badge badge--unofficial`}>Unofficial</span>
+                )}
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <div
+                class="code-block"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.7rem',
+                }}
+              >
+                <span>Platform:</span>
+                <span>{x.platform.toString()}</span>
+              </div>
+              <div
+                class="code-block"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.7rem',
+                }}
+              >
+                <span>Self-Hosted:</span>
+                <span>{x.selfHosted.toString()}</span>
+              </div>
+            </div>
+          </div>
+        </ButtonCard>
+      </div>
+    ))}
+  </div>
+</div>
+
+### Configure third-party providers
+
+You can enable third-party providers with the click of a button by navigating to Authentication > Settings > Auth Providers and inputting your `Client ID` and `Secret` for each.
+
+![OAuth Logins.](/img/supabase-oauth-logins.png)
+
+## Authorization
+
+When you need granular authorization rules, nothing beats PostgreSQL's Row Level Security (RLS).
+
+Policies are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
+
+Get started with our [Row Level Security Guides](/docs/guides/auth/row-level-security).
+
+### Row Level Security
 
 Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). Supabase makes it simple to turn RLS on and off.
 
-<video width="99%" playsinline controls>
-  <source src="/docs/videos/rls-zoom2.mp4" type="video/mp4" playsInline />
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/rls-zoom2.mp4" type="video/mp4" muted playsInline />
 </video>
 
-## Policies
+### Policies
 
 [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
 
-<video width="99%" playsinline controls>
-  <source src="/docs/videos/policies-zoom2.mp4" type="video/mp4" playsInline />
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/policies-zoom2.mp4" type="video/mp4" muted playsInline />
 </video>
 
-With policies, your database becomes the rules engine. Instead of repetitively filtering your queries, like this...
+With policies, your database becomes the rules engine. Instead of repetitively filtering your queries, like this ...
 
-```Javascript
+```js
 const loggedInUserId = 'd0714948'
 let { data, error } = await supabase
   .from('users')
@@ -68,14 +148,14 @@ let { data, error } = await supabase
 
 ... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
 
-```Javascript
-let user = await supabase.from('users').select('user_id, name')
+```js
+let { data, error } = await supabase.from('users').select('user_id, name')
 
 // console.log(data)
 // Still => { id: 'd0714948', name: 'Jane' }
 ```
 
-## How It Works
+### How It Works
 
 1. A user signs up. Supabase creates a new user in the `auth.users` table.
 2. Supabase returns a new JWT, which contains the user's `UUID`.
@@ -85,34 +165,18 @@ let user = await supabase.from('users').select('user_id, name')
 
 Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
 
-## Tips
+## User Management
 
-**Enable Realtime for database tables**
+Supabase provides multiple endpoints to authenticate and manage your users:
 
-Realtime server broadcasts database changes to authorized users depending on your Row Level Security (RLS) policies. We recommend that you enable row level security and set row security policies on tables that you add to the publication. However, you may choose to disable RLS on a table and have changes broadcast to all connected clients.
+- [Sign up](/docs/reference/javascript/auth-signup)
+- [Sign in with password](/docs/reference/javascript/auth-signinwithpassword)
+- [Sign in with passwordless / one-time password (OTP)](/docs/reference/javascript/auth-signinwithotp)
+- [Sign in with OAuth](/docs/reference/javascript/auth-signinwithoauth)
+- [Sign out](/docs/reference/javascript/auth-signout)
 
-```sql
-/**
- * REALTIME SUBSCRIPTIONS
- * Realtime enables listening to any table in your public schema.
- */
+When users sign up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing `id` in the `auth.users` table using a `user_id` field.
 
-begin;
-  -- remove the realtime publication
-  drop publication if exists supabase_realtime;
-
-  -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;
-commit;
-
--- add a table to the publication
-alter publication supabase_realtime add table products;
-
--- add other tables to the publication
-alter publication supabase_realtime add table posts;
-```
-
-## Next Steps
-
-- Read more about Auth in the [Guides](https://supabase.com/docs/guides/auth/intro).
-- Sign in: [app.supabase.com](https://app.supabase.com/)
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/auth-zoom2.mp4" type="video/mp4" muted playsInline />
+</video>

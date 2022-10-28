@@ -18,7 +18,6 @@ import {
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import Flag from 'components/ui/Flag/Flag'
 
 interface Props {}
 
@@ -109,13 +108,11 @@ const StorageMenu: FC<Props> = () => {
               <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
-          <Flag name="logsStorage">
-            <Link href={`/project/${projectRef}/storage/logs`}>
-              <Menu.Item rounded active={page === 'logs'}>
-                <p className="truncate">Logs</p>
-              </Menu.Item>
-            </Link>
-          </Flag>
+          <Link href={`/project/${projectRef}/storage/logs`}>
+            <Menu.Item rounded active={page === 'logs'}>
+              <p className="truncate">Logs</p>
+            </Menu.Item>
+          </Link>
         </div>
       </div>
     </Menu>
@@ -156,7 +153,7 @@ const BucketRow = ({
               >
                 {bucket.public ? 'Make private' : 'Make public'}
               </Dropdown.Item>,
-              <Dropdown.Seperator key="bucket-separator" />,
+              <Dropdown.Separator key="bucket-separator" />,
               <Dropdown.Item
                 icon={<IconTrash size="tiny" />}
                 key="delete-bucket"

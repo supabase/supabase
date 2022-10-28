@@ -14,6 +14,17 @@ import ProjectSetup from './_partials/project_setup.mdx'
 
 ![Supabase User Management example](/img/user-management-demo.png)
 
+### Video Guide
+
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/0Fs96oZ4se0"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 ### GitHub
 
 Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management).
@@ -462,13 +473,12 @@ export default function Account({ session }: { session: Session }) {
 Now that we have all the components in place, let's update `pages/index.js`:
 
 ```jsx title="pages/index.js"
-import type { NextPage } from 'next'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 // highlight-next-line
 import Account from '../components/Account'
 
-const Home: NextPage = () => {
+const Home = () => {
   const session = useSession()
   const supabase = useSupabaseClient()
 

@@ -47,12 +47,8 @@ Run `flutter pub get` to install the dependencies.
 
 Now that we have the dependencies installed let's setup deep links so users who have logged in via magic link or OAuth can come back to the app.
 
-```sh
-1. Go to the "Authentication" section.
-2. Click "Settings" in the sidebar.
-3. Type `io.supabase.flutterquickstart://login-callback/` in the Additional Redirect URLs input field.
-4. Hit save.
-```
+1. Go to [Authentication Settings](https://app.supabase.com/project/_/auth/settings) in the Dashboard.
+1. In **Redirect URLs**, add `io.supabase.flutterquickstart://login-callback/` as a new domain.
 
 ![Supabase console deep link setting](/img/deeplink-setting.png)
 
@@ -175,7 +171,7 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  bool _redicrectCalled = false;
+  bool _redirectCalled = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -184,11 +180,11 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<void> _redirect() async {
     await Future.delayed(Duration.zero);
-    if (_redicrectCalled || !mounted) {
+    if (_redirectCalled || !mounted) {
       return;
     }
 
-    _redicrectCalled = true;
+    _redirectCalled = true;
     final session = supabase.auth.currentSession;
     if (session != null) {
       Navigator.of(context).pushReplacementNamed('/account');
@@ -253,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
 
     setState(() {
@@ -350,7 +346,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occured');
+      context.showErrorSnackBar(message: 'Unexpected exception occurred');
     }
 
     setState(() {
@@ -380,7 +376,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occured');
+      context.showErrorSnackBar(message: 'Unexpeted error occurred');
     }
     setState(() {
       _loading = false;
@@ -393,7 +389,7 @@ class _AccountPageState extends State<AccountPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/');
@@ -623,7 +619,7 @@ class _AvatarState extends State<Avatar> {
       }
     } catch (error) {
       if (mounted) {
-        context.showErrorSnackBar(message: 'Unexpected error occured');
+        context.showErrorSnackBar(message: 'Unexpected error occurred');
       }
     }
 
@@ -674,7 +670,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occured');
+      context.showErrorSnackBar(message: 'Unexpected exception occurred');
     }
 
     setState(() {
@@ -704,7 +700,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occured');
+      context.showErrorSnackBar(message: 'Unexpeted error occurred');
     }
     setState(() {
       _loading = false;
@@ -717,7 +713,7 @@ class _AccountPageState extends State<AccountPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/');
@@ -738,7 +734,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error has occured');
+      context.showErrorSnackBar(message: 'Unexpected error has occurred');
     }
     if (!mounted) {
       return;

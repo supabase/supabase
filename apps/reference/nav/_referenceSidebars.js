@@ -111,12 +111,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'APIs',
-      collapsed: true,
-      items: ['guides/api', 'guides/api/generating-types'],
-    },
-    {
-      type: 'category',
       label: 'Database',
       collapsed: true,
       items: [
@@ -124,20 +118,28 @@ const sidebars = {
         'guides/database/connecting-to-postgres',
         'guides/database/tables',
         'guides/database/functions',
+        'guides/database/webhooks',
         'guides/database/full-text-search',
-        'guides/database/migrating-between-projects',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Serverless APIs',
+          collapsed: true,
+          items: ['guides/api', 'guides/api/generating-types'],
+        },
         {
           type: 'category',
           label: 'Extensions',
           collapsed: true,
           items: [
             'guides/database/extensions',
-            'guides/database/extensions/plv8',
             'guides/database/extensions/http',
+            'guides/database/extensions/pgcron',
+            'guides/database/extensions/pgnet',
             'guides/database/extensions/pgtap',
+            'guides/database/extensions/plv8',
             'guides/database/extensions/uuid-ossp',
           ],
         },
@@ -173,6 +175,7 @@ const sidebars = {
         'guides/realtime',
         'guides/realtime/quickstart',
         'guides/realtime/postgres-cdc',
+        'guides/realtime/rate-limits',
       ],
     },
     {
@@ -188,9 +191,10 @@ const sidebars = {
       items: [
         'guides/hosting/platform',
         'guides/platform/custom-domains',
-        'guides/platform/disk-usage',
+        'guides/platform/database-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
+        'guides/platform/migrating-and-upgrading-projects',
         'guides/platform/performance',
         'guides/platform/permissions',
         'going-into-prod',
@@ -285,7 +289,7 @@ const sidebars = {
           href: '/reference/dart',
         },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
+        { type: 'link', label: 'Management API', href: '/reference/api' },
       ],
     },
     // TODO: add back in with typedocs
@@ -308,6 +312,7 @@ const sidebars = {
       collapsed: false,
       items: [
         { type: 'link', label: 'Auth Server', href: '/reference/auth' },
+        { type: 'link', label: 'Realtime Server', href: '/reference/realtime' },
         { type: 'link', label: 'Storage Server', href: '/reference/storage' },
       ],
     },

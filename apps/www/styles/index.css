@@ -20,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
 }
 
 body {
@@ -143,7 +144,7 @@ h6 { */
   /* transform-origin: var(--sectionTransformOrigin);
     transform: skewY(var(--sectionAngle));
     background: var(--backgroundColor);
-    overflow: 
+    overflow:
     hidden; */
 }
 
@@ -156,7 +157,7 @@ h6 { */
 
 /* Database page */
 
-.dashboard-tabs div[role='seperator'] {
+.dashboard-tabs div[role='separator'] {
   @apply border border-gray-50 dark:border-gray-700;
 }
 

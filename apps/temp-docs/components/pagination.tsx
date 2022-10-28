@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { IconArrowLeft, IconArrowRight } from '@supabase/ui'
+import { IconArrowLeft, IconArrowRight } from 'ui'
 
 const pagination = ({ currentPage, totalCount }: { currentPage: number; totalCount: number }) => {
   // TODO: not sure if this is the most efficient way to do this. may need to refactor.
