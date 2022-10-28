@@ -120,6 +120,7 @@ const sidebars = {
         'guides/database/functions',
         'guides/database/webhooks',
         'guides/database/full-text-search',
+        'guides/database/testing',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
