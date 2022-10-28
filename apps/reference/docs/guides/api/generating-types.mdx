@@ -28,21 +28,21 @@ Generate types for your project to produce the file `types/supabase.ts`
 npx supabase gen types typescript --project-id "$PROJECT_ID" --schema public > types/supabase.ts
 ```
 
-After you have generated your types, you can use them in your TypeScript projects:
+After you have generated your types, you can use them in `src/index.ts`
 
-```
+```tsx
 import { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
-import { definitions } from './types/supabase'
+import { Database } from '../types/supabase'
 
-const supabase = createClient(
+const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SECRET_KEY
 )
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const allOnlineUsers = await supabase
-    .from<definitions['users']>('users')
+    .from('users')
     .select('*')
     .eq('status', 'ONLINE')
   res.status(200).json(allOnlineUsers)
@@ -61,7 +61,7 @@ Add the script above to your `package.json` to run it using `npm run update-type
 
 Create a file `.github/workflows/update-types.yml` with the following snippet to define the action along with the environment variables. This script will commit new type changes to your repo every night.
 
-```
+```yaml
 name: Update database types
 
 on:
