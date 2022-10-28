@@ -10,6 +10,7 @@ const subNavRoutes = [
   `/${baseUrl}/reference/cli`,
   `/${baseUrl}/reference/auth`,
   `/${baseUrl}/reference/storage`,
+  `/${baseUrl}/reference/realtime`,
   `/${baseUrl}/reference/javascript`,
   `/${baseUrl}/reference/dart`,
 ]
@@ -25,6 +26,9 @@ const headerNames = {
   },
   auth: {
     name: 'Auth',
+  },
+  realtime: {
+    name: 'Realtime',
   },
   storage: {
     name: 'Storage',

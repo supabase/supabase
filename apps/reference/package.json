@@ -18,7 +18,7 @@
     "storage:version": "docusaurus docs:version:_storage",
     "supabase-js:version": "docusaurus docs:version:_supabase_js",
     "supabase-dart:version": "docusaurus docs:version:_supabase_dart",
-    "generate:all": "npm-run-all --parallel gen:api gen:cli gen:gotrue gen:storage gen:supabase-dart:v0 gen:supabase-dart:v1 gen:supabase-js:v1 gen:supabase-js:v2",
+    "generate:all": "npm-run-all --parallel gen:api gen:cli gen:gotrue gen:storage gen:supabase-dart:v0 gen:supabase-dart:v1 gen:supabase-js:v1 gen:supabase-js:v2 gen:realtime",
     "gen:api": "npm-run-all gen:api:usage",
     "gen:api:usage": "ts-node ./generator/index.ts gen --type api --url https://api.supabase.com --input ../../spec/transforms/api_v0_openapi_deparsed.json --output  ./_api/usage.mdx",
     "gen:cli": "npm-run-all gen:cli:commands gen:cli:config",
@@ -37,7 +37,9 @@
     "gen:supabase-js:v1": "npm-run-all gen:supabase-js:v1:ref",
     "gen:supabase-js:v1:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v1.yml --output ./_supabase_js_versioned_docs/version-v1/generated",
     "gen:supabase-js:v2": "npm-run-all gen:supabase-js:v2:ref",
-    "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./_supabase_js/generated"
+    "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./_supabase_js/generated",
+    "gen:realtime": "npm-run-all gen:realtime:config",
+    "gen:realtime:config": "ts-node ./generator/index.ts gen --type config --input ../../spec/realtime_v0_config.yaml --output  ./_realtime/generated/config.mdx"
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.1",

@@ -34,7 +34,7 @@ Reference documentation for the official Supabase client libraries, APIs, and to
     </div>
     {/* API */}
     <div class="col col--6">
-      <ButtonCard icon={useBaseUrl("/img/icons/api-icon.svg")} class="card" to={useBaseUrl("/reference/api")} style={{ height: '100%' }} title="Supabase API" description="Manage your Supabase organizations and projects."/>
+      <ButtonCard icon={useBaseUrl("/img/icons/api-icon.svg")} class="card" to={useBaseUrl("/reference/api")} style={{ height: '100%' }} title="Management API" description="Manage your Supabase projects programmatically."/>
     </div>
     {/*  */}
 
@@ -55,6 +55,16 @@ Reference documentation for self-hosting Supabase features.
         style={{ height: '100%' }}
         title={'Auth Server'}
         description=" JSON Web Token (JWT)-based API for managing users and issuing access tokens."
+      />
+    </div>
+    {/*  */}
+    <div class="col col--6">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/reference/realtime')}
+        style={{ height: '100%' }}
+        title={'Realtime'}
+        description="Build multiplayer applications and listen to your database changes via websockets."
       />
     </div>
     {/*  */}

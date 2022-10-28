@@ -1,22 +1,18 @@
-import { useEffect } from 'react'
+import { useEffect, FC } from 'react'
 import Head from 'next/head'
-import NavBar from '../components/nav/NavBar'
-import SideBar from '../components/nav/SideBar'
+import NavBar from '../components/Navigation/NavBar'
+import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
 
-const Layout = ({
-  meta,
-  children,
-  toc,
-  menuItems,
-  currentPage,
-}: {
-  meta: { title: string; description: string; hide_table_of_contents?: boolean }
+interface Props {
+  meta: { title: string; description?: string; hide_table_of_contents?: boolean }
   children: any
   toc?: any
   menuItems: any
   currentPage: string
-}) => {
+}
+
+const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -27,7 +23,7 @@ const Layout = ({
     }
   }, [])
 
-  console.log('default')
+  console.log('Default:Layout', { currentPage })
 
   return (
     <>
@@ -54,7 +50,9 @@ const Layout = ({
           <SideBar menuItems={menuItems} />
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
-              className={`${meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-8'} py-4 px-8`}
+              className={`${
+                meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-10 xl:col-span-8'
+              } py-4 px-8`}
             >
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
                 {children}

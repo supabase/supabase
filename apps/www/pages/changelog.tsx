@@ -1,4 +1,4 @@
-import { IconGitCommit } from '@supabase/ui'
+import { IconGitCommit } from 'ui'
 import dayjs from 'dayjs'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
