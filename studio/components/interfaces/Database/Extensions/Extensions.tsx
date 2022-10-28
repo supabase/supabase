@@ -33,7 +33,7 @@ const Extensions: FC<Props> = ({}) => {
     (ext: any) => !isNull(ext.installed_version)
   )
 
-  const canUpdateExtentions = checkPermissions(
+  const canUpdateExtensions = checkPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -49,7 +49,7 @@ const Extensions: FC<Props> = ({}) => {
             onChange={(e) => setFilterString(e.target.value)}
             icon={<IconSearch size="tiny" />}
           />
-          {!canUpdateExtentions && (
+          {!canUpdateExtensions && (
             <div className="w-[500px]">
               <InformationBox
                 icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}

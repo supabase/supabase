@@ -33,7 +33,7 @@ const PolicyRow = ({
               >
                 Edit
               </Dropdown.Item>
-              <Dropdown.Seperator />
+              <Dropdown.Separator />
               <Dropdown.Item
                 icon={<IconTrash size={14} />}
                 type="outline"

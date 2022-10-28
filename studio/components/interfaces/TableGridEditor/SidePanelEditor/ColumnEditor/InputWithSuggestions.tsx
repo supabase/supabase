@@ -90,7 +90,7 @@ const InputWithSuggestions: FC<Props> = ({
               overlay={
                 <>
                   <Dropdown.Label>{suggestionsHeader || 'Suggestions'}</Dropdown.Label>
-                  <Dropdown.Seperator />
+                  <Dropdown.Separator />
                   {filteredSuggestions.map((suggestion: Suggestion) => (
                     <Dropdown.Item
                       key={suggestion.name}
