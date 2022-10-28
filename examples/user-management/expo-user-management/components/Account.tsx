@@ -61,7 +61,7 @@ export default function Account({ session }: { session: Session }) {
         username,
         website,
         avatar_url,
-        updated_at: new Date(),
+        updated_at: new Date().toISOString(),
       }
 
       let { error } = await supabase.from('profiles').upsert(updates)
@@ -81,13 +81,13 @@ export default function Account({ session }: { session: Session }) {
   return (
     <View>
       <View>
-        <Avatar 
+        <Avatar
           size={200}
-          url={avatarUrl} 
+          url={avatarUrl}
           onUpload={(url: string) => {
             setAvatarUrl(url)
             updateProfile({ username, website, avatar_url: url })
-          }} 
+          }}
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
