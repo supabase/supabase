@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@types/json-stringify-safe": "^5.0.0",
+    "@storybook/addon-actions": "^6.5.13",
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
     "json-stringify-safe": "^5.0.1",
