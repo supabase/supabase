@@ -84,6 +84,18 @@ const config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: '_realtime',
+        path: '_realtime',
+        routeBasePath: '/reference/realtime',
+        sidebarPath: require.resolve('./nav/realtime_sidebars.js'),
+        breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: '_supabase_dart',
         path: '_supabase_dart',
         routeBasePath: '/reference/dart',

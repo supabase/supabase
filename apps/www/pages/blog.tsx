@@ -39,7 +39,7 @@ function Blog(props: any) {
   const router = useRouter()
 
   useEffect(() => {
-    // contruct an array of blog posts
+    // construct an array of blog posts
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
     shiftedBlogs.shift()
