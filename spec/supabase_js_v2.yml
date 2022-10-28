@@ -602,13 +602,21 @@ pages:
             email: 'email@example.com'
           })
           ```
-      - name: Generate a link to change email addresses
+      - name: Generate links to change current email address
         isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'email_change_current',
-            email: 'old.email@example.com',
+            email: 'current.email@example.com',
+            newEmail: 'new.email@example.com'
+          })
+          ```
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'email_change_new',
+            email: 'current.email@example.com',
             newEmail: 'new.email@example.com'
           })
           ```
