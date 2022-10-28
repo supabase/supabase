@@ -280,7 +280,7 @@ launch week
   }
 }
 
-.launch-week-gradientBg--anouncement-bar {
+.launch-week-gradientBg--announcement-bar {
   background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
   background-color: hsl(0, 0%, 11%);
   width: 100%;
@@ -291,13 +291,13 @@ launch week
   background-repeat: no-repeat;
 }
 
-.dark .launch-week-gradientBg--anouncement-bar {
+.dark .launch-week-gradientBg--announcement-bar {
   background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
   background-color: #1c1c1c;
 }
 
 @media screen and (min-width: 1032px) {
-  .launch-week-gradientBg--anouncement-bar {
+  .launch-week-gradientBg--announcement-bar {
     background-position-y: -780px;
   }
 }
