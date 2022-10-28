@@ -17,17 +17,21 @@ const FunctionsEmptyState = () => {
           </p>
           <div className="flex gap-2">
             <Link passHref href="https://supabase.com/docs/guides/functions">
-              <Button as="a" type="default" iconRight={<IconBookOpen />}>
-                Documentation
-              </Button>
+              <a target="_blank" rel="noreferrer">
+                <Button type="default" iconRight={<IconBookOpen />}>
+                  Documentation
+                </Button>
+              </a>
             </Link>
             <Link
               passHref
               href="https://github.com/supabase/supabase/tree/chore/stripe-issue/examples/edge-functions/supabase/functions"
             >
-              <Button as="a" type="default" iconRight={<IconCode />}>
-                Examples
-              </Button>
+              <a target="_blank" rel="noreferrer">
+                <Button type="default" iconRight={<IconCode />}>
+                  Examples
+                </Button>
+              </a>
             </Link>
           </div>
         </div>
