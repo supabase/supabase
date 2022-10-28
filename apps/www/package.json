@@ -18,7 +18,6 @@
     "@mdx-js/react": "^1.6.22",
     "@next/bundle-analyzer": "^13.0.0",
     "@next/mdx": "^10.0.7",
-    "@storybook/addon-actions": "^6.5.13",
     "@supabase/auth-ui-react": "^0.1.6",
     "@supabase/supabase-js": "^2.0.0",
     "classnames": "^2.3.1",
