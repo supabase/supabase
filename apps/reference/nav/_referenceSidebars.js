@@ -312,6 +312,7 @@ const sidebars = {
       collapsed: false,
       items: [
         { type: 'link', label: 'Auth Server', href: '/reference/auth' },
+        { type: 'link', label: 'Realtime Server', href: '/reference/realtime' },
         { type: 'link', label: 'Storage Server', href: '/reference/storage' },
       ],
     },
