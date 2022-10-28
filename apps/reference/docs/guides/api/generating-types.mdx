@@ -6,34 +6,34 @@ description: How to generate types for your API and Supabase libraries.
 
 Supabase APIs are generated from your database, which means that we can use database introspection to generate type-safe API definitions.
 
-### Generating types from OpenAPI specification
+### Generating types using Supabase CLI
 
-Supabase generates an OpenAPI specification file for your database which can be used to generate your data types for usage with TypeScript.
+The Supabase CLI is a single binary Go application that provides everything you need to setup a local development environment.
 
-The OpenAPI specification for your Supabase project can be accessed as follows:
-
-```txt
-https://your-project.supabase.co/rest/v1/?apikey=your-anon-key
-```
-
-Using the open source [openapi-typescript](https://github.com/drwpow/openapi-typescript#%EF%B8%8F-reading-specs-from-remote-resource) tool you can generate your types and store them locally:
+You can [install the CLI](https://www.npmjs.com/package/supabase) via npm or other supported package managers.
 
 ```bash
-npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
+npm i supabase
 ```
 
-Important notes:
+Login with your Personal Access Token
 
-- Since the generator uses JSON API, there is no way to determine if a column is an Array. It will generate array types as `string`, even though Supabase handles this automatically and returns arrays.
-  You can fix this manually in the files by changing the type, e.g. `names: string` -> `names: string[]`
-- The types won't automatically stay in sync with your database, so make sure to regenerate your types after you make changes to your database.
+```bash
+npx supabase login
+```
+
+Generate types for your project to produce the file `types/supabase.ts`
+
+```bash
+npx supabase gen types typescript --project-id "$PROJECT_ID" --schema public > types/supabase.ts
+```
 
 After you have generated your types, you can use them in your TypeScript projects:
 
-```ts
+```
 import { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
-import { definitions } from '../../types/supabase'
+import { definitions } from './types/supabase'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -49,28 +49,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 }
 ```
 
-For more advance type-support, check out [`postgrest-js-tools`](https://github.com/mzalevski/postgrest-js-tools).
-
 ## Update types automatically with GitHub Actions
 
 One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
 
-The following script can be run in your terminal to produce the file `types/database/index.ts`.
+Add the script above to your `package.json` to run it using `npm run update-types`
 
-```
-npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts
-```
-
-You can add this script to your `package.json` and run it using `npm run update-types`:
-
-```
-"update-types": "npx openapi-typescript \"${SUPABASE_URL}/rest/v1/?apikey=${SUPABASE_ANON_KEY}\" --version=2 --output types/database/index.ts"
+```json
+"update-types": "npx supabase gen types typescript --project-id \"$PROJECT_ID\" > types/supabase.ts"
 ```
 
-You can use GitHub actions to generate this file automatically. This script will commit the change to your repo every night.
-Create a file `.github/workflows/update-types.yml` and add the following snippet into this file to define the action along with the environment variables.
+Create a file `.github/workflows/update-types.yml` with the following snippet to define the action along with the environment variables. This script will commit new type changes to your repo every night.
 
-```yml
+```
 name: Update database types
 
 on:
@@ -82,8 +73,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     env:
-      SUPABASE_URL: ${{secrets.SUPABASE_URL}}
-      SUPABASE_ANON_KEY: ${{secrets.SUPABASE_ANON_KEY}}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      PROJECT_ID: <your-project-id>
     steps:
       - uses: actions/checkout@v2
         with:
@@ -91,7 +82,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v2.1.5
         with:
-          node-version: 14
+          node-version: 16
       - run: npm run update-types
       - name: check for file changes
         id: git_status
