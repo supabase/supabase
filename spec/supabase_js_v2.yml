@@ -606,6 +606,7 @@ pages:
         isSpotlight: false
         js: |
           ```js
+          // generate an email change link to be sent to the current email address
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'email_change_current',
             email: 'current.email@example.com',
