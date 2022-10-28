@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
 
     setState(() {

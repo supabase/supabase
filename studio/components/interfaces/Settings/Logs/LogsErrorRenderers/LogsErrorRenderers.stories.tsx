@@ -55,7 +55,7 @@ export const ErrorRenderers = () => (
       <Alert
         key={i}
         variant="danger"
-        title="Sorry! An error occured when fetching data."
+        title="Sorry! An error occurred when fetching data."
         withIcon
         className="w-1/2"
       >

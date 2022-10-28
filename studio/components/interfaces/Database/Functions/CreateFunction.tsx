@@ -372,11 +372,11 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                     <SelectSchema />
                   </div>
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputMultiArguments readonly={true} />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputDefinition />
                 </SidePanel.Content>
@@ -386,22 +386,22 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                 <SidePanel.Content>
                   <InputName />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <div className="space-y-4">
                     <SelectSchema />
                     <SelectReturnType />
                   </div>
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputMultiArguments />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputDefinition />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
                     <div className={`space-y-8 rounded bg-bg-alt-light py-4 dark:bg-bg-alt-dark`}>
@@ -425,11 +425,11 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                         <SelectBehavior />
                       </div>
                     </SidePanel.Content>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <SidePanel.Content>
                       <InputMultiConfigParams />
                     </SidePanel.Content>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <SidePanel.Content>
                       <RadioSecurity />
                     </SidePanel.Content>
