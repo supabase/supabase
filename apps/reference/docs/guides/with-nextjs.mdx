@@ -473,13 +473,12 @@ export default function Account({ session }: { session: Session }) {
 Now that we have all the components in place, let's update `pages/index.js`:
 
 ```jsx title="pages/index.js"
-import type { NextPage } from 'next'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 // highlight-next-line
 import Account from '../components/Account'
 
-const Home: NextPage = () => {
+const Home = () => {
   const session = useSession()
   const supabase = useSupabaseClient()
 

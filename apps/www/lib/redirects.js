@@ -1358,6 +1358,11 @@ module.exports = [
     source: '/docs/reference/auth-helpers/sveltekit',
     destination: '/docs/guides/auth/auth-helpers/sveltekit',
   },
+  {
+    permanent: true,
+    source: '/guides/database/migrating-between-projects',
+    destination: '/guides/platform/migrating-and-upgrading-projects',
+  },
 
   // supabase-js v1 to v2 redirects
   // v1: /auth-update
@@ -1437,7 +1442,7 @@ module.exports = [
     source: '/docs/reference/javascript/auth-api-updateuserbyid',
     destination: '/docs/reference/javascript/v1/auth-api-updateuserbyid',
   },
-  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v1 docs instead
   {
     permanent: true,
@@ -1496,7 +1501,7 @@ module.exports = [
     source: '/docs/reference/dart/reset-password-email',
     destination: '/docs/reference/dart/auth-resetpasswordforemail',
   },
-  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v0 docs instead
   {
     permanent: true,

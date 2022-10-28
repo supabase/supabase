@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from '@supabase/ui'
+import { Button, Form, Input, Select } from 'ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
 import supabase from '~/lib/supabase'
