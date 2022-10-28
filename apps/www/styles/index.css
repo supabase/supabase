@@ -20,7 +20,6 @@
 
 html {
   scroll-behavior: smooth;
-  width: 100%;
 }
 
 body {
@@ -144,7 +143,7 @@ h6 { */
   /* transform-origin: var(--sectionTransformOrigin);
     transform: skewY(var(--sectionAngle));
     background: var(--backgroundColor);
-    overflow:
+    overflow: 
     hidden; */
 }
 
