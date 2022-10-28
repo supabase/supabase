@@ -125,7 +125,7 @@ const sidebars = {
         // 'guides/database/sql-to-api',
         {
           type: 'category',
-          label: 'Data APIs',
+          label: 'Serverless APIs',
           collapsed: true,
           items: ['guides/api', 'guides/api/generating-types'],
         },
@@ -175,6 +175,7 @@ const sidebars = {
         'guides/realtime',
         'guides/realtime/quickstart',
         'guides/realtime/postgres-cdc',
+        'guides/realtime/rate-limits',
       ],
     },
     {

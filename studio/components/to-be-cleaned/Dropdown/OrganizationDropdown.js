@@ -29,7 +29,7 @@ const OrganizationDropdown = ({ organizations }) => {
                 {x.name}
               </Dropdown.Item>
             ))}
-          <Dropdown.Seperator />
+          <Dropdown.Separator />
           <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
             New organization
           </Dropdown.Item>

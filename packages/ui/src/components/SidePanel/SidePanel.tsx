@@ -115,10 +115,10 @@ const SidePanel = ({
   )
 }
 
-export function Seperator() {
+export function Separator() {
   let __styles = styleHandler('sidepanel')
 
-  return <div className={__styles.seperator}></div>
+  return <div className={__styles.separator}></div>
 }
 
 export function Content({ children }: { children: React.ReactNode }) {
@@ -128,5 +128,5 @@ export function Content({ children }: { children: React.ReactNode }) {
 }
 
 SidePanel.Content = Content
-SidePanel.Seperator = Seperator
+SidePanel.Separator = Separator
 export default SidePanel
