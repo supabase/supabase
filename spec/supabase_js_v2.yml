@@ -611,9 +611,7 @@ pages:
             email: 'current.email@example.com',
             newEmail: 'new.email@example.com'
           })
-          ```
-        js: |
-          ```js
+
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'email_change_new',
             email: 'current.email@example.com',
