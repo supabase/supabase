@@ -101,12 +101,12 @@ function Close() {
   )
 }
 
-function Seperator() {
+function Separator() {
   const __styles = styleHandler('popover')
 
-  return <div className={__styles.seperator}></div>
+  return <div className={__styles.separator}></div>
 }
 
-Popover.Seperator = Seperator
+Popover.Separator = Separator
 Popover.Close = Close
 export default Popover

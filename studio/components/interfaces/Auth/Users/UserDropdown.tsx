@@ -140,7 +140,7 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
               Send OTP
             </Dropdown.Item>
           ) : null}
-          <Dropdown.Seperator />
+          <Dropdown.Separator />
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
               <Dropdown.Item

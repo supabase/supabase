@@ -143,7 +143,7 @@ const BucketRow = ({
               >
                 {bucket.public ? 'Make private' : 'Make public'}
               </Dropdown.Item>,
-              <Dropdown.Seperator key="bucket-separator" />,
+              <Dropdown.Separator key="bucket-separator" />,
               <Dropdown.Item
                 icon={<IconTrash size="tiny" />}
                 key="delete-bucket"
