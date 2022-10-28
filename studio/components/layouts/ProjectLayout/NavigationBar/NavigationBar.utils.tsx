@@ -147,7 +147,7 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
     ...(IS_PLATFORM
       ? [
           {
-            key: 'explorer',
+            key: 'logs',
             label: 'Logs',
             icon: <IconList size={18} strokeWidth={2} />,
             link:
