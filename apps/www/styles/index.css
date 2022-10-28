@@ -140,11 +140,6 @@ h6 { */
   transform-origin: 100% 0;
   transform: skewY(-2deg);
   overflow: hidden;
-  /* transform-origin: var(--sectionTransformOrigin);
-    transform: skewY(var(--sectionAngle));
-    background: var(--backgroundColor);
-    overflow: 
-    hidden; */
 }
 
 .section-container {
