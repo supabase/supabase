@@ -4108,7 +4108,7 @@
                         "isOptional": true
                       },
                       "comment": {
-                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                       },
                       "sources": [
                         {
