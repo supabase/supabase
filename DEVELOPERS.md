@@ -1,6 +1,6 @@
 # Developing Supabase
 
-1. [Development setup](#development-setup)                
+1. [Development setup](#development-setup)
     - [Install dependencies](#install-dependencies)
     - [Fork the repository](#fork-the-repository)
 1. [Build Supabase](#build-supabase)
