@@ -223,7 +223,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final UserResponse res = await supabase.updateUser(
+          final UserResponse res = await supabase.auth.updateUser(
             UserAttributes(
               email: 'example@email.com',
             ),
@@ -234,7 +234,7 @@ pages:
         isSpotlight: false
         dart: |
           ```dart
-          final UserResponse res = await supabase.updateUser(
+          final UserResponse res = await supabase.auth.updateUser(
             UserAttributes(
               password: 'new password',
             ),
@@ -245,7 +245,7 @@ pages:
         isSpotlight: true
         dart: |
           ```dart
-          final UserResponse res = await supabase.updateUser(
+          final UserResponse res = await supabase.auth.updateUser(
             UserAttributes(
               data: { 'hello': 'world' },
             ),

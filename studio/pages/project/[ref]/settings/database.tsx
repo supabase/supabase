@@ -289,7 +289,7 @@ const ResetDbPassword: FC<any> = () => {
             />
           </div>
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <div className="flex space-x-2 pb-2">
             <Button type="default" onClick={() => setShowResetDbPass(false)}>

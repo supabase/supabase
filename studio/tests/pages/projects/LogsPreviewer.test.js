@@ -299,7 +299,7 @@ test('bug: load older btn does not error out when previous page is empty', async
   // clicking load older multiple times should not give error
   await waitFor(() => {
     expect(screen.queryByText(/Sorry/)).toBeNull()
-    expect(screen.queryByText(/An error occured/)).toBeNull()
+    expect(screen.queryByText(/An error occurred/)).toBeNull()
     expect(screen.queryByText(/undefined/)).toBeNull()
   })
 })
