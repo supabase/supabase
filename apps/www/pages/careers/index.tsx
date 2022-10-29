@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Button, IconCheck, Badge } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
-import career from '../../data/career.json'
+import career from '~/data/career.json'
 import Globe from '~/components/Globe'
 import Styles from './career.module.css'
 
