@@ -879,3 +879,82 @@ export const getServerSideProps = withPageAuth({
   },
 })
 ```
+
+```jsx
+import { User, createServerClient } from '@supabase/auth-helpers-remix';
+import { ActionFunction, json, redirect } from '@remix-run/node'; // change this import to whatever runtime you are using
+import { createServerClient } from '@supabase/auth-helpers-remix';
+
+interface Profile {
+  /* ... */
+}
+
+export const loader: LoaderFunction = async ({
+  request
+}: {
+  request: Request
+}) => {
+  const response = new Response();
+  const supabaseClient = createServerClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY,
+    { request, response }
+  );
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  const user = session?.user;
+
+  if (!user) {
+    // there is no user, therefore, we are redirecting
+    // to the landing page. we still need to return
+    // response.headers to attach the set-cookie header
+    return redirect('/', {
+      headers: response.headers
+    });
+  }
+
+  // Retrieve provider_token from cookies
+  const provider_token = request.headers.get('sb-provider-token');
+
+  if (!provider_token) {
+    // there is no provider_token, therefore, we are redirecting
+    // to the landing page. we still need to return
+    // response.headers to attach the set-cookie header
+    return redirect('/', {
+      headers: response.headers
+    });
+  }
+
+  // Get logged in user's third-party id from metadata
+  const userId = user?.user_metadata.provider_id;
+
+  const allRepos = await (
+    await fetch(
+      `https://api.github.com/search/repositories?q=user:${userId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `token ${provider_token}`,
+        },
+      }
+    )
+  ).json()
+
+  // in order for the set-cookie header to be set,
+  // headers must be returned as part of the action response
+  return json(
+    { allRepos, user },
+    {
+      headers: response.headers
+    }
+  );
+};
+
+export default function Page() {
+  const { allRepos, user } = useLoaderData();
+  return <pre>{JSON.stringify({ allRepos, user }, null, 2)}</pre>;
+}
+```
