@@ -113,8 +113,6 @@ const NavBar: FC<Props> = ({ currentPage }) => {
         )}
       </div>
 
-      <Search />
-
       <div className="flex items-center space-x-4">
         <div className="hidden items-center md:flex">
           <ul className="flex items-center">
@@ -184,19 +182,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
             </li>
           </ul>
         </div>
-        <Input
-          placeholder="Search"
-          icon={<IconSearch />}
-          type="search"
-          actions={[
-            <Button disabled key="icon-command" type="default" size="tiny">
-              <IconCommand size="tiny" />
-            </Button>,
-            <Button disabled key="icon-letter" type="default" size="tiny">
-              K
-            </Button>,
-          ]}
-        />
+        <Search />
       </div>
     </nav>
   )

@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",
-    "@algolia/autocomplete-theme-classic": "^1.7.2",
+    "@algolia/autocomplete-plugin-recent-searches": "^1.7.2",
     "@apollo/client": "^3.6.6",
     "@docsearch/react": "1.0.0-alpha.27",
     "@mdx-js/loader": "^1.6.22",

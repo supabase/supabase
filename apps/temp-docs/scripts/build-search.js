@@ -55,7 +55,7 @@ function walk(dir) {
       const { data, content } = matter(fileContents)
 
       const { id, title, description } = data
-      return { objectID: id, title, description }
+      return { objectID: id, title, description, url: '' }
     })
 
     const algoliaResponse = await index.saveObjects(searchObjects)
