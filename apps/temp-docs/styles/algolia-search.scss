@@ -485,18 +485,15 @@ body {
 // 6. Hit Layout
 // ----------------
 .aa-Item {
+  @apply px-4 py-4;
   align-items: center;
   border-radius: 3px;
   cursor: pointer;
   display: grid;
   min-height: calc(var(--aa-spacing) * 2.5);
-  padding: calc(var(--aa-spacing-half) / 2);
   // When the result is active
   &[aria-selected='true'] {
-    background-color: rgba(
-      var(--aa-selected-color-rgb),
-      var(--aa-selected-color-alpha)
-    );
+    @apply bg-scale-400;
     .aa-ItemActionButton,
     .aa-ActiveOnly {
       visibility: visible;
@@ -550,19 +547,16 @@ body {
     }
   }
   @at-root .aa-ItemContent {
-    align-items: center;
+    @apply flex flex-col space-y-1;
     cursor: pointer;
-    display: grid;
-    gap: var(--aa-spacing-half);
-    grid-auto-flow: column;
     line-height: 1.25em;
     overflow: hidden;
     &:empty {
       display: none;
     }
     mark {
+      @apply text-brand-900;
       background: none;
-      color: rgba(var(--aa-text-color-rgb), var(--aa-text-color-alpha));
       font-style: normal;
       font-weight: var(--aa-font-weight-bold);
     }
@@ -596,7 +590,7 @@ body {
       white-space: nowrap;
     }
     @at-root .aa-ItemContentSubtitle {
-      font-size: 0.92em;
+      @apply text-scale-1000 text-sm truncate;
       @at-root .aa-ItemContentSubtitleIcon {
         &::before {
           border-color: rgba(var(--aa-muted-color-rgb), 0.64);
@@ -814,10 +808,7 @@ body {
     margin: var(--aa-spacing-half) 0 var(--aa-spacing-half) 2px;
   }
   .aa-Panel {
-    background-color: rgba(
-      var(--aa-background-color-rgb),
-      var(--aa-background-color-alpha)
-    );
+    @apply bg-scale-200;
     border-radius: 0;
     box-shadow: none;
     flex-grow: 1;
@@ -883,13 +874,6 @@ body {
 .aa-DetachedSearchButton {
   @apply rounded-md bg-scaleA-200 border border-scale-700;
   align-items: center;
-  // background-color: rgba(
-  //   var(--aa-input-background-color-rgb),
-  //   var(--aa-input-background-color-alpha)
-  // );
-  // border: 1px solid
-    // rgba(var(--aa-input-border-color-rgb), var(--aa-input-border-color-alpha));
-  // border-radius: 3px;
   color: rgba(var(--aa-muted-color-rgb), var(--aa-muted-color-alpha));
   cursor: pointer;
   display: flex;
@@ -903,11 +887,7 @@ body {
   text-align: left;
   width: 100%;
   &:focus {
-    border-color: rgba(var(--aa-primary-color-rgb), 1);
-    box-shadow: rgba(var(--aa-primary-color-rgb), var(--aa-primary-color-alpha))
-        0 0 0 3px,
-      inset rgba(var(--aa-primary-color-rgb), var(--aa-primary-color-alpha)) 0 0
-        0 2px;
+    @apply border-brand-900;
     outline: currentColor none medium;
   }
   @at-root .aa-DetachedSearchButtonIcon {

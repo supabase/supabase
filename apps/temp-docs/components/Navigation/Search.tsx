@@ -60,7 +60,12 @@ const Search: FC<Props> = ({}) => {
       },
       plugins: [recentSearchesPlugin],
       renderNoResults({ state, render }, root) {
-        render(`No results for "${state.query}".`, root)
+        render(
+          <div className="text-scale-1100 py-2 text-sm px-4">
+            No results found for "{state.query}".
+          </div>,
+          root
+        )
       },
       // @ts-ignore
       getSources({ query }) {
@@ -76,6 +81,7 @@ const Search: FC<Props> = ({}) => {
                       <div className="aa-ItemTitle">
                         <components.Highlight hit={item} attribute="title" />
                       </div>
+                      <p className="aa-ItemContentSubtitle">{item.description}</p>
                     </div>
                   </a>
                 )
