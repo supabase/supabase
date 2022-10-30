@@ -93,6 +93,7 @@ const sidebars = {
             'guides/auth/auth-helpers/auth-ui',
             'guides/auth/auth-helpers/nextjs',
             'guides/auth/auth-helpers/sveltekit',
+            'guides/auth/auth-helpers/remix',
           ],
         },
         {
