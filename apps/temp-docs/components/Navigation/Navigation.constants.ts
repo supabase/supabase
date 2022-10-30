@@ -247,7 +247,7 @@ export const menuItems: NavMenu = {
         { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth', items: [] },
         { name: 'Firestore Data', url: '/guides/migrations/firestore-data', items: [] },
         { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage', items: [] },
-        { name: 'Herokuy', url: '/guides/migrations/heroku', items: [] },
+        { name: 'Heroku', url: '/guides/migrations/heroku', items: [] },
       ],
     },
     {

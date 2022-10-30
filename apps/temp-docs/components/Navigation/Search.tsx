@@ -1,10 +1,10 @@
 import { render } from 'react-dom'
+import { IconCommand } from 'ui'
 import { createElement, FC, useEffect, useRef, Fragment } from 'react'
 import algoliasearch from 'algoliasearch/lite'
 import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js'
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches'
 import Link from 'next/link'
-import { Button, IconCommand } from '~/../../packages/ui'
 
 const searchClient = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
