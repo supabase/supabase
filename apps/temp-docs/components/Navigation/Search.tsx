@@ -1,5 +1,5 @@
 import { render } from 'react-dom'
-import { Badge, IconCommand } from 'ui'
+import { IconCommand } from 'ui'
 import { createElement, FC, useEffect, useRef, Fragment } from 'react'
 import algoliasearch from 'algoliasearch/lite'
 import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js'
@@ -76,7 +76,11 @@ const Search: FC<Props> = ({}) => {
                         <div className="aa-ItemTitle flex items-center space-x-1">
                           {item.category && (
                             <p
-                              className={`${item.category === 'cli' ? 'uppercase' : 'capitalize'}`}
+                              className={`${
+                                ['cli', 'api'].includes(item.category as string)
+                                  ? 'uppercase'
+                                  : 'capitalize'
+                              }`}
                             >
                               {item.category}
                               {item.version ? ` (${item.version})` : ''}:
@@ -88,6 +92,7 @@ const Search: FC<Props> = ({}) => {
                         </div>
                         <p className="aa-ItemContentSubtitle">{item.description}</p>
                       </div>
+                      {/* [Joshen] Thinking of adding some meta tags here like where the doc is from, what version etc */}
                       {/* <div>
                         <Badge color="gray">{item.source}</Badge>
                       </div> */}
