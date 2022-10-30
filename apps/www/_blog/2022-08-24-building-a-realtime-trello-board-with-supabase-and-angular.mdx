@@ -357,7 +357,7 @@ export class AppRoutingModule {}
 
 Our app will start with the login screen, after which we can move to the workspace with our boards and finally dive into one specific board to show all its lists and cards.
 
-To correclty use the Angular router we can now update the **src/app/app.component.html** so it only holds one line:
+To correctly use the Angular router we can now update the **src/app/app.component.html** so it only holds one line:
 
 ```html
 <router-outlet></router-outlet>
@@ -721,7 +721,7 @@ In fact that's enough for our first interaction with our Supabase tables, so we 
 
 Additionally we want to add a board, and here we encounter one of those _real world problems_:
 
-Because we have a **database trigger** that adds an entry when a new table is added, the user is not immediately authroized to access the new board row! Only once the trigger has finished, the RLS that checks user boards can confirm that this user is part of the board.
+Because we have a **database trigger** that adds an entry when a new table is added, the user is not immediately authorized to access the new board row! Only once the trigger has finished, the RLS that checks user boards can confirm that this user is part of the board.
 
 Therefore we add another line to load the boards again and pop the last added element so we can automatically navigate into its details page.
 
@@ -981,7 +981,7 @@ To keep track of data and changes we hold all cards in the `listCards` object th
 
 In terms of additional logic we might want to update or delete the board, which we can do simply with the previously created service functions.
 
-Same is true for lists and cards, whcih can be added, updated or removed.
+Same is true for lists and cards, which can be added, updated or removed.
 
 However, this will not (yet) update our local data, since we want to implement this with realtime updates later.
 

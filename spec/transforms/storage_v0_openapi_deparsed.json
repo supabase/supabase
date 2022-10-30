@@ -1825,6 +1825,59 @@
         }
       }
     },
+    "/object/info/public/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Get object info",
+        "description": "returns object info",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/render/authenticated/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render an authenticated image with the given transformations",
