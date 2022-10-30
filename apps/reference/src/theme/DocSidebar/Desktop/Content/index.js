@@ -10,6 +10,7 @@ const subNavRoutes = [
   `/${baseUrl}/reference/cli`,
   `/${baseUrl}/reference/auth`,
   `/${baseUrl}/reference/storage`,
+  `/${baseUrl}/reference/realtime`,
   `/${baseUrl}/reference/javascript`,
   `/${baseUrl}/reference/dart`,
 ]
@@ -26,6 +27,9 @@ const headerNames = {
   auth: {
     name: 'Auth',
   },
+  realtime: {
+    name: 'Realtime',
+  },
   storage: {
     name: 'Storage',
   },
@@ -34,8 +38,8 @@ const headerNames = {
     icon: 'javascript-icon',
   },
   dart: {
-    name: 'Dart',
-    icon: 'dart-icon',
+    name: 'Flutter',
+    icon: 'flutter-icon',
   },
   'auth-helpers': {
     name: 'Auth Helpers',

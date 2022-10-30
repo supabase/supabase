@@ -13,12 +13,11 @@ import {
   Alert,
   IconEdit,
   IconTrash,
-} from '@supabase/ui'
+} from 'ui'
 
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import Flag from 'components/ui/Flag/Flag'
 
 interface Props {}
 
@@ -45,8 +44,8 @@ const StorageMenu: FC<Props> = () => {
   } = storageExplorerStore || {}
 
   return (
-    <Menu type="pills" className="my-6 flex flex-col flex-grow px-5">
-      <div className="px-2 mb-6">
+    <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
+      <div className="mb-6 px-2">
         <Button
           block
           type="default"
@@ -66,7 +65,7 @@ const StorageMenu: FC<Props> = () => {
           <div>
             <Menu.Group title="All buckets" />
             {!loaded ? (
-              <div className="py-2 px-2 flex items-center space-x-2">
+              <div className="flex items-center space-x-2 py-2 px-2">
                 <IconLoader className="animate-spin" size={14} strokeWidth={2} />
                 <span className="text-sm">Loading buckets</span>
               </div>
@@ -109,13 +108,11 @@ const StorageMenu: FC<Props> = () => {
               <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
-          <Flag name="logsStorage">
-            <Link href={`/project/${projectRef}/storage/logs`}>
-              <Menu.Item rounded active={page === 'logs'}>
-                <p className="truncate">Logs</p>
-              </Menu.Item>
-            </Link>
-          </Flag>
+          <Link href={`/project/${projectRef}/storage/logs`}>
+            <Menu.Item rounded active={page === 'logs'}>
+              <p className="truncate">Logs</p>
+            </Menu.Item>
+          </Link>
         </div>
       </div>
     </Menu>
@@ -156,7 +153,7 @@ const BucketRow = ({
               >
                 {bucket.public ? 'Make private' : 'Make public'}
               </Dropdown.Item>,
-              <Dropdown.Seperator key="bucket-separator" />,
+              <Dropdown.Separator key="bucket-separator" />,
               <Dropdown.Item
                 icon={<IconTrash size="tiny" />}
                 key="delete-bucket"

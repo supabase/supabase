@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
-import { Button, IconArrowRight, IconLink } from '@supabase/ui'
+import { Button, IconArrowRight, IconLink } from 'ui'
 
 import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
@@ -88,7 +88,7 @@ const ColumnForeignKeyInformation: FC<{
       block
       icon={<IconLink />}
       title={
-        <div className="text-scale-900 flex items-center justify-between">
+        <div className="flex items-center justify-between text-scale-900">
           <div className="space-y-2">
             <span>This column has the following foreign key relation:</span>
             <div className="flex items-center space-x-2">
@@ -125,18 +125,18 @@ const ColumnForeignKeyAdded: FC<{
       block
       icon={<IconLink />}
       title={
-        <div className="text-scale-1100 flex items-center justify-between">
+        <div className="flex items-center justify-between text-scale-1100">
           <div className="space-y-2">
             <span>
               The following foreign key relation will be{' '}
               <span className="text-brand-900">added</span>:
             </span>
-            <div className="text-scale-1200 flex items-center space-x-2">
+            <div className="flex items-center space-x-2 text-scale-1200">
               <span className={`${columnName.length > 0 ? 'text-code' : ''} max-w-xs truncate`}>
                 {columnName || 'This column'}
               </span>
               <IconArrowRight size={14} strokeWidth={2} />
-              <span className="text-code max-w-xs truncate">
+              <span className="max-w-xs truncate text-code">
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
                 {foreignKey?.target_column_name}
               </span>

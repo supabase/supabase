@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import { useRouter } from 'next/router'
 
 const Benchmark = () => {
@@ -30,11 +30,6 @@ const Benchmark = () => {
               </span>
             </p>
           </div>
-        </div>
-        <div className="col-span-1 rounded-r-md px-12 pb-12 lg:col-span-2 lg:px-0 lg:pb-0">
-          <a href="https://supabasesubscribe.vercel.app/subscription/enterpriseBenchmarks">
-            <Button>Get notified</Button>
-          </a>
         </div>
       </div>
     </div>

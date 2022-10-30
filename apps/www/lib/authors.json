@@ -213,5 +213,21 @@
     "position": "Guest Author",
     "author_url": "https://twitter.com/schlimmson",
     "author_image_url": "https://github.com/saimon24.png"
+  },
+  {
+    "author_id": "burggraf",
+    "author": "Mark Burggraf",
+    "username": "burggraf",
+    "position": "Engineering",
+    "author_url": "https://github.com/burggraf",
+    "author_image_url": "https://github.com/burggraf.png"
+  },
+  {
+    "author_id": "pavel",
+    "author": "Pavel Borisov",
+    "username": "pavel",
+    "position": "Postgres Engineer",
+    "author_url": "https://github.com/pashkinelfe",
+    "author_image_url": "https://avatars.githubusercontent.com/u/63344111?v=4"
   }
 ]

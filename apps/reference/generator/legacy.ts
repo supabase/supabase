@@ -54,7 +54,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
 
       const description =
         pageSpec.description ||
-        tsDocCommentToMdComment(getDescriptionFromDefintion(tsDefinition))
+        tsDocCommentToMdComment(getDescriptionFromDefinition(tsDefinition))
 
       // Create page
       const content = Page({
@@ -107,7 +107,7 @@ function generateParameters(tsDefinition: any) {
   return methodListGroup(parameters)
 }
 
-function getDescriptionFromDefintion(tsDefinition) {
+function getDescriptionFromDefinition(tsDefinition) {
   if (!tsDefinition) return null
   if (
     ['Method', 'Constructor', 'Constructor signature'].includes(
@@ -130,7 +130,16 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
   if (param.type?.declaration?.children) {
     children = param.type?.declaration?.children
   } else if (isUnion(param)) {
-    children = param.type.types
+    // We don't want to show the union types if it's a literal
+    const nonLiteralVariants = param.type.types.filter(
+      ({ type }) => type !== 'literal'
+    )
+
+    if (nonLiteralVariants.length === 0) {
+      children = null
+    } else {
+      children = nonLiteralVariants
+    }
   } else if (param.type === 'reflection') {
     children = param.declaration.children
   }

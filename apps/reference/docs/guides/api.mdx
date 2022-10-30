@@ -1,6 +1,6 @@
 ---
 id: api
-title: APIs
+title: Serverless APIs
 description: Auto-generating and Realtime APIs.
 sidebar_label: Overview
 ---
@@ -9,9 +9,7 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 
-## Overview
-
-Supabase generates three types of API directly from your database schema.
+Supabase auto-generates three types of API directly from your database schema.
 
 - REST - interact with your database through a restful interface.
 - Realtime - listen to database changes.
@@ -25,7 +23,7 @@ The APIs are:
 - **Fast.** <br />Our benchmarks for basic reads are more than 300% faster than Firebase. The API is a very thin layer on top of Postgres, which does most of the heavy lifting.
 - **Scalable.** <br />The API can serve thousands of simultaneous requests, and works well for Serverless workloads.
 
-### REST API {#rest-api-overview}
+## REST API {#rest-api-overview}
 
 Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres.
 It provides everything you need from a CRUD API:
@@ -45,7 +43,7 @@ It provides everything you need from a CRUD API:
   ></iframe>
 </div>
 
-### GraphQL API {#graphql-api-overview}
+## GraphQL API {#graphql-api-overview}
 
 :::note
 
@@ -55,7 +53,7 @@ GraphQL is in Beta, and may have breaking changes. It is only available on self-
 
 GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-graphql), an open source PostgreSQL extension for GraphQL.
 
-### Realtime API {#realtime-api-overview}
+## Realtime API {#realtime-api-overview}
 
 Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
@@ -248,7 +246,7 @@ import { createClient, useQuery } from 'urql'
 // Prepare API key and Authorization header
 const headers = {
   apikey: <SUPABASE_ANON_KEY>,
-  authorization: `Bearer: ${<SUPABASE_ANON_KEY}`>
+  authorization: `Bearer ${<SUPABASE_ANON_KEY}`>
 }
 
 // Create GraphQL client

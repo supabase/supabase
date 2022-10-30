@@ -23,7 +23,7 @@ info:
 # This section is an array of public functions which a user might need to execute.
 parameters:
   - id: 'ANON_KEY' # {string} A unique identifier for this param.
-    title: 'ANON_KEY' # {string} Any a name.
+    title: 'ANON_KEY' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -32,7 +32,7 @@ parameters:
       A long-lived JWT with anonymous Postgres privileges.
 
   - id: 'SERVICE_KEY' # {string} A unique identifier for this param.
-    title: 'SERVICE_KEY' # {string} Any a name.
+    title: 'SERVICE_KEY' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -41,7 +41,7 @@ parameters:
       A long-lived JWT with Postgres privileges to bypass Row Level Security.
 
   - id: 'TENANT_ID' # {string} A unique identifier for this param.
-    title: 'TENANT_ID' # {string} Any a name.
+    title: 'TENANT_ID' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -50,7 +50,7 @@ parameters:
       The ID of a Storage tenant.
 
   - id: 'REGION' # {string} A unique identifier for this param.
-    title: 'REGION' # {string} Any a name.
+    title: 'REGION' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -59,7 +59,7 @@ parameters:
       Region of your S3 bucket.
 
   - id: 'GLOBAL_S3_BUCKET' # {string} A unique identifier for this param.
-    title: 'GLOBAL_S3_BUCKET' # {string} Any a name.
+    title: 'GLOBAL_S3_BUCKET' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -68,7 +68,7 @@ parameters:
       Name of your S3 bucket.
 
   - id: 'POSTGREST_URL' # {string} A unique identifier for this param.
-    title: 'POSTGREST_URL' # {string} Any a name.
+    title: 'POSTGREST_URL' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -77,7 +77,7 @@ parameters:
       The URL of your PostgREST server.
 
   - id: 'PGRST_JWT_SECRET' # {string} A unique identifier for this param.
-    title: 'PGRST_JWT_SECRET' # {string} Any a name.
+    title: 'PGRST_JWT_SECRET' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -86,7 +86,7 @@ parameters:
       A JWT Secret for the PostgREST database.
 
   - id: 'DATABASE_URL' # {string} A unique identifier for this param.
-    title: 'DATABASE_URL' # {string} Any a name.
+    title: 'DATABASE_URL' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -95,7 +95,7 @@ parameters:
       The URL of your Postgres database.
 
   - id: 'PGOPTIONS' # {string} A unique identifier for this param.
-    title: 'PGOPTIONS' # {string} Any a name.
+    title: 'PGOPTIONS' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -104,7 +104,7 @@ parameters:
       Additional configuration parameters for Postgres startup.
 
   - id: 'FILE_SIZE_LIMIT' # {string} A unique identifier for this param.
-    title: 'FILE_SIZE_LIMIT' # {string} Any a name.
+    title: 'FILE_SIZE_LIMIT' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -113,7 +113,7 @@ parameters:
       The maximum file size allowed.
 
   - id: 'STORAGE_BACKEND' # {string} A unique identifier for this param.
-    title: 'STORAGE_BACKEND' # {string} Any a name.
+    title: 'STORAGE_BACKEND' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -122,7 +122,7 @@ parameters:
       The storage provider.
 
   - id: 'FILE_STORAGE_BACKEND_PATH' # {string} A unique identifier for this param.
-    title: 'FILE_STORAGE_BACKEND_PATH' # {string} Any a name.
+    title: 'FILE_STORAGE_BACKEND_PATH' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -131,7 +131,7 @@ parameters:
       The location storage when the "STORAGE_BACKEND" is set to "file".
 
   - id: 'IS_MULTITENANT' # {string} A unique identifier for this param.
-    title: 'IS_MULTITENANT' # {string} Any a name.
+    title: 'IS_MULTITENANT' # {string} Any name.
     tags: ['multitenant'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -140,7 +140,7 @@ parameters:
       Operate across multiple tenants.
 
   - id: 'MULTITENANT_DATABASE_URL' # {string} A unique identifier for this param.
-    title: 'MULTITENANT_DATABASE_URL' # {string} Any a name.
+    title: 'MULTITENANT_DATABASE_URL' # {string} Any name.
     tags: ['multitenant'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -149,7 +149,7 @@ parameters:
       The URL of the multitenant Postgres database.
 
   - id: 'X_FORWARDED_HOST_REGEXP' # {string} A unique identifier for this param.
-    title: 'X_FORWARDED_HOST_REGEXP' # {string} Any a name.
+    title: 'X_FORWARDED_HOST_REGEXP' # {string} Any name.
     tags: ['multitenant'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -158,7 +158,7 @@ parameters:
       TBD.
 
   - id: 'POSTGREST_URL_SUFFIX' # {string} A unique identifier for this param.
-    title: 'POSTGREST_URL_SUFFIX' # {string} Any a name.
+    title: 'POSTGREST_URL_SUFFIX' # {string} Any name.
     tags: ['multitenant'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -167,7 +167,7 @@ parameters:
       The suffix for the PostgREST instance.
 
   - id: 'ADMIN_API_KEYS' # {string} A unique identifier for this param.
-    title: 'ADMIN_API_KEYS' # {string} Any a name.
+    title: 'ADMIN_API_KEYS' # {string} Any name.
     tags: ['multitenant'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true
@@ -176,7 +176,7 @@ parameters:
       Secure API key for administrative endpoints.
 
   - id: 'ENCRYPTION_KEY' # {string} A unique identifier for this param.
-    title: 'ENCRYPTION_KEY' # {string} Any a name.
+    title: 'ENCRYPTION_KEY' # {string} Any name.
     tags: ['multitenant'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true

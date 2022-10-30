@@ -299,7 +299,7 @@ test('bug: load older btn does not error out when previous page is empty', async
   // clicking load older multiple times should not give error
   await waitFor(() => {
     expect(screen.queryByText(/Sorry/)).toBeNull()
-    expect(screen.queryByText(/An error occured/)).toBeNull()
+    expect(screen.queryByText(/An error occurred/)).toBeNull()
     expect(screen.queryByText(/undefined/)).toBeNull()
   })
 })
@@ -309,7 +309,7 @@ test('log event chart hide', async () => {
     return { result: [] }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await screen.findByText('Events')
+  await screen.findByText(/Logs \/ Time/)
   const toggle = await screen.findByText(/Chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
@@ -391,5 +391,30 @@ test('filters accept filterOverride', async () => {
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
+  })
+})
+
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
+        },
+      },
+    })
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(4, 'months').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+    await screen.findByText('Log retention') // assert modal title is present
   })
 })

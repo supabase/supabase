@@ -53,7 +53,7 @@ function generateColorClasses() {
   colors.map((x) => {
     for (let index = 0; index < 12; index++) {
       const step = index + 1
-      mappedColors[x][step * 100] = `var(--colors-${x.toLowerCase()}${step})`
+      mappedColors[x][step * 100] = `var(--colors-${x}${step})`
 
       if (
         fixedOptions.some(function (v) {

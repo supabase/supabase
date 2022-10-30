@@ -8,12 +8,28 @@ id: typescript-support
 
 ## Generating types
 
-You can use our CLI to generate types:
+You can use the [Supabase CLI](/docs/guides/cli) to generate types directly from your Postgres database’s schema:
+
+### Generate types from a remote database
+
+Install the [Supabase CLI](/docs/guides/cli#installation) locally, and then run:
+
+```bash
+supabase login
+supabase projects list
+supabase gen types typescript --project-id <project_id> > lib/database.types.ts
+```
+
+### Generate types from a local database
+
+Set up your [local development environment](/docs/guides/cli/local-development), and then run:
 
 ```bash
 supabase start
 supabase gen types typescript --local > lib/database.types.ts
 ```
+
+For additional methods, see the [CLI Reference Docs](/docs/reference/cli/usage#supabase-gen-types).
 
 These types are generated directly from your database. Given a table `public.movies`, the definition will provide the following data:
 
@@ -76,9 +92,9 @@ async function getMovies() {
   return await supabase.from('movies').select('id, title, actors(*)')
 }
 
-type actors = Database['public']['Tables']['actors']['Row']
+type Actors = Database['public']['Tables']['actors']['Row']
 type MoviesResponse = Awaited<ReturnType<typeof getMovies>>
 type MoviesResponseSuccess = MoviesResponse['data'] & {
-  actors: actors[]
+  actors: Actors[]
 }
 ```

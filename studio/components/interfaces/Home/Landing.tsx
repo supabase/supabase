@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Head from 'next/head'
 import { observer } from 'mobx-react-lite'
-import { Button, IconGitHub } from '@supabase/ui'
+import { Button, IconGitHub } from 'ui'
 
 import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
@@ -16,7 +16,11 @@ const Landing = () => {
       const { error } = await auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?auth=true`,
+          redirectTo: `${
+            process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+              ? process.env.NEXT_PUBLIC_VERCEL_URL
+              : process.env.NEXT_PUBLIC_SITE_URL
+          }?auth=true`,
         },
       })
       if (error) throw error
@@ -47,7 +51,7 @@ const Landing = () => {
           <div className="hidden items-center space-x-3 md:ml-10 md:flex md:pr-4">
             <a
               href="https://supabase.com/docs"
-              className="text-scale-1100 hover:text-scale-1200 text-sm transition-colors"
+              className="text-sm text-scale-1100 transition-colors hover:text-scale-1200"
             >
               Documentation
             </a>
@@ -62,7 +66,7 @@ const Landing = () => {
           <h1 className="text-3xl">
             Give Your Database <span className="text-brand-900">Superpowers</span>
           </h1>
-          <p className="text-scale-1100 mb-10 text-base sm:mx-auto sm:max-w-2xl md:mt-5">
+          <p className="mb-10 text-base text-scale-1100 sm:mx-auto sm:max-w-2xl md:mt-5">
             Create a backend in less than 2 minutes. Start your project with a Postgres database,
             Authentication, instant APIs, Edge Functions, Realtime subscriptions, and Storage.
           </p>
@@ -79,14 +83,14 @@ const Landing = () => {
           </div>
 
           <div className="sm:text-center">
-            <p className="text-scale-900 mt-8 mb-5 text-xs sm:mx-auto sm:max-w-sm">
+            <p className="mt-8 mb-5 text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
               By continuing, you agree to Supabase's{' '}
               <Link href="https://supabase.com/docs/company/terms">
-                <a className="hover:text-scale-1100 underline">Terms of Service</a>
+                <a className="underline hover:text-scale-1100">Terms of Service</a>
               </Link>{' '}
               and{' '}
               <Link href="https://supabase.com/docs/company/privacy">
-                <a className="hover:text-scale-1100 underline">Privacy Policy</a>
+                <a className="underline hover:text-scale-1100">Privacy Policy</a>
               </Link>
               , and to receive periodic emails with updates.
             </p>
@@ -95,7 +99,7 @@ const Landing = () => {
           <hr className="mt-16 max-w-[75px] border-zinc-500 sm:mx-auto " />
 
           <div className="sm:text-center">
-            <p className="text-scale-900 mt-16 mb-5 text-base sm:mx-auto sm:max-w-2xl">
+            <p className="mt-16 mb-5 text-base text-scale-900 sm:mx-auto sm:max-w-2xl">
               Ready to learn about our pay-as-you-go Enterprise plan?
             </p>
             <Link href="https://supabase.com/contact/enterprise">Let's talk!</Link>

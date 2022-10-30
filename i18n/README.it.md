@@ -38,7 +38,7 @@ Per ottenere la documentazione completa, visitare il sito [supabase.com/docs](ht
 
 Attualmente siamo in Beta Pubblica. Tenete d'occhio (cliccando sul bottone "Watch") le "release" di questa repository per essere notificati sui nostri aggiornamenti piú importanti.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -50,7 +50,7 @@ Supabase è un insieme di strumenti con sorgente aperto. Stiamo sviluppando le f
 
 Supabase è una [piattaforma ospitata](https://app.supabase.com). Ci si può iscrivere ed iniziare ad utilizzare Supabase senza la necessità di installare qualcosa. Ci impegnamo nel creare un'esperienza di sviluppo interamente in locale - attualmente é il nostro obiettivo primario, così come lo è la stabilità della piattaforma stessa.
 
-![Architettura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architettura](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) è un sistema di database relazionali ad oggetti, con oltre 30 anni di sviluppo all'attivo che gli hanno permesso di ottenere una ottima reputazione in termini di affidabilità, robustezza delle funzionalità e prestazioni.
 - [Realtime](https://github.com/supabase/realtime) è un server Elixir che consente di ascoltare eventi PostreSQL quali inserimento, aggiornamenti e rimozioni utilizzando i websocket. Supabase rimane in ascolto della funzionalità incorporata di replicazione di Postgres, convertendo il flusso di byte replicato in JSON, dopodichè diffondendo il JSON attraverso i websocket.
@@ -71,7 +71,7 @@ La nostra libreria utente è modulare. Ogni sotto-libreria è una implementazion
 
 | Repository            | Ufficiale                                        | Comunità                                                                                                                                                                                                                   |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                                |
+| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                          |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
