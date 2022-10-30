@@ -55,11 +55,33 @@ async function walk(dir) {
         const { data, content } = matter(fileContents)
 
         const { id, title, description } = data
-        const url = slug.includes('/generated/')
-          ? slug.replace('/generated', '').replace(/\.mdx$/, '')
-          : slug.replace(/\.mdx$/, '')
+        const url = (slug.includes('/generated') ? slug.replace('/generated', '') : slug)
+          .replace('docs', '')
+          .replace(/\.mdx$/, '')
         const source = slug.includes('/reference') ? 'reference' : 'guide'
-        return { objectID: crypto.randomUUID(), id, title, description, url, source, content }
+        const object = {
+          objectID: crypto.randomUUID(),
+          id,
+          title,
+          description,
+          url,
+          source,
+          content,
+        }
+
+        if (slug.includes('/reference')) {
+          const slugSegments = slug.split('/')
+          const category = slugSegments[slugSegments.indexOf('reference') + 1]
+          const version = slugSegments[slugSegments.indexOf('reference') + 2] || ''
+
+          object.category = category.replace(/\.mdx$/, '')
+          if (version.length === 2) object.version = version
+        } else {
+          object.category = undefined
+          object.version = undefined
+        }
+
+        return object
       })
       // Some of the reference generated files come with an 'index' page that we can ignore
       .filter((object) => !object.url.endsWith('/index'))

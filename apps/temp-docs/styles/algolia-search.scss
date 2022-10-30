@@ -672,7 +672,6 @@ body {
     .aa-ItemLink {
     align-items: center;
     color: inherit;
-    display: grid;
     gap: calc(var(--aa-spacing-half) / 2);
     grid-auto-flow: column;
     justify-content: space-between;

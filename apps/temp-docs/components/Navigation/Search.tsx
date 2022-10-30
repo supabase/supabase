@@ -1,5 +1,5 @@
 import { render } from 'react-dom'
-import { IconCommand } from 'ui'
+import { Badge, IconCommand } from 'ui'
 import { createElement, FC, useEffect, useRef, Fragment } from 'react'
 import algoliasearch from 'algoliasearch/lite'
 import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js'
@@ -53,16 +53,11 @@ const Search: FC<Props> = ({}) => {
       // @ts-ignore
       renderer: { createElement, Fragment, render },
       placeholder: 'Search docs',
-      navigator: {
-        navigate({ itemUrl }) {
-          // router.push(itemUrl);
-        },
-      },
       plugins: [recentSearchesPlugin],
       renderNoResults({ state, render }, root) {
         render(
           <div className="text-scale-1100 py-2 text-sm px-4">
-            No results found for "{state.query}".
+            No results found for {state.query}.
           </div>,
           root
         )
@@ -74,16 +69,30 @@ const Search: FC<Props> = ({}) => {
             sourceId: 'pages',
             templates: {
               item({ item, components }) {
-                console.log(item)
                 return (
-                  <a href={item.url as string} className="aa-ItemLink">
-                    <div className="aa-ItemContent">
-                      <div className="aa-ItemTitle">
-                        <components.Highlight hit={item} attribute="title" />
+                  <Link href={item.url as string}>
+                    <a className="aa-ItemLink truncate flex justify-between space-x-4">
+                      <div className="aa-ItemContent w-full">
+                        <div className="aa-ItemTitle flex items-center space-x-1">
+                          {item.category && (
+                            <p
+                              className={`${item.category === 'cli' ? 'uppercase' : 'capitalize'}`}
+                            >
+                              {item.category}
+                              {item.version ? ` (${item.version})` : ''}:
+                            </p>
+                          )}
+                          <p>
+                            <components.Highlight hit={item} attribute="title" />
+                          </p>
+                        </div>
+                        <p className="aa-ItemContentSubtitle">{item.description}</p>
                       </div>
-                      <p className="aa-ItemContentSubtitle">{item.description}</p>
-                    </div>
-                  </a>
+                      {/* <div>
+                        <Badge color="gray">{item.source}</Badge>
+                      </div> */}
+                    </a>
+                  </Link>
                 )
               },
             },
