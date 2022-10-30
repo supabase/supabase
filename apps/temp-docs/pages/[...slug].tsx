@@ -1,39 +1,32 @@
-import { getAllDocs, getDocsBySlug } from '../lib/docs'
-import Layout from '../components/layouts/DocsLayout'
-import { serialize } from 'next-mdx-remote/serialize'
-import { MDXRemote } from 'next-mdx-remote'
 import { MDXProvider } from '@mdx-js/react'
-import components from '../components/index'
-import menuItems from '../components/nav/menu-items.json'
 import { useRouter } from 'next/router'
+import { MDXRemote } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
+import components from '../components/index'
+import { menuItems } from '../components/Navigation/Navigation.constants'
+import { getPageType } from '../lib/helpers'
+import { getAllDocs, getDocsBySlug } from '../lib/docs'
+import Layout from '~/layouts/Default'
 
 // table of contents extractor
 const toc = require('markdown-toc')
 
-export default function Doc({
-  meta,
-  content,
-  toc,
-}: {
-  meta: { title: string; description: string }
+interface Meta {
+  id: string
+  title: string
+  sidebar_label: string
+  hide_table_of_contents: boolean
+}
+
+interface Props {
+  meta: Meta
   content: any
   toc: any
-}) {
+}
+
+export default function Doc({ meta, content, toc }: Props) {
   const { asPath } = useRouter()
-  let page
-  switch (asPath) {
-    case '/guides':
-    case '/guides/local-development':
-    case /\/guides\/[a-zA-Z]*\/[a-zA-Z\-]*/.test(asPath) && asPath:
-      page = 'Guides'
-      break
-    case asPath.includes('/reference') && asPath:
-      page = 'Reference'
-      break
-    default:
-      page = 'Docs'
-      break
-  }
+  const page = getPageType(asPath)
 
   return (
     // @ts-ignore
@@ -55,7 +48,6 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   }
 
   let doc = getDocsBySlug(slug)
-
   const content = await serialize(doc.content || '')
 
   return {

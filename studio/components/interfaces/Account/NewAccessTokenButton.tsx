@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Input, Button, Modal, Form, Alert } from '@supabase/ui'
+import { Input, Button, Modal, Form, Alert } from 'ui'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -56,7 +56,7 @@ const NewAccessTokenButton = observer(() => {
         visible={isOpen}
         onCancel={() => setIsOpen(!isOpen)}
         header={
-          <div className="flex gap-2 items-baseline">
+          <div className="flex items-baseline gap-2">
             <h5 className="text-sm text-scale-1200">Generate New Token</h5>
           </div>
         }
@@ -77,7 +77,7 @@ const NewAccessTokenButton = observer(() => {
                   className="w-full"
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Button htmlType="submit" loading={isSubmitting} size="small" block danger>
                   Generate Token

@@ -10,11 +10,15 @@ import 'styles/contextMenu.scss'
 import 'styles/react-data-grid-logs.scss'
 import 'styles/date-picker.scss'
 import 'styles/grid.scss'
+import 'styles/users-table.scss'
 
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+
+// @ts-ignore
+import Prism from 'prism-react-renderer/prism'
 
 import Head from 'next/head'
 import { AppPropsWithLayout } from 'types'
@@ -24,6 +28,7 @@ import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
 import { GOTRUE_ERRORS } from 'lib/constants'
 import { auth } from 'lib/gotrue'
+import { dart } from 'lib/constants/prism'
 
 import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
@@ -32,6 +37,8 @@ import FlagProvider from 'components/ui/Flag/FlagProvider'
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
+
+dart(Prism)
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const [rootStore] = useState(() => new RootStore())

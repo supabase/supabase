@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconExternalLink } from '@supabase/ui'
+import { IconChevronLeft, IconExternalLink } from 'ui'
 import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
@@ -201,7 +201,7 @@ function Partner({ partner }: { partner: Partner }) {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from<Partner>('partners').select('slug')
+  const { data: slugs } = await supabase.from('partners').select('slug')
 
   const paths: {
     params: { slug: string }
@@ -222,7 +222,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 // This also gets called at build time
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   let { data: partner } = await supabase
-    .from<Partner>('partners')
+    .from('partners')
     .select('*')
     .eq('slug', params!.slug as string)
     .single()

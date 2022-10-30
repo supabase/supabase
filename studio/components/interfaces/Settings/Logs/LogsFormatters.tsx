@@ -4,15 +4,45 @@
  * for http response codes
  */
 
-import { IconAlertCircle, IconInfo } from '@supabase/ui'
+import { IconAlertCircle, IconInfo } from 'ui'
 import dayjs from 'dayjs'
 import React from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import CopyButton from 'components/ui/CopyButton'
 
 export const RowLayout: React.FC = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
 )
 
+export const SelectionDetailedRow = ({
+  label,
+  value,
+  valueRender,
+}: {
+  label: string
+  value: string
+  valueRender?: React.ReactNode
+}) => {
+  return (
+    <div className="grid grid-cols-12 group">
+      <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
+      <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
+        {valueRender ?? value}
+      </span>
+      <CopyButton
+        bounceIconOnCopy
+        text={value}
+        className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
+        type="text"
+        title="Copy to clipboard"
+      >
+        {''}
+      </CopyButton>
+    </div>
+  )
+}
+
+// used for column renderers
 export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
   value,
   className,
@@ -34,10 +64,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '1':
     case '2':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-500 dark:bg-scale-400 border
+            className="relative flex h-6 items-center justify-center rounded border bg-scale-500 px-2
+            py-1 text-center dark:bg-scale-400
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -48,10 +78,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     // 5XX responses
     case '5':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-red-400
+            className="relative flex h-6 items-center justify-center rounded bg-red-400 px-2 py-1
+            text-center
 
             "
           >
@@ -64,10 +94,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '4':
     case '3':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-amber-400
+            className="relative flex h-6 items-center justify-center rounded bg-amber-400 px-2 py-1
+            text-center
 
             "
           >
@@ -81,10 +111,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     // All other responses
     default:
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-300
+            className="relative flex h-6 items-center justify-center rounded bg-scale-300 px-2 py-1
+            text-center
 
             "
           >
@@ -211,7 +241,7 @@ export const TimestampLocalFormatter = ({
  */
 
 export const HeaderFormmater = ({ value }: any) => {
-  return <div className="text-scale-900 font-normal flex items-center text-xs h-full">{value}</div>
+  return <div className="flex h-full items-center text-xs font-normal text-scale-900">{value}</div>
 }
 
 /*

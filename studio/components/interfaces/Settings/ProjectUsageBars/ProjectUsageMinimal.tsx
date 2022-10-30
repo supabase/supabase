@@ -1,11 +1,11 @@
 import { FC } from 'react'
-import { Loading } from '@supabase/ui'
+import { Loading } from 'ui'
 
 import { useProjectSubscription, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
-import { usageBasedItems } from './ProjectUsageBars.constants'
+import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 
 interface ProjectUsageMinimalProps {
   projectRef?: string
@@ -23,7 +23,7 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
     return <></>
   }
 
-  const product = usageBasedItems.find((item) => item.title === filter)
+  const product = USAGE_BASED_PRODUCTS.find((item) => item.title === filter)
   if (!product) return <></>
 
   if (usageError || subscriptionError) {
@@ -42,7 +42,7 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
 
             return (
               <div key={feature.key} className="space-y-1">
-                <h5 className="text-scale-1200 text-sm">{feature.title}</h5>
+                <h5 className="text-sm text-scale-1200">{feature.title}</h5>
                 <SparkBar
                   type="horizontal"
                   barClass={`${

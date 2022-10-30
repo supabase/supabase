@@ -17,6 +17,9 @@ services:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
+      DEFAULT_ORGANIZATION: ${STUDIO_DEFAULT_ORGANIZATION}
+      DEFAULT_PROJECT: ${STUDIO_DEFAULT_PROJECT}
+
       SUPABASE_URL: http://kong:8000
       SUPABASE_REST_URL: ${PUBLIC_REST_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
@@ -35,12 +38,14 @@ services:
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
       - ./volumes/api:/var/lib/kong
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.10.0
+    image: supabase/gotrue:v2.19.4
     depends_on:
       - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
@@ -93,7 +98,7 @@ services:
 
   realtime:
     container_name: supabase-realtime
-    image: supabase/realtime:v0.22.4
+    image: supabase/realtime:v0.25.1
     depends_on:
       - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
@@ -156,8 +161,13 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.21
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    image: supabase/postgres:14.1.0.77
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+      - -c
+      - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432

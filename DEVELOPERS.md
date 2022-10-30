@@ -1,13 +1,13 @@
 # Developing Supabase
 
 1. [Getting started](#getting-started)
-    - [Install dependencies](#install-dependencies)
+   - [Install dependencies](#install-dependencies)
 2. [Local development](#local-development)
    - [Fork the repository](#fork-the-repository)
    - [Clone the repo](#clone-the-repo)
    - [Running turborepo](#running-turborepo)
-      - [Shared components](#shared-components)
-      - [Installing packages](#installing-packages)    
+     - [Shared components](#shared-components)
+     - [Installing packages](#installing-packages)
 3. [Create a pull request](#create-a-pull-request)
 
 - [Common tasks](#common-tasks)
@@ -59,6 +59,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 [Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
 
 1. Install the dependences in the root of the repo.
+
    ```sh
    npm install # install dependencies
    ```
@@ -70,19 +71,19 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 Then visit, and edit, any of the following sites:
 
-Site | Directory | Scope name | Description | Local development server
----- | --------- | ---------- | ----------- | ------------------------
-[supabase.com](https://supabase.com) | `/apps/www` | www | The main website | http://localhost:3000
-[app.supabase.com](https://app.supabase.com) | `/studio` | studio | Studio dashboard | http://localhost:8082
-[POC] Next.js based Docs site | `/apps/temp-docs` | temp-docs | Guides and Reference (Next.js based) | http://localhost:3001  
-[POC] Community forum | `/apps/temp-community-forum` | forum | GitHub Discussions | http://localhost:3002
-[POC] DEV articles site | `/apps/temp-community-tutorials` | tutorials | DEV articles (which community members can write) | http://localhost:3003
+| Site                                         | Directory                        | Scope name | Description                                      | Local development server |
+| -------------------------------------------- | -------------------------------- | ---------- | ------------------------------------------------ | ------------------------ |
+| [supabase.com](https://supabase.com)         | `/apps/www`                      | www        | The main website                                 | http://localhost:3000    |
+| [app.supabase.com](https://app.supabase.com) | `/studio`                        | studio     | Studio dashboard                                 | http://localhost:8082    |
+| [POC] Next.js based Docs site                | `/apps/temp-docs`                | temp-docs  | Guides and Reference (Next.js based)             | http://localhost:3001    |
+| [POC] Community forum                        | `/apps/temp-community-forum`     | forum      | GitHub Discussions                               | http://localhost:3002    |
+| [POC] DEV articles site                      | `/apps/temp-community-tutorials` | tutorials  | DEV articles (which community members can write) | http://localhost:3003    |
 
 The following sites are temporarily not run using turborepo, and must be run independently.
 
-Site | Directory | Scope name | Description | Local development server
----- | --------- | ---------- | ----------- | ------------------------ 
-[supabase.com/docs](https://supabase.com/docs) | `/apps/reference` | N/A | Guides and Reference (Currently not in Turborepo) | http://localhost:3010/docs
+| Site                                           | Directory         | Scope name | Description                                       | Local development server   |
+| ---------------------------------------------- | ----------------- | ---------- | ------------------------------------------------- | -------------------------- |
+| [supabase.com/docs](https://supabase.com/docs) | `/apps/reference` | N/A        | Guides and Reference (Currently not in Turborepo) | http://localhost:3010/docs |
 
 For the docs website, please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
 
@@ -117,14 +118,13 @@ After making your changes, open a pull request (PR). Once you submit your pull r
 
 Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
 
-
 ---
 
 ## Common tasks
 
 ### Add a redirect
 
-Create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
+Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
 
 ---
 

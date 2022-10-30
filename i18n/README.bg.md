@@ -45,7 +45,7 @@
 
 В момента сме в публична Beta версия. Вижте "releases" на това "repository", за да бъдете уведомени за всички нови версии.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -58,7 +58,7 @@ Supabase е комбинация на инструменти с отворен �
 Supabase е [хоствана платформа](https://app.supabase.com). Можете да се регистрирате и да използвате Supabase без да инсталирате нищо.
 Можете също да използвате [самостоятелен хостинг](https://supabase.com/docs/guides/hosting/overview) и да го [използвате локално](https://supabase.com/docs/guides/local-development).
 
-![Архитектура](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Архитектура](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) е обектно-релативна база данни с повече от 30 години активно развитие, което е създало висока репутация за съвместимост, функционалност и производителност.
 - [Realtime](https://github.com/supabase/realtime) е сървър на Elixir, който позволява да проследявате всички въвеждания, актуализации и изтривания на данни в PostgreSQL чрез уеб-сокети (websockets). Realtime проверява въвеждането на данни на PostgreSQL и конвертира в JSON записи, като после ги праща по уеб-сокети на оторизирани клиенти.
@@ -116,8 +116,8 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
   </tr>
   <tr>
-    <td>Dart (Flutter)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td>Flutter</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>

@@ -2,12 +2,12 @@ import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { Tabs, Button, Space } from '@supabase/ui'
+import { Tabs, Button, Space } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
 import 'swiper/swiper.min.css'
-import { Badge } from '@supabase/ui'
+import { Badge } from 'ui'
 import Link from 'next/link'
 
 interface Content {
