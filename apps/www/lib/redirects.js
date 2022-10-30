@@ -1442,7 +1442,7 @@ module.exports = [
     source: '/docs/reference/javascript/auth-api-updateuserbyid',
     destination: '/docs/reference/javascript/v1/auth-api-updateuserbyid',
   },
-  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v1 docs instead
   {
     permanent: true,
@@ -1501,7 +1501,7 @@ module.exports = [
     source: '/docs/reference/dart/reset-password-email',
     destination: '/docs/reference/dart/auth-resetpasswordforemail',
   },
-  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v0 docs instead
   {
     permanent: true,

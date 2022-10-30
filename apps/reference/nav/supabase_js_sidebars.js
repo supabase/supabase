@@ -41,6 +41,7 @@ const sidebars = {
         'generated/auth-signout',
         'generated/auth-verifyotp',
         'generated/auth-getsession',
+        'generated/auth-refreshsession',
         'generated/auth-getuser',
         'generated/auth-updateuser',
         'generated/auth-setsession',
