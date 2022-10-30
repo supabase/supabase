@@ -22,9 +22,6 @@ export default function ButtonCard({
           children
         ) : (
           <div
-            className={`px-6 py-4 gap-x-4 gap-y-2 flex ${
-              layout === 'vertical' ? 'flex-col' : 'items-center'
-            }`}
             className={[
               'px-6 py-4 gap-x-4 gap-y-2 flex',
               `${layout === 'vertical' ? 'flex-col' : 'items-center'}`,
