@@ -37,6 +37,13 @@ async function walk(dir) {
 ;(async function () {
   // initialize environment variables
   dotenv.config()
+
+  if (!process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || process.env.ALGOLIA_SEARCH_ADMIN_KEY) {
+    return console.log(
+      'Missing Algolia app ID / admin Key: skipping saving of Algolia search index'
+    )
+  }
+
   console.log('Preparing docs indexing for Algolia')
 
   try {
