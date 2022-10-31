@@ -45,7 +45,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   } = useProjectSubscription(ui.selectedProject?.ref)
 
   const [dateRange, setDateRange] = useState<any>()
-  const projectTier = ui.selectedProject?.subscription_tier
   const isPayg = subscription?.tier?.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
   useEffect(() => {
