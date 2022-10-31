@@ -10,7 +10,7 @@ const ResetPasswordPage: NextPageWithLayout = () => {
         <ResetPasswordForm />
       </div>
 
-      <div className="my-8 self-center">
+      <div className="my-8 self-center text-sm">
         <span className="text-scale-1100">Already have an account?</span>{' '}
         <Link href="/sign-in">
           <a className="underline hover:text-scale-1100">Sign In</a>
