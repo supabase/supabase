@@ -187,5 +187,4 @@ services:
       POSTGRES_HOST: /var/run/postgresql
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./volumes/db/data:/var/lib/postgresql/data
       - ./volumes/db/roles.sql:/etc/postgresql.schema.sql

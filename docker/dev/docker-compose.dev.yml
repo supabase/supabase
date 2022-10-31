@@ -18,7 +18,7 @@ services:
   db:
     restart: 'no'
     volumes:
-      - /var/lib/postgresql/data
+      # Seed data should be inserted last (alphabetical order)
       - ./dev/data.sql:/docker-entrypoint-initdb.d/seed.sql
   storage:
     volumes:
