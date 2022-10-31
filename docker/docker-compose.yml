@@ -58,8 +58,8 @@ services:
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 
-      GOTRUE_SITE_URL: http://rest:3000
-      GOTRUE_URI_ALLOW_LIST: https://rest:3000
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
       GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP}
 
       GOTRUE_JWT_ADMIN_ROLES: service_role
@@ -132,7 +132,7 @@ services:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
       rest:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
@@ -184,6 +184,7 @@ services:
     ports:
       - ${POSTGRES_PORT}:5432
     environment:
+      POSTGRES_HOST: /var/run/postgresql
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./volumes/db/data:/var/lib/postgresql/data
+      - ./volumes/db/roles.sql:/etc/postgresql.schema.sql
