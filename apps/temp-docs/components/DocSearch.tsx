@@ -7,9 +7,12 @@ import { DocSearchModal } from '@docsearch/react'
 import clsx from 'clsx'
 import { useActionKey } from '~/hooks/useActionKey'
 
-const INDEX_NAME = 'tailwindcss_dev'
-const API_KEY = '5fc87cef58bb80203d2207578309fab6'
-const APP_ID = 'KNPXZI5B0M'
+// [Joshen] We're currently using this over Algolia search for the time being
+// Refer to the comment in Navigation/AlgoliaSearch for more information about this
+
+const INDEX_NAME = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME
+const API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY
+const APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID
 
 const SearchContext = createContext(null)
 
@@ -64,10 +67,6 @@ export function SearchProvider({ children }: any) {
             // @ts-ignore
             initialQuery={initialQuery}
             initialScrollY={window.scrollY}
-            searchParameters={{
-              facetFilters: 'version:v3',
-              distinct: 1,
-            }}
             placeholder="Search documentation"
             onClose={onClose}
             indexName={INDEX_NAME}

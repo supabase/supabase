@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function ButtonCard({
   children = undefined,
@@ -11,22 +12,30 @@ export default function ButtonCard({
 }) {
   return (
     <Link href={to}>
-      <a className={['button-card h-full pb-4 block', `button-card--${layout}`].join(' ')}>
+      <a
+        className={[
+          'h-full block shadow-none bg-scale-400 rounded transition',
+          'border border-transparent hover:border-scale-600',
+        ].join('')}
+      >
         {children ? (
           children
         ) : (
           <div
-            className={`button-card__inner p-4 gap-1 flex ${
-              layout === 'vertical' ? 'flex-col' : 'items-center'
-            }`}
+            className={[
+              'px-6 py-4 gap-x-4 gap-y-2 flex',
+              `${layout === 'vertical' ? 'flex-col' : 'items-center'}`,
+            ].join(' ')}
           >
             {icon && typeof icon == 'string' ? (
-              <img className="m-0" src={icon} width={24} alt={title} />
+              <div className="w-[24px] h-[24px]">
+                <Image className="m-0" src={icon} width={24} height={24} alt={title} />
+              </div>
             ) : (
               icon
             )}
-            <h3 className="mt-0">{title}</h3>
-            <p>{description}</p>
+            <h3 className="my-0 text-base truncate">{title}</h3>
+            <p className="my-0 text-sm truncate">{description}</p>
           </div>
         )}
       </a>
