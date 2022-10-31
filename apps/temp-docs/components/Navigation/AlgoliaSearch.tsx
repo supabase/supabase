@@ -6,6 +6,23 @@ import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js'
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches'
 import { useRouter } from 'next/router'
 
+// [Joshen] We're currently using DocSearch from Algolia as it provides a nice
+// UI out of the box + some good preconfigured search settings (e.g hierarchy).
+// However, we're using our own Algolia account to store the records in the indexes
+// (rather than going through the DocSearch program from Algolia where they'll crawl
+// our site for us). Refer to scripts/build-search on how we're saving the records.
+
+// Using Algolia's autocomplete library gives us full flexbility in terms of customizing
+// our search experience, but that will take time to figure out. Hence why for now we're just
+// using DocSearch with our own records.
+
+// Potentially for search, we could
+// - Go ahead with the DocSearch program and let them crawl our site to generate the records
+//   - But we need to ensure that our site is semantically correct first
+// - Use Algolia itself to flesh out our own search logic
+//   - The basics are already set up to be honest, but will take time to make it great
+// - Go back to Typesense if we deem that Algolia is not helpful in the long run
+
 const searchClient = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
   process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY
@@ -38,7 +55,7 @@ const recentSearchesPlugin = createLocalStorageRecentSearchesPlugin({
 
 interface Props {}
 
-const Search: FC<Props> = ({}) => {
+const AlgoliaSearch: FC<Props> = ({}) => {
   const searchRef = useRef(null)
   const router = useRouter()
 
@@ -79,7 +96,6 @@ const Search: FC<Props> = ({}) => {
             templates: {
               item({ item, components }) {
                 return (
-                  // <Link href={item.url as string}>
                   <a
                     href={item.url as string}
                     className="aa-ItemLink truncate flex justify-between space-x-4"
@@ -104,12 +120,7 @@ const Search: FC<Props> = ({}) => {
                       </div>
                       <p className="aa-ItemContentSubtitle">{item.description}</p>
                     </div>
-                    {/* [Joshen] Thinking of adding some meta tags here like where the doc is from, what version etc */}
-                    {/* <div>
-                        <Badge color="gray">{item.source}</Badge>
-                      </div> */}
                   </a>
-                  // </Link>
                 )
               },
             },
@@ -153,4 +164,4 @@ const Search: FC<Props> = ({}) => {
   )
 }
 
-export default Search
+export default AlgoliaSearch

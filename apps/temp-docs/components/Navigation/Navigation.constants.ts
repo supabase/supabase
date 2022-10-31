@@ -302,7 +302,7 @@ export const menuItems: NavMenu = {
       label: 'Official',
       items: [
         { name: 'Reference Documentation', url: '/reference', items: [] },
-        { name: 'Supabase Javascript Library', url: '/reference/javascript', items: [] },
+        { name: 'Supabase JavaScript Library', url: '/reference/javascript', items: [] },
         { name: 'Supabase Flutter Library', url: '/reference/dart', items: [] },
         { name: 'Supabase CLI', url: '/reference/cli', items: [] },
         { name: 'Management API', url: '/reference/api', items: [] },

@@ -5,12 +5,15 @@ const matter = require('gray-matter')
 const dotenv = require('dotenv')
 const algoliasearch = require('algoliasearch/lite')
 
-// [Joshen] Scaffolding index logic to save to Algolia
-// Need to think about what object structure to send to algolia
-// Experiment is currently only sending MDX files from the docs/guides
-// We need to send everything else too
+// [Joshen] We initially thought of building out our search using Algolia directly,
+// but eventually decided to just use DocSearch since it provides us a UI and some
+// configurations out of the box (e.g Doc hierarchy).
 
-// Also note that we'll need to do a general clean up of the files in the docs
+// As such when creating the search object, the properties that are specifically read
+// by DocSearch are "type" and "hierarchy". The rest, though saved into Algolia (which we
+// can potentially use to craft more nuanced search experiences) are not used by DocSearch
+
+// Note that we'll need to do a general clean up of the files in the docs
 // A lot of them are not even linked to within the docs site, so just need to
 // double check if they can be removed or if we want them in the side bars.
 const ignoredFiles = [
@@ -19,6 +22,16 @@ const ignoredFiles = [
   'docs/going-into-prod.mdx',
   'docs/guides.mdx',
 ]
+
+const nameMap = {
+  api: 'Management API',
+  cli: 'Supabase CLI',
+  auth: 'Auth Server',
+  storage: 'Storage Server',
+  postgres: 'Postgres',
+  dart: 'Supabase Flutter Library',
+  javascript: 'Supabase JavaScript Library',
+}
 
 async function walk(dir) {
   let files = await fs.promises.readdir(dir)
@@ -63,22 +76,27 @@ async function walk(dir) {
 
         const { id, title, description } = data
         const url = (slug.includes('/generated') ? slug.replace('/generated', '') : slug)
-          .replace('docs', '/docs')
+          .replace('docs', '')
           .replace(/\.mdx$/, '')
         const source = slug.includes('/reference') ? 'reference' : 'guide'
         const object = {
+          // For Algolia
           objectID: crypto.randomUUID(),
           id,
           title,
           description,
           url,
           source,
-          // content,
+          pageContent: content,
+          category: undefined,
+          version: undefined,
+
+          // Docsearch specific
           type: 'lvl1',
           hierarchy: {
-            lvl0: 'Core Concepts',
-            lvl1: 'Dark Mode',
-            lvl2: title,
+            lvl0: 'Guides',
+            lvl1: title,
+            lvl2: null,
             lvl3: null,
             lvl4: null,
             lvl5: null,
@@ -87,15 +105,31 @@ async function walk(dir) {
         }
 
         if (slug.includes('/reference')) {
-          const slugSegments = slug.split('/')
-          const category = slugSegments[slugSegments.indexOf('reference') + 1]
-          const version = slugSegments[slugSegments.indexOf('reference') + 2] || ''
+          const urlSegments = url.split('/')
+          const category = urlSegments[urlSegments.indexOf('reference') + 1]
+          const version = urlSegments[urlSegments.indexOf('reference') + 2] || ''
 
-          object.category = category.replace(/\.mdx$/, '')
-          if (version.length === 2) object.version = version
-        } else {
-          object.category = undefined
-          object.version = undefined
+          const hasVersion = /v[0-9]+/.test(version)
+          if (hasVersion) {
+            object.version = version
+            object.type = title === nameMap[category] ? 'lvl2' : 'lvl3'
+            object.hierarchy.lvl1 = nameMap[category]
+            object.hierarchy.lvl2 = version
+            object.hierarchy.lvl3 = title
+          } else {
+            const page = urlSegments[urlSegments.indexOf('reference') + 2]
+            if (page === 'generated') {
+            } else {
+              if (page !== undefined) {
+                object.type = 'lvl2'
+                object.hierarchy.lvl1 = nameMap[category]
+                object.hierarchy.lvl2 = title
+              }
+            }
+          }
+
+          object.category = category ? category.replace(/\.mdx$/, '') : undefined
+          object.hierarchy.lvl0 = 'References'
         }
 
         return object
