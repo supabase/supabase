@@ -65,7 +65,7 @@ export function SearchProvider({ children }: any) {
             initialQuery={initialQuery}
             initialScrollY={window.scrollY}
             // searchParameters={{
-            //   facetFilters: 'version:v3',
+            //   facetFilters: 'version:v2',
             //   distinct: 1,
             // }}
             placeholder="Search documentation"
@@ -83,6 +83,7 @@ export function SearchProvider({ children }: any) {
             hitComponent={Hit}
             transformItems={(items) => {
               return items.map((item, index) => {
+                console.log('transformItems', item)
                 // We transform the absolute URL into a relative URL to
                 // leverage Next's preloading.
                 const a = document.createElement('a')
@@ -114,6 +115,7 @@ export function SearchProvider({ children }: any) {
 
 // @ts-ignore
 function Hit({ hit, children }) {
+  console.log('Hit', { hit })
   return (
     <Link href={hit.url}>
       <a
