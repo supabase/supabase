@@ -3,6 +3,7 @@ import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
+import { Modal } from 'ui'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
@@ -51,7 +52,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${
-                meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-10 xl:col-span-8'
+                meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-12 xl:col-span-8'
               } py-4 px-8`}
             >
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">

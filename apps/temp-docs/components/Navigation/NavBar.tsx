@@ -2,9 +2,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
-import { IconMenu, IconSearch, Input, IconCommand, Button, IconMoon, IconSun, Listbox } from 'ui'
+import { IconMenu, IconMoon, IconSearch, IconSun, IconCommand, Listbox } from 'ui'
 import { useTheme } from '../Providers'
 import { REFERENCES } from './Navigation.constants'
+import { SearchButton } from '../DocSearch'
 
 interface Props {
   currentPage: string
@@ -111,6 +112,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
           </div>
         )}
       </div>
+
       <div className="flex items-center space-x-4">
         <div className="hidden items-center md:flex">
           <ul className="flex items-center">
@@ -180,19 +182,22 @@ const NavBar: FC<Props> = ({ currentPage }) => {
             </li>
           </ul>
         </div>
-        <Input
-          placeholder="Search"
-          icon={<IconSearch />}
-          type="search"
-          actions={[
-            <Button disabled key="icon-command" type="default" size="tiny">
-              <IconCommand size="tiny" />
-            </Button>,
-            <Button disabled key="icon-letter" type="default" size="tiny">
-              K
-            </Button>,
-          ]}
-        />
+        <SearchButton>
+          <div className="flex items-center justify-between space-x-6 bg-scale-300 border border-scale-700 pl-3 pr-1.5 py-1.5 rounded">
+            <div className="flex items-center space-x-2">
+              <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
+              <p className="text-scale-800 text-sm">Search docs</p>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="text-scale-1200 flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                <IconCommand size={12} strokeWidth={1.5} />
+              </div>
+              <div className="text-xs text-scale-1200 flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                K
+              </div>
+            </div>
+          </div>
+        </SearchButton>
       </div>
     </nav>
   )

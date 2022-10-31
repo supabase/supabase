@@ -123,6 +123,7 @@ export const menuItems: NavMenu = {
             { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
             { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
             { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
+            { name: 'Remix', url: '/guides/auth/auth-helpers/remix', items: [] },
           ],
         },
         {
@@ -247,7 +248,7 @@ export const menuItems: NavMenu = {
         { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth', items: [] },
         { name: 'Firestore Data', url: '/guides/migrations/firestore-data', items: [] },
         { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage', items: [] },
-        { name: 'Herokuy', url: '/guides/migrations/heroku', items: [] },
+        { name: 'Heroku', url: '/guides/migrations/heroku', items: [] },
       ],
     },
     {
@@ -302,7 +303,7 @@ export const menuItems: NavMenu = {
       label: 'Official',
       items: [
         { name: 'Reference Documentation', url: '/reference', items: [] },
-        { name: 'Supabase Javascript Library', url: '/reference/javascript', items: [] },
+        { name: 'Supabase JavaScript Library', url: '/reference/javascript', items: [] },
         { name: 'Supabase Flutter Library', url: '/reference/dart', items: [] },
         { name: 'Supabase CLI', url: '/reference/cli', items: [] },
         { name: 'Management API', url: '/reference/api', items: [] },
