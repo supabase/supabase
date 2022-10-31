@@ -11,7 +11,7 @@ import { ThemeProvider } from '~/components/Providers'
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
-  function telemetry(route) {
+  function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
@@ -20,7 +20,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
-    function handleRouteChange(url) {
+    function handleRouteChange(url: string) {
       telemetry(url)
     }
 
