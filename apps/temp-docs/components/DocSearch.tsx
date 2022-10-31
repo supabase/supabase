@@ -7,7 +7,10 @@ import { DocSearchModal } from '@docsearch/react'
 import clsx from 'clsx'
 import { useActionKey } from '~/hooks/useActionKey'
 
-const INDEX_NAME = 'dev_docs'
+// [Joshen] We're currently using this over Algolia search for the time being
+// Refer to the comment in Navigation/AlgoliaSearch for more information about this
+
+const INDEX_NAME = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME
 const API_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY
 const APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID
 
@@ -64,10 +67,6 @@ export function SearchProvider({ children }: any) {
             // @ts-ignore
             initialQuery={initialQuery}
             initialScrollY={window.scrollY}
-            // searchParameters={{
-            //   facetFilters: 'version:v2',
-            //   distinct: 1,
-            // }}
             placeholder="Search documentation"
             onClose={onClose}
             indexName={INDEX_NAME}
@@ -83,7 +82,6 @@ export function SearchProvider({ children }: any) {
             hitComponent={Hit}
             transformItems={(items) => {
               return items.map((item, index) => {
-                console.log('transformItems', item)
                 // We transform the absolute URL into a relative URL to
                 // leverage Next's preloading.
                 const a = document.createElement('a')
@@ -115,7 +113,6 @@ export function SearchProvider({ children }: any) {
 
 // @ts-ignore
 function Hit({ hit, children }) {
-  console.log('Hit', { hit })
   return (
     <Link href={hit.url}>
       <a
