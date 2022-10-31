@@ -11,16 +11,17 @@ import { ThemeProvider } from '~/components/Providers'
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
-  function telemetry() {
+  function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
+      route,
     })
   }
 
   useEffect(() => {
-    function handleRouteChange() {
-      telemetry()
+    function handleRouteChange(url: string) {
+      telemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
