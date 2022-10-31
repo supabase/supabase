@@ -93,6 +93,7 @@ const sidebars = {
             'guides/auth/auth-helpers/auth-ui',
             'guides/auth/auth-helpers/nextjs',
             'guides/auth/auth-helpers/sveltekit',
+            'guides/auth/auth-helpers/remix',
           ],
         },
         {
@@ -120,6 +121,7 @@ const sidebars = {
         'guides/database/functions',
         'guides/database/webhooks',
         'guides/database/full-text-search',
+        'guides/database/testing',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
