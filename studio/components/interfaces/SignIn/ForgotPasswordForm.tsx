@@ -1,5 +1,6 @@
 import { useStore } from 'hooks'
-import { auth } from 'lib/gotrue'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
@@ -18,22 +19,17 @@ const ForgotPasswordForm = () => {
       message: `Sending password reset email...`,
     })
 
-    const { error } = await auth.resetPasswordForEmail(email, {
-      redirectTo: `${
-        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? process.env.NEXT_PUBLIC_VERCEL_URL
-          : process.env.NEXT_PUBLIC_SITE_URL
-      }/reset-password`,
-    })
+    const response = await post(`${API_URL}/reset-password`, { email })
+    const error = response.error
 
     if (!error) {
       ui.setNotification({
         id: toastId,
         category: 'success',
-        message: `Password reset email sent successfully!`,
+        message: `Password reset email sent successfully! Please check your email`,
       })
 
-      await router.push('/')
+      await router.push('/sign-in')
     } else {
       ui.setNotification({
         id: toastId,
