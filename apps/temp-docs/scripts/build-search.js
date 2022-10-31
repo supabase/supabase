@@ -63,7 +63,7 @@ async function walk(dir) {
 
         const { id, title, description } = data
         const url = (slug.includes('/generated') ? slug.replace('/generated', '') : slug)
-          .replace('docs', '')
+          .replace('docs', '/docs')
           .replace(/\.mdx$/, '')
         const source = slug.includes('/reference') ? 'reference' : 'guide'
         const object = {
@@ -74,6 +74,11 @@ async function walk(dir) {
           url,
           source,
           content,
+          type: 'lvl1',
+          hierarchy: {
+            lvl0: 'Core Concepts',
+            lvl1: title,
+          },
         }
 
         if (slug.includes('/reference')) {

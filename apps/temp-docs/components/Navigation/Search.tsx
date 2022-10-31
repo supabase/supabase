@@ -4,7 +4,7 @@ import { createElement, FC, useEffect, useRef, Fragment } from 'react'
 import algoliasearch from 'algoliasearch/lite'
 import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js'
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const searchClient = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
@@ -40,6 +40,7 @@ interface Props {}
 
 const Search: FC<Props> = ({}) => {
   const searchRef = useRef(null)
+  const router = useRouter()
 
   useEffect(() => {
     if (!searchRef.current) {
@@ -62,6 +63,14 @@ const Search: FC<Props> = ({}) => {
           root
         )
       },
+      navigator: {
+        navigate({ itemUrl }) {
+          router.push(itemUrl)
+        },
+      },
+      onSelect({ item, setQuery, setIsOpen, refresh }) {
+        console.log('onSelect', item.url)
+      },
       // @ts-ignore
       getSources({ query }) {
         return [
@@ -70,34 +79,37 @@ const Search: FC<Props> = ({}) => {
             templates: {
               item({ item, components }) {
                 return (
-                  <Link href={item.url as string}>
-                    <a className="aa-ItemLink truncate flex justify-between space-x-4">
-                      <div className="aa-ItemContent w-full">
-                        <div className="aa-ItemTitle flex items-center space-x-1">
-                          {item.category && (
-                            <p
-                              className={`${
-                                ['cli', 'api'].includes(item.category as string)
-                                  ? 'uppercase'
-                                  : 'capitalize'
-                              }`}
-                            >
-                              {item.category}
-                              {item.version ? ` (${item.version})` : ''}:
-                            </p>
-                          )}
-                          <p>
-                            <components.Highlight hit={item} attribute="title" />
+                  // <Link href={item.url as string}>
+                  <a
+                    href={item.url as string}
+                    className="aa-ItemLink truncate flex justify-between space-x-4"
+                  >
+                    <div className="aa-ItemContent w-full">
+                      <div className="aa-ItemTitle flex items-center space-x-1">
+                        {item.category && (
+                          <p
+                            className={`${
+                              ['cli', 'api'].includes(item.category as string)
+                                ? 'uppercase'
+                                : 'capitalize'
+                            }`}
+                          >
+                            {item.category}
+                            {item.version ? ` (${item.version})` : ''}:
                           </p>
-                        </div>
-                        <p className="aa-ItemContentSubtitle">{item.description}</p>
+                        )}
+                        <p>
+                          <components.Highlight hit={item} attribute="title" />
+                        </p>
                       </div>
-                      {/* [Joshen] Thinking of adding some meta tags here like where the doc is from, what version etc */}
-                      {/* <div>
+                      <p className="aa-ItemContentSubtitle">{item.description}</p>
+                    </div>
+                    {/* [Joshen] Thinking of adding some meta tags here like where the doc is from, what version etc */}
+                    {/* <div>
                         <Badge color="gray">{item.source}</Badge>
                       </div> */}
-                    </a>
-                  </Link>
+                  </a>
+                  // </Link>
                 )
               },
             },
@@ -116,7 +128,6 @@ const Search: FC<Props> = ({}) => {
                 ],
               })
             },
-            onSelect({ item, setQuery, setIsOpen, refresh }) {},
           },
         ]
       },

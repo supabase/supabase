@@ -1,14 +1,18 @@
 import React from 'react'
 import type { AppProps } from 'next/app'
 import { ThemeProvider } from '../components/Providers'
+import { SearchProvider } from '~/components/Navigation/DocSearch'
 import '../styles/main.scss'
+import '../styles/docsearch.scss'
 import '../styles/algolia-search.scss'
 import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider>
-      <Component {...pageProps} />
+      <SearchProvider>
+        <Component {...pageProps} />
+      </SearchProvider>
     </ThemeProvider>
   )
 }
