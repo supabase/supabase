@@ -24,8 +24,6 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
     }
   }, [])
 
-  console.log('Default:Layout', { currentPage })
-
   return (
     <>
       <Head>
@@ -52,7 +50,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${
-                meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-12 xl:col-span-8'
+                meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-12 xl:col-span-9'
               } py-4 px-8`}
             >
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
@@ -60,7 +58,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               </article>
             </div>
             {toc && !meta?.hide_table_of_contents && (
-              <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-4 border-l px-4">
+              <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-4">
                 <h5>On this page</h5>
                 <ul className="list-none pl-2 text-[0.8rem]">
                   {toc.json.map((item: any, i: number) => {
