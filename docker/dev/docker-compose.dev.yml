@@ -18,6 +18,7 @@ services:
   db:
     restart: 'no'
     volumes:
+      - /var/lib/postgresql/data
       - ./dev/data.sql:/docker-entrypoint-initdb.d/seed.sql
   storage:
     volumes:
