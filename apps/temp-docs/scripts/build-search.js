@@ -73,11 +73,16 @@ async function walk(dir) {
           description,
           url,
           source,
-          content,
+          // content,
           type: 'lvl1',
           hierarchy: {
             lvl0: 'Core Concepts',
-            lvl1: title,
+            lvl1: 'Dark Mode',
+            lvl2: title,
+            lvl3: null,
+            lvl4: null,
+            lvl5: null,
+            lvl6: null,
           },
         }
 
