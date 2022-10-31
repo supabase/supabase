@@ -354,7 +354,6 @@
       },
       {
         "title": "Vanity URLs",
-        "tooltip": "We currently screen vanity URLs to ensure they are non-offensive. Please email growth@supabase.io with your project details to request your vanity URL. We process requests in batches once every 14 days.",
         "tiers": {
           "free": false,
           "pro": true,
