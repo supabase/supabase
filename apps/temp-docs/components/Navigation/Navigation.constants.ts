@@ -123,6 +123,7 @@ export const menuItems: NavMenu = {
             { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
             { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
             { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
+            { name: 'Remix', url: '/guides/auth/auth-helpers/remix', items: [] },
           ],
         },
         {
