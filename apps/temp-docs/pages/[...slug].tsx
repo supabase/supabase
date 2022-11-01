@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '../components/index'
-import { menuItems } from '../components/Navigation/Nav.constants'
+import { menuItems } from '../components/Navigation/Navigation.constants'
 import { getPageType } from '../lib/helpers'
 import { getAllDocs, getDocsBySlug } from '../lib/docs'
 import Layout from '~/layouts/Default'
@@ -18,11 +18,15 @@ interface Meta {
   hide_table_of_contents: boolean
 }
 
-export default function Doc({ meta, content, toc }: { meta: Meta; content: any; toc: any }) {
+interface Props {
+  meta: Meta
+  content: any
+  toc: any
+}
+
+export default function Doc({ meta, content, toc }: Props) {
   const { asPath } = useRouter()
   const page = getPageType(asPath)
-
-  console.log('[slug]', { meta, asPath, page })
 
   return (
     // @ts-ignore
@@ -44,7 +48,6 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   }
 
   let doc = getDocsBySlug(slug)
-
   const content = await serialize(doc.content || '')
 
   return {

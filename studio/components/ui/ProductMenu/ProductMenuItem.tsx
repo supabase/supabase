@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import { Button, IconExternalLink, Menu } from 'ui'
+import { Badge, Button, Menu } from 'ui'
 
 interface Props {
   name: string | ReactNode
@@ -13,6 +13,7 @@ interface Props {
   onClick?: () => void
   textClassName?: string
   hoverText?: string
+  isPreview?: boolean
 }
 
 const ProductMenuItem: FC<Props> = ({
@@ -26,15 +27,19 @@ const ProductMenuItem: FC<Props> = ({
   onClick,
   textClassName = '',
   hoverText = '',
+  isPreview = false,
 }) => {
   const menuItem = (
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
       <div className="flex w-full items-center justify-between">
         <span
           title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
-          className={'flex items-center truncate ' + textClassName}
+          className={'flex items-center gap-2 truncate ' + textClassName}
         >
-          {name}
+          {name}{' '}
+          {isPreview && (
+            <span className="uppercase text-orange-800 text-xs font-normal">Alpha</span>
+          )}
         </span>
         {action}
       </div>

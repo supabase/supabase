@@ -18,7 +18,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const canUpdateExtentions = checkPermissions(
+  const canUpdateExtensions = checkPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -84,7 +84,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
             <Toggle
               size="tiny"
               checked={isOn}
-              disabled={!canUpdateExtentions}
+              disabled={!canUpdateExtensions}
               onChange={() => (isOn ? disableExtension() : enableExtension())}
             />
           )}

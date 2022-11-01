@@ -151,7 +151,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
                     >
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
-                    <Modal.Seperator />
+                    <Modal.Separator />
                     {/* @ts-ignore */}
                     {schemas.map((schema: PostgresSchema) => {
                       return (
@@ -176,7 +176,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
                 </Modal.Content>
               )}
 
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center justify-end space-x-2">
                   <Button type="default" disabled={isSubmitting} onClick={() => onCancel()}>
