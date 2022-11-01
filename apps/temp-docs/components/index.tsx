@@ -7,7 +7,11 @@ import AuthProviders from './AuthProviders'
 import { H3, H4 } from './CustomMDX'
 
 const components = {
-  Alert,
+  Alert: (props: any) => (
+    <Alert {...props} className="not-prose">
+      {props.children}
+    </Alert>
+  ),
   ButtonCard,
   CodeBlock,
   Frameworks,
