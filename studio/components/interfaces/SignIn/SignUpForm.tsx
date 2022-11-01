@@ -44,7 +44,7 @@ const SignUpForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'success',
-        message: `Signed successfully! Please confirm your email before logging in.`,
+        message: `Signed successfully! Please confirm your email before signing in.`,
       })
 
       await router.push('/sign-in')
