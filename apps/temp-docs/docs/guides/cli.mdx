@@ -15,24 +15,12 @@ You can also use the CLI to manage your Supabase projects, handle database migra
 ## Installation
 
 <Tabs
-  groupId="platform"
-  defaultValue="macos"
-  values={[
-    {label: 'macOS', value: 'macos'},
-    {label: 'Windows', value: 'windows'},
-    {label: 'Linux', value: 'linux'},
-  ]}>
-<TabItem value="npm">
-
-Install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
-
-```sh
-npm install supabase --save-dev
-```
-
-</TabItem>
-
-<TabItem value="macos">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="macos"
+>
+<TabPanel id="macos" label="macOS">
 
 Install the CLI with [Homebrew](https://brew.sh):
 
@@ -40,9 +28,8 @@ Install the CLI with [Homebrew](https://brew.sh):
 brew install supabase/tap/supabase
 ```
 
-</TabItem>
-
-<TabItem value="windows">
+</TabPanel>
+<TabPanel id="windows" label="Windows">
 
 Install the CLI with [Scoop](https://scoop.sh):
 
@@ -51,9 +38,8 @@ scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
 scoop install supabase
 ```
 
-</TabItem>
-
-<TabItem value="linux">
+</TabPanel>
+<TabPanel id="linux" label="Linux">
 
 The CLI is available through [Homebrew](https://brew.sh) and Linux packages.
 
@@ -73,7 +59,7 @@ and run one of the following:
 - `sudo dpkg -i <...>.deb`
 - `sudo rpm -i <...>.rpm`
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Updates
@@ -81,44 +67,32 @@ and run one of the following:
 When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
 
 <Tabs
-  groupId="platform"
-  defaultValue="macos"
-  values={[
-    {label: 'macOS', value: 'macos'},
-    {label: 'Windows', value: 'windows'},
-    {label: 'Linux', value: 'linux'},
-  ]}>
-<TabItem value="npm">
-
-```sh
-npm update supabase --save-dev
-```
-
-</TabItem>
-
-<TabItem value="macos">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="macos"
+>
+<TabPanel id="macos" label="macOS">
 
 ```sh
 brew upgrade supabase
 ```
 
-</TabItem>
-
-<TabItem value="windows">
+</TabPanel>
+<TabPanel id="windows" label="Windows">
 
 ```powershell
 scoop update supabase
 ```
 
-</TabItem>
-
-<TabItem value="linux">
+</TabPanel>
+<TabPanel id="linux" label="Linux">
 
 ```sh
 brew upgrade supabase
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## See also
