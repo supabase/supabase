@@ -13,14 +13,12 @@ This submodule provides convenience helpers for implementing user authentication
 ## Install the Remix helper library
 
 <Tabs
-  groupId="install"
-  defaultValue="npm"
-  values={[
-    {label: 'npm', value: 'npm'},
-    {label: 'Yarn', value: 'yarn'},
-  ]}>
-
-<TabItem value="npm">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+>
+<TabPanel id="npm" label="npm">
 
 ```sh
 npm install @supabase/auth-helpers-remix
@@ -30,8 +28,8 @@ This library supports the following tooling versions:
 
 - Remix: `>=1.7.2`
 
-</TabItem>
-<TabItem value="yarn">
+</TabPanel>
+<TabPanel id="yarn" label="Yarn">
 
 ```sh
 yarn add @supabase/auth-helpers-remix
@@ -41,7 +39,7 @@ This library supports the following tooling versions:
 
 - Remix: `>=1.7.2`
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Set up environment variables
@@ -56,12 +54,12 @@ SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ## Loader
 
 <Tabs
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Loader functions run on the server immediately before the component is rendered. They respond to all GET requests on a route. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
@@ -95,8 +93,8 @@ export const loader = async ({ request }) => {
 
 > Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Loader functions run on the server immediately before the component is rendered. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
@@ -104,11 +102,7 @@ Loader functions run on the server immediately before the component is rendered.
 import { LoaderFunction, json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-export const loader: LoaderFunction = async ({
-  request,
-}: {
-  request: Request,
-}) => {
+export const loader: LoaderFunction = async ({ request }: { request: Request }) => {
   const response = new Response()
   const supabaseClient = createServerClient(
     process.env.SUPABASE_URL,
@@ -129,18 +123,18 @@ export const loader: LoaderFunction = async ({
 
 > Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Action
 
 <Tabs
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
@@ -170,8 +164,8 @@ export const action = async ({ request }) => {
 
 > Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
@@ -179,11 +173,7 @@ Action functions run on the server and respond to HTTP requests to a route, othe
 import { ActionFunction, json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-export const action: ActionFunction = async ({
-  request,
-}: {
-  request: Request,
-}) => {
+export const action: ActionFunction = async ({ request }: { request: Request }) => {
   const response = new Response()
 
   const supabaseClient = createServerClient(
@@ -205,7 +195,7 @@ export const action: ActionFunction = async ({
 
 > Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Session and User
@@ -229,13 +219,12 @@ const user = session?.user
 ## Client-side
 
 <Tabs
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
 >
-<TabItem value="js">
+<TabPanel id="js" label="JavaScript">
 
 In order to use the Supabase client in the browser - fetching data in `useEffect` or subscribing to realtime events - we need to do a little more plumbing. Remix does not include a way to make environment variables available to the browser, so we need to pipe them through from a `loader` function in our `root.jsx` route and attach them to the `window`.
 
@@ -283,10 +272,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from '@remix-run/react'
-import {
-  createBrowserClient,
-  createServerClient,
-} from '@supabase/auth-helpers-remix'
+import { createBrowserClient, createServerClient } from '@supabase/auth-helpers-remix'
 
 export const meta = () => ({
   charset: 'utf-8',
@@ -331,9 +317,8 @@ export default function App() {
 
 Now we can call `createBrowserClient` in our components to fetch data client-side, or subscribe to realtime events - changes in the database.
 
-</TabItem>
-
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 In order to use the Supabase client in the browser - fetching data in `useEffect` or subscribing to realtime events - we need to do a little more plumbing. Remix does not include a way to make environment variables available to the browser, so we need to pipe them through from a `loader` function in our `root.tsx` route and attach them to the `window`.
 
@@ -381,10 +366,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from '@remix-run/react'
-import {
-  createBrowserClient,
-  createServerClient,
-} from '@supabase/auth-helpers-remix'
+import { createBrowserClient, createServerClient } from '@supabase/auth-helpers-remix'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -429,7 +411,7 @@ export default function App() {
 
 Now we can call `createBrowserClient` in our components to fetch data client-side, or subscribe to realtime events - changes in the database.
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Authentication
@@ -449,12 +431,12 @@ Given this Remix `<Form />` component.
 ### Signing Up
 
 <Tabs
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Any of the [supported authentication strategies from `supabase-js`](https://supabase.com/docs/reference/javascript/auth-signup) will work server-side. This is how you would handle simple `email` and `password` auth.
 
@@ -485,9 +467,8 @@ export const action = async ({ request }) => {
 }
 ```
 
-</TabItem>
-
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Any of the [supported authentication strategies from `supabase-js`](https://supabase.com/docs/reference/javascript/auth-signup) will work server-side. This is how you would handle simple `email` and `password` auth.
 
@@ -522,18 +503,18 @@ export const action: ActionFunction = async ({
 };
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Login
 
 <Tabs
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Any of the [supported authentication strategies from `supabase-js`](https://supabase.com/docs/reference/javascript/auth-signinwithpassword) will work server-side. This is how you would handle simple `email` and `password` auth.
 
@@ -564,9 +545,8 @@ export const action = async ({ request }) => {
 }
 ```
 
-</TabItem>
-
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Any of the [supported authentication strategies from `supabase-js`](https://supabase.com/docs/reference/javascript/auth-signinwithpassword) will work server-side. This is how you would handle simple `email` and `password` auth.
 
@@ -601,18 +581,18 @@ export const action: ActionFunction = async ({
 };
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Logout
 
 <Tabs
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```jsx
 export const action = async ({ request }) => {
@@ -638,9 +618,8 @@ export const action = async ({ request }) => {
 }
 ```
 
-</TabItem>
-
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 ```jsx
 export const action: ActionFunction = async ({
@@ -670,7 +649,7 @@ export const action: ActionFunction = async ({
 };
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Subscribe to realtime events
@@ -689,13 +668,9 @@ export default function SubscribeToRealtime() {
     )
     const channel = supabaseClient
       .channel('test')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'test' },
-        (payload) => {
-          setData((data) => [...data, payload.new])
-        }
-      )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'test' }, (payload) => {
+        setData((data) => [...data, payload.new])
+      })
       .subscribe()
 
     return () => {
