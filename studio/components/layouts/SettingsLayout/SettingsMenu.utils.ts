@@ -3,6 +3,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { ProjectBase } from 'types'
 import { checkPermissions } from '../../../hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'lib/constants'
 
 export const generateSettingsMenu = (ref: string, project?: ProjectBase): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
@@ -17,7 +18,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
 
   return [
     {
-      title: 'Project settings',
+      title: 'Project Settings',
       items: [
         {
           name: 'General',
@@ -37,27 +38,56 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
         },
-        {
-          name: 'Authentication',
-          key: 'auth',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/auth/settings`,
-          items: [],
-        },
-        {
-          name: 'Storage',
-          key: 'storage',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/settings`,
-          items: [],
-          // disabled: canReadStorage,
-        },
-        {
-          name: 'Billing & Usage',
-          key: 'billing',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing`,
-          items: [],
-          // disabled: canReadInvoices && canReadSubscriptions,
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Auth',
+                key: 'auth',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Storage',
+                key: 'storage',
+                url: `/project/${ref}/settings/storage`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
+    ...(IS_PLATFORM
+      ? [
+          {
+            title: 'Billing',
+            items: [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: isProjectBuilding
+                  ? buildingUrl
+                  : `/project/${ref}/settings/billing/subscription`,
+                items: [],
+              },
+              {
+                name: 'Usage',
+                key: 'usage',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
+                items: [],
+              },
+              {
+                name: 'Invoices',
+                key: 'invoices',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 }

@@ -104,7 +104,7 @@ interface Session {
 ### New Auth methods
 
 We're removing the `signIn()` method in favor of more explicit function signatures:
-`signInWithPassword()`, `signInWithPasswordless()`, and `signInWithOtp()`.
+`signInWithPassword()`, `signInWithOtp()`, and `signInWithOtp()`.
 
 ```ts
 // v2
@@ -147,7 +147,7 @@ supabaseClient
   .subscribe()
 ```
 
-We will deprecate the `.from().on().subscribe()` method previosuly used for listening to postgres changes.
+We will deprecate the `.from().on().subscribe()` method previously used for listening to postgres changes.
 
 ### Deprecated setAuth()
 
@@ -168,8 +168,8 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
     - client-level `throwOnError`
 - `gotrue-js`
   - `supabase-js` client allows passing a `storageKey` param which will allow the user to set the key used in local storage for storing the session. By default, this will be namespace-d with the supabase project ref. ([PR](https://github.com/supabase/supabase-js/pull/460))
-  - `signIn` method is now split into `signInWithPassword` , `signInWithPasswordless` , `signInWithOAuth` ([PR](https://github.com/supabase/gotrue-js/pull/304))
-  - Deprecated and removed `session()` , `user()` in favour of using `getSession()` instead. `getSession()` will always return a valid session if a user is already logged in, meaning no more random logouts. ([PR](https://github.com/supabase/gotrue-js/pull/299))
+  - `signIn` method is now split into `signInWithPassword` , `signInWithOtp` , `signInWithOAuth` ([PR](https://github.com/supabase/gotrue-js/pull/304))
+  - Deprecated and removed `session()` , `user()` in favor of using `getSession()` instead. `getSession()` will always return a valid session if a user is already logged in, meaning no more random logouts. ([PR](https://github.com/supabase/gotrue-js/pull/299))
   - Deprecated and removed setting for `multitab` support because `getSession()` and gotrue’s reuse interval setting takes care of session management across multiple tabs ([PR](https://github.com/supabase/gotrue-js/pull/366))
   - No more throwing of random errors, gotrue-js v2 always returns a custom error type: ([PR](https://github.com/supabase/gotrue-js/pull/341))
     - `AuthSessionMissingError`
