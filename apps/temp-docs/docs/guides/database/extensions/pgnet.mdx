@@ -1,0 +1,254 @@
+---
+id: pgnet
+title: 'pg_net: Async Networking'
+description: 'pg_net: an async networking extension for PostgreSQL.'
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+:::caution
+
+The pg_net API is in beta. Functions signatures may change.
+
+:::
+
+[pg_net](https://github.com/supabase/pg_net/) is a PostgreSQL extension exposing a SQL interface for async networking with a focus on scalability and UX.
+
+It differs from the `http` extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
+
+## Usage
+
+### Enable the extension
+
+<Tabs
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pg_net" and enable the extension.
+
+</TabItem>
+<TabItem value="sql">
+
+```sql
+-- Example: enable the "pg_net" extension
+create schema if not exists net;
+create extension pg_net with schema net;
+
+-- Example: disable the "plv8" extension
+drop extension if exists pg_net;
+drop schema net;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension, call `drop extension`.
+
+Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
+
+</TabItem>
+</Tabs>
+
+## `http_get` {#http_get}
+
+Creates an HTTP GET request returning the request's ID. HTTP requests are not started until the transaction is committed.
+
+### Signature
+
+:::caution
+
+This is a Postgres SECURITY DEFINER function.
+
+:::
+
+```sql
+net.http_get(
+    -- url for the request
+    url text,
+    -- key/value pairs to be url encoded and appended to the `url`
+    params jsonb default '{}'::jsonb,
+    -- key/values to be included in request headers
+    headers jsonb default '{}'::jsonb,
+    -- WARNING: this is currently ignored, so there is no timeout
+    -- the maximum number of milliseconds the request may take before being cancelled
+    timeout_milliseconds int default 1000
+)
+    -- request_id reference
+    returns bigint
+
+    strict
+    volatile
+    parallel safe
+    language plpgsql
+```
+
+### Usage
+
+```sql
+select net.http_get('https://news.ycombinator.com') as request_id;
+request_id
+----------
+         1
+(1 row)
+```
+
+After triggering `http_get`, use [`http_get_result`](#http_get_result) to get the result of the request.
+
+## `http_post` {#http_post}
+
+Creates an HTTP POST request with a JSON body, returning the request's ID. HTTP requests are not started until the transaction is committed.
+
+The body's character set encoding matches the database's `server_encoding` setting.
+
+### Signature
+
+:::caution
+
+This is a Postgres SECURITY DEFINER function
+
+:::
+
+```sql
+net.http_post(
+    -- url for the request
+    url text,
+    -- body of the POST request
+    body jsonb default '{}'::jsonb,
+    -- key/value pairs to be url encoded and appended to the `url`
+    params jsonb default '{}'::jsonb,
+    -- key/values to be included in request headers
+    headers jsonb default '{"Content-Type": "application/json"}'::jsonb,
+    -- WARNING: this is currently ignored, so there is no timeout
+    -- the maximum number of milliseconds the request may take before being cancelled
+    timeout_milliseconds int default 1000
+)
+    -- request_id reference
+    returns bigint
+
+    volatile
+    parallel safe
+    language plpgsql
+```
+
+### Usage
+
+```sql
+select
+    net.http_post(
+        url:='https://httpbin.org/post',
+        body:='{"hello": "world"}'::jsonb
+    ) as request_id;
+request_id
+----------
+         1
+(1 row)
+```
+
+After triggering `http_post`, use [`http_get_result`](#http_get_result) to get the result of the request.
+
+## `http_collect_response` {#http_collect_response}
+
+Given a `request_id` reference, retrieves the response.
+
+When `async:=false` is set it is recommended that [statement_timeout](https://www.postgresql.org/docs/13/runtime-config-client.html) is set for the maximum amount of time the caller is willing to wait in case the response is slow to populate.
+
+### Signature
+
+:::caution
+
+This is a Postgres SECURITY DEFINER function
+
+:::
+
+```sql
+net.http_collect_response(
+    -- request_id reference
+    request_id bigint,
+    -- when `true`, return immediately. when `false` wait for the request to complete before returning
+    async bool default true
+)
+    -- http response composite wrapped in a result type
+    returns net.http_response_result
+
+    strict
+    volatile
+    parallel safe
+```
+
+### Usage
+
+:::caution
+
+`net.http_collect_response` must be in a separate transaction from the calls to `net.http_<method>`
+
+:::
+
+```sql
+select
+    net.http_post(
+        url:='https://httpbin.org/post',
+        body:='{"hello": "world"}'::jsonb
+    ) as request_id;
+request_id
+----------
+         1
+(1 row)
+
+select * from net.http_collect_response(1, async:=false);
+status  | message | response
+--------+---------+----------
+SUCCESS        ok   (
+                      status_code := 200,
+                      headers     := '{"date": ...}',
+                      body        := '{"args": ...}'
+                    )::net.http_response_result
+
+
+select
+    (response).body::json
+from
+    net.http_collect_response(request_id:=1);
+                               body
+-------------------------------------------------------------------
+ {
+   "args": {},
+   "data": "{\"hello\": \"world\"}",
+   "files": {},
+   "form": {},
+   "headers": {
+     "Accept": "*/*",
+     "Content-Length": "18",
+     "Content-Type": "application/json",
+     "Host": "httpbin.org",
+     "User-Agent": "pg_net/0.2",
+     "X-Amzn-Trace-Id": "Root=1-61031a5c-7e1afeae69bffa8614d8e48e"
+   },
+   "json": {
+     "hello": "world"
+   },
+   "origin": "135.63.38.488",
+   "url": "https://httpbin.org/post"
+ }
+(1 row)
+```
+
+Where `response` is a composite:
+
+```sql
+status_code integer
+headers jsonb
+body text
+```
+
+Possible values for `net.http_response_result.status` are `('PENDING', 'SUCCESS', 'ERROR')`
+
+## Resources
+
+- Source code: [github.com/supabase/pg_net](https://github.com/supabase/pg_net/)
+- Official Docs: [supabase.github.io/pg_net](https://supabase.github.io/pg_net/)
