@@ -17,9 +17,11 @@ Instead, we'll rely on the Supabase client to do some of the work on the **web**
 
 That means you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database.
 
-:::note
+<Admonition type="note">
+
 TLDR; Prisma currently doesn't support cross-schema foreign keys, so introspecting the schema fails due to how your Supabase `public` schema references the `auth.users`.
-:::
+
+</Admonition>
 
 This example provides the steps to build a simple user management app (from scratch!) using Supabase and [RedwoodJS](https://redwoodjs.com/docs/introduction). It includes:
 
@@ -33,9 +35,11 @@ By the end of this guide you'll have an app which allows users to login and upda
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-:::note
+<Admonition type="note">
+
 Note: For RedwoodJS apps, port will be 8910
-:::
+
+</Admonition>
 
 ### GitHub
 
@@ -69,9 +73,11 @@ A Redwood application is split into two parts: a frontend and a backend. This is
 The frontend project is called **`web`** and the backend project is called **`api`**. For clarity, we will refer to these in prose as **"sides"**, i.e. the "web side" and the "api side".
 They are separate projects because code on the `web side` will end up running in the user's browser while code on the `api side` will run on a server somewhere.
 
-:::note
+<Admonition type="note">
+
 Important: When this guide refers to "API", that means the Supabase API and when it refers to "api side", that means the RedwoodJS `api side`.
-:::
+
+</Admonition>
 
 The **`api side`** is an implementation of a GraphQL API. The business logic is organized into "services" that represent their own internal API and can be called both from external GraphQL requests and other internal services.
 
@@ -79,21 +85,25 @@ The **`web side`** is built with React. Redwood's router makes it simple to map 
 Pages may contain a "Layout" component to wrap content. They also contain "Cells" and regular React components.
 Cells allow you to declaratively manage the lifecycle of a component that fetches and displays data.
 
-:::note
+<Admonition type="note">
+
 For the sake of consistency with the other framework Quickstart examples, we'll build a RedwoodJS a little differently than normal.
 We **_won't use_** Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
 Instead, we'll rely on the Supabase client to do some of the work on the **`web`** side and use the client again on the **`api`** side to do data fetching as well.
-:::
+
+</Admonition>
 
 ## Project set up
 
 Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
 and then creating a "schema" inside the database.
 
-:::note
+<Admonition type="note">
+
 When setting up Supabase, you'll interact with your project dashboard. However, most of the RedwoodJS setup steps will interact with the [Redwood CLI](https://redwoodjs.com/docs/cli-commands) to generate routes, pages, components, and more.
 So be sure to have a terminal at the ready and in your project directory.
-:::
+
+</Admonition>
 
 ### Create a project
 
@@ -180,9 +190,11 @@ create policy "Anyone can upload an avatar."
 
 #### Important Note about Prisma and Migrations
 
-:::note
+<Admonition type="note">
+
 Because this Quick Start does not use Prisma to manage the database schema, seed it, or run migrations, you **need** to take extra care when running some of the typical Redwood CLI commands.
-:::
+
+</Admonition>
 
 ### Get the API Keys
 
@@ -201,9 +213,11 @@ We just need to get the URL as well as the `anon`, `service_role` and `JWT_SECRE
 
 Let's start building the RedwoodJS app from scratch.
 
-:::note
+<Admonition type="note">
+
 RedwoodJS requires Node.js (>=14.x <=16.x) and Yarn (>=1.15).
-:::
+
+</Admonition>
 
 Make sure you have installed yarn since RedwoodJS relies on it to [manage its packages in workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) for its `web` and `api` "sides".
 
@@ -321,9 +335,11 @@ Let's test our setup at the moment by starting up the app:
 yarn rw dev
 ```
 
-:::note
+<Admonition type="note">
+
 Note: You can also use the alias `rw` for `redwood`, as in `yarn rw` to run Redwood CLI commands
-:::
+
+</Admonition>
 
 You should see a "Welcome to RedwoodJS" page and a message about not having any pages yet.
 
@@ -340,9 +356,11 @@ yarn rw generate page home /
 ✔ Generating types ...
 ```
 
-:::note
+<Admonition type="note">
+
 Note: the slash `/` is important here as it creates a root level route.
-:::
+
+</Admonition>
 
 You can stop the `dev` server if you want; to see your changes, just be sure to run `yarn rw dev` again.
 
@@ -576,11 +594,13 @@ const Account = () => {
 export default Account
 ```
 
-:::note
+<Admonition type="note">
+
 Note: You'll see the use of `useAuth()` several times in the quickstart. Redwood's `useAuth` hook provides convenient ways to access
 logIn, logOut, currentUser, and access the `supabase` authenticate client. We'll use it to get an instance
 of the supabase client to interact with your API.
-:::
+
+</Admonition>
 
 ### Update Home Page
 

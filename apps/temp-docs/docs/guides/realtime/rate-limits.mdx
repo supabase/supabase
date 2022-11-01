@@ -38,9 +38,11 @@ For example, the [multiplayer.dev demo](/docs/guides/realtime/quickstart#cursor-
 
 Rate limiting errors can appear in backend logs and messages in the WebSocket connection.
 
-:::note
+<Admonition type="note">
+
 Use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to reproduce an error and share those connection details with Supabase support.
-:::
+
+</Admonition>
 
 ### Backend Logs
 
@@ -56,9 +58,11 @@ Some limits can cause a Channel join to be refused. Realtime will reply with one
 - `too_many_connections`: Too many total concurrent connections for a project.
 - `too_many_joins`: Too many Channel joins per second.
 
-:::note
+<Admonition type="note">
+
 Use your browser's developer tools to find the WebSocket initiation request and view individual messages.
-:::
+
+</Admonition>
 
 ## Payload Limits
 

@@ -7,11 +7,11 @@ description: 'pg_net: an async networking extension for PostgreSQL.'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-:::caution
+<Admonition type="caution">
 
 The pg_net API is in beta. Functions signatures may change.
 
-:::
+</Admonition>
 
 [pg_net](https://github.com/supabase/pg_net/) is a PostgreSQL extension exposing a SQL interface for async networking with a focus on scalability and UX.
 
@@ -60,11 +60,11 @@ Creates an HTTP GET request returning the request's ID. HTTP requests are not st
 
 ### Signature
 
-:::caution
+<Admonition type="caution">
 
 This is a Postgres SECURITY DEFINER function.
 
-:::
+</Admonition>
 
 ```sql
 net.http_get(
@@ -107,11 +107,11 @@ The body's character set encoding matches the database's `server_encoding` setti
 
 ### Signature
 
-:::caution
+<Admonition type="caution">
 
 This is a Postgres SECURITY DEFINER function
 
-:::
+</Admonition>
 
 ```sql
 net.http_post(
@@ -159,11 +159,11 @@ When `async:=false` is set it is recommended that [statement_timeout](https://ww
 
 ### Signature
 
-:::caution
+<Admonition type="caution">
 
 This is a Postgres SECURITY DEFINER function
 
-:::
+</Admonition>
 
 ```sql
 net.http_collect_response(
@@ -182,11 +182,11 @@ net.http_collect_response(
 
 ### Usage
 
-:::caution
+<Admonition type="caution">
 
 `net.http_collect_response` must be in a separate transaction from the calls to `net.http_<method>`
 
-:::
+</Admonition>
 
 ```sql
 select
