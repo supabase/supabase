@@ -1,7 +1,9 @@
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
@@ -16,13 +18,26 @@ const SignUpForm = () => {
   const { ui } = useStore()
   const router = useRouter()
 
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
+
   const onSignUp = async ({ email, password }: { email: string; password: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Signing up...`,
     })
 
-    const response = await post(`${API_URL}/signup`, { email, password })
+    let token = captchaToken
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+    }
+
+    const response = await post(`${API_URL}/signup`, {
+      email,
+      password,
+      captchaToken: token ?? null,
+    })
     const error = response.error
 
     if (!error) {
@@ -34,6 +49,8 @@ const SignUpForm = () => {
 
       await router.push('/sign-in')
     } else {
+      captchaRef.current?.resetCaptcha()
+
       ui.setNotification({
         id: toastId,
         category: 'error',
@@ -68,6 +85,20 @@ const SignUpForm = () => {
               label="Password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
             />
+
+            <div className="self-center">
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
+            </div>
 
             <Button
               block
