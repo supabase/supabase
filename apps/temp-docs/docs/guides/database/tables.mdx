@@ -65,9 +65,11 @@ create table movies (
 </TabPanel>
 </Tabs>
 
-:::note
+<Admonition type="note">
+
 When naming tables, use lowercase and underscores instead of spaces (e.g., `table_name`, not `Table Name`).
-:::
+
+</Admonition>
 
 ## Columns
 
@@ -336,11 +338,11 @@ create table salaries (
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
 
-:::caution
+<Admonition type="caution">
 
 By default, PostgreSQL views bypass Row Level Security unless you change their owner (see https://github.com/supabase/supabase/discussions/901). PostgreSQL v15 (coming soon) will have a more intuitive control for this through [security invoker views](https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/) and the previous step won't be needed.
 
-:::
+</Admonition>
 
 Say we have the following tables from a database of a university:
 

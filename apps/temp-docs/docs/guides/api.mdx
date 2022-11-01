@@ -41,11 +41,11 @@ It provides everything you need from a CRUD API:
 
 ## GraphQL API {#graphql-api-overview}
 
-:::note
+<Admonition type='note'>
 
 GraphQL is in Beta, and may have breaking changes. It is only available on self-hosted setups and Supabase projects created after 28th March 2022.
 
-:::
+</Admonition>
 
 GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-graphql), an open source PostgreSQL extension for GraphQL.
 
@@ -199,12 +199,12 @@ JS Reference: [select()](../reference/javascript/select),
 
 ### GraphQL API
 
-:::note
+<Admonition type='note'>
 
 To rebuild your GraphQL schema from the SQL schema, call `select graphql.rebuild_schema();`.
 Be sure to rebuild the GraphQL schema after altering the SQL schema.
 
-:::
+</Admonition>
 
 You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urql](https://formidable.com/open-source/urql/docs/).
 

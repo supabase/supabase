@@ -65,9 +65,11 @@ This will allow your users to use your custom Azure login page when logging in.
 
 ## Add login code to your client app
 
-:::tip
+<Admonition type="tip">
+
 Supabase Auth requires that Azure returns a valid email address. Therefore you must request the `email` scope in the `signIn` method above.
-:::
+
+</Admonition>
 
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 

@@ -3,19 +3,20 @@ import { IconInfo, IconHelpCircle, IconAlertTriangle } from 'ui'
 
 interface Props {
   type: 'note' | 'tip' | 'info' | 'caution' | 'danger'
+  label?: string
   children: any
 }
 
-const Admonition: FC<Props> = ({ type = 'note', children }) => {
+const Admonition: FC<Props> = ({ type = 'note', label, children }) => {
   return (
     <div
       className={[
-        'shadow p-4 rounded border-l-[5px] space-y-2',
+        'shadow p-4 rounded border-l-[5px] space-y-2 my-4',
         `${
           type === 'note'
             ? 'bg-scale-500 border-scale-800'
             : type === 'info'
-            ? 'bg-blue-500 border-blue-800'
+            ? 'bg-scale-500 border-scale-800'
             : type === 'tip'
             ? 'bg-brand-500 border-brand-800'
             : type === 'caution'
@@ -40,9 +41,9 @@ const Admonition: FC<Props> = ({ type = 'note', children }) => {
         ) : (
           <IconInfo className="text-scale-1200" size={18} strokeWidth={1.5} />
         )}
-        <p className="text-base text-scale-1200 uppercase my-0">{type}</p>
+        <p className="text-base text-scale-1200 uppercase my-0">{label || type}</p>
       </div>
-      <div className="admonition-content text-scale-1200 text-base">{children}</div>
+      <div className="admonition-content text-scale-1200 text-base space-y-1">{children}</div>
     </div>
   )
 }
