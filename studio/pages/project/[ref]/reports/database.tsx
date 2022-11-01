@@ -75,8 +75,8 @@ const DatabaseUsage: FC<any> = () => {
   return (
     <>
       <div>
-        <section className="">
-          <Panel title={<h1>Database usage</h1>}>
+        <section>
+          <Panel title={<h2>Database usage</h2>}>
             <Panel.Content>
               <div className="space-y-1">
                 <h5 className="text-sm text-scale-1200">Database size</h5>
@@ -117,7 +117,7 @@ const DatabaseUsage: FC<any> = () => {
             </Panel.Content>
           </Panel>
 
-          <Panel title={<h1>Database health</h1>}>
+          <Panel title={<h2>Database health</h2>}>
             <Panel.Content>
               <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
