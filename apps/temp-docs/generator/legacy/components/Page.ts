@@ -33,8 +33,6 @@ slug: ${slug}
 custom_edit_url: ${specFileName}
 ---
 
-${title ? `# ${title}` : ''}
-
 ${description}
 
 ${spotlight}

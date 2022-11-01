@@ -34,8 +34,8 @@ export default function ButtonCard({
             ) : (
               icon
             )}
-            <h3 className="my-0 text-base truncate">{title}</h3>
-            <p className="my-0 text-sm truncate">{description}</p>
+            <h3 className="my-0 text-base">{title}</h3>
+            <p className="my-0 text-sm">{description}</p>
           </div>
         )}
       </a>

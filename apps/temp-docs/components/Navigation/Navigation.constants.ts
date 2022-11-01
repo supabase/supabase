@@ -42,7 +42,7 @@ export const menuItems: NavMenu = {
       label: 'Overview',
       items: [
         { name: 'Introduction', url: '/', items: [] },
-        { name: 'Features', url: '/guides/features', items: [] },
+        { name: 'Features', url: '/features', items: [] },
         { name: 'Architecture', url: '/architecture', items: [] },
       ],
     },
@@ -148,24 +148,22 @@ export const menuItems: NavMenu = {
       ],
     },
     {
-      label: 'APIs',
-      items: [
-        { name: 'Overview', url: '/guides/api', items: [] },
-        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
-      ],
-    },
-    {
       label: 'Database',
       items: [
         { name: 'Overview', url: '/guides/database', items: [] },
         { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
         { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
         { name: 'Database Functions', url: '/guides/database/functions', items: [] },
+        { name: 'Database Webhooks', url: '/guides/database/database-webhooks', items: [] },
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
+        { name: 'Database Testing', url: '/guides/database/testing', items: [] },
         {
-          name: 'Migrating Between Projects',
-          url: '/guides/platform/migrating-and-upgrading-projects',
-          items: [],
+          name: 'Serverless APIs',
+          url: undefined,
+          items: [
+            { name: 'Overview', url: '/guides/api', items: [] },
+            { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+          ],
         },
         {
           name: 'Extensions',
@@ -178,6 +176,16 @@ export const menuItems: NavMenu = {
               items: [],
             },
             { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
+            {
+              name: 'pg_cron: Job Scheduling',
+              url: '/guides/database/extensions/pgcron',
+              items: [],
+            },
+            {
+              name: 'pg_net: Async Networking',
+              url: '/guides/database/extensions/pgnet',
+              items: [],
+            },
             { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
             {
               name: 'uuid-ossp: Unique Identifiers',
@@ -213,6 +221,7 @@ export const menuItems: NavMenu = {
         { name: 'Overview', url: '/guides/realtime', items: [] },
         { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
         { name: 'Postgres CDC', url: '/guides/realtime/postgres-cdc', items: [] },
+        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
     },
     {
@@ -227,10 +236,15 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Overview', url: '/guides/hosting/platform', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
-        { name: 'Disk Space Usage', url: '/guides/platform/disk-usage', items: [] },
+        { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
-        { name: 'Performance', url: '/guides/platform/performance', items: [] },
+        {
+          name: 'Migrating and upgrading',
+          url: '/guides/platform/migrating-and-upgrading-projects',
+          items: [],
+        },
+        { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
       ],
