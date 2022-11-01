@@ -41,8 +41,9 @@ const DatabaseUsage: FC<any> = () => {
   const [dateRange, setDateRange] = useState<any>(undefined)
 
   const { ref } = router.query
-  const { usage, error: usageError, isLoading } = useProjectUsage(ref as string)
-  const databaseSizeLimit = usage?.db_size?.limit ?? 0
+  const { usage } = useProjectUsage(ref as string)
+  // const databaseSizeLimit = usage?.db_size?.limit ?? 0
+  const databaseSizeLimit = 0
 
   useEffect(() => {
     let cancel = false
@@ -78,12 +79,12 @@ const DatabaseUsage: FC<any> = () => {
                 <SparkBar
                   type="horizontal"
                   value={databaseSize}
-                  max={databaseSizeLimit}
+                  max={databaseSizeLimit > 0 ? databaseSizeLimit : Infinity}
                   barClass={`${
                     isExceeded ? 'bg-red-900' : isApproaching ? 'bg-yellow-900' : 'bg-brand-900'
                   }`}
                   labelBottom={formatBytes(databaseSize)}
-                  labelTop={formatBytes(databaseSizeLimit)}
+                  labelTop={databaseSizeLimit > 0 ? formatBytes(databaseSizeLimit) : ''}
                 />
               </div>
             </Panel.Content>
