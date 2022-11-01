@@ -5,56 +5,49 @@ description: A collection of framework-specific Auth utilities for working with 
 sidebar_label: Overview
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
 import ButtonCard from '@site/src/components/ButtonCard'
 
 A collection of framework-specific Auth utilities for working with Supabase.
 
 <div class="container" style={{ padding: 0 }}>
-  <div class="row is-multiline">
+  <div class="grid grid-cols-12 gap-4">
     {/* Auth UI */}
-    <div class="col col--4">
+    <div class="col-span-6">
       <ButtonCard
         class="card"
-        to={useBaseUrl('/guides/auth/auth-helpers/auth-ui')}
+        to={'/guides/auth/auth-helpers/auth-ui'}
         title={'Auth UI'}
         description={'A pre-built React component for authenticating users.'}
         style={{ height: '100%' }}
       />
     </div>
     {/* Next.js */}
-    <div class="col col--4">
+    <div class="col-span-6">
       <ButtonCard
         class="card"
-        to={useBaseUrl('/guides/auth/auth-helpers/nextjs')}
+        to={'/guides/auth/auth-helpers/nextjs'}
         title={'Next.js'}
-        description={
-          'Helpers for authenticating users in Next.js applications.'
-        }
+        description={'Helpers for authenticating users in Next.js applications.'}
         style={{ height: '100%' }}
       />
     </div>
     {/* SvelteKit */}
-    <div class="col col--4">
+    <div class="col-span-6">
       <ButtonCard
         class="card"
-        to={useBaseUrl('/guides/auth/auth-helpers/sveltekit')}
+        to={'/guides/auth/auth-helpers/sveltekit'}
         title={'SvelteKit'}
-        description={
-          'Helpers for authenticating users in SvelteKit applications.'
-        }
+        description={'Helpers for authenticating users in SvelteKit applications.'}
         style={{ height: '100%' }}
       />
     </div>
     {/* Remix */}
-    <div class="col col--4">
+    <div class="col-span-6">
       <ButtonCard
         class="card"
-        to={useBaseUrl('/guides/auth/auth-helpers/remix')}
+        to={'/guides/auth/auth-helpers/remix'}
         title={'Remix'}
-        description={
-          'Helpers for authenticating users in Remix applications.'
-        }
+        description={'Helpers for authenticating users in Remix applications.'}
         style={{ height: '100%' }}
       />
     </div>
