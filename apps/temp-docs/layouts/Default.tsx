@@ -3,7 +3,6 @@ import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
-import { Modal } from 'ui'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
@@ -23,6 +22,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
       document.documentElement.className = key === 'true' ? 'dark' : ''
     }
   }, [])
+
   return (
     <>
       <Head>
@@ -58,7 +58,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
             </div>
             {toc && !meta?.hide_table_of_contents && (
               <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-4">
-                <ul className="list-none pl-4 text-[0.8rem] grid gap-1 mt-1">
+                <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-1 mt-1">
                   {toc.json.map((item: any, i: number) => {
                     return (
                       <li key={i}>

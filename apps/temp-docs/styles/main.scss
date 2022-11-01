@@ -157,3 +157,8 @@ pre[class*='language-'] {
     transform: rotate(90deg);
   }
 }
+
+// ToC styles
+.toc__menu-item--active {
+  color: var(--colors-brand9) !important;
+}
