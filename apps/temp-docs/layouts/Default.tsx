@@ -23,7 +23,6 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
       document.documentElement.className = key === 'true' ? 'dark' : ''
     }
   }, [])
-
   return (
     <>
       <Head>
@@ -58,13 +57,17 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               </article>
             </div>
             {toc && !meta?.hide_table_of_contents && (
-              <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-4">
-                <h5>On this page</h5>
-                <ul className="list-none pl-2 text-[0.8rem]">
+              <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-4">
+                <ul className="list-none pl-4 text-[0.8rem] grid gap-1 mt-1">
                   {toc.json.map((item: any, i: number) => {
                     return (
                       <li key={i}>
-                        <a href={`#${item.slug}`}>{item.content}</a>
+                        <a
+                          className="text-scale-1000 hover:text-brand-900 transition-colors"
+                          href={`#${item.slug}`}
+                        >
+                          {item.content}
+                        </a>
                       </li>
                     )
                   })}
