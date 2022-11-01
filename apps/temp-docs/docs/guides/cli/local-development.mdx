@@ -61,12 +61,12 @@ You can use the [stop](/reference/cli/usage#supabase-stop) command at any time t
 You can access services directly with any Postgres client or through the API Gateway ([Kong](https://github.com/Kong/kong)).
 
 <Tabs
-  defaultValue="postgres"
-  values={[
-    {label: 'Postgres', value: 'postgres'},
-    {label: 'API Gateway', value: 'kong'},
-  ]}>
-<TabItem value="postgres">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="postgres"
+>
+<TabPanel id="postgres" label="Postgres">
 
 ```sh
 # Default URL:
@@ -82,8 +82,8 @@ For example:
 psql 'postgresql://postgres:postgres@localhost:54322/postgres'
 ```
 
-</TabItem>
-<TabItem value="kong">
+</TabPanel>
+<TabPanel id="kong" label="API Gateway">
 
 ```sh
 # Default URL:
@@ -104,7 +104,7 @@ http://localhost:54321/storage/v1/        # Storage
 http://localhost:54321/auth/v1/           # Auth (GoTrue)
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 :::note
