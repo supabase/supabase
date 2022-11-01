@@ -43,9 +43,11 @@ drop extension pgtap;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension call `drop extension`.
 
-:::caution
+<Admonition type="caution">
+
 Enabling some extensions with `create extension <extension-name> with schema extensions` may lead to permission issues (e.g., `dblink`, `http`, `pg_cron`).
-:::
+
+</Admonition>
 
 </TabPanel>
 </Tabs>

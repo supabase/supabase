@@ -93,13 +93,14 @@ supabase db reset
 
 This command recreates your local database from scratch and applies all migration scripts under `supabase/migrations` directory. Now your local database is up to date.
 
-:::tip
+<Admonition type="tip">
 
 The new migration command also supports stdin as input.
 This allows you to pipe in an existing script from another file or stdout:
 
 `supabase migration new new_employee < create_employees_table.sql`
-:::
+
+</Admonition>
 
 ### Auto schema diff
 
@@ -149,14 +150,14 @@ This is because the default schema diff tool does not account for default privil
 
 Commit the new migration script to git and you are ready to deploy.
 
-:::tip
+<Admonition type="tip">
 
 Alternatively, you may pass in the `--use-migra` experimental flag to generate a more concise migration using [migra](https://github.com/djrobstep/migra).
 Without the `-f` file flag, the output is written to stdout by default.
 
 `supabase db diff --use-migra`
 
-:::
+</Admonition>
 
 ## Deploy a migration
 
@@ -171,11 +172,11 @@ Prepare your environments by:
 - Creating separate Supabase projects for staging and production
 - Pushing your git repository to GitHub and enabling GitHub Actions
 
-:::caution
+<Admonition type="caution">
 
 You need a _new_ project for staging. A project which has already been modified to reflect the production project's schema can't be used because the CLI would reapply these changes.
 
-:::
+</Admonition>
 
 ### Configure GitHub Actions
 

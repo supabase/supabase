@@ -44,9 +44,11 @@ If you intend to grow beyond this, reach out to our team to learn more about our
 Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. Instead, they are internally marked as removed until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed.
 As a result, deleting data from your database may not immediately reduce the reported disk usage.
 
-:::note
+<Admonition type="note">
+
 Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed.
-:::
+
+</Admonition>
 
 Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
 However, it can be necessary to either [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/)

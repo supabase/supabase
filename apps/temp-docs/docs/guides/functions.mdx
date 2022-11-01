@@ -63,13 +63,13 @@ supabase functions deploy hello-world
 This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform.
 The command outputs a URL to the Supabase Dashboard which you can open to find view more details. Let's open the link to find the execution command.
 
-:::note
+<Admonition type="note">
 
 By default, Edge Functions require a valid JWT in the authorization header. This header is automatically set when invoking your function via a Supabase client library.
 
 If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
 
-:::
+</Admonition>
 
 ### Executing Remote Functions
 
@@ -93,7 +93,7 @@ You can debug your deployed Edge Functions using the "Functions" section of the 
 - Invocations: shows the Request and Response for each execution.
 - Logs: shows any platform events, including deployments and errors.
 
-![Function invocations.](/img/guides/functions/function-logs.png)
+![Function invocations.](/docs/img/guides/functions/function-logs.png)
 
 ## Developing locally
 
@@ -159,11 +159,11 @@ echo "MY_NAME=Yoda" >> ./supabase/.env.local
 
 This creates a new file `./supabase/.env.local` for storing your local development secrets.
 
-:::caution
+<Admonition type="caution">
 
 Never check your .env files into Git!
 
-:::
+</Admonition>
 
 Now let's access this environment variable `MY_NAME` inside our Function. Anywhere in your function, add this line:
 
@@ -189,11 +189,11 @@ cp ./supabase/.env.local ./supabase/.env
 
 This creates a new file `./supabase/.env` for storing your production secrets.
 
-:::caution
+<Admonition type="caution">
 
 Never check your `.env` files into Git!
 
-:::
+</Admonition>
 
 Let's push all the secrets from the `.env` file to our remote project using [`supabase secrets set`](/docs/reference/cli/usage#supabase-secrets-set):
 
