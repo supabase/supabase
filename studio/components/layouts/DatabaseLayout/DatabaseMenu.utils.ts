@@ -1,7 +1,5 @@
 import { Project } from 'types'
-import { IS_PLATFORM } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { useFlag } from 'hooks'
 
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
