@@ -14,8 +14,8 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      tableName={LogsTableName.POSTGREST}
-      queryType="postgrest"
+      tableName={LogsTableName.PGBOUNCER}
+      queryType="pgbouncer"
     />
   )
 }
