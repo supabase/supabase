@@ -82,6 +82,27 @@ pre[class*='language-'] {
 
 // Spec doc specifics ported from docusaurus
 // @TODO these should be converted to Tailwind classes
+
+.method-list-item {
+  @apply border-t border-gray-400;
+  .method-list-item-label {
+    @apply flex items-center gap-1;
+  }
+  .method-list-item-label-name {
+    @apply font-mono font-bold text-sm py-2;
+  }
+  .method-list-item-label-badge {
+    @apply font-mono text-xs px-1;
+    overflow-wrap: anywhere;
+  }
+  .method-list-item-validation {
+    @apply flex flex-wrap gap-2;
+  }
+  .method-list-item-description {
+    @apply text-sm space-y-2;
+  }
+}
+
 .method-list-group li:last-child {
   border-bottom: 1px solid var(--colors-scale3);
 }
@@ -93,21 +114,19 @@ pre[class*='language-'] {
   }
 }
 
-.method-list-item-label-badge {
-  overflow-wrap: anywhere;
-}
-
 .method-list-item-validation {
   code {
+    @apply text-xs bg-scale-300 rounded;
     padding: 1px 6px;
-    border-radius: 4px;
-    background-color: var(--colors-scale3);
   }
 }
 
+.method-list-group {
+  @apply p-0 m-0 list-none;
+}
+
 .method-list-group .method-list-group {
-  border: 1px solid var(--colors-scale3);
-  border-radius: 8px;
+  @apply border border-scale-400 rounded-md;
   margin-bottom: 20px;
   max-width: 600px;
 }

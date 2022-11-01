@@ -146,23 +146,21 @@ const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
 }
 
 const methodListGroup = (items) => `
-<ul className="method-list-group p-0 m-0 list-none">
+<ul className="method-list-group">
   ${items}
 </ul>
 `
 
 const methodListItemLabel = ({ name, isOptional, type, description }, subContent) => `
-<li className="method-list-item border-t border-gray-300">
-  <h4 className="method-list-item-label flex items-center gap-1">
-    <span className="method-list-item-label-name font-mono font-bold text-sm py-2">
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
       ${name}
     </span>
-    <span className="method-list-item-label-badge font-mono text-xs px-1 ${
-      !isOptional && 'required'
-    }">
+    <span className="method-list-item-label-badge ${!isOptional && 'required'}">
       ${isOptional ? 'optional' : 'required'}
     </span>
-    <span className="method-list-item-validation flex flex-wrap gap-2">
+    <span className="method-list-item-validation">
       ${type}
     </span>
   </h4>
