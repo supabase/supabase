@@ -1,7 +1,8 @@
 import { Tabs, Alert } from 'ui'
 
-import CodeBlock from './CodeBlock/CodeBlock'
+import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
+import CodeBlock from './CodeBlock/CodeBlock'
 import Frameworks from './Frameworks'
 import AuthProviders from './AuthProviders'
 import { H3, H4 } from './CustomHTMLElements'
@@ -10,6 +11,7 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 
 const components = {
+  Admonition,
   ButtonCard,
   CodeBlock,
   Frameworks,
