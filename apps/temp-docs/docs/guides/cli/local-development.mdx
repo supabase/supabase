@@ -9,6 +9,19 @@ import TabItem from '@theme/TabItem'
 
 Learn how to use the Supabase CLI to develop your project locally and deploy to the Supabase Platform.
 
+:::note
+To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
+:::
+
+<h3>this is a proper heading</h3>
+
+### this is a proper md heading
+
+<Alert title="Title of the alert" withIcon variant="warning">
+  To access the database from an edge function in your local Supabase setup, replace `localhost`
+  with `host.docker.internal`.
+</Alert>
+
 ## Prerequisites
 
 Make sure you have these installed on your local machine:
@@ -126,10 +139,6 @@ create table employees (
 );
 ```
 
-:::note
-You can execute any SQL using the `DB URL` shown by [`supabase status`](/reference/cli/usage#supabase-status).
-:::
-
 Run the [`db diff`](/reference/cli/usage#supabase-db-diff) command to detect changes in the local database:
 
 ```sh
@@ -222,3 +231,7 @@ The local development environment is not as feature-complete as the Supabase Pla
 - The Functions interface is coming soon.
 - Logs are not supported through the interface (however you can access them through the Docker containers).
 - You cannot update your project settings in the Dashboard—this must be done using the CLI.
+
+```
+
+```
