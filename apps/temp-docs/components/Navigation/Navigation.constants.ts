@@ -26,13 +26,13 @@ export const REFERENCES: References = {
     name: 'CLI',
     library: undefined,
     versions: [],
-    icon: '/docs/img/libraries/cli-icon.svg',
+    icon: '/docs/img/icons/cli-icon.svg',
   },
   api: {
     name: 'API',
     library: undefined,
     versions: [],
-    icon: '/docs/img/libraries/api-icon.svg',
+    icon: '/docs/img/icons/api-icon.svg',
   },
 }
 

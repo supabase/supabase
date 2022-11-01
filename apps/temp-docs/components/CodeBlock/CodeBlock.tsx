@@ -4,15 +4,17 @@ import { Button, IconCheck, IconCopy } from 'ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
+import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
+import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
 
 import { useState } from 'react'
 import { useTheme } from '../Providers'
 
 interface Props {
-  lang: 'js' | 'sql' | 'py' | 'bash'
+  lang: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart'
   startingLineNumber?: number
   hideCopy?: boolean
   className?: string
@@ -42,9 +44,11 @@ function CodeBlock(props: Props) {
   // force jsx to be js highlighted
   if (lang === 'jsx') lang = 'js'
   SyntaxHighlighter.registerLanguage('js', js)
+  SyntaxHighlighter.registerLanguage('ts', ts)
   SyntaxHighlighter.registerLanguage('py', py)
   SyntaxHighlighter.registerLanguage('sql', sql)
   SyntaxHighlighter.registerLanguage('bash', bash)
+  SyntaxHighlighter.registerLanguage('dart', dart)
 
   // const large = props.size === 'large' ? true : false
   const large = false
