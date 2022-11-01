@@ -56,15 +56,12 @@ function CodeBlock(props: Props) {
         <SyntaxHighlighter
           language={lang}
           style={monokaiTheme}
-          className={`code-block rounded-lg border p-4 ${!showLineNumbers && 'pl-6'}`}
+          className={`code-block rounded-lg border p-4 !my-2 !bg-scale-400 ${
+            !showLineNumbers && 'pl-6'
+          }`}
           customStyle={{
             fontSize: large ? 18 : 12,
             lineHeight: large ? 1.4 : 1.2,
-            // borderTop: '1px solid #393939',
-            //background: isDarkMode ? 'bg-scale-700' : 'bg-scale-300',
-            //background: isDarkMode ? '#444' : '#F1F3F5',
-            // we really should support proper light mode, not just show dark in both modes
-            background: isDarkMode ? '#444' : '#F1F3F5',
           }}
           showLineNumbers={showLineNumbers}
           lineNumberContainerStyle={{
@@ -72,7 +69,6 @@ function CodeBlock(props: Props) {
           }}
           lineNumberStyle={{
             minWidth: '44px',
-            background: isDarkMode ? '#444' : '#F1F3F5',
             paddingLeft: '4px',
             paddingRight: '4px',
             marginRight: '12px',
