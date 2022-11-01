@@ -42,8 +42,7 @@ const DatabaseUsage: FC<any> = () => {
 
   const { ref } = router.query
   const { usage } = useProjectUsage(ref as string)
-  // const databaseSizeLimit = usage?.db_size?.limit ?? 0
-  const databaseSizeLimit = 0
+  const databaseSizeLimit = usage?.db_size?.limit ?? 0
 
   useEffect(() => {
     let cancel = false
