@@ -13,14 +13,12 @@ This submodule provides convenience helpers for implementing user authentication
 ## Install the Next.js helper library
 
 <Tabs
-  groupId="install"
-  defaultValue="npm"
-  values={[
-    {label: 'npm', value: 'npm'},
-    {label: 'Yarn', value: 'yarn'},
-  ]}>
-
-<TabItem value="npm">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+>
+<TabPanel id="npm" label="npm">
 
 ```sh
 npm install @supabase/auth-helpers-nextjs
@@ -37,8 +35,8 @@ Additionally, install the **React Auth Helpers** for components and hooks that c
 npm install @supabase/auth-helpers-react
 ```
 
-</TabItem>
-<TabItem value="yarn">
+</TabPanel>
+<TabPanel id="yarn" label="Yarn">
 
 ```sh
 yarn add @supabase/auth-helpers-nextjs
@@ -55,7 +53,7 @@ Additionally, install the **React Auth Helpers** for components and hooks that c
 yarn add @supabase/auth-helpers-react
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Set up environment variables
@@ -70,12 +68,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ## Basic Setup
 
 <Tabs
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
@@ -99,8 +97,8 @@ function MyApp({ Component, pageProps }) {
 }
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
@@ -130,7 +128,7 @@ function MyApp({
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 You can now determine if a user is authenticated by checking that the `user` object returned by the `useUser()` hook is defined.
@@ -272,13 +270,7 @@ Both `withApiAuth` and `withPageAuth` return a supabase client that you can use 
 ```js
 import { User, withPageAuth } from '@supabase/auth-helpers-nextjs'
 
-export default function ProtectedPage({
-  user,
-  data,
-}: {
-  user: User,
-  data: any,
-}) {
+export default function ProtectedPage({ user, data }: { user: User, data: any }) {
   return (
     <>
       <div>Protected content for {user.email}</div>
@@ -305,13 +297,7 @@ When using third-party auth providers, sessions are initiated with an additional
 ```js
 import { User, withPageAuth } from '@supabase/auth-helpers-nextjs'
 
-export default function ProtectedPage({
-  user,
-  allRepos,
-}: {
-  user: User,
-  allRepos: any,
-}) {
+export default function ProtectedPage({ user, allRepos }: { user: User, allRepos: any }) {
   return (
     <>
       <div>Protected content for {user.email}</div>
@@ -342,15 +328,12 @@ export const getServerSideProps = withPageAuth({
     const userId = user.user_metadata.user_name
 
     const allRepos = await (
-      await fetch(
-        `https://api.github.com/search/repositories?q=user:${userId}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `token ${provider_token}`,
-          },
-        }
-      )
+      await fetch(`https://api.github.com/search/repositories?q=user:${userId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `token ${provider_token}`,
+        },
+      })
     ).json()
 
     return { props: { allRepos, user } }
