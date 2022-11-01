@@ -9,6 +9,7 @@ import { H3, H4 } from './CustomMDX'
 const components = {
   Alert,
   ButtonCard,
+  CodeBlock,
   Frameworks,
   AuthProviders,
 
@@ -18,6 +19,7 @@ const components = {
   h3: H3,
   h4: H4,
   code: (props: any) => <CodeBlock {...props} />,
+  mono: (props: any) => <code className="text-sm">{props.children}</code>,
 }
 
 export default components

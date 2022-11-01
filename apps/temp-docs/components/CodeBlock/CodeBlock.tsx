@@ -18,7 +18,9 @@ interface Props {
   className?: string
   children?: string
   size?: 'small' | 'medium' | 'large'
+  value?: string
 }
+
 function CodeBlock(props: Props) {
   const { isDarkMode } = useTheme()
   const monokaiTheme = monokaiCustomTheme(isDarkMode)
@@ -79,14 +81,14 @@ function CodeBlock(props: Props) {
             paddingBottom: '4px',
           }}
         >
-          {props.children?.trimEnd()}
+          {(props.value || props.children)?.trimEnd()}
         </SyntaxHighlighter>
       ) : (
-        <code>{props.children}</code>
+        <code>{props.value || props.children}</code>
       )}
-      {!props.hideCopy && props.children && props.className ? (
+      {!props.hideCopy && (props.value || props.children) && props.className ? (
         <div className={`${isDarkMode ?? 'dark'} absolute right-2 top-2`}>
-          <CopyToClipboard text={props.children}>
+          <CopyToClipboard text={props.value || props.children}>
             <Button
               type="default"
               icon={copied ? <IconCheck /> : <IconCopy />}
