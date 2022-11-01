@@ -17,3 +17,19 @@ export const removeAnchor = (text: any) => {
     else return text
   }
 }
+
+export const highlightSelectedTocItem = (id: string) => {
+  const tocMenuItems = document.querySelectorAll('.toc-menu a')
+
+  // find any currently active items and remove them
+  const currentActiveItem = document.querySelector('.toc-menu .toc__menu-item--active')
+  currentActiveItem?.classList.remove('toc__menu-item--active')
+
+  // Add active class to the current item
+  tocMenuItems.forEach((item) => {
+    // @ts-ignore
+    if (item.href.split('#')[1] === id) {
+      item.classList.add('toc__menu-item--active')
+    }
+  })
+}
