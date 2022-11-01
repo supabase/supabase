@@ -12,7 +12,7 @@ import ProjectSetup from './_partials/project_setup.mdx'
 
 <QuickstartIntro />
 
-![Supabase User Management example](/img/user-management-demo.png)
+![Supabase User Management example](/docs/img/user-management-demo.png)
 
 ### GitHub
 
@@ -226,19 +226,11 @@ const Account: Component<Props> = ({ session }) => {
           />
         </div>
         <div>
-          <button
-            type="submit"
-            class="button primary block"
-            disabled={loading()}
-          >
+          <button type="submit" class="button primary block" disabled={loading()}>
             {loading() ? 'Saving ...' : 'Update profile'}
           </button>
         </div>
-        <button
-          type="button"
-          class="button block"
-          onClick={() => supabase.auth.signOut()}
-        >
+        <button type="button" class="button block" onClick={() => supabase.auth.signOut()}>
           Sign Out
         </button>
       </form>
@@ -291,7 +283,7 @@ npm start
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase SolidJS](/img/supabase-solidjs-demo.png)
+![Supabase SolidJS](/docs/img/supabase-solidjs-demo.png)
 
 ## Bonus: Profile photos
 
