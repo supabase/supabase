@@ -4,15 +4,21 @@ import CodeBlock from './CodeBlock/CodeBlock'
 import ButtonCard from './ButtonCard'
 import Frameworks from './Frameworks'
 import AuthProviders from './AuthProviders'
-import { H3, H4 } from './CustomMDX'
+import { H3, H4 } from './CustomHTMLElements'
+
+import QuickstartIntro from './MDX/quickstart_intro.mdx'
+import ProjectSetup from './MDX/project_setup.mdx'
 
 const components = {
-  Alert,
   ButtonCard,
   CodeBlock,
   Frameworks,
   AuthProviders,
 
+  QuickstartIntro,
+  ProjectSetup,
+
+  Alert,
   Tabs,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
 

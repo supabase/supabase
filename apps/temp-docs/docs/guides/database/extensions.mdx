@@ -14,30 +14,23 @@ Supabase has pre-installed some of the most useful open source extensions.
 ### Enable and disable extensions
 
 <Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
 2. Click **Extensions** in the sidebar.
 3. Enable or disable an extension.
 
 <video width="99%" muted playsInline controls={true}>
-  <source
-    src="/docs/videos/toggle-extensions.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+  <source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
-</TabItem>
-
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Example: enable the "pgtap" extension and ensure it is installed
@@ -54,8 +47,7 @@ To disable an extension call `drop extension`.
 Enabling some extensions with `create extension <extension-name> with schema extensions` may lead to permission issues (e.g., `dblink`, `http`, `pg_cron`).
 :::
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ### Full list of extensions
