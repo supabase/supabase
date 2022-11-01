@@ -3,11 +3,12 @@ import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { useStore, checkPermissions } from 'hooks'
-import { AuthLayout } from 'components/layouts'
-import { EmailTemplates } from 'components/interfaces'
+import { checkPermissions, useStore } from 'hooks'
+import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
+import { SettingsLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
+import { SmtpForm } from 'components/interfaces'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ui, authConfig } = useStore()
@@ -19,12 +20,13 @@ const PageLayout: NextPageWithLayout = () => {
   const canReadAuthSettings = checkPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   if (!canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's email settings" />
+    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
   } else if (authConfig) {
     return (
-      <FormsContainer>
-        <EmailTemplates />
-      </FormsContainer>
+      <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
+        <AutoSchemaForm />
+        <SmtpForm />
+      </div>
     )
   } else {
     return <div />
@@ -32,7 +34,7 @@ const PageLayout: NextPageWithLayout = () => {
 }
 
 PageLayout.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
+  return <SettingsLayout>{page}</SettingsLayout>
 }
 
 export default observer(PageLayout)

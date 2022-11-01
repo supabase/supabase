@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
 import { checkPermissions, useStore } from 'hooks'
-import { AuthLayout } from 'components/layouts'
+import { LogsLayout } from 'components/layouts'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import NoPermission from 'components/ui/NoPermission'
 
@@ -20,6 +20,6 @@ const LogsPage: NextPageWithLayout = () => {
   )
 }
 
-LogsPage.getLayout = (page) => <AuthLayout title="Auth Logs">{page}</AuthLayout>
+LogsPage.getLayout = (page) => <LogsLayout title="Auth Logs">{page}</LogsLayout>
 
 export default observer(LogsPage)
