@@ -1,16 +1,19 @@
 import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { IconArrowRight } from 'ui'
 
-import { useStore } from 'hooks'
-import { TIME_PERIODS_INFRA } from 'lib/constants'
+import { useStore, useProjectUsage } from 'hooks'
+import { formatBytes } from 'lib/helpers'
+import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Panel from 'components/ui/Panel'
+import SparkBar from 'components/ui/SparkBar'
 
 const DatabaseReport: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -32,13 +35,61 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 export default observer(DatabaseReport)
 
 const DatabaseUsage: FC<any> = () => {
+  const router = useRouter()
+  const { meta, ui } = useStore()
+  const [databaseSize, setDatabaseSize] = useState<any>(0)
   const [dateRange, setDateRange] = useState<any>(undefined)
+
+  const { ref } = router.query
+  const { usage, error: usageError, isLoading } = useProjectUsage(ref as string)
+  const databaseSizeLimit = usage?.db_size?.limit ?? 0
+
+  useEffect(() => {
+    let cancel = false
+    const getDatabaseSize = async () => {
+      const res = await meta.query(
+        'select sum(pg_database_size(pg_database.datname))::integer as db_size from pg_database;'
+      )
+      if (!res.error && !cancel) {
+        setDatabaseSize(res[0].db_size)
+      } else {
+        ui.setNotification({ category: 'error', message: 'Failed to retrieve database size' })
+      }
+    }
+    getDatabaseSize()
+
+    return () => {
+      cancel = true
+    }
+  }, [])
+
+  const usageRatio = databaseSize / databaseSizeLimit
+  const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
+  const isExceeded = usageRatio >= 1
 
   return (
     <>
       <div>
         <section className="">
-          <Panel>
+          <Panel title={<h1>Database usage</h1>}>
+            <Panel.Content>
+              <div className="space-y-1">
+                <h5 className="text-sm text-scale-1200">Database size</h5>
+                <SparkBar
+                  type="horizontal"
+                  value={databaseSize}
+                  max={databaseSizeLimit}
+                  barClass={`${
+                    isExceeded ? 'bg-red-900' : isApproaching ? 'bg-yellow-900' : 'bg-brand-900'
+                  }`}
+                  labelBottom={formatBytes(databaseSize)}
+                  labelTop={formatBytes(databaseSizeLimit)}
+                />
+              </div>
+            </Panel.Content>
+          </Panel>
+
+          <Panel title={<h1>Database health</h1>}>
             <Panel.Content>
               <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
