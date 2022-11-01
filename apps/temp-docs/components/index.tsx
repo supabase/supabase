@@ -4,7 +4,7 @@ import CodeBlock from './CodeBlock/CodeBlock'
 import ButtonCard from './ButtonCard'
 import Frameworks from './Frameworks'
 import AuthProviders from './AuthProviders'
-import { H3, H4 } from './CustomMDX'
+import { H2, H3, H4 } from './CustomMDX'
 
 const components = {
   Alert: (props: any) => (
@@ -20,6 +20,7 @@ const components = {
   Tabs,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
 
+  h2: H2,
   h3: H3,
   h4: H4,
   code: (props: any) => <CodeBlock {...props} />,
