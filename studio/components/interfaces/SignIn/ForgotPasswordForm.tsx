@@ -1,7 +1,9 @@
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
@@ -13,13 +15,25 @@ const ForgotPasswordForm = () => {
   const { ui } = useStore()
   const router = useRouter()
 
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
+
   const onForgotPassword = async ({ email }: { email: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Sending password reset email...`,
     })
 
-    const response = await post(`${API_URL}/reset-password`, { email })
+    let token = captchaToken
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+    }
+
+    const response = await post(`${API_URL}/reset-password`, {
+      email,
+      captchaToken: token ?? undefined,
+    })
     const error = response.error
 
     if (!error) {
@@ -31,6 +45,8 @@ const ForgotPasswordForm = () => {
 
       await router.push('/sign-in')
     } else {
+      captchaRef.current?.resetCaptcha()
+
       ui.setNotification({
         id: toastId,
         category: 'error',
@@ -49,7 +65,7 @@ const ForgotPasswordForm = () => {
     >
       {({ isSubmitting }: { isSubmitting: boolean }) => {
         return (
-          <div className="space-y-4 pt-4">
+          <div className="flex flex-col space-y-4 pt-4">
             <Input
               id="email"
               name="email"
@@ -57,6 +73,20 @@ const ForgotPasswordForm = () => {
               label="Email"
               placeholder="you@example.com"
             />
+
+            <div className="self-center">
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
+            </div>
 
             <div className="border-overlay-border border-t" />
 

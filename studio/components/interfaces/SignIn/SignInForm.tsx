@@ -1,8 +1,10 @@
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useStore } from 'hooks'
 import { useParams } from 'hooks/misc/useParams'
 import { auth } from 'lib/gotrue'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useRef, useState } from 'react'
 import { useSWRConfig } from 'swr'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
@@ -18,13 +20,26 @@ const SignInForm = () => {
   const { returnTo } = useParams()
   const { cache } = useSWRConfig()
 
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
+
   const onSignIn = async ({ email, password }: { email: string; password: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Logging in...`,
     })
 
-    const { error } = await auth.signInWithPassword({ email, password })
+    let token = captchaToken
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+    }
+
+    const { error } = await auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken: token ?? undefined },
+    })
 
     if (!error) {
       ui.setNotification({
@@ -39,6 +54,8 @@ const SignInForm = () => {
 
       await router.push(returnTo ?? '/projects')
     } else {
+      captchaRef.current?.resetCaptcha()
+
       ui.setNotification({
         id: toastId,
         category: 'error',
@@ -79,6 +96,20 @@ const SignInForm = () => {
               <Link href="/forgot-password">
                 <a className="text-scale-900 text-sm absolute top-0 right-0">Forgot Password?</a>
               </Link>
+            </div>
+
+            <div className="self-center">
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
             </div>
 
             <Button
