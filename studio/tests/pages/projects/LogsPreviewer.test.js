@@ -3,18 +3,9 @@ import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(utc)
 
-// mock the fetch function
-jest.mock('lib/common/fetch')
 import { get } from 'lib/common/fetch'
-
-// mock mobx
-jest.mock('mobx-react-lite')
-import { observer } from 'mobx-react-lite'
-observer.mockImplementation((v) => v)
-
-// mock the router
-jest.mock('next/router')
 import { useRouter } from 'next/router'
+
 const defaultRouterMock = () => {
   const router = jest.fn()
   router.query = {}
@@ -24,58 +15,15 @@ const defaultRouterMock = () => {
 }
 useRouter.mockReturnValue(defaultRouterMock())
 
-// mock monaco editor
-jest.mock('@monaco-editor/react')
-import Editor, { useMonaco } from '@monaco-editor/react'
-Editor = jest.fn()
-Editor.mockImplementation((props) => {
-  return (
-    <textarea className="monaco-editor" onChange={(e) => props.onChange(e.target.value)}></textarea>
-  )
-})
-useMonaco.mockImplementation((v) => v)
-
-// mock usage flags
-jest.mock('components/ui/Flag/Flag')
-import Flag from 'components/ui/Flag/Flag'
-Flag.mockImplementation(({ children }) => <>{children}</>)
-jest.mock('hooks')
-import { useFlag } from 'hooks'
-useFlag.mockReturnValue(true)
-
-import { SWRConfig } from 'swr'
-jest.mock('components/interfaces/Settings/Logs/LogsPreviewer')
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-LogsPreviewer.mockImplementation((props) => {
-  const Comp = jest.requireActual('components/interfaces/Settings/Logs/LogsPreviewer').default
-  // wrap with SWR to reset the cache each time
-  return (
-    <SWRConfig
-      value={{
-        provider: () => new Map(),
-        shouldRetryOnError: false,
-      }}
-    >
-      <Comp {...props} />
-    </SWRConfig>
-  )
-})
-
-jest.mock('hooks')
 import { useProjectSubscription } from 'hooks'
-useProjectSubscription = jest.fn((ref) => ({
-  subscription: {
-    tier: {
-      supabase_prod_id: 'tier_free',
-    },
-  },
-}))
-
-import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
+
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
@@ -88,48 +36,46 @@ test.each([
     queryType: 'api',
     tableName: undefined,
     tableLog: logDataFixture({
-      id: 'some-id',
       path: 'some-path',
       method: 'POST',
       status_code: '400',
       metadata: undefined,
     }),
-    selectionLog: {
-      id: 'some-id',
+    selectionLog: logDataFixture({
       metadata: [{ request: [{ method: 'POST' }] }],
-    },
+    }),
     tableTexts: [/POST/, /some\-path/, /400/],
-    selectionTexts: [/POST/],
+    selectionTexts: [/POST/, /Timestamp/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
   },
   // TODO: add more tests for each type of ui
-
   {
     queryType: 'auth',
     tableName: undefined,
     tableLog: logDataFixture({
-      id: 'some-id',
       event_message: JSON.stringify({
         msg: 'some message',
         path: '/auth-path',
         level: 'info',
         status: 300,
       }),
-      timestamp: 1659545029083869,
-      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
     }),
     selectionLog: logDataFixture({
-      id: 'some-id',
       event_message: JSON.stringify({
         msg: 'some message',
         path: '/auth-path',
         level: 'info',
         status: 300,
       }),
-      timestamp: 1659545029083869,
-      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
     }),
     tableTexts: [/auth\-path/, /some message/, /INFO/],
-    selectionTexts: [/auth\-path/, /some message/, /INFO/, /300/],
+    selectionTexts: [
+      /auth\-path/,
+      /some message/,
+      /INFO/,
+      /300/,
+      /Timestamp/,
+      RegExp(`${new Date().getFullYear()}.+`, 'g'),
+    ],
   },
 ])(
   'selection $queryType $tableName , can display log data and metadata',
