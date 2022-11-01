@@ -61,7 +61,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
                 <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-1 mt-1">
                   {toc.json.map((item: any, i: number) => {
                     return (
-                      <li key={i}>
+                      <li key={i} className={`${item.lvl === 3 ? 'ml-4' : ''}`}>
                         <a
                           className="text-scale-1000 hover:text-brand-900 transition-colors"
                           href={`#${item.slug}`}
