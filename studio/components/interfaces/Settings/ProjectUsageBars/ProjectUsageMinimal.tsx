@@ -12,6 +12,8 @@ interface ProjectUsageMinimalProps {
   filter: string
 }
 
+// [Joshen] This is currently not being used anywhere as of 011122
+
 const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter }) => {
   const { usage, error: usageError, isLoading } = useProjectUsage(projectRef)
   const { subscription, error: subscriptionError } = useProjectSubscription(projectRef)
