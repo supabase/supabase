@@ -16,12 +16,7 @@ const algoliasearch = require('algoliasearch/lite')
 // Note that we'll need to do a general clean up of the files in the docs
 // A lot of them are not even linked to within the docs site, so just need to
 // double check if they can be removed or if we want them in the side bars.
-const ignoredFiles = [
-  'docs/404.mdx',
-  'docs/faqs.mdx',
-  'docs/going-into-prod.mdx',
-  'docs/guides.mdx',
-]
+const ignoredFiles = ['docs/404.mdx', 'docs/support.mdx', 'docs/faqs.mdx', 'docs/guides.mdx']
 
 const nameMap = {
   api: 'Management API',
