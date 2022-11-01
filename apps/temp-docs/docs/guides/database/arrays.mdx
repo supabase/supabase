@@ -14,14 +14,12 @@ PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/ar
 Create a test table with a text array (an array of strings):
 
 <Tabs
-  groupId="dashboard-or-sql"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
 1. Click **New Table** and create a table with the name `arraytest`.
@@ -29,46 +27,41 @@ Create a test table with a text array (an array of strings):
 1. Click **New Column** and create a column with the name `textarray`, type `text`, and select **Define as array**.
 1. Click **Save**.
 
-</TabItem>
-
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 CREATE TABLE arraytest (id integer NOT NULL, textarray text ARRAY);
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Insert a record with an array value
 
 <Tabs
-  groupId="dashboard-or-sql"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
 1. Select the `arraytest` table.
 1. Click **Insert row** and add `["Harry", "Larry", "Moe"]`.
 1. Click **Save.**
 
-</TabItem>
-
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 INSERT INTO arraytest (id, textarray) VALUES (1, ARRAY['Harry', 'Larry', 'Moe']);
 ```
 
-</TabItem>
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
-<TabItem value="javascript">
 Insert a record from the JavaScript client:
 
 ```js
@@ -77,21 +70,18 @@ const { data, error } = await supabase
   .insert([{ id: 2, textarray: ['one', 'two', 'three', 'four'] }])
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ## View the results
 
 <Tabs
-  groupId="dashboard-or-sql"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
 1. Select the `arraytest` table.
@@ -102,8 +92,8 @@ You should see:
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 SELECT * FROM arraytest;
@@ -115,7 +105,7 @@ You should see:
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Query array data
@@ -123,14 +113,12 @@ You should see:
 PostgreSQL uses 1-based indexing (e.g., `textarray[1]` is the first item in the array).
 
 <Tabs
-  groupId="dashboard-or-sql"
-  defaultValue="sql"
-  values={[
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-  ]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 To select the first item from the array and get the total length of the array:
 
@@ -144,9 +132,8 @@ returns:
 | --------- | ------------ |
 | Harry     | 3            |
 
-</TabItem>
-
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 This returns the entire array field:
 
@@ -165,7 +152,7 @@ returns:
 ]
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Resources
