@@ -5,11 +5,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { NextPageWithLayout } from 'types'
 import { useStore, checkPermissions } from 'hooks'
 import { AuthLayout } from 'components/layouts'
-import { EmailTemplates } from 'components/interfaces'
-import { FormsContainer } from 'components/ui/Forms'
-import NoPermission from 'components/ui/NoPermission'
 
-const PageLayout: NextPageWithLayout = () => {
+import NoPermission from 'components/ui/NoPermission'
+import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
+import { FormsContainer } from 'components/ui/Forms'
+import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
+
+const URLConfiguration: NextPageWithLayout = () => {
   const { ui, authConfig } = useStore()
 
   useEffect(() => {
@@ -23,7 +25,8 @@ const PageLayout: NextPageWithLayout = () => {
   } else if (authConfig) {
     return (
       <FormsContainer>
-        <EmailTemplates />
+        <SiteUrl />
+        <RedirectDomains />
       </FormsContainer>
     )
   } else {
@@ -31,8 +34,8 @@ const PageLayout: NextPageWithLayout = () => {
   }
 }
 
-PageLayout.getLayout = (page) => {
+URLConfiguration.getLayout = (page) => {
   return <AuthLayout>{page}</AuthLayout>
 }
 
-export default observer(PageLayout)
+export default observer(URLConfiguration)

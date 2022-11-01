@@ -50,7 +50,7 @@ function Tabs({
   )
 
   const router = useRouter()
-  const hash = router.asPath.split('#')[1]?.toUpperCase()
+  const hash = router.asPath?.split('#')[1]?.toUpperCase()
 
   let __styles = styleHandler('tabs')
 
