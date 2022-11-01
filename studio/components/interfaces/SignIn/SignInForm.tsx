@@ -81,6 +81,7 @@ const SignInForm = () => {
               type="email"
               label="Email"
               placeholder="you@example.com"
+              disabled={isSubmitting}
             />
 
             <div className="relative">
@@ -90,6 +91,7 @@ const SignInForm = () => {
                 type="password"
                 label="Password"
                 placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                disabled={isSubmitting}
               />
 
               {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
