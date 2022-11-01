@@ -68,7 +68,7 @@ There are two ways to make schema changes:
 
 ### Manual migration
 
-<!-- ![Manual migration](/img/guides/cli/diff-manual.png) -->
+<!-- ![Manual migration](/docs/img/guides/cli/diff-manual.png) -->
 
 Create a new migration script by running:
 
@@ -106,7 +106,7 @@ This allows you to pipe in an existing script from another file or stdout:
 
 Unlike manual migrations, auto schema diff creates a new migration script from changes **already** applied to your local database.
 
-<!-- ![Auto schema diff](/img/guides/cli/diff-auto.png) -->
+<!-- ![Auto schema diff](/docs/img/guides/cli/diff-auto.png) -->
 
 Create an `employees` table under the `public` schema using Studio UI, accessible at [localhost:54323](http://localhost:54323/) by default.
 
@@ -163,7 +163,7 @@ Without the `-f` file flag, the output is written to stdout by default.
 
 In a production environment, we recommend using a CI/CD pipeline to deploy new migrations with GitHub Actions rather than deploying from your local machine.
 
-![Deploy migration](/img/guides/cli/cicd-github.png)
+![Deploy migration](/docs/img/guides/cli/cicd-github.png)
 
 This example uses two Supabase projects, one for production and one for staging.
 
@@ -308,7 +308,7 @@ Commit these files to git and push to your `main` branch on GitHub. Update these
 
 When configured correctly, your repository will have CI and Release workflows that trigger on new commits pushed to `main` and `develop` branches.
 
-![Correctly configured repo](/img/guides/cli/ci-main.png)
+![Correctly configured repo](/docs/img/guides/cli/ci-main.png)
 
 ### Open a PR with new migration
 
@@ -331,7 +331,7 @@ Once the test error is resolved, merge this PR and watch the deployment in actio
 
 After verifying your staging project has successfully migrated, create another PR from `develop` to `main` and merge it to deploy the migration to the production project.
 
-<!-- ![Merge new PR](/img/guides/cli/ci-release.png) -->
+<!-- ![Merge new PR](/docs/img/guides/cli/ci-release.png) -->
 
 The `release` job applies all new migration scripts merged in `supabase/migrations` directory to a linked Supabase project. You can control which project the job links to via `PROJECT_ID` environment variable.
 
@@ -400,7 +400,7 @@ Apart from tables, you also need to reassign owner of other entities using their
 
 Sometimes your teammate may merge a new migration file to git main branch, and now you need to rebase your local schema changes on top.
 
-<!-- ![Rebase on main](/img/guides/cli/rebase.png) -->
+<!-- ![Rebase on main](/docs/img/guides/cli/rebase.png) -->
 
 We can handle this scenario gracefully by renaming your old migration file with a new timestamp.
 

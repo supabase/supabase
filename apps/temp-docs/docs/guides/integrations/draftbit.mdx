@@ -12,7 +12,7 @@ Draftbit is back-end agnostic and connects to Supabase via REST API.
 
 > Note: For the demonstration purpose of this guide, we are using a pre-populated database in Supabase. We are calling `Groceries`. To follow along, rename it any way you prefer.
 
-![Prepopulated Database](/img/guides/integrations/draftbit/prepopulated-database.png)
+![Prepopulated Database](/docs/img/guides/integrations/draftbit/prepopulated-database.png)
 
 If you don’t have a Draftbit account, create one [here](https://draftb.it/3Fkbask). Once you’ve got your account set up, Create a New App. You can select `Start From a Blank App` for this demo and proceed to the Builder interface.
 
@@ -30,7 +30,7 @@ You can find these unique values in the API settings of your Supabase account.
 - In the **Project URL** section, select and copy the URL. It is the Base URL of your Supabase REST API. It will be required to make a connection to the Draftbit app.
 - Also, under `Project API keys`, select and copy the API key under `anon`. It is required for every request made to the Supabase database.
 
-![Get Supabase connection string](/img/guides/integrations/draftbit/endpoint.png)
+![Get Supabase connection string](/docs/img/guides/integrations/draftbit/endpoint.png)
 
 ## Step 2: Save Supabase API key as Authorization Header in Draftbit
 
@@ -44,7 +44,7 @@ To authorize your Draftbit app with Supabse, in the builder interface:
 - The value of this key requires you to enter an authorization token that starts with syntax is `<your-api-key>`. Click **Add** after adding the value.
 - Click **Save** to save these keys and close the modal.
 
-![Add header values in Draftbit](/img/guides/integrations/draftbit/authheader.png)
+![Add header values in Draftbit](/docs/img/guides/integrations/draftbit/authheader.png)
 
 ## Step 3: Add Supabase RESTful endpoint in Draftbit
 
@@ -57,7 +57,7 @@ In your Draftbit builder interface:
 - In Step 2: Under **Key** add `Authorization` and `apikey`. Then, under **Value**, select the global variables (from the previous section) to add the actual values for both keys.
 - Click Save.
 
-![Create a API service in Draftbit](/img/guides/integrations/draftbit/service.png)
+![Create a API service in Draftbit](/docs/img/guides/integrations/draftbit/service.png)
 
 ## Making API requests with Supabase & Draftbit
 
@@ -67,7 +67,7 @@ In this section, let's populate a Fetch component with all the data from a simpl
 
 For reference, here is a how the Components tree looks like for this screen:
 
-![Components tree](/img/guides/integrations/draftbit/ctree.png)
+![Components tree](/docs/img/guides/integrations/draftbit/ctree.png)
 
 The next step is to create an endpoint. Let's try fetching all the data using a `GET` HTTP request. Select the Supabase service in the **API & Cloud Services** modal, and then:
 
@@ -77,7 +77,7 @@ The next step is to create an endpoint. Let's try fetching all the data using a 
 - In Step 4: click the **Test** button next to the Endpoint input to verify the response coming from the Supabase.
 - Click Save.
 
-![Creating a GET request endpoint](/img/guides/integrations/draftbit/get-request.gif)
+![Creating a GET request endpoint](/docs/img/guides/integrations/draftbit/get-request.gif)
 
 In the Builder, on the app screen:
 
@@ -89,7 +89,7 @@ In the Builder, on the app screen:
 - Add a `{{varName}}` value (inside the curly braces) to represent a column field from the Supabase. For example, add `{{title}}` to represent the column name from the Supabase Base.
 - Under **Variables**, you will see the variable name defined in the previous step. From the dropdown menu, select the appropriate field that represents the data field.
 
-![Fetching data on app screen](/img/guides/integrations/draftbit/fetchall.gif)
+![Fetching data on app screen](/docs/img/guides/integrations/draftbit/fetchall.gif)
 
 ### GET request to fetch single row
 
@@ -101,7 +101,7 @@ Open the **API & Cloud services** modal from the top menu, select the Supabase s
 - In Step 4: click the **Test** button next to the Endpoint input to verify the response coming from the Supabase.
 - Click Save.
 
-![Creating endpoint to fetch a single row](/img/guides/integrations/draftbit/getsingle.gif)
+![Creating endpoint to fetch a single row](/docs/img/guides/integrations/draftbit/getsingle.gif)
 
 On app screen:
 
@@ -114,7 +114,7 @@ On app screen:
 - Add a `{{varName}}` value (inside the curly braces) to represent the column field from the Supabase. For example, add `{{title}}` to represent the field and value from the Supabase data table.
 - Under **Variables**, you will see the variable name defined in the previous step. From the dropdown menu, select the appropriate field that represents the data field.
 
-![Displaying data from single row](/img/guides/integrations/draftbit/fetchsingle.png)
+![Displaying data from single row](/docs/img/guides/integrations/draftbit/fetchsingle.png)
 
 ### POST request to submit a new row
 
@@ -140,7 +140,7 @@ In addition, you need a Touchable component like a Button to attach the POST act
 - In Step 4: to see the new row added to the Supabase data table as JSON response inside the Builder, you have to pass a new header called `Prefer` with its value as `return=representation`.
 - In Step 5: click the **Test** button next to the Endpoint input to verify the response coming from the Supabase and click Save.
 
-![Make a POST request to add new data to Supabase database](/img/guides/integrations/draftbit/postrequest.gif)
+![Make a POST request to add new data to Supabase database](/docs/img/guides/integrations/draftbit/postrequest.gif)
 
 Once you follow the above steps, you should get a 200 OK response with exactly the new record as a JSON you have entered for your schema.
 
@@ -160,7 +160,7 @@ Now, there is a working `POST` request in Draftbit. Map its response to the comp
 
 First, for each input component, make sure you have set the Field Names (found in the Configs tab, second from the left) to unique values. For example, in the screen below, there is one TextInput field component with the value of the `Field Name` prop of `textInputValue`.
 
-![Field Name prop on a TextInput component](/img/guides/integrations/draftbit/textinput.png)
+![Field Name prop on a TextInput component](/docs/img/guides/integrations/draftbit/textinput.png)
 
 Next, on your Button component, go to the Interactions tab in the Properties panel located on the far-right-hand side. Select an Action called `API request`.
 
@@ -170,7 +170,7 @@ In the API request action:
 - In **Endpoint**, select the name of the Endpoint.
 - Then add the configuration for the body request to be sent by selecting the values for `{{inputValue}}`.
 
-![Setting up the API Request to send a POST request](/img/guides/integrations/draftbit/postapirequest.png)
+![Setting up the API Request to send a POST request](/docs/img/guides/integrations/draftbit/postapirequest.png)
 
 After completing the above steps, you can trigger the API request to submit new data to the Supabase database.
 
@@ -186,7 +186,7 @@ After you have created your screen components in the Draftbit builder, open the 
 - In Step 3: add a valid Body structure to submit a PATCH request. Add one or many `{{variable}}` for test values depending on the structure of your app. Click Body Preview to validate the structure of the Body in the request. For the example, let's create a variable called `{{inputValue}}`.
 - In Step 5: click the **Test** button next to the Endpoint input to verify the response coming from the Supabase and click Save.
 
-![Creating an endpoint for PATCH request](/img/guides/integrations/draftbit/patch.gif)
+![Creating an endpoint for PATCH request](/docs/img/guides/integrations/draftbit/patch.gif)
 
 Next, on your Button component, go to the Interactions tab in the Properties panel located on the far-right-hand side. Select an Action called `API request`.
 
@@ -196,7 +196,7 @@ In the API request action:
 - In **Endpoint**, select the name of the Endpoint.
 - Then add the configuration for the query param, and the body request to be sent by selecting the values for `{{inputValue}}`.
 
-![Setting up the API Request to send a PATCH request](/img/guides/integrations/draftbit/patchapirequest.png)
+![Setting up the API Request to send a PATCH request](/docs/img/guides/integrations/draftbit/patchapirequest.png)
 
 After completing the above steps, you can trigger the API request to update existing data in the Supabase database.
 
@@ -212,7 +212,7 @@ After you have created your screen components in the Draftbit builder, open the 
 - In Step 4: click the **Test** button next to the Endpoint input to verify the response from the Supabase.
 - Click Save.
 
-![Creating an endpoint for DELETE request](/img/guides/integrations/draftbit/delete.gif)
+![Creating an endpoint for DELETE request](/docs/img/guides/integrations/draftbit/delete.gif)
 
 Next, on your Button component, go to the Interactions tab in the Properties panel located on the far-right-hand side. Select an Action called `API request`.
 
@@ -222,7 +222,7 @@ In the API Request action:
 - In **Endpoint**, select the name of the Endpoint.
 - Then, add the configuration for the query request to be sent by selecting a value. For example, in this case it will be the `id` of the record coming from the Navigation parameter.
 
-![Setting up the API Request to send a DELETE request](/img/guides/integrations/draftbit/deleteapirequest.gif)
+![Setting up the API Request to send a DELETE request](/docs/img/guides/integrations/draftbit/deleteapirequest.gif)
 
 ## Resources
 
