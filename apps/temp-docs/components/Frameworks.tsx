@@ -37,8 +37,8 @@ const Frameworks = () => {
     {
       name: 'Next.js',
       logo: {
-        light: '/docs/img/libraries/nextjs-icon.svg',
-        dark: '/docs/img/libraries/nextjs-icon.svg',
+        light: '/docs/img/libraries/nextjs-light-icon.svg',
+        dark: '/docs/img/libraries/nextjs-dark-icon.svg',
       },
       href: '/guides/with-nextjs',
     },
