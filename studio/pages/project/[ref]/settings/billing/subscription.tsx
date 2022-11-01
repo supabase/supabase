@@ -1,17 +1,14 @@
-import dayjs from 'dayjs'
-import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Loading, IconArrowRight } from 'ui'
+import { FC, useEffect } from 'react'
+import { Loading } from 'ui'
 
-import { Project, NextPageWithLayout } from 'types'
-import { useProjectSubscription, useStore } from 'hooks'
-import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
 import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
-import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
-import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import { useProjectSubscription, useStore } from 'hooks'
+import { NextPageWithLayout, Project } from 'types'
+
+import { Subscription } from 'components/interfaces/Billing'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -38,16 +35,13 @@ interface SettingsProps {
 
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
+  const projectTier = ui.selectedProject?.subscription_tier
 
   const {
     subscription,
     isLoading: loading,
     error,
   } = useProjectSubscription(ui.selectedProject?.ref)
-
-  const [dateRange, setDateRange] = useState<any>()
-  const projectTier = ui.selectedProject?.subscription_tier
-  const isPayg = subscription?.tier?.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
   useEffect(() => {
     if (error) {
@@ -80,39 +74,9 @@ const Settings: FC<SettingsProps> = ({ project }) => {
             </div>
           </div>
         </Loading>
-      ) : isPayg ? (
-        <div>
-          <div className="mb-4 flex items-center space-x-3">
-            <DateRangePicker
-              onChange={setDateRange}
-              value={TIME_PERIODS_BILLING[0].key}
-              options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-              loading={loading}
-              currentBillingPeriodStart={subscription?.billing.current_period_start}
-            />
-            {dateRange && (
-              <div className="flex items-center space-x-2">
-                <p className="text-scale-1000">
-                  {dayjs(dateRange.period_start.date).format('MMM D, YYYY')}
-                </p>
-                <p className="text-scale-1000">
-                  <IconArrowRight size={12} />
-                </p>
-                <p className="text-scale-1000">
-                  {dayjs(dateRange.period_end.date).format('MMM D, YYYY')}
-                </p>
-              </div>
-            )}
-          </div>
-          {dateRange && <PAYGUsage dateRange={dateRange} />}
-        </div>
       ) : (
-        <ProjectUsage projectRef={project?.ref} />
+        <></>
       )}
-      <div className="space-y-2">
-        <h4 className="text-lg">Invoices</h4>
-        <Invoices projectRef={ui.selectedProject?.ref ?? ''} />
-      </div>
     </div>
   )
 }
