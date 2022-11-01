@@ -15,19 +15,44 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
       title: 'Database',
       items: [
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
-        { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
+        {
+          name: 'Triggers',
+          key: 'triggers',
+          url: `/project/${ref}/database/triggers`,
+          items: [],
+          isPreview: false,
+        },
+        {
+          name: 'Functions',
+          key: 'functions',
+          url: `/project/${ref}/database/functions`,
+          items: [],
+          isPreview: false,
+        },
         {
           name: 'Extensions',
           key: 'extensions',
           url: `/project/${ref}/database/extensions`,
           items: [],
         },
+        { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
         {
           name: 'Replication',
           key: 'replication',
           url: `/project/${ref}/database/replication`,
           items: [],
         },
+        ...(showHooksRoute
+          ? [
+              {
+                name: 'Webhooks',
+                key: 'hooks',
+                url: `/project/${ref}/database/hooks`,
+                items: [],
+                isPreview: true,
+              },
+            ]
+          : []),
         {
           name: 'Backups',
           key: 'backups',
@@ -36,73 +61,5 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
         },
       ],
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            title: 'Logs and Usage',
-            items: [
-              {
-                name: 'API logs',
-                key: 'api-logs',
-                url: `/project/${ref}/database/api-logs`,
-                items: [],
-              },
-              ...(productReports
-                ? [
-                    {
-                      name: 'API usage',
-                      key: 'api-usage',
-                      url: `/project/${ref}/database/api-usage`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              {
-                name: 'Postgres logs',
-                key: 'postgres-logs',
-                url: `/project/${ref}/database/postgres-logs`,
-                items: [],
-              },
-              {
-                name: 'Realtime logs',
-                key: 'realtime-logs',
-                url: `/project/${ref}/database/realtime-logs`,
-                items: [],
-              },
-            ],
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
-            title: 'Alpha Preview',
-            items: [
-              {
-                name: 'Database Triggers',
-                key: 'triggers',
-                url: `/project/${ref}/database/triggers`,
-                items: [],
-              },
-              {
-                name: 'Database Functions',
-                key: 'functions',
-                url: `/project/${ref}/database/functions`,
-                items: [],
-              },
-              ...(showHooksRoute
-                ? [
-                    {
-                      name: 'Database Webhooks',
-                      key: 'hooks',
-                      url: `/project/${ref}/database/hooks`,
-                      items: [],
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]
-      : []),
   ]
 }

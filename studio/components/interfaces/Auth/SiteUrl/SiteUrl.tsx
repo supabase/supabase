@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'ui'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
+import { Form, Input } from 'ui'
+import { boolean, number, object, string } from 'yup'
 
-import { useStore, checkPermissions } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -13,8 +12,9 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import { checkPermissions, useStore } from 'hooks'
 
-const AutoSchemaForm = observer(() => {
+const SiteUrl = observer(() => {
   const { authConfig, ui } = useStore()
   const { isLoaded } = authConfig
 
@@ -87,8 +87,8 @@ const AutoSchemaForm = observer(() => {
         return (
           <>
             <FormHeader
-              title="Auth settings"
-              description="Configure authentication sessions for your users"
+              title="Site URL"
+              description="Configure the url of your site. This is used for password reset emails and other links."
             />
             <FormPanel
               disabled={true}
@@ -109,78 +109,15 @@ const AutoSchemaForm = observer(() => {
                 </div>
               }
             >
-              <FormSection header={<FormSectionLabel>User Signups</FormSectionLabel>}>
+              <FormSection>
                 <FormSectionContent loading={!isLoaded}>
-                  <Toggle
-                    id="DISABLE_SIGNUP"
+                  <Input
+                    id="SITE_URL"
                     size="small"
-                    label="Allow new users to sign up"
-                    layout="flex"
-                    descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                    label="Site URL"
+                    descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
                     disabled={!canUpdateConfig}
                   />
-                </FormSectionContent>
-              </FormSection>
-              <div className="border-t border-scale-400"></div>
-              <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
-                <FormSectionContent loading={!isLoaded}>
-                  {/* Permitted redirects for anything on that domain */}
-                  {/* Check with @kangming about this */}
-                  <InputNumber
-                    id="JWT_EXP"
-                    size="small"
-                    label="JWT expiry limit"
-                    descriptionText="How long tokens are valid for. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
-                    actions={<span className="mr-3 text-scale-900">seconds</span>}
-                    disabled={!canUpdateConfig}
-                  />
-                </FormSectionContent>
-              </FormSection>
-              <FormSection header={<FormSectionLabel>Security and Protection</FormSectionLabel>}>
-                <FormSectionContent loading={!isLoaded}>
-                  <Toggle
-                    id="SECURITY_CAPTCHA_ENABLED"
-                    size="small"
-                    label="Enable hCaptcha protection"
-                    layout="flex"
-                    descriptionText="Protect authentication endpoints from abuse."
-                    disabled={!canUpdateConfig}
-                  />
-                  {values.SECURITY_CAPTCHA_ENABLED && (
-                    <Input
-                      id="SECURITY_CAPTCHA_SECRET"
-                      type={hidden ? 'password' : 'text'}
-                      size="small"
-                      label="hCaptcha secret"
-                      disabled={!canUpdateConfig}
-                      actions={
-                        <Button
-                          icon={hidden ? <IconEye /> : <IconEyeOff />}
-                          type="default"
-                          onClick={() => setHidden(!hidden)}
-                        />
-                      }
-                    />
-                  )}
-                  <Toggle
-                    id="REFRESH_TOKEN_ROTATION_ENABLED"
-                    size="small"
-                    label="Enable automatic reuse detection"
-                    layout="flex"
-                    descriptionText="Prevent replay attacks from compromised refresh tokens."
-                    disabled={!canUpdateConfig}
-                  />
-                  {values.REFRESH_TOKEN_ROTATION_ENABLED && (
-                    <InputNumber
-                      id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                      size="small"
-                      min={0}
-                      label="Reuse Interval"
-                      descriptionText="Time interval where the same refresh token can be used to request for an access token."
-                      actions={<span className="mr-3 text-scale-900">seconds</span>}
-                      disabled={!canUpdateConfig}
-                    />
-                  )}
                 </FormSectionContent>
               </FormSection>
             </FormPanel>
@@ -191,4 +128,4 @@ const AutoSchemaForm = observer(() => {
   )
 })
 
-export default AutoSchemaForm
+export default SiteUrl

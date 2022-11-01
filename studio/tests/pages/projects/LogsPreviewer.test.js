@@ -102,6 +102,35 @@ test.each([
     selectionTexts: [/POST/],
   },
   // TODO: add more tests for each type of ui
+
+  {
+    queryType: 'auth',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      id: 'some-id',
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+      timestamp: 1659545029083869,
+      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+    }),
+    selectionLog: logDataFixture({
+      id: 'some-id',
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+      timestamp: 1659545029083869,
+      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+    }),
+    tableTexts: [/auth\-path/, /some message/, /INFO/],
+    selectionTexts: [/auth\-path/, /some message/, /INFO/, /300/],
+  },
 ])(
   'selection $queryType $tableName , can display log data and metadata',
   async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
