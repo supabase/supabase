@@ -22,20 +22,19 @@ It differs from the `http` extension in that it is asynchronous by default. This
 ### Enable the extension
 
 <Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pg_net" and enable the extension.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Example: enable the "pg_net" extension
@@ -52,7 +51,7 @@ To disable an extension, call `drop extension`.
 
 Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## `http_get` {#http_get}
