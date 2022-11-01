@@ -42,7 +42,7 @@ export const menuItems: NavMenu = {
       label: 'Overview',
       items: [
         { name: 'Introduction', url: '/', items: [] },
-        { name: 'Features', url: '/guides/features', items: [] },
+        { name: 'Features', url: '/features', items: [] },
         { name: 'Architecture', url: '/architecture', items: [] },
       ],
     },
