@@ -72,6 +72,7 @@ const ForgotPasswordForm = () => {
               type="email"
               label="Email"
               placeholder="you@example.com"
+              disabled={isSubmitting}
             />
 
             <div className="self-center">

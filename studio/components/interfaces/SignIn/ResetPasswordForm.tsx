@@ -56,6 +56,7 @@ const ResetPasswordForm = () => {
               type="password"
               label="Password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+              disabled={isSubmitting}
             />
 
             <div className="border-overlay-border border-t" />

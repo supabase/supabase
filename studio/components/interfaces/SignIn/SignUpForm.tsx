@@ -76,6 +76,7 @@ const SignUpForm = () => {
               type="email"
               label="Email"
               placeholder="you@example.com"
+              disabled={isSubmitting}
             />
 
             <Input
@@ -84,6 +85,7 @@ const SignUpForm = () => {
               type="password"
               label="Password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+              disabled={isSubmitting}
             />
 
             <div className="self-center">
