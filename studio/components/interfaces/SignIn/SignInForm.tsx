@@ -26,7 +26,7 @@ const SignInForm = () => {
   const onSignIn = async ({ email, password }: { email: string; password: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
-      message: `Logging in...`,
+      message: `Signing in...`,
     })
 
     let token = captchaToken
