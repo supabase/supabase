@@ -172,3 +172,7 @@ pre[class*='language-'] {
     border: 0;
   }
 }
+
+.admonition-content > p {
+  @apply m-0;
+}
