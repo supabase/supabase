@@ -148,13 +148,6 @@ export const menuItems: NavMenu = {
       ],
     },
     {
-      label: 'APIs',
-      items: [
-        { name: 'Overview', url: '/guides/api', items: [] },
-        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
-      ],
-    },
-    {
       label: 'Database',
       items: [
         { name: 'Overview', url: '/guides/database', items: [] },
