@@ -32,7 +32,7 @@ Azure OAuth consists of four broad steps:
 - The redirect / callback URI should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
 - Click "Register" at the bottom of the form.
 
-![Register an application.](/img/guides/auth-azure/azure-register-app.png)
+![Register an application.](/docs/img/guides/auth-azure/azure-register-app.png)
 
 ## Obtain a Client ID
 
@@ -40,7 +40,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 - Once your app has been registered, the client id can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled "Application (client) ID".
 
-![Obtain the client id](/img/guides/auth-azure/azure-client-id.png)
+![Obtain the client id](/docs/img/guides/auth-azure/azure-client-id.png)
 
 ## Obtain a Secret ID
 
@@ -52,7 +52,7 @@ This will serve as the `client_secret` when you make API calls to authenticate t
 - Enter a description and choose your preferred expiry for the secret.
 - Once the secret is generated, save the `value` (not the secret ID).
 
-![Obtain the client secret](/img/guides/auth-azure/azure-client-secret.png)
+![Obtain the client secret](/docs/img/guides/auth-azure/azure-client-secret.png)
 
 ## Obtain the Tenant URL
 
@@ -61,7 +61,7 @@ This will allow your users to use your custom Azure login page when logging in.
 - Select the Directory (Tenant) ID value.
 - The Azure Tenant URL should look like this: `https://login.microsoftonline.com/<tenant-id>`
 
-![Obtain the tenant url](/img/guides/auth-azure/azure-tenant-url.png)
+![Obtain the tenant url](/docs/img/guides/auth-azure/azure-tenant-url.png)
 
 ## Add login code to your client app
 

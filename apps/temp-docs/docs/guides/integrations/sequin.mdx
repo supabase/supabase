@@ -14,29 +14,29 @@ To connect Supabase to Sequin, you'll first need to retrieve the credentials for
 
 1. In the Supabase dashboard, go to the settings page and open up your **Database** settings. In the **Connection info** section, you'll find the credentials you need - like `host` and `user`:
 
-   ![TBD](/img/guides/integrations/sequin/001_supabase_dash.png)
+   ![TBD](/docs/img/guides/integrations/sequin/001_supabase_dash.png)
 
 2. In the [Sequin console](https://app.sequin.io), go to your sync's configuration and open the **Destination** section. Select **Launch or Connect** and then click **Connect** to configure the connection to your Supabase Postgres:
 
-   ![TBD](/img/guides/integrations/sequin/002_connect.png)
+   ![TBD](/docs/img/guides/integrations/sequin/002_connect.png)
 
 3. In the connection modal that appears, enter the `Host` and `Port` for your Supabase database and click **Continue**.
 
-   ![TBD](/img/guides/integrations/sequin/003_step_1.png)
+   ![TBD](/docs/img/guides/integrations/sequin/003_step_1.png)
 
 4. Now, enter the `Database name` and set the `schema` name for your sync. For instance, if your syncing Stripe, you'll likely want to name your synced schema something like `stripe`. Finally, enter the `user` and `password` for your Supabase database and then click **Continue**. Sequin will verify it can properly connect to your database with the correct permissions.
 
-   ![TBD](/img/guides/integrations/sequin/004_step_2.png)
+   ![TBD](/docs/img/guides/integrations/sequin/004_step_2.png)
 
 5. Sequin is now connected to your Supabase Postgres database and will ask you to confirm which database users should be able to access your synced schema. Select all of the users and click **Continue**:
 
-   ![TBD](/img/guides/integrations/sequin/005_step_3.png)
+   ![TBD](/docs/img/guides/integrations/sequin/005_step_3.png)
 
 6. That's it. Sequin will now create a new schema and permissions group in your Supabase database. Name the database connection in Sequin something like `Supabase` and your done!
 
 In the Supabase dashboard, you can go to the **Table Editor** and you'll see a new schema full of your synced platform data.
 
-![TBD](/img/guides/integrations/sequin/006_see_data.png)
+![TBD](/docs/img/guides/integrations/sequin/006_see_data.png)
 
 ## Step 2: Grant Permissions
 
@@ -44,7 +44,7 @@ To ensure the right users can access the synced schema Sequin manages, you'll ne
 
 1. In the Sequin console, click the **Connect** button next to your sync and copy down your `Schema` and unique `Read Group`.
 
-   ![TBD](/img/guides/integrations/sequin/007_get_read.png)
+   ![TBD](/docs/img/guides/integrations/sequin/007_get_read.png)
 
 2. Now, in the Supabase dashboard, go to the **SQL Editor** and run the following permission grants:
 
