@@ -189,7 +189,7 @@ const methodListItemLabel = (
 ) => `
 <li className="method-list-item">
   <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name hello">
+    <span className="method-list-item-label-name">
       ${name}
     </span>
     <span className="method-list-item-label-badge ${!isOptional && 'required'}">
