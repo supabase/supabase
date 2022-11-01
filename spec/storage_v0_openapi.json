@@ -1166,6 +1166,36 @@
         }
       }
     },
+    "/object/info/public/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Get object info",
+        "description": "returns object info",
+        "parameters": [
+          {
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Default Response",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+            }
+          }
+        }
+      }
+    },
     "/render/authenticated/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render an authenticated image with the given transformations",

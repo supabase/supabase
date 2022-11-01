@@ -65,7 +65,7 @@ const Filter: FC = () => {
           </div>
         )}
       </div>
-      <Popover.Seperator />
+      <Popover.Separator />
       <div className="px-3">
         <Button icon={<IconPlus />} type="text" onClick={onAddFilter}>
           Add filter
