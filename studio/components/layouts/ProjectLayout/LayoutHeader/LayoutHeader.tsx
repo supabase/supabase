@@ -65,7 +65,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 <ProjectDropdown />
                 {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link href={`/project/${ref}/settings/billing`}>
+                    <Link href={`/project/${ref}/settings/billing/subscription`}>
                       <a>
                         <Badge color="red">Project has exceeded usage limits </Badge>
                       </a>
