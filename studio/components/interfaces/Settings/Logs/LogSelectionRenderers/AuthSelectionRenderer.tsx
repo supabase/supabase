@@ -1,4 +1,5 @@
 import { parse } from 'crypto-js/enc-utf8'
+import { tryParseJson } from 'lib/helpers'
 import { isUnixMicro, PreviewLogData, unixMicroToIsoTimestamp } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import {
@@ -18,12 +19,8 @@ export interface AuthEventParsed extends Record<string, string | number> {
   status: number
 }
 const AuthSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
-  let parsed: AuthEventParsed | undefined
-  try {
-    parsed = JSON.parse(log.event_message.trim())
-  } catch (_e) {
-    // do nothing
-  }
+  const parsed: AuthEventParsed | undefined = tryParseJson(log.event_message.trim())
+
   return (
     <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-6`}>
       <div className="flex flex-col gap-3">
