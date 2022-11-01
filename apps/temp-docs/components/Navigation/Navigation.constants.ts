@@ -99,9 +99,13 @@ export const menuItems: NavMenu = {
             { name: 'Login with Twitch', url: '/guides/auth/auth-twitch', items: [] },
             { name: 'Login with Twitter', url: '/guides/auth/auth-twitter', items: [] },
             { name: 'Login with WorkOS', url: '/guides/auth/auth-workos', items: [] },
-            { name: 'Phone Auth with Twilio', url: '/guides/auth/twilio', items: [] },
-            { name: 'Phone Auth with Vonage', url: '/guides/auth/vonage', items: [] },
-            { name: 'Phone Auth with MessageBird', url: '/guides/auth/messagebird', items: [] },
+            { name: 'Phone Auth with Twilio', url: '/guides/auth/auth-twilio', items: [] },
+            { name: 'Phone Auth with Vonage', url: '/guides/auth/auth-vonage', items: [] },
+            {
+              name: 'Phone Auth with MessageBird',
+              url: '/guides/auth/auth-messagebird',
+              items: [],
+            },
           ],
         },
         {
