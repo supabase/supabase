@@ -189,13 +189,12 @@ We recommend adding these as [encrypted secrets](https://docs.github.com/en/acti
 Create the following files inside the `.github/workflows` directory:
 
 <Tabs
-  defaultValue="CI"
-  values={[
-    {label: 'ci.yaml', value: 'CI'},
-    {label: 'staging.yaml', value: 'STAGING'},
-    {label: 'production.yaml', value: 'PRODUCTION'},
-  ]}>
-<TabItem value="CI">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="ci"
+>
+<TabPanel id="ci" label="ci.yaml">
 
 ```yaml title=".github/workflows/ci.yml"
 name: CI
@@ -227,8 +226,8 @@ jobs:
           fi
 ```
 
-</TabItem>
-<TabItem value="STAGING">
+</TabPanel>
+<TabPanel id="staging" label="staging.yaml">
 
 ```yaml title=".github/workflows/staging.yml"
 name: Deploy Migrations to Staging
@@ -260,8 +259,8 @@ jobs:
           supabase db push
 ```
 
-</TabItem>
-<TabItem value="PRODUCTION">
+</TabPanel>
+<TabPanel id="production" label="production.yaml">
 
 ```yaml title=".github/workflows/production.yml"
 name: Deploy Migrations to Production
@@ -293,7 +292,7 @@ jobs:
           supabase db push
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 The full example code is available in the [demo repository](https://github.com/supabase/supabase-action-example).
