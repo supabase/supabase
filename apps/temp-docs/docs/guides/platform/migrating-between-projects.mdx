@@ -1,18 +1,31 @@
 ---
-id: migrating-between-projects
-title: 'Migrating Between Projects'
-description: Migrate data from one project to another
+id: migrating-and-upgrading-projects
+title: 'Migrating and Upgrading Projects'
+description: Upgrade your project to the latest version of Supabase.
+sidebar_label: 'Migrating and upgrading'
 ---
+
+Supabase ships fast and we endeavor to add all new features to existing projects wherever possible. 
+In some cases, access to new features require upgrading or migrating your Supabase project.
+
+## Upgrade your project
+
+When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
+
+1. On the [General Settings](https://app.supabase.com/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
+1. After your project is paused, click **Restore project**. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
+
+## Migrate your project
 
 Migrating projects can be achieved using standard PostgreSQL tooling. This is particularly useful for older projects (e.g. to use a newer Postgres version).
 
-## Before you begin
+### Before you begin
 
 - Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
 - Create a new [Supabase project](https://app.supabase.com).
 - Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
 
-## Migrate the database
+### Migrate the database
 
 1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) in your new project if you enabled them in your old project.
 2. In your new project, enable all extensions that were enabled in your old project.
@@ -43,11 +56,11 @@ psql \
   --dbname "$NEW_DB_URL"
 ```
 
-## Enable publication on tables
+### Enable publication on tables
 
 Replication for Realtime is disabled for all tables in your new project. On the [Replication](https://app.supabase.com/project/_/database/replication) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
 
-## Migrate Storage objects
+### Migrate Storage objects
 
 The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.com](mailto:support@supabase.com).
 
