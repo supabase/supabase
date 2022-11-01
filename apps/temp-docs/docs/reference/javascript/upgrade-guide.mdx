@@ -20,13 +20,12 @@ npm install @supabase/supabase-js@2
 _Optionally_ if you are using custom configuration with `createClient` then follow below:
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts title="src/supabaseClient.ts"
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -35,9 +34,8 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 })
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts title="src/supabaseClient.ts"
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -50,7 +48,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 Read more about the [constructor options](/docs/reference/javascript/release-notes#explicit-constructor-options).
@@ -62,21 +60,19 @@ The signIn() method has been deprecated in favor of more explicit method signatu
 #### Sign in with email and password
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { user, error } = await supabase.auth.signIn({ email, password })
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const {
@@ -85,105 +81,97 @@ const {
 } = await supabase.auth.signInWithPassword({ email, password })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Sign in with magic link
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { error } = await supabase.auth.signIn({ email })
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const { error } = await supabase.auth.signInWithOtp({ email })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Sign in with a third-party provider
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { error } = await supabase.auth.signIn({ provider })
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const { error } = await supabase.auth.signInWithOAuth({ provider })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Sign in with phone
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { error } = await supabase.auth.signIn({ phone, password })
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const { error } = await supabase.auth.signInWithPassword({ phone, password })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Sign in with phone using OTP
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { error } = await supabase.auth.api.sendMobileOTP(phone)
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const { data, error } = await supabase.auth.signInWithOtp({ phone })
@@ -192,53 +180,49 @@ const { data, error } = await supabase.auth.signInWithOtp({ phone })
 const { data, error } = await supabase.auth.verifyOtp({ phone, token })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Reset password for email
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const { data, error } = await supabase.auth.resetPasswordForEmail(email)
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Get the user's current session
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const session = supabase.auth.session()
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const {
@@ -246,27 +230,25 @@ const {
 } = await supabase.auth.getSession()
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Get the logged-in user
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const user = supabase.auth.user()
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const {
@@ -275,27 +257,25 @@ const {
 const { user } = session
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Update user data for a logged-in user
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { user, error } = await supabase.auth.update({ attributes })
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const {
@@ -304,27 +284,25 @@ const {
 } = await supabase.auth.updateUser({ attributes })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Use a custom `access_token` JWT with Supabase
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { user, error } = supabase.auth.setAuth(access_token)
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -336,7 +314,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Data methods
@@ -348,53 +326,49 @@ Previously, these methods return inserted/updated/deleted rows by default (which
 #### Insert and return data
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { data, error } = await supabase.auth.insert({ new_data })
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const { data, error } = await supabase.auth.insert({ new_data }).select()
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Update and return data
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const { data, error } = await supabase.auth.update({ new_data }).eq('id', id)
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).select()
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Realtime methods
@@ -402,13 +376,12 @@ const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).se
 #### Subscribe
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 const userListener = supabase
@@ -417,9 +390,8 @@ const userListener = supabase
   .subscribe()
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 const userListener = supabase
@@ -430,31 +402,29 @@ const userListener = supabase
   .subscribe()
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Unsubscribe
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: 'Before', value: '1.x'},
-    {label: 'After', value: '2.x'},
-  ]}>
-
-<TabItem value="1.x">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
 
 ```ts
 userListener.unsubscribe()
 ```
 
-</TabItem>
-
-<TabItem value="2.x">
+</TabPanel>
+<TabPanel id="2.0x" label="After">
 
 ```ts
 supabase.removeChannel(userListener)
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
