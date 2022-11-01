@@ -13,7 +13,16 @@ import CopyButton from 'components/ui/CopyButton'
 export const RowLayout: React.FC = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
 )
-
+// renders a timestamp (either unix microsecond or iso timestap)
+export const SelectionDetailedTimestampRow = ({ value }: { value: string | number }) => (
+  <>
+    <SelectionDetailedRow
+      label="Timestamp"
+      value={isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : String(value)}
+    />
+    {console.log(isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : String(value))}
+  </>
+)
 export const SelectionDetailedRow = ({
   label,
   value,
