@@ -149,7 +149,10 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       })
       if (feedbackRes.error) throw feedbackRes.error
     } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to cancel subscription: ${error}` })
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to cancel subscription: ${error.message}`,
+      })
     } finally {
       setIsSubmitting(false)
     }

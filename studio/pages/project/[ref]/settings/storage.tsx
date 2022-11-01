@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { StorageLayout } from 'components/layouts'
+import { SettingsLayout, StorageLayout } from 'components/layouts'
 import { StorageSettings } from 'components/to-be-cleaned/Storage'
 import { NextPageWithLayout } from 'types'
 
@@ -36,6 +36,6 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <StorageLayout title="Settings">{page}</StorageLayout>
+PageLayout.getLayout = (page) => <SettingsLayout title="Settings">{page}</SettingsLayout>
 
 export default observer(PageLayout)
