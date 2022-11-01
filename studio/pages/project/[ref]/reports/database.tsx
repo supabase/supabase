@@ -42,7 +42,9 @@ const DatabaseUsage: FC<any> = () => {
 
   const { ref } = router.query
   const { usage } = useProjectUsage(ref as string)
+
   const databaseSizeLimit = usage?.db_size?.limit ?? 0
+  const databaseEgressLimit = usage?.db_egress?.limit ?? 0
 
   useEffect(() => {
     let cancel = false
@@ -63,9 +65,12 @@ const DatabaseUsage: FC<any> = () => {
     }
   }, [])
 
-  const usageRatio = databaseSize / databaseSizeLimit
-  const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
-  const isExceeded = usageRatio >= 1
+  const databaseSizeUsageRatio = databaseSize / databaseSizeLimit
+  const sizeIsApproaching = databaseSizeUsageRatio >= USAGE_APPROACHING_THRESHOLD
+  const sizeIsExceeded = databaseSizeUsageRatio >= 1
+
+  const egressIsApproaching = databaseSizeUsageRatio >= USAGE_APPROACHING_THRESHOLD
+  const egressIsExceeded = databaseSizeUsageRatio >= 1
 
   return (
     <>
@@ -80,10 +85,33 @@ const DatabaseUsage: FC<any> = () => {
                   value={databaseSize}
                   max={databaseSizeLimit > 0 ? databaseSizeLimit : Infinity}
                   barClass={`${
-                    isExceeded ? 'bg-red-900' : isApproaching ? 'bg-yellow-900' : 'bg-brand-900'
+                    sizeIsExceeded
+                      ? 'bg-red-900'
+                      : sizeIsApproaching
+                      ? 'bg-yellow-900'
+                      : 'bg-brand-900'
                   }`}
                   labelBottom={formatBytes(databaseSize)}
                   labelTop={databaseSizeLimit > 0 ? formatBytes(databaseSizeLimit) : ''}
+                />
+              </div>
+            </Panel.Content>
+            <Panel.Content>
+              <div className="space-y-1">
+                <h5 className="text-sm text-scale-1200">Database egress</h5>
+                <SparkBar
+                  type="horizontal"
+                  value={usage?.db_egress?.usage ?? 0}
+                  max={databaseEgressLimit > 0 ? databaseEgressLimit : Infinity}
+                  barClass={`${
+                    egressIsExceeded
+                      ? 'bg-red-900'
+                      : egressIsApproaching
+                      ? 'bg-yellow-900'
+                      : 'bg-brand-900'
+                  }`}
+                  labelBottom={formatBytes(usage?.db_egress?.usage ?? 0)}
+                  labelTop={databaseEgressLimit > 0 ? formatBytes(databaseEgressLimit) : ''}
                 />
               </div>
             </Panel.Content>
