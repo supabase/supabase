@@ -245,7 +245,7 @@ export const menuItems: NavMenu = {
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
         {
           name: 'Migrating and upgrading',
-          url: '/guides/platform/migrating-and-upgrading-projects',
+          url: '/guides/platform/migrating-between-projects',
           items: [],
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
@@ -277,12 +277,12 @@ export const menuItems: NavMenu = {
           name: 'Auth',
           url: undefined,
           items: [
-            { name: 'Auth0', url: '/guides/integration/auth0', items: [] },
-            { name: 'Authsignal', url: '/guides/integration/authsignal', items: [] },
-            { name: 'Clerk', url: '/guides/integration/clerk', items: [] },
-            { name: 'keyri', url: '/guides/integration/keyri', items: [] },
-            { name: 'Stytch', url: '/guides/integration/stytch', items: [] },
-            { name: 'SuperTokens', url: '/guides/integration/supertokens', items: [] },
+            { name: 'Auth0', url: '/guides/integrations/auth0', items: [] },
+            { name: 'Authsignal', url: '/guides/integrations/authsignal', items: [] },
+            { name: 'Clerk', url: '/guides/integrations/clerk', items: [] },
+            { name: 'keyri', url: '/guides/integrations/keyri', items: [] },
+            { name: 'Stytch', url: '/guides/integrations/stytch', items: [] },
+            { name: 'SuperTokens', url: '/guides/integrations/supertokens', items: [] },
           ],
         },
         {
