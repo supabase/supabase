@@ -39,6 +39,8 @@
     "dayjs": "^1.11.0",
     "file-saver": "^2.0.5",
     "generate-password": "^1.7.0",
+    "graphiql": "^2.0.13",
+    "graphql": "^16.6.0",
     "html-to-image": "^1.10.8",
     "immutability-helper": "^3.1.1",
     "json-logic-js": "^2.0.2",
