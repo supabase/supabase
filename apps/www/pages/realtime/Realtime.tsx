@@ -62,10 +62,8 @@ function RealtimePage() {
         <ProductHeader
           icon={Solutions['realtime']?.icon}
           title={Solutions['realtime']?.name}
-          h1={[<span key={'authentication-h1'}>Build reactive web and mobile applications</span>]}
-          subheader={[
-            'Sync data across clients by listening to changes in your Database and broadcasting them over web sockets',
-          ]}
+          h1={[<span key={'authentication-h1'}>Build modern web and mobile applications</span>]}
+          subheader={['Sync client state globally over WebSockets in Realtime']}
           image={[
             <div className="bg-scale-300 border-scale-500 relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border">
               <div
@@ -145,6 +143,13 @@ function RealtimePage() {
               </div>
               <h3>Database changes</h3>
               <p>Listen to changes in the Database, such as new inserts, updates, and deletes.</p>
+              <div className="not-prose mt-3">
+                <Link passHref href="/docs/guides/realtime/postgres-cdc">
+                  <Button as="a" type="default">
+                    View docs
+                  </Button>
+                </Link>
+              </div>
             </div>
             <div className="prose col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
               <div className="p mb-4">
@@ -155,14 +160,7 @@ function RealtimePage() {
                 />
               </div>
               <h3>Presence</h3>
-              <p>
-                Store and synchronize shared state across clients in a consistent manner, and have
-                that consolidated state sent back to the clients.
-              </p>
-              <small>
-                Some of the common use cases of Presence include tracking which clients are
-                currently online.
-              </small>
+              <p>Store and synchronize online user state consistently across clients.</p>
               <div className="not-prose mt-3">
                 <Link passHref href="/docs/guides/realtime/presence">
                   <Button as="a" type="default">
@@ -180,11 +178,7 @@ function RealtimePage() {
                 />
               </div>
               <h3>Broadcast</h3>
-              <p>Enables a client to send any data to all clients connected the same channel.</p>
-              <small>
-                Other clients can decide to want messages based on that topic, spin up a Channel
-                with that topic name, and receive messages.
-              </small>
+              <p>Send any data to all clients subscribed to the same Channel.”</p>
               <div className="not-prose mt-3">
                 <Link passHref href="/docs/guides/realtime/broadcast">
                   <Button as="a" type="default">
@@ -203,14 +197,14 @@ function RealtimePage() {
               Build any kind of Realtime application with ease, including any of these scenarios.
             </p>
           </div>
-          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-10 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
             {AppExamples.map((example) => {
               return (
                 <>
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     <img
                       className="bg-scale-300 hidden rounded-lg dark:block"
-                      src={`/images/realtime/example-apps/dark/${example.img}`}
+                      src={`/images/realtime/example-apps/dark/${example.img}?type=1`}
                       alt={example.title}
                     />
                     <img
@@ -229,7 +223,7 @@ function RealtimePage() {
           </div>
         </SectionContainer>
 
-        <SectionContainer className="-mb-48">
+        <SectionContainer className="-mb-48 -z-10">
           <APISection
             title="Simple and convenient APIs"
             // @ts-ignore
@@ -247,22 +241,6 @@ function RealtimePage() {
             documentation_link={'/docs/guides//docs/guides/realtime/broadcast'}
           />
         </SectionContainer>
-
-        <div className="relative">
-          <div className="section--masked">
-            <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
-            </div>
-            <div className="section-container pt-12 pb-0">
-              <FloatingIcons />
-              <div className="overflow-x-hidden">
-                <SectionContainer className="mb-0 pb-8">
-                  <GithubExamples />
-                </SectionContainer>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <CTABanner />
       </DefaultLayout>

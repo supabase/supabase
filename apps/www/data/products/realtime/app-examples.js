@@ -32,7 +32,7 @@ export default [
     description: 'Listen to changes in the database to display up-to-date text messages.',
   },
   {
-    img: 'text-editor.svg',
+    img: 'code-editor.svg',
     title: 'Shared text editor',
     description: 'Users can collaborate with text documents or even code editors.',
   },
