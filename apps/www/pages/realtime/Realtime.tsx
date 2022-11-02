@@ -63,7 +63,7 @@ function RealtimePage() {
           h1={[<span key={'authentication-h1'}>Build modern web and mobile applications</span>]}
           subheader={['Sync client state globally over WebSockets in Realtime']}
           image={[
-            <div className="bg-scale-300 border-scale-500 relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border">
+            <div className="bg-scale-300 border-scale-500 relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
               <div
                 className={[
                   'border-brand-800 relative h-12 w-48 bg-[#34B27B]',
@@ -112,16 +112,16 @@ function RealtimePage() {
               {/* <div className="bg-scale-100 border-scale-500 absolute right-0 h-full w-20 border-l py-9 shadow">
                 <div className="border-scale-500 h-7 border-b" />
               </div> */}
-              <div className="bg-scale-100 border-scale-500 absolute top-0 flex h-9 w-full items-center justify-between border-b">
+              <div className="bg-scale-200 border-scale-500 absolute top-0 flex h-9 w-full items-center justify-between border-b">
                 <div className="flex items-center">
                   <IconMenu className="text-scale-1200 mx-3" strokeWidth={1} size={16} />
                   <IconGrid className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
                   <IconLayers className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
                 </div>
                 <div className="mx-3 flex items-center">
-                  <div className="border-scale-1200 bg-scale-1000 relative -right-4 h-5 w-5 rounded-full border" />
-                  <div className="border-scale-1200 bg-scale-1000 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
-                  <div className="border-scale-1200 bg-scale-1000 z-[3] h-5 w-5 rounded-full border" />
+                  <div className="border-scale-300 dark:border-scale-1200 bg-tomato-900 dark:bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
+                  <div className="border-scale-300 dark:border-scale-1200 bg-yellow-900 dark:bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
+                  <div className="border-scale-300 dark:border-scale-1200 bg-indigo-900 dark:bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
                 </div>
               </div>
             </div>,
