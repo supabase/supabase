@@ -42,7 +42,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
 
   return (
     <div
-      className="dark:bg-scale-200 dark:border-scale-400 sidebar-width sticky top-0
+      className="dark:bg-scale-200 dark:border-scale-400 sidebar-width sticky top-8
       h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container"
     >
       {isInReferencePages && (
@@ -82,7 +82,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                     'py-1.5 px-5 rounded text-sm transition',
                     `${
                       item.url === asPath
-                        ? 'bg-scale-400 text-brand-900'
+                        ? 'bg-scale-200 text-brand-900'
                         : 'text-scale-1100 hover:text-scale-1200'
                     }`,
                   ].join(' ')}
@@ -124,7 +124,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                               'py-1.5 px-5 rounded text-sm transition',
                               `${
                                 section.url === asPath
-                                  ? 'bg-scale-400 text-brand-900'
+                                  ? 'bg-scale-200 text-brand-900'
                                   : 'text-scale-1100 hover:text-scale-1200'
                               }`,
                             ].join(' ')}
@@ -164,7 +164,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                                       'py-1.5 ml-4 px-5 rounded text-sm transition',
                                       `${
                                         item.url === asPath
-                                          ? 'bg-scale-400 text-brand-900'
+                                          ? 'bg-scale-200 text-brand-900'
                                           : 'text-scale-1100 hover:text-scale-1200'
                                       }`,
                                     ].join(' ')}
