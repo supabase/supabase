@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, IconLoader, IconPauseCircle } from '@supabase/ui'
+import { Badge, IconLoader, IconPauseCircle } from 'ui'
 
 import { Project } from 'types'
 import CardButton from 'components/ui/CardButton'
@@ -27,10 +27,9 @@ const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
             <span className="flex-shrink truncate">{name}</span>
           </div>
         }
-        description={''}
         footer={
           <div className="flex items-end justify-between">
-            <span className="text-scale-900 text-sm lowercase">{desc}</span>
+            <span className="text-sm lowercase text-scale-1000">{desc}</span>
             {isRestoring ? (
               <div className="grow text-right">
                 <Badge color="brand">
@@ -63,7 +62,7 @@ const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
             )}
           </div>
         }
-      ></CardButton>
+      />
     </li>
   )
 }

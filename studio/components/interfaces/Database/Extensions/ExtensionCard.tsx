@@ -1,10 +1,10 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconLoader, Toggle } from '@supabase/ui'
+import { Badge, IconLoader, Toggle } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { EXTENSIONS_IN_OWN_SCHEMA } from './Extensions.constants'
 import EnableExtensionModal from './EnableExtensionModal'
 
 interface Props {
@@ -18,41 +18,13 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  async function enableExtension() {
-    if (EXTENSIONS_IN_OWN_SCHEMA.includes(extension.name)) {
-      return setShowConfirmEnableModal(true)
-    }
+  const canUpdateExtensions = checkPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
 
-    confirmAlert({
-      title: 'Confirm to enable extension',
-      message: `Are you sure you want to turn ON "${extension.name}" extension?`,
-      onAsyncConfirm: async () => {
-        try {
-          setLoading(true)
-          const response = await meta.extensions.create({
-            name: extension.name,
-            schema: 'extensions',
-            version: extension.default_version,
-            cascade: true,
-          })
-          if (response.error) {
-            throw response.error
-          } else {
-            ui.setNotification({
-              category: 'success',
-              message: `${extension.name.toUpperCase()} is on.`,
-            })
-          }
-        } catch (error: any) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to toggle ${extension.name.toUpperCase()}: ${error.message}`,
-          })
-        } finally {
-          setLoading(false)
-        }
-      },
-    })
+  async function enableExtension() {
+    return setShowConfirmEnableModal(true)
   }
 
   async function disableExtension() {
@@ -90,19 +62,19 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
     <>
       <div
         className={[
-          'border-panel-border-light dark:border-panel-border-dark flex',
+          'flex border-panel-border-light dark:border-panel-border-dark',
           'flex-col overflow-hidden rounded border shadow-sm',
         ].join(' ')}
       >
         <div
           className={[
-            'bg-panel-header-light dark:bg-panel-header-dark border-panel-border-light',
-            'dark:border-panel-border-dark flex border-b p-4 px-6',
+            'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
+            'flex border-b p-4 px-6 dark:border-panel-border-dark',
           ].join(' ')}
         >
           <h3
             title={extension.name}
-            className="text-scale-1200 m-0 h-5 flex-1 truncate text-base uppercase"
+            className="m-0 h-5 flex-1 truncate text-base uppercase text-scale-1200"
           >
             {extension.name}
           </h3>
@@ -112,6 +84,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
             <Toggle
               size="tiny"
               checked={isOn}
+              disabled={!canUpdateExtensions}
               onChange={() => (isOn ? disableExtension() : enableExtension())}
             />
           )}
@@ -123,13 +96,13 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           ].join(' ')}
         >
           <div className="p-4 px-6">
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               <span className="flex-grow capitalize">{extension.comment}</span>
             </p>
           </div>
           {isOn && extension.schema && (
             <div className="p-4 px-6">
-              <div className="text-scale-1100 text-sm flex-grow space-x-2 flex items-center">
+              <div className="flex flex-grow items-center space-x-2 text-sm text-scale-1100">
                 <span>Schema:</span>
                 <Badge>{`${extension.schema}`}</Badge>
               </div>

@@ -1,32 +1,32 @@
 ---
 id: managing-timezones
-title: "Timezones"
+title: 'Timezones'
 slug: managing-timezones
 description: How to change your database timezone.
 ---
 
-# Timezones
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Every Supabase database is set to UTC timezone by default. We strongly recommend keeping it this way, even if your users are in a different location.
 This is because it makes it much easier to calculate differences between timezones if you adopt the mental model that "everything in my database is in UTC time".
 
-
 ### Change timezone
 
-
-
-<Tabs defaultActiveId="sql">
-
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
 <TabPanel id="sql" label="SQL">
 
 ```sql
-alter database postgres 
+alter database postgres
 set timezone to 'America/New_York';
 ```
 
-
 </TabPanel>
-
 </Tabs>
 
 ### Full list of timezones
@@ -38,20 +38,21 @@ Get a full list of timezones supported by your database. This will return the fo
 - `utc_offset`: Offset from UTC (positive means east of Greenwich)
 - `is_dst`: True if currently observing daylight savings
 
-
-<Tabs defaultActiveId="sql">
-
-<TabPanel value="sql">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select name, abbrev, utc_offset, is_dst
-from pg_timezone_names() 
+from pg_timezone_names()
 order by name;
 ```
 
-
 </TabPanel>
-
 </Tabs>
 
 ### Search for a specific timezone
@@ -59,15 +60,18 @@ order by name;
 Use `ilike` (case insensitive search) to find specific timezones.
 
 <Tabs
-  defaultActiveId="sql">
-
-<TabPanel value="sql" label="SQL">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
-select * 
-from pg_timezone_names() 
+select *
+from pg_timezone_names()
 where name ilike '%york%';
 ```
-</TabPanel>
 
+</TabPanel>
 </Tabs>

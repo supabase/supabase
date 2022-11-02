@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Button, IconList, IconChevronDown, Popover } from '@supabase/ui'
+import { Button, IconList, IconChevronDown, Popover } from 'ui'
 
 import { useUrlState } from 'hooks'
 import SortRow from './SortRow'
@@ -17,10 +17,10 @@ const SortPopover: FC = () => {
   return (
     <Popover size="large" align="start" className="sb-grid-sort-popover" overlay={<Sort />}>
       <Button
-        as={'span'}
-        type="text"
+        as="span"
+        type={(sorts || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-900">
+          <div className="text-scale-1000">
             <IconList strokeWidth={1.5} />
           </div>
         }
@@ -65,12 +65,12 @@ const Sort: FC = () => {
       ))}
       {formattedSorts.length === 0 && (
         <div className="space-y-1 px-3">
-          <h5 className="text-scale-1100 text-sm">No sorts applied to this view</h5>
-          <p className="text-scale-900 text-xs">Add a column below to sort the view</p>
+          <h5 className="text-sm text-scale-1100">No sorts applied to this view</h5>
+          <p className="text-xs text-scale-900">Add a column below to sort the view</p>
         </div>
       )}
 
-      <Popover.Seperator />
+      <Popover.Separator />
       <div className="px-3">
         {columns && columns.length > 0 ? (
           <DropdownControl
@@ -89,7 +89,7 @@ const Sort: FC = () => {
             </Button>
           </DropdownControl>
         ) : (
-          <p className="text-scale-1100 text-sm">All columns have been added</p>
+          <p className="text-sm text-scale-1100">All columns have been added</p>
         )}
       </div>
     </div>

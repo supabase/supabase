@@ -33,6 +33,7 @@ h4.method-list-item-label .method-list-item-label-name {
 }
 
 h4.method-list-item-label .method-list-item-label-badge {
+  overflow-wrap: anywhere;
   font-family: var(--ifm-font-family-monospace);
   color: var(--ifm-font-color-base);
   font-size: var(--custom-font-size-xs);

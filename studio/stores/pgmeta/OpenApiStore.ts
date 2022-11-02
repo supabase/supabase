@@ -15,6 +15,9 @@ export interface IOpenApiStore {
   isLoading: boolean
 
   load: () => void
+
+  setUrl: (url: string) => void
+  setHeaders: (headers: { [prop: string]: any }) => void
 }
 export default class OpenApiStore implements IOpenApiStore {
   STATES = {
@@ -53,7 +56,7 @@ export default class OpenApiStore implements IOpenApiStore {
     const projectConfig = await get(this.url, { headers })
     if (projectConfig.error) throw projectConfig.error
 
-    const apiKey = projectConfig.autoApiService?.serviceApiKey
+    const apiKey = projectConfig.autoApiService?.defaultApiKey
     const restApiUrl = projectConfig.autoApiService?.restUrl
 
     const response = await get<OpenAPIV2.Document>(`${restApiUrl}?apikey=${apiKey}`, {
@@ -125,5 +128,18 @@ export default class OpenApiStore implements IOpenApiStore {
 
   setError(value: any) {
     this.error = value
+  }
+
+  setUrl(url: string) {
+    this.url = url
+
+    // if the url changes, we need to reset the state
+    this.state = this.STATES.INITIAL
+    this.data = undefined
+    this.error = null
+  }
+
+  setHeaders(headers: { [prop: string]: any }) {
+    this.headers = headers
   }
 }

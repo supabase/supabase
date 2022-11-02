@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react'
-import { Modal, Button, Typography, Input, Alert, Form } from '@supabase/ui'
+import { Modal, Button, Input, Alert, Form } from 'ui'
 
 interface Props {
   loading: boolean
@@ -58,11 +58,9 @@ const TextConfirmModal: FC<Props> = ({
                 </Modal.Content>
               )}
               <Modal.Content>
-                <Typography.Text className="block">
-                  <p className="mb-2 text-sm">{text}</p>
-                </Typography.Text>
+                <p className="mb-2 block text-sm">{text}</p>
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Input
                   id="confirmValue"
@@ -74,7 +72,7 @@ const TextConfirmModal: FC<Props> = ({
                   placeholder={confirmPlaceholder}
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Button
                   block

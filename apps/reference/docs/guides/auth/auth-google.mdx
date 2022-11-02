@@ -17,16 +17,14 @@ Setting up Google logins for your application consists of 3 parts:
 - Add your Google OAuth keys to your [Supabase Project](https://app.supabase.com)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Steps
-
-### Access your Google Cloud Platform account
+## Access your Google Cloud Platform account
 
 - Go to [cloud.google.com](https://cloud.google.com).
 - Click on `Sign in` at the top right to log in.
 
 ![Google Developer Portal.](/img/guides/auth-google/google-portal.png)
 
-### Create a Google Cloud Platform Project
+## Create a Google Cloud Platform Project
 
 - Click on `Select a Project` at the top left.
   - (Or, if a project is currently selected, click on the current project name at the top left.)
@@ -35,7 +33,7 @@ Setting up Google logins for your application consists of 3 parts:
   - (This can take a few minutes.)
 - This should bring you to the dashboard for your new project.
 
-### Create the OAuth Keys for your project
+## Create the OAuth Keys for your project
 
 From your project's dashboard screen:
 
@@ -44,12 +42,12 @@ From your project's dashboard screen:
 - On the `OAuth consent screen` page select `External`.
 - Click `Create`.
 
-### Edit your app information
+## Edit your app information
 
 - On the `Edit app registration` page fill out your app information.
 - Click `Save and continue` at the bottom.
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
@@ -70,9 +68,9 @@ The next step requires a callback URL, which looks like this:
   />
 </video>
 
-### Create your credentials
+## Create your Google credentials
 
-- Click `Credentials` at the left to go to the `Credentials` page
+- Click `Credentials` at the left to go to the `Credentials` page on the Google Cloud Platform console.
 - Click `Create Credentials` near the top then select `OAuth client ID`
 - On the `Create OAuth client ID` page, select your application type. If you're not sure, choose `Web application`.
 - Fill in your app name.
@@ -87,7 +85,7 @@ Copy your new OAuth credentials
 - A box will appear called `OAuth client created`.
 - Copy and save the values under `Your Client ID` and `Your Client Secret`.
 
-### Enter your Google credentials into your Supabase Project
+## Enter your Google credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com)
 - In the left sidebar, click the `Authentication` icon (near the top)
@@ -97,27 +95,19 @@ Copy your new OAuth credentials
 - Enter your `Google Client ID` and `Google Client Secret` saved in the previous step
 - Click `Save`
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'google',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `google` as the `provider`:
 
 ```js
 async function signInWithGoogle() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

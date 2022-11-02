@@ -20,10 +20,10 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   }
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       meta.openApi.load()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   if (error) {
     return (

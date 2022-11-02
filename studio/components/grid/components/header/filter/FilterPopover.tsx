@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, IconPlus, IconFilter, Popover } from '@supabase/ui'
+import { Button, IconPlus, IconFilter, Popover } from 'ui'
 
 import { useUrlState } from 'hooks'
 import FilterRow from './FilterRow'
@@ -16,10 +16,10 @@ const FilterPopover: FC = () => {
   return (
     <Popover size="large" align="start" className="sb-grid-filter-popover" overlay={<Filter />}>
       <Button
-        as={'span'}
-        type="text"
+        as="span"
+        type={(filters || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-900">
+          <div className="text-scale-1000">
             <IconFilter strokeWidth={1.5} />
           </div>
         }
@@ -53,19 +53,19 @@ const Filter: FC = () => {
       <div className="space-y-2">
         {formattedFilters.map((filter, index) => (
           <FilterRow
-            key={`filter-${(filters as string[])[index]}-${[index]}`}
+            key={`filter-${filter.column}-${[index]}`}
             filter={filter}
             filterIdx={index}
           />
         ))}
         {formattedFilters.length == 0 && (
           <div className="space-y-1 px-3">
-            <h5 className="text-scale-1100 text-sm">No filters applied to this view</h5>
-            <p className="text-scale-900 text-xs">Add a column below to filter the view</p>
+            <h5 className="text-sm text-scale-1100">No filters applied to this view</h5>
+            <p className="text-xs text-scale-900">Add a column below to filter the view</p>
           </div>
         )}
       </div>
-      <Popover.Seperator />
+      <Popover.Separator />
       <div className="px-3">
         <Button icon={<IconPlus />} type="text" onClick={onAddFilter}>
           Add filter

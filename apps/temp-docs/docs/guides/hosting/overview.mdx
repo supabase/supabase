@@ -10,22 +10,8 @@ import JwtGenerator from '@site/src/components/JwtGenerator'
 There are several ways to use Supabase:
 
 - [Supabase Cloud](https://app.supabase.com): you don't need to deploy anything. We will manage and scale your infrastructure.
-- [Docker](/docs/guides/hosting/docker): deploy to your own infrastructure.
+- [Docker](../../guides/hosting/docker): deploy to your own infrastructure.
 - Kubernetes: coming soon.
-
-#### Before you begin
-
-The self-hosted version of Supabase does not include a UI yet.
-We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) and with a [WIP PR here](https://github.com/supabase/supabase/pull/2281).
-[[more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)]
-
-In the meantime, here are some suggestions for working with your Postgres Database:
-
-- `pgadmin`: https://www.pgadmin.org
-- `dbeaver`: https://dbeaver.com
-- `BeeKeeper`: https://beekeeperstudio.io
-- `HeidiSQL`: https://heidisql.com
-- `Table Plus`: https://www.tableplus.io
 
 ## Architecture
 
@@ -36,13 +22,13 @@ If the tool doesn't exist, we build and open source it ourselves.
 
 ![Supabase Architecture](/docs/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
+- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
+- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 
 ## Configuration
 
@@ -50,7 +36,7 @@ Each system has a number of configuration options which can be found in the rele
 
 - [Postgres](https://hub.docker.com/_/postgres/)
 - [PostgREST](https://postgrest.org/en/stable/configuration.html)
-- [Realtime](https://github.com/supabase/realtime#server-set-up)
+- [Realtime](https://github.com/supabase/realtime#server)
 - [GoTrue](https://github.com/supabase/gotrue)
 - [Storage](https://github.com/supabase/storage-api)
 - [Kong](https://docs.konghq.com/install/docker/)
@@ -60,10 +46,11 @@ Each system has a number of configuration options which can be found in the rele
 It is recommended that you decouple your database from the middleware so that you can upgrade the middleware without any downtime.
 The "middleware" is everything except Postgres, and it should work with any Postgres provider (such as AWS RDS), or your own Postgres cluster.
 
-### Database Extensions
+### Extensions
 
 Supabase requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the
-[schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
+[schema migration scripts](https://github.com/supabase/postgres/tree/develop/migrations). These are mounted at `/docker-entrypoint-initdb.d`
+to run automatically when starting the database container.
 
 We recommend installing all extensions into an `extensions` schema. This will keep your API clean,
 since all tables in the `public` schema are exposed via the API.
@@ -83,10 +70,11 @@ For UUID functions, required for PostgreSQL <13.
 
 For working with JWT and Auth functions.
 
-### Database Roles
+### Roles
 
 Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
-[schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
+[schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your
+[role passwords](./docker#securing-your-setup) before deploying to production environments.
 
 ##### `postgres`
 
@@ -125,6 +113,10 @@ For running commands via the Supabase UI.
 
 Supabase Administrative role for maintaining your database.
 
+### Realtime Logs
+
+Set your database's `log_min_messages` configuration to `fatal` to prevent redundant database logs generated by Realtime. However, you might miss important log messages such as database errors. Configure `log_min_messages` based on your needs.
+
 ## API Keys
 
 The API Gateway (Kong) uses JWT to authenticate access through to the database. The JWT should correspond to a relevant Postgres Role,
@@ -154,3 +146,12 @@ If you have decoupled your database from the middleware, then you should be able
 Supabase is evolving fast, and we'll continue to improve the migration strategy as part of our core offering.
 
 We realize that database migrations are difficult, and this is one of the problems we plan to make easy for developers.
+
+## Deployment options
+
+While Supabase officially supports Docker, we have several other deployment strategies managed by the community:
+
+- [supabase-docker](../../guides/hosting/docker) (Official)
+- [supabase-kubernetes](https://github.com/supabase-community/supabase-kubernetes) (Unofficial)
+- [supabase-terraform](https://github.com/supabase-community/supabase-terraform) (Unofficial)
+- [supabase-traefik](https://github.com/supabase-community/supabase-traefik) (Unofficial)

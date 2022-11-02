@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Button, IconRefreshCw } from '@supabase/ui'
+import { Button, IconRefreshCw } from 'ui'
 import { Filter, Sort } from 'components/grid/types'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { fetchCount, fetchPage } from 'components/grid/utils'
@@ -24,9 +24,8 @@ const RefreshButton: FC<Props> = ({ sorts, filters }) => {
   return (
     <Button
       type="text"
-      // style={{ padding: '4px 8px' }}
       icon={
-        <div className="text-scale-900">
+        <div className="text-scale-1000">
           <IconRefreshCw strokeWidth={1.5} />
         </div>
       }

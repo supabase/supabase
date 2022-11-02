@@ -1,6 +1,6 @@
 ---
-title: 'supabase-js v2 Release Candidate'
-description: First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.
+title: 'supabase-js v2'
+description: A look at supabase-js v2, which brings type support and focuses on quality-of-life improvements for developers.
 author: inian,alaister
 image: lw5-supabase-js/thumb.jpg
 thumb: lw5-supabase-js/thumb.jpg
@@ -9,6 +9,13 @@ tags:
 date: '2022-08-16'
 toc_depth: 3
 ---
+
+<div className="bg-gray-300 rounded-lg p-6 italic">
+<br /> ⚠️ UPDATED 20/10: supabase-js v2 is fully released 🥳<br />
+
+<a href="https://supabase.com/docs/reference/javascript">Check the updated docs</a> and <a href="https://supabase.com/docs/reference/javascript/upgrade-guide">migration guide</a>.
+
+</div>
 
 Today we're publishing a release candidate for [supabase-js v2](https://github.com/supabase/supabase-js), which focuses on “quality-of-life” improvements for developers.
 
@@ -63,7 +70,7 @@ supabase.from<Database['Message']>('messages').select('*')
 ### New Auth methods
 
 We're removing the `signIn()` method in favor of more explicit method signatures:
-`signInWithPassword()`, `signInWithPasswordless()`, and `signInWithOtp()`.
+`signInWithPassword()`, and `signInWithOtp()`.
 
 ```ts
 // v2
@@ -179,7 +186,7 @@ const supabase = createClient(apiURL, apiKey, {
 })
 ```
 
-This is clearer for developers - if you're only using some parts of Supabase, you only recieve the hints for those parts.
+This is clearer for developers - if you're only using some parts of Supabase, you only receive the hints for those parts.
 
 <details>
 
@@ -299,10 +306,10 @@ Special shout outs to: [@vejja](https://github.com/vejja), [@pixtron](https://gi
 Update today by running:
 
 ```bash
-npm i @supabase/supabase-js@rc
+npm i @supabase/supabase-js@2
 ```
 
-You can find a full list of updates, breaking changes, and a migration guide in our [Release Notes](https://supabase.com/docs/reference/javascript/next/release-notes).
+[Migration guide](https://supabase.com/docs/reference/javascript/upgrade-guide)
 
 We'll continuing merging security fixes to v1, with maintenance patches for the next three months.
 
@@ -312,25 +319,16 @@ We'll continuing merging security fixes to v1, with maintenance patches for the 
   className="w-full"
   width="560"
   height="315"
-  src="https://www.youtube.com/embed/iqZlPtl_b-I"
+  src="https://www.youtube-nocookie.com/embed/iqZlPtl_b-I"
   title="YouTube video player"
   frameborder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen
 ></iframe>
 
-## Links
+## supabase-js v2 resources
 
-- [v2 Release Candidate Documentation](https://supabase.com/docs/reference/javascript/next)
-- [Release Notes & Migration Guide](https://supabase.com/docs/reference/javascript/next/release-notes)
-  
-  ## More Launch Week 5
-
-- [Launch Week Page](https://supabase.com/launch-week)
-- [Launch Week 5 Hackathon](https://supabase.com/blog/launch-week-5-hackathon)
-- [Supabase Series B](https://supabase.com/blog/supabase-series-b)
-- [Open Source at Supabase - Founders Fireside Chat](https://www.youtube.com/watch?v=4t_63HT3rZY)
-- [Day 1 - Supabase CLI v1 and Admin API Beta](https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta)
-- [Youtube video - Supabase CLI v1 and Admin API Beta](https://www.youtube.com/watch?v=OpPOaJI_Z28&feature=emb_title)
-- [Day 3 - Supabase is SOC2 compliant](https://supabase.com/blog/supabase-soc2)
-- [Youtube video - Security Day](https://www.youtube.com/watch?v=6bGQotxisoY)
+- [v2 Documentation](https://supabase.com/docs/reference/javascript)
+- [Migration guide](https://supabase.com/docs/reference/javascript/upgrade-guide)
+- [Next.js quickstart guide](/docs/guides/with-nextjs)
+- [Examples](https://github.com/supabase/supabase/tree/master/examples)

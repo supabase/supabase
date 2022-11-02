@@ -6,9 +6,9 @@ id: release-notes
 
 Supabase.js v2 release notes.
 
-## 2.0.0 Release Candidate
+## 2.0.0
 
-Install the latest with `npm install @supabase/supabase-js@rc`.
+Install the latest with `npm install @supabase/supabase-js`.
 
 ### Explicit constructor options
 
@@ -20,6 +20,7 @@ const supabase = createClient(apiURL, apiKey, {
     schema: 'public',
   },
   auth: {
+    storage: AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
@@ -78,7 +79,7 @@ Previously `nullsFirst` defaults to `false` , meaning `null`s are ordered last. 
 
 ### Cookies and localstorage namespace
 
-Storage key name in the Auth library has changed to include project reference which means that existing website that had their JWT expiry set to a longer time could find their user’s logged out with this upgrade.
+Storage key name in the Auth library has changed to include project reference which means that existing websites that had their JWT expiry set to a longer time could find their users logged out with this upgrade.
 
 ```jsx
 const defaultStorageKey = `sb-${
@@ -105,7 +106,7 @@ interface Session {
 ### New Auth methods
 
 We're removing the `signIn()` method in favor of more explicit function signatures:
-`signInWithPassword()`, `signInWithPasswordless()`, and `signInWithOtp()`.
+`signInWithPassword()`, `signInWithOtp()`, and `signInWithOtp()`.
 
 ```ts
 // v2
@@ -148,7 +149,7 @@ supabaseClient
   .subscribe()
 ```
 
-We will deprecate the `.from().on().subscribe()` method previosuly used for listening to postgres changes.
+We will deprecate the `.from().on().subscribe()` method previously used for listening to postgres changes.
 
 ### Deprecated setAuth()
 
@@ -169,8 +170,8 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
     - client-level `throwOnError`
 - `gotrue-js`
   - `supabase-js` client allows passing a `storageKey` param which will allow the user to set the key used in local storage for storing the session. By default, this will be namespace-d with the supabase project ref. ([PR](https://github.com/supabase/supabase-js/pull/460))
-  - `signIn` method is now split into `signInWithPassword` , `signInWithPasswordless` , `signInWithOAuth` ([PR](https://github.com/supabase/gotrue-js/pull/304))
-  - Deprecated and removed `session()` , `user()` in favour of using `getSession()` instead. `getSession()` will always return a valid session if a user is already logged in, meaning no more random logouts. ([PR](https://github.com/supabase/gotrue-js/pull/299))
+  - `signIn` method is now split into `signInWithPassword` , `signInWithOtp` , `signInWithOAuth` ([PR](https://github.com/supabase/gotrue-js/pull/304))
+  - Deprecated and removed `session()` , `user()` in favor of using `getSession()` instead. `getSession()` will always return a valid session if a user is already logged in, meaning no more random logouts. ([PR](https://github.com/supabase/gotrue-js/pull/299))
   - Deprecated and removed setting for `multitab` support because `getSession()` and gotrue’s reuse interval setting takes care of session management across multiple tabs ([PR](https://github.com/supabase/gotrue-js/pull/366))
   - No more throwing of random errors, gotrue-js v2 always returns a custom error type: ([PR](https://github.com/supabase/gotrue-js/pull/341))
     - `AuthSessionMissingError`

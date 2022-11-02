@@ -31,7 +31,7 @@ export default function CustomCodeBlock({
       </div>
       {response && (
         <>
-          <div className={'code-with-header repsonse-header'}>
+          <div className={'code-with-header response-header'}>
             <a
               className="code-header has-hover-pointer"
               style={

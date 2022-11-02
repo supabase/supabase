@@ -6,6 +6,8 @@ export const INTEGRATION_ENVS_ALIAS = {
   ENDPOINT: 'SUPABASE_ENDPOINT',
   ANONKEY: 'SUPABASE_ANON_KEY',
   SERVICEKEY: 'SUPABASE_SERVICE_KEY',
+  DBHOST: 'SUPABASE_DB_HOST',
+  DBPASSWORD: 'SUPABASE_DB_PASSWORD',
 }
 export const VERCEL_DEFAULT_EXTERNAL_ID = 'nextjs-initial-project'
 /*
@@ -99,6 +101,16 @@ export const VERCEL_INTEGRATION_CONFIGS = [
       {
         key: 'SUPABASE_SERVICE_ROLE_KEY',
         alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
+        type: 'encrypted',
+      },
+      {
+        key: 'SUPABASE_DB_HOST',
+        alias: INTEGRATION_ENVS_ALIAS.DBHOST,
+        type: 'encrypted',
+      },
+      {
+        key: 'SUPABASE_DB_PASSWORD',
+        alias: INTEGRATION_ENVS_ALIAS.DBPASSWORD,
         type: 'encrypted',
       },
     ],

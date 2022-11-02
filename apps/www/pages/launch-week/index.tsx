@@ -56,7 +56,7 @@ export default function launchweek() {
             {days.map((item: WeekDayProps, i) => {
               return (
                 <LaunchSection
-                  key={'launchweek-item ' + item.title}
+                  key={'launchweek-item ' + (item.title || i)}
                   {...item}
                   index={i}
                   shippingHasStarted={shippingHasStarted}

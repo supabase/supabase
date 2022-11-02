@@ -1,7 +1,7 @@
 ---
 title: 'Supabase is SOC2 compliant'
 description: Supabase is now SOC2 compliant. Learn how we got here and what it means for our customers.
-author: inian
+author: inian,joel
 image: lw5-soc2/thumb.jpg
 thumb: lw5-soc2/thumb.jpg
 tags:
@@ -57,7 +57,7 @@ We submitted a ton of evidence to prove that we can stay on top of all activitie
 
 Enabling GitHub’s branch protection protects your repos from merging code without receiving a review first. This can be a challenge sometimes - at Supabase we have a few one-person teams. We had to relax our policy for some repos (POCs, internal projects) while keeping it strict for repos that handle critical systems.
 
-Other tasks were already handled - encrypting data at rest and in transit, enforcing MFA where possible, standardizing on a password manager, and not using long-lived SSH keys (we use [AWS Instance Connect](https://www.notion.so/c4eafbfe9628427880d4e359a1ab8884)), etc.
+Other tasks were already handled - encrypting data at rest and in transit, enforcing MFA where possible, standardizing on a password manager, and not using long-lived SSH keys (we use [AWS Instance Connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Connect-using-EC2-Instance-Connect.html)), etc.
 
 We also evaluated all our vendors who had access to confidential data and now it was our turn to send them questionnaires or ask them for their SOC2 reports 😈.
 
@@ -83,7 +83,7 @@ Auditors aren’t adversarial like pentesters or bug bounty hunters. For example
 
 ## Security Center
 
-Today we are launching our security center, which shows the steps we take to protect your data. You can also find our audit reports at our security portal [here](https://security.supabase.com), or reach out to growth@supabase.com
+Today we are launching our [security center](https://supabase.com/security), which shows the steps we take to protect your data. You can also find our audit reports at our security portal [here](https://security.supabase.com), or reach out to growth@supabase.com
 
 ## What’s next
 
@@ -92,9 +92,10 @@ Getting the Type 1 certification is just the start, and we will be working on ge
 ## Announcement video and discussion
 
 <iframe
+  className="w-full"
   width="560"
   height="315"
-  src="https://www.youtube.com/embed/6bGQotxisoY"
+  src="https://www.youtube-nocookie.com/embed/6bGQotxisoY"
   title="YouTube video player"
   frameborder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -105,7 +106,7 @@ Getting the Type 1 certification is just the start, and we will be working on ge
 
 - [Launch Week Page](https://supabase.com/launch-week)
 - [Launch Week 5 Hackathon](https://supabase.com/blog/launch-week-5-hackathon)
-- [Day 1 - Supabase CLI v1 and Admin API Beta](https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta)
-- [Youtube video - Supabase CLI v1 and Admin API Beta](https://www.youtube.com/watch?v=OpPOaJI_Z28&feature=emb_title)
+- [Day 1 - Supabase CLI v1 and Management API Beta](https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta)
+- [Youtube video - Supabase CLI v1 and Management API Beta](https://www.youtube.com/watch?v=OpPOaJI_Z28&feature=emb_title)
 - [Day 2 - supabase-js v2 Release Candidate](https://supabase.com/blog/supabase-js-v2)
 - [Youtube Video - supabase-js v2 Release Candidate](https://www.youtube.com/watch?v=iqZlPtl_b-I)

@@ -5,7 +5,7 @@ description: Add Twitter OAuth to your Supabase project
 ---
 
 import Tabs from '@theme/Tabs'
-import TabsPanel from '@theme/TabsPanel'
+import TabItem from '@theme/TabItem'
 
 To enable Twitter Auth for your project, you need to set up a Twitter OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -14,25 +14,23 @@ To enable Twitter Auth for your project, you need to set up a Twitter OAuth appl
 Setting up Twitter logins for your application consists of 3 parts:
 
 - Create and configure a Twitter Project and App on the [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
-- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com).
+- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
-## Steps
-
-### Access your Twitter Developer account
+## Access your Twitter Developer account
 
 - Go to [developer.twitter.com](https://developer.twitter.com).
 - Click on `Sign in` at the top right to log in.
 
-![Twitter Developer Portal.](/docs/img/guides/twitter-portal.png)
+![Twitter Developer Portal.](/docs/img/guides/auth-twitter/twitter-portal.png)
 
-### Find your callback URL
+## Find your callback URL
 
 The next step requires a callback URL, which looks like this:
 
 `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Go to your [Supabase Project Dashboard](https://supabase.com).
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
 - Click on the `Settings` icon at the bottom of the left sidebar.
 - Click on `API` in the list.
 - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
@@ -42,7 +40,7 @@ The next step requires a callback URL, which looks like this:
   <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
-### Create a Twitter OAuth app
+## Create a Twitter OAuth app
 
 - Click `+ Create Project`.
   - Enter your project name, click `Next`.
@@ -62,9 +60,9 @@ The next step requires a callback URL, which looks like this:
 - Enter your `Privacy policy URL`.
 - Click `Save`.
 
-### Enter your Twitter credentials into your Supabase Project
+## Enter your Twitter credentials into your Supabase Project
 
-- Go to your [Supabase Project Dashboard](https://supabase.com).
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
 - In the left sidebar, click the `Authentication` icon (near the top).
 - Click `Settings` from the list to go to the `Authentication Settings` page.
 - Enter the final (hosted) URL of your app under `Site URL` (this is important).
@@ -72,27 +70,19 @@ The next step requires a callback URL, which looks like this:
 - Enter your `API Key` (`client_id`) and `API Secret Key` (`client_secret`) saved in the previous step.
 - Click `Save`.
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'twitter',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitter` as the `provider`:
 
 ```js
 async function signInWithTwitter() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitter',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

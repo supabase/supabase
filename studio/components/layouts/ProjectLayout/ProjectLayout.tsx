@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { FC, ReactNode, PropsWithChildren } from 'react'
+import { FC, ReactNode, PropsWithChildren, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth, useFlag } from 'hooks'
@@ -12,6 +12,7 @@ import LayoutHeader from './LayoutHeader'
 import ConnectingState from './ConnectingState'
 import PausingState from './PausingState'
 import BuildingState from './BuildingState'
+import RestoringState from './RestoringState'
 
 interface Props {
   title?: string
@@ -31,12 +32,16 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
 }: PropsWithChildren<Props>) => {
+  const { ui } = useStore()
   const ongoingIncident = useFlag('ongoingIncident')
+  const projectName = ui.selectedProject?.name
 
   return (
     <>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+        <title>
+          {title ? `${title} | Supabase` : projectName ? `${projectName} | Supabase` : 'Supabase'}
+        </title>
         <meta name="description" content="Supabase Studio" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -61,7 +66,7 @@ const ProjectLayout = ({
   )
 }
 
-export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
+export const ProjectLayoutWithAuth = withAuth(observer(ProjectLayout))
 
 export default ProjectLayout
 
@@ -99,7 +104,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     '/project/[ref]/reports',
     '/project/[ref]/settings/general',
     '/project/[ref]/settings/database',
-    '/project/[ref]/settings/billing',
+    '/project/[ref]/settings/billing/subscription',
     '/project/[ref]/settings/billing/update',
     '/project/[ref]/settings/billing/update/free',
     '/project/[ref]/settings/billing/update/pro',
@@ -108,6 +113,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
 
+  const isProjectRestoring = ui.selectedProject?.status === PROJECT_STATUS.RESTORING
   const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
     ui.selectedProject?.status ?? ''
   )
@@ -122,10 +128,12 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
         <PausingState project={ui.selectedProject} />
       ) : requiresPostgrestConnection && isProjectOffline ? (
         <ConnectingState project={ui.selectedProject} />
+      ) : requiresDbConnection && isProjectRestoring ? (
+        <RestoringState />
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={ui.selectedProject} />
       ) : (
-        <>{children}</>
+        <Fragment key={ui.selectedProject.ref}>{children}</Fragment>
       )}
     </>
   )

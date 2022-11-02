@@ -1,22 +1,33 @@
-import LinkCard from './LinkCard'
-import LinkCardsWrapper from './LinkCardsWrapper'
-import { Tabs } from '@supabase/ui'
-import Sponsor from './Sponsor'
-import SponsorsWrapper from './SponsorsWrapper'
+import { Tabs, Alert } from 'ui'
+
+import Admonition from './Admonition'
+import ButtonCard from './ButtonCard'
 import CodeBlock from './CodeBlock/CodeBlock'
+import Frameworks from './Frameworks'
 import AuthProviders from './AuthProviders'
+import { H3, H4 } from './CustomHTMLElements'
+
+import QuickstartIntro from './MDX/quickstart_intro.mdx'
+import ProjectSetup from './MDX/project_setup.mdx'
 
 const components = {
-  // LinkCard,
-  // LinkCardsWrapper,
-  // SponsorsWrapper,
-  // Sponsor,
-  // AuthProviders,
-  // Tabs: (props: any) => <Tabs {...props} type="underlined" size="small" />,
-  // TabsPanel: (props: any) => {
-  //   return <Tabs.Panel {...props} />
-  // },
-  // code: (props: any) => <CodeBlock {...props} />,
+  Admonition,
+  ButtonCard,
+  CodeBlock,
+  Frameworks,
+  AuthProviders,
+
+  QuickstartIntro,
+  ProjectSetup,
+
+  Alert,
+  Tabs,
+  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
+
+  h3: H3,
+  h4: H4,
+  code: (props: any) => <CodeBlock {...props} />,
+  mono: (props: any) => <code className="text-sm">{props.children}</code>,
 }
 
 export default components

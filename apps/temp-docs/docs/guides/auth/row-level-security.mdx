@@ -4,12 +4,18 @@ title: Row Level Security
 description: Secure your data using Postgres Row Level Security.
 ---
 
-When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). 
+When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
 
 [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Policies
 
@@ -18,8 +24,8 @@ every time a table is accessed.
 You can just think of them as adding a `WHERE` clause to every query. For example a policy like this ...
 
 ```sql
-create policy "Individuals can view their own todos." 
-    on todos for select 
+create policy "Individuals can view their own todos."
+    on todos for select
     using ( auth.uid() = user_id );
 ```
 
@@ -31,26 +37,21 @@ from todos
 where auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
-## Helper Functions 
+## Helper Functions
 
 Supabase provides you with a few easy functions that you can use with your policies.
 
-
-### `auth.uid()` 
+### `auth.uid()`
 
 Returns the ID of the user making the request.
 
-### `auth.role()`
+### `auth.jwt()`
 
-Returns the role of the user making the request. In most cases this is either `authenticated` or `anon`.
-
-### `auth.email()`
-
-Returns the email of the user making the request.
+Returns the JWT of the user making the request.
 
 ## Examples
 
-Here are some examples to show you the power of PostgreSQL's RLS. 
+Here are some examples to show you the power of PostgreSQL's RLS.
 
 ### Allow read access
 
@@ -99,6 +100,19 @@ create policy "Users can update their own profiles."
 1. Creates a table called `profiles` in the public schema (default schema).
 2. Enables RLS.
 3. Creates a policy which allows logged in users to update their own data.
+
+### Only anon or authenticated access
+
+You can add a Postgres role
+
+```sql
+create policy "Public profiles are viewable by everyone."
+on profiles for select
+to authenticated, anon
+using (
+  true
+);
+```
 
 ### Policies with joins
 
@@ -188,7 +202,7 @@ alter table leaderboard
 create policy "Only Blizzard staff can update leaderboard"
   on leaderboard
   for update using (
-    right(auth.email(), 13) = '@blizzard.com'
+    right(auth.jwt() ->> 'email', 13) = '@blizzard.com'
   );
 ```
 
@@ -267,17 +281,18 @@ using (
 );
 ```
 
-
 ## Tips
 
-### Disable realtime for private tables
+### Enable Realtime for database tables
 
-Our realtime server doesn't provide per-user security. Until we build a more robust auth system for WebSockets, you can disable realtime functionality for any private tables. To do this, you can manage the underlying Postgres replication publication:
+Realtime server broadcasts database changes to authorized users depending on your Row Level Security (RLS) policies.
+We recommend that you enable row level security and set row security policies on tables that you add to the publication.
+However, you may choose to disable RLS on a table and have changes broadcast to all connected clients.
 
 ```sql
 /**
  * REALTIME SUBSCRIPTIONS
- * Only allow realtime listening on public tables.
+ * Realtime enables listening to any table in your public schema.
  */
 
 begin;
@@ -295,21 +310,56 @@ alter publication supabase_realtime add table products;
 alter publication supabase_realtime add table posts;
 ```
 
-We're in the process of building [enhanced realtime security](https://github.com/supabase/walrus).
-
-### You don't have to use policies 
+### You don't have to use policies
 
 You can also put your authorization rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
 
 Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all.
 
-However, if you want to use another authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application 
-works with Postgres, then it also works with Supabase. 
+However, if you want to use another authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application
+works with Postgres, then it also works with Supabase.
 
 Tip: Make sure to enable RLS for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide, which is designed to bypass RLS.
 
-
 ### Never use a service key on the client
 
-Supabase provides special "Service" keys, which can be used to bypass all RLS. 
+Supabase provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
+
+## Deprecated features
+
+We have deprecate some functions to ensure better performance and extensibilty of RLS policies.
+
+### `auth.role()`
+
+<Admonition type="caution">
+
+Deprecated: The `auth.role()` function has been deprecated in favour of using the `TO` field, natively supported within Postgres.
+
+</Admonition>
+
+```sql
+-- DEPRECATED
+create policy "Public profiles are viewable by everyone."
+on profiles for select using (
+  auth.role() = 'authenticated' or auth.role() = 'anon'
+);
+
+-- RECOMMENDED
+create policy "Public profiles are viewable by everyone."
+on profiles for select
+to authenticated, anon
+using (
+  true
+);
+```
+
+### `auth.email()`
+
+<Admonition type="caution">
+
+Deprecated. Use `auth.jwt() ->> 'email'` instead.
+
+</Admonition>
+
+Returns the email of the user making the request.

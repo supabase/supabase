@@ -17,11 +17,7 @@ const FormPanel = ({ children, header, footer }: Props) => (
       overflow-hidden 
       rounded-md border shadow"
   >
-    {header && (
-      <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
-        {header}
-      </div>
-    )}
+    {header && <div className=" border-scale-400 border-b px-8 py-4">{header}</div>}
     <div className="divide-scale-400 flex flex-col gap-0 divide-y">{children}</div>
     {footer && (
       <>

@@ -1,5 +1,5 @@
 import { ServerIcon, SupportIcon } from '@heroicons/react/outline'
-import { Accordion, Button, IconCheck } from '@supabase/ui'
+import { Accordion, Button, IconCheck } from 'ui'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
@@ -653,9 +653,8 @@ export default function IndexPage() {
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
-                      <div className="border-b pb-3">
+                      <div className="border-b pb-3" key={i}>
                         <Accordion.Item
-                          key={i}
                           header={<span className="text-scale-1200">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
                         >

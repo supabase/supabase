@@ -4,12 +4,13 @@ title: Introduction
 description: 'What is Supabase?'
 slug: /
 hide_table_of_contents: true
+pagination_next: null
 ---
 
 import ThemedImage from '@theme/ThemedImage'
 import AngularLogo from '@site/static/img/libraries/angular-icon.svg'
 import ExpoLogo from '@site/static/img/libraries/expo-icon.svg'
-import DartLogo from '@site/static/img/libraries/dart-icon.svg'
+import FlutterLogo from '@site/static/img/libraries/flutter-icon.svg'
 import JavascriptLogo from '@site/static/img/libraries/javascript-icon.svg'
 import NextjsDarkLogo from '@site/static/img/libraries/nextjs-dark-icon.svg'
 import NextjsLightLogo from '@site/static/img/libraries/nextjs-light-icon.svg'
@@ -32,13 +33,13 @@ const frameworks = [
   {
     name: 'Expo',
     logo: ExpoLogo,
-    href: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/expo-todo-list',
+    href: '/guides/with-expo',
   },
-  { name: 'Flutter', logo: DartLogo, href: '/guides/with-flutter' },
+  { name: 'Flutter', logo: FlutterLogo, href: '/guides/with-flutter' },
   {
     name: 'JavaScript',
     logo: JavascriptLogo,
-    href: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/auth/javascript-auth',
+    href: '/reference/javascript/installing#javascript',
   },
   {
     name: 'Next.js',
@@ -69,36 +70,6 @@ You can use it completely, or just the features you need.
 
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
-    {/* Database */}
-    <div class="col col--4">
-      <ButtonCard
-        class="card"
-        to={useBaseUrl('/guides/database')}
-        title={'Database'}
-        description={'A dedicated, scalable Postgres database.'}
-        style={{ height: '100%' }}
-      />
-    </div>
-    {/* API */}
-    <div class="col col--4">
-      <ButtonCard
-        class="card"
-        to={useBaseUrl('/guides/api')}
-        title={'Auto-generated APIs'}
-        description={'Instantly generate APIs for your database.'}
-        style={{ height: '100%' }}
-      />
-    </div>
-    {/* Functions */}
-    <div class="col col--4">
-      <ButtonCard
-        class="card"
-        to={useBaseUrl('/guides/functions')}
-        title={'Edge Functions'}
-        description={'Server-side functions, distributed globally.'}
-        style={{ height: '100%' }}
-      />
-    </div>
     {/* Auth */}
     <div class="col col--4">
       <ButtonCard
@@ -109,7 +80,47 @@ You can use it completely, or just the features you need.
         style={{ height: '100%' }}
       />
     </div>
-    {/* Storage */}
+    {/* Auto-generated APIs */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/api')}
+        title={'Auto-generated APIs'}
+        description={'Instantly generate APIs for your database.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* Database */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/database')}
+        title={'Database'}
+        description={'A dedicated, scalable Postgres database.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* Edge Functions */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/functions')}
+        title={'Edge Functions'}
+        description={'Server-side functions, distributed globally.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* Realtime */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/realtime')}
+        title={'Realtime'}
+        description={'Build with Broadcast, Presence, and Postgres CDC.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* File Storage */}
     <div class="col col--4">
       <ButtonCard
         class="card"
@@ -129,7 +140,6 @@ You can use it completely, or just the features you need.
         style={{ height: '100%' }}
       />
     </div>
-    {/*  */}
   </div>
 </div>
 
@@ -148,11 +158,16 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
               <x.logo
                 width="20"
                 alt={x.name}
-                style={{ display: 'block', maxHeight: 20 }}
+                style={{ display: 'block', maxHeight: 20, minWidth: 20 }}
               />
             ) : (
               <ThemedImage
-                style={{ display: 'block', maxHeight: 20 }}
+                style={{
+                  display: 'block',
+                  maxHeight: 20,
+                  minWidth: 20,
+                  margin: 0,
+                }}
                 alt={x.name}
                 width="20"
                 sources={{

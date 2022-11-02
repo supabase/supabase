@@ -1,6 +1,9 @@
 import {
   Count,
+  EventChart,
+  EventChartData,
   Filters,
+  genChartQuery,
   genCountQuery,
   genDefaultQuery,
   genQueryParams,
@@ -11,7 +14,7 @@ import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
 import { API_URL } from 'lib/constants'
@@ -27,6 +30,7 @@ interface Data {
   filters: Filters
   params: LogsEndpointParams
   oldestTimestamp?: string
+  eventChartData: EventChartData[] | null
 }
 interface Handlers {
   loadOlder: () => void
@@ -43,18 +47,21 @@ function useLogsPreview(
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
   const [filters, setFilters] = useState<Filters>({ ...filterOverride })
+  const isFirstRender = useRef<boolean>(true)
 
   const [params, setParams] = useState<LogsEndpointParams>({
     project: projectRef,
-    sql: '',
+    sql: genDefaultQuery(table, filters),
     iso_timestamp_start: defaultHelper.calcFrom(),
     iso_timestamp_end: defaultHelper.calcTo(),
   })
 
   useEffect(() => {
-    if (filters !== {}) {
-      refresh()
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
     }
+    refresh()
   }, [JSON.stringify(filters)])
 
   // handle url generation for log pagination
@@ -116,11 +123,40 @@ function useLogsPreview(
   })
   const newCount = countData?.result?.[0]?.count ?? 0
 
+  // chart data
+
+  const chartQuery = genChartQuery(table, params, filters)
+  const chartUrl = () => {
+    // cancel request if no sql provided
+    if (!params.sql) {
+      // return null to restrict unnecessary requests to api
+      // https://swr.vercel.app/docs/conditional-fetching#conditional
+      return null
+    }
+
+    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+      iso_timestamp_end: params.iso_timestamp_end,
+      project: params.project,
+      sql: chartQuery,
+    } as any)}`
+  }
+
+  const { data: eventChartResponse, mutate: refreshEventChart } = useSWR<EventChart>(
+    chartUrl,
+    get,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 10000,
+      refreshInterval: 0,
+    }
+  )
+
   const refresh = async () => {
     const generatedSql = genDefaultQuery(table, filters)
     setParams((prev) => ({ ...prev, sql: generatedSql }))
     setLatestRefresh(new Date().toISOString())
     setSize(1)
+    refreshEventChart()
   }
 
   let error: null | string | object = swrError ? swrError.message : null
@@ -142,7 +178,7 @@ function useLogsPreview(
         return { ...resolved, ...filterOverride }
       })
     } else {
-      setFilters((prev) => ({ ...prev, ...newFilters, ...filterOverride }))
+      setFilters({ ...newFilters, ...filterOverride })
     }
   }
   return [
@@ -155,6 +191,7 @@ function useLogsPreview(
       filters,
       params,
       oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
+      eventChartData: eventChartResponse?.result || null,
     },
     {
       setFilters: handleSetFilters,

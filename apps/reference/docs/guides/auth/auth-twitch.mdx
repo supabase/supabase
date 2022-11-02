@@ -17,9 +17,7 @@ Setting up Twitch logins for your application consists of 3 parts:
 - Add your Twitch OAuth Consumer keys to your [Supabase Project](https://app.supabase.com)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Steps
-
-### Access your Twitch Developer account
+## Access your Twitch Developer account
 
 - Go to [dev.twitch.tv](https://dev.twitch.tv).
 - Click on `Log in with Twitch` at the top right to log in.
@@ -31,7 +29,7 @@ Setting up Twitch logins for your application consists of 3 parts:
 
 ![Twitch Developer Console](/img/guides/auth-twitch/twitch-console.png)
 
-### Find your callback URL
+## Find your callback URL
 
 In the next step you require a callback URL, which looks like this:
 
@@ -52,7 +50,7 @@ In the next step you require a callback URL, which looks like this:
   />
 </video>
 
-### Create a Twitch Application
+## Create a Twitch Application
 
 ![Twitch Developer Console](/img/guides/auth-twitch/twitch-console.png)
 
@@ -65,7 +63,7 @@ In the next step you require a callback URL, which looks like this:
 - Select a category for your app.
 - Check the Captcha box and click `Create`.
 
-### Retrieve your Twitch OAuth Client ID and Client Secret
+## Retrieve your Twitch OAuth Client ID and Client Secret
 
 - Click `Manage` at the right of your application entry in the list.
 
@@ -77,7 +75,7 @@ In the next step you require a callback URL, which looks like this:
 
 ![Get Client ID and Secret](/img/guides/auth-twitch/twitch-get-keys.png)
 
-### Add your Twitch credentials into your Supabase Project
+## Add your Twitch credentials into your Supabase Project
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.com)
 - In the left sidebar, click the `Authentication` icon (near the top)
@@ -87,27 +85,19 @@ In the next step you require a callback URL, which looks like this:
 - Enter your `client_id` and `client_secret` saved in the previous step
 - Click `Save`
 
-### Add login code to your client app
+## Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'twitch',
-})
-```
-
-Add this function which you can call from a button, link, or UI element.
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitch` as the `provider`:
 
 ```js
 async function signInWithTwitch() {
-  const { user, session, error } = await supabase.auth.signIn({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitch',
   })
 }
 ```
 
-To log out:
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
 async function signout() {

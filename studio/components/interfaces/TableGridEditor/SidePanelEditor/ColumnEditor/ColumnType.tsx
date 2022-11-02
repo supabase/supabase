@@ -1,5 +1,5 @@
-import React, { FC } from 'react'
-import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from '@supabase/ui'
+import React, { FC, ReactNode } from 'react'
+import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from 'ui'
 import { PostgresType } from '@supabase/postgres-meta'
 import { POSTGRES_DATA_TYPES, POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
@@ -12,6 +12,7 @@ interface Props {
   error?: any
   disabled?: boolean
   showLabel?: boolean
+  description?: ReactNode
   onOptionSelect: (value: string) => void
 }
 
@@ -23,6 +24,7 @@ const ColumnType: FC<Props> = ({
   error,
   disabled = false,
   showLabel = true,
+  description,
   onOptionSelect = () => {},
 }) => {
   // @ts-ignore
@@ -75,6 +77,8 @@ const ColumnType: FC<Props> = ({
       size={size}
       error={error}
       disabled={disabled}
+      // @ts-ignore
+      descriptionText={description}
       className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
       onChange={(value: string) => onOptionSelect(value)}
       optionsWidth={480}
@@ -84,11 +88,11 @@ const ColumnType: FC<Props> = ({
       </Listbox.Option>
 
       {/*
-        Weird issue with Listbox here 
-        1. Can't do render conditionally (&&) within Listbox hence why using Fragment
-        2. Can't wrap these 2 components within a Fragment conditional (enumTypes.length)
-           as selecting the enumType option will not render it in the Listbox component
-      */}
+          Weird issue with Listbox here
+          1. Can't do render conditionally (&&) within Listbox hence why using Fragment
+          2. Can't wrap these 2 components within a Fragment conditional (enumTypes.length)
+            as selecting the enumType option will not render it in the Listbox component
+        */}
       {enumTypes.length > 0 ? (
         <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
           User-defined Enumerated Types
@@ -105,7 +109,7 @@ const ColumnType: FC<Props> = ({
             value={enumType.name}
             label={enumType.name}
             addOnBefore={() => {
-              return <div className="bg-scale-1200 mx-1 h-2 w-2 rounded-full" />
+              return <div className="mx-1 h-2 w-2 rounded-full bg-scale-1200" />
             }}
           >
             <div className="flex items-center space-x-4">

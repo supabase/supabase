@@ -1,6 +1,5 @@
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Loading from 'components/ui/Loading'
@@ -11,7 +10,7 @@ import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 
 interface Props {}
 
@@ -37,7 +36,7 @@ const ConnectionPooling: FC<Props> = () => {
   if (poolingConfiguration.error) {
     return (
       <div className="p-4">
-        <Typography.Text type="secondary">Error loading pooling configuration</Typography.Text>
+        <p className="text-scale-1000">Error loading pooling configuration</p>
       </div>
     )
   }
@@ -49,15 +48,13 @@ const ConnectionPooling: FC<Props> = () => {
     return (
       <Panel
         title={
-          <Typography.Title key="panel-title" level={5} className="mb-0">
+          <h5 key="panel-title" className="mb-0">
             Connection Pooling is not available for this project
-          </Typography.Title>
+          </h5>
         }
       >
         <Panel.Content>
-          <Typography.Text type="secondary">
-            Please start a new project to enable this feature.
-          </Typography.Text>
+          <p className="text-scale-1000">Please start a new project to enable this feature.</p>
         </Panel.Content>
       </Panel>
     )
@@ -165,72 +162,74 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
     }
 
     return (
-      <SchemaFormPanel
-        title="Connection Pooling"
-        schema={formSchema}
-        model={updates}
-        submitLabel="Save"
-        cancelLabel="Cancel"
-        onChangeModel={(model: any) => setUpdates(model)}
-        onSubmit={(model: any) => updateConfig(model)}
-        onReset={() => setUpdates(bouncerInfo)}
-      >
-        <div className="space-y-6 py-4">
-          <ToggleField name="pgbouncer_enabled" />
+      <div>
+        <SchemaFormPanel
+          title="Connection Pooling"
+          schema={formSchema}
+          model={updates}
+          submitLabel="Save"
+          cancelLabel="Cancel"
+          onChangeModel={(model: any) => setUpdates(model)}
+          onSubmit={(model: any) => updateConfig(model)}
+          onReset={() => setUpdates(bouncerInfo)}
+        >
+          <div className="space-y-6 py-4">
+            <ToggleField name="pgbouncer_enabled" />
 
-          <Divider light />
+            <Divider light />
 
-          {updates.pgbouncer_enabled && (
-            <>
-              <AutoField
-                name="pool_mode"
-                showInlineError
-                errorMessage="You must select one of the three options"
-              />
-              <div className="flex !mt-1" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                <p className="text-sm text-scale-900">
-                  Specify when a connection can be returned to the pool. To find out the most
-                  suitable mode for your use case,{' '}
-                  <a
-                    className="text-green-900"
-                    target="_blank"
-                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
-                  >
-                    click here
-                  </a>
-                  .
-                </p>
-              </div>
-              <Divider light />
-              <AutoField name="ignore_startup_parameters" />
-            </>
-          )}
-          <Divider light />
-          <Input
-            className="input-mono"
-            layout="horizontal"
-            readOnly
-            copy
-            disabled
-            value={connectionInfo.db_port}
-            label="Port"
-          />
-          <Divider light />
-          <Input
-            className="input-mono"
-            layout="vertical"
-            readOnly
-            copy
-            disabled
-            label="Connection string"
-            value={
-              `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
-              `${connectionInfo.db_host}:${connectionInfo.db_port}` +
-              `/${connectionInfo.db_name}`
-            }
-          />
-        </div>
-      </SchemaFormPanel>
+            {updates.pgbouncer_enabled && (
+              <>
+                <AutoField
+                  name="pool_mode"
+                  showInlineError
+                  errorMessage="You must select one of the three options"
+                />
+                <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
+                  <p className="text-sm text-scale-900">
+                    Specify when a connection can be returned to the pool. To find out the most
+                    suitable mode for your use case,{' '}
+                    <a
+                      className="text-green-900"
+                      target="_blank"
+                      href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
+                    >
+                      click here
+                    </a>
+                    .
+                  </p>
+                </div>
+                <Divider light />
+                <AutoField name="ignore_startup_parameters" />
+              </>
+            )}
+            <Divider light />
+            <Input
+              className="input-mono"
+              layout="horizontal"
+              readOnly
+              copy
+              disabled
+              value={connectionInfo.db_port}
+              label="Port"
+            />
+            <Divider light />
+            <Input
+              className="input-mono"
+              layout="vertical"
+              readOnly
+              copy
+              disabled
+              label="Connection string"
+              value={
+                `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
+                `${connectionInfo.db_host}:${connectionInfo.db_port}` +
+                `/${connectionInfo.db_name}`
+              }
+            />
+          </div>
+        </SchemaFormPanel>
+      </div>
     )
   }
 )
