@@ -65,7 +65,7 @@ Choose if you want to work on the [Supabase Website](https://supabase.com), [Sup
    Go to the [Supabase Docs](https://supabase.com/docs) directory
 
    ```sh
-   cd apps/reference
+   cd apps/docs
    ```
 
    Go to the [Supabase Studio](https://app.supabase.com) directory
@@ -183,7 +183,7 @@ Then edit and visit any of the following sites:
 Site | Directory | Description | Local development server
 ---- | --------- | ----------- | ------------------------
 [supabase.com](https://supabase.com) | `/apps/www` | The main website | http://localhost:3000
-[supabase.com/docs](https://supabase.com/docs) | `apps/reference` | Guides and Reference documentation | http://localhost:3010/docs
+[supabase.com/docs](https://supabase.com/docs) | `apps/docs` | Guides and Reference documentation | http://localhost:3010/docs
 [POC] Community forum | `/apps/temp-community-forum` | GitHub Discussions in a Next.js site | http://localhost:3002
 [POC] DEV articles site | `/apps/temp-community-tutorials` | A Next.js site for our DEV articles (which community members can write) | http://localhost:3003
 

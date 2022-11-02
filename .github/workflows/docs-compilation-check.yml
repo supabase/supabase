@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: [master]
     paths:
-      - 'apps/reference/**'
+      - 'apps/docs/**'
 
 jobs:
   build:
@@ -35,8 +35,8 @@ jobs:
 
       - name: Install Deps
         run: npm ci
-        working-directory: ./apps/reference
+        working-directory: ./apps/docs
 
       - name: Build
         run: npm run build
-        working-directory: ./apps/reference
+        working-directory: ./apps/docs
