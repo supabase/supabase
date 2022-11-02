@@ -36,7 +36,7 @@ const SignUpForm = () => {
     const response = await post(`${API_URL}/signup`, {
       email,
       password,
-      captchaToken: token ?? null,
+      hcaptchaToken: token ?? null,
     })
     const error = response.error
 
