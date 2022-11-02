@@ -176,7 +176,7 @@ function RealtimePage() {
                 />
               </div>
               <h3>Broadcast</h3>
-              <p>Send any data to all clients subscribed to the same Channel.</p>
+              <p>Send any data to any client subscribed to the same Channel.</p>
               <div className="not-prose mt-3">
                 <Link passHref href="/docs/guides/realtime/broadcast">
                   <Button as="a" type="default">
