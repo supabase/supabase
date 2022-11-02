@@ -82,17 +82,29 @@ pre[class*='language-'] {
 
 // Spec doc specifics ported from docusaurus
 // @TODO these should be converted to Tailwind classes
-.method-list-group {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+
+.method-list-item {
+  @apply border-t border-gray-400;
+  .method-list-item-label {
+    @apply flex items-center gap-1;
+  }
+  .method-list-item-label-name {
+    @apply font-mono font-bold text-sm py-2;
+  }
+  .method-list-item-label-badge {
+    @apply font-mono text-xs px-1;
+    overflow-wrap: anywhere;
+  }
+  .method-list-item-validation {
+    @apply flex flex-wrap gap-2;
+  }
+  .method-list-item-description {
+    @apply text-sm space-y-2;
+  }
 }
-.method-list-group li {
-  border-top: 1px solid var(--custom-border-color);
-  padding-top: 12px;
-}
+
 .method-list-group li:last-child {
-  border-bottom: 1px solid var(--custom-border-color);
+  border-bottom: 1px solid var(--colors-scale3);
 }
 
 .method-list-title-isChild {
@@ -102,57 +114,25 @@ pre[class*='language-'] {
   }
 }
 
-h4.method-list-item-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-h4.method-list-item-label .method-list-item-label-name {
-  font-family: var(--ifm-font-family-monospace);
-  font-weight: 700;
-  font-size: var(--custom-font-size-sm);
-  color: var(--ifm-font-color-base);
-  padding: var(--ifm-code-padding-vertical) 0;
-}
-
-h4.method-list-item-label .method-list-item-label-badge {
-  overflow-wrap: anywhere;
-  font-family: var(--ifm-font-family-monospace);
-  color: var(--ifm-font-color-base);
-  font-size: var(--custom-font-size-xs);
-  padding: 0 5px;
-  font-weight: 300;
-  padding: var(--ifm-code-padding-vertical) var(--ifm-code-padding-horizontal);
-}
-h4.method-list-item-label .method-list-item-validation {
-  font-family: var(--ifm-font-family-monospace);
-  font-size: var(--custom-font-size-xs);
-  font-weight: 300;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-
+.method-list-item-validation {
   code {
+    @apply text-xs bg-scale-300 rounded;
     padding: 1px 6px;
-    border-radius: 4px;
-    background-color: var(--custom-background-color-diff-1);
-    color: var(--ifm-font-color-base);
   }
 }
 
-.method-list-item-description p {
-  color: var(--custom-content-color-light);
-  font-size: var(--custom-font-size-sm);
+.method-list-group {
+  @apply p-0 m-0 list-none;
 }
 
 .method-list-group .method-list-group {
-  border: 1px solid var(--custom-border-color);
-  border-radius: 8px;
+  @apply border border-scale-400 rounded-md;
   margin-bottom: 20px;
   max-width: 600px;
 }
+
 .method-list-group .method-list-group li {
+  margin-top: 0;
   padding: 12px;
   border-bottom: none;
 }
@@ -176,4 +156,23 @@ h4.method-list-item-label .method-list-item-validation {
   svg {
     transform: rotate(90deg);
   }
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+.admonition-content > p {
+  @apply m-0;
 }

@@ -53,7 +53,10 @@ export function getDocsBySlug(slug: string) {
 
   const { data, content } = matter(fileContents)
 
-  return { slug: realSlug, meta: data, content }
+  // Append the title as the h1 tag in the content
+  const formattedContent = data.title !== undefined ? `# ${data.title} \n\n${content}` : content
+
+  return { slug: realSlug, meta: data, content: formattedContent }
 }
 
 export function getAllDocs() {

@@ -12,7 +12,7 @@ import ProjectSetup from './_partials/project_setup.mdx'
 
 <QuickstartIntro />
 
-![Supabase User Management example](/img/user-management-demo.png)
+![Supabase User Management example](/docs/img/user-management-demo.png)
 
 ### GitHub
 
@@ -94,9 +94,7 @@ export default function Auth() {
     <div className="row flex-center flex">
       <div className="col-6 form-widget" aria-live="polite">
         <h1 className="header">Supabase + React</h1>
-        <p className="description">
-          Sign in via magic link with your email below
-        </p>
+        <p className="description">Sign in via magic link with your email below</p>
         {loading ? (
           'Sending magic link...'
         ) : (
@@ -227,11 +225,7 @@ const Account = ({ session }) => {
           </div>
         </form>
       )}
-      <button
-        type="button"
-        className="button block"
-        onClick={() => supabase.auth.signOut()}
-      >
+      <button type="button" className="button block" onClick={() => supabase.auth.signOut()}>
         Sign Out
       </button>
     </div>
@@ -267,11 +261,7 @@ export default function App() {
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session ? (
-        <Auth />
-      ) : (
-        <Account key={session.user.id} session={session} />
-      )}
+      {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
     </div>
   )
 }
@@ -285,7 +275,7 @@ npm start
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase React](/img/supabase-react-demo.png)
+![Supabase React](/docs/img/supabase-react-demo.png)
 
 ## Bonus: Profile photos
 
@@ -309,9 +299,7 @@ export default function Avatar({ url, size, onUpload }) {
 
   const downloadImage = async (path) => {
     try {
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .download(path)
+      const { data, error } = await supabase.storage.from('avatars').download(path)
       if (error) {
         throw error
       }
@@ -335,9 +323,7 @@ export default function Avatar({ url, size, onUpload }) {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file)
+      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError

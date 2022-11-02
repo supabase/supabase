@@ -15,28 +15,25 @@ This submodule provides convenience helpers for implementing user authentication
 This library supports Node.js `^16.15.0`.
 
 <Tabs
-  groupId="install"
-  defaultValue="npm"
-  values={[
-    {label: 'npm', value: 'npm'},
-    {label: 'Yarn', value: 'yarn'},
-  ]}>
-
-<TabItem value="npm">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+>
+<TabPanel id="npm" label="npm">
 
 ```sh
 npm install @supabase/auth-helpers-sveltekit
 ```
 
-</TabItem>
-
-<TabItem value="yarn">
+</TabPanel>
+<TabPanel id="yarn" label="Yarn">
 
 ```sh
 yarn add @supabase/auth-helpers-sveltekit
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Getting Started
@@ -63,14 +60,10 @@ import { env } from '$env/dynamic/public'
 // or use the static env
 // import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(
-  env.PUBLIC_SUPABASE_URL,
-  env.PUBLIC_SUPABASE_ANON_KEY,
-  {
-    persistSession: false,
-    autoRefreshToken: false,
-  }
-)
+export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY, {
+  persistSession: false,
+  autoRefreshToken: false,
+})
 
 setupSupabaseHelpers({
   supabaseClient,
@@ -378,13 +371,9 @@ export const actions: Actions = {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { data, error } = await supabaseClient.auth.api.signInWithEmail(
-      email,
-      password,
-      {
-        redirectTo: `${url.origin}/logging-in`,
-      }
-    )
+    const { data, error } = await supabaseClient.auth.api.signInWithEmail(email, password, {
+      redirectTo: `${url.origin}/logging-in`,
+    })
 
     if (error || !data) {
       if (error?.status === 400) {
@@ -470,13 +459,12 @@ The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE
 ### Set up the Supabase client {#migration-set-up-supabase-client}
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: '0.6.11 and below', value: 'older'},
-    {label: '0.7.0', value: 'latest'},
-  ]}>
-
-<TabItem value="older">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="older"
+>
+<TabPanel id="older" label="0.6.11 and below">
 
 ```js title="src/lib/db.ts"
 import { createSupabaseClient } from '@supabase/auth-helpers-sveltekit';
@@ -489,9 +477,8 @@ const { supabaseClient } = createSupabaseClient(
 export { supabaseClient };
 ```
 
-</TabItem>
-
-<TabItem value="latest">
+</TabPanel>
+<TabPanel id="latest" label="0.7.0">
 
 ```js title="src/lib/db.ts"
 import { createClient } from '@supabase/supabase-js'
@@ -502,14 +489,10 @@ import { env } from '$env/dynamic/public'
 
 // import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(
-  env.PUBLIC_SUPABASE_URL,
-  env.PUBLIC_SUPABASE_ANON_KEY,
-  {
-    persistSession: false,
-    autoRefreshToken: false,
-  }
-)
+export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY, {
+  persistSession: false,
+  autoRefreshToken: false,
+})
 
 setupSupabaseHelpers({
   supabaseClient,
@@ -519,19 +502,18 @@ setupSupabaseHelpers({
 })
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Initialize the client {#migration-initialize-client}
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: '0.6.11 and below', value: 'older'},
-    {label: '0.7.0', value: 'latest'},
-  ]}>
-
-<TabItem value="older">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="older"
+>
+<TabPanel id="older" label="0.6.11 and below">
 
 ```html title="src/routes/__layout.svelte"
 <script>
@@ -545,9 +527,8 @@ setupSupabaseHelpers({
 </SupaAuthHelper>
 ```
 
-</TabItem>
-
-<TabItem value="latest">
+</TabPanel>
+<TabPanel id="latest" label="0.7.0">
 
 The `@supabase/auth-helpers-svelte` library is no longer required as the `@supabase/auth-helpers-sveltekit` library handles all the client-side code.
 
@@ -569,19 +550,18 @@ The `@supabase/auth-helpers-svelte` library is no longer required as the `@supab
 <slot />
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Set up hooks {#migration-set-up-hooks}
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: '0.6.11 and below', value: 'older'},
-    {label: '0.7.0', value: 'latest'},
-  ]}>
-
-<TabItem value="older">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="older"
+>
+<TabPanel id="older" label="0.6.11 and below">
 
 ```ts title="src/hooks.ts"
 import { handleAuth } from '@supabase/auth-helpers-sveltekit'
@@ -600,9 +580,8 @@ export const getSession: GetSession = async (event) => {
 }
 ```
 
-</TabItem>
-
-<TabItem value="latest">
+</TabPanel>
+<TabPanel id="latest" label="0.7.0">
 
 ```ts title="src/hooks.server.ts"
 // make sure the supabase instance is initialized on the server
@@ -625,19 +604,18 @@ import { sequence } from '@sveltejs/kit/hooks'
 export const handle = sequence(auth(), yourHandler)
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Typings {#migration-typings}
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: '0.6.11 and below', value: 'older'},
-    {label: '0.7.0', value: 'latest'},
-  ]}>
-
-<TabItem value="older">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="older"
+>
+<TabPanel id="older" label="0.6.11 and below">
 
 ```ts title="src/app.d.ts"
 /// <reference types="@sveltejs/kit" />
@@ -660,9 +638,8 @@ declare namespace App {
 }
 ```
 
-</TabItem>
-
-<TabItem value="latest">
+</TabPanel>
+<TabPanel id="latest" label="0.7.0">
 
 ```ts title="src/app.d.ts"
 /// <reference types="@sveltejs/kit" />
@@ -684,19 +661,18 @@ declare namespace App {
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Check the user on the client
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: '0.6.11 and below', value: 'older'},
-    {label: '0.7.0', value: 'latest'},
-  ]}>
-
-<TabItem value="older">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="older"
+>
+<TabPanel id="older" label="0.6.11 and below">
 
 ```html title="src/routes/index.svelte"
 <script>
@@ -711,9 +687,8 @@ declare namespace App {
 {/if}
 ```
 
-</TabItem>
-
-<TabItem value="latest">
+</TabPanel>
+<TabPanel id="latest" label="0.7.0">
 
 ```html title="src/routes/+page.svelte"
 <script>
@@ -728,26 +703,22 @@ declare namespace App {
 {/if}
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### withPageAuth
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: '0.6.11 and below', value: 'older'},
-    {label: '0.7.0', value: 'latest'},
-  ]}>
-
-<TabItem value="older">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="older"
+>
+<TabPanel id="older" label="0.6.11 and below">
 
 ```html title="src/routes/protected-route.svelte"
 <script lang="ts" context="module">
-  import {
-    supabaseServerClient,
-    withPageAuth,
-  } from '@supabase/auth-helpers-sveltekit'
+  import { supabaseServerClient, withPageAuth } from '@supabase/auth-helpers-sveltekit'
   import type { Load } from './__types/protected-page'
 
   export const load: Load = async ({ session }) =>
@@ -757,9 +728,7 @@ declare namespace App {
         user: session.user,
       },
       async () => {
-        const { data } = await supabaseServerClient(session.accessToken)
-          .from('test')
-          .select('*')
+        const { data } = await supabaseServerClient(session.accessToken).from('test').select('*')
         return { props: { data, user: session.user } }
       }
     )
@@ -777,9 +746,8 @@ declare namespace App {
 <pre>{JSON.stringify(user, null, 2)}</pre>
 ```
 
-</TabItem>
-
-<TabItem value="latest">
+</TabPanel>
+<TabPanel id="latest" label="0.7.0">
 
 ```html title="src/routes/protected-route/+page.svelte"
 <script lang="ts">
@@ -801,39 +769,31 @@ import { withAuth } from '@supabase/auth-helpers-sveltekit'
 import { redirect } from '@sveltejs/kit'
 import type { PageLoad } from './$types'
 
-export const load: PageLoad = withAuth(
-  async ({ session, getSupabaseClient }) => {
-    if (!session.user) {
-      throw redirect(303, '/')
-    }
-
-    const { data: tableData } = await getSupabaseClient()
-      .from('test')
-      .select('*')
-    return { tableData, user: session.user }
+export const load: PageLoad = withAuth(async ({ session, getSupabaseClient }) => {
+  if (!session.user) {
+    throw redirect(303, '/')
   }
-)
+
+  const { data: tableData } = await getSupabaseClient().from('test').select('*')
+  return { tableData, user: session.user }
+})
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### withApiAuth
 
 <Tabs
-  groupId="version"
-  values={[
-    {label: '0.6.11 and below', value: 'older'},
-    {label: '0.7.0', value: 'latest'},
-  ]}>
-
-<TabItem value="older">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="older"
+>
+<TabPanel id="older" label="0.6.11 and below">
 
 ```ts title="src/routes/api/protected-route.ts"
-import {
-  supabaseServerClient,
-  withApiAuth,
-} from '@supabase/auth-helpers-sveltekit'
+import { supabaseServerClient, withApiAuth } from '@supabase/auth-helpers-sveltekit'
 import type { RequestHandler } from './__types/protected-route'
 
 interface TestTable {
@@ -848,9 +808,7 @@ interface GetOutput {
 export const GET: RequestHandler<GetOutput> = async ({ locals, request }) =>
   withApiAuth({ user: locals.user }, async () => {
     // Run queries with RLS on the server
-    const { data } = await supabaseServerClient(request)
-      .from('test')
-      .select('*')
+    const { data } = await supabaseServerClient(request).from('test').select('*')
 
     return {
       status: 200,
@@ -859,9 +817,8 @@ export const GET: RequestHandler<GetOutput> = async ({ locals, request }) =>
   })
 ```
 
-</TabItem>
-
-<TabItem value="latest">
+</TabPanel>
+<TabPanel id="latest" label="0.7.0">
 
 ```ts title="src/routes/api/protected-route/+server.ts"
 import type { RequestHandler } from './$types';
@@ -886,7 +843,7 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
 );
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Additional Links

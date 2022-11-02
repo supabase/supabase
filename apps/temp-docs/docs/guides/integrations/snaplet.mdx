@@ -40,29 +40,29 @@ Follow along in the video below as the founder of Snaplet, Peter Pistorius, take
 
 Navigate to [https://www.snaplet.dev/](https://www.snaplet.dev/) and sign up for a new account (it’s free). Once you have successfully signed up for a new account, create a team, and start by connecting to your Supabase project.
 
-![connect-your-database](/img/guides/integrations/snaplet/connect-your-database.png)
+![connect-your-database](/docs/img/guides/integrations/snaplet/connect-your-database.png)
 
 Enter the credentials of your production Supabase project. Find the "Connection string" in Supabase via `Organization > Project > Settings > Database > Connection string` (at the bottom of the page).
 
 The password is the same password you used when creating the Supabase project.
 
-![supabase-connection-db-info](/img/guides/integrations/snaplet/supabase-connection-db-info.png)
+![supabase-connection-db-info](/docs/img/guides/integrations/snaplet/supabase-connection-db-info.png)
 
 You’ll have to confirm providing Snaplet access to your database. Snaplet will prompt you to only provide `read-only` access to your database. Snaplet has a guide in their documentation on how to do so [here](https://docs.snaplet.dev/postgresql/create-read-only-role).
 
 > Note that whatever connection string you provide here will be that of your Data Source – essentially the production database in a real-life scenario
 
-![checking-database-credentials](/img/guides/integrations/snaplet/checking-database-credentials.png)
+![checking-database-credentials](/docs/img/guides/integrations/snaplet/checking-database-credentials.png)
 
 ### 2.2. Transform your data
 
-![transform-your-data](/img/guides/integrations/snaplet/transform-your-data.png)
+![transform-your-data](/docs/img/guides/integrations/snaplet/transform-your-data.png)
 
 The next step is to exclude any schemas that you do not require. You are able to exclude an entire schema by clicking on the drop-down at the top, selecting the schema you would like to exclude and clicking ‘Exclude schema’. Alternatively, you can select a given schema and exclude only specific tables from that particular schema. Exclude any non-required table data (such as logs) and extensions and view your columns.
 
 At this point, Snaplet will automatically detect any columns that have Personally Identifiable Information (PII) and mark them in purple. If there are any additional columns that hold data you would like to anonymise, you can click on the respective column name and provide a replacement value for the data in that column. To complete the onboarding, click on `Review and Save` and proceed to the dashboard.
 
-![create-your-first-snapshot](/img/guides/integrations/snaplet/create-your-first-snapshot.png)
+![create-your-first-snapshot](/docs/img/guides/integrations/snaplet/create-your-first-snapshot.png)
 
 ### 2.3. Create a Snapshot
 

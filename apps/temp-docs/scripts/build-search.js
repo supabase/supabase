@@ -18,9 +18,11 @@ const algoliasearch = require('algoliasearch/lite')
 // double check if they can be removed or if we want them in the side bars.
 const ignoredFiles = [
   'docs/404.mdx',
+  'docs/support.mdx',
   'docs/faqs.mdx',
-  'docs/going-into-prod.mdx',
   'docs/guides.mdx',
+  'docs/guides/database/arrays.mdx',
+  'docs/guides/database/json.mdx',
 ]
 
 const nameMap = {
