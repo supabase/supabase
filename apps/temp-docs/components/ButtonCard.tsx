@@ -14,7 +14,7 @@ export default function ButtonCard({
     <Link href={to}>
       <a
         className={[
-          'h-full block shadow-none bg-scale-400 rounded transition',
+          'h-full block shadow-none bg-scale-300 rounded transition',
           'border border-transparent hover:border-scale-600',
         ].join('')}
       >
