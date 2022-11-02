@@ -32,7 +32,7 @@ const ForgotPasswordForm = () => {
 
     const response = await post(`${API_URL}/reset-password`, {
       email,
-      captchaToken: token ?? undefined,
+      hcaptchaToken: token ?? undefined,
     })
     const error = response.error
 
