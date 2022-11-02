@@ -20,7 +20,7 @@ If you already have a Stytch account you may skip this step.
 
 Go to [Stytch](https://stytch.com?utm_source=supabase&utm_medium=guide), and create an account. Note that Stytch provides two ways to create an account, either via Google OAuth, or through Email magic links.  This is the same user experience we will be building in this guide!
 
-![Stytch redirect URL settings](/img/guides/integrations/stytch/01.png)
+![Stytch redirect URL settings](/docs/img/guides/integrations/stytch/01.png)
 
 ## Step 1: Set up Stytch redirect URLs
 
@@ -28,11 +28,11 @@ First we need to add the redirect URLs that will be used during the Email magic 
 
 Navigate to your [redirect URL settings](https://stytch.com/dashboard/redirect-urls?utm_source=supabase&utm_medium=guide) in the Stytch dashboard, and under **Test environment** create an entry where the **URL** is `http://localhost:3000/api/authenticate` and the **Type** is `All`.
 
-![Edit Stytch redirect URL settings](/img/guides/integrations/stytch/02.png)
+![Edit Stytch redirect URL settings](/docs/img/guides/integrations/stytch/02.png)
 
 After pressing **Confirm**, the redirect URLs dashboard will update to show your new entry. We will use this URL later on.
 
-![Stytch redirect URL settings](/img/guides/integrations/stytch/03.png)
+![Stytch redirect URL settings](/docs/img/guides/integrations/stytch/03.png)
 
 ## Step 2: Create a Supabase project
 
@@ -44,7 +44,7 @@ Enter a secure `Database Password`.
 
 Click **Create new project**. It may take a couple minutes for your project to be provisioned.
 
-![New Supabase project settings](/img/guides/integrations/stytch/04.png)
+![New Supabase project settings](/docs/img/guides/integrations/stytch/04.png)
 
 ## Step 3: Creating data in Supabase
 
@@ -64,17 +64,17 @@ Add three new columns:
 
 Click **Save** to create the new table.
 
-![Creating a new table](/img/guides/integrations/stytch/05.png)
+![Creating a new table](/docs/img/guides/integrations/stytch/05.png)
 
 From the Table editor view, select the expenses table and click **Insert row**.
 
 Fill out the title and value fields (leave user_id blank for now) and click **Save**.
 
-![Creating a new row](/img/guides/integrations/stytch/06.png)
+![Creating a new row](/docs/img/guides/integrations/stytch/06.png)
 
 Use **Insert Row** to further populate the table with expenses.
 
-![Multiple rows](/img/guides/integrations/stytch/07.png)
+![Multiple rows](/docs/img/guides/integrations/stytch/07.png)
 
 ## Step 4: Building a Next.js app
 
@@ -98,11 +98,11 @@ SUPABASE_SIGNING_SECRET=GET_FROM_SUPABASE_DASHBOARD
 
 > Note: Stytch values can be found in the project [dashboard](https://stytch.com/dashboard/api-keys?utm_source=supabase&utm_medium=guide) under **API Keys**.
 
-![Stytch API keys](/img/guides/integrations/stytch/08.png)
+![Stytch API keys](/docs/img/guides/integrations/stytch/08.png)
 
 > Note: Supabase values can be found under **Settings** > **API** for your project.
 
-![Supabase API keys](/img/guides/integrations/stytch/09.png)
+![Supabase API keys](/docs/img/guides/integrations/stytch/09.png)
 
 Start your Next.js development server to read in the new values from `.env.local`.
 
@@ -225,15 +225,15 @@ export default Index
 
 On `localhost:3000` there is now a login form prompting for your email address.
 
-![Email login step one](/img/guides/integrations/stytch/10.png)
+![Email login step one](/docs/img/guides/integrations/stytch/10.png)
 
 Enter your email address and press **Continue with email**.
 
-![Email login step two](/img/guides/integrations/stytch/11.png)
+![Email login step two](/docs/img/guides/integrations/stytch/11.png)
 
 In your inbox you will find a login request from your app.
 
-![Email login step three](/img/guides/integrations/stytch/12.png)
+![Email login step three](/docs/img/guides/integrations/stytch/12.png)
 
 However, if you click the link in the email you will get a 404. We need to build an API route to handle the email magic link authentication.
 
@@ -266,10 +266,7 @@ const loadStytch = () => {
     client = new stytch.Client({
       project_id: process.env.STYTCH_PROJECT_ID,
       secret: process.env.STYTCH_SECRET,
-      env:
-        process.env.STYTCH_PROJECT_ENV === 'live'
-          ? stytch.envs.live
-          : stytch.envs.test,
+      env: process.env.STYTCH_PROJECT_ENV === 'live' ? stytch.envs.live : stytch.envs.test,
     })
   }
 
@@ -400,7 +397,7 @@ export default Index
 
 Return to `localhost:3000`, and login again by sending yourself a new email. Upon clicking through in the email you should be presented with “Welcome $USER_ID”. If you refresh the page, you should remain in an authenticated state. If you press **Logout** then you should return to the login screen.
 
-![Profile page](/img/guides/integrations/stytch/13.png)
+![Profile page](/docs/img/guides/integrations/stytch/13.png)
 
 Now that we have a working login flow with persistent authentication it is time to pull in our expense data from Supabase.
 
@@ -520,11 +517,11 @@ Let's create a policy that checks whether this user is the owner of an expense.
 
 Select **Authentication** from the Supabase sidebar menu, click **Policies**, then **New Policy**.
 
-![Supabase authentication page](/img/guides/integrations/stytch/14.png)
+![Supabase authentication page](/docs/img/guides/integrations/stytch/14.png)
 
 From the modal, select **For full customization create a policy from scratch** and add the following.
 
-![Supabase create policy page](/img/guides/integrations/stytch/15.png)
+![Supabase create policy page](/docs/img/guides/integrations/stytch/15.png)
 
 This policy is calling the function we just created to get the currently logged in user's `user_id` `auth.user_id()` and checking whether this matches the `user_id` column for the current expense. If it does, then it will allow the user to select it, otherwise it will continue to deny.
 
@@ -536,19 +533,19 @@ The last thing we need to do is update the `user_id` columns for our existing ex
 
 Head back to the Supabase dashboard, and select Table editor from the sidebar. You will notice each entry has `user_id` set to `NULL`. We need to update this value to the proper `user_id`.
 
-![Supabase null users in table](/img/guides/integrations/stytch/16.png)
+![Supabase null users in table](/docs/img/guides/integrations/stytch/16.png)
 
 To get the `user_id` for our Stytch user, you can pull it from the welcome page in our example app (eg `user-test-61497d40-f957-45cd-a6c8-5408d22e93bc`).
 
-![Get user_id](/img/guides/integrations/stytch/17.png)
+![Get user_id](/docs/img/guides/integrations/stytch/17.png)
 
 Update each row in Supabase to this `user_id`.
 
-![Populate user_id](/img/guides/integrations/stytch/18.png)
+![Populate user_id](/docs/img/guides/integrations/stytch/18.png)
 
 Return to `localhost:3000`, and you will see your expenses listed.
 
-![Listed expenses](/img/guides/integrations/stytch/19.png)
+![Listed expenses](/docs/img/guides/integrations/stytch/19.png)
 
 We now have a basic expense tracker application powered by Stytch, Supabase, and Next.js. From here you could add additional features like adding, editing, and organizing your expenses further.
 
@@ -651,7 +648,7 @@ export const authenticateTokenStartSession = async (req, res) => {
 
 With these two changes you will now have a working Google One Tap authentication method along with email magic links.
 
-![Google One Tap](/img/guides/integrations/stytch/20.png)
+![Google One Tap](/docs/img/guides/integrations/stytch/20.png)
 
 ## Resources
 

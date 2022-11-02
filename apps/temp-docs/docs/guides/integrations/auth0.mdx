@@ -24,7 +24,7 @@ You will also need a Supabase account, which can be created by signing in [here]
 
 From the Auth0 dashboard, click the menu to the right of the Auth0 logo, and select `Create tenant`.
 
-![Create tenant from Auth0 dashboard](/img/guides/integrations/auth0/IYzHxeW.png)
+![Create tenant from Auth0 dashboard](/docs/img/guides/integrations/auth0/IYzHxeW.png)
 
 Enter a `Domain` for your tenant - this will need to be unique.
 
@@ -32,7 +32,7 @@ Select a `Region` - this should be geographically close to the majority of your 
 
 Select `Development` for `Environment Tag` - this should be production when you're ready to go live.
 
-![Auth0 tenant settings](/img/guides/integrations/auth0/iSA3E0J.png)
+![Auth0 tenant settings](/docs/img/guides/integrations/auth0/iSA3E0J.png)
 
 ## Step 2: Setting up an Auth0 application
 
@@ -40,7 +40,7 @@ From the sidebar menu, select `Applications` > `Applications` and click `Create 
 
 Give your application a name, select the `Regular Web Applications` option and click `Create`.
 
-![Auth0 application settings](/img/guides/integrations/auth0/ANU4Wez.png)
+![Auth0 application settings](/docs/img/guides/integrations/auth0/ANU4Wez.png)
 
 Select `Settings` and navigate to the `Application URIs` section, and update the following:
 
@@ -68,7 +68,7 @@ Select the same `Region` you selected for your Auth0 tenant.
 
 Click `Create new project`.
 
-![New Supabase project settings](/img/guides/integrations/auth0/qnmJEU7.png)
+![New Supabase project settings](/docs/img/guides/integrations/auth0/qnmJEU7.png)
 
 ## Step 4: Creating data in Supabase
 
@@ -86,17 +86,17 @@ Create two new columns:
 
 Click `Save` to create the new table.
 
-![Todo table](/img/guides/integrations/auth0/33kqP4K.png)
+![Todo table](/docs/img/guides/integrations/auth0/33kqP4K.png)
 
 From the `Table editor` view, select the `todo` table and click `Insert row`.
 
 Fill out the `title` field and click `Save`.
 
-![New row settings](/img/guides/integrations/auth0/mEhHAWC.png)
+![New row settings](/docs/img/guides/integrations/auth0/mEhHAWC.png)
 
 Click `Insert row` and add a couple of extra todos.
 
-![List of todos](/img/guides/integrations/auth0/dLOvhdq.png)
+![List of todos](/docs/img/guides/integrations/auth0/dLOvhdq.png)
 
 ## Step 5: Building a Next.js app
 
@@ -121,11 +121,11 @@ SUPABASE_SIGNING_SECRET=get-from-supabase-dashboard
 
 > Note: Auth0 values can be found under `Settings > Basic Information` for your application.
 
-![Auth0 settings](/img/guides/integrations/auth0/o07FaoV.png)
+![Auth0 settings](/docs/img/guides/integrations/auth0/o07FaoV.png)
 
 > Note: Supabase values can be found under `Settings > API` for your project.
 
-![Supabase settings](/img/guides/integrations/auth0/r1GAfLo.png)
+![Supabase settings](/docs/img/guides/integrations/auth0/r1GAfLo.png)
 
 Restart your Next.js development server to read in the new values from `.env.local`.
 
@@ -203,13 +203,13 @@ export default Index
 
 Test this is working by navigating to `http://localhost:3000` which should redirect you to an Auth0 sign in screen.
 
-![Auth0 sign in screen](/img/guides/integrations/auth0/xLRL7S7.png)
+![Auth0 sign in screen](/docs/img/guides/integrations/auth0/xLRL7S7.png)
 
 Either `Sign up` for a new account, or click `Continue with Google` to sign in.
 
 You should now be able to view the landing page.
 
-![Landing page](/img/guides/integrations/auth0/YdBKRy6.png)
+![Landing page](/docs/img/guides/integrations/auth0/YdBKRy6.png)
 
 ## Step 7: Sign Auth0 token for Supabase
 
@@ -239,10 +239,7 @@ const afterCallback = async (req, res, session) => {
     exp: Math.floor(Date.now() / 1000) + 60 * 60,
   }
 
-  session.user.accessToken = jwt.sign(
-    payload,
-    process.env.SUPABASE_SIGNING_SECRET
-  )
+  session.user.accessToken = jwt.sign(payload, process.env.SUPABASE_SIGNING_SECRET)
 
   return session
 }
@@ -390,7 +387,7 @@ export default Index
 
 Either way, when we reload our application, we are still getting the empty state for todos.
 
-![Empty todo list](/img/guides/integrations/auth0/XgEMwnN.png)
+![Empty todo list](/docs/img/guides/integrations/auth0/XgEMwnN.png)
 
 This is because we enabled Row Level Security, which blocks all requests by default. To enable our user to select their `todos` we need to write a policy.
 
@@ -416,11 +413,11 @@ Let's create a policy that checks whether this user is the owner of the todo.
 
 Select `Authentication` from the Supabase sidebar menu, click `Policies`, and then `New Policy` on the `todo` table.
 
-![Create new policy](/img/guides/integrations/auth0/M7XyhHe.png)
+![Create new policy](/docs/img/guides/integrations/auth0/M7XyhHe.png)
 
 From the modal, select `Create a policy from scratch` and add the following.
 
-![Policy settings for SELECT](/img/guides/integrations/auth0/wuWz3am.png)
+![Policy settings for SELECT](/docs/img/guides/integrations/auth0/wuWz3am.png)
 
 This policy is calling the function we just created to get the currently logged in user's ID `auth.user_id()` and checking whether this matches the `user_id` column for the current `todo`. If it does, then it will allow the user to select it, otherwise it will continue to deny.
 
@@ -432,21 +429,21 @@ The last thing we need to do is update the `user_id` columns for our existing `t
 
 Head back to the Supabase dashboard, and select `Table editor` from the sidebar.
 
-![User ID null in Supabase Table Editor](/img/guides/integrations/auth0/dLOvhdq.png)
+![User ID null in Supabase Table Editor](/docs/img/guides/integrations/auth0/dLOvhdq.png)
 
 Each of our `user_id` columns are set to `NULL`!
 
 To get the ID for our Auth0 user, head over to the Auth0 dashboard, select `User Management` from the sidebar, click `Users` and select your test user.
 
-![List of users in Auth0 dashboard](/img/guides/integrations/auth0/GdXS013.png)
+![List of users in Auth0 dashboard](/docs/img/guides/integrations/auth0/GdXS013.png)
 
 Copy their `user_id`.
 
-![User ID in Auth0 dashboard](/img/guides/integrations/auth0/tbvd0Uj.png)
+![User ID in Auth0 dashboard](/docs/img/guides/integrations/auth0/tbvd0Uj.png)
 
 Update each row in Supabase.
 
-![User ID set to Auth0 user](/img/guides/integrations/auth0/tPu4Tt8.png)
+![User ID set to Auth0 user](/docs/img/guides/integrations/auth0/tPu4Tt8.png)
 
 Now when we refresh our application, we should finally see our list of `todos`!
 

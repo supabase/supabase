@@ -14,7 +14,7 @@ You can also take a look at the Plasmic project here:
 
 > You’ll need to enable 3rd-party cookies in your browser for the project to properly load.
 
-![pokedex-screenshot](/img/guides/integrations/plasmic/application-screenshot-00.png)
+![pokedex-screenshot](/docs/img/guides/integrations/plasmic/application-screenshot-00.png)
 
 At a high level,
 
@@ -27,7 +27,7 @@ At a high level,
 - On the [Supabase dashboard](https://app.supabase.com/), click `New project` and set the name of the project.
   By default, Supabase will already be set up for user signups with email, with users being stored in a `users` table.
 
-![create-project-supabase](/img/guides/integrations/plasmic/create-project-supabase-01.png)
+![create-project-supabase](/docs/img/guides/integrations/plasmic/create-project-supabase-01.png)
 
 - Navigate to the `Table Editor` on the left side navigation bar. Here we can create a `New table` to store our Pokemon entries. Make sure you are in the `schema public` view. Create a new table called `entries`, with 6 columns:
   - `id`: is a unique ID for the entry. This column should be generated automatically as the primary column.
@@ -37,11 +37,11 @@ At a high level,
 
 > Note: In this tutorial we’ve turned off “[Row Level Security (RLS)](https://supabase.com/docs/guides/auth/row-level-security)”. In practice, you will want to create policies that restrict who gets to create, edit, and delete posts. By turning this off, any user can modify the database without restrictions.
 
-![create-table-supabase](/img/guides/integrations/plasmic/create-table-supabase-02.png)
+![create-table-supabase](/docs/img/guides/integrations/plasmic/create-table-supabase-02.png)
 
 For your convenience, feel free to import the following CSV into Supabase to pre-populate your database. In order to import, you must select `Import data via spreadsheet`, in the new table dialog box. (It does not work on existing tables.)
 
-[pokedex-export.csv](/img/guides/integrations/plasmic/pokedex-export.csv)
+[pokedex-export.csv](/docs/img/guides/integrations/plasmic/pokedex-export.csv)
 
 ## Step 2: Set up your codebase
 
@@ -71,7 +71,7 @@ Navigate to [http://localhost:3000](http://localhost:3000) in your web browser. 
 
 If you pre-populated the database in Step 1. you should see the following homepage after logging in. Otherwise, feel free to add Pokemon manually via the UI.
 
-![application-screenshot](/img/guides/integrations/plasmic/application-screenshot-03.png)
+![application-screenshot](/docs/img/guides/integrations/plasmic/application-screenshot-03.png)
 
 ## Step 4: Clone the Plasmic project
 
@@ -80,7 +80,7 @@ Now let’s try to make some additions! The code base is currently configured to
 Open the default starter Plasmic project here:  
 [https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6](https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6)
 
-![clone-project-plasmic](/img/guides/integrations/plasmic/clone-project-plasmic-04.png)
+![clone-project-plasmic](/docs/img/guides/integrations/plasmic/clone-project-plasmic-04.png)
 
 To make an editable copy, click on the `Copy Project` button in the blue bar. This will clone the project and redirect you to your copy.
 
@@ -91,7 +91,7 @@ Take note of the `project ID` and `API token`. You can find the project ID in th
 
 The API token can be found by clicking the `Code` button in the top bar.
 
-![api-token-plasmic](/img/guides/integrations/plasmic/api-token-plasmic-05.png)
+![api-token-plasmic](/docs/img/guides/integrations/plasmic/api-token-plasmic-05.png)
 
 Now go back to `.env.local` and update the corresponding project ID and token fields.
 
@@ -131,7 +131,7 @@ Insert a `SupabaseGrid` by searching the AddDrawer (by clicking the blue + butto
 
 > For source see `components/CodeComponents/DatabaseComponents.tsx`
 
-![add-supabasegrid-plasmic](/img/guides/integrations/plasmic/add-supabasegrid-plasmic-07.png)
+![add-supabasegrid-plasmic](/docs/img/guides/integrations/plasmic/add-supabasegrid-plasmic-07.png)
 
 Then in the right-hand panel, configure the props on `SupabaseGrid`.
 
@@ -139,13 +139,13 @@ Then in the right-hand panel, configure the props on `SupabaseGrid`.
 - `tableColumns` are a comma-delimited list of columns you want to select from the table
 - We also set the number of columns and spacing shown in the grid
 
-![set-props-plasmic](/img/guides/integrations/plasmic/set-props-plasmic-08.png)
+![set-props-plasmic](/docs/img/guides/integrations/plasmic/set-props-plasmic-08.png)
 
 The `SupabaseGrid` will loop over the rows from the query.
 
 Now customize the repeated content by inserting instances of `SupabaseField`. Select the type of content and a selector string to fetch a single value. In the example below, we use `{{row.imageUrl}}` to retrieve the `imageUrl` column of the row. Apply any styling and layout you want on these elements.
 
-![add-supabasefield-plasmic](/img/guides/integrations/plasmic/add-supabasefield-plasmic-09.png)
+![add-supabasefield-plasmic](/docs/img/guides/integrations/plasmic/add-supabasefield-plasmic-09.png)
 
 ### Putting it all together (video)
 
@@ -266,16 +266,7 @@ Note that this code component is defined in your codebase. Feel free to augment 
 
 export function SupabaseGridCollection(props: SupabaseGridCollectionProps) {
   const supabaseQuery = React.useContext(SupabaseQueryContext)
-  const {
-    children,
-    columns,
-    columnGap,
-    rowGap,
-    count,
-    className,
-    loading,
-    testLoading,
-  } = props
+  const { children, columns, columnGap, rowGap, count, className, loading, testLoading } = props
 
   const result = supabaseQuery
   if (!result || testLoading) {
@@ -309,13 +300,7 @@ export function SupabaseGridCollection(props: SupabaseGridCollectionProps) {
 ```tsx
 // supabase-demo/components/CodeComponents/DisplayCollections.tsx
 
-export function SupabaseTextField({
-  name,
-  className,
-}: {
-  name?: string
-  className?: string
-}) {
+export function SupabaseTextField({ name, className }: { name?: string; className?: string }) {
   const contexts = useAllContexts()
   if (!name) {
     return <p>You need to set the name prop</p>

@@ -24,26 +24,26 @@ The procedure consists of five broad steps:
 ## Create a WorkOS Organization
 
 Log in to the dashboard and hop over to the Organizations tab to create and organization
-![Create an Organization](/img/guides/auth-workos/workos-create-organization.png)
+![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
 
 ## Obtain the Client ID and configure Redirect URI
 
 Head over to the Configuration tab and configure the redirect URI.The redirect URI should look like `https://<project-ref>.supabase.co/auth/v1/callback`
 Note that this is distinct from the redirect URI referred to in the Supabase dashboard
 
-![Fetch Client ID and configure Redirect URI](/img/guides/auth-workos/workos-clientid-redirect-uri.png)
+![Fetch Client ID and configure Redirect URI](/docs/img/guides/auth-workos/workos-clientid-redirect-uri.png)
 
 ## Obtain the WorkOS Secret
 
 Head over to the API Keys page and obtain the secret key.
 
-![WorkOS Secret Key](/img/guides/auth-workos/workos-secret-key.png)
+![WorkOS Secret Key](/docs/img/guides/auth-workos/workos-secret-key.png)
 
 ## Connect a WorkOS Supported Identity Provider
 
 Set up the identity provider by visiting the setup link.
 
-![Visiting the setup link](/img/guides/auth-workos/workos-setup-identity-provider.png)
+![Visiting the setup link](/docs/img/guides/auth-workos/workos-setup-identity-provider.png)
 
 You can pick between any one of the many identity providers that WorkOS supports.
 
@@ -62,18 +62,16 @@ When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/aut
 
 ```js
 async function signInWithWorkOS() {
-  const { data, error } = await supabase.auth.signInWithOAuth(
-    {
-      provider: 'workos',
-      options: {
-        queryParams: {
-          connection: '<your_connection>',
-          organization: '<your_organization',
-          provider: '<your_provider>',
-        }
-      }
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'workos',
+    options: {
+      queryParams: {
+        connection: '<your_connection>',
+        organization: '<your_organization',
+        provider: '<your_provider>',
+      },
     },
-  )
+  })
 }
 ```
 

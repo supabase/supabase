@@ -5,7 +5,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { NextPageWithLayout } from 'types'
 import { useStore, checkPermissions } from 'hooks'
 import { AuthLayout } from 'components/layouts'
-import { EmailTemplates, SmtpForm } from 'components/interfaces'
+import { EmailTemplates } from 'components/interfaces'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 
@@ -23,7 +23,6 @@ const PageLayout: NextPageWithLayout = () => {
   } else if (authConfig) {
     return (
       <FormsContainer>
-        <SmtpForm />
         <EmailTemplates />
       </FormsContainer>
     )

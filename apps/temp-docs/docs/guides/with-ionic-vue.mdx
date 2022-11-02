@@ -12,7 +12,7 @@ import ProjectSetup from './_partials/project_setup.mdx'
 
 <QuickstartIntro />
 
-![Supabase User Management example](/img/ionic-demos/ionic-angular-account.png)
+![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 ### GitHub
 
@@ -83,12 +83,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
         <form @submit.prevent="handleLogin">
           <ion-item>
             <ion-label position="stacked">Email</ion-label>
-            <ion-input
-              v-model="email"
-              name="email"
-              autocomplete
-              type="email"
-            ></ion-input>
+            <ion-input v-model="email" name="email" autocomplete type="email"></ion-input>
           </ion-item>
           <div class="ion-text-center">
             <ion-button type="submit" fill="clear">Login</ion-button>
@@ -185,20 +180,12 @@ Let's create a new component for that called `Account.vue`.
 
         <ion-item>
           <ion-label position="stacked">Name</ion-label>
-          <ion-input
-            type="text"
-            name="username"
-            v-model="profile.username"
-          ></ion-input>
+          <ion-input type="text" name="username" v-model="profile.username"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Website</ion-label>
-          <ion-input
-            type="url"
-            name="website"
-            v-model="profile.website"
-          ></ion-input>
+          <ion-input type="url" name="website" v-model="profile.website"></ion-input>
         </ion-item>
         <div class="ion-text-center">
           <ion-button fill="clear" type="submit">Update Profile</ion-button>
@@ -400,7 +387,7 @@ ionic serve
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase Ionic Vue](/img/ionic-demos/ionic-vue.png)
+![Supabase Ionic Vue](/docs/img/ionic-demos/ionic-vue.png)
 
 ## Bonus: Profile photos
 
@@ -470,9 +457,7 @@ Then create an **AvatarComponent**.
 
       const downloadImage = async () => {
         try {
-          const { data, error } = await supabase.storage
-            .from('avatars')
-            .download(path.value)
+          const { data, error } = await supabase.storage.from('avatars').download(path.value)
           if (error) throw error
           avatarUrl.value = URL.createObjectURL(data!)
         } catch (error: any) {
@@ -488,14 +473,9 @@ Then create an **AvatarComponent**.
           if (photo.dataUrl) {
             const file = await fetch(photo.dataUrl)
               .then((res) => res.blob())
-              .then(
-                (blob) =>
-                  new File([blob], 'my-file', { type: `image/${photo.format}` })
-              )
+              .then((blob) => new File([blob], 'my-file', { type: `image/${photo.format}` }))
 
-            const fileName = `${Math.random()}-${new Date().getTime()}.${
-              photo.format
-            }`
+            const fileName = `${Math.random()}-${new Date().getTime()}.${photo.format}`
             let { error: uploadError } = await supabase.storage
               .from('avatars')
               .upload(fileName, file)
