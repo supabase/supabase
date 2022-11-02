@@ -27,7 +27,7 @@ Let's start building the Svelte app from scratch.
 ### Initialize a Svelte app
 
 We can use the [SvelteKit Skeleton Project](https://kit.svelte.dev/docs) to initialize
-an app called `supabase-sveltekit` (for this tutorial you do not need TypeScript, ESLint, Prettier, or Playwright):
+an app called `supabase-sveltekit` (for this tutorial enable TypeScript, but you do not need ESLint, Prettier, or Playwright):
 
 ```bash
 npm init svelte@next supabase-sveltekit
@@ -59,8 +59,8 @@ import { env } from '$env/dynamic/public'
 export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
 ```
 
-And one optional step is to update the CSS file `public/global.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
+And one optional step is to add the CSS file at `src/routes/styles.css` to make the app look nice.
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/routes/styles.css).
 
 ### Supabase Auth Helpers
 
@@ -435,19 +435,17 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 ### Add the new widget
 
-And then we can add the widget to the Account page:
+And then we can add the widget to the Account component:
 
 ```html title="src/routes/Account.svelte"
 <script>
   // Import the new component
   import Avatar from './Avatar.svelte'
+
+  // ..rest of script...
 </script>
 
-<form
-  use:getProfile
-  class="form-widget"
-  on:submit|preventDefault="{updateProfile}"
->
+<form class="form-widget" on:submit|preventDefault="{updateProfile}">
   <!-- Add to body -->
   <Avatar bind:url={avatarUrl} size={10} on:upload={updateProfile} />
 
