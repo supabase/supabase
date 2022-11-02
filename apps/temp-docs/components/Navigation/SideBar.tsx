@@ -42,7 +42,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
 
   return (
     <div
-      className="dark:bg-scale-200 dark:border-scale-400 sidebar-width sticky top-8
+      className="dark:bg-scale-200 dark:border-scale-400 sidebar-width sticky top-10
       h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container"
     >
       {isInReferencePages && (
