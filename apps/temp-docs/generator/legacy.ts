@@ -44,7 +44,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
       if (hasTsRef && !tsDefinition) throw new Error('Definition not found: ' + hasTsRef)
 
       const description =
-        pageSpec.description || tsDocCommentToMdComment(getDescriptionFromDefintion(tsDefinition))
+        pageSpec.description || tsDocCommentToMdComment(getDescriptionFromDefinition(tsDefinition))
 
       // Create page
       const content = Page({
@@ -86,7 +86,7 @@ function generateParameters(tsDefinition: any) {
   return methodListGroup(parameters)
 }
 
-function getDescriptionFromDefintion(tsDefinition) {
+function getDescriptionFromDefinition(tsDefinition) {
   if (!tsDefinition) return null
   if (['Method', 'Constructor', 'Constructor signature'].includes(tsDefinition.kindString))
     return tsDefinition?.signatures[0].comment
