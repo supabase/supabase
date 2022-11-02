@@ -121,13 +121,13 @@ The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) sec
    npm
 
    ```sh
-   npm run start
+   npm run dev
    ```
 
    or with yarn
 
    ```sh
-   yarn start
+   yarn dev
    ```
 
 1. Access the local server in your web browser at http://localhost:3010/docs.
