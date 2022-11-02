@@ -187,7 +187,8 @@ pre[class*='language-'] {
 // format <code> inside <p>
 p code {
   word-break: keep-all !important;
-  padding: 0.1rem 0.25rem !important;
+  white-space: nowrap !important;
+  padding: 0.1rem 0.35rem !important;
 
   &:before {
     display: none;
@@ -195,4 +196,17 @@ p code {
   &::after {
     display: none;
   }
+}
+// code inside admonitions
+.admonition-content p code {
+  @apply bg-scale-300;
+}
+
+article p strong {
+  color: inherit !important;
+}
+
+// fix box shadow when <code> is inside <a>
+p a:has(code) {
+  box-shadow: none !important;
 }
