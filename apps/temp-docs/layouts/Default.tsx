@@ -57,7 +57,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               </article>
             </div>
             {toc && !meta?.hide_table_of_contents && (
-              <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-4">
+              <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-2">
                 <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-1 mt-1">
                   {toc.json
                     .filter((item) => item.lvl !== 1)
