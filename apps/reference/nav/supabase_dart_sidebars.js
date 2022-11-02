@@ -45,18 +45,6 @@ const sidebars = {
         'generated/rpc',
         {
           type: 'category',
-          label: 'Modifiers',
-          items: [
-            'generated/using-modifiers',
-            'generated/limit',
-            'generated/order',
-            'generated/range',
-            'generated/single',
-          ],
-          collapsed: true,
-        },
-        {
-          type: 'category',
           label: 'Filters',
           items: [
             'generated/using-filters',
@@ -83,6 +71,18 @@ const sidebars = {
             'generated/overlaps',
             'generated/textsearch',
             'generated/filter',
+          ],
+          collapsed: true,
+        },
+        {
+          type: 'category',
+          label: 'Modifiers',
+          items: [
+            'generated/using-modifiers',
+            'generated/limit',
+            'generated/order',
+            'generated/range',
+            'generated/single',
           ],
           collapsed: true,
         },
