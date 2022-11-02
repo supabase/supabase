@@ -33,9 +33,6 @@ slug: ${slug}
 custom_edit_url: ${specFileName}
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 ${description}
 
 ${spotlight}

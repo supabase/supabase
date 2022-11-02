@@ -12,7 +12,7 @@ import ProjectSetup from './_partials/project_setup.mdx'
 
 <QuickstartIntro />
 
-![Supabase User Management example](/img/user-management-demo.png)
+![Supabase User Management example](/docs/img/user-management-demo.png)
 
 ### GitHub
 
@@ -106,12 +106,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
         />
       </div>
       <div>
-        <button
-          type="submit"
-          class="button block"
-          aria-live="polite"
-          disabled="{loading}"
-        >
+        <button type="submit" class="button block" aria-live="polite" disabled="{loading}">
           <span>{loading ? 'Loading' : 'Send magic link'}</span>
         </button>
       </div>
@@ -262,7 +257,7 @@ And then open the browser to [localhost:5173](http://localhost:5173) and you sho
 
 > ⚠️ WARNING: Svelte uses Vite and the default port is `5173`, Supabase uses `port 3000`. To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:5173`
 
-![Supabase Svelte](/img/supabase-svelte-demo.png)
+![Supabase Svelte](/docs/img/supabase-svelte-demo.png)
 
 ## Bonus: Profile photos
 
@@ -288,9 +283,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
   const downloadImage = async (path: string) => {
     try {
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .download(path)
+      const { data, error } = await supabase.storage.from('avatars').download(path)
 
       if (error) {
         throw error
@@ -317,9 +310,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
 
-      let { error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file)
+      let { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (error) {
         throw error
@@ -340,8 +331,8 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 </script>
 
 <div style="width: {size}px" aria-live="polite">
-  {#if avatarUrl} <img src={avatarUrl} alt={avatarUrl ? 'Avatar' : 'No image'}
-  class="avatar image" style="height: {size}px, width: {size}px" /> {:else}
+  {#if avatarUrl} <img src={avatarUrl} alt={avatarUrl ? 'Avatar' : 'No image'} class="avatar image"
+  style="height: {size}px, width: {size}px" /> {:else}
   <div class="avatar no-image" style="height: {size}px, width: {size}px" />
   {/if}
   <div style="width: {size}px">
