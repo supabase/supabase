@@ -427,7 +427,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     <div className="cursor-pointer md:cursor-default" key={i}>
                       <Link href={job.absolute_url}>
                         <div className="text-xs bg-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center">
-                          <h2 className="text-2xl min-w-[316px] mr-6">{job.title}</h2>
+                          <h2 className="text-2xl min-w-[300px] lg:min-w-[316px] truncate mr-6">{job.title}</h2>
                           <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
                             <div className="flex items-center space-x-4">
                               <Badge className="rounded-md flex items-center lg:text-sm">
