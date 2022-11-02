@@ -4,56 +4,82 @@ const Frameworks = () => {
   const frameworks = [
     {
       name: 'Angular',
-      // logo: AngularLogo,
+      logo: {
+        light: '/docs/img/libraries/angular-icon.svg',
+        dark: '/docs/img/libraries/angular-icon.svg',
+      },
       href: '/guides/with-angular',
     },
     {
       name: 'Expo',
-      // logo: ExpoLogo,
+      logo: {
+        light: '/docs/img/libraries/expo-icon.svg',
+        dark: '/docs/img/libraries/expo-icon.svg',
+      },
       href: '/guides/with-expo',
     },
     {
       name: 'Flutter',
-      // logo: FlutterLogo,
+      logo: {
+        light: '/docs/img/libraries/dart-icon.svg',
+        dark: '/docs/img/libraries/dart-icon.svg',
+      },
       href: '/guides/with-flutter',
     },
     {
       name: 'JavaScript',
-      // logo: JavascriptLogo,
+      logo: {
+        light: '/docs/img/libraries/javascript-icon.svg',
+        dark: '/docs/img/libraries/javascript-icon.svg',
+      },
       href: '/reference/javascript/installing#javascript',
     },
     {
       name: 'Next.js',
-      themed: true,
       logo: {
-        dark: '/img/libraries/nextjs-dark-icon.svg',
-        light: '/img/libraries/nextjs-light-icon.svg',
+        light: '/docs/img/libraries/nextjs-light-icon.svg',
+        dark: '/docs/img/libraries/nextjs-dark-icon.svg',
       },
       href: '/guides/with-nextjs',
     },
     {
       name: 'React',
-      // logo: ReactLogo,
+      logo: {
+        light: '/docs/img/libraries/react-icon.svg',
+        dark: '/docs/img/libraries/react-icon.svg',
+      },
       href: '/guides/with-react',
     },
     {
       name: 'RedwoodJS',
-      // logo: RedwoodJsLogo,
+      logo: {
+        light: '/docs/img/libraries/redwoodjs-icon.svg',
+        dark: '/docs/img/libraries/redwoodjs-icon.svg',
+      },
       href: '/guides/with-redwoodjs',
     },
     {
       name: 'SolidJS',
-      // logo: SolidJSLogo,
+      logo: {
+        light: '/docs/img/libraries/solidjs-icon.svg',
+        dark: '/docs/img/libraries/solidjs-icon.svg',
+      },
       href: '/guides/with-solidjs',
     },
     {
       name: 'Svelte',
-      // logo: SvelteLogo,
+      logo: {
+        light: '/docs/img/libraries/svelte-icon.svg',
+        dark: '/docs/img/libraries/svelte-icon.svg',
+      },
       href: '/guides/with-svelte',
     },
     {
       name: 'Vue',
-      // logo: VuejsLogo,
+      logo: {
+        light: '/docs/img/libraries/vuejs-icon.svg',
+        dark: '/docs/img/libraries/vuejs-icon.svg',
+      },
       href: '/guides/with-vue-3',
     },
   ]
@@ -65,30 +91,8 @@ const Frameworks = () => {
             layout="horizontal"
             to={x.href}
             title={x.name}
-            // icon={
-            //   x.logo && !x.themed ? (
-            //     <x.logo
-            //       width="20"
-            //       alt={x.name}
-            //       style={{ display: 'block', maxHeight: 20, minWidth: 20 }}
-            //     />
-            //   ) : (
-            //     <ThemedImage
-            //       style={{
-            //         display: 'block',
-            //         maxHeight: 20,
-            //         minWidth: 20,
-            //         margin: 0,
-            //       }}
-            //       alt={x.name}
-            //       width="20"
-            //       sources={{
-            //         light: useBaseUrl(x.logo.light),
-            //         dark: useBaseUrl(x.logo.dark),
-            //       }}
-            //     />
-            //   )
-            // }
+            // [Joshen] Nice to have: theming
+            icon={x.logo.dark}
           />
         </div>
       ))}

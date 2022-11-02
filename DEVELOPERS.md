@@ -163,7 +163,7 @@ Did you have an issue, like a merge conflict, or don't know how to open a pull r
 
 ### Add a redirect
 
-Create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
+Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
 
 ## Monorepo
 
@@ -183,7 +183,7 @@ Then edit and visit any of the following sites:
 Site | Directory | Description | Local development server
 ---- | --------- | ----------- | ------------------------
 [supabase.com](https://supabase.com) | `/apps/www` | The main website | http://localhost:3000
-[supabase.com/docs](https://supabase.com/docs) | `apps/reference` | Guides and Reference documentaion | http://localhost:3010/docs
+[supabase.com/docs](https://supabase.com/docs) | `apps/reference` | Guides and Reference documentation | http://localhost:3010/docs
 [POC] Community forum | `/apps/temp-community-forum` | GitHub Discussions in a Next.js site | http://localhost:3002
 [POC] DEV articles site | `/apps/temp-community-tutorials` | A Next.js site for our DEV articles (which community members can write) | http://localhost:3003
 

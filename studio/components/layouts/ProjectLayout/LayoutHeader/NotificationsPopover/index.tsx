@@ -102,7 +102,7 @@ const NotificationsPopover: FC<Props> = () => {
       await app.projects.fetchDetail(projectToApplyMigration.ref, (project) => meta.setProjectDetails(project))
       ui.setNotification({
         category: 'success',
-        message: `Succesfully applied migration for project "${projectToApplyMigration.name}"`,
+        message: `Successfully applied migration for project "${projectToApplyMigration.name}"`,
       })
     } else {
       ui.setNotification({
@@ -124,7 +124,7 @@ const NotificationsPopover: FC<Props> = () => {
       await app.projects.fetchDetail(projectToRollbackMigration.ref, (project) => meta.setProjectDetails(project))
       ui.setNotification({
         category: 'success',
-        message: `Succesfully rolled back migration for project "${projectToRollbackMigration.name}"`,
+        message: `Successfully rolled back migration for project "${projectToRollbackMigration.name}"`,
       })
     } else {
       ui.setNotification({
@@ -146,7 +146,7 @@ const NotificationsPopover: FC<Props> = () => {
       await app.projects.fetchDetail(projectToFinalizeMigration.ref, (project) => meta.setProjectDetails(project))
       ui.setNotification({
         category: 'success',
-        message: `Succesfully finalized migration for project "${projectToFinalizeMigration.name}"`,
+        message: `Successfully finalized migration for project "${projectToFinalizeMigration.name}"`,
       })
     } else {
       ui.setNotification({
@@ -204,7 +204,7 @@ const NotificationsPopover: FC<Props> = () => {
                           setTargetNotification(notification)
                         }}
                       />
-                      {i !== notifications.length - 1 && <Popover.Seperator />}
+                      {i !== notifications.length - 1 && <Popover.Separator />}
                     </Fragment>
                   ))}
                 </>

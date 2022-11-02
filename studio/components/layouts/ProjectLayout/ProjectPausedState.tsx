@@ -135,7 +135,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
               </p>
             </div>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
               <Button

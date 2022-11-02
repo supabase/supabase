@@ -1,10 +1,10 @@
 const Tab = (library: string, exampleText: string) =>
   `
-<TabItem value="${library}">
+<TabPanel id="${library}" label="${library}">
 
 ${exampleText}
 
-</TabItem>
+</TabPanel>
 `.trim()
 
 export default Tab

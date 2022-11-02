@@ -7,12 +7,11 @@ sidebar_label: 'Next.js'
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
-import QuickstartIntro from './_partials/quickstart_intro.md'
 import ProjectSetup from './_partials/project_setup.mdx'
 
 <QuickstartIntro />
 
-![Supabase User Management example](/img/user-management-demo.png)
+![Supabase User Management example](/docs/img/user-management-demo.png)
 
 ### Video Guide
 
@@ -41,28 +40,27 @@ We can use [`create-next-app`](https://nextjs.org/docs/getting-started) to initi
 an app called `supabase-nextjs`:
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```bash
 npx create-next-app@latest --use-npm supabase-nextjs
 cd supabase-nextjs
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 ```bash
 npx create-next-app@latest --ts --use-npm supabase-nextjs
 cd supabase-nextjs
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 Then install the Supabase client library: [supabase-js](https://github.com/supabase/supabase-js)
@@ -97,13 +95,12 @@ npm install @supabase/auth-helpers-react @supabase/auth-helpers-nextjs
 ```
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
@@ -127,8 +124,8 @@ function MyApp({ Component, pageProps }) {
 export default MyApp
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
@@ -160,7 +157,7 @@ export default MyApp
 
 See the [Auth Helpers docs](/docs/guides/auth/auth-helpers/nextjs#usage-with-typescript) for more details on usage with TypeScript.
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### Supabase Auth UI
@@ -186,11 +183,7 @@ const Home = () => {
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
       {!session ? (
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          theme="dark"
-        />
+        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
       ) : (
         <p>Account page will go here.</p>
       )}
@@ -206,13 +199,12 @@ export default Home
 After a user is signed in we can allow them to edit their profile details and manage their account.
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Let's create a new component for that called `Account.js` within a `components` folder.
 
@@ -318,10 +310,7 @@ export default function Account({ session }) {
       </div>
 
       <div>
-        <button
-          className="button block"
-          onClick={() => supabase.auth.signOut()}
-        >
+        <button className="button block" onClick={() => supabase.auth.signOut()}>
           Sign Out
         </button>
       </div>
@@ -330,18 +319,14 @@ export default function Account({ session }) {
 }
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Let's create a new component for that called `Account.tsx` within a `components` folder.
 
 ```tsx title="components/Account.tsx"
 import { useState, useEffect } from 'react'
-import {
-  useUser,
-  useSupabaseClient,
-  Session,
-} from '@supabase/auth-helpers-react'
+import { useUser, useSupabaseClient, Session } from '@supabase/auth-helpers-react'
 import { Database } from '../utils/database.types'
 type Profiles = Database['public']['Tables']['profiles']['Row']
 
@@ -453,10 +438,7 @@ export default function Account({ session }: { session: Session }) {
       </div>
 
       <div>
-        <button
-          className="button block"
-          onClick={() => supabase.auth.signOut()}
-        >
+        <button className="button block" onClick={() => supabase.auth.signOut()}>
           Sign Out
         </button>
       </div>
@@ -465,7 +447,7 @@ export default function Account({ session }: { session: Session }) {
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Launch!
@@ -473,24 +455,19 @@ export default function Account({ session }: { session: Session }) {
 Now that we have all the components in place, let's update `pages/index.js`:
 
 ```jsx title="pages/index.js"
-import type { NextPage } from 'next'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 // highlight-next-line
 import Account from '../components/Account'
 
-const Home: NextPage = () => {
+const Home = () => {
   const session = useSession()
   const supabase = useSupabaseClient()
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
       {!session ? (
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          theme="dark"
-        />
+        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
       ) : (
         // highlight-next-line
         <Account session={session} />
@@ -520,13 +497,12 @@ photos and videos.
 Let's create an avatar widget for the user so that they can upload a profile photo. We can start by creating a new component:
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```jsx title="components/Avatar.js"
 import React, { useEffect, useState } from 'react'
@@ -543,9 +519,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
 
   async function downloadImage(path) {
     try {
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .download(path)
+      const { data, error } = await supabase.storage.from('avatars').download(path)
       if (error) {
         throw error
       }
@@ -596,10 +570,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
           style={{ height: size, width: size }}
         />
       ) : (
-        <div
-          className="avatar no-image"
-          style={{ height: size, width: size }}
-        />
+        <div className="avatar no-image" style={{ height: size, width: size }} />
       )}
       <div style={{ width: size }}>
         <label className="button primary block" htmlFor="single">
@@ -622,8 +593,8 @@ export default function Avatar({ uid, url, size, onUpload }) {
 }
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 ```tsx title="components/Avatar.tsx"
 import React, { useEffect, useState } from 'react'
@@ -652,9 +623,7 @@ export default function Avatar({
 
   async function downloadImage(path: string) {
     try {
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .download(path)
+      const { data, error } = await supabase.storage.from('avatars').download(path)
       if (error) {
         throw error
       }
@@ -665,9 +634,7 @@ export default function Avatar({
     }
   }
 
-  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (
-    event
-  ) => {
+  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
     try {
       setUploading(true)
 
@@ -707,10 +674,7 @@ export default function Avatar({
           style={{ height: size, width: size }}
         />
       ) : (
-        <div
-          className="avatar no-image"
-          style={{ height: size, width: size }}
-        />
+        <div className="avatar no-image" style={{ height: size, width: size }} />
       )}
       <div style={{ width: size }}>
         <label className="button primary block" htmlFor="single">
@@ -733,7 +697,7 @@ export default function Avatar({
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Add the new widget
@@ -771,6 +735,6 @@ At this stage you have a fully functional application!
 - Explore the [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-helpers/auth-ui).
 - Explore the [Auth Helpers for Next.js](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
 - Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers).
-- See the [Next.js Supscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub.
+- See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub.
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Sign in: [app.supabase.com](https://app.supabase.com)

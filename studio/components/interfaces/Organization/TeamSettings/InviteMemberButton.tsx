@@ -180,7 +180,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
                     </div>
                   </div>
                 </Modal.Content>
-                <Modal.Seperator />
+                <Modal.Separator />
                 <Modal.Content>
                   <div className="pt-2 pb-3">
                     <Button

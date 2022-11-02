@@ -163,7 +163,7 @@ const BillingUpdate: NextPageWithLayout = () => {
               </p>
             </div>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
               <Button

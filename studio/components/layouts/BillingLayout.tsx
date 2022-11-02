@@ -18,7 +18,7 @@ const BillingLayout: FC<Props> = ({ children }) => {
       <div className="flex h-full w-full flex-col">
         {/* Header */}
         <div className="flex items-center space-x-4 border-b py-4 px-5 dark:border-dark">
-          <Link href={`/project/${ui.selectedProject?.ref}/settings/billing`} passHref>
+          <Link href={`/project/${ui.selectedProject?.ref}/settings/billing/subscription`} passHref>
             <a className="text-scale-900 transition-colors hover:text-scale-1200">
               <IconX size={16} strokeWidth={1.5} />
             </a>

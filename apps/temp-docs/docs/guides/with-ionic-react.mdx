@@ -5,14 +5,9 @@ description: Learn how to use Supabase in your Ionic React App.
 sidebar_label: Ionic React
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
-import QuickstartIntro from './_partials/quickstart_intro.md'
-import ProjectSetup from './_partials/project_setup.mdx'
-
 <QuickstartIntro />
 
-![Supabase User Management example](/img/ionic-demos/ionic-angular-account.png)
+![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 ### GitHub
 
@@ -316,13 +311,13 @@ import { Session } from '@supabase/supabase-js'
 setupIonicReact()
 
 const App: React.FC = () => {
-  const [session, setSession] = (useState < Session) | (null > null)
+  const [session, setSession] = useState < Session > null
   useEffect(() => {
     setSession(supabase.auth.session())
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
-  }, [session])
+  }, [])
   return (
     <IonApp>
       <IonReactRouter>
@@ -354,7 +349,7 @@ ionic serve
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase Ionic React](/img/ionic-demos/ionic-react.png)
+![Supabase Ionic React](/docs/img/ionic-demos/ionic-react.png)
 
 ## Bonus: Profile photos
 

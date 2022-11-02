@@ -26,7 +26,7 @@ Global variables can be overridden at root like this:
 }
 ```
 
-Styles can be overriden like this:
+Styles can be overridden like this:
 
 ```css
 #__docusaurus {

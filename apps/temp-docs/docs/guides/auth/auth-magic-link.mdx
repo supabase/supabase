@@ -26,12 +26,12 @@ Setting up Magic Link logins for your Supabase application.
 ## Add login code to your client app
 
 <Tabs
-  defaultValue="js"
-  groupId="guides/auth"
-  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
 >
-
-<TabItem value="js">
+<TabPanel id="js" label="JavaScript">
 
 When your user signs in, call [signInWithOtp()](/docs/reference/javascript/auth-signinwithotp) with their email address:
 
@@ -43,9 +43,8 @@ async function signInWithEmail() {
 }
 ```
 
-</TabItem>
-
-<TabItem value="dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 When your user signs in, call [signIn()](/docs/reference/dart/auth-signinwithotp) with their email address:
 
@@ -55,17 +54,16 @@ Future<void> signInWithEmail() async {
 }
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 <Tabs
-  defaultValue="js"
-  groupId="guides/auth"
-  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
 >
-
-<TabItem value="js">
+<TabPanel id="js" label="JavaScript">
 
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
@@ -75,9 +73,8 @@ async function signOut() {
 }
 ```
 
-</TabItem>
-
-<TabItem value="dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
 
@@ -87,8 +84,7 @@ Future<void> signOut() async {
 }
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ## Resources

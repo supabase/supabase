@@ -16,14 +16,12 @@ When you use the `JSONB` format, the data is parsed when it's put into the datab
 ## Create a table with a JSON column
 
 <Tabs
-  groupId="json"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
 2. Click **New Table** and create a table called `books`.
@@ -43,9 +41,8 @@ When you use the `JSONB` format, the data is parsed when it's put into the datab
      - Name: `metadata`
      - Type: `jsonb`
 
-</TabItem>
-
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 create table books (
@@ -56,21 +53,18 @@ create table books (
 );
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Insert data into the table
 
 <Tabs
-  groupId="json"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
 2. Select the `books` table in the sidebar.
@@ -84,9 +78,8 @@ create table books (
 | 4   | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                 |
 
-</TabItem>
-
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 insert into books
@@ -119,9 +112,8 @@ values
   );
 ```
 
-</TabItem>
-
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const { data, error } = await supabase.from('books').insert([
@@ -156,8 +148,7 @@ const { data, error } = await supabase.from('books').insert([
     title: 'Green Eggs and Ham',
     author: 'Dr. Seuss',
     metadata: {
-      description:
-        'Sam has changing food preferences and eats unusually colored food.',
+      description: 'Sam has changing food preferences and eats unusually colored food.',
       price: 7.49,
       ages: [4, 8],
     },
@@ -174,39 +165,34 @@ const { data, error } = await supabase.from('books').insert([
 ])
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## View the data
 
 <Tabs
-  groupId="json"
-  defaultValue="sql"
-  values={[
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-    {label: 'Result', value: 'result'},
-  ]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select *
 from books;
 ```
 
-</TabItem>
-
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const { data, error } = await supabase.from('books').select('*')
 console.log(JSON.stringify(data, null, 2))
 ```
 
-</TabItem>
-
-<TabItem value="result">
+</TabPanel>
+<TabPanel id="result" label="Result">
 
 | id  | title                               | author                 | metadata                                                                                                       |
 | --- | ----------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -218,7 +204,7 @@ console.log(JSON.stringify(data, null, 2))
 
 The data as it appears here has the `JSONB` fields in a different order than when inserted. As mentioned earlier, data is parsed as its inserted when using the JSONB format.
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Query the `JSONB` data
@@ -226,15 +212,12 @@ The data as it appears here has the `JSONB` fields in a different order than whe
 Select the title, description, price, and age range for each book.
 
 <Tabs
-  groupId="json"
-  defaultValue="sql"
-  values={[
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-    {label: 'Result', value: 'result'}
-  ]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select
@@ -247,9 +230,8 @@ from
   books;
 ```
 
-</TabItem>
-
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const { data, error } = await supabase
@@ -260,9 +242,8 @@ const { data, error } = await supabase
 console.log(JSON.stringify(data, null, 2))
 ```
 
-</TabItem>
-
-<TabItem value="result">
+</TabPanel>
+<TabPanel id="result" label="Result">
 
 | title                               | description                                                        | price | low_age | high_age |
 | ----------------------------------- | ------------------------------------------------------------------ | ----- | ------- | -------- |
@@ -272,7 +253,7 @@ console.log(JSON.stringify(data, null, 2))
 | Green Eggs and Ham                  | Sam has changing food preferences and eats unusually colored food. | 7.49  | 4       | 8        |
 | Harry Potter and the Goblet of Fire | Fourth year of school starts, big drama ensues.                    | 24.95 | 10      | 99       |
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 Note that the `->` operator returns JSONB data. If you want TEXT/STRING data returned, use the `->>` operator.

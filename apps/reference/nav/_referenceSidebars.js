@@ -93,6 +93,7 @@ const sidebars = {
             'guides/auth/auth-helpers/auth-ui',
             'guides/auth/auth-helpers/nextjs',
             'guides/auth/auth-helpers/sveltekit',
+            'guides/auth/auth-helpers/remix',
           ],
         },
         {
@@ -120,12 +121,13 @@ const sidebars = {
         'guides/database/functions',
         'guides/database/webhooks',
         'guides/database/full-text-search',
+        'guides/database/testing',
         // 'guides/database/json',
         // 'guides/database/arrays',
         // 'guides/database/sql-to-api',
         {
           type: 'category',
-          label: 'Data APIs',
+          label: 'Serverless APIs',
           collapsed: true,
           items: ['guides/api', 'guides/api/generating-types'],
         },
@@ -175,6 +177,7 @@ const sidebars = {
         'guides/realtime',
         'guides/realtime/quickstart',
         'guides/realtime/postgres-cdc',
+        'guides/realtime/rate-limits',
       ],
     },
     {
@@ -190,7 +193,7 @@ const sidebars = {
       items: [
         'guides/hosting/platform',
         'guides/platform/custom-domains',
-        'guides/platform/disk-usage',
+        'guides/platform/database-usage',
         'guides/platform/logs',
         'guides/platform/metrics',
         'guides/platform/migrating-and-upgrading-projects',
@@ -311,6 +314,7 @@ const sidebars = {
       collapsed: false,
       items: [
         { type: 'link', label: 'Auth Server', href: '/reference/auth' },
+        { type: 'link', label: 'Realtime Server', href: '/reference/realtime' },
         { type: 'link', label: 'Storage Server', href: '/reference/storage' },
       ],
     },
