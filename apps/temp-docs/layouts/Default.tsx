@@ -29,7 +29,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
         <title>{meta?.title} | Supabase</title>
         <meta name="description" content={meta?.description} />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/docs/favicon.ico" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={meta?.title} />
         <meta property="og:description" content={meta?.description} />

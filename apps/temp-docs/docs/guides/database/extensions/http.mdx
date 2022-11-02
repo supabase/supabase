@@ -38,20 +38,19 @@ You can use the `http` extension to make these network requests from Postgres.
 ### Enable the extension
 
 <Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "http" and enable the extension.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Example: enable the "http" extension
@@ -66,8 +65,7 @@ To disable an extension, call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ### Available functions

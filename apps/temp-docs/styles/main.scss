@@ -158,7 +158,28 @@ pre[class*='language-'] {
   }
 }
 
+<<<<<<< HEAD
 // ToC styles
 .toc__menu-item--active {
   color: var(--colors-brand9) !important;
 }
+=======
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+.admonition-content > p {
+  @apply m-0;
+}
+>>>>>>> 5621209861bab5be01b13620a346bdf1da80f4a0

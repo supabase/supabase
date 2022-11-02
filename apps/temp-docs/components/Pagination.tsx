@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { IconArrowLeft, IconArrowRight } from 'ui'
 
-const pagination = ({ currentPage, totalCount }: { currentPage: number; totalCount: number }) => {
+const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCount: number }) => {
   // TODO: not sure if this is the most efficient way to do this. may need to refactor.
   const totalArray = Array.from({ length: totalCount }, (_, i: number) => i + 1)
   const pages = totalArray.filter((page: number) => {
@@ -50,4 +50,4 @@ const pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
   )
 }
 
-export default pagination
+export default Pagination

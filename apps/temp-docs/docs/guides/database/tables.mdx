@@ -25,7 +25,7 @@ There are a few important differences from a spreadsheet, but it's a good starti
 
 When creating a table, it's best practice to add columns at the same time.
 
-![Tables and columns](/img/guides/database/tables-columns.png)
+![Tables and columns](/docs/img/guides/database/tables-columns.png)
 
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
 
@@ -34,22 +34,15 @@ We provide a SQL editor within the Dashboard, or you can [connect](../../guides/
 and run the SQL queries yourself.
 
 <Tabs
-  groupId="dashboard-or-sql"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 <video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/api/api-create-table-sm.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+  <source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
 </video>
 
 1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
@@ -58,8 +51,8 @@ and run the SQL queries yourself.
 4. Click **New Column** and create a column with the name `task` and type `text`.
 5. Click **Save**.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 create table movies (
@@ -69,12 +62,14 @@ create table movies (
 );
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
-:::note
+<Admonition type="note">
+
 When naming tables, use lowercase and underscores instead of spaces (e.g., `table_name`, not `Table Name`).
-:::
+
+</Admonition>
 
 ## Columns
 
@@ -178,14 +173,12 @@ Use the "Bulk Loading" instructions if you are loading large data sets.
 ### Basic data loading
 
 <Tabs
-  defaultValue="sql"
-  values={[
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-    {label: 'Dart', value: 'dart'},
-  ]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 insert into movies
@@ -195,9 +188,8 @@ values
   ('Return of the Jedi', 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.');
 ```
 
-</TabItem>
-
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```sql
 const { data, error } = await supabase
@@ -211,9 +203,8 @@ const { data, error } = await supabase
   }])
 ```
 
-</TabItem>
-
-<TabItem value="dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```sql
 final res = await supabase
@@ -227,7 +218,7 @@ final res = await supabase
   }]).execute();
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Bulk data loading
@@ -253,7 +244,7 @@ psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
 
 Tables can be "joined" together using Foreign Keys.
 
-![Foreign Keys](/img/guides/database/foreign-keys.png)
+![Foreign Keys](/docs/img/guides/database/foreign-keys.png)
 
 This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
 
@@ -278,14 +269,12 @@ For example if you had the following situations:
 - An `actor` can perfom in several movies.
 
 <Tabs
-  groupId="dashboard-or-sql"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 <div class="video-container">
   <iframe
@@ -296,9 +285,8 @@ For example if you had the following situations:
   ></iframe>
 </div>
 
-</TabItem>
-
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 create table movies (
@@ -319,14 +307,14 @@ create table performances (
 );
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Schemas
 
 Tables belong to `schemas`. Schemas are a way of organizing your tables, often for security reasons.
 
-![Schemas and tables](/img/guides/database/schema-tables.png)
+![Schemas and tables](/docs/img/guides/database/schema-tables.png)
 
 If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema.
 
@@ -350,11 +338,11 @@ create table salaries (
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
 
-:::caution
+<Admonition type="caution">
 
 By default, PostgreSQL views bypass Row Level Security unless you change their owner (see https://github.com/supabase/supabase/discussions/901). PostgreSQL v15 (coming soon) will have a more intuitive control for this through [security invoker views](https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/) and the previous step won't be needed.
 
-:::
+</Admonition>
 
 Say we have the following tables from a database of a university:
 

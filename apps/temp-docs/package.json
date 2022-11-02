@@ -27,7 +27,7 @@
     "gen:supabase-js:v1": "npm-run-all gen:supabase-js:v1:ref",
     "gen:supabase-js:v1:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v1.yml --output ./docs/reference/javascript/v1/generated",
     "gen:supabase-js:v2": "npm-run-all gen:supabase-js:v2:ref",
-    "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./docs/reference/javascript/generated"
+    "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2_temp.yml --output ./docs/reference/javascript/generated"
   },
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",

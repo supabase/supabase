@@ -1,4 +1,4 @@
-import { getAnchor, removeAnchor, highlightSelectedTocItem } from './CustomMDX.utils'
+import { getAnchor, removeAnchor, highlightSelectedTocItem } from './CustomHTMLElements.utils'
 import { useInView } from 'react-intersection-observer'
 
 const Heading = ({ tag, children }) => {
