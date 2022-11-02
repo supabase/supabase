@@ -25,7 +25,7 @@ simplicity, so we also refer to it as Postgres.
 
 You don't have to be a database expert to start using Supabase. Our table view makes Postgres as easy to use as a spreadsheet.
 
-![Table View.](/img/table-view.png)
+![Table View.](/docs/img/table-view.png)
 
 ### Relationships
 
@@ -40,12 +40,7 @@ Dig into the relationships within your data.
 You can duplicate your tables, just like you would inside a spreadsheet.
 
 <video width="99%" muted playsInline controls={true}>
-  <source
-    src="/docs/videos/duplicate-tables.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+  <source src="/docs/videos/duplicate-tables.mp4" type="video/mp4" muted playsInline />
 </video>
 
 ### The SQL Editor
@@ -63,9 +58,13 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 - Supabase manages your database backups.
 - Import data directly from a CSV or excel spreadsheet.
 
-:::info
-Database backups **do not** include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.
-:::
+<Admonition type="note">
+
+Database backups **do not** include objects stored via the Storage API, as the database only
+includes metadata about these objects. Restoring an old backup does not restore objects that have
+been deleted since then.
+
+</Admonition>
 
 ### Extensions
 
@@ -73,12 +72,7 @@ To expand the functionality of your Postgres database, you can use extensions.
 You can enable Postgres extensions with the click of a button within the Supabase dashboard.
 
 <video width="99%" muted playsInline controls={true}>
-  <source
-    src="/docs/videos/toggle-extensions.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+  <source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
 [Learn more](/docs/guides/database/extensions) about all the extensions provided on Supabase.
