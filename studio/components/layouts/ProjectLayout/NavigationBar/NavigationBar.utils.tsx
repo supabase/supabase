@@ -50,6 +50,20 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
         ref &&
         (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
+    {
+      key: 'graphiql',
+      label: 'GraphiQL',
+      icon: (
+        <SVG
+          src="/img/graphql.svg"
+          style={{ width: `${18}px`, height: `${18}px` }}
+          preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
+        />
+      ),
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/graphiql`),
+    },
   ]
 }
 export const generateProductRoutes = (ref?: string, project?: ProjectBase): Route[] => {
