@@ -26,7 +26,7 @@ Select the same `Region` you host your app's backend in.
 
 Click `Create new project`.
 
-![New Supabase project settings](/img/guides/integrations/supertokens/supabase_dashboard_create.png)
+![New Supabase project settings](/docs/img/guides/integrations/supertokens/supabase_dashboard_create.png)
 
 ## Step 2: Creating tables in Supabase
 
@@ -45,7 +45,7 @@ Create two new columns:
 
 Click `Save` to create the new table.
 
-![Users table](/img/guides/integrations/supertokens/supabase_table_create.png)
+![Users table](/docs/img/guides/integrations/supertokens/supabase_table_create.png)
 
 ## Step 3: Setup your Next.js App with SuperTokens.
 
@@ -53,7 +53,7 @@ Since the scope of this guide is limited to the integration between SuperTokens 
 
 Once you finish setting up your app, you will be greeted with the following screen
 
-![SuperTokens Auth Screen](/img/guides/integrations/supertokens/supertokens_thirdpartyemailpassword_auth_screen.png)
+![SuperTokens Auth Screen](/docs/img/guides/integrations/supertokens/supertokens_thirdpartyemailpassword_auth_screen.png)
 
 ## Step 4: Creating a Supabase JWT to access Supabase
 
@@ -294,10 +294,7 @@ function ProtectedPage() {
       const supabase = getSupabase(accessTokenPayload.supabase_token)
 
       // retrieve the user's name from the users table whose email matches the email in the JWT
-      const { data } = await supabase
-        .from('users')
-        .select('email')
-        .eq('user_id', userId)
+      const { data } = await supabase.from('users').select('email').eq('user_id', userId)
 
       if (data.length > 0) {
         setEmail(data[0].email)
@@ -363,11 +360,11 @@ Our first policy will check whether the user is the owner of the email.
 
 Select `Authentication` from the Supabase sidebar menu, click `Policies`, and then `New Policy` on the `Users` table.
 
-![Create new policy](/img/guides/integrations/supertokens/create_policy.png)
+![Create new policy](/docs/img/guides/integrations/supertokens/create_policy.png)
 
 From the modal, select `Create a policy from scratch` and add the following.
 
-![Policy settings for SELECT](/img/guides/integrations/supertokens/policy_config_select.png)
+![Policy settings for SELECT](/docs/img/guides/integrations/supertokens/policy_config_select.png)
 
 This policy is calling the PostgreSQL function we just created to get the currently logged in user's ID `auth.user_id()` and checking whether this matches the `user_id` column for the current `email`. If it does, then it will allow the user to select it, otherwise it will continue to deny.
 
@@ -379,7 +376,7 @@ Our second policy will check whether the `user_id` being inserted is the same as
 
 Create another policy and add the following:
 
-![Policy settings for INSERT](/img/guides/integrations/supertokens/policy_config_insert.png)
+![Policy settings for INSERT](/docs/img/guides/integrations/supertokens/policy_config_insert.png)
 
 Similar to the previous policy we are calling the PostgreSQL function we created to get the currently logged in user's ID `auth.user_id()` and check whether this matches the `user_id` column for the row we are trying to insert. If it does, then it will allow the user to insert the row, otherwise it will continue to deny.
 
@@ -389,11 +386,11 @@ Click `Review` and then `Save policy`.
 
 You can now sign up and you should see the following screen:
 
-![SuperTokens App Authenticated](/img/guides/integrations/supertokens/supabase_app_authenticated_screen.png)
+![SuperTokens App Authenticated](/docs/img/guides/integrations/supertokens/supabase_app_authenticated_screen.png)
 
 If you navigate to your table you should see a new row with the user's `user_id` and `email`.
 
-![Supabase Users table](/img/guides/integrations/supertokens/table_with_user.png)
+![Supabase Users table](/docs/img/guides/integrations/supertokens/table_with_user.png)
 
 ## Resources
 

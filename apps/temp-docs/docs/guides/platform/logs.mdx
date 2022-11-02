@@ -7,14 +7,15 @@ description: Getting started with Supabase Platform Log Browser
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import ThemedImage from '@theme/ThemedImage'
-import useBaseUrl from '@docusaurus/useBaseUrl'
 
 The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
 
-:::note
+<Admonition type="note">
+
 These features are not currently available for self-hosting and local development.<br/>
 This is on the roadmap and you can follow the progress in the [Logflare repository](https://github.com/Logflare/logflare).
-:::
+
+</Admonition>
 
 ## Product Logs
 
@@ -24,15 +25,20 @@ Supabase provides a logging interface specific to each product. You can use simp
 To update the screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example.
 -->
 
-<Tabs>
-  <TabItem value="api" label="API" default>
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="api"
+>
+<TabPanel id="api" label="API">
 
 [API logs](https://app.supabase.com/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/api).
 
-![API Logs](/img/guides/platform/logs/logs-api.png)
+![API Logs](/docs/img/guides/platform/logs/logs-api.png)
 
-  </TabItem>
-  <TabItem value="postgres" label="Postgres">
+</TabPanel>
+<TabPanel id="postgres" label="Postgres">
 
 [Postgres logs](https://app.supabase.com/project/_/database/postgres-logs) show queries and activity for your [database](../../guides/database).
 
@@ -61,31 +67,31 @@ To remove a system-wide setting, you can use (followed by a db reboot):
 alter system reset pgaudit.log
 ```
 
-![Postgres Logs](/img/guides/platform/logs/logs-database.png)
+![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
 
-  </TabItem>
-  <TabItem value="auth" label="Auth">
+</TabPanel>
+<TabPanel id="auth" label="Auth">
 
 [Auth logs](https://app.supabase.com/project/_/auth/logs) show all server logs for your [Auth usage](../../guides/auth).
 
-![Auth Logs](/img/guides/platform/logs/logs-auth.png)
+![Auth Logs](/docs/img/guides/platform/logs/logs-auth.png)
 
-  </TabItem>
-  <TabItem value="storage" label="Storage">
+</TabPanel>
+<TabPanel id="storage" label="Storage">
 
 [Storage logs](https://app.supabase.com/project/_/storage/logs) shows all server logs for your [Storage API](../../guides/storage).
 
-![Storage Logs](/img/guides/platform/logs/logs-storage.png)
+![Storage Logs](/docs/img/guides/platform/logs/logs-storage.png)
 
-  </TabItem>
-  <TabItem value="realtime" label="Realtime">
+</TabPanel>
+<TabPanel id="realtime" label="Realtime">
 
 [Realtime logs](https://app.supabase.com/project/_/database/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
 
-![Realtime Logs](/img/guides/platform/logs/logs-realtime.png)
+![Realtime Logs](/docs/img/guides/platform/logs/logs-realtime.png)
 
-  </TabItem>
-  <TabItem value="functions" label="Edge Functions">
+</TabPanel>
+<TabPanel id="functions" label="Edge Functions">
 
 For each [Edge Function](https://app.supabase.com/project/_/functions), logs are available under the following tabs:
 
@@ -93,22 +99,22 @@ For each [Edge Function](https://app.supabase.com/project/_/functions), logs are
 
 The Invocations tab displays the edge logs of function calls.
 
-![Function Edge Logs](/img/guides/platform/logs/logs-functions-edge.png)
+![Function Edge Logs](/docs/img/guides/platform/logs/logs-functions-edge.png)
 
 **Logs**
 
 The Logs tab displays logs emitted during function execution.
 
-![Function Logs](/img/guides/platform/logs/logs-functions.png)
+![Function Logs](/docs/img/guides/platform/logs/logs-functions.png)
 
-  </TabItem>
+</TabPanel>
 </Tabs>
 
 ## Logs Explorer
 
 The [Logs Explorer](https://app.supabase.com/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
 
-![Logs Explorer](/img/guides/platform/logs/logs-explorer.png)
+![Logs Explorer](/docs/img/guides/platform/logs/logs-explorer.png)
 
 You can access the following logs from the **Sources** drop-down:
 
@@ -157,8 +163,8 @@ The resulting `metadata` key is rendered as an array of objects in the Logs Expl
 <ThemedImage
   alt="Without Unnesting"
   sources={{
-    light: useBaseUrl('/img/guides/platform/logs/unnesting-none.png'),
-    dark: useBaseUrl('/img/guides/platform/logs/unnesting-none-dark.png'),
+    light: '/docs/img/guides/platform/logs/unnesting-none.png',
+    dark: '/docs/img/guides/platform/logs/unnesting-none-dark.png',
   }}
   style={{ maxHeight: 200 }}
 />
@@ -180,8 +186,8 @@ This surfaces the following columns available for selection:
 <ThemedImage
   alt="With Two Level Unnesting"
   sources={{
-    light: useBaseUrl('/img/guides/platform/logs/unnesting-2.png'),
-    dark: useBaseUrl('/img/guides/platform/logs/unnesting-2-dark.png'),
+    light: '/docs/img/guides/platform/logs/unnesting-2.png',
+    dark: '/docs/img/guides/platform/logs/unnesting-2-dark.png',
   }}
   style={{ maxHeight: 200 }}
 />
