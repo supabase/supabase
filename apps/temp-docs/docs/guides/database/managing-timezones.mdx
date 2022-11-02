@@ -14,19 +14,19 @@ This is because it makes it much easier to calculate differences between timezon
 ### Change timezone
 
 <Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 alter database postgres
 set timezone to 'America/New_York';
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ### Full list of timezones
@@ -39,11 +39,12 @@ Get a full list of timezones supported by your database. This will return the fo
 - `is_dst`: True if currently observing daylight savings
 
 <Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select name, abbrev, utc_offset, is_dst
@@ -51,8 +52,7 @@ from pg_timezone_names()
 order by name;
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ### Search for a specific timezone
@@ -60,11 +60,12 @@ order by name;
 Use `ilike` (case insensitive search) to find specific timezones.
 
 <Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select *
@@ -72,6 +73,5 @@ from pg_timezone_names()
 where name ilike '%york%';
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>

@@ -3,7 +3,6 @@ import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
-import { Modal } from 'ui'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
@@ -24,15 +23,13 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
     }
   }, [])
 
-  console.log('Default:Layout', { currentPage })
-
   return (
     <>
       <Head>
         <title>{meta?.title} | Supabase</title>
         <meta name="description" content={meta?.description} />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/docs/favicon.ico" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={meta?.title} />
         <meta property="og:description" content={meta?.description} />
@@ -52,7 +49,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${
-                meta?.hide_table_of_contents ? 'col-span-12' : 'col-span-12 xl:col-span-8'
+                meta?.hide_table_of_contents ? 'col-span-10' : 'col-span-12 xl:col-span-9'
               } py-4 px-8`}
             >
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
@@ -60,7 +57,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               </article>
             </div>
             {toc && !meta?.hide_table_of_contents && (
-              <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-4 border-l px-4">
+              <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-4">
                 <h5>On this page</h5>
                 <ul className="list-none pl-2 text-[0.8rem]">
                   {toc.json.map((item: any, i: number) => {

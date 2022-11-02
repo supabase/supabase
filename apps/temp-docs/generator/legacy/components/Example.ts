@@ -5,9 +5,11 @@ const Example = ({ name, description = '', tabs = '', note = '' }: params) => {
     const [noteTitle, ...noteText] = note.split('\n')
     console.log(noteText)
     note = `
-:::note ${noteTitle}
-  ${noteText.join('\n')}
-:::
+<Admonition type="${noteTitle}">
+  
+${noteText.join('\n')}
+
+</Admonition>
 `
   }
   return `

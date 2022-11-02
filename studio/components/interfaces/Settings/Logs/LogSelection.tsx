@@ -18,6 +18,7 @@ import {
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import Connecting from 'components/ui/Loading/Loading'
 import CopyButton from 'components/ui/CopyButton'
+import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -57,6 +58,10 @@ const LogSelection: FC<LogSelectionProps> = ({
       case 'functions':
         if (!fullLog) return null
         return <FunctionLogsSelectionRender log={fullLog} />
+
+      case 'auth':
+        if (!fullLog) return null
+        return <AuthSelectionRenderer log={fullLog} />
 
       default:
         if (queryType && fullLog && isDefaultLogPreviewFormat(fullLog)) {

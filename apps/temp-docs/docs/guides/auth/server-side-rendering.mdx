@@ -22,10 +22,12 @@ Most Supabase projects have their auth server listening on
 set as `sb-access-token` and `sb-refresh-token` cookies on the
 `<project-ref>.supabase.co` domain.
 
-:::note
+<Admonition type="note">
+
 These cookie names are for internal Supabase use only and may change without
 warning. They are included in this guide for illustration purposes only.
-:::
+
+</Admonition>
 
 Web browsers limit access to cookies across domains, consistent with the
 [Same-Origin Policy
@@ -44,10 +46,12 @@ or use a social login (if you have any setup in your project).
 Upon successful verification of the identity of the user, the Supabase Auth
 server redirects the user back to your single-page app.
 
-:::tip
+<Admonition type="tip">
+
 You can configure [redirects URLs](https://app.supabase.com/project/_/auth/settings) in the Supabase Dashboard. You can use wildcard match patterns
 like `*` and `**` to allow redirects to different forms of URLs.
-:::
+
+</Admonition>
 
 These redirect URLs have the following structure:
 
@@ -63,7 +67,8 @@ The client libraries are designed to listen for this type of URL, extract
 the access token, refresh token and some extra information from it, and finally
 persist it in local storage for further use by the library and your app.
 
-:::info
+<Admonition type="info">
+
 Web browsers do not send the URL fragment to the server they're making the
 request to. Since you may not be hosting the single-page app on a server under
 your direct control (such as on GitHub Pages or other freemium hosting
@@ -71,7 +76,8 @@ providers), we want to prevent hosting services from getting access to your
 user's authorization credentials by default. Even if the server is under your
 direct control, `GET` requests and their full URLs are often logged. This
 approach also avoids leaking credentials in request or access logs.
-:::
+
+</Admonition>
 
 ## Bringing it together
 
@@ -91,15 +97,15 @@ can add to the root of your application:
 
 ```typescript
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+  if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
     // delete cookies on sign out
-    const expires = new Date(0).toUTCString();
-    document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
-    document.cookie = `my-refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
-  } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-    const maxAge = 100 * 365 * 24 * 60 * 60; // 100 years, never expires
-    document.cookie = `my-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
-    document.cookie = `my-refresh-token=${session.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
+    const expires = new Date(0).toUTCString()
+    document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`
+    document.cookie = `my-refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`
+  } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+    const maxAge = 100 * 365 * 24 * 60 * 60 // 100 years, never expires
+    document.cookie = `my-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`
+    document.cookie = `my-refresh-token=${session.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`
   }
 })
 ```
@@ -114,27 +120,26 @@ parameters can be changed).
 In your server-side rendering code you can now access user and session
 information:
 
-
 ```typescript
-const refreshToken = req.cookies['my-refresh-token'];
-const accessToken = req.cookies['my-access-token'];
+const refreshToken = req.cookies['my-refresh-token']
+const accessToken = req.cookies['my-access-token']
 
 if (refreshToken && accessToken) {
   await supabase.auth.setSession({
     refresh_token: refreshToken,
-    access_token: accessToken 
-  });
+    access_token: accessToken,
+  })
 } else {
   // make sure you handle this case!
-  throw new Error("User is not authenticated.")
+  throw new Error('User is not authenticated.')
 }
 
 // returns user information
-await supabase.auth.getUser();
+await supabase.auth.getUser()
 ```
 
 Use `setSession({ access_token, refresh_token })` instead of
-`setSession(refreshToken)` or `getUser(accessToken)` as refresh tokens or access tokens alone do not properly identify a user session. 
+`setSession(refreshToken)` or `getUser(accessToken)` as refresh tokens or access tokens alone do not properly identify a user session.
 
 Access tokens are valid only for a short amount of time.
 

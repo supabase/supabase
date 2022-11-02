@@ -16,9 +16,11 @@ Postgres CDC works out of the box for tables in the `public` schema. You can lis
 GRANT SELECT ON "private_schema"."table" TO authenticated;
 ```
 
-:::caution
+<Admonition type="caution">
+
 We strongly encourage you to enable RLS and create policies for tables in private schemas. Otherwise, any role you grant access to will have unfettered read access to the table.
-:::
+
+</Admonition>
 
 You can do this in the [Replication](https://app.supabase.com/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://app.supabase.com/project/_/sql):
 
@@ -47,10 +49,7 @@ To listen to all changes in the `public` schema:
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-)
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
 
 /*
   Channel name can be any string.
@@ -62,9 +61,7 @@ const supabase = createClient(
 */
 const channel = supabase
   .channel('schema-db-changes')
-  .on('postgres_changes', { event: '*', schema: 'public' }, (payload) =>
-    console.log(payload)
-  )
+  .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => console.log(payload))
   .subscribe()
 ```
 
@@ -75,10 +72,8 @@ To listen to changes on a table in the `public` schema:
 
 const channel = supabase
   .channel('table-db-changes')
-  .on(
-    'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: 'messages' },
-    (payload) => console.log(payload)
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) =>
+    console.log(payload)
   )
   .subscribe()
 ```
@@ -115,10 +110,8 @@ const channel = supabase
     { event: '*', schema: 'public', table: 'messages', filter: 'body=eq.bye' },
     (payload) => console.log(payload)
   )
-  .on(
-    'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: 'users' },
-    (payload) => console.log(payload)
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, (payload) =>
+    console.log(payload)
   )
   .subscribe()
 ```

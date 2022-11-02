@@ -21,20 +21,19 @@ It can be used for database functions, triggers, queries and more.
 ### Enable the extension
 
 <Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "plv8" and enable the extension.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Example: enable the "plv8" extension
@@ -49,7 +48,7 @@ To disable an extension, call `drop extension`.
 
 Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Create `plv8` functions
@@ -69,26 +68,25 @@ $$ language plv8;
 You can call `plv8` functions like any other Postgres function:
 
 <Tabs
-  defaultValue="sql"
-  values={[
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-  ]}>
-
-<TabItem value="sql">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select function_name();
 ```
 
-</TabItem>
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const { data, error } = supabase.rpc('function_name')
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Examples
