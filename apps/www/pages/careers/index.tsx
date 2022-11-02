@@ -84,12 +84,12 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
           </div>
 
           <SectionContainer>
-            <div className="space-y-10 md:space-y-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
+            <div className="flex flex-wrap md:flex-nowrap -mt-6 md:mt-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
               {career.company.map((company: { number: string; text: string }, i: number) => {
                 return (
                   <div
                     key={i}
-                    className="border-t-[1px] md:border-0 border-brand-900 max-w-[134px] md:max-w-none"
+                    className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand-900 w-[134px] md:max-w-none"
                   >
                     <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand-900 w-[60px] lg:w-[100px]"></div>
                     <h1 className="text-3xl lg:text-4xl pt-3">{company.number}</h1>
@@ -281,7 +281,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     <div
                       className={`${
                         Styles[`contributors-${i}`]
-                      } absolute z-10 w-12 h-12 md:w-14 md:h-14 xl:w-16 xl:h-16 rounded-full border-[1.5px] border-scale-600`}
+                      } absolute z-10 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600`}
                       key={i}
                     >
                       <div className="relative w-full h-full">
@@ -346,8 +346,8 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                           </div>
                         </div>
                         <div className="h-fit text-sm lg:text-base">
-                          <h2 className="md:text-lg xl:text-base">{benefits.title}</h2>
-                          <ReactMarkdown className="prose pt-1 xl:text-base">
+                          <h2>{benefits.title}</h2>
+                          <ReactMarkdown className="prose pt-1 text-sm xl:text-base">
                             {benefits.text}
                           </ReactMarkdown>
                         </div>
