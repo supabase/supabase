@@ -1,4 +1,9 @@
-import { getAnchor, removeAnchor, highlightSelectedTocItem } from './CustomHTMLElements.utils'
+import {
+  getAnchor,
+  removeAnchor,
+  highlightSelectedTocItem,
+  unHighlightSelectedTocItems,
+} from './CustomHTMLElements.utils'
 import { useInView } from 'react-intersection-observer'
 
 const Heading = ({ tag, children }) => {
@@ -11,6 +16,7 @@ const Heading = ({ tag, children }) => {
   const { ref, inView, entry } = useInView({
     threshold: 1,
     onChange: (inView, entry) => {
+      if (window.scrollY === 0) unHighlightSelectedTocItems()
       if (inView) highlightSelectedTocItem(entry.target.id)
     },
   })

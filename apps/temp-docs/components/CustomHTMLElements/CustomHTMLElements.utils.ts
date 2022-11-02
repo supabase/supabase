@@ -33,3 +33,9 @@ export const highlightSelectedTocItem = (id: string) => {
     }
   })
 }
+
+// find any currently active items and remove them on route change
+export const unHighlightSelectedTocItems = () => {
+  const currentActiveItem = document.querySelector('.toc-menu .toc__menu-item--active')
+  currentActiveItem?.classList.remove('toc__menu-item--active')
+}

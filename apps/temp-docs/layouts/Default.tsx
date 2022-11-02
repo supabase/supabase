@@ -59,18 +59,24 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
             {toc && !meta?.hide_table_of_contents && (
               <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-4">
                 <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-1 mt-1">
-                  {toc.json.map((item: any, i: number) => {
-                    return (
-                      <li key={i} className={`${item.lvl === 3 ? 'ml-4' : ''}`}>
-                        <a
-                          className="text-scale-1000 hover:text-brand-900 transition-colors"
-                          href={`#${item.slug}`}
+                  {toc.json
+                    .filter((item) => item.lvl !== 1)
+                    .map((item: any, i: number) => {
+                      return (
+                        <li
+                          key={i}
+                          className={`${item.lvl === 3 && i !== 0 ? 'ml-4' : ''}`}
+                          id={item.lvl}
                         >
-                          {item.content}
-                        </a>
-                      </li>
-                    )
-                  })}
+                          <a
+                            className="text-scale-1000 hover:text-brand-900 transition-colors"
+                            href={`#${item.slug}`}
+                          >
+                            {item.content}
+                          </a>
+                        </li>
+                      )
+                    })}
                 </ul>
               </div>
             )}
