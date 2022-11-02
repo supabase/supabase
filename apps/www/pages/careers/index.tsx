@@ -105,10 +105,10 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
           <div className="border-y-2 border-scale-400 bg-scale-100 overflow-clip">
             <SectionContainer className="!py-0 !pb-16 lg:!pt-16">
               <div className="lg:flex lg:h-[500px]">
-                <div className="relative aspect-square -top-[110px] -left-[200px] w-[575px] sm:-top-[150px] sm:-left-[300px] sm:w-[850px] lg:-top-[225px] lg:-left-[330px] lg:w-[800px] lg:h-[800px] xl:-left-[100px] xl:-top-[210px] xl:w-[1000px]">
+                <div className="relative aspect-square -top-[110px] -left-[200px] w-[575px] sm:-top-[150px] sm:-left-[300px] sm:w-[850px] lg:-top-[225px] lg:-left-[330px] lg:w-[800px] lg:h-[800px] xl:-left-[200px] xl:-top-[210px] xl:w-[1000px]">
                   <Globe />
                 </div>
-                <div className="relative -top-[75px] lg:top-0 lg:-left-[325px] xl:-left-[150px] 2xl:-left-[50px] lg:min-w-[400px] lg:h-fit xl:mt-10">
+                <div className="relative -top-[75px] lg:top-0 lg:-left-[325px] xl:-top-[45px] xl:-left-[150px] 2xl:-left-[50px] lg:min-w-[400px] lg:h-fit xl:mt-10">
                   <h1 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] lg:max-w-xs">
                     We work together, wherever we are
                   </h1>
@@ -222,13 +222,13 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                 As a completely remote and asynchronous team, we focus on these four traits to keep
                 our team effective:
               </p>
-              <div className="sm:flex items-start justify-between pt-10 space-y-6 sm:space-y-0">
+              <div className="sm:flex items-start justify-between pt-10 space-y-6 sm:space-y-0 md:space-x-4">
                 {career.humanPowered.map(
                   (human: { icon: string; title: string; text: string }, i: number) => {
                     return (
                       <div
                         key={i}
-                        className="flex sm:block items-center space-x-6 sm:space-x-0 sm:space-y-4"
+                        className="flex sm:block items-center space-x-6 sm:space-x-0 sm:space-y-4 md:w-full"
                       >
                         <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-brand-700 rounded-lg flex items-center">
                           <div className="relative w-[80%] h-[80%] mx-auto">
@@ -244,7 +244,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                           <h2 className="text-sm md:text-md xl:text-lg md:pt-4 lg:pt-0">
                             {human.title}
                           </h2>
-                          <p className="text-scale-1100 text-xs lg:text-base">{human.text}</p>
+                          <p className="text-scale-1100 text-xs lg:text-sm">{human.text}</p>
                         </div>
                       </div>
                     )
@@ -427,7 +427,9 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     <div className="cursor-pointer md:cursor-default" key={i}>
                       <Link href={job.absolute_url}>
                         <div className="text-xs bg-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center">
-                          <h2 className="text-2xl min-w-[300px] lg:min-w-[316px] truncate mr-6">{job.title}</h2>
+                          <h2 className="text-2xl min-w-[300px] lg:min-w-[316px] truncate mr-6">
+                            {job.title}
+                          </h2>
                           <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
                             <div className="flex items-center space-x-4">
                               <Badge className="rounded-md flex items-center lg:text-sm">
