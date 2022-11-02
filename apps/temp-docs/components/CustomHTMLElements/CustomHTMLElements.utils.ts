@@ -2,8 +2,10 @@ export const getAnchor = (text: any): string | undefined => {
   if (typeof text !== 'string') {
     return undefined
   } else {
-    const [anchor] = text.match(/{#[a-z-]*}/g) || []
-    return anchor !== undefined ? anchor.slice(2, anchor.length - 1) : undefined
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, '')
+      .replace(/[ ]/g, '-')
   }
 }
 
@@ -14,4 +16,20 @@ export const removeAnchor = (text: any) => {
     if (text.indexOf('{#') > 0) return text.slice(0, text.indexOf('{#'))
     else return text
   }
+}
+
+export const highlightSelectedTocItem = (id: string) => {
+  const tocMenuItems = document.querySelectorAll('.toc-menu a')
+
+  // find any currently active items and remove them
+  const currentActiveItem = document.querySelector('.toc-menu .toc__menu-item--active')
+  currentActiveItem?.classList.remove('toc__menu-item--active')
+
+  // Add active class to the current item
+  tocMenuItems.forEach((item) => {
+    // @ts-ignore
+    if (item.href.split('#')[1] === id) {
+      item.classList.add('toc__menu-item--active')
+    }
+  })
 }
