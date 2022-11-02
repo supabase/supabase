@@ -65,21 +65,19 @@ At it's most basic a function has the following parts:
 After the Function is created, we have several ways of "executing" the function - either directly inside the database using SQL, or with one of the client libraries.
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JS', value: 'JS'},
-  {label: 'Dart', value: 'Dart'},
-]}>
-
-<TabItem value="SQL">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select hello_world();
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const { data, error } = await supabase.rpc('hello_world')
@@ -87,8 +85,8 @@ const { data, error } = await supabase.rpc('hello_world')
 
 Reference: [rpc()](../../reference/javascript/rpc)
 
-</TabItem>
-<TabItem value="Dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final res = await supabase
@@ -98,8 +96,7 @@ final res = await supabase
 
 Reference: [rpc()](../../reference/dart/rpc)
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ## Returning data sets
@@ -109,13 +106,32 @@ Database Functions can also return data sets from [Tables](../../guides/database
 For example, if we had a database with some Star Wars data inside:
 
 <Tabs
-defaultValue="Data"
-values={[
-  {label: 'Data', value: 'Data'},
-  {label: 'SQL', value: 'SQL'},
-]}>
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="data"
+>
+<TabPanel id="data" label="Data">
 
-<TabItem value="SQL">
+<h4>Planets</h4>
+
+| id  | name     |
+| --- | -------- |
+| 1   | Tattoine |
+| 2   | Alderaan |
+| 3   | Kashyyyk |
+
+<h4>People</h4>
+
+| id  | name             | planet_id |
+| --- | ---------------- | --------- |
+| 1   | Anakin Skywalker | 1         |
+| 2   | Luke Skywalker   | 1         |
+| 3   | Princess Leia    | 2         |
+| 4   | Chewbacca        | 3         |
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 create table planets (
@@ -143,28 +159,7 @@ values
   (4, 'Chewbacca', 3);
 ```
 
-</TabItem>
-<TabItem value="Data">
-
-<h4>Planets</h4>
-
-| id  | name     |
-| --- | -------- |
-| 1   | Tattoine |
-| 2   | Alderaan |
-| 3   | Kashyyyk |
-
-<h4>People</h4>
-
-| id  | name             | planet_id |
-| --- | ---------------- | --------- |
-| 1   | Anakin Skywalker | 1         |
-| 2   | Luke Skywalker   | 1         |
-| 3   | Princess Leia    | 2         |
-| 4   | Chewbacca        | 3         |
-
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 We could create a function which returns all the planets:
@@ -181,14 +176,12 @@ $$;
 Because this function returns a table set, we can also apply filters and selectors. For example, if we only wanted the first planet:
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JS', value: 'JS'},
-  {label: 'Dart', value: 'Dart'},
-]}>
-
-<TabItem value="SQL">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select *
@@ -196,15 +189,15 @@ from get_planets()
 where id = 1;
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const { data, error } = supabase.rpc('get_planets').eq('id', 1)
 ```
 
-</TabItem>
-<TabItem value="Dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final res = await supabase
@@ -213,8 +206,7 @@ final res = await supabase
   .execute();
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ## Passing parameters
@@ -241,28 +233,26 @@ $$;
 Once again, you can execute this function either inside your database using a `select` query, or with the client libraries:
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JS', value: 'JS'},
-  {label: 'Dart', value: 'Dart'},
-]}>
-
-<TabItem value="SQL">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 select * from add_planet('Jakku');
 ```
 
-</TabItem>
-<TabItem value="JS">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const { data, error } = await supabase.rpc('add_planet', { name: 'Jakku' })
 ```
 
-</TabItem>
-<TabItem value="Dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final res = await supabase
@@ -270,8 +260,7 @@ final res = await supabase
   .execute();
 ```
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ## Suggestions

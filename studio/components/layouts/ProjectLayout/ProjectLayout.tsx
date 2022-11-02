@@ -104,7 +104,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     '/project/[ref]/reports',
     '/project/[ref]/settings/general',
     '/project/[ref]/settings/database',
-    '/project/[ref]/settings/billing',
+    '/project/[ref]/settings/billing/subscription',
     '/project/[ref]/settings/billing/update',
     '/project/[ref]/settings/billing/update/free',
     '/project/[ref]/settings/billing/update/pro',

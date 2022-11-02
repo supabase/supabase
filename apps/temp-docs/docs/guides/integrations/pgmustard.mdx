@@ -22,7 +22,7 @@ explain (analyze, format json, buffers, verbose, settings)
 
 Run the query, and copy the output.
 
-![01-supabase-run-query](/img/guides/integrations/pgmustard/01-supabase-run-query.png)
+![01-supabase-run-query](/docs/img/guides/integrations/pgmustard/01-supabase-run-query.png)
 
 If you’re using the Supabase SQL Editor, this is easily copied from the cell titled `QUERY PLAN`, as seen above.
 
@@ -32,17 +32,17 @@ If you have any trouble, check out pgMustard’s guide for [getting a query plan
 
 Paste the json output into pgMustard and press Submit.
 
-![02-paste-plan-pgmustard](/img/guides/integrations/pgmustard/02-paste-plan-pgmustard.png)
+![02-paste-plan-pgmustard](/docs/img/guides/integrations/pgmustard/02-paste-plan-pgmustard.png)
 
 ## Step 3: Look through the top tips and slowest operations
 
 Review the top tips in pgMustard. These are scored on a scale of 0 to 5 stars, based on how much time-saving potential they have (5 stars meaning lots of potential).
 
-![03-review-tips-pgmustard](/img/guides/integrations/pgmustard/03-review-tips-pgmustard.png)
+![03-review-tips-pgmustard](/docs/img/guides/integrations/pgmustard/03-review-tips-pgmustard.png)
 
 Click one of the tips, or one of the operations, to see more information.
 
-![04-click-tip-pgmustard](/img/guides/integrations/pgmustard/04-click-tip-pgmustard.png)
+![04-click-tip-pgmustard](/docs/img/guides/integrations/pgmustard/04-click-tip-pgmustard.png)
 
 ## Step 4: Consider your options
 
@@ -52,11 +52,11 @@ If you don’t get any tips, your query might be quite fast for the amount of wo
 
 For the example we saw in Step 3, let's try adding an index on the `customer_name` field in Supabase.
 
-![05-create-index-supabase](/img/guides/integrations/pgmustard/05-create-index-supabase.png)
+![05-create-index-supabase](/docs/img/guides/integrations/pgmustard/05-create-index-supabase.png)
 
 Going through Steps 1-3 again, we now get an efficient index scan, that will scale nicely as our data grows.
 
-![06-check-pgmustard](/img/guides/integrations/pgmustard/06-check-pgmustard.png)
+![06-check-pgmustard](/docs/img/guides/integrations/pgmustard/06-check-pgmustard.png)
 
 We could look into why Postgres isn’t choosing to do an index-only scan here, but pgMustard is letting us know that it doesn’t think we’ll gain much by doing so, by scoring the tip 0.3 out of 5.
 

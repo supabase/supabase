@@ -5,14 +5,9 @@ description: Learn how to use Supabase in your Flutter App.
 sidebar_label: Flutter
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
-import QuickstartIntro from './_partials/quickstart_intro.md'
-import ProjectSetup from './_partials/project_setup.mdx'
-
 <QuickstartIntro />
 
-![Supabase User Management example](/img/supabase-flutter-demo.png)
+![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
 
 ### GitHub
 
@@ -50,7 +45,7 @@ Now that we have the dependencies installed let's setup deep links so users who 
 1. Go to [Authentication Settings](https://app.supabase.com/project/_/auth/settings) in the Dashboard.
 1. In **Redirect URLs**, add `io.supabase.flutterquickstart://login-callback/` as a new domain.
 
-![Supabase console deep link setting](/img/deeplink-setting.png)
+![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
 That is it on Supabase's end and the rest are platform specific settings:
 
@@ -171,7 +166,7 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  bool _redicrectCalled = false;
+  bool _redirectCalled = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -180,11 +175,11 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<void> _redirect() async {
     await Future.delayed(Duration.zero);
-    if (_redicrectCalled || !mounted) {
+    if (_redirectCalled || !mounted) {
       return;
     }
 
-    _redicrectCalled = true;
+    _redirectCalled = true;
     final session = supabase.auth.currentSession;
     if (session != null) {
       Navigator.of(context).pushReplacementNamed('/account');
@@ -249,7 +244,7 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
 
     setState(() {
@@ -346,7 +341,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occured');
+      context.showErrorSnackBar(message: 'Unexpected exception occurred');
     }
 
     setState(() {
@@ -376,7 +371,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occured');
+      context.showErrorSnackBar(message: 'Unexpeted error occurred');
     }
     setState(() {
       _loading = false;
@@ -389,7 +384,7 @@ class _AccountPageState extends State<AccountPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/');
@@ -503,7 +498,7 @@ flutter run -d web-server --web-hostname localhost --web-port 3000
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase User Management example](/img/supabase-flutter-account-page.png)
+![Supabase User Management example](/docs/img/supabase-flutter-account-page.png)
 
 ## Bonus: Profile photos
 
@@ -619,7 +614,7 @@ class _AvatarState extends State<Avatar> {
       }
     } catch (error) {
       if (mounted) {
-        context.showErrorSnackBar(message: 'Unexpected error occured');
+        context.showErrorSnackBar(message: 'Unexpected error occurred');
       }
     }
 
@@ -670,7 +665,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occured');
+      context.showErrorSnackBar(message: 'Unexpected exception occurred');
     }
 
     setState(() {
@@ -700,7 +695,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occured');
+      context.showErrorSnackBar(message: 'Unexpeted error occurred');
     }
     setState(() {
       _loading = false;
@@ -713,7 +708,7 @@ class _AccountPageState extends State<AccountPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occured');
+      context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/');
@@ -734,7 +729,7 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error has occured');
+      context.showErrorSnackBar(message: 'Unexpected error has occurred');
     }
     if (!mounted) {
       return;

@@ -16,12 +16,12 @@ Let’s get started!
 
 - On the [Supabase dashboard](https://app.supabase.com), click `New project` and set the name to **Support Dashboard**
 
-![create-project-supabase-01](/img/guides/integrations/appsmith/create-project-supabase-01.png)
+![create-project-supabase-01](/docs/img/guides/integrations/appsmith/create-project-supabase-01.png)
 
 - Create a new table by clicking on the Create Table option on the side navigation.
 - Supabase provides many ways to add data to the tables, from writing queries to creating schemas using UI to simply uploading CSV files. For our support dashboard, we will be creating the **tickets** table by uploading the [CSV file](https://raw.githubusercontent.com/vihar/datasets/master/tickets.csv) on Supabase.
 
-![create-table-supabase-02](/img/guides/integrations/appsmith/create-table-supabase-02.png)
+![create-table-supabase-02](/docs/img/guides/integrations/appsmith/create-table-supabase-02.png)
 
 The database is now set up.
 
@@ -29,40 +29,40 @@ The database is now set up.
 
 - Note down the database connection information under Project Settings in Supabase.
 
-![project-settings-supabase-03](/img/guides/integrations/appsmith/project-settings-supabase-03.png)
+![project-settings-supabase-03](/docs/img/guides/integrations/appsmith/project-settings-supabase-03.png)
 
 - On Appsmith, create a new application under the dashboard under your preferred organization.
 - Click on the `+` icon next to Datasources on the left navigation bar under Page1
 - Next, click on Create New tab and choose PostgreSQL datasource, you’ll see the following screenshot:
 
-![create-datasource-appsmith-04](/img/guides/integrations/appsmith/create-datasource-appsmith-04.png)
+![create-datasource-appsmith-04](/docs/img/guides/integrations/appsmith/create-datasource-appsmith-04.png)
 
 - Fill out the form to connect to your Supabase instance. Click **Test** to test connection and then **Save** to save the datasource
 
-![connect-supabase-datasource-05](/img/guides/integrations/appsmith/connect-supabase-datasource-05.png)
+![connect-supabase-datasource-05](/docs/img/guides/integrations/appsmith/connect-supabase-datasource-05.png)
 
 ## Step 3: Build UI on Appsmith
 
 - Click on the + icon next to widgets and drag and drop a Tab widget. We can configure using the property pane by clicking on the cog icon on the top-right corner.
 - As seen in the below screenshot, we have added four tabs to support the dashboard.
 
-![property-pane-appsmith-06](/img/guides/integrations/appsmith/property-pane-appsmith-06.png)
+![property-pane-appsmith-06](/docs/img/guides/integrations/appsmith/property-pane-appsmith-06.png)
 
 - Add widgets to the **Home** tab to create the dashboard as shown in the screenshot below. For eg: **Critical Open Issues** is a **Text** widget and below it is an **Input** widget which we will bind later to display the number of open tickets.
 
 - Set up the **New** button to open a modal which will have a form to raise a new ticket.
 
-![bind-query-appsmith-07](/img/guides/integrations/appsmith/bind-query-appsmith-07.png)
+![bind-query-appsmith-07](/docs/img/guides/integrations/appsmith/bind-query-appsmith-07.png)
 
 - In the modal widget, add a few widgets to accept input when creating a new ticket. Please refer to the screenshot below.
 
-![modal-appsmith-08](/img/guides/integrations/appsmith/modal-appsmith-08.png)
+![modal-appsmith-08](/docs/img/guides/integrations/appsmith/modal-appsmith-08.png)
 
 ## Step 4: Writing Queries in Appsmith and binding data to widgets
 
 - Click on the + icon next to Datasources on the navigation bar and click New Query next to the Supabase connection here to create a new query.
 
-![create-query-appsmith-09](/img/guides/integrations/appsmith/create-query-appsmith-09.png)
+![create-query-appsmith-09](/docs/img/guides/integrations/appsmith/create-query-appsmith-09.png)
 
 - Rename the query to create_new_ticket under the query pane; here we can write SQL that can collect the data from the widgets using mustache templates.
 

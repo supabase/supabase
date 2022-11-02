@@ -32,10 +32,7 @@ Pass `supabaseClient` from `@supabase/supabase-js` as a prop to the component.
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => <Auth supabaseClient={supabase} />
 ```
@@ -80,10 +77,7 @@ import { createClient } from '@supabase/supabase-js'
 //highlight-next-line
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -94,9 +88,11 @@ const App = () => (
 )
 ```
 
-:::info
+<Admonition type="info">
+
 Currently there is only one predefined theme available, but we plan to add more.
-:::
+
+</Admonition>
 
 ### Switch theme variations
 
@@ -106,10 +102,7 @@ Auth UI comes with two theme variations: `default` and `dark`. You can switch be
 import { createClient } from '@supabase/supabase-js'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -131,10 +124,7 @@ Auth UI themes can be overridden using variable tokens. See the [list of variabl
 import { createClient } from '@supabase/supabase-js'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -219,10 +209,7 @@ You can use custom CSS classes for the following elements:
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -247,10 +234,7 @@ You can use custom CSS inline styles for the following elements:
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -274,10 +258,7 @@ You can use custom labels with `localization.variables`. See the [list of labels
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth

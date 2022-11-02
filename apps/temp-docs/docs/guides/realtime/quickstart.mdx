@@ -33,17 +33,13 @@ You need to get the public `anon` access token from your project's [API settings
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
-const supabase = createClient(
-  'https://your-project-ref.supabase.co',
-  'anon-key',
-  {
-    realtime: {
-      params: {
-        eventsPerSecond: 10,
-      },
+const supabase = createClient('https://your-project-ref.supabase.co', 'anon-key', {
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
     },
-  }
-)
+  },
+})
 
 // Channel name can be any string.
 // Create channels with the same name for both the broadcasting and receiving clients.
@@ -65,9 +61,11 @@ channel.subscribe((status) => {
 })
 ```
 
-:::info
+<Admonition type="info">
+
 JavaScript client has a default rate limit of 1 Realtime event every 100 milliseconds that's configured by `eventsPerSecond`.
-:::
+
+</Admonition>
 
 Another client can subscribe to channel `room1` and receive cursor positions:
 
@@ -85,9 +83,11 @@ supabase
   })
 ```
 
-:::info
+<Admonition type="info">
+
 `type` must be `broadcast` and the `event` must match for clients subscribed to the channel.
-:::
+
+</Admonition>
 
 ## Roundtrip Latency
 
@@ -98,25 +98,25 @@ You can also configure the channel so that the server must return an acknowledge
 
 const channel = supabase.channel('calc-latency', {
   config: {
-    broadcast: { ack: true }
-  }
+    broadcast: { ack: true },
+  },
 })
 
 channel.subscribe(async (status) => {
-    if (status === 'SUBSCRIBED') {
-      const begin = performance.now()
+  if (status === 'SUBSCRIBED') {
+    const begin = performance.now()
 
-      await channel.send({
-        type: 'broadcast',
-        event: 'latency',
-        payload: {},
-      })
+    await channel.send({
+      type: 'broadcast',
+      event: 'latency',
+      payload: {},
+    })
 
-      const end = performance.now()
+    const end = performance.now()
 
-      console.log(`Latency is ${end - begin} milliseconds`)
-    }
-  })
+    console.log(`Latency is ${end - begin} milliseconds`)
+  }
+})
 ```
 
 ## Track and display which users are online
