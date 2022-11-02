@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { GetServerSideProps, NextPage } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
-// import Image from 'next/image'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button, IconCheck, Badge } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -141,58 +141,76 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     </p>
                   </div>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
-                    <img
-                      className="rounded-md"
-                      src={'/images/career/1.jpg'}
-                      width="100%"
-                      height="100%"
-                    />
+                    <div className="relative w-full aspect-[148/125]">
+                      <Image
+                        src="/images/career/1.jpg"
+                        alt="team photo"
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-md"
+                      />
+                    </div>
                   </div>
                   <div className="grid justify-items-end">
                     <div className="w-5/6 rounded-md mt-6">
-                      <img
-                        className="rounded-md"
-                        src={'/images/career/2.jpg'}
-                        width="100%"
-                        height="100%"
-                      />
+                      <div className="relative w-full aspect-[29/22]">
+                        <Image
+                          src="/images/career/2.jpg"
+                          alt="team photo"
+                          layout="fill"
+                          objectFit="cover"
+                          className="rounded-md"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="mt-6 md:mt-0 md:w-1/2">
                   <div className="w-full rounded-md">
-                    <img
-                      className="rounded-md"
-                      src={'/images/career/3.jpg'}
-                      width="100%"
-                      height="100%"
-                    />
+                    <div className="relative w-full aspect-[137/110]">
+                      <Image
+                        src="/images/career/3.jpg"
+                        alt="team photo"
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-md"
+                      />
+                    </div>
                   </div>
                   <div className="flex gap-6 mt-6">
                     <div className="w-full rounded-md">
-                      <img
-                        className="rounded-md"
-                        src={'/images/career/4.jpg'}
-                        width="100%"
-                        height="100%"
-                      />
+                      <div className="relative w-full aspect-[142/189]">
+                        <Image
+                          src="/images/career/4.jpg"
+                          alt="team photo"
+                          layout="fill"
+                          objectFit="cover"
+                          className="rounded-md"
+                        />
+                      </div>
                     </div>
                     <div className="w-full rounded-md">
-                      <img
-                        className="rounded-md"
-                        src={'/images/career/5.jpg'}
-                        width="100%"
-                        height="100%"
-                      />
+                      <div className="relative w-full aspect-[142/189]">
+                        <Image
+                          src="/images/career/5.jpg"
+                          alt="team photo"
+                          layout="fill"
+                          objectFit="cover"
+                          className="rounded-md"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="w-5/6 rounded-md mt-6">
-                    <img
-                      className="rounded-md"
-                      src={'/images/career/6.jpg'}
-                      width="100%"
-                      height="100%"
-                    />
+                    <div className="relative w-full aspect-[41/43]">
+                      <Image
+                        src="/images/career/6.jpg"
+                        alt="team photo"
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-md"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -212,8 +230,15 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                         key={i}
                         className="flex sm:block items-center space-x-6 sm:space-x-0 sm:space-y-4"
                       >
-                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-brand-700 rounded-lg flex justify-center">
-                          <img className="rounded-md" src={human.icon} width="80%" height="80%" />
+                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-brand-700 rounded-lg flex items-center">
+                          <div className="relative w-[80%] h-[80%] mx-auto">
+                            <Image
+                              src={human.icon}
+                              alt={`${human.title} icon`}
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
                         </div>
                         <div className="sm:max-w-[120px] md:max-w-[150px] lg:max-w-[230px]">
                           <h2 className="text-sm md:text-md xl:text-lg md:pt-4 lg:pt-0">
@@ -229,13 +254,15 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
             </SectionContainer>
 
             <SectionContainer className="!pb-0">
-              <div className="w-14 h-14 bg-brand-700 rounded-lg flex justify-center mx-auto mb-6">
-                <img
-                  className="rounded-md"
-                  src="images/career/icon/contributors.svg"
-                  width="80%"
-                  height="80%"
-                />
+              <div className="w-14 h-14 bg-brand-700 rounded-lg flex items-center mx-auto mb-6">
+                <div className="relative w-[80%] h-[80%] mx-auto">
+                  <Image
+                    src="/images/career/icon/contributors.svg"
+                    alt="contributor icon"
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
               </div>
               <div className="text-center">
                 <h1 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto">
@@ -257,13 +284,15 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                       } absolute z-10 w-12 h-12 md:w-14 md:h-14 xl:w-16 xl:h-16 rounded-full border-[1.5px] border-scale-600`}
                       key={i}
                     >
-                      <img
-                        className="rounded-full"
-                        src={contributor.avatar_url}
-                        width="100%"
-                        height="100%"
-                        alt={`${contributor.login} github avatar`}
-                      />
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={contributor.avatar_url}
+                          alt={`${contributor.login} github avatar`}
+                          className="rounded-full"
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </div>
                     </div>
                   )
                 })}
@@ -306,13 +335,15 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                         className="h-full bg-scale-300 border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
-                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square bg-brand-700 rounded-lg flex justify-center">
-                          <img
-                            className="rounded-md"
-                            src={benefits.icon}
-                            width="80%"
-                            height="80%"
-                          />
+                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square bg-brand-700 rounded-lg flex items-center">
+                          <div className="relative w-[80%] h-[80%] mx-auto">
+                            <Image
+                              src={benefits.icon}
+                              alt={`${benefits.title} icon`}
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
                         </div>
                         <div className="h-fit text-sm lg:text-base">
                           <h2 className="md:text-lg xl:text-base">{benefits.title}</h2>
@@ -329,13 +360,15 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
           </SectionContainer>
 
           <SectionContainer>
-            <div className="w-14 h-14 bg-brand-700 rounded-lg flex justify-center mx-auto mb-6">
-              <img
-                className="rounded-md"
-                src="images/career/icon/person.svg"
-                width="80%"
-                height="80%"
-              />
+            <div className="w-14 h-14 bg-brand-700 rounded-lg flex items-center mx-auto mb-6">
+              <div className="relative w-[80%] h-[80%] mx-auto">
+                <Image
+                  src="/images/career/icon/person.svg"
+                  alt="how we hire icon"
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
             </div>
             <div className="text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
               <h1 className="text-2xl sm:text-3xl xl:text-4xl">How we hire</h1>
@@ -398,7 +431,14 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                           <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
                             <div className="flex items-center space-x-4">
                               <Badge className="rounded-md flex items-center lg:text-sm">
-                                <img src="/images/career/icon/globe.svg" />
+                                <div className="relative w-3 h-3 mx-auto">
+                                  <Image
+                                    src="/images/career/icon/globe.svg"
+                                    alt="globe icon"
+                                    layout="fill"
+                                    objectFit="cover"
+                                  />
+                                </div>
                                 <span className="ml-1">{job.location.name}</span>
                               </Badge>
                               <span className="hidden md:block">{job.employment}</span>
