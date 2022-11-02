@@ -20,23 +20,23 @@ After your Clerk application has been created, use the lefthand menu to navigate
 
 Click on the button to create a new template based on Supabase.
 
-![Create Supabase JWT template from Clerk dashboard](/img/guides/integrations/clerk/01_supabase-template.png)
+![Create Supabase JWT template from Clerk dashboard](/docs/img/guides/integrations/clerk/01_supabase-template.png)
 
 This will pre-populate the default claims required by Supabase. You can include additional claims or modify them as necessary. [Shortcodes](https://docs.clerk.dev/popular-guides/jwt-templates#shortcodes) are also available for adding dynamic values.
 
 ℹ️ Note the name of the JWT template (which you can change) because this will be needed later.
 
-![JWT template claims](/img/guides/integrations/clerk/02_jwt-claims.png)
+![JWT template claims](/docs/img/guides/integrations/clerk/02_jwt-claims.png)
 
 ## Step 2: Sign JWT with Supabase secret
 
 Supabase requires JWTs be signed with the HS256 signing algorithm and use their signing key. Find the JWT secret key in your Supabase project under **Settings** > **API** in the **Config** section.
 
-![Sign with Supabase secret](/img/guides/integrations/clerk/03_jwt-secret.png)
+![Sign with Supabase secret](/docs/img/guides/integrations/clerk/03_jwt-secret.png)
 
 Click to reveal the JWT secret, copy it, and then paste it in the Signing key field in the Clerk JWT template.
 
-![Paste signing key](/img/guides/integrations/clerk/04_signing-key.png)
+![Paste signing key](/docs/img/guides/integrations/clerk/04_signing-key.png)
 
 After the key is added, click the **Apply Changes** button to save your template.
 
@@ -58,11 +58,11 @@ NEXT_PUBLIC_SUPABASE_KEY=your-supabase-anon-key
 
 Your Clerk Frontend API can be found on the [API Keys](https://dashboard.clerk.dev/last-active?path=api-keys) screen.
 
-![Clerk Frontend API](/img/guides/integrations/clerk/05_clerk-frontend-api.png)
+![Clerk Frontend API](/docs/img/guides/integrations/clerk/05_clerk-frontend-api.png)
 
 To get the ones needed for Supabase, navigate to the same Settings > API page as before and locate the anon public key and URL.
 
-![Supabase keys](/img/guides/integrations/clerk/06_supabase-keys.png)
+![Supabase keys](/docs/img/guides/integrations/clerk/06_supabase-keys.png)
 
 **Note**: It is recommended that you enable [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) (RLS) for your database tables and configure access policies as needed.
 
@@ -174,7 +174,7 @@ For example, this policy would check that the user making the request is authent
 
 If you would like the requesting user ID from the JWT to automatically populate a text type column in your database table, you can set the **Default Value** field to the previously defined `requesting_user_id()` function.
 
-![Set requesting_user_id() as default value](/img/guides/integrations/clerk/07_requesting-user-id.png)
+![Set requesting_user_id() as default value](/docs/img/guides/integrations/clerk/07_requesting-user-id.png)
 
 ## Resources
 

@@ -335,7 +335,7 @@ pages:
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
-      - Refresh token rotation (see [`REFRESH_TOKEN_ROTATION_ENABLED`](https://supabase.com/docs/reference/auth/config#refresh_token_rotation_enabled)) is enabled by default on all projects to guard against replay attacks. 
+      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - name: Refresh the session
@@ -344,6 +344,25 @@ pages:
         js: |
           ```js
             const { data, error } = supabase.auth.setSession(refresh_token)
+          ```
+  auth.refreshSession():
+    title: 'refreshSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
+    notes: |
+      - This method will refresh the session whether the current one is expired or not.
+      - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
+    examples:
+      - name: Refresh session using the current session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: { user, session }, error } = await supabase.auth.refreshSession()
+          ```
+      - name: Refresh session using a passed-in session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
           ```
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
@@ -521,9 +540,9 @@ pages:
            */
           const { data, error } = await supabase.auth
             .resetPasswordForEmail('user@email.com')
-            
+
           /**
-           * Step 2: Once the user is redirected back to your application, 
+           * Step 2: Once the user is redirected back to your application,
            * ask the user to reset their password.
            */
            useEffect(() => {
@@ -532,10 +551,10 @@ pages:
                  const newPassword = prompt("What would you like your new password to be?");
                  const { data, error } = await supabase.auth
                    .updateUser({ password: newPassword })
-                   
+
                  if (data) alert("Password updated successfully!")
                  if (error) alert("There was an error updating your password.")
-               } 
+               }
              })
            }, [])
           ```
@@ -583,13 +602,21 @@ pages:
             email: 'email@example.com'
           })
           ```
-      - name: Generate a link to change email addresses
+      - name: Generate links to change current email address
         isSpotlight: false
         js: |
           ```js
+          // generate an email change link to be sent to the current email address
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'email_change_current',
-            email: 'old.email@example.com',
+            email: 'current.email@example.com',
+            newEmail: 'new.email@example.com'
+          })
+
+          // generate an email change link to be sent to the new email address
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'email_change_new',
+            email: 'current.email@example.com',
             newEmail: 'new.email@example.com'
           })
           ```
@@ -1016,7 +1043,7 @@ pages:
       - name: Filtering through foreign tables
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
-          table returns `[]` or `null` but the parent table is not filtered out. 
+          table returns `[]` or `null` but the parent table is not filtered out.
 
           <Tabs>
           <TabItem value="schema" label="Schema">
@@ -4114,7 +4141,7 @@ pages:
     description: |
       Filters work on the row level—they allows you to return rows that
       only match certain conditions without changing the shape of the rows.
-      Modifiers are everything that don't fit that definition—allowing you to 
+      Modifiers are everything that don't fit that definition—allowing you to
       change the format of the response (e.g., returning a CSV string).
 
       Modifiers must be specified after filters. Some modifiers only apply for
@@ -4837,7 +4864,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             body: { foo: 'bar' }
           })
           ```
@@ -4849,7 +4876,7 @@ pages:
           ```js
           import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
 
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             headers: {
               "my-custom-header": 'my-custom-header-value'
             },
@@ -4870,7 +4897,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             headers: {
               "my-custom-header": 'my-custom-header-value'
             },

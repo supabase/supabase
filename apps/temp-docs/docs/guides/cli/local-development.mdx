@@ -61,12 +61,12 @@ You can use the [stop](/reference/cli/usage#supabase-stop) command at any time t
 You can access services directly with any Postgres client or through the API Gateway ([Kong](https://github.com/Kong/kong)).
 
 <Tabs
-  defaultValue="postgres"
-  values={[
-    {label: 'Postgres', value: 'postgres'},
-    {label: 'API Gateway', value: 'kong'},
-  ]}>
-<TabItem value="postgres">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="postgres"
+>
+<TabPanel id="postgres" label="Postgres">
 
 ```sh
 # Default URL:
@@ -82,8 +82,8 @@ For example:
 psql 'postgresql://postgres:postgres@localhost:54322/postgres'
 ```
 
-</TabItem>
-<TabItem value="kong">
+</TabPanel>
+<TabPanel id="kong" label="API Gateway">
 
 ```sh
 # Default URL:
@@ -104,12 +104,14 @@ http://localhost:54321/storage/v1/        # Storage
 http://localhost:54321/auth/v1/           # Auth (GoTrue)
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
-:::note
+<Admonition type="note">
+
 To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
-:::
+
+</Admonition>
 
 ## Database migrations
 
@@ -126,9 +128,11 @@ create table employees (
 );
 ```
 
-:::note
+<Admonition type="note">
+
 You can execute any SQL using the `DB URL` shown by [`supabase status`](/reference/cli/usage#supabase-status).
-:::
+
+</Admonition>
 
 Run the [`db diff`](/reference/cli/usage#supabase-db-diff) command to detect changes in the local database:
 
@@ -181,9 +185,11 @@ Go to the [Supabase Dashboard](https://app.supabase.com) and create a project to
 
 ### Link your project
 
-:::note
+<Admonition type="note">
+
 There are a few commands required to link your project. We are in the process of consolidating these commands into a single command. Bear with us!
-:::
+
+</Admonition>
 
 Associate your project with your remote project using [`supabase link`](/reference/cli/usage#supabase-link).
 

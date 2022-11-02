@@ -20,7 +20,7 @@ Supabase is a combination of open source tools, each specifically chosen for Ent
 If the tools and communities already exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool.
 If the tool doesn't exist, we build and open source it ourselves.
 
-![Supabase Architecture](/img/supabase-architecture.png)
+![Supabase Architecture](/docs/img/supabase-architecture.png)
 
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 - [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
@@ -49,7 +49,8 @@ The "middleware" is everything except Postgres, and it should work with any Post
 ### Extensions
 
 Supabase requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the
-[schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
+[schema migration scripts](https://github.com/supabase/postgres/tree/develop/migrations). These are mounted at `/docker-entrypoint-initdb.d`
+to run automatically when starting the database container.
 
 We recommend installing all extensions into an `extensions` schema. This will keep your API clean,
 since all tables in the `public` schema are exposed via the API.
@@ -72,7 +73,8 @@ For working with JWT and Auth functions.
 ### Roles
 
 Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
-[schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
+[schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your
+[role passwords](./docker#securing-your-setup) before deploying to production environments.
 
 ##### `postgres`
 

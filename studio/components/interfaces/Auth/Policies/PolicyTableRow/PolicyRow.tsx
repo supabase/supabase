@@ -55,7 +55,7 @@ const PolicyRow: FC<Props> = ({
                 >
                   Edit
                 </Dropdown.Item>
-                <Dropdown.Seperator />
+                <Dropdown.Separator />
                 <Dropdown.Item
                   icon={<IconTrash size={14} />}
                   onClick={() => onSelectDeletePolicy(policy)}
