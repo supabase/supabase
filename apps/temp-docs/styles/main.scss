@@ -181,3 +181,16 @@ pre[class*='language-'] {
 .admonition-content > p {
   @apply m-0;
 }
+
+// format <code> inside <p>
+p code {
+  word-break: keep-all !important;
+  padding: 0.1rem 0.25rem !important;
+
+  &:before {
+    display: none;
+  }
+  &::after {
+    display: none;
+  }
+}
