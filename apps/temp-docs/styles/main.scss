@@ -25,6 +25,8 @@
 body {
   @apply bg-white dark:bg-[#1c1c1c] #{!important};
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
@@ -37,7 +39,7 @@ a {
 }
 
 article h1 {
-  margin-bottom: 3rem !important;
+  margin-bottom: 2rem !important;
   font-size: 3rem !important;
   font-weight: 400 !important;
 }
