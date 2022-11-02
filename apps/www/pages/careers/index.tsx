@@ -25,7 +25,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       object.login !== 'thorwebdev' &&
       object.login !== 'dependabot[bot]' &&
       object.login !== 'soedirgo' &&
-      object.login !== 'dragarcia'
+      object.login !== 'dragarcia' &&
+      object.login !== 'stavares843'
     )
   })
 
@@ -83,12 +84,12 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
           </div>
 
           <SectionContainer>
-            <div className="space-y-10 md:space-y-0 ml-6 sm:ml-12 md:ml-0 md:flex md:items-start justify-around lg:max-w-5xl lg:mx-auto">
+            <div className="space-y-10 md:space-y-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
               {career.company.map((company: { number: string; text: string }, i: number) => {
                 return (
                   <div
                     key={i}
-                    className="border-t-[1px] md:border-0 md:pt-2 border-brand-900 max-w-[134px] md:max-w-none"
+                    className="border-t-[1px] md:border-0 border-brand-900 max-w-[134px] md:max-w-none"
                   >
                     <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand-900 w-[60px] lg:w-[100px]"></div>
                     <h1 className="text-3xl lg:text-4xl pt-3">{company.number}</h1>
@@ -261,27 +262,28 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                         src={contributor.avatar_url}
                         width="100%"
                         height="100%"
+                        alt={`${contributor.login} github avatar`}
                       />
                     </div>
                   )
                 })}
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[100%] lg:w-[80%] left-[0%] lg:left-[10%] -bottom-[30%] sm:-bottom-[52%] md:-bottom-[68%] lg:-bottom-[80%] xl:-bottom-[100%]`}
+                  className={`${Styles['contributors-bg-circle']} w-[100%] lg:w-[80%] left-[0%] lg:left-[10%] -bottom-[30%] xs:-bottom-[36%] sm:-bottom-[52%] md:-bottom-[64%] lg:-bottom-[80%] xl:-bottom-[100%]`}
                 >
                   <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
                 </div>
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[80%] lg:w-[60%] left-[10%] lg:left-[20%] -bottom-[25%] sm:-bottom-[44%] md:-bottom-[56%] lg:-bottom-[60%] xl:-bottom-[75%]`}
+                  className={`${Styles['contributors-bg-circle']} w-[80%] lg:w-[60%] left-[10%] lg:left-[20%] -bottom-[25%] xs:-bottom-[30%] sm:-bottom-[44%] md:-bottom-[54%] lg:-bottom-[60%] xl:-bottom-[75%]`}
                 >
                   <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
                 </div>
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[60%] lg:w-[40%] left-[20%] lg:left-[30%] -bottom-[20%] sm:-bottom-[38%] md:-bottom-[48%] lg:-bottom-[40%] xl:-bottom-[50%]`}
+                  className={`${Styles['contributors-bg-circle']} w-[60%] lg:w-[40%] left-[20%] lg:left-[30%] -bottom-[20%] xs:-bottom-[25%] sm:-bottom-[38%] md:-bottom-[44%] lg:-bottom-[40%] xl:-bottom-[50%]`}
                 >
                   <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
                 </div>
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[40%] lg:w-[20%] left-[30%] lg:left-[40%] -bottom-[15%] sm:-bottom-[30%] md:-bottom-[38%] lg:-bottom-[20%] xl:-bottom-[25%]`}
+                  className={`${Styles['contributors-bg-circle']} w-[40%] lg:w-[20%] left-[30%] lg:left-[40%] -bottom-[15%] xs:-bottom-[19%] sm:-bottom-[30%] md:-bottom-[34%] lg:-bottom-[20%] xl:-bottom-[25%]`}
                 >
                   <div className="flex flex-col justify-between h-full bg-scale-100 rounded-full p-4"></div>
                 </div>
@@ -301,7 +303,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                   (benefits: { icon: string; title: string; text: string }, i: number) => {
                     return (
                       <div
-                        className="h-full bg-scale-300 border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 max-w-md"
+                        className="h-full bg-scale-300 border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
                         <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square bg-brand-700 rounded-lg flex justify-center">
