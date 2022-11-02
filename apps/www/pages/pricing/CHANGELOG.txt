@@ -1,6 +1,6 @@
 Pricing Changelog
 
-### 27 Oct 2022
+### 02 Nov 2022
 ----
 
 Database
