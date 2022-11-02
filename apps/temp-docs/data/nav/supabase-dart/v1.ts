@@ -24,7 +24,7 @@ const Nav = [
       { name: 'currentSession', url: '/reference/dart/auth-currentsession', items: [] },
       { name: 'currentUser', url: '/reference/dart/auth-currentuser', items: [] },
       { name: 'updateUser()', url: '/reference/dart/auth-updateuser', items: [] },
-      { name: 'setSession()', url: '/reference/dart/auth-setSession', items: [] },
+      { name: 'onAuthStateChange()', url: '/reference/dart/auth-onauthstatechange', items: [] },
       {
         name: 'resetPasswordForEmail()',
         url: '/reference/dart/auth-resetpasswordforemail',

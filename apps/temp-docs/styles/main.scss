@@ -207,6 +207,6 @@ article p strong {
 }
 
 // fix box shadow when <code> is inside <a>
-p a:has(code) {
+a:has(code) {
   box-shadow: none !important;
 }
