@@ -116,10 +116,9 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 {group.items.map((section: NavMenuSection) => {
                   if (section.items.length === 0) {
                     return (
-                      <Link href={section.url}>
+                      <Link href={section.url} key={section.name}>
                         <a>
                           <div
-                            key={section.name}
                             className={[
                               'py-1.5 px-5 rounded text-sm transition',
                               `${
