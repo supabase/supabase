@@ -130,7 +130,7 @@ The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) sec
    yarn dev
    ```
 
-1. Access the local server in your web browser at http://localhost:3010/docs.
+1. Access the local server in your web browser at http://localhost:3001/docs.
 
 ### Supabase Studio
 
