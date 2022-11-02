@@ -1,5 +1,4 @@
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
-import { Typography } from '@supabase/ui'
 
 interface Props {
   table: PostgresTable
@@ -11,14 +10,13 @@ const HeaderTitle: React.FC<Props> = ({ table, column }) => {
   if (!column) {
     return (
       <>
-        Add new column to <Typography.Text code>{table.name}</Typography.Text>
+        Add new column to <code>{table.name}</code>
       </>
     )
   }
   return (
     <>
-      Update column <Typography.Text code>{column.name}</Typography.Text> from{' '}
-      <Typography.Text code>{column.table}</Typography.Text>
+      Update column <code>{column.name}</code> from <code>{column.table}</code>
     </>
   )
 }

@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { object, string } from 'yup'
 import { observer } from 'mobx-react-lite'
-import { Button, Form, Input, Modal } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button, Form, Input, Modal } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { FormHeader } from 'components/ui/Forms'
 import { domainRegex } from '../Auth.constants'
 import DomainList from './DomainList'
@@ -19,6 +21,8 @@ const RedirectDomains = () => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [selectedDomainToDelete, setSelectedDomainToDelete] = useState<string>()
 
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
   const newDomainSchema = object({
     domain: string().matches(domainRegex, 'URL is not valid').required(),
   })
@@ -28,7 +32,19 @@ const RedirectDomains = () => {
     const payload = URI_ALLOW_LIST_ARRAY
     payload.push(values.domain)
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+    const payloadString = payload.toString()
+
+    if (payloadString.length > 2 * 1024) {
+      ui.setNotification({
+        message: 'Too many redirect domains, please remove some or try to use wildcards',
+        category: 'error',
+      })
+
+      setSubmitting(false)
+      return
+    }
+
+    const { error } = await authConfig.update({ URI_ALLOW_LIST: payloadString })
     if (!error) {
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully added domain' })
@@ -72,11 +88,32 @@ const RedirectDomains = () => {
       <div className="flex items-center justify-between">
         <FormHeader
           title="Redirect URLs"
-          description="URLs that auth providers are permitted to redirect to post authentication"
+          description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
-        <Button onClick={() => setOpen(true)}>Add domain</Button>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
+              Add URL
+            </Button>
+          </Tooltip.Trigger>
+          {!canUpdateConfig && (
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  You need additional permissions to update redirect URLs
+                </span>
+              </div>
+            </Tooltip.Content>
+          )}
+        </Tooltip.Root>
       </div>
-      <DomainList onSelectDomainToDelete={setSelectedDomainToDelete} />
+      <DomainList canUpdate={canUpdateConfig} onSelectDomainToDelete={setSelectedDomainToDelete} />
       <Modal
         hideFooter
         size="small"
@@ -95,7 +132,7 @@ const RedirectDomains = () => {
             return (
               <div className="mb-4 space-y-4 pt-4">
                 <div className="px-5">
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-sm text-scale-1100">
                     This will add a domain to a list of allowed domains that can interact with your
                     Authenticaton services for this project.
                   </p>
@@ -136,11 +173,11 @@ const RedirectDomains = () => {
       >
         <div className="mb-4 space-y-4 pt-4">
           <div className="px-5">
-            <p className="text-scale-1100 mb-2 text-sm">
+            <p className="mb-2 text-sm text-scale-1100">
               Are you sure you want to remove{' '}
               <span className="text-scale-1200">{selectedDomainToDelete}</span>?
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               This domain will no longer work with your authentication configuration.
             </p>
           </div>

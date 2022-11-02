@@ -1,12 +1,14 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { partition, isNull } from 'lodash'
-import { Input, IconSearch } from '@supabase/ui'
+import { Input, IconSearch, IconAlertCircle } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag, checkPermissions } from 'hooks'
 import ExtensionCard from './ExtensionCard'
 import { HIDDEN_EXTENSIONS } from './Extensions.constants'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {}
 
@@ -14,22 +16,32 @@ const Extensions: FC<Props> = ({}) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
+  const enableVaultExtension = useFlag('vaultExtension')
+  const hiddenExtensions = enableVaultExtension
+    ? HIDDEN_EXTENSIONS
+    : HIDDEN_EXTENSIONS.concat(['vault'])
+
   const extensions =
     filterString.length === 0
       ? meta.extensions.list()
       : meta.extensions.list((ext: any) => ext.name.includes(filterString))
   const extensionsWithoutHidden = extensions.filter(
-    (ext: any) => !HIDDEN_EXTENSIONS.includes(ext.name)
+    (ext: any) => !hiddenExtensions.includes(ext.name)
   )
   const [enabledExtensions, disabledExtensions] = partition(
     extensionsWithoutHidden,
     (ext: any) => !isNull(ext.installed_version)
   )
 
+  const canUpdateExtensions = checkPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
+
   return (
     <div className="p-4">
       <div className="mb-4">
-        <div className="flex">
+        <div className="flex items-center justify-between">
           <Input
             size="small"
             placeholder={'Filter'}
@@ -37,6 +49,14 @@ const Extensions: FC<Props> = ({}) => {
             onChange={(e) => setFilterString(e.target.value)}
             icon={<IconSearch size="tiny" />}
           />
+          {!canUpdateExtensions && (
+            <div className="w-[500px]">
+              <InformationBox
+                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                title="You need additional permissions to update database extensions"
+              />
+            </div>
+          )}
         </div>
       </div>
 

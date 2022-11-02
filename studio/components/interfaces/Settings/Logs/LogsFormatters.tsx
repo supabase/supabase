@@ -4,9 +4,49 @@
  * for http response codes
  */
 
-import { IconAlertCircle, IconInfo } from '@supabase/ui'
+import { IconAlertCircle, IconInfo } from 'ui'
 import dayjs from 'dayjs'
+import React from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import CopyButton from 'components/ui/CopyButton'
+
+export const RowLayout: React.FC = ({ children }) => (
+  <div className="flex h-full w-full items-center gap-4">{children}</div>
+)
+
+export const SelectionDetailedRow = ({
+  label,
+  value,
+  valueRender,
+}: {
+  label: string
+  value: string
+  valueRender?: React.ReactNode
+}) => {
+  return (
+    <div className="grid grid-cols-12 group">
+      <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
+      <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
+        {valueRender ?? value}
+      </span>
+      <CopyButton
+        bounceIconOnCopy
+        text={value}
+        className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
+        type="text"
+        title="Copy to clipboard"
+      >
+        {''}
+      </CopyButton>
+    </div>
+  )
+}
+
+// used for column renderers
+export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
+  value,
+  className,
+}) => <span className={'font-mono text-xs truncate ' + className}>{value}</span>
 
 export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
@@ -24,10 +64,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '1':
     case '2':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-500 dark:bg-scale-400 border
+            className="relative flex h-6 items-center justify-center rounded border bg-scale-500 px-2
+            py-1 text-center dark:bg-scale-400
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -38,10 +78,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     // 5XX responses
     case '5':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-red-400
+            className="relative flex h-6 items-center justify-center rounded bg-red-400 px-2 py-1
+            text-center
 
             "
           >
@@ -54,10 +94,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '4':
     case '3':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-amber-400
+            className="relative flex h-6 items-center justify-center rounded bg-amber-400 px-2 py-1
+            text-center
 
             "
           >
@@ -71,10 +111,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     // All other responses
     default:
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-300
+            className="relative flex h-6 items-center justify-center rounded bg-scale-300 px-2 py-1
+            text-center
 
             "
           >
@@ -92,7 +132,13 @@ export const ResponseCodeFormatter = ({ value }: any) => {
  * for http response codes
  */
 
-export const SeverityFormatter = ({ value }: { value: string }) => {
+export const SeverityFormatter = ({
+  value,
+  uppercase = true,
+}: {
+  value: string
+  uppercase?: boolean
+}) => {
   if (!value) {
     return (
       <div>
@@ -101,19 +147,24 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
     )
   }
 
-  value = value.toUpperCase()
+  const uppercasedValue = value.toUpperCase()
+  const text = uppercase ? uppercasedValue : value
+  const Layout: React.FC<{ className?: string }> = ({ className, children }) => (
+    <div className={`w-24 flex items-center h-full ${className}`}>{children}</div>
+  )
 
-  switch (value) {
+  switch (uppercasedValue) {
+    case 'UNCAUGHTEXCEPTION':
     case 'PANIC':
     case 'FATAL':
     case 'ERROR':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-red-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-red-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-red-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
@@ -121,45 +172,45 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
 
     case 'DEBUG':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
     case 'LOG':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
             <IconInfo size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
     case 'WARNING':
       return (
-        <div className="flex items-center h-full gap-1">
+        <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-amber-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-amber-900 !block titlecase">{value}</span>
-        </div>
+          <span className="!text-amber-900 !block titlecase">{text}</span>
+        </Layout>
       )
       break
 
     // All other responses
     default:
       return (
-        <div className="flex items-center h-full">
+        <Layout>
           <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
-            <label className="block font-mono text-sm text-scale-900">{value}</label>
+            <label className="block font-mono text-sm text-scale-900">{text}</label>
           </div>
-        </div>
+        </Layout>
       )
       break
   }
@@ -190,7 +241,7 @@ export const TimestampLocalFormatter = ({
  */
 
 export const HeaderFormmater = ({ value }: any) => {
-  return <div className="text-scale-900 font-normal flex items-center text-xs h-full">{value}</div>
+  return <div className="flex h-full items-center text-xs font-normal text-scale-900">{value}</div>
 }
 
 /*

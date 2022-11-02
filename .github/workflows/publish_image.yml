@@ -2,17 +2,18 @@ name: Publish to Image Registry
 
 on:
   push:
-    branches:
-      - studio
-    paths:
-      - 'studio/**'
     tags:
-      - 'v*'
+      - '*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image tag'
+        required: true
+        type: string
 
 jobs:
   publish:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - id: meta
         uses: docker/metadata-action@v4
@@ -21,9 +22,10 @@ jobs:
             supabase/studio
             public.ecr.aws/t3w2s2c9/studio
           flavor: |
-            latest=true
+            latest=false
           tags: |
             type=ref,event=tag
+            type=raw,value=${{ inputs.version }},enable=${{ github.event_name != 'push' }}
 
       - uses: docker/setup-qemu-action@v2
         with:
@@ -47,7 +49,7 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           push: true
-          context: studio
+          context: '{{defaultContext}}:studio'
           target: production
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}

@@ -278,10 +278,10 @@ final res = await supabase
 
 ### Database Functions vs Edge Functions
 
-For data-intensive operations we recommend using [Database Functions](../../guides/database/functions), which are executed within your database
+For data-intensive operations, use Database Functions, which are executed within your database
 and can be called remotely using the [REST and GraphQL API](../api).
 
-For use-cases which require low-latency we recommend [Edge Functions](../../guides/functions), which are globally-distributed and can be written in Typescript.
+For use-cases which require low-latency, use [Edge Functions](../../guides/functions), which are globally-distributed and can be written in Typescript.
 
 ### Security `definer` vs `invoker`
 
@@ -302,9 +302,21 @@ $$;
 It is best practice to use `security invoker` (which is also the default). If you ever use `security definer`, you _must_ set the `search_path`.
 This limits the potential damage if you allow access to schemas which the user executing the function should not have.
 
+### Function privileges
+
+By default, database functions can be executed by any role. You can restrict this by altering the default privileges and then choosing which roles can execute functions.
+
+```sql
+ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+
+-- Choose which roles can execute functions
+GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
+GRANT EXECUTE ON FUNCTION hello_world TO service_role;
+```
+
 ## Resources
 
-- Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Dart](../../reference/dart/rpc)
+- Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Flutter](../../reference/dart/rpc)
 - Community client libraries: [github.com/supabase-community](https://github.com/supabase-community)
 - PostgreSQL Official Docs: [Chapter 9. Functions and Operators](https://www.postgresql.org/docs/current/functions.html)
 - PostgreSQL Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/9.1/sql-createfunction.html)

@@ -33,6 +33,28 @@ const supabaseUrl = '${endpoint}'
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)`,
     },
+    python: {
+      language: 'python',
+      code: `
+import os
+from supabase import create_client, Client
+
+url: str = '${endpoint}'
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+`,
+    },
+    dart: {
+      language: 'dart',
+      code: `
+final supabaseUrl = '${endpoint}'
+final supabaseKey = String.fromEnvironment('SUPABASE_KEY')
+
+Future<void> main() async {
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  runApp(MyApp());
+}`,
+    },
   }),
   authKey: (title, varName, apikey) => ({
     title: `${title}`,
@@ -684,7 +706,7 @@ const { user, error } = await supabase.auth.update({
 curl -X POST '${endpoint}/auth/v1/logout' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
--H "Authorization: Bearer USER_TOKEN"'
+-H "Authorization: Bearer USER_TOKEN"
 `,
     },
     js: {

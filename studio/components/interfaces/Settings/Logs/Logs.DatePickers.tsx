@@ -1,4 +1,4 @@
-import { Alert, Button, Dropdown, IconClock } from '@supabase/ui'
+import { Alert, Button, Dropdown, IconClock } from 'ui'
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
@@ -13,9 +13,10 @@ interface Props {
 const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const defaultHelper = getDefaultHelper(helpers)
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
+
   const handleHelperChange = (newValue: string) => {
-    setHelperValue(newValue)
     const selectedHelper = helpers.find((h) => h.text === newValue)
+
     if (onChange && selectedHelper) {
       onChange({ to: selectedHelper.calcTo(), from: selectedHelper.calcFrom() })
     }
@@ -24,17 +25,18 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const selectedHelper = helpers.find((helper) => {
     if (to === helper.calcTo() && from === helper.calcFrom()) {
       return true
-    } else if (helper.text === helperValue) {
-      return true
     } else {
       return false
     }
   })
+
   useEffect(() => {
     if (selectedHelper && helperValue !== selectedHelper.text) {
       setHelperValue(selectedHelper.text)
+    } else if (!selectedHelper && (to || from)) {
+      setHelperValue('')
     }
-  }, [selectedHelper])
+  }, [selectedHelper, to, from])
 
   return (
     <div className="flex items-center">
@@ -66,6 +68,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
       <DatePicker
         triggerButtonClassName="rounded-l-none"
         triggerButtonType={selectedHelper ? 'default' : 'secondary'}
+        triggerButtonTitle="Custom"
         onChange={(value) => {
           setHelperValue('')
           if (onChange) onChange(value)

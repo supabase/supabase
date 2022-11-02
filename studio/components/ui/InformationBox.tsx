@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState } from 'react'
-import { IconMaximize2, IconMinimize2 } from '@supabase/ui'
+import { IconMaximize2, IconMinimize2 } from 'ui'
 
 interface Props {
   icon?: ReactNode
@@ -31,19 +31,19 @@ const InformationBox: FC<Props> = ({
   return (
     <div
       className={`${block ? 'block w-full' : ''}
-      bg-scale-100 dark:bg-scale-400 border-scale-600 dark:border-scale-500 block w-full rounded border py-3 ${className}`}
+      block w-full rounded border border-scale-600 bg-scale-100 py-3 dark:border-scale-500 dark:bg-scale-400 ${className}`}
     >
       <div className="flex flex-col px-4">
         <div className="flex items-center justify-between">
-          <div className="flex w-full space-x-3 lg:items-center">
+          <div className="flex w-full space-x-3 lg:items-start">
             {icon && <span className="text-scale-900">{icon}</span>}
             <div className="flex-grow">
-              <h5 className="text-scale-1200 text-sm">{title}</h5>
+              <h5 className="text-sm text-scale-1200">{title}</h5>
             </div>
           </div>
           {description && !hideCollapse ? (
             <div
-              className="text-scale-900 cursor-pointer"
+              className="cursor-pointer text-scale-900"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
@@ -54,26 +54,28 @@ const InformationBox: FC<Props> = ({
             </div>
           ) : null}
         </div>
-        <div
-          className={`flex flex-col space-y-3 overflow-hidden transition-all ${
-            isExpanded ? 'mt-3' : ''
-          }`}
-          style={{ maxHeight: isExpanded ? 500 : 0 }}
-        >
-          <div className="text-scale-1100 text-sm">{description}</div>
+        {(description || url || button) && (
+          <div
+            className={`flex flex-col space-y-3 overflow-hidden transition-all ${
+              isExpanded ? 'mt-3' : ''
+            }`}
+            style={{ maxHeight: isExpanded ? 500 : 0 }}
+          >
+            <div className="text-scale-1100 text-sm">{description}</div>
 
-          {url && (
-            <a
-              href={url}
-              target="_blank"
-              className="text-scale-1100 hover:text-scale-1200 text-sm underline transition-colors"
-            >
-              {urlLabel}
-            </a>
-          )}
+            {url && (
+              <a
+                href={url}
+                target="_blank"
+                className="text-scale-1100 hover:text-scale-1200 text-sm underline transition-colors"
+              >
+                {urlLabel}
+              </a>
+            )}
 
-          {button && <div>{button}</div>}
-        </div>
+            {button && <div>{button}</div>}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,10 +1,9 @@
 import { auth } from 'lib/gotrue'
-import { tryParseJson } from 'lib/helpers'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
-  const message = e?.message ? `An error has occured: ${e.message}` : 'An error has occured'
+  const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
   const error = { code: 500, message, requestId }
   return { error } as unknown as SupaResponse<T>
 }
@@ -78,7 +77,7 @@ export async function handleResponseError<T = unknown>(
   } else if (resJson.error && resJson.error.message) {
     return { error: { code: response.status, ...resJson.error } } as unknown as SupaResponse<T>
   } else {
-    const message = resTxt ?? `An error has occured: ${response.status}`
+    const message = resTxt ?? `An error has occurred: ${response.status}`
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }
@@ -91,32 +90,8 @@ export async function getAccessToken() {
   const {
     data: { session },
   } = await auth.getSession()
-  if (!session) {
-    // try to get from url fragment
-    const accessToken = getParameterByName('access_token')
-    if (accessToken) {
-      return accessToken
-    } else {
-      return undefined
-    }
-  }
 
-  return session.access_token
-}
-
-// get param from URL fragment
-export function getParameterByName(name: string, url?: string) {
-  // ignore if server-side
-  if (typeof window === 'undefined') return ''
-
-  if (!url) url = window?.location?.href || ''
-  // eslint-disable-next-line no-useless-escape
-  name = name.replace(/[\[\]]/g, '\\$&')
-  const regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
-    results = regex.exec(url)
-  if (!results) return null
-  if (!results[2]) return ''
-  return decodeURIComponent(results[2].replace(/\+/g, ' '))
+  return session?.access_token
 }
 
 export async function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {

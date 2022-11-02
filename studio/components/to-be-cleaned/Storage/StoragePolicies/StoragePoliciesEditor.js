@@ -1,19 +1,19 @@
-import { Badge, Button, Checkbox, Input, Modal } from '@supabase/ui'
+import { Badge, Button, Checkbox, Input, Modal } from 'ui'
 import { get } from 'lodash'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
 import SqlEditor from 'components/ui/SqlEditor'
-import { PolicyName, PolicyRoles } from 'components/interfaces/Authentication/Policies/PolicyEditor'
+import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
   return (
     <div className="flex space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-scale-1100 text-base" htmlFor="policy-name">
+        <label className="text-base text-scale-1100" htmlFor="policy-name">
           Policy definition
         </label>
-        <p className="text-scale-900 text-sm">
+        <p className="text-sm text-scale-900">
           Provide a SQL conditional expression that returns a boolean.
         </p>
       </div>
@@ -29,12 +29,19 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
   return (
     <div className="flex justify-between space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-scale-1100 text-base" htmlFor="allowed-operation">
+        <label className="text-base text-scale-1100" htmlFor="allowed-operation">
           Allowed operation
         </label>
-        <p className="text-scale-900 text-sm">
-          Based on the operations you have selected, you can use any of the highlighted functions in
-          the supabase-js JavaScript library
+        <p className="text-sm text-scale-900">
+          Based on the operations you have selected, you can use the highlighted functions in the{' '}
+          <a
+            href="https://supabase.com/docs/reference/javascript/storage-from-list"
+            target="_blank"
+            className="underline"
+          >
+            client library
+          </a>
+          .
         </p>
       </div>
       <div className="w-2/3">
@@ -75,7 +82,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 }
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
-  <div className="dark:border-dark flex w-full items-center justify-end space-x-4 border-t px-6 py-3">
+  <div className="flex w-full items-center justify-end space-x-4 border-t px-6 py-3 dark:border-dark">
     <Button type="default" onClick={onViewTemplates}>
       View templates
     </Button>
@@ -110,14 +117,14 @@ const StoragePoliciesEditor = ({
             onUpdatePolicyName={onUpdatePolicyName}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <PolicyAllowedOperations
             allowedOperations={policyFormFields.allowedOperations}
             onToggleOperation={onToggleOperation}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <PolicyRoles
             roles={roles}
@@ -125,7 +132,7 @@ const StoragePoliciesEditor = ({
             onUpdateSelectedRoles={onUpdatePolicyRoles}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <PolicyDefinition
             definition={definition}

@@ -5,7 +5,7 @@ description: How to set up and use Mobile OTP with MessageBird and Supabase.
 ---
 
 import Tabs from '@theme/Tabs'
-import TabsPanel from '@theme/TabsPanel'
+import TabItem from '@theme/TabItem'
 
 ## Overview
 
@@ -82,12 +82,12 @@ In this use scenario we'll be using the user's mobile phone number as an alterna
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
 <Tabs
-defaultActiveId="JS"
-values={[
-  {label: 'Javascript', value: 'JS'},
-  {label: 'HTTP', value: 'HTTP'},
-]}>
-<TabsPanel id="JS" label="JS">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 let { user, error } = await supabase.auth.signUp({
@@ -96,8 +96,8 @@ let { user, error } = await supabase.auth.signUp({
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
@@ -109,7 +109,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 }'
 ```
 
-</TabsPanel>
+</TabPanel>
 </Tabs>
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
@@ -117,12 +117,12 @@ The user will now receive an SMS with a 6-digit pin that you will need to receiv
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
 
 <Tabs
-defaultActiveId="JS"
-values={[
-  {label: 'Javascript', value: 'JS'},
-  {label: 'HTTP', value: 'HTTP'},
-]}>
-<TabsPanel id="JS" label="JS">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 let { session, error } = await supabase.auth.verifyOTP({
@@ -131,8 +131,8 @@ let { session, error } = await supabase.auth.verifyOTP({
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
@@ -145,7 +145,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
 }'
 ```
 
-</TabsPanel>
+</TabPanel>
 </Tabs>
 
 If successful the user will now be logged in and you should receive a valid session like:
@@ -164,22 +164,22 @@ The access token can be sent in the Authorization header as a Bearer token for a
 Also now that the mobile has been verified, the user can use the number and password to sign in without needing to verify their number each time:
 
 <Tabs
-defaultActiveId="JS"
-values={[
-  {label: 'Javascript', value: 'JS'},
-  {label: 'HTTP', value: 'HTTP'},
-]}>
-<TabsPanel id="JS" label="JS">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithPassword({
   phone: '+13334445555',
   password: 'some-password',
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=password' \
@@ -191,7 +191,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=
 }'
 ```
 
-</TabsPanel>
+</TabPanel>
 </Tabs>
 
 ### Using OTP as a passwordless sign-in mechanism
@@ -201,21 +201,21 @@ In this scenario you are granting your user's the ability to login to their acco
 In javascript we can use the `signIn` method with a single parameter: `phone`
 
 <Tabs
-defaultActiveId="JS"
-values={[
-  {label: 'Javascript', value: 'JS'},
-  {label: 'HTTP', value: 'HTTP'},
-]}>
-<TabsPanel id="JS" label="JS">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555',
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
@@ -226,18 +226,18 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
 }'
 ```
 
-</TabsPanel>
+</TabPanel>
 </Tabs>
 
 The second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
 
 <Tabs
-defaultActiveId="JS"
-values={[
-  {label: 'Javascript', value: 'JS'},
-  {label: 'HTTP', value: 'HTTP'},
-]}>
-<TabsPanel id="JS" label="JS">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 let { session, error } = await supabase.auth.verifyOTP({
@@ -246,8 +246,8 @@ let { session, error } = await supabase.auth.verifyOTP({
 })
 ```
 
-</TabsPanel>
-<TabsPanel id="HTTP" label="HTTP">
+</TabPanel>
+<TabPanel id="http" label="HTTP">
 
 ```bash
 curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
@@ -260,7 +260,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
 }'
 ```
 
-</TabsPanel>
+</TabPanel>
 </Tabs>
 
 and the response should also be the same as above:

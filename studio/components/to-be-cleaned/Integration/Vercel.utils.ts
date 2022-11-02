@@ -126,6 +126,8 @@ export function prepareVercelEvns(
     type: 'encrypted' | string
   }[],
   project: {
+    db_host?: string
+    db_password?: string
     endpoint: string
     anon_key: string
     service_key: string
@@ -141,14 +143,22 @@ export function prepareVercelEvns(
       target: ('production' | 'development' | 'preview')[]
     } = { key: x.key, type: x.type, target: ['production', 'development', 'preview'], value: '' }
 
-    if (x.alias == INTEGRATION_ENVS_ALIAS.ENDPOINT) {
-      env.value = project.endpoint
-    }
-    if (x.alias == INTEGRATION_ENVS_ALIAS.ANONKEY) {
-      env.value = project.anon_key
-    }
-    if (x.alias == INTEGRATION_ENVS_ALIAS.SERVICEKEY) {
-      env.value = project.service_key
+    switch (x.alias) {
+      case INTEGRATION_ENVS_ALIAS.ENDPOINT:
+        env.value = project.endpoint
+        break
+      case INTEGRATION_ENVS_ALIAS.ANONKEY:
+        env.value = project.anon_key
+        break
+      case INTEGRATION_ENVS_ALIAS.SERVICEKEY:
+        env.value = project.service_key
+        break
+      case INTEGRATION_ENVS_ALIAS.DBHOST:
+        env.value = project.db_host ?? ''
+        break
+      case INTEGRATION_ENVS_ALIAS.DBPASSWORD:
+        env.value = project.db_password ?? ''
+        break
     }
 
     envs.push(env)

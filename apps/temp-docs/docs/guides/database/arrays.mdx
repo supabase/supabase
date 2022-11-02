@@ -5,81 +5,64 @@ description: How to use arrays in PostgreSQL and the Supabase API.
 ---
 
 import Tabs from '@theme/Tabs'
-import TabsPanel from '@theme/TabsPanel'
+import TabItem from '@theme/TabItem'
 
-PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html).  
-These arrays are also supported in the Supabase dashboard and in the Javascript API.
+PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html). These arrays are also supported in the Supabase Dashboard and in the JavaScript API.
 
-## Steps
-
-### Create a table with an array column
+## Create a table with an array column
 
 Create a test table with a text array (an array of strings):
 
 <Tabs
-defaultActiveId="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
-<TabsPanel id="UI" label="UI">
+1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Click **New Table** and create a table with the name `arraytest`.
+1. Click **Save**.
+1. Click **New Column** and create a column with the name `textarray`, type `text`, and select **Define as array**.
+1. Click **Save**.
 
-```bash
-1. Got the Table Editor
-2. Create a New Table
-3. Create a new table named `arraytest` and save the table
-    - New Column
-        - Name the new column `textarray`
-        - Make it type `text`
-        - Check the box labelled `Define as array`
-        - Save the new column
-```
-
-</TabsPanel>
-
-<TabsPanel id="SQL" label="SQL">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 CREATE TABLE arraytest (id integer NOT NULL, textarray text ARRAY);
 ```
 
-</TabsPanel>
+</TabPanel>
 </Tabs>
 
-### Insert a record with an array value
+## Insert a record with an array value
 
 <Tabs
-defaultActiveId="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JS', value: 'JavaScript'},
-]}>
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
-<TabsPanel id="UI" label="UI">
+1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Select the `arraytest` table.
+1. Click **Insert row** and add `["Harry", "Larry", "Moe"]`.
+1. Click **Save.**
 
-```bash
-- Table Editor
-- Select `arraytest`
-- Insert Row
-    - In the `textarray` field input, paste:
-    - `["Harry", "Larry", "Moe"]`
-    - Save the new row
-```
-
-</TabsPanel>
-
-<TabsPanel id="SQL" label="SQL">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 INSERT INTO arraytest (id, textarray) VALUES (1, ARRAY['Harry', 'Larry', 'Moe']);
 ```
 
-</TabsPanel>
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
-<TabsPanel id="JavaScript" label="JavaScript">
-To insert a record from the Javascript client:
+Insert a record from the JavaScript client:
 
 ```js
 const { data, error } = await supabase
@@ -87,60 +70,55 @@ const { data, error } = await supabase
   .insert([{ id: 2, textarray: ['one', 'two', 'three', 'four'] }])
 ```
 
-</TabsPanel>
-
+</TabPanel>
 </Tabs>
 
-### View the results
+## View the results
 
 <Tabs
-defaultActiveId="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
-<TabsPanel id="UI" label="UI">
+1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Select the `arraytest` table.
 
-```bash
-- Table Editor
-- Select `arraytest`
-```
-
-Your first array data!
+You should see:
 
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
 
-</TabsPanel>
-<TabsPanel id="SQL" label="SQL">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 SELECT * FROM arraytest;
 ```
 
-Your first array data!
+You should see:
 
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
 
-</TabsPanel>
+</TabPanel>
 </Tabs>
 
-### Query Array Data
+## Query array data
 
-To query an array, PostgreSQL uses 1-based arrays, so be careful, since you're probably used to 0-based arrays in Javascript.
+PostgreSQL uses 1-based indexing (e.g., `textarray[1]` is the first item in the array).
 
 <Tabs
-defaultActiveId="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JS', value: 'JavaScript'},
-]}>
-
-<TabsPanel id="SQL" label="SQL">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+>
+<TabPanel id="sql" label="SQL">
 
 To select the first item from the array and get the total length of the array:
 
@@ -154,8 +132,8 @@ returns:
 | --------- | ------------ |
 | Harry     | 3            |
 
-</TabsPanel>
-<TabsPanel id="JavaScript" label="JavaScript">
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
 
 This returns the entire array field:
 
@@ -174,8 +152,7 @@ returns:
 ]
 ```
 
-</TabsPanel>
-
+</TabPanel>
 </Tabs>
 
 ## Resources

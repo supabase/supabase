@@ -14,11 +14,11 @@ export const CLIENT_LIBRARIES = [
     gitUrl: 'https://github.com/supabase/supabase-py',
   },
   {
-    language: 'Dart',
+    language: 'Flutter',
     officialSupport: false,
-    releaseState: 'Beta',
+    releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/dart/installing',
-    gitUrl: 'https://github.com/supabase/supabase-dart',
+    gitUrl: 'https://github.com/supabase/supabase-flutter',
   },
 ]
 
@@ -63,25 +63,25 @@ export const EXAMPLE_PROJECTS = [
     framework: 'JavaScript',
     title: 'Vanilla-js Auth app',
     description: 'Example app of real-time chat using supabase realtime api',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/auth/javascript-auth',
+    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/auth/javascript-auth',
   },
   {
     framework: 'React',
     title: 'React Native todo list app',
     description: 'React Native Todo List example with Expo',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/expo-todo-list',
+    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/expo-todo-list',
   },
   {
     framework: 'NextJS',
     title: 'Next.js todo list app',
     description: 'NextJS todo list example',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list',
+    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/nextjs-todo-list',
   },
   {
     framework: 'React',
     title: 'React todo List app',
     description: 'React todo List example',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/react-todo-list',
+    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/react-todo-list',
   },
   {
     framework: 'Svelte',
@@ -93,6 +93,6 @@ export const EXAMPLE_PROJECTS = [
     framework: 'VueJS',
     title: 'Vue.js todo list app',
     description: 'Vue.js todo app using TypeScript',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list',
+    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/vue3-ts-todo-list',
   },
 ]

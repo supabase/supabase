@@ -1,5 +1,5 @@
-import { FC } from 'react'
-import { Input } from '@supabase/ui'
+import { FC, ReactNode } from 'react'
+import { Input } from 'ui'
 import { getColumnType } from './DateTimeInput.utils'
 import dayjs from 'dayjs'
 
@@ -7,7 +7,7 @@ interface Props {
   name: string
   format: string
   value: string
-  description: string
+  description: string | ReactNode
   onChange: (value: string) => void
 }
 
@@ -21,7 +21,7 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
 
   function handleOnChange(e: any) {
     const temp = e.target.value
-    if (temp.length === 0) return
+    if (temp.length === 0 && temp !== '') return
     onChange(temp)
   }
 
@@ -31,11 +31,12 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
       className="w-full"
       label={name}
       descriptionText={
-        description && description.length !== 0
-          ? description
-          : format.includes('tz')
-          ? `Your local timezone will be automatically applied (${dayjs().format('ZZ')})`
-          : undefined
+        <div className="space-y-1">
+          {description}
+          {format.includes('tz') && (
+            <p>Your local timezone will be automatically applied ({dayjs().format('ZZ')})</p>
+          )}
+        </div>
       }
       labelOptional={format}
       size="small"

@@ -1,75 +1,17 @@
 ---
 id: initializing
-title: "Initializing"
+title: 'Initializing'
 slug: initializing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
-
-## Dart
-You can initialize a new Supabase client using the `SupabaseClient()` method.
-
-The Supabase client is your entrypoint to the rest of the Supabase functionality
-and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ## Flutter
 
-For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
+For `supabase-flutter`, you will be using the static `initialize()` method on `Supabase` class.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Examples
-
-### Dart SupabaseClient()
-
-
-
-<Tabs
-  defaultActiveId="dart"
-  groupId="reference/dart"
-  values={[{ label: 'Dart', value: 'dart' }]}>
-
-<TabsPanel id="dart" label="dart">
-
-```dart
-final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
-```
-
-
-</TabsPanel>
-
-</Tabs>
-
-### Flutter initialize()
-
-
-
-<Tabs
-  defaultActiveId="dart"
-  groupId="reference/dart"
-  values={[{ label: 'Dart', value: 'dart' }]}>
-
-<TabsPanel id="dart" label="dart">
+### Flutter `initialize()`
 
 ```dart title="main.dart"
 Future<void> main() async {
@@ -78,7 +20,23 @@ Future<void> main() async {
 }
 ```
 
+### Access `SupabaseClient` instance
 
-</TabsPanel>
+Once you initialize Supabase in your `main()` method, you can access the `SupabaseClient` instance from anywhere in your app.
 
-</Tabs>
+```dart
+final supabase = Supabase.instance.client;
+```
+
+## Other Dart Projects
+
+You can initialize a new Supabase client using the `SupabaseClient()` method.
+
+The Supabase client is your entrypoint to the rest of the Supabase functionality
+and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+### Dart `SupabaseClient()`
+
+```dart
+final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
+```

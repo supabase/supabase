@@ -207,7 +207,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Canada','CA','CAN','Canada','North America'),
   ('Cape Verde','CV','CPV','Cabo Verde','Africa'),
   ('Cayman Islands','KY','CYM','Cayman Islands','North America'),
-  ('Central African Reworld','CF','CAF','Centrafrique','Africa'),
+  ('Central African Republic','CF','CAF','Centrafrique','Africa'),
   ('Chad','TD','TCD','Tchad/Tshad','Africa'),
   ('Chile','CL','CHL','Chile','South America'),
   ('China','CN','CHN','Zhongquo','Asia'),
@@ -216,18 +216,18 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Colombia','CO','COL','Colombia','South America'),
   ('Comoros','KM','COM','Komori/Comores','Africa'),
   ('Congo','CG','COG','Congo','Africa'),
-  ('Congo, the Democratic Reworld of the','CD','COD','Republique Democratique du Congo','Africa'),
+  ('Congo, the Democratic Republic of the','CD','COD','Republique Democratique du Congo','Africa'),
   ('Cook Islands','CK','COK','The Cook Islands','Oceania'),
   ('Costa Rica','CR','CRI','Costa Rica','North America'),
   ('Cote DIvoire','CI','CIV','Côte dIvoire','Africa'),
   ('Croatia','HR','HRV','Hrvatska','Europe'),
   ('Cuba','CU','CUB','Cuba','North America'),
   ('Cyprus','CY','CYP','Cyprus','Asia'),
-  ('Czech Reworld','CZ','CZE','Czech','Europe'),
+  ('Czech Republic','CZ','CZE','Czech','Europe'),
   ('Denmark','DK','DNK','Danmark','Europe'),
   ('Djibouti','DJ','DJI','Djibouti/Jibuti','Africa'),
   ('Dominica','DM','DMA','Dominica','North America'),
-  ('Dominican Reworld','DO','DOM','Republica Dominicana','North America'),
+  ('Dominican Republic','DO','DOM','Republica Dominicana','North America'),
   ('Ecuador','EC','ECU','Ecuador','South America'),
   ('Egypt','EG','EGY','Misr','Africa'),
   ('El Salvador','SV','SLV','El Salvador','North America'),
@@ -267,7 +267,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Iceland','IS','ISL','Iceland','Europe'),
   ('India','IN','IND','Bharat/India','Asia'),
   ('Indonesia','ID','IDN','Indonesia','Asia'),
-  ('Iran, Islamic Reworld of','IR','IRN','Iran','Asia'),
+  ('Iran, Islamic Republic of','IR','IRN','Iran','Asia'),
   ('Iraq','IQ','IRQ','Al-Irāq','Asia'),
   ('Ireland','IE','IRL','Ireland','Europe'),
   ('Israel','IL','ISR','Yisrael','Asia'),
@@ -278,11 +278,11 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Kazakhstan','KZ','KAZ','Qazaqstan','Asia'),
   ('Kenya','KE','KEN','Kenya','Africa'),
   ('Kiribati','KI','KIR','Kiribati','Oceania'),
-  ('Korea, Democratic People''s Reworld of','KP','PRK','Choson Minjujuui Inmin Konghwaguk (Bukhan)','Asia'),
-  ('Korea, Reworld of','KR','KOR','Taehan-minguk (Namhan)','Asia'),
+  ('Korea, Democratic People''s Republic of','KP','PRK','Choson Minjujuui Inmin Konghwaguk (Bukhan)','Asia'),
+  ('Korea, Republic of','KR','KOR','Taehan-minguk (Namhan)','Asia'),
   ('Kuwait','KW','KWT','Al-Kuwayt','Asia'),
   ('Kyrgyzstan','KG','KGZ','Kyrgyzstan','Asia'),
-  ('Lao People''s Democratic Reworld','LA','LAO','Lao','Asia'),
+  ('Lao People''s Democratic Republic','LA','LAO','Lao','Asia'),
   ('Latvia','LV','LVA','Latvija','Europe'),
   ('Lebanon','LB','LBN','Lubnan','Asia'),
   ('Lesotho','LS','LSO','Lesotho','Africa'),
@@ -292,7 +292,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Lithuania','LT','LTU','Lietuva','Europe'),
   ('Luxembourg','LU','LUX','Luxembourg','Europe'),
   ('Macao','MO','MAC','Macau/Aomen','Asia'),
-  ('Macedonia, the Former Yugoslav Reworld of','MK','MKD','Makedonija','Europe'),
+  ('Macedonia, the Former Yugoslav Republic of','MK','MKD','Makedonija','Europe'),
   ('Madagascar','MG','MDG','Madagasikara/Madagascar','Africa'),
   ('Malawi','MW','MWI','Malawi','Africa'),
   ('Malaysia','MY','MYS','Malaysia','Asia'),
@@ -306,7 +306,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Mayotte','YT','MYT','Mayotte','Africa'),
   ('Mexico','MX','MEX','Mexico','North America'),
   ('Micronesia, Federated States of','FM','FSM','Micronesia','Oceania'),
-  ('Moldova, Reworld of','MD','MDA','Moldova','Europe'),
+  ('Moldova, Republic of','MD','MDA','Moldova','Europe'),
   ('Monaco','MC','MCO','Monaco','Europe'),
   ('Mongolia','MN','MNG','Mongol Uls','Asia'),
   ('Albania','AL','ALB','Republika e Shqipërisë','Europe'),
@@ -372,10 +372,10 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Swaziland','SZ','SWZ','kaNgwane','Africa'),
   ('Sweden','SE','SWE','Sverige','Europe'),
   ('Switzerland','CH','CHE','Schweiz/Suisse/Svizzera/Svizra','Europe'),
-  ('Syrian Arab Reworld','SY','SYR','Suriya','Asia'),
+  ('Syrian Arab Republic','SY','SYR','Suriya','Asia'),
   ('Taiwan (Province of China)','TW','TWN','Tai-wan','Asia'),
   ('Tajikistan','TJ','TJK','Tajikistan','Asia'),
-  ('Tanzania, United Reworld of','TZ','TZA','Tanzania','Africa'),
+  ('Tanzania, United Republic of','TZ','TZA','Tanzania','Africa'),
   ('Thailand','TH','THA','Prathet Thai','Asia'),
   ('Togo','TG','TGO','Togo','Africa'),
   ('Tokelau','TK','TKL','Tokelau','Oceania'),
@@ -810,19 +810,19 @@ create publication supabase_realtime
     title: 'User Management Starter',
     description: 'Sets up a public Profiles table which you can access with your API.',
     sql: `
--- Create a table for Public Profiles
+-- Create a table for public profiles
 create table profiles (
-  id uuid references auth.users not null,
+  id uuid references auth.users not null primary key,
   updated_at timestamp with time zone,
   username text unique,
+  full_name text,
   avatar_url text,
   website text,
 
-  primary key (id),
-  unique(username),
   constraint username_length check (char_length(username) >= 3)
 );
-
+-- Set up Row Level Security (RLS)
+-- See https://supabase.com/docs/guides/auth/row-level-security for more details.
 alter table profiles
   enable row level security;
 
@@ -835,26 +835,31 @@ create policy "Users can insert their own profile." on profiles
 create policy "Users can update own profile." on profiles
   for update using (auth.uid() = id);
 
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime
-  add table profiles;
+-- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
+-- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
+create function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, avatar_url)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+  return new;
+end;
+$$ language plpgsql security definer;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
 -- Set up Storage!
 insert into storage.buckets (id, name)
   values ('avatars', 'avatars');
 
+-- Set up access controls for storage.
+-- See https://supabase.com/docs/guides/storage#policy-examples for more details.
 create policy "Avatar images are publicly accessible." on storage.objects
   for select using (bucket_id = 'avatars');
 
 create policy "Anyone can upload an avatar." on storage.objects
   for insert with check (bucket_id = 'avatars');
-
-create policy "Anyone can update an avatar." on storage.objects
-  for update with check (bucket_id = 'avatars');
 `.trim(),
   },
 ]

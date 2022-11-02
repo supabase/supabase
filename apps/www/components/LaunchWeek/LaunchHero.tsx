@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import Link from 'next/link'
 import Controller from './launch-controller.json'
 
@@ -14,7 +14,7 @@ export default function LaunchHero() {
         </h2>
       </div>
       <div className="flex gap-3">
-        <Link href="#launch-week-5-day-3">
+        <Link href="#launch-week-5-day-5">
           <Button type="primary" size="small" className="text-white">
             Latest release
           </Button>

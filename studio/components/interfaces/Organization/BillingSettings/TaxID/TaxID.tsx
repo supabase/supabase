@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isEqual } from 'lodash'
-import { Input, Button, IconPlus, Select, IconX } from '@supabase/ui'
+import { Input, Button, IconPlus, Select, IconX } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
@@ -8,8 +8,9 @@ import { uuidv4 } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import Panel from 'components/ui/Panel'
-import { TAX_IDS } from './TaxID.constants'
+import { StripeTaxId, TAX_IDS } from './TaxID.constants'
 import NoPermission from 'components/ui/NoPermission'
+import { sanitizeTaxID } from './TaxID.utils'
 
 interface Props {
   loading: boolean
@@ -26,8 +27,8 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
 
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [taxIdValues, setTaxIdValues] = useState(taxIds)
-  const formattedTaxIds = taxIds.map((taxId: any) => {
+  const [taxIdValues, setTaxIdValues] = useState<StripeTaxId[]>(taxIds)
+  const formattedTaxIds: StripeTaxId[] = taxIds.map((taxId: StripeTaxId) => {
     return {
       id: taxId.id,
       type: taxId.type,
@@ -78,7 +79,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   }
 
   const onRemoveTaxId = (id: string) => {
-    const updatedTaxIds = taxIdValues.filter((taxId: any) => {
+    const updatedTaxIds = taxIdValues.filter((taxId: StripeTaxId) => {
       return taxId.id !== id
     })
     setTaxIdValues(updatedTaxIds)
@@ -93,21 +94,21 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
     setIsSaving(true)
     try {
       const deletedIds = await Promise.all(
-        taxIds.map(async (taxId: any) => {
+        taxIds.map(async (taxId: StripeTaxId) => {
           return await delete_(`${API_URL}/organizations/${slug}/tax-ids`, { id: taxId.id })
         })
       )
 
       const newIds = await Promise.all(
-        taxIdValues.map(async (taxId: any) => {
+        taxIdValues.map(async (taxId: StripeTaxId) => {
+          const sanitizedID = sanitizeTaxID(taxId)
           const result = await post(`${API_URL}/organizations/${slug}/tax-ids`, {
-            type: taxId.type,
-            value: taxId.value,
+            type: sanitizedID.type,
+            value: sanitizedID.value,
           })
-          return { id: taxId.id, result }
+          return { id: sanitizedID.id, result }
         })
       )
-
       const taxIdsWithErrors = newIds.filter((taxId: any) => {
         if (taxId.result.error) return taxId
       })
@@ -137,7 +138,8 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
       <div>
         <h4>Tax ID</h4>
         <p className="text-sm opacity-50">
-          If you would like to include specific tax ID(s) to your invoices
+          If you would like to include specific tax ID(s) to your invoices. <br />
+          Make sure the tax ID looks exactly like the placeholder text.
         </p>
       </div>
 
@@ -150,7 +152,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
           loading={loading}
           footer={
             !loading && (
-              <div className="flex justify-between w-full">
+              <div className="flex w-full justify-between">
                 {!canUpdateTaxIds ? (
                   <p className="text-sm text-scale-1000">
                     You need additional permissions to update this organization's tax IDs
@@ -158,7 +160,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                 ) : (
                   <div />
                 )}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
                   <Button
                     type="default"
                     htmlType="reset"
@@ -174,7 +176,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                     disabled={!hasChanges || isSaving}
                     onClick={() => onSaveTaxIds()}
                   >
-                    Save changes
+                    Save
                   </Button>
                 </div>
               </div>
@@ -183,15 +185,15 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
         >
           {loading && taxIdValues.length === 0 ? (
             <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-              <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
+              <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
             </div>
           ) : (
-            <Panel.Content className="w-3/5 space-y-4">
+            <Panel.Content className="w-8/12 space-y-4">
               {taxIdValues.length >= 1 ? (
                 <div className="w-full space-y-2">
-                  {taxIdValues.map((taxId: any, idx: number) => {
+                  {taxIdValues.map((taxId: StripeTaxId, idx: number) => {
                     const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
                     return (
                       <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
@@ -200,11 +202,13 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                           onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e.target.value)}
                           disabled={!canUpdateTaxIds}
                         >
-                          {TAX_IDS.map((option) => (
-                            <Select.Option key={option.name} value={option.name}>
-                              {option.name}
-                            </Select.Option>
-                          ))}
+                          {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
+                            (option) => (
+                              <Select.Option key={option.name} value={option.name}>
+                                {option.country} - {option.name}
+                              </Select.Option>
+                            )
+                          )}
                         </Select>
                         <Input
                           value={taxId.value}
@@ -230,7 +234,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
               )}
               {canUpdateTaxIds && (
                 <div
-                  className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition cursor-pointer"
+                  className="flex cursor-pointer items-center space-x-2 opacity-50 transition hover:opacity-100"
                   onClick={() => onAddNewTaxId()}
                 >
                   <IconPlus size={14} />

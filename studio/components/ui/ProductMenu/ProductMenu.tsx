@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, Menu } from '@supabase/ui'
+import { Badge, Menu } from 'ui'
 import ProductMenuItem from './ProductMenuItem'
 import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
 
@@ -19,10 +19,12 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                 <Menu.Group
                   //@ts-ignore
                   title={
-                    <div className="flex flex-col space-y-2">
-                      <span>{group.title}</span>
-                      {group.isPreview && <Badge color="amber">Not production ready</Badge>}
-                    </div>
+                    group.title ? (
+                      <div className="flex flex-col space-y-2">
+                        <span>{group.title}</span>
+                        {group.isPreview && <Badge color="amber">Not production ready</Badge>}
+                      </div>
+                    ) : null
                   }
                 />
                 <div>
@@ -35,12 +37,13 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                       isActive={page === item.key}
                       isExternal={item.isExternal}
                       target={item.isExternal ? '_blank' : '_self'}
+                      isPreview={item.isPreview}
                     />
                   ))}
                 </div>
               </div>
             </div>
-            {idx !== menu.length - 1 && <div className="bg-scale-500 h-px w-full"></div>}
+            {idx !== menu.length - 1 && <div className="h-px w-full bg-scale-500"></div>}
           </div>
         ))}
       </Menu>

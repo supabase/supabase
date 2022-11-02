@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, Divider, IconPlus } from '@supabase/ui'
+import { Button, Dropdown, Divider, IconPlus } from 'ui'
 
 import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -25,7 +25,7 @@ const OrgDropdown = () => {
                 {x.name}
               </Dropdown.Item>
             ))}
-          <Dropdown.Seperator />
+          <Dropdown.Separator />
           <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
             New organization
           </Dropdown.Item>

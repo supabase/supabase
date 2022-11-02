@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "noImplicitAny": false
+  },
+  "exclude": ["node_modules"]
+}
