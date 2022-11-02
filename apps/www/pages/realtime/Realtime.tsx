@@ -77,41 +77,41 @@ function RealtimePage() {
                 </p>
               </div>
               <Cursor
-                color="#236574"
+                color="var(--colors-yellow9)"
                 className={`${RealtimeStyles['cursor-one']} absolute top-[220px] right-[130px]`}
               />
               <Cursor
-                color="#170B6B"
+                color="var(--colors-indigo9)"
                 className={`${RealtimeStyles['cursor-two']} absolute top-[180px] right-[280px]`}
               />
               <div
                 className={[
                   'border-scale-1200 absolute bottom-[40px] left-[175px] flex h-10 w-20',
-                  'items-center justify-center space-x-2 rounded-full border-[3px] bg-[#170B6B]',
+                  'items-center justify-center space-x-2 rounded-full border-[3px] bg-indigo-900',
                   `${RealtimeStyles['cursor-two-comment']}`,
                 ].join(' ')}
               >
                 <p className="text-lg">🤔</p>
               </div>
               <Cursor
-                color="#FFCC00"
+                color="var(--colors-tomato9)"
                 className={`${RealtimeStyles['cursor-three']} absolute top-[170px] right-[180px]`}
               />
               <div
                 className={[
                   'border-scale-1200 absolute top-[72px] left-[320px] flex h-10 w-20',
-                  'items-center justify-center space-x-2 rounded-full border-[3px] bg-[#FFCC00]',
+                  'items-center justify-center space-x-2 rounded-full border-[3px] bg-tomato-900',
                   `${RealtimeStyles['cursor-three-comment']}`,
                 ].join(' ')}
               >
                 <p className="text-lg">😄</p>
               </div>
-              <div className="bg-scale-100 border-scale-500 absolute left-0 h-full w-24 border-r py-9 shadow">
+              {/* <div className="bg-scale-100 border-scale-500 absolute left-0 h-full w-24 border-r py-9 shadow">
                 <div className="border-scale-500 h-7 border-b" />
-              </div>
-              <div className="bg-scale-100 border-scale-500 absolute right-0 h-full w-20 border-l py-9 shadow">
+              </div> */}
+              {/* <div className="bg-scale-100 border-scale-500 absolute right-0 h-full w-20 border-l py-9 shadow">
                 <div className="border-scale-500 h-7 border-b" />
-              </div>
+              </div> */}
               <div className="bg-scale-100 border-scale-500 absolute top-0 flex h-9 w-full items-center justify-between border-b">
                 <div className="flex items-center">
                   <IconMenu className="text-scale-1200 mx-3" strokeWidth={1} size={16} />
