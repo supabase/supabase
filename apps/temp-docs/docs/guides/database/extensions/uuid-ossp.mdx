@@ -19,13 +19,12 @@ This makes them particularly well suited as Primary Keys. It is occasionally ref
 ### Enable the extension
 
 <Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
@@ -34,8 +33,8 @@ This makes them particularly well suited as Primary Keys. It is occasionally ref
 **Note**:
 Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Example: enable the "uuid-ossp" extension
@@ -53,8 +52,7 @@ It's good practice to create the extension within a separate schema (like `exten
 **Note**:
 Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
 
-</TabItem>
-
+</TabPanel>
 </Tabs>
 
 ### The `uuid` type

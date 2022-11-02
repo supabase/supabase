@@ -5,9 +5,6 @@ description: Auto-generating and Realtime APIs.
 sidebar_label: Overview
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
-
 Supabase auto-generates three types of API directly from your database schema.
 
 - REST - interact with your database through a restful interface.
@@ -44,11 +41,11 @@ It provides everything you need from a CRUD API:
 
 ## GraphQL API {#graphql-api-overview}
 
-:::note
+<Admonition type='note'>
 
 GraphQL is in Beta, and may have breaking changes. It is only available on self-hosted setups and Supabase projects created after 28th March 2022.
 
-:::
+</Admonition>
 
 GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-graphql), an open source PostgreSQL extension for GraphQL.
 
@@ -73,7 +70,6 @@ This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATC
   scrollable
   size="small"
   type="underlined"
-  listClassNames="px-8 pt-4"
   defaultActiveId="dashboard"
 >
 <TabPanel id="dashboard" label="Dashboard">
@@ -168,7 +164,6 @@ using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_ANON_KEY`) we provided:
   scrollable
   size="small"
   type="underlined"
-  listClassNames="px-8 pt-4"
   defaultActiveId="javascript"
 >
 <TabPanel id="javascript" label="Javascript">
@@ -204,12 +199,12 @@ JS Reference: [select()](../reference/javascript/select),
 
 ### GraphQL API
 
-:::note
+<Admonition type='note'>
 
 To rebuild your GraphQL schema from the SQL schema, call `select graphql.rebuild_schema();`.
 Be sure to rebuild the GraphQL schema after altering the SQL schema.
 
-:::
+</Admonition>
 
 You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urql](https://formidable.com/open-source/urql/docs/).
 
@@ -217,7 +212,6 @@ You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL ex
   scrollable
   size="small"
   type="underlined"
-  listClassNames="px-8 pt-4"
   defaultActiveId="javascript"
 >
 <TabPanel id="javascript" label="Javascript">
@@ -285,7 +279,6 @@ By default Realtime is disabled on your database. Let's turn on Realtime for the
   scrollable
   size="small"
   type="underlined"
-  listClassNames="px-8 pt-4"
   defaultActiveId="dashboard"
 >
 <TabPanel id="dashboard" label="Dashboard">
@@ -341,7 +334,6 @@ When you create a table in Postgres, Row Level Security is disabled by default. 
   scrollable
   size="small"
   type="underlined"
-  listClassNames="px-8 pt-4"
   defaultActiveId="dashboard"
 >
 <TabPanel id="dashboard" label="Dashboard">

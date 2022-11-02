@@ -43,9 +43,11 @@ which you can deploy yourself.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
 
-:::note
+<Admonition type="note">
+
 File, Folder, and Bucket names **must follow** [AWS object key naming guidelines](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) and avoid use of any other characters.
-:::
+
+</Admonition>
 
 ### Create a bucket
 
@@ -54,22 +56,19 @@ Since the storage is interoperable with your Postgres database, you can also use
 client libraries. Here we create a bucket called "avatars":
 
 <Tabs
-  groupId="storage-tabs"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-    {label: 'JavaScript', value: 'javascript'},
-    {label: 'Dart', value: 'dart'},
-  ]}>
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
 2. Click **New Bucket** and enter a name for the bucket.
 3. Click **Create Bucket**.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Use Postgres to create a bucket.
@@ -78,8 +77,8 @@ insert into storage.buckets (id, name)
 values ('avatars', 'avatars');
 ```
 
-</TabItem>
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="javascript" label="JavaScript">
 
 ```js
 // Use the JS library to create a bucket.
@@ -89,8 +88,8 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 
 [Reference.](/docs/reference/javascript/storage-createbucket)
 
-</TabItem>
-<TabItem value="dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```dart
 void main() async {
@@ -104,7 +103,7 @@ void main() async {
 
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Upload a file
@@ -112,22 +111,20 @@ void main() async {
 You can upload a file from the Dashboard, or within a browser using our JS libraries.
 
 <Tabs
-  groupId="storage-tabs"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'JavaScript', value: 'javascript'},
-    {label: 'Dart', value: 'dart'},
-  ]}>
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
 2. Select the bucket you want to upload the file to.
 3. Click **Upload File**.
 4. Select the file you want to upload.
 
-</TabItem>
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="javascript" label="JavaScript">
 
 ```js
 const avatarFile = event.target.files[0]
@@ -138,8 +135,8 @@ const { data, error } = await supabase.storage
 
 [Reference.](/docs/reference/javascript/storage-from-upload)
 
-</TabItem>
-<TabItem value="dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```dart
 void main() async {
@@ -155,7 +152,9 @@ void main() async {
 }
 ```
 
-</TabItem>
+[Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
+
+</TabPanel>
 </Tabs>
 
 ### Download a file
@@ -163,35 +162,31 @@ void main() async {
 You can download a file from the Dashboard, or within a browser using our JS libraries.
 
 <Tabs
-  groupId="storage-tabs"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'JavaScript', value: 'javascript'},
-    {label: 'Dart', value: 'dart'},
-  ]}>
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
 2. Select the bucket that contains the file.
 3. Select the file that you want to download.
 4. Click **Download**.
 
-</TabItem>
-<TabItem value="javascript">
+</TabPanel>
+<TabPanel id="javascript" label="JavaScript">
 
 ```js
 // Use the JS library to download a file.
 
-const { data, error } = await supabase.storage
-  .from('avatars')
-  .download('public/avatar1.png')
+const { data, error } = await supabase.storage.from('avatars').download('public/avatar1.png')
 ```
 
 [Reference.](/docs/reference/javascript/storage-from-download)
 
-</TabItem>
-<TabItem value="dart">
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```dart
 void main() async {
@@ -204,7 +199,9 @@ void main() async {
 }
 ```
 
-</TabItem>
+[Reference.](/docs/reference/dart/storage-from-download)
+
+</TabPanel>
 </Tabs>
 
 ### Add security rules
@@ -212,13 +209,12 @@ void main() async {
 To restrict access to your files you can use either the Dashboard or SQL.
 
 <Tabs
-  groupId="storage-tabs"
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'}
-  ]}>
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
 2. Click **Policies** in the sidebar.
@@ -227,8 +223,8 @@ To restrict access to your files you can use either the Dashboard or SQL.
 5. Give your policy a unique name.
 6. Write the policy using SQL.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Use SQL to create a policy.
@@ -238,7 +234,7 @@ create policy "Public Access"
   using ( bucket_id = 'public' );
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Public and Private Buckets
@@ -274,11 +270,11 @@ Supabase Storage is integrated with your [Postgres Database](/docs/guides/databa
 This means that you can use the same [Row Level Security Policies](/docs/guides/auth#policies)
 for managing access to your files. Supabase Storage stores metadata in the `objects` and `buckets` table in the storage schema. To allow read access to files, the RLS policy must allow users to `SELECT` the `objects` table and for uploading a new object, the RLS policy must grant users access to `INSERT` into the `objects` table and so on. The mapping between the different API calls and the database permissions required is documented in the [Reference docs](/docs/reference/javascript/storage-createbucket).
 
-:::note
+<Admonition type="note">
 
 Access control for Storage is mapped to CRUD operations on the `buckets` and `objects` table via RLS policies.
 
-:::
+</Admonition>
 
 ## Helpers
 

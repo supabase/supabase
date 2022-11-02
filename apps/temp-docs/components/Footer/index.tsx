@@ -1,10 +1,9 @@
-import FooterLinks from 'data/footer.json'
-import SectionContainer from './SectionContainer'
-import DarkModeToggle from './DarkModeToggle'
-import Link from 'next/link'
-import { useTheme } from './Providers'
 import { Badge } from 'ui'
+import Link from 'next/link'
 import Image from 'next/image'
+import FooterLinks from 'data/footer.json'
+import DarkModeToggle from './DarkModeToggle'
+import { useTheme } from '../Providers'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
@@ -19,7 +18,7 @@ const Footer = () => {
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
-      <SectionContainer>
+      <div className="sm:py-18 container relative mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/">
@@ -126,7 +125,7 @@ const Footer = () => {
           <small className="small">&copy; Supabase Inc</small>
           <DarkModeToggle />
         </div>
-      </SectionContainer>
+      </div>
     </footer>
   )
 }

@@ -14,20 +14,19 @@ The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that
 ### Enable the extension
 
 <Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-
-<TabItem value="dashboard">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pg_cron" and enable the extension.
 
-</TabItem>
-<TabItem value="sql">
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Example: enable the "pg_cron" extension
@@ -45,7 +44,7 @@ grant all privileges on all tables in schema cron to {{DB user}};
 drop extension if exists pg_cron;
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ### Syntax

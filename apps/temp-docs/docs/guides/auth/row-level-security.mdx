@@ -332,11 +332,11 @@ We have deprecate some functions to ensure better performance and extensibilty o
 
 ### `auth.role()`
 
-:::caution
+<Admonition type="caution">
 
 Deprecated: The `auth.role()` function has been deprecated in favour of using the `TO` field, natively supported within Postgres.
 
-:::
+</Admonition>
 
 ```sql
 -- DEPRECATED
@@ -356,10 +356,10 @@ using (
 
 ### `auth.email()`
 
-:::caution
+<Admonition type="caution">
 
 Deprecated. Use `auth.jwt() ->> 'email'` instead.
 
-:::
+</Admonition>
 
 Returns the email of the user making the request.
