@@ -1,13 +1,18 @@
 export const getAnchor = (text: any): string | undefined => {
+  let formattedText
   if (typeof text === 'object') {
-    const formattedText = text.map((x) => {
-      if (typeof x !== 'string') {
-        return x.props.children
-      } else {
-        return x.trim()
-      }
-    })
-    return formattedText.join('-').toLowerCase()
+    if (Array.isArray(text)) {
+      formattedText = text.map((x) => {
+        if (typeof x !== 'string') {
+          return x.props.children
+        } else {
+          return x.trim()
+        }
+      })
+      return formattedText.join('-').toLowerCase()
+    } else {
+      return text.props.children
+    }
   } else if (typeof text === 'string') {
     return text
       .toLowerCase()
