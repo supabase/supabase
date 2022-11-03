@@ -48,7 +48,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
             <div
               className={`${
                 meta?.hide_table_of_contents || !hasTableOfContents
-                  ? 'col-span-12 md:col-span-10 2xl:col-span-8'
+                  ? 'col-span-12 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8'
                   : 'col-span-12 md:col-span-9'
               } py-2 md:py-4 px-2 md:px-8`}
             >
@@ -57,7 +57,12 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               </article>
             </div>
             {hasTableOfContents && !meta?.hide_table_of_contents && (
-              <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height overflow-y-auto sticky col-span-3 border-l px-2">
+              <div
+                className={[
+                  'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
+                  'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+                ].join(' ')}
+              >
                 <TableOfContents toc={toc} />
               </div>
             )}
