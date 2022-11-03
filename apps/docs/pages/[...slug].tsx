@@ -3,11 +3,11 @@ import { MDXProvider } from '@mdx-js/react'
 import { useRouter } from 'next/router'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import components from '../components/index'
-import { menuItems } from '../components/Navigation/Navigation.constants'
-import { getPageType } from '../lib/helpers'
-import { getAllDocs, getDocsBySlug } from '../lib/docs'
-import Layout from '~/layouts/Default'
+import components from 'components'
+import { menuItems } from 'components/Navigation/Navigation.constants'
+import { getPageType } from 'lib/helpers'
+import { getAllDocs, getDocsBySlug } from 'lib/docs'
+import Layout from 'layouts/Default'
 
 interface Meta {
   id: string
