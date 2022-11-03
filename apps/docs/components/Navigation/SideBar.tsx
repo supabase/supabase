@@ -74,7 +74,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
       {menuItems.length === 1 ? (
         <div className="my-2">
           {menuItems[0].items.map((item) => (
-            <Link href={item.url}>
+            <Link key={item.name} href={item.url}>
               <a>
                 <div
                   key={item.name}
@@ -155,7 +155,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                           </Accordion.Trigger>
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
-                              <Link href={item.url}>
+                              <Link key={item.name} href={item.url}>
                                 <a>
                                   <div
                                     key={item.name}
