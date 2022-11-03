@@ -2,16 +2,17 @@ import { IconAlertCircle } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import { useParams, useStore } from 'hooks'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
 const CustomDomainConfig = () => {
   const { ui } = useStore()
   const { ref } = useParams()
 
-  const isError = false
+  const { isError, data } = useCustomDomainsQuery({ projectRef: ref })
 
   return (
     <>
-      <Panel title={<h5 className="mb-0">Custom Domains</h5>}>
+      <Panel title={<h5 className="mb-0">Custom Domain</h5>}>
         <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
           {isError && (
             <div className="flex items-center justify-center space-x-2 py-8">

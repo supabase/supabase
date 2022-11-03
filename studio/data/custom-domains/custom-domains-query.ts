@@ -1,6 +1,5 @@
-import { QueryKey, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { get } from 'lib/common/fetch'
 import { useCallback } from 'react'
 import { customDomainKeys } from './keys'
 
@@ -16,18 +15,17 @@ export async function getCustomDomains(
     throw new Error('projectRef is required')
   }
 
-  let headers = new Headers()
-
-  const response = await post(
-    `${API_URL}/pg-meta/${projectRef}/query`,
-    { query: '' },
-    { headers: Object.fromEntries(headers), signal }
+  const response = await get(
+    `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/custom-hostname`,
+    {
+      signal,
+    }
   )
   if (response.error) {
     throw response.error
   }
 
-  return { result: response }
+  return { customDomains: response }
 }
 
 export type CustomDomainsData = Awaited<ReturnType<typeof getCustomDomains>>
