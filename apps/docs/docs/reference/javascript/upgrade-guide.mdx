@@ -317,6 +317,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 </TabPanel>
 </Tabs>
 
+#### Cookie methods
+
+The cookie-related methods like `setAuthCookie` and `getUserByCookie` have been removed.
+
+For Next.js you can use the [Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs) to help you manage cookies.
+If you can't use the Auth Helpers, you can use [server-side rendering](https://supabase.com/docs/guides/auth/server-side-rendering).
+
+Some the [PR](https://github.com/supabase/gotrue-js/pull/340) for additional background information.
+
 ### Data methods
 
 `.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
