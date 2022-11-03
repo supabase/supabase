@@ -62,8 +62,8 @@ function CodeBlock(props: Props) {
         <SyntaxHighlighter
           language={lang}
           style={monokaiTheme}
-          className={`code-block rounded-lg border p-4 !my-2 !bg-scale-400 ${
-            !showLineNumbers && 'pl-6'
+          className={`code-block rounded-lg border p-4 !my-2 !bg-scale-300 ${
+            !showLineNumbers ? 'pl-6' : ''
           }`}
           customStyle={{
             fontSize: large ? 18 : 12,
@@ -91,7 +91,7 @@ function CodeBlock(props: Props) {
         <code>{props.value || props.children}</code>
       )}
       {!props.hideCopy && (props.value || props.children) && props.className ? (
-        <div className={`${isDarkMode ?? 'dark'} absolute right-2 top-2`}>
+        <div className={`${isDarkMode ? 'dark' : ''} absolute right-2 top-2`}>
           <CopyToClipboard text={props.value || props.children}>
             <Button
               type="default"

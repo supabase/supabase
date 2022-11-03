@@ -27,8 +27,6 @@ export function getDocsBySlug(slug: string) {
       ? getPathToGeneratedDoc(realSlug)
       : realSlug
 
-  console.log('getDocsBySlug', { slug, formattedSlug })
-
   // files can either be .md or .mdx
   // we need to check which one exists
   let fullPath

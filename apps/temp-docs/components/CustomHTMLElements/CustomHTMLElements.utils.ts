@@ -1,11 +1,20 @@
 export const getAnchor = (text: any): string | undefined => {
-  if (typeof text !== 'string') {
-    return undefined
-  } else {
+  if (typeof text === 'object') {
+    const formattedText = text.map((x) => {
+      if (typeof x !== 'string') {
+        return x.props.children
+      } else {
+        return x.trim()
+      }
+    })
+    return formattedText.join('-').toLowerCase()
+  } else if (typeof text === 'string') {
     return text
       .toLowerCase()
-      .replace(/[^a-z0-9 ]/g, '')
+      .replace(/[^a-z0-9- ]/g, '')
       .replace(/[ ]/g, '-')
+  } else {
+    return undefined
   }
 }
 
@@ -32,4 +41,10 @@ export const highlightSelectedTocItem = (id: string) => {
       item.classList.add('toc__menu-item--active')
     }
   })
+}
+
+// find any currently active items and remove them on route change
+export const unHighlightSelectedTocItems = () => {
+  const currentActiveItem = document.querySelector('.toc-menu .toc__menu-item--active')
+  currentActiveItem?.classList.remove('toc__menu-item--active')
 }

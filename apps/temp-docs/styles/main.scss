@@ -25,6 +25,8 @@
 body {
   @apply bg-white dark:bg-[#1c1c1c] #{!important};
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
@@ -37,7 +39,7 @@ a {
 }
 
 article h1 {
-  margin-bottom: 3rem !important;
+  margin-bottom: 2rem !important;
   font-size: 3rem !important;
   font-weight: 400 !important;
 }
@@ -56,8 +58,6 @@ article h1 {
 
 .table-of-contents-height {
   max-height: calc(100vh - 3.75rem - 2rem);
-  overflow-y: auto;
-  position: sticky;
   top: calc(3.75rem + 1rem);
 }
 
@@ -180,4 +180,31 @@ pre[class*='language-'] {
 
 .admonition-content > p {
   @apply m-0;
+}
+
+// format <code> inside <p>
+p code {
+  word-break: keep-all !important;
+  white-space: nowrap !important;
+  padding: 0.1rem 0.35rem !important;
+
+  &:before {
+    display: none;
+  }
+  &::after {
+    display: none;
+  }
+}
+// code inside admonitions
+.admonition-content p code {
+  @apply bg-scale-300;
+}
+
+article p strong {
+  color: inherit !important;
+}
+
+// fix box shadow when <code> is inside <a>
+a:has(code) {
+  box-shadow: none !important;
 }

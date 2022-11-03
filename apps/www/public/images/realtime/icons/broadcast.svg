@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        stroke: #3fcf8e;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .cls-2, .cls-3 {
+        fill: none;
+      }
+
+      .cls-4 {
+        fill: #3fcf8e;
+        opacity: .1;
+      }
+
+      .cls-3 {
+        opacity: .25;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <rect class="cls-4" x=".5" y=".5" width="24" height="24" rx="6" ry="6"/>
+    <circle class="cls-3" cx="12.5" cy="12.5" r="4"/>
+    <circle class="cls-3" cx="12.5" cy="12.5" r="7"/>
+    <rect class="cls-2" x=".5" y=".5" width="24" height="24" rx="6" ry="6"/>
+    <line class="cls-1" x1="12.5" y1="24.18" x2="12.5" y2="12.5"/>
+    <circle class="cls-2" cx="12.5" cy="12.5" r="1"/>
+    <g>
+      <path class="cls-2" d="M7.19,16.74c-1.09-1.09-1.76-2.59-1.76-4.24"/>
+      <path class="cls-2" d="M7.19,8.26c-1.09,1.09-1.76,2.59-1.76,4.24"/>
+      <path class="cls-2" d="M9.31,14.62c-.54-.54-.88-1.29-.88-2.12"/>
+      <path class="cls-2" d="M9.31,10.38c-.54,.54-.88,1.29-.88,2.12"/>
+    </g>
+    <g>
+      <path class="cls-2" d="M17.74,8.26c1.09,1.09,1.76,2.59,1.76,4.24"/>
+      <path class="cls-2" d="M17.74,16.74c1.09-1.09,1.76-2.59,1.76-4.24"/>
+      <path class="cls-2" d="M15.62,10.38c.54,.54,.88,1.29,.88,2.12"/>
+      <path class="cls-2" d="M15.62,14.62c.54-.54,.88-1.29,.88-2.12"/>
+    </g>
+  </g>
+</svg>
