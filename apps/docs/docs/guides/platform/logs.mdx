@@ -40,14 +40,14 @@ To update the screenshots, ensure that at least one log line is selected to disp
 </TabPanel>
 <TabPanel id="postgres" label="Postgres">
 
-[Postgres logs](https://app.supabase.com/project/_/database/postgres-logs) show queries and activity for your [database](../../guides/database).
+[Postgres logs](https://app.supabase.com/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
 
 By default, query logs are disabled for all new Supabase projects, as they can reveal metadata about the contents of your database (e.g. table and column names). If you'd like to enable query logs, you can enable and configure the [pgAudit extension](https://www.pgaudit.org/):
 
 - [Enable the pgAudit extension for your project](https://app.supabase.com/project/_/database/extensions)
 - [Reboot the DB](https://app.supabase.com/project/_/settings/general); a "Fast database reboot" is sufficient, and faster than a full project restart
 - Configure `pgaudit.log` to the [appropriate value](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog)
-- You should be able to view query logs in your [log explorer](https://app.supabase.com/project/_/database/postgres-logs) now
+- You should be able to view query logs in your [log explorer](https://app.supabase.com/project/_/logs/explorer) now
 
 As an example, if you wanted to enable logs for writes and DDL statements for a single session, you could execute within the session:
 
@@ -72,21 +72,21 @@ alter system reset pgaudit.log
 </TabPanel>
 <TabPanel id="auth" label="Auth">
 
-[Auth logs](https://app.supabase.com/project/_/auth/logs) show all server logs for your [Auth usage](../../guides/auth).
+[Auth logs](https://app.supabase.com/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
 
 ![Auth Logs](/docs/img/guides/platform/logs/logs-auth.png)
 
 </TabPanel>
 <TabPanel id="storage" label="Storage">
 
-[Storage logs](https://app.supabase.com/project/_/storage/logs) shows all server logs for your [Storage API](../../guides/storage).
+[Storage logs](https://app.supabase.com/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
 
 ![Storage Logs](/docs/img/guides/platform/logs/logs-storage.png)
 
 </TabPanel>
 <TabPanel id="realtime" label="Realtime">
 
-[Realtime logs](https://app.supabase.com/project/_/database/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
+[Realtime logs](https://app.supabase.com/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
 
 ![Realtime Logs](/docs/img/guides/platform/logs/logs-realtime.png)
 
