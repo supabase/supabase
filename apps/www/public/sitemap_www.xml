@@ -55,7 +55,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/blog/</loc>
+    <loc>https://supabase.com/contact/enterprise</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/contact/mfa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -73,13 +79,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/contact/enterprise</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/contact/mfa</loc>
+    <loc>https://supabase.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -878,6 +878,12 @@
 
   <url>
     <loc>https://supabase.com/blog/postgresql-commitfest</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-beta-update-october-2022</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
