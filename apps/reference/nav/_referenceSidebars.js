@@ -249,6 +249,7 @@ const sidebars = {
           label: 'Developer Tools',
           collapsed: true,
           items: [
+            'guides/integrations/estuary',
             'guides/integrations/pgmustard',
             'guides/integrations/prisma',
             'guides/integrations/sequin',
