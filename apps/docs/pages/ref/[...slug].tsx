@@ -17,14 +17,14 @@ import { Tabs } from '~/../../packages/ui'
 export default function Post(props) {
   return (
     <div className="my-32 mx-5 mx-auto">
-      <div className="flex flex-col gap-16 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-32 max-w-7xl mx-auto">
         {props.docs.map((x) => {
           return (
-            <div className="grid grid-cols-2 gap-16">
-              <article className="prose" key={x.id}>
-                <h1>{x.title ?? x.id}</h1>
+            <div className="grid grid-cols-2 gap-32">
+              <div className="prose" key={x.id}>
+                <h1 className="text-3xl not-prose">{x.title ?? x.id}</h1>
                 {x.content && (
-                  <div>
+                  <div className="prose">
                     <MDXRemote {...x.content} components={components} />
                   </div>
                 )}
@@ -33,14 +33,48 @@ export default function Post(props) {
                     <ReactMarkdown>{jsSpec.pages[x.id].notes}</ReactMarkdown>
                   </div>
                 )}
-              </article>
-              <div className="bg-scale-100 h-96 w-full">
-                {/* <Tabs defaultActiveId={'hello 0'} size="small" type="underlined"> */}
-                {jsSpec.pages[x.id].examples &&
-                  jsSpec.pages[x.id].examples.map((x, i) => {
-                    return <pre>{x.js}</pre>
-                  })}
-                {/* </Tabs> */}
+              </div>
+              <div className="w-full">
+                {jsSpec.pages[x.id].examples && (
+                  <Tabs
+                    defaultActiveId={jsSpec.pages[x.id].examples[0].name}
+                    size="small"
+                    type="underlined"
+                    scrollable
+                  >
+                    {jsSpec.pages[x.id].examples &&
+                      jsSpec.pages[x.id].examples.map((x, i) => {
+                        return (
+                          <Tabs.Panel id={x.name} label={x.name}>
+                            <CodeBlock lang="js" className="useless-code-block-class">
+                              {x.js && x.js.replace('```', '').replace('js', '')}
+                            </CodeBlock>
+                            <CodeBlock lang="js" className="useless-code-block-class">
+                              {`{ 
+  data: [
+    {
+      id: 1,
+      name: 'Afghanistan',
+    },
+    {
+      id: 2,
+      name: 'Albania',
+    },
+    {
+      id: 3,
+      name: 'Algeria',
+    },
+  ],
+  status: 200,
+  statusText: 'OK',
+}
+                              `}
+                            </CodeBlock>
+                          </Tabs.Panel>
+                        )
+                      })}
+                  </Tabs>
+                )}
               </div>
             </div>
           )
