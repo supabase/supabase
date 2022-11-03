@@ -749,6 +749,51 @@ pages:
             .from('countries')
             .select()
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        data: |
+          |id|name|
+          |-:||
+          |1|Afghanistan|
+          |2|Albania|
+          |3|Algeria|
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Selecting specific columns
         description: |
           You can select specific fields from your tables.
@@ -801,6 +846,50 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          You can select specific fields from your tables.
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        data: |
+          |id|name|
+          |-:||
+          |1|Afghanistan|
+          |2|Albania|
+          |3|Algeria|
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Query foreign tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
@@ -875,6 +964,76 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          If your database has foreign key relationships, you can query related tables too.
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          create table
+            cities (
+              id int8 primary key,
+              country_id int8 not null references countries,
+              name text
+            );
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Germany'),
+            (2, 'Indonesia');
+          insert into
+            cities (id, country_id, name)
+          values
+            (1, 2, 'Bali'),
+            (2, 1, 'Munich');
+          ```
+        data: |
+          |id|name|
+          |-:||
+          |1|Germany|
+          |2|Indonesia|
+
+          |id|country_id|name|
+          |-:|-:||
+          |1|2|Bali|
+          |2|1|Munich|
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              },
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Query foreign tables through a join table
         description: |
           If you're in a situation where your tables are **NOT** directly
@@ -971,6 +1130,88 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          If you're in a situation where your tables are **NOT** directly
+          related, but instead are joined by a _join table_, you can still use
+          the `select()` method to query the related data. The join table needs
+          to have the foreign keys as part of its composite primary key.
+        sql: |
+          ```sql
+          create table
+            users (
+              id int8 primary key,
+              name text
+            );
+          create table
+            teams (
+              id int8 primary key,
+              name text
+            );
+          -- join table
+          create table
+            users_teams (
+              user_id int8 not null references users,
+              team_id int8 not null references teams,
+              -- both foreign keys must be part of a composite primary key
+              primary key (user_id, team_id)
+            );
+
+          insert into
+            users (id, name)
+          values
+            (1, 'Kiran'),
+            (2, 'Evan');
+          insert into
+            teams (id, name)
+          values
+            (1, 'Green'),
+            (2, 'Blue');
+          insert into
+            users_teams (user_id, team_id)
+          values
+            (1, 1),
+            (1, 2),
+            (2, 2);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select(`
+              name,
+              teams (
+                name
+              )
+            `)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Kiran",
+                "teams": [
+                  {
+                    "name": "Green"
+                  },
+                  {
+                    "name": "Blue"
+                  }
+                ]
+              },
+              {
+                "name": "Evan",
+                "teams": [
+                  {
+                    "name": "Blue"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Query the same foreign table multiple times
         description: |
           If you need to query the same foreign table twice, use the name of the
@@ -1040,6 +1281,61 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          If you need to query the same foreign table twice, use the name of the
+          joined column to identify which join to use. You can also give each
+          column an alias.
+        sql: |
+          ```sql
+          create table
+            users (id int8 primary key, name text);
+
+          create table
+            messages (
+              sender_id int8 not null references users,
+              receiver_id int8 not null references users,
+              content text
+            );
+
+          insert into
+            users (id, name)
+          values
+            (1, 'Kiran'),
+            (2, 'Evan');
+
+          insert into
+            messages (sender_id, receiver_id, content)
+          values
+            (1, 2, '👋');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('messages')
+            .select(`
+              content,
+              from:sender_id(name),
+              to:receiver_id(name)
+            `)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "content": "👋",
+                "from": {
+                  "name": "Kiran"
+                },
+                "to": {
+                  "name": "Evan"
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Filtering through foreign tables
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
@@ -1129,6 +1425,70 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          If the filter on a foreign table's column is not satisfied, the foreign
+          table returns `[]` or `null` but the parent table is not filtered out.
+
+          If you want to filter out the parent table rows, use the `!inner` hint.
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          create table
+            cities (
+              id int8 primary key,
+              country_id int8 not null references countries,
+              name text
+            );
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Germany'),
+            (2, 'Indonesia');
+          insert into
+            cities (id, country_id, name)
+          values
+            (1, 2, 'Bali'),
+            (2, 1, 'Munich');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries(*)')
+            .eq('countries.name', 'Estonia')
+          ```
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries!inner(*)')
+            .eq('countries.name', 'Estonia')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": null
+              },
+              {
+                "name": "Munich",
+                "countries": null
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+          ```json
+          {
+            "data": [],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Querying with count option
         description: |
           You can get the number of rows by using the
@@ -1173,6 +1533,36 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          You can get the number of rows by using the
+          [count](/docs/reference/javascript/select#parameters) option. For
+          example, to get the table count without returning all rows:
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { count, error } = await supabase
+            .from('countries')
+            .select('*', { count: 'exact', head: true })
+          ```
+        response: |
+          ```json
+          {
+            "count": 3,
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Querying JSON data
         description: |
           You can select and filter data inside of
@@ -1229,6 +1619,48 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          You can select and filter data inside of
+          [JSON](/docs/guides/database/json) columns. Postgres offers some
+          [operators](/docs/guides/database/json#query-the-jsonb-data) for
+          querying JSON data.
+        sql: |
+          ```sql
+          create table
+            users (
+              id int8 primary key,
+              name text,
+              address jsonb
+            );
+
+          insert into
+            users (id, name, address)
+          values
+            (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select(`
+              id, name,
+              address->city
+            `)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Avdotya",
+                "city": "Saint Petersburg"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   insert():
     title: 'Create data: insert()'
@@ -1300,6 +1732,41 @@ pages:
             .from('countries')
             .insert({ id: 1, name: 'Denmark' })
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          ```
+        ts: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .insert({ id: 1, name: 'Denmark' })
+          ```
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Denmark"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Create a record and return it
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -1339,6 +1806,31 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .insert({ id: 1, name: 'Denmark' })
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Denmark"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
       - name: Bulk create
         description: |
           A bulk create operation is handled in a single transaction.
@@ -1406,6 +1898,48 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          A bulk create operation is handled in a single transaction.
+          If any of the inserts fail, none of the rows are inserted.
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          ```
+        ts: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .insert([
+              { id: 1, name: 'Nepal' },
+              { id: 1, name: 'Vietnam' },
+            ])
+          ```
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (id)=(1) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
+          ```json
+          {
+            "data": [],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   update():
     title: 'Modify data: update()'
@@ -1487,6 +2021,47 @@ pages:
             .update({ name: 'Australia' })
             .eq('id', 1)
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Taiwan');
+          ```
+        ts: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .update({ name: 'Australia' })
+            .eq('id', 1)
+          ```
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Australia"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Update a record and return it
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -1532,6 +2107,37 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Taiwan');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Australia' })
+            .eq('id', 1)
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Australia"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Updating JSON data
         description: |
           Postgres offers some
@@ -1596,6 +2202,56 @@ pages:
 
           Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
+        descriptionNew: |
+          Postgres offers some
+          [operators](/docs/guides/database/json#query-the-jsonb-data) for
+          working with JSON data.
+
+          Currently, it is only possible to update the entire JSON document.
+        sql: |
+          ```sql
+          create table
+            users (
+              id int8 primary key,
+              name text,
+              address jsonb
+            );
+
+          insert into
+            users (id, name, address)
+          values
+            (1, 'Michael', '{ "postcode": 90210 }');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .update({
+              address: {
+                street: 'Melrose Place',
+                postcode: 90210
+              }
+            })
+            .eq('address->postcode', 90210)
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "street": "Melrose Place",
+                  "postcode": 90210
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   upsert():
     title: 'Upsert data: upsert()'
@@ -1655,6 +2311,36 @@ pages:
             .upsert({ id: 1, name: 'Albania' })
             .select()
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Albania' })
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
       - name: Bulk Upsert your data
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -1706,6 +2392,43 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert([
+              { id: 1, name: 'Albania' },
+              { id: 2, name: 'Algeria' },
+            ])
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              },
+              {
+                "id": 2,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
       - name: Upserting into tables with constraints
         description: |
           In the following query, `upsert()` implicitly uses the `id`
@@ -1797,6 +2520,72 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          In the following query, `upsert()` implicitly uses the `id`
+          (primary key) column to determine conflicts. If there is no existing
+          row with the same `id`, `upsert()` inserts a new row, which
+          will fail in this case as there is already a row with `handle` `"saoirse"`.
+
+          Using the `onConflict` option, you can instruct `upsert()` to use
+          another column with a unique constraint to determine conflicts.
+        sql: |
+          ```sql
+          create table
+            users (
+              id int8 generated by default as identity primary key,
+              handle text not null unique,
+              display_name text
+            );
+
+          insert into
+            users (id, handle, display_name)
+          values
+            (1, 'saoirse', null);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' })
+            .select()
+          ```
+          ```ts
+          await supabase
+            .from('users')
+            .upsert(
+              { id: 42, handle: 'saoirse', display_name: 'Saoirse' },
+              { onConflict: 'handle' },
+            )
+          const { data, error } = await supabase
+            .from('users')
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (handle)=(saoirse) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"users_handle_key\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
+          ```json
+          {
+            "data": [
+              {
+                "id": 42,
+                "handle": "saoirse",
+                "display_name": "Saoirse"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   delete():
     title: 'Delete data: delete()'
@@ -1878,6 +2667,42 @@ pages:
             .delete()
             .eq('id', 1)
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Spain');
+          ```
+        ts: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .delete()
+            .eq('id', 1)
+          ```
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+          ```json
+          {
+            "data": [],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   rpc():
     title: 'Postgres functions: rpc()'
@@ -1929,6 +2754,24 @@ pages:
           ```ts
           const { data, error } = await supabase.rpc('hello_world')
           ```
+        sql: |
+          ```sql
+          create function hello_world() returns text as $$
+            select 'Hello world';
+          $$ language sql;
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase.rpc('hello_world')
+          ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Call a Postgres function with arguments
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -1961,6 +2804,24 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create function echo(say text) returns text as $$
+            select say;
+          $$ language sql;
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase.rpc('echo', { say: '👋' })
+          ```
+        response: |
+          ```json
+          {
+            "data": "👋",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Bulk processing
         description: |
           You can process large payloads by passing in an array as an argument:
@@ -1999,6 +2860,30 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          You can process large payloads by passing in an array as an argument:
+        sql: |
+          ```sql
+          create function add_one_each(arr int[]) returns int[] as $$
+            select array_agg(n + 1) from unnest(arr) as n;
+          $$ language sql;
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase.rpc('add_one_each', { arr: [1, 2, 3] })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              2,
+              3,
+              4
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Call a Postgres function with filters
         description: |
           Postgres functions that return tables can also be combined with
@@ -2050,6 +2935,43 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          Postgres functions that return tables can also be combined with
+          [Filters](/docs/reference/javascript/using-filters) and
+          [Modifiers](/docs/reference/javascript/using-modifiers).
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'France'),
+            (2, 'United Kingdom');
+
+          create function list_stored_countries() returns setof countries as $$
+            select * from countries;
+          $$ language sql;
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .rpc('list_stored_countries')
+            .eq('id', 1)
+            .single()
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 1,
+              "name": "France"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   Using Filters:
     description: |
@@ -2112,123 +3034,99 @@ pages:
 
       ### Filter by values within a JSON column
 
-      <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-      <TabPanel id="schema" label="Schema">
+      ```sql
+      create table
+        users (
+          id int8 primary key,
+          name text,
+          address jsonb
+        );
 
-        ```sql
-        create table
-          users (
-            id int8 primary key,
-            name text,
-            address jsonb
-          );
+      insert into
+        users (id, name, address)
+      values
+        (1, 'Michael', '{ "postcode": 90210 }'),
+        (2, 'Jane', null);
+      ```
 
-        insert into
-          users (id, name, address)
-        values
-          (1, 'Michael', '{ "postcode": 90210 }'),
-          (2, 'Jane', null);
-        ```
+      ```ts
+      const { data, error } = await supabase
+        .from('users')
+        .select()
+        .eq('address->postcode', 90210)
+      ```
 
-      </TabPanel>
-      <TabPanel id="js" label="JavaScript">
-
-        ```ts
-        const { data, error } = await supabase
-          .from('users')
-          .select()
-          .eq('address->postcode', 90210)
-        ```
-
-      </TabPanel>
-      <TabPanel id="result" label="Result">
-
-        ```json
-        {
-          "data": [
-            {
-              "id": 1,
-              "name": "Michael",
-              "address": {
-                "postcode": 90210
-              }
+      ```json
+      {
+        "data": [
+          {
+            "id": 1,
+            "name": "Michael",
+            "address": {
+              "postcode": 90210
             }
-          ],
-          "status": 200,
-          "statusText": "OK"
-        }
-        ```
-
-      </TabPanel>
-      </Tabs>
+          }
+        ],
+        "status": 200,
+        "statusText": "OK"
+      }
+      ```
 
       ### Filter Foreign Tables
 
       You can filter on foreign tables in your `select()` query using dot
       notation:
 
-      <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-      <TabPanel id="schema" label="Schema">
+      ```sql
+      create table
+        countries (id int8 primary key, name text);
+      create table
+        cities (
+          id int8 primary key,
+          country_id int8 not null references countries,
+          name text
+        );
 
-        ```sql
-        create table
-          countries (id int8 primary key, name text);
-        create table
-          cities (
-            id int8 primary key,
-            country_id int8 not null references countries,
-            name text
-          );
+      insert into
+        countries (id, name)
+      values
+        (1, 'Germany'),
+        (2, 'Indonesia');
+      insert into
+        cities (id, country_id, name)
+      values
+        (1, 2, 'Bali'),
+        (2, 1, 'Munich');
+      ```
 
-        insert into
-          countries (id, name)
-        values
-          (1, 'Germany'),
-          (2, 'Indonesia');
-        insert into
-          cities (id, country_id, name)
-        values
-          (1, 2, 'Bali'),
-          (2, 1, 'Munich');
-        ```
+      ```ts
+      const { data, error } = await supabase
+        .from('countries')
+        .select(`
+          name,
+          cities!inner (
+            name
+          )
+        `)
+        .eq('cities.name', 'Bali')
+      ```
 
-      </TabPanel>
-      <TabPanel id="js" label="JavaScript">
-
-        ```ts
-        const { data, error } = await supabase
-          .from('countries')
-          .select(`
-            name,
-            cities!inner (
-              name
-            )
-          `)
-          .eq('cities.name', 'Bali')
-        ```
-
-      </TabPanel>
-      <TabPanel id="result" label="Result">
-
-        ```json
-        {
-          "data": [
-            {
-              "name": "Indonesia",
-              "cities": [
-                {
-                  "name": "Bali"
-                }
-              ]
-            }
-          ],
-          "status": 200,
-          "statusText": "OK"
-        }
-        ```
-
-      </TabPanel>
-      </Tabs>
+      ```json
+      {
+        "data": [
+          {
+            "name": "Indonesia",
+            "cities": [
+              {
+                "name": "Bali"
+              }
+            ]
+          }
+        ],
+        "status": 200,
+        "statusText": "OK"
+      }
+      ```
 
   eq():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
@@ -2286,6 +3184,38 @@ pages:
             .from('countries')
             .select()
             .eq('name', 'Albania')
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Albania')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   neq():
@@ -2349,6 +3279,42 @@ pages:
             .select()
             .neq('name', 'Albania')
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .neq('name', 'Albania')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   gt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
@@ -2406,6 +3372,38 @@ pages:
             .from('countries')
             .select()
             .gt('id', 2)
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .gt('id', 2)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   gte():
@@ -2469,6 +3467,42 @@ pages:
             .select()
             .gte('id', 2)
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .gte('id', 2)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   lt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
@@ -2526,6 +3560,38 @@ pages:
             .from('countries')
             .select()
             .lt('id', 2)
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .lt('id', 2)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   lte():
@@ -2589,6 +3655,42 @@ pages:
             .select()
             .lte('id', 2)
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .lte('id', 2)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   like():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
@@ -2647,6 +3749,38 @@ pages:
             .select()
             .like('name', '%Alba%')
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .like('name', '%Alba%')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   ilike():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
@@ -2704,6 +3838,38 @@ pages:
             .from('countries')
             .select()
             .like('name', '%alba%')
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .like('name', '%alba%')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   is():
@@ -2795,6 +3961,57 @@ pages:
             .select()
             .is('name', null)
           ```
+        descriptionNew: |
+          Using the `eq()` filter doesn't work when filtering for `null`. Instead, you need to use `is()`.
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'null'),
+            (2, null);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .eq('name', null)
+          ```
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .is('name', null)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "null"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": null
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   in():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
@@ -2857,6 +4074,42 @@ pages:
             .select()
             .in('name', ['Albania', 'Algeria'])
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .in('name', ['Albania', 'Algeria'])
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   contains():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
@@ -2917,6 +4170,40 @@ pages:
             .select()
             .contains('name', ['is:online', 'faction:red'])
           ```
+        sql: |
+          ```sql
+          create table
+            issues (
+              id int8 primary key,
+              title text,
+              tags text[]
+            );
+
+          insert into
+            issues (id, title, tags)
+          values
+            (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+            (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('issues')
+            .select('title')
+            .contains('tags', ['is:open', 'severity:high'])
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "title": "Cache invalidation is not working"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: On range columns
         description: |
           Postgres supports a number of [range
@@ -2972,6 +4259,47 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: On `jsonb` columns
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -3020,6 +4348,40 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            users (
+              id int8 primary key,
+              name text,
+              address jsonb
+            );
+
+          insert into
+            users (id, name, address)
+          values
+            (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+            (2, 'Jane', '{}');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select('name')
+            .contains('address', { postcode: 90210 })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Michael"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   containedBy():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
@@ -3080,6 +4442,40 @@ pages:
             .select('name')
             .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
           ```
+        sql: |
+          ```sql
+          create table
+            classes (
+              id int8 primary key,
+              name text,
+              days text[]
+            );
+
+          insert into
+            classes (id, name, days)
+          values
+            (1, 'Chemistry', array['monday', 'friday']),
+            (2, 'History', array['monday', 'wednesday', 'thursday']);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('classes')
+            .select('name')
+            .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Chemistry"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: On range columns
         description: |
           Postgres supports a number of [range
@@ -3135,6 +4531,47 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: On `jsonb` columns
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -3183,6 +4620,40 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            users (
+              id int8 primary key,
+              name text,
+              address jsonb
+            );
+
+          insert into
+            users (id, name, address)
+          values
+            (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+            (2, 'Jane', '{}');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select('name')
+            .containedBy('address', {})
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Jane"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   rangeGt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
@@ -3249,6 +4720,47 @@ pages:
             .from('reservations')
             .select()
             .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
+          ```
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "room_name": "Topaz",
+                "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   rangeGte():
@@ -3317,6 +4829,47 @@ pages:
             .select()
             .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
           ```
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "room_name": "Topaz",
+                "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   rangeLt():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
@@ -3383,6 +4936,47 @@ pages:
             .from('reservations')
             .select()
             .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
+          ```
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   rangeLte():
@@ -3451,6 +5045,47 @@ pages:
             .select()
             .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
           ```
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   rangeAdjacent():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
@@ -3518,6 +5153,47 @@ pages:
             .select()
             .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
           ```
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   overlaps():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
@@ -3578,6 +5254,40 @@ pages:
             .select('title')
             .overlaps('tags', ['is:closed', 'severity:high'])
           ```
+        sql: |
+          ```sql
+          create table
+            issues (
+              id int8 primary key,
+              title text,
+              tags text[]
+            );
+
+          insert into
+            issues (id, title, tags)
+          values
+            (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+            (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('issues')
+            .select('title')
+            .overlaps('tags', ['is:closed', 'severity:high'])
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "title": "Cache invalidation is not working"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: On range columns
         description: |
           Postgres supports a number of [range
@@ -3633,6 +5343,47 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        sql: |
+          ```sql
+          create table
+            reservations (
+              id int8 primary key,
+              room_name text,
+              during tsrange
+            );
+
+          insert into
+            reservations (id, room_name, during)
+          values
+            (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+            (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   # TODO: schema & result
   textSearch():
@@ -3752,6 +5503,37 @@ pages:
             .select('name')
             .match({ id: 2, name: 'Albania' })
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .match({ id: 2, name: 'Albania' })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   not():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
@@ -3815,6 +5597,37 @@ pages:
             .from('countries')
             .select()
             .not('name', 'is', null)
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'null'),
+            (2, null);
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .not('name', 'is', null)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "null"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   or():
@@ -3883,6 +5696,40 @@ pages:
             .select('name')
             .or('id.eq.2,name.eq.Algeria')
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .or('id.eq.2,name.eq.Algeria')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Use `or` with `and`
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -3929,6 +5776,37 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - name: Use `or` on foreign tables
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -3994,6 +5872,57 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          create table
+            cities (
+              id int8 primary key,
+              country_id int8 not null references countries,
+              name text
+            );
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Germany'),
+            (2, 'Indonesia');
+          insert into
+            cities (id, country_id, name)
+          values
+            (1, 2, 'Bali'),
+            (2, 1, 'Munich');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities!inner (
+                name
+              )
+            `)
+            .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   filter():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
@@ -4058,6 +5987,38 @@ pages:
             .from('countries')
             .select()
             .filter('name', 'in', '("Algeria","Japan")')
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .filter('name', 'in', '("Algeria","Japan")')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - name: On a foreign table
         description: |
@@ -4135,6 +6096,57 @@ pages:
               )
             `)
             .filter('cities.name', 'eq', 'Bali')
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          create table
+            cities (
+              id int8 primary key,
+              country_id int8 not null references countries,
+              name text
+            );
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Germany'),
+            (2, 'Indonesia');
+          insert into
+            cities (id, country_id, name)
+          values
+            (1, 2, 'Bali'),
+            (2, 1, 'Munich');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities!inner (
+                name
+              )
+            `)
+            .filter('cities.name', 'eq', 'Bali')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   Using Modifiers:
@@ -4226,6 +6238,48 @@ pages:
             .upsert({ id: 1, name: 'Algeria' })
             .select()
           ```
+        descriptionNew: |
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Albania' })
+          ```
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Algeria' })
+            .select()
+          ```
+        response: |
+          ```json
+          {
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
 
   order():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
@@ -4291,6 +6345,46 @@ pages:
             .from('cities')
             .select('name', 'country_id')
             .order('id', { ascending: false })
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .order('name', { ascending: false })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - name: On a foreign table
         description: |
@@ -4367,6 +6461,67 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        descriptionNew: |
+          Ordering on foreign tables doesn't affect the ordering of
+          the parent table.
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          create table
+            cities (
+              id int8 primary key,
+              country_id int8 not null references countries,
+              name text
+            );
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'United States'),
+            (2, 'Vanuatu');
+          insert into
+            cities (id, country_id, name)
+          values
+            (1, 1, 'Atlanta'),
+            (2, 1, 'New York City');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+            .order('name', { foreignTable: 'cities', ascending: false })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "New York City"
+                  },
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              },
+              {
+                "name": "Vanuatu",
+                "cities": []
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   limit():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
@@ -4423,6 +6578,37 @@ pages:
             .from('countries')
             .select('name')
             .limit(1)
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .limit(1)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - name: On a foreign table
         description: |
@@ -4488,6 +6674,56 @@ pages:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+          create table
+            cities (
+              id int8 primary key,
+              country_id int8 not null references countries,
+              name text
+            );
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'United States');
+          insert into
+            cities (id, country_id, name)
+          values
+            (1, 1, 'Atlanta'),
+            (2, 1, 'New York City');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+            .limit(1, { foreignTable: 'cities' })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   range():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.range'
@@ -4548,6 +6784,40 @@ pages:
             .select('name')
             .range(0, 1)
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .range(0, 1)
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   db.abortSignal():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
@@ -4597,6 +6867,30 @@ pages:
             .from('very_big_table')
             .select()
             .abortSignal(ac.signal)
+          ```
+        descriptionNew: |
+          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
+        ts: |
+          ```ts
+          const ac = new AbortController()
+          ac.abort()
+          const { data, error } = await supabase
+            .from('very_big_table')
+            .select()
+            .abortSignal(ac.signal)
+          ```
+        response: |
+          ```json
+          {
+            "error": {
+              "message": "FetchError: The user aborted a request.",
+              "details": "",
+              "hint": "",
+              "code": ""
+            },
+            "status": 400,
+            "statusText": "Bad Request"
+          }
           ```
 
   single():
@@ -4655,6 +6949,36 @@ pages:
             .limit(1)
             .single()
           ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .limit(1)
+            .single()
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Afghanistan"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
 
   maybeSingle():
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
@@ -4708,6 +7032,33 @@ pages:
             .select()
             .eq('name', 'Singapore')
             .maybeSingle()
+          ```
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Singapore')
+            .maybeSingle()
+          ```
+        response: |
+          ```json
+          {
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   db.csv():
@@ -4764,6 +7115,35 @@ pages:
             .from('countries')
             .select()
             .csv()
+          ```
+        descriptionNew: |
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        sql: |
+          ```sql
+          create table
+            countries (id int8 primary key, name text);
+
+          insert into
+            countries (id, name)
+          values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+          ```
+        ts: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .csv()
+          ```
+        response: |
+          ```json
+          {
+            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
 
   # NOTE: Not available on currently deployed PostgREST
