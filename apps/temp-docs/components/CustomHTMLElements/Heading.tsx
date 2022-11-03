@@ -13,7 +13,9 @@ const Heading = ({ tag, children }) => {
   const link = `#${anchor}`
 
   // check if current heading is in view, update TOC active item accordingly
-  const { ref, inView, entry } = useInView({
+  // [Joshen] Ideally we highlight the section in the TOC when it's at the top of the page
+  // much like when we click on the item in the TOC itself, the rootMargin fix is insufficient
+  const { ref } = useInView({
     threshold: 1,
     onChange: (inView, entry) => {
       if (window.scrollY === 0) unHighlightSelectedTocItems()

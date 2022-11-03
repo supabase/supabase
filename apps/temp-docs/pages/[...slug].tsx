@@ -1,3 +1,4 @@
+import toc from 'markdown-toc'
 import { MDXProvider } from '@mdx-js/react'
 import { useRouter } from 'next/router'
 import { MDXRemote } from 'next-mdx-remote'
@@ -7,9 +8,6 @@ import { menuItems } from '../components/Navigation/Navigation.constants'
 import { getPageType } from '../lib/helpers'
 import { getAllDocs, getDocsBySlug } from '../lib/docs'
 import Layout from '~/layouts/Default'
-
-// table of contents extractor
-const toc = require('markdown-toc')
 
 interface Meta {
   id: string
@@ -54,7 +52,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     props: {
       ...doc,
       content,
-      toc: toc(doc.content, { maxdepth: 2 }),
+      toc: toc(doc.content, { maxdepth: 1, firsth1: false }),
     },
   }
 }
