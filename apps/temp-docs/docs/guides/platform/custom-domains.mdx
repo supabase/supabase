@@ -40,7 +40,7 @@ supabase domains create --project-ref foobar --custom-hostname api.example.com -
 The output of the `create` command includes two TXT records[^1] you will need to set up, in order to verify your control over the domain in question,
 and for us to issue SSL certificates for it. For example:
 
-```
+```bash
 [...]
 Required outstanding validation records:
         _cf-custom-hostname.api.example.com TXT -> 46BBC14D-D50A-409C-8DB5-F862CF5BA660
