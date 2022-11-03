@@ -38,5 +38,13 @@
     "description_short": "",
     "label": "",
     "url": "/edge-functions"
+  },
+  "realtime": {
+    "name": "Realtime",
+    "icon": "M13 10V3L4 14h7v7l9-11h-7z",
+    "description": "Create multiplayer experiences by sharing, broadcasting, and listenning to changes from other clients or the Database.",
+    "description_short": "",
+    "label": "",
+    "url": "/realtime"
   }
 }
