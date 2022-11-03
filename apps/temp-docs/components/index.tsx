@@ -1,11 +1,16 @@
 import { Tabs, Alert } from 'ui'
 
+// Common components
 import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
 import CodeBlock from './CodeBlock/CodeBlock'
+
+// Page specific components
 import Frameworks from './Frameworks'
 import AuthProviders from './AuthProviders'
+import FunctionsExamples from './FunctionsExamples'
 
+// Other components
 import { Heading } from './CustomHTMLElements'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
@@ -16,10 +21,9 @@ const components = {
   CodeBlock,
   Frameworks,
   AuthProviders,
-
+  FunctionsExamples,
   QuickstartIntro,
   ProjectSetup,
-
   Alert: (props: any) => (
     <Alert {...props} className="not-prose">
       {props.children}
