@@ -5,13 +5,15 @@ import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
-import { object, string } from 'yup'
+import * as yup from 'yup'
+import YupPassword from 'yup-password'
 
-const signUpSchema = object({
-  email: string().email('Must be a valid email').required('Email is required'),
-  password: string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters long'),
+// extend yup with password validation
+YupPassword(yup)
+
+const signUpSchema = yup.object({
+  email: yup.string().email().required().label('Email'),
+  password: yup.string().password().required().label('Password'),
 })
 
 const SignUpForm = () => {

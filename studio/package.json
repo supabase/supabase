@@ -86,6 +86,7 @@
     "uniforms-bridge-json-schema": "^3.6.2",
     "uuid": "^8.3.2",
     "yup": "^0.32.11",
+    "yup-password": "^0.2.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
