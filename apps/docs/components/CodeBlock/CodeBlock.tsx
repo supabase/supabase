@@ -61,6 +61,7 @@ function CodeBlock(props: Props) {
       {props.className ? (
         <SyntaxHighlighter
           language={lang}
+          wrapLines={true}
           style={monokaiTheme}
           className={`code-block rounded-lg border p-4 !my-2 !bg-scale-300 w-full ${
             !showLineNumbers ? 'pl-6' : ''
