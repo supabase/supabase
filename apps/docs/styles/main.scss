@@ -212,11 +212,6 @@ article p strong {
 a:has(code) {
   box-shadow: none !important;
 }
-pre {
-  max-width: 100% !important;
-  overflow: auto;
-  float: left;
-}
 
 pre code {
   white-space: normal !important;
