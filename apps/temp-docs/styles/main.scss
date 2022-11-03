@@ -58,8 +58,6 @@ article h1 {
 
 .table-of-contents-height {
   max-height: calc(100vh - 3.75rem - 2rem);
-  overflow-y: auto;
-  position: sticky;
   top: calc(3.75rem + 1rem);
 }
 
