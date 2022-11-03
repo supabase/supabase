@@ -15,6 +15,7 @@ import PostgrestConfig from './PostgrestConfig'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
+import CustomDomainConfig from './CustomDomainConfig'
 
 interface Props {
   projectRef: string
@@ -97,6 +98,10 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
 
         <section>
           <PostgrestConfig />
+        </section>
+
+        <section className="mt-8">
+          <CustomDomainConfig />
         </section>
       </div>
     </>
