@@ -212,3 +212,7 @@ article p strong {
 a:has(code) {
   box-shadow: none !important;
 }
+
+pre code {
+  white-space: normal !important;
+}
