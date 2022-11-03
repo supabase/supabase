@@ -24,6 +24,9 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
     }
   }, [])
 
+  const hasTableOfContents =
+    toc !== undefined && toc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
+
   return (
     <>
       <Head>
@@ -44,14 +47,16 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${
-                meta?.hide_table_of_contents ? 'col-span-10 2xl:col-span-8' : 'col-span-9'
+                meta?.hide_table_of_contents || !hasTableOfContents
+                  ? 'col-span-10 2xl:col-span-8'
+                  : 'col-span-9'
               } py-4 px-8`}
             >
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
                 {children}
               </article>
             </div>
-            {toc && !meta?.hide_table_of_contents && (
+            {hasTableOfContents && !meta?.hide_table_of_contents && (
               <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height overflow-y-auto sticky col-span-3 border-l px-2">
                 <TableOfContents toc={toc} />
               </div>
