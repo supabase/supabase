@@ -51,9 +51,7 @@ You can see that it's possible to freely read from and write to the table by usi
 
 ```js
 // Writing
-let { data, error } = await supabase
-  .from('leaderboard')
-  .insert({ name: 'Bob', score: 99999 })
+let { data, error } = await supabase.from('leaderboard').insert({ name: 'Bob', score: 99999 })
 
 // Reading
 let { data, error } = await supabase
