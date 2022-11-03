@@ -52,7 +52,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               </article>
             </div>
             {toc && !meta?.hide_table_of_contents && (
-              <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-2">
+              <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height overflow-y-auto sticky col-span-3 border-l px-2">
                 <TableOfContents toc={toc} />
               </div>
             )}

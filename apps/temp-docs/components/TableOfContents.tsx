@@ -26,7 +26,7 @@ const TableOfContents: FC<Props> = ({ toc }) => {
   // Our first level headers will be H2s (H1 is ignored), and we only show up to H3
 
   return (
-    <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-1">
+    <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-14">
       {(toc.json as TOCHeader[])
         .filter((item) => item.lvl !== 1 && item.lvl <= 3)
         .map((item: any, i: number) => {
