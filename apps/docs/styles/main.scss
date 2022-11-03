@@ -54,6 +54,10 @@ article h1 {
 
 .docs-width {
   max-width: calc(100% - var(--sidebar-width));
+
+  @media screen and (max-width: 768px) {
+    max-width: none;
+  }
 }
 
 .table-of-contents-height {

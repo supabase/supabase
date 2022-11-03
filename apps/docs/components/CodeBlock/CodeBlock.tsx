@@ -62,7 +62,7 @@ function CodeBlock(props: Props) {
         <SyntaxHighlighter
           language={lang}
           style={monokaiTheme}
-          className={`code-block rounded-lg border p-4 !my-2 !bg-scale-300 ${
+          className={`code-block rounded-lg border p-4 !my-2 !bg-scale-300 w-full ${
             !showLineNumbers ? 'pl-6' : ''
           }`}
           customStyle={{
