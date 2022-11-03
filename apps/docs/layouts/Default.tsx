@@ -44,13 +44,13 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
         <NavBar currentPage={currentPage} />
         <div className="flex w-full flex-row">
           <SideBar menuItems={menuItems} />
-          <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
+          <div className="main-content-pane docs-width grid md:grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${
                 meta?.hide_table_of_contents || !hasTableOfContents
-                  ? 'col-span-10 2xl:col-span-8'
-                  : 'col-span-9'
-              } py-4 px-8`}
+                  ? 'col-span-12 md:col-span-10 2xl:col-span-8'
+                  : 'col-span-12 md:col-span-9'
+              } py-2 md:py-4 px-2 md:px-8`}
             >
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
                 {children}

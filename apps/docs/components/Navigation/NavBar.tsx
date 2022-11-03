@@ -14,6 +14,7 @@ interface Props {
 const NavBar: FC<Props> = ({ currentPage }) => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const { asPath, push } = useRouter()
   const pathSegments = asPath.split('/')
@@ -53,6 +54,19 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     }
   }
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+    const sidebar = document.querySelector('.sidebar-menu-container')
+    const contentPane = document.querySelector('.main-content-pane')
+
+    sidebar.classList.toggle('hidden')
+    contentPane.classList.toggle('hidden')
+  }
+
+  useEffect(() => {
+    if (mobileMenuOpen) toggleMobileMenu()
+  }, [asPath])
+
   return (
     <nav
       className={[
@@ -62,7 +76,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
       ].join(' ')}
     >
       <div className="flex items-center">
-        <button className="mr-4 block stroke-2 lg:hidden">
+        <button className="mr-4 block stroke-2 lg:hidden" onClick={toggleMobileMenu}>
           <IconMenu className="text-scale-1100" />
         </button>
         {mounted && (
@@ -189,10 +203,10 @@ const NavBar: FC<Props> = ({ currentPage }) => {
               <p className="text-scale-800 text-sm">Search docs</p>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="text-scale-1200 flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+              <div className="hidden text-scale-1200 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                 <IconCommand size={12} strokeWidth={1.5} />
               </div>
-              <div className="text-xs text-scale-1200 flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+              <div className="hidden text-xs text-scale-1200 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                 K
               </div>
             </div>
