@@ -57,7 +57,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     <nav
       className={[
         'sticky top-0 z-10 flex items-center justify-between',
-        'h-[60px] border-b bg-white p-4 backdrop-blur backdrop-filter',
+        'h-[60px] border-b bg-white px-4 backdrop-blur backdrop-filter',
         'dark:border-scale-400 dark:bg-scale-200',
       ].join(' ')}
     >
