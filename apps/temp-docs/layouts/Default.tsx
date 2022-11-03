@@ -3,6 +3,7 @@ import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
+import TableOfContents from '~/components/TableOfContents'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
@@ -34,12 +35,6 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
         <meta property="og:site_name" content={meta?.title} />
         <meta property="og:description" content={meta?.description} />
         <meta property="og:title" content={meta?.title} />
-        {/* <link
-          rel="preload"
-          href="https://unpkg.com/prismjs@0.0.1/themes/prism-okaidia.css"
-          as="script"
-        /> */}
-        {/* <link href={`https://unpkg.com/prismjs@0.0.1/themes/prism-${theme}.css`} rel="stylesheet" /> */}
       </Head>
 
       <main>
@@ -49,7 +44,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
           <div className="docs-width grid grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${
-                meta?.hide_table_of_contents ? 'col-span-10' : 'col-span-12 xl:col-span-9'
+                meta?.hide_table_of_contents ? 'col-span-10 2xl:col-span-8' : 'col-span-9'
               } py-4 px-8`}
             >
               <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
@@ -58,26 +53,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
             </div>
             {toc && !meta?.hide_table_of_contents && (
               <div className="border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height col-span-3 border-l px-2">
-                <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-1 mt-1">
-                  {toc.json
-                    .filter((item) => item.lvl !== 1)
-                    .map((item: any, i: number) => {
-                      return (
-                        <li
-                          key={i}
-                          className={`${item.lvl === 3 && i !== 0 ? 'ml-4' : ''}`}
-                          id={item.lvl}
-                        >
-                          <a
-                            className="text-scale-1000 hover:text-brand-900 transition-colors"
-                            href={`#${item.slug}`}
-                          >
-                            {item.content}
-                          </a>
-                        </li>
-                      )
-                    })}
-                </ul>
+                <TableOfContents toc={toc} />
               </div>
             )}
           </div>
