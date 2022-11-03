@@ -42,6 +42,7 @@ async function generate() {
               .replace('/database/Database', '/database')
               .replace('/storage/Storage', '/storage')
               .replace('/realtime/Realtime', '/realtime')
+              .replace('/edge-functions/edge-functions', '/edge-functions')
 
             let route = path === '/index' ? '' : path
 
