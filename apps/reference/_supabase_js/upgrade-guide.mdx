@@ -441,3 +441,12 @@ supabase.channel('any')
 ```
 </TabItem>
 </Tabs>
+
+### Cookie methods
+
+The cookie related methods like `setAuthCookie` and `getUserByCookie` have been removed.
+
+For Next.js you can use the [Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs) to help you manage cookies.
+If you prefer not to use the auth helpers package you can follow [this approach](https://supabase.com/docs/guides/auth/server-side-rendering) for server-side-rendering.
+
+Some more background information about the reasoning can be obtained [here](https://github.com/supabase/gotrue-js/pull/340).
