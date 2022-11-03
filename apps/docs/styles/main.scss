@@ -214,5 +214,7 @@ a:has(code) {
 }
 
 pre code {
-  white-space: normal !important;
+  @media screen and (max-width: 768px) {
+    white-space: normal !important;
+  }
 }
