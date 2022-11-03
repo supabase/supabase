@@ -29,7 +29,7 @@ and is the easiest way to interact with everything we offer within the Supabase 
       <code>string</code>
     </span>
   </h4>
-  <div class="method-list-item-description">
+  <div className="method-list-item-description">
 
 The unique Supabase URL which is supplied when you create a new project in your project dashboard.
 
@@ -49,7 +49,7 @@ The unique Supabase URL which is supplied when you create a new project in your 
       <code>string</code>
     </span>
   </h4>
-  <div class="method-list-item-description">
+  <div className="method-list-item-description">
 
 The unique Supabase Key which is supplied when you create a new project in your project dashboard.
 
@@ -69,7 +69,7 @@ The unique Supabase Key which is supplied when you create a new project in your 
       <code>SupabaseClientOptions</code>
     </span>
   </h4>
-  <div class="method-list-item-description">
+  <div className="method-list-item-description">
 
 No description provided.
 
@@ -87,10 +87,7 @@ No description provided.
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
-const supabase = createClient(
-  'https://xyzcompany.supabase.co',
-  'public-anon-key'
-)
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 ```
 
 ### With additional parameters
@@ -105,11 +102,7 @@ const options = {
   persistSession: true,
   detectSessionInUrl: true,
 }
-const supabase = createClient(
-  'https://xyzcompany.supabase.co',
-  'public-anon-key',
-  options
-)
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
 ```
 
 ### API schemas
@@ -118,13 +111,9 @@ const supabase = createClient(
 import { createClient } from '@supabase/supabase-js'
 
 // Provide a custom schema. Defaults to "public".
-const supabase = createClient(
-  'https://xyzcompany.supabase.co',
-  'public-anon-key',
-  {
-    schema: 'other_schema',
-  }
-)
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+  schema: 'other_schema',
+})
 ```
 
 By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
@@ -137,13 +126,9 @@ Note: each client connection can only access a single schema, so the code above 
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://xyzcompany.supabase.co',
-  'public-anon-key',
-  {
-    fetch: fetch.bind(globalThis),
-  }
-)
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+  fetch: fetch.bind(globalThis),
+})
 ```
 
 `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
