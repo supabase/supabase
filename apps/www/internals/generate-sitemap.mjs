@@ -41,6 +41,7 @@ async function generate() {
               .replace('/auth/Auth', '/auth')
               .replace('/database/Database', '/database')
               .replace('/storage/Storage', '/storage')
+              .replace('/realtime/Realtime', '/realtime')
 
             let route = path === '/index' ? '' : path
 
