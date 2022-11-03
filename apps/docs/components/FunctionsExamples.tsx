@@ -47,7 +47,7 @@ const examples = [
 
 const FunctionsExamples = () => {
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="grid md:grid-cols-12 gap-4">
       {examples.map((x) => (
         <div className="col-span-6">
           <ButtonCard to={x.href} title={x.name} description={x.description} />
