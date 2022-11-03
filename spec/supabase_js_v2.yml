@@ -17,6 +17,96 @@ info:
 
 functions:
   
+  - id: function-init
+    title: Initializing
+    $definition: ../../spec/enrichments/tsdoc_v2/combined.json
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize a new Supabase client using the `createClient()` method.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - id: example-init-basic
+        title: createClient()
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          ```
+      - id: example-init-parameters
+        title: With additional parameters
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const options = {
+            db: {
+              schema: 'public',
+            },
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true
+            },
+            global: {
+              headers: { 'x-my-custom-header': 'my-app-name' },
+            },
+          }
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+      - id: example-init-schemas
+        title: API schemas
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Provide a custom schema. Defaults to "public".
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            db: { schema: 'other_schema' }
+          })
+          ```
+
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - id: example-init-custom-fetch
+        title: Custom `fetch` implementation
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            global: { fetch: fetch.bind(globalThis) }
+          })
+          ```
+
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
+      - id: example-init-react-native
+        title: React Native options
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+          import AsyncStorage from "@react-native-async-storage/async-storage";
+
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+            auth: {
+              storage: AsyncStorage,
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: false,
+            },
+          });
+          ```
+
+          For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
+  
   - id: function-auth-signup
     name: 'auth.signUp()'
     title: 'signUp()'
@@ -61,7 +151,6 @@ functions:
             }
           )
           ```
-
   auth.signInWithPassword():
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
