@@ -66,8 +66,8 @@ function CodeBlock(props: Props) {
             !showLineNumbers ? 'pl-6' : ''
           }`}
           customStyle={{
-            fontSize: large ? 18 : 12,
-            lineHeight: large ? 1.4 : 1.2,
+            fontSize: large ? 18 : 13,
+            lineHeight: large ? 1.5 : 1.4,
           }}
           showLineNumbers={showLineNumbers}
           lineNumberContainerStyle={{
