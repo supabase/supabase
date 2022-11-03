@@ -7,6 +7,8 @@ import rehypeSlug from 'rehype-slug'
 
 import withTM from 'next-transpile-modules'
 
+import withYaml from 'next-plugin-yaml'
+
 // import { remarkCodeHike } from '@code-hike/mdx'
 // import theme from 'shiki/themes/dark-plus.json' assert { type: 'json' }
 // import codeHikeTheme from './codeHikeTheme.js'
@@ -50,6 +52,6 @@ const nextConfig = {
 
 // next.config.js
 export default () => {
-  const plugins = [withMDX, withTM(['ui', 'common'])]
+  const plugins = [withYaml, withMDX, withTM(['ui', 'common'])]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
