@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #3fcf8e;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .cls-2 {
+        fill: #3fcf8e;
+        opacity: .1;
+      }
+
+      .cls-3 {
+        opacity: .5;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <rect class="cls-2" x=".5" y=".5" width="24" height="24" rx="6" ry="6"/>
+    <g class="cls-3">
+      <path class="cls-1" d="M5.5,10.5c0-1.54,.59-3.07,1.76-4.24"/>
+      <path class="cls-1" d="M11.5,4.5c-1.54,0-3.07,.59-4.24,1.76"/>
+    </g>
+    <g class="cls-3">
+      <path class="cls-1" d="M20.5,13.5c0,1.54-.59,3.07-1.76,4.24"/>
+      <path class="cls-1" d="M14.5,19.5c1.54,0,3.07-.59,4.24-1.76"/>
+    </g>
+    <rect class="cls-1" x=".5" y=".5" width="24" height="24" rx="6" ry="6"/>
+    <rect class="cls-1" x="12.5" y="3.5" width="8" height="8" rx="4" ry="4"/>
+    <polygon class="cls-1" points="9.86 13.5 5.62 13.5 3.5 17.17 5.62 20.85 9.86 20.85 11.99 17.17 9.86 13.5"/>
+  </g>
+</svg>
