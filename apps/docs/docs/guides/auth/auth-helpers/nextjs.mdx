@@ -13,14 +13,12 @@ This submodule provides convenience helpers for implementing user authentication
 ## Install the Next.js helper library
 
 <Tabs
-  groupId="install"
-  defaultValue="npm"
-  values={[
-    {label: 'npm', value: 'npm'},
-    {label: 'Yarn', value: 'yarn'},
-  ]}>
-
-<TabItem value="npm">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+>
+<TabPanel id="npm" label="npm">
 
 ```sh
 npm install @supabase/auth-helpers-nextjs
@@ -38,8 +36,8 @@ Additionally, install the **React Auth Helpers** for components and hooks that c
 npm install @supabase/auth-helpers-react
 ```
 
-</TabItem>
-<TabItem value="yarn">
+</TabPanel>
+<TabPanel id="yarn" label="Yarn">
 
 ```sh
 yarn add @supabase/auth-helpers-nextjs
@@ -57,7 +55,7 @@ Additionally, install the **React Auth Helpers** for components and hooks that c
 yarn add @supabase/auth-helpers-react
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Set up environment variables
@@ -72,13 +70,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ## Basic Setup
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
@@ -102,8 +99,8 @@ function MyApp({ Component, pageProps }) {
 }
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
@@ -133,7 +130,7 @@ function MyApp({
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 You can now determine if a user is authenticated by checking that the `user` object returned by the `useUser()` hook is defined.
@@ -273,13 +270,12 @@ export const getServerSideProps = async (ctx) => {
 You can use the server supabase client to run [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```jsx
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -323,8 +319,8 @@ export const getServerSideProps = async (ctx) => {
 }
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 ```tsx
 import { User, createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -369,21 +365,20 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
-## Server-side data fetching to OAuth APIs using `provider_token`
+## Server-side data fetching to OAuth APIs using provider token
 
 When using third-party auth providers, sessions are initiated with an additional `provider_token` field which is persisted in the auth cookie and can be accessed within the session object. The `provider_token` can be used to make API requests to the OAuth provider's API endpoints on behalf of the logged-in user.
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```jsx
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -433,8 +428,8 @@ export const getServerSideProps = async (ctx) => {
 }
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 ```tsx
 import { User, createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -485,7 +480,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 ## Protecting API routes
@@ -493,13 +488,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 Create a server supabase client to retrieve the logged in user's session:
 
 <Tabs
-  groupId="language"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'},
-  ]}>
-<TabItem value="js">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```jsx title="pages/api/protected-route.js"
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -526,8 +520,8 @@ const ProtectedRoute = async (req, res) => {
 export default ProtectedRoute
 ```
 
-</TabItem>
-<TabItem value="ts">
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
 
 ```tsx title="pages/api/protected-route.ts"
 import { NextApiHandler } from 'next'
@@ -555,12 +549,12 @@ const ProtectedRoute: NextApiHandler = async (req, res) => {
 export default ProtectedRoute
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
-## Protecting routes with [Nextjs Middleware](https://nextjs.org/docs/middleware)
+## Auth with Next.js Middleware
 
-As an alternative to protecting individual pages you can use a `middleware` file to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
+As an alternative to protecting individual pages you can use a [Next.js Middleware](https://nextjs.org/docs/middleware) to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
 
 ```ts title="middleware.ts"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -595,9 +589,9 @@ export const config = {
 }
 ```
 
-## Migration Guide {#migration}
+## Migration Guide
 
-### Migrating to `0.5.X`
+### Migrating to v0.5.X
 
 To make these helpers more flexible as well as more maintainable and easier to upgrade for new versions of Next.js, we're stripping them down to the most useful part which is managing the cookies and giving you an authenticated supabase-js client in any environment (client, server, middleware/edge).
 
@@ -610,12 +604,12 @@ Please follow the steps below to update your API routes, pages, and middleware h
 Use `createServerSupabaseClient` within your `NextApiHandler`:
 
 <Tabs
-  defaultValue="before"
-  values={[
-    {label: 'Before', value: 'before'},
-    {label: 'After', value: 'after'},
-  ]}>
-<TabItem value="before">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="before"
+>
+<TabPanel id="before" label="Before">
 
 ```tsx title="pages/api/protected-route.ts"
 import { withApiAuth } from '@supabase/auth-helpers-nextjs'
@@ -627,8 +621,8 @@ export default withApiAuth(async function ProtectedRoute(req, res, supabase) {
 })
 ```
 
-</TabItem>
-<TabItem value="after">
+</TabPanel>
+<TabPanel id="after" label="After">
 
 ```tsx title="pages/api/protected-route.ts"
 import { NextApiHandler } from 'next'
@@ -656,7 +650,7 @@ const ProtectedRoute: NextApiHandler = async (req, res) => {
 export default ProtectedRoute
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### `withPageAuth` deprecated!
@@ -664,12 +658,12 @@ export default ProtectedRoute
 Use `createServerSupabaseClient` within `getServerSideProps`:
 
 <Tabs
-  defaultValue="before"
-  values={[
-    {label: 'Before', value: 'before'},
-    {label: 'After', value: 'after'},
-  ]}>
-<TabItem value="before">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="before"
+>
+<TabPanel id="before" label="Before">
 
 ```tsx title="pages/profile.tsx"
 import { withPageAuth, User } from '@supabase/auth-helpers-nextjs'
@@ -681,8 +675,8 @@ export default function Profile({ user }: { user: User }) {
 export const getServerSideProps = withPageAuth({ redirectTo: '/' })
 ```
 
-</TabItem>
-<TabItem value="after">
+</TabPanel>
+<TabPanel id="after" label="After">
 
 ```tsx title="pages/profile.js"
 import { createServerSupabaseClient, User } from '@supabase/auth-helpers-nextjs'
@@ -717,18 +711,18 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
 #### `withMiddlewareAuth` deprecated!
 
 <Tabs
-  defaultValue="before"
-  values={[
-    {label: 'Before', value: 'before'},
-    {label: 'After', value: 'after'},
-  ]}>
-<TabItem value="before">
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="before"
+>
+<TabPanel id="before" label="Before">
 
 ```tsx title="middleware.ts"
 import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs'
@@ -748,8 +742,8 @@ export const config = {
 }
 ```
 
-</TabItem>
-<TabItem value="after">
+</TabPanel>
+<TabPanel id="after" label="After">
 
 ```tsx title="middleware.ts"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -784,10 +778,10 @@ export const config = {
 }
 ```
 
-</TabItem>
+</TabPanel>
 </Tabs>
 
-### Migrating to `0.4.X` and supabase-js v2
+### Migrating to v0.4.X and supabase-js v2
 
 - With the update to `supabase-js` v2 the `auth` API routes are no longer required, therefore you can go ahead and delete your `auth` directory under the `/pages/api/` directory. Please refer to the [v2 migration guide](https://supabase.com/docs/reference/javascript/upgrade-guide) for the full set of changes within supabase-js.
 
