@@ -108,7 +108,7 @@ parameters:
     required: true
     default: 'realtime_rls'
     description: |
-      A unique name for Postgres to track the Write-Ahead Logging (WAL). If the Realtime server dies then this slot can keep the changes since the last commited position.
+      A unique name for Postgres to track the Write-Ahead Logging (WAL). If the Realtime server dies then this slot can keep the changes since the last committed position.
 
   - id: 'TEMPORARY_SLOT' # {string} A unique identifier for this param.
     title: 'TEMPORARY_SLOT' # {string} Any name.
