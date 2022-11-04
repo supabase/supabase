@@ -4,7 +4,7 @@ title: Database usage
 description: Understanding how database usage applies to your subscription.
 ---
 
-Database storage refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing page](https://app.supabase.com/project/_/settings/billing) and is updated daily.
+Database storage refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily.
 
 For an instantaneous live view of the DB storage usage, you can execute in Postgres:
 
@@ -29,7 +29,7 @@ If you intend to grow beyond this, reach out to our team to learn more about our
 
 ### Increasing available database storage
 
-1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing) to increase your storage quota.
+1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription) to increase your storage quota.
 
 2. Delete data from your project's database to lower its disk usage. If your database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
 
