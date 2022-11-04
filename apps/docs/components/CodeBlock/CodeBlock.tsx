@@ -1,7 +1,8 @@
+import { FC } from 'react'
+import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from './CodeBlock.utils'
 import { Button, IconCheck, IconCopy } from 'ui'
-import CopyToClipboard from 'react-copy-to-clipboard'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
@@ -14,16 +15,25 @@ import { useState } from 'react'
 import { useTheme } from '../Providers'
 
 interface Props {
-  lang: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart'
-  startingLineNumber?: number
+  title?: string
+  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart'
   hideCopy?: boolean
+  hideLineNumbers?: boolean
   className?: string
-  children?: string
-  size?: 'small' | 'medium' | 'large'
   value?: string
+  children?: string
 }
 
-function CodeBlock(props: Props) {
+const CodeBlock: FC<Props> = ({
+  title,
+  language,
+  className,
+  value,
+  children,
+  hideCopy = false,
+  hideLineNumbers = false,
+}) => {
+  console.log('CodeBlock', { title })
   const { isDarkMode } = useTheme()
   const monokaiTheme = monokaiCustomTheme(isDarkMode)
 
@@ -36,13 +46,9 @@ function CodeBlock(props: Props) {
     }, 1000)
   }
 
-  let lang = props.lang
-    ? props.lang
-    : props.className
-    ? props.className.replace('language-', '')
-    : 'js'
+  let xxxlang = language ? language : className ? className.replace('language-', '') : 'js'
   // force jsx to be js highlighted
-  if (lang === 'jsx') lang = 'js'
+  if (xxxlang === 'jsx') xxxlang = 'js'
   SyntaxHighlighter.registerLanguage('js', js)
   SyntaxHighlighter.registerLanguage('ts', ts)
   SyntaxHighlighter.registerLanguage('py', py)
@@ -54,18 +60,25 @@ function CodeBlock(props: Props) {
   const large = false
 
   // don't show line numbers if bash == lang
-  const showLineNumbers = lang !== 'bash'
+  const showLineNumbers = hideLineNumbers || xxxlang !== 'bash'
 
   return (
-    <div className="relative">
-      {props.className ? (
+    <div className="relative my-2">
+      {title && (
+        <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100">
+          {title}
+        </div>
+      )}
+      {className ? (
         <SyntaxHighlighter
-          language={lang}
+          language={xxxlang}
           wrapLines={true}
           style={monokaiTheme}
-          className={`code-block rounded-lg border p-4 !my-2 !bg-scale-300 w-full ${
-            !showLineNumbers ? 'pl-6' : ''
-          }`}
+          className={[
+            'code-block border p-4 w-full !my-0 !bg-scale-300',
+            `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
+            `${!showLineNumbers ? 'pl-6' : ''}`,
+          ].join(' ')}
           customStyle={{
             fontSize: large ? 18 : 13,
             lineHeight: large ? 1.5 : 1.4,
@@ -86,14 +99,20 @@ function CodeBlock(props: Props) {
             paddingBottom: '4px',
           }}
         >
-          {(props.value || props.children)?.trimEnd()}
+          {(value || children)?.trimEnd()}
         </SyntaxHighlighter>
       ) : (
-        <code>{props.value || props.children}</code>
+        <code>{value || children}</code>
       )}
-      {!props.hideCopy && (props.value || props.children) && props.className ? (
-        <div className={`${isDarkMode ? 'dark' : ''} absolute right-2 top-2`}>
-          <CopyToClipboard text={props.value || props.children}>
+      {!hideCopy && (value || children) && className ? (
+        <div
+          className={[
+            'absolute right-2',
+            `${isDarkMode ? 'dark' : ''}`,
+            `${!title ? 'top-2' : 'top-[3.25rem]'}`,
+          ].join(' ')}
+        >
+          <CopyToClipboard text={value || children}>
             <Button
               type="default"
               icon={copied ? <IconCheck /> : <IconCopy />}
