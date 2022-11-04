@@ -65,8 +65,8 @@ const CodeBlock: FC<Props> = ({
   return (
     <div className="relative my-2">
       {title && (
-        <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100">
-          {title}
+        <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
+          {title.replace(/%20/g, ' ')}
         </div>
       )}
       {className ? (

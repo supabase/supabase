@@ -1,15 +1,24 @@
-import React from 'react'
+import React, { FC, ReactNode } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function ButtonCard({
+interface Props {
+  title: string
+  description?: string
+  to: string
+  icon?: string | ReactNode
+  children?: ReactNode
+  layout: 'vertical' | 'horizontal'
+}
+
+const ButtonCard: FC<Props> = ({
   children = undefined,
   icon = undefined,
   title,
   description = '',
   to,
   layout = 'vertical',
-}) {
+}) => {
   return (
     <Link href={to}>
       <a
@@ -42,3 +51,5 @@ export default function ButtonCard({
     </Link>
   )
 }
+
+export default ButtonCard
