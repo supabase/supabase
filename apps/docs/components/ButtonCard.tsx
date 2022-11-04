@@ -8,7 +8,7 @@ interface Props {
   to: string
   icon?: string | ReactNode
   children?: ReactNode
-  layout: 'vertical' | 'horizontal'
+  layout?: 'vertical' | 'horizontal'
 }
 
 const ButtonCard: FC<Props> = ({
