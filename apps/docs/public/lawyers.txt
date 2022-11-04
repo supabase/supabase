@@ -1,0 +1,409 @@
+
+Lawyers.txt
+
+____________
+
+For compliance.
+
+Supabase™ is a trademark of Supabase Inc.
+
+If you're a creator/contributor to one of these packages, thanks!
+
+Last updated: 2022-03-29
+
+JavaScript/TypeScript
+
+--  ------------------------------------  ----------------------  --------------------------------------------------------------------  ---------------------------------------------------------------------------------------  -------------------------
+ 0  lodash@4.17.21                        MIT                     https://github.com/lodash/lodash                                      https://github.com/lodash/lodash/raw/master/LICENSE                                      @supabase/ui
+ 1  prop-types@15.7.2                     MIT                     https://github.com/facebook/prop-types                                https://github.com/facebook/prop-types/raw/master/LICENSE                                @supabase/ui
+ 2  @types/lodash.clonedeep@4.5.6         MIT                     https://github.com/DefinitelyTyped/DefinitelyTyped                    https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE                    @supabase/realtime-js
+ 3  @types/phoenix@1.5.4                  MIT                     https://github.com/DefinitelyTyped/DefinitelyTyped                    https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE                    @supabase/realtime-js
+ 4  @types/websocket@1.0.4                MIT                     https://github.com/DefinitelyTyped/DefinitelyTyped                    https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE                    @supabase/realtime-js
+ 5  lodash.clonedeep@4.5.0                MIT                     https://github.com/lodash/lodash                                      https://github.com/lodash/lodash/raw/master/LICENSE                                      @supabase/realtime-js
+ 6  websocket@1.0.34                      Apache-2.0              https://github.com/theturtle32/WebSocket-Node                         https://github.com/theturtle32/WebSocket-Node/raw/master/LICENSE                         @supabase/realtime-js
+ 7  argparse@2.0.1                        Python-2.0              https://github.com/nodeca/argparse                                    https://github.com/nodeca/argparse/raw/master/LICENSE                                    @supabase/sql-formatter
+ 8  @supabase/supabase-js@1.1.2           MIT                     https://github.com/supabase/supabase-js                               https://github.com/supabase/supabase-js/raw/master/LICENSE                               issue-tracker
+ 9  @supabase/ui@0.6.1                    MIT                     https://github.com/supabase/ui                                                          https://github.com/supabase/ui/blob/master/LICENSE                                       issue-tracker
+10  autoprefixer@10.1.0                   MIT                     https://github.com/postcss/autoprefixer                               https://github.com/postcss/autoprefixer/raw/master/LICENSE                               issue-tracker
+11  crypto-js@4.0.0                       MIT                     http://github.com/brix/crypto-js                                      http://github.com/brix/crypto-js/raw/master/LICENSE                                      issue-tracker
+12  next@10.0.3                           MIT                     https://github.com/vercel/next.js                                     https://github.com/vercel/next.js/raw/master/license.md                                  issue-tracker
+13  postcss@8.2.1                         MIT                     https://github.com/postcss/postcss                                    https://github.com/postcss/postcss/raw/master/LICENSE                                    issue-tracker
+14  react-dom@17.0.1                      MIT                     https://github.com/facebook/react                                     https://github.com/facebook/react/raw/master/LICENSE                                     issue-tracker
+15  react-toastify@6.2.0                  MIT                     https://github.com/fkhadra/react-toastify                             https://github.com/fkhadra/react-toastify/raw/master/LICENSE                             issue-tracker
+16  react-transition-group@4.4.1          BSD-3-Clause            https://github.com/reactjs/react-transition-group                     https://github.com/reactjs/react-transition-group/raw/master/LICENSE                     issue-tracker
+17  react@17.0.1                          MIT                     https://github.com/facebook/react                                     https://github.com/facebook/react/raw/master/LICENSE                                     issue-tracker
+18  tailwindcss@2.0.2                     MIT                     https://github.com/tailwindlabs/tailwindcss                           https://github.com/tailwindlabs/tailwindcss/raw/master/LICENSE                           issue-tracker
+19  @headlessui/react@1.2.0               MIT                     https://github.com/tailwindlabs/headlessui                            https://github.com/tailwindlabs/headlessui                                               supabase-ui-web
+20  @mdx-js/loader@1.6.22                 MIT                     https://github.com/mdx-js/mdx                                         https://github.com/mdx-js/mdx/raw/master/license                                         supabase-ui-web
+21  @next/mdx@10.1.1                      MIT                     https://github.com/vercel/next.js                                     https://github.com/vercel/next.js/raw/master/license.md                                  supabase-ui-web
+22  @supabase/supabase-js@1.7.5           MIT                     https://github.com/supabase/supabase-js                               https://github.com/supabase/supabase-js/raw/master/LICENSE                               supabase-ui-web
+23  @supabase/ui@0.25.1                   MIT                     https://github.com/supabase/ui                                                          https://github.com/supabase/ui/blob/master/LICENSE                                       supabase-ui-web
+24  @types/react-copy-to-clipboard@5.0.0  MIT                     https://github.com/DefinitelyTyped/DefinitelyTyped                    https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE                    supabase-ui-web
+25  gray-matter@4.0.2                     MIT                     https://github.com/jonschlinkert/gray-matter                          https://github.com/jonschlinkert/gray-matter/raw/master/LICENSE                          supabase-ui-web
+26  markdown-toc@1.2.0                    MIT                     https://github.com/jonschlinkert/markdown-toc                         https://github.com/jonschlinkert/markdown-toc/raw/master/LICENSE                         supabase-ui-web
+27  next-mdx-remote@2.1.3                 MPL-2.0                 https://github.com/hashicorp/next-mdx-remote                          https://github.com/hashicorp/next-mdx-remote/raw/master/LICENSE                          supabase-ui-web
+28  next-seo@4.23.0                       MIT                     https://github.com/garmeeh/next-seo                                   https://github.com/garmeeh/next-seo/raw/master/LICENSE.md                                supabase-ui-web
+29  next@10.1.1                           MIT                     https://github.com/vercel/next.js                                     https://github.com/vercel/next.js/raw/master/license.md                                  supabase-ui-web
+30  react-copy-to-clipboard@5.0.3         MIT                     https://github.com/nkbt/react-copy-to-clipboard                       https://github.com/nkbt/react-copy-to-clipboard/raw/master/LICENSE                       supabase-ui-web
+31  react-dom@17.0.2                      MIT                     https://github.com/facebook/react                                     https://github.com/facebook/react/raw/master/LICENSE                                     supabase-ui-web
+32  react-frame-component@4.1.3           MIT                     https://github.com/ryanseddon/react-frame-component                   https://github.com/ryanseddon/react-frame-component/raw/master/LICENSE.md                supabase-ui-web
+33  react-markdown@5.0.3                  MIT                     https://github.com/remarkjs/react-markdown                            https://github.com/remarkjs/react-markdown/raw/master/license                            supabase-ui-web
+34  react-syntax-highlighter@15.4.3       MIT                     https://github.com/react-syntax-highlighter/react-syntax-highlighter  https://github.com/react-syntax-highlighter/react-syntax-highlighter/raw/master/LICENSE  supabase-ui-web
+35  react@17.0.2                          MIT                     https://github.com/facebook/react                                     https://github.com/facebook/react/raw/master/LICENSE                                     supabase-ui-web
+36  rehype-slug@4.0.1                     MIT                     https://github.com/rehypejs/rehype-slug                               https://github.com/rehypejs/rehype-slug/raw/master/license                               supabase-ui-web
+37  remark-gfm@1.0.0                      MIT                     https://github.com/remarkjs/remark-gfm                                https://github.com/remarkjs/remark-gfm/raw/master/license                                supabase-ui-web
+38  cross-fetch@3.1.4                     MIT                     https://github.com/lquixada/cross-fetch                               https://github.com/lquixada/cross-fetch/raw/master/LICENSE                               @supabase/storage-js
+39  cross-fetch@3.0.6                     MIT                     https://github.com/lquixada/cross-fetch                               https://github.com/lquixada/cross-fetch/raw/master/LICENSE                               @supabase/postgrest-js
+40  @supabase/gotrue-js@1.22.3            MIT                     https://github.com/supabase/gotrue-js                                 https://github.com/supabase/gotrue-js/raw/master/LICENSE                                 @supabase/supabase-js
+41  @supabase/postgrest-js@0.37.0         MIT                     https://github.com/supabase/postgrest-js                              https://github.com/supabase/postgrest-js/raw/master/LICENSE                              @supabase/supabase-js
+42  @supabase/realtime-js@1.3.6           MIT                     https://github.com/supabase/realtime-js                               https://github.com/supabase/realtime-js/raw/master/LICENSE.md                            @supabase/supabase-js
+43  @supabase/storage-js@1.6.4            MIT                     https://github.com/supabase/storage-js                                https://github.com/supabase/storage-js/raw/master/LICENSE                                @supabase/supabase-js
+44  @sinclair/typebox@0.23.4              MIT                     https://github.com/sinclairzx81/typebox                               https://github.com/sinclairzx81/typebox/raw/master/license                               @supabase/postgres-meta
+45  pg-format@1.0.4                       MIT                     https://github.com/datalanche/node-pg-format                          https://github.com/datalanche/node-pg-format/raw/master/LICENSE                          @supabase/postgres-meta
+46  pg@8.7.3                              MIT                     https://github.com/brianc/node-postgres                               https://github.com/brianc/node-postgres/raw/master/LICENSE                               @supabase/postgres-meta
+47  pgsql-parser@13.3.0                   MIT                     https://github.com/pyramation/pgsql-parser                            https://github.com/pyramation/pgsql-parser/raw/master/LICENSE                            @supabase/postgres-meta
+48  pino@7.9.1                            MIT                     https://github.com/pinojs/pino                                        https://github.com/pinojs/pino/raw/master/LICENSE                                        @supabase/postgres-meta
+49  postgres-array@3.0.1                  MIT                     https://github.com/bendrucker/postgres-array                          https://github.com/bendrucker/postgres-array/raw/master/license                          @supabase/postgres-meta
+50  prettier-plugin-sql@0.4.1             MIT                     git@github.com/rx-ts/prettier                                         git@github.com/rx-ts/prettier/raw/master/LICENSE                                         @supabase/postgres-meta
+51  prettier@2.6.0                        MIT                     https://github.com/prettier/prettier                                  https://github.com/prettier/prettier/raw/master/LICENSE                                  @supabase/postgres-meta
+52  sql-formatter@4.0.2                   MIT                     https://github.com/zeroturnaround/sql-formatter                       https://github.com/zeroturnaround/sql-formatter/raw/master/LICENSE                       @supabase/postgres-meta
+53  @monaco-editor/react@4.3.1            MIT                     https://github.com/suren-atoyan/monaco-react                          https://github.com/suren-atoyan/monaco-react/raw/master/LICENSE                          @supabase/grid
+54  @scaleleap/pg-format@1.0.0            MIT                     https://github.com/ScaleLeap/pg-format                                https://github.com/ScaleLeap/pg-format/raw/master/LICENSE                                @supabase/grid
+55  awesome-debounce-promise@2.1.0        MIT                     https://github.com/slorber/awesome-debounce-promise                   https://github.com/slorber/awesome-debounce-promise                                      @supabase/grid
+56  dayjs@1.10.7                          MIT                     https://github.com/iamkun/dayjs                                       https://github.com/iamkun/dayjs/raw/master/LICENSE                                       @supabase/grid
+57  file-saver@2.0.5                      MIT                     https://github.com/eligrey/FileSaver.js                               https://github.com/eligrey/FileSaver.js/raw/master/LICENSE.md                            @supabase/grid
+58  immutability-helper@3.1.1             MIT                     https://github.com/kolodny/immutability-helper                        https://github.com/kolodny/immutability-helper/raw/master/LICENSE                        @supabase/grid
+59  p-queue@6.6.2                         MIT                     https://github.com/sindresorhus/p-queue                               https://github.com/sindresorhus/p-queue/raw/master/license                               @supabase/grid
+60  react-contexify@5.0.0                 MIT                     https://github.com/fkhadra/react-contexify                            https://github.com/fkhadra/react-contexify/raw/master/LICENSE                            @supabase/grid
+61  react-dnd-html5-backend@14.0.2        MIT                     https://github.com/react-dnd/react-dnd                                https://github.com/react-dnd/react-dnd/raw/master/LICENSE                                @supabase/grid
+62  react-dnd@14.0.4                      MIT                     https://github.com/react-dnd/react-dnd                                https://github.com/react-dnd/react-dnd/raw/master/LICENSE                                @supabase/grid
+63  react-tiny-popover@6.0.10             MIT                     https://github.com/alexkatz/react-tiny-popover                        https://github.com/alexkatz/react-tiny-popover/raw/master/LICENSE                        @supabase/grid
+64  react-tracked@1.7.4                   MIT                     https://github.com/dai-shi/react-tracked                              https://github.com/dai-shi/react-tracked/raw/master/LICENSE                              @supabase/grid
+65  scheduler@0.20.2                      MIT                     https://github.com/facebook/react                                     https://github.com/facebook/react/raw/master/LICENSE                                     @supabase/grid
+66  @aws-sdk/client-s3@3.53.0             Apache-2.0              https://github.com/aws/aws-sdk-js-v3                                  https://github.com/aws/aws-sdk-js-v3/raw/master/LICENSE                                  supa-storage
+67  @aws-sdk/lib-storage@3.53.0           Apache-2.0              https://github.com/aws/aws-sdk-js-v3                                  https://github.com/aws/aws-sdk-js-v3/raw/master/LICENSE                                  supa-storage
+68  @aws-sdk/node-http-handler@3.53.0     Apache-2.0              https://github.com/aws/aws-sdk-js-v3                                  https://github.com/aws/aws-sdk-js-v3/raw/master/LICENSE                                  supa-storage
+69  @supabase/postgrest-js@0.36.0         MIT                     https://github.com/supabase/postgrest-js                              https://github.com/supabase/postgrest-js/raw/master/LICENSE                              supa-storage
+70  crypto-js@4.1.1                       MIT                     http://github.com/brix/crypto-js                                      http://github.com/brix/crypto-js/raw/master/LICENSE                                      supa-storage
+71  dotenv@16.0.0                         BSD-2-Clause            https://github.com/motdotla/dotenv                                    https://github.com/motdotla/dotenv/raw/master/LICENSE                                    supa-storage
+72  fastify-cors@6.0.3                    MIT                     https://github.com/fastify/fastify-cors                               https://github.com/fastify/fastify-cors/raw/master/LICENSE                               supa-storage
+73  fastify-multipart@5.3.1               MIT                     https://github.com/fastify/fastify-multipart                          https://github.com/fastify/fastify-multipart/raw/master/LICENSE                          supa-storage
+74  fastify-plugin@3.0.1                  MIT                     https://github.com/fastify/fastify-plugin                             https://github.com/fastify/fastify-plugin/raw/master/LICENSE                             supa-storage
+75  fastify-swagger@4.15.0                MIT                     https://github.com/fastify/fastify-swagger                            https://github.com/fastify/fastify-swagger/raw/master/LICENSE                            supa-storage
+76  fastify@3.27.2                        MIT                     https://github.com/fastify/fastify                                    https://github.com/fastify/fastify/raw/master/LICENSE                                    supa-storage
+77  fs-extra@10.0.1                       MIT                     https://github.com/jprichardson/node-fs-extra                         https://github.com/jprichardson/node-fs-extra/raw/master/LICENSE                         supa-storage
+78  fs-xattr@0.3.1                        MIT                     https://github.com/LinusU/fs-xattr                                    https://github.com/LinusU/fs-xattr/raw/master/LICENSE                                    supa-storage
+79  jsonwebtoken@8.5.1                    MIT                     https://github.com/auth0/node-jsonwebtoken                            https://github.com/auth0/node-jsonwebtoken/raw/master/LICENSE                            supa-storage
+80  knex@1.0.3                            MIT                     https://github.com/knex/knex                                          https://github.com/knex/knex/raw/master/LICENSE                                          supa-storage
+81  p-limit@3.1.0                         MIT                     https://github.com/sindresorhus/p-limit                               https://github.com/sindresorhus/p-limit/raw/master/license                               supa-storage
+82  pg-listen@1.7.0                       MIT                     github:andywer/pg-listen                                              github:andywer/pg-listen                                                                 supa-storage
+83  pg@8.7.3                              MIT                     https://github.com/brianc/node-postgres                               https://github.com/brianc/node-postgres/raw/master/LICENSE                               supa-storage
+84  pino@7.8.0                            MIT                     https://github.com/pinojs/pino                                        https://github.com/pinojs/pino/raw/master/LICENSE                                        supa-storage
+85  pkg@5.5.2                             MIT                     https://github.com/vercel/pkg                                         https://github.com/vercel/pkg/raw/master/LICENSE                                         supa-storage
+86  postgres-migrations@5.3.0             MIT                     https://github.com/thomwright/postgres-migrations                     https://github.com/thomwright/postgres-migrations/raw/master/LICENSE                     supa-storage
+87  under-pressure@5.8.0                  MIT                     https://github.com/fastify/under-pressure                             https://github.com/fastify/under-pressure/raw/master/LICENSE                             supa-storage
+88  clsx@1.1.1                            MIT                     https://github.com/lukeed/clsx                                        https://github.com/lukeed/clsx/raw/master/license                                        @supabase/react-data-grid
+89  dotenv@8.2.0                          BSD-2-Clause            https://github.com/motdotla/dotenv                                    https://github.com/motdotla/dotenv/raw/master/LICENSE                                    stripe-sync-engine
+90  fastify-autoload@3.6.0                MIT                     https://github.com/fastify/fastify-autoload                           https://github.com/fastify/fastify-autoload/raw/master/LICENSE                           stripe-sync-engine
+91  fastify-swagger@4.4.1                 MIT                     https://github.com/fastify/fastify-swagger                            https://github.com/fastify/fastify-swagger/raw/master/LICENSE                            stripe-sync-engine
+92  fastify@3.14.0                        MIT                     https://github.com/fastify/fastify                                    https://github.com/fastify/fastify/raw/master/LICENSE                                    stripe-sync-engine
+93  pg-node-migrations@0.0.7              MIT                     https://github.com/jbelelieu/pg_node_migrations                       https://github.com/jbelelieu/pg_node_migrations/raw/master/LICENSE                       stripe-sync-engine
+94  pg@8.6.0                              MIT                     https://github.com/brianc/node-postgres                               https://github.com/brianc/node-postgres/raw/master/LICENSE                               stripe-sync-engine
+95  stripe@8.145.0                        MIT                     https://github.com/stripe/stripe-node                                 https://github.com/stripe/stripe-node/raw/master/LICENSE                                 stripe-sync-engine
+96  yesql@5.0.0                           ISC                     https://github.com/pihvi/yesql                                        https://github.com/pihvi/yesql                                                           stripe-sync-engine
+--  ------------------------------------  ----------------------  --------------------------------------------------------------------  ---------------------------------------------------------------------------------------  -------------------------
+
+
+Elixir
+
+Id  Name                               Version  License
+--  ---------------------------------  -------  ----------
+ 0  castore                            0.1.11   Apache 2.0
+ 1  certifi                            2.5.3    BSD
+ 2  combine                            0.10.0   MIT
+ 3  connection                         1.1.0    Apache 2.0
+ 4  cowboy                             2.8.0    ISC
+ 5  cowboy_telemetry                   0.3.1    Apache 2.0
+ 6  cowlib                             2.9.1    ISC
+ 7  db_connection                      2.4.1    Apache 2.0
+ 8  decimal                            2.0.0    Apache 2.0
+ 9  ecto                               3.7.1    Apache 2.0
+10  ecto_sql                           3.7.1    Apache 2.0
+11  epgsql                             4.6.0    BSD
+12  file_system                        0.2.10   WTFPL
+13  finch                              0.7.0    MIT
+14  gettext                            0.18.2   Apache 2.0
+15  hackney                            1.17.0   Apache 2.0
+16  httpoison                          1.8.0    MIT
+17  idna                               6.1.1    MIT
+18  jason                              1.2.2    Apache 2.0
+19  joken                              2.3.0    Apache 2.0
+20  jose                               1.11.1   MIT
+21  metrics                            1.0.1    BSD
+22  mime                               1.5.0    Apache 2.0
+23  mimerl                             1.2.0    MIT
+24  mint                               1.3.0    Apache 2.0
+25  nimble_options                     0.3.5    Apache 2.0
+26  nimble_pool                        0.2.4    Apache 2.0
+27  parse_trans                        3.3.1    Apache 2.0
+28  phoenix                            1.5.8    MIT
+29  phoenix_html                       2.14.3   MIT
+30  phoenix_live_reload                1.3.0    MIT
+31  phoenix_pubsub                     2.0.0    MIT
+32  plug                               1.11.0   Apache 2.0
+33  plug_cowboy                        2.4.1    Apache 2.0
+34  plug_crypto                        1.2.1    Apache 2.0
+35  postgrex                           0.15.13  Apache 2.0
+36  prom_ex                            1.3.0    MIT
+37  ranch                              1.7.1    ISC
+38  retry                              0.14.1   Apache 2.0
+39  ssl_verify_fun                     1.1.6    MIT
+40  telemetry                          0.4.2    Apache 2.0
+41  telemetry_metrics                  0.6.1    Apache 2.0
+42  telemetry_metrics_prometheus_core  1.0.1    Apache 2.0
+43  telemetry_poller                   0.5.1    Apache 2.0
+44  timex                              3.6.3    MIT
+45  tzdata                             1.0.5    MIT
+46  unicode_util_compat                0.7.0    Apache 2.0
+47  bunt                               0.2.0    MIT
+48  credo                              1.5.5    MIT
+49  dialyxir                           1.1.0    Apache 2.0
+50  earmark_parser                     1.4.12   Apache 2.0
+51  erlex                              0.2.6    Apache 2.0
+52  ex_doc                             0.24.1   Apache 2.0
+53  file_system                        0.2.10   WTFPL
+54  jason                              1.2.2    Apache 2.0
+55  makeup                             1.0.5    BSD
+56  makeup_elixir                      0.15.1   BSD
+57  makeup_erlang                      0.1.1    BSD
+58  nimble_parsec                      1.1.0    Apache 2.0
+59  warpath                            0.6.0    MIT
+--  ---------------------------------  -------  ----------
+
+Go
+
+ID   Package Link                                                 Version                                
+---  -----------------------------------------------------------  -------------------------------------  
+License Type
+------------------------------------------------------
+  0  github.com/BurntSushi/toml                                   v1.0.0                                 MIT
+  1  github.com/adrg/xdg                                          v0.4.0                                 MIT
+  2  github.com/alecthomas/chroma                                 v0.10.0                                MIT
+  3  github.com/aymerick/douceur                                  v0.2.0                                 MIT
+  4  github.com/charmbracelet/bubbles                             v0.10.3                                MIT
+  5  github.com/charmbracelet/bubbletea                           v0.20.0                                MIT
+  6  github.com/charmbracelet/glamour                             v0.5.0                                 MIT
+  7  github.com/charmbracelet/harmonica                           v0.1.0                                 MIT
+  8  github.com/charmbracelet/lipgloss                            v0.5.0                                 MIT
+  9  github.com/containerd/console                                v1.0.3                                 Apache 2.0
+ 10  github.com/containerd/containerd                             v1.6.2                                 Apache 2.0
+ 11  github.com/dlclark/regexp2                                   v1.4.0                                 MIT
+ 12  github.com/docker/distribution                               v2.8.1                                 Apache 2.0
+ 13  github.com/docker/docker                                     v20.10.14                              Apache 2.0,MIT
+ 14  github.com/docker/go-connections                             v0.4.0                                 Apache 2.0
+ 15  github.com/docker/go-units                                   v0.4.0                                 Apache 2.0
+ 16  github.com/fsnotify/fsnotify                                 v1.5.1                                 New BSD
+ 17  github.com/gogo/protobuf                                     v1.3.2                                 New BSD
+ 18  github.com/golang/protobuf                                   v1.5.2                                 New BSD
+ 19  github.com/gorilla/css                                       v1.0.0                                 New BSD
+ 20  github.com/hashicorp/hcl                                     v1.0.0                                 Mozilla Public License 2.0
+ 21  github.com/jackc/chunkreader/v2                              v2.0.1                                 MIT
+ 22  github.com/jackc/pgconn                                      v1.11.0                                MIT
+ 23  github.com/jackc/pgio                                        v1.0.0                                 MIT
+ 24  github.com/jackc/pgpassfile                                  v1.0.0                                 MIT
+ 25  github.com/jackc/pgproto3/v2                                 v2.2.0                                 MIT
+ 26  github.com/jackc/pgservicefile                               v0.0.0-20200714003250-2b9c44734f2b     MIT
+ 27  github.com/jackc/pgtype                                      v1.10.0                                MIT
+ 28  github.com/jackc/pgx/v4                                      v4.15.0                                MIT
+ 29  github.com/joho/godotenv                                     v1.4.0                                 MIT
+ 30  github.com/lucasb-eyer/go-colorful                           v1.2.0                                 MIT
+ 31  github.com/magiconair/properties                             v1.8.6                                 Simplified BSD
+ 32  github.com/mattn/go-isatty                                   v0.0.14                                MIT
+ 33  github.com/mattn/go-runewidth                                v0.0.13                                MIT
+ 34  github.com/microcosm-cc/bluemonday                           v1.0.18                                New BSD
+ 35  github.com/mitchellh/mapstructure                            v1.4.3                                 MIT
+ 36  github.com/moby/term                                         v0.0.0-20210619224110-3f7ff695adc6     Apache 2.0
+ 37  github.com/morikuni/aec                                      v1.0.0                                 MIT
+ 38  github.com/muesli/ansi                                       v0.0.0-20211031195517-c9f0611b6c70     MIT
+ 39  github.com/muesli/reflow                                     v0.3.0                                 MIT
+ 40  github.com/muesli/termenv                                    v0.11.1-0.20220212125758-44cd13922739  MIT
+ 41  github.com/olekukonko/tablewriter                            v0.0.5                                 MIT
+ 42  github.com/opencontainers/go-digest                          v1.0.0                                 Apache 2.0
+ 43  github.com/opencontainers/image-spec                         v1.0.2                                 Apache 2.0
+ 44  github.com/pelletier/go-toml                                 v1.9.4                                 Apache 2.0
+ 45  github.com/pkg/errors                                        v0.9.1                                 Simplified BSD
+ 46  github.com/rivo/uniseg                                       v0.2.0                                 MIT
+ 47  github.com/sirupsen/logrus                                   v1.8.1                                 MIT
+ 48  github.com/spf13/afero                                       v1.8.2                                 Apache 2.0
+ 49  github.com/spf13/cast                                        v1.4.1                                 MIT
+ 50  github.com/spf13/cobra                                       v1.4.0                                 Apache 2.0
+ 51  github.com/spf13/jwalterweatherman                           v1.1.0                                 MIT
+ 52  github.com/spf13/pflag                                       v1.0.5                                 New BSD
+ 53  github.com/spf13/viper                                       v1.10.1                                MIT
+ 54  github.com/subosito/gotenv                                   v1.2.0                                 MIT
+ 55  github.com/withfig/autocomplete-tools/packages/cobra         v1.1.3                                 MIT
+ 56  github.com/yuin/goldmark                                     v1.4.11                                MIT
+ 57  github.com/yuin/goldmark-emoji                               v1.0.1                                 MIT
+ 58  golang.org/x/crypto                                          v0.0.0-20220321153916-2c7772ba3064     New BSD
+ 59  golang.org/x/net                                             v0.0.0-20220225172249-27dd8689420f     New BSD
+ 60  golang.org/x/sys                                             v0.0.0-20220319134239-a9b59b0215f8     New BSD
+ 61  golang.org/x/term                                            v0.0.0-20210927222741-03fcf44c2211     New BSD
+ 62  golang.org/x/text                                            v0.3.7                                 New BSD
+ 63  google.golang.org/genproto                                   v0.0.0-20220323144105-ec3c684e5b14     Apache 2.0
+ 64  google.golang.org/grpc                                       v1.45.0                                Apache 2.0
+ 65  google.golang.org/protobuf                                   v1.28.0                                New BSD
+ 66  gopkg.in/ini.v1                                              v1.66.4                                Apache 2.0
+ 67  gopkg.in/yaml.v2                                             v2.4.0                                 Apache 2.0,MIT
+ 68  github.com/aws/aws-sdk-go-v2                                 v1.8.0                                 Apache 2.0,New BSD
+ 69  github.com/aws/aws-sdk-go-v2/config                          v1.6.0                                 Apache 2.0
+ 70  github.com/aws/aws-sdk-go-v2/credentials                     v1.3.2                                 Apache 2.0
+ 71  github.com/aws/aws-sdk-go-v2/feature/ec2/imds                v1.4.0                                 Apache 2.0
+ 72  github.com/aws/aws-sdk-go-v2/internal/ini                    v1.2.0                                 Apache 2.0
+ 73  github.com/aws/aws-sdk-go-v2/service/internal/presigned-url  v1.2.2                                 Apache 2.0
+ 74  github.com/aws/aws-sdk-go-v2/service/secretsmanager          v1.5.0                                 Apache 2.0
+ 75  github.com/aws/aws-sdk-go-v2/service/sso                     v1.3.2                                 Apache 2.0
+ 76  github.com/aws/aws-sdk-go-v2/service/sts                     v1.6.1                                 Apache 2.0
+ 77  github.com/aws/smithy-go                                     v1.7.0                                 Apache 2.0
+ 78  github.com/coreos/go-semver                                  v0.3.0                                 Apache 2.0
+ 79  github.com/coreos/go-systemd/v22                             v22.3.2                                Apache 2.0
+ 80  github.com/fsnotify/fsnotify                                 v1.4.9                                 New BSD
+ 81  github.com/gogo/protobuf                                     v1.3.2                                 New BSD
+ 82  github.com/golang/protobuf                                   v1.5.2                                 New BSD
+ 83  github.com/hashicorp/hcl                                     v1.0.0                                 Mozilla Public License 2.0
+ 84  github.com/magiconair/properties                             v1.8.5                                 Simplified BSD
+ 85  github.com/mitchellh/mapstructure                            v1.4.1                                 MIT
+ 86  github.com/pelletier/go-toml                                 v1.9.3                                 Apache 2.0
+ 87  github.com/pkg/errors                                        v0.9.1                                 Simplified BSD
+ 88  github.com/spf13/afero                                       v1.6.0                                 Apache 2.0
+ 89  github.com/spf13/cast                                        v1.3.1                                 MIT
+ 90  github.com/spf13/cobra                                       v1.2.1                                 Apache 2.0,GPLv2,GPLv3,LGPL,MIT,New BSD,Simplified BSD
+ 91  github.com/spf13/jwalterweatherman                           v1.1.0                                 MIT
+ 92  github.com/spf13/pflag                                       v1.0.5                                 New BSD
+ 93  github.com/spf13/viper                                       v1.8.1                                 MIT
+ 94  github.com/subosito/gotenv                                   v1.2.0                                 MIT
+ 95  go.etcd.io/etcd/api/v3                                       v3.5.0                                 Apache 2.0
+ 96  go.etcd.io/etcd/client/pkg/v3                                v3.5.0                                 Apache 2.0
+ 97  go.etcd.io/etcd/client/v3                                    v3.5.0                                 Apache 2.0
+ 98  go.uber.org/atomic                                           v1.9.0                                 MIT
+ 99  go.uber.org/multierr                                         v1.7.0                                 MIT
+100  go.uber.org/zap                                              v1.19.0                                MIT
+101  golang.org/x/net                                             v0.0.0-20210405180319-a5a99cb37ef4     New BSD
+102  golang.org/x/sys                                             v0.0.0-20210603081109-ebe580a85c40     New BSD
+103  golang.org/x/text                                            v0.3.5                                 New BSD
+104  google.golang.org/genproto                                   v0.0.0-20210602131652-f16073e35f0c     Apache 2.0
+105  google.golang.org/grpc                                       v1.38.0                                Apache 2.0
+106  google.golang.org/protobuf                                   v1.26.0                                New BSD
+107  gopkg.in/ini.v1                                              v1.62.0                                Apache 2.0
+108  gopkg.in/yaml.v2                                             v2.4.0                                 Apache 2.0,MIT
+109  github.com/coreos/go-oidc                                    v2.2.1                                 Apache 2.0
+110  github.com/kelseyhightower/envconfig                         v1.4.0                                 MIT
+111  github.com/pquerna/cachecontrol                              v0.0.0-20180517163645-1555304b9b35     Apache 2.0
+112  golang.org/x/crypto                                          v0.0.0-20200709230013-948cd5f35899     New BSD
+113  golang.org/x/net                                             v0.0.0-20200707034311-ab3426394381     New BSD
+114  golang.org/x/oauth2                                          v0.0.0-20200107190931-bf48bf16ab8d     New BSD
+115  gopkg.in/square/go-jose.v2                                   v2.5.1                                 Apache 2.0,New BSD
+116  cloud.google.com/go                                          v0.67.0                                Apache 2.0,New BSD
+117  github.com/GoogleCloudPlatform/cloudsql-proxy                v0.0.0-20170623214735-571947b0f240     Apache 2.0
+118  github.com/Masterminds/semver/v3                             v3.1.1                                 MIT
+119  github.com/aymerick/douceur                                  v0.2.0                                 MIT
+120  github.com/badoux/checkmail                                  v0.0.0-20170203135005-d0a759655d62     MIT
+121  github.com/beevik/etree                                      v1.1.0                                 Simplified BSD
+122  github.com/coreos/go-oidc/v3                                 v3.0.0                                 Apache 2.0
+123  github.com/didip/tollbooth/v5                                v5.1.1                                 MIT
+124  github.com/fatih/color                                       v1.10.0                                MIT
+125  github.com/fatih/structs                                     v1.1.0                                 MIT
+126  github.com/go-chi/chi                                        v4.0.2                                 MIT
+127  github.com/go-sql-driver/mysql                               v1.5.0                                 Mozilla Public License 2.0
+128  github.com/gobuffalo/envy                                    v1.9.0                                 MIT
+129  github.com/gobuffalo/fizz                                    v1.13.0                                MIT
+130  github.com/gobuffalo/flect                                   v0.2.2                                 MIT
+131  github.com/gobuffalo/github_flavored_markdown                v1.1.0                                 MIT,Simplified BSD
+132  github.com/gobuffalo/helpers                                 v0.6.1                                 MIT
+133  github.com/gobuffalo/nulls                                   v0.4.0                                 MIT
+134  github.com/gobuffalo/packd                                   v1.0.0                                 MIT
+135  github.com/gobuffalo/plush/v4                                v4.1.0                                 MIT
+136  github.com/gobuffalo/pop/v5                                  v5.3.3                                 MIT
+137  github.com/gobuffalo/tags/v3                                 v3.1.0                                 MIT
+138  github.com/gobuffalo/validate/v3                             v3.3.0                                 MIT
+139  github.com/gofrs/uuid                                        v4.0.0                                 MIT
+140  github.com/golang-jwt/jwt                                    v3.2.1                                 MIT
+141  github.com/golang/groupcache                                 v0.0.0-20200121045136-8c9f03a8e57e     Apache 2.0
+142  github.com/golang/protobuf                                   v1.4.2                                 New BSD
+143  github.com/googleapis/gax-go/v2                              v2.0.5                                 New BSD
+144  github.com/gorilla/context                                   v1.1.1                                 New BSD
+145  github.com/gorilla/css                                       v1.0.0                                 New BSD
+146  github.com/gorilla/securecookie                              v1.1.1                                 New BSD
+147  github.com/gorilla/sessions                                  v1.1.1                                 New BSD
+148  github.com/imdario/mergo                                     v0.0.0-20160216103600-3e95a51e0639     New BSD
+149  github.com/jackc/chunkreader/v2                              v2.0.1                                 MIT
+150  github.com/jackc/pgconn                                      v1.8.0                                 MIT
+151  github.com/jackc/pgio                                        v1.0.0                                 MIT
+152  github.com/jackc/pgpassfile                                  v1.0.0                                 MIT
+153  github.com/jackc/pgproto3/v2                                 v2.0.7                                 MIT
+154  github.com/jackc/pgservicefile                               v0.0.0-20200714003250-2b9c44734f2b     MIT
+155  github.com/jackc/pgtype                                      v1.6.2                                 MIT
+156  github.com/jackc/pgx/v4                                      v4.10.1                                MIT
+157  github.com/jmoiron/sqlx                                      v1.3.1                                 MIT
+158  github.com/joho/godotenv                                     v1.3.0                                 MIT
+159  github.com/jonboulle/clockwork                               v0.2.2                                 Apache 2.0
+160  github.com/kballard/go-shellquote                            v0.0.0-20180428030007-95032a82bc51     MIT
+161  github.com/kelseyhightower/envconfig                         v1.4.0                                 MIT
+162  github.com/lestrrat-go/jwx                                   v0.9.0                                 MIT
+163  github.com/luna-duclos/instrumentedsql                       v1.1.3                                 MIT
+164  github.com/mattermost/xml-roundtrip-validator                v0.1.0                                 Apache 2.0
+165  github.com/mattn/go-colorable                                v0.1.8                                 MIT
+166  github.com/mattn/go-isatty                                   v0.0.12                                MIT
+167  github.com/microcosm-cc/bluemonday                           v1.0.16                                New BSD
+168  github.com/mitchellh/mapstructure                            v1.1.2                                 MIT
+169  github.com/mrjones/oauth                                     v0.0.0-20190623134757-126b35219450     MIT
+170  github.com/netlify/mailme                                    v1.1.1                                 MIT
+171  github.com/netlify/netlify-commons                           v0.32.0                                MIT
+172  github.com/opentracing/opentracing-go                        v1.1.0                                 Apache 2.0
+173  github.com/patrickmn/go-cache                                v2.1.0                                 MIT
+174  github.com/philhofer/fwd                                     v1.0.0                                 MIT
+175  github.com/pkg/errors                                        v0.9.1                                 Simplified BSD
+176  github.com/rogpeppe/go-internal                              v1.8.0                                 New BSD
+177  github.com/rs/cors                                           v1.6.0                                 MIT
+178  github.com/russellhaering/gosaml2                            v0.6.1-0.20210916051624-757d23f1bc28   Apache 2.0
+179  github.com/russellhaering/goxmldsig                          v1.1.1                                 Apache 2.0
+180  github.com/sebest/xff                                        v0.0.0-20160910043805-6c115e0ffa35     MIT
+181  github.com/sergi/go-diff                                     v1.1.0                                 Apache 2.0,MIT
+182  github.com/sethvargo/go-password                             v0.2.0                                 MIT
+183  github.com/sirupsen/logrus                                   v1.7.0                                 MIT
+184  github.com/sourcegraph/annotate                              v0.0.0-20160123013949-f4cad6c6324d     New BSD
+185  github.com/sourcegraph/syntaxhighlight                       v0.0.0-20170531221838-bd320f5d308e     New BSD
+186  github.com/spf13/cobra                                       v1.1.3                                 Apache 2.0,GPLv2,GPLv3,LGPL,MIT,New BSD,Simplified BSD
+187  github.com/spf13/pflag                                       v1.0.5                                 New BSD
+188  github.com/tinylib/msgp                                      v1.1.0                                 MIT
+189  go.opencensus.io                                             v0.22.4                                Apache 2.0
+190  golang.org/x/crypto                                          v0.0.0-20201221181555-eec23a3978ad     New BSD
+191  golang.org/x/net                                             v0.0.0-20220121210141-e204ce36a2ba     New BSD
+192  golang.org/x/oauth2                                          v0.0.0-20200902213428-5d25da1a8d43     New BSD
+193  golang.org/x/sync                                            v0.0.0-20201207232520-09787c993a3a     New BSD
+194  golang.org/x/sys                                             v0.0.0-20211216021012-1d35b9e2eb4e     New BSD
+195  golang.org/x/text                                            v0.3.7                                 New BSD
+196  golang.org/x/time                                            v0.0.0-20200416051211-89c76fbcd5d1     New BSD
+197  golang.org/x/xerrors                                         v0.0.0-20200804184101-5ec99f83aff1     New BSD
+198  google.golang.org/api                                        v0.32.0                                New BSD
+199  google.golang.org/genproto                                   v0.0.0-20200929141702-51c3e5b607fe     Apache 2.0
+200  google.golang.org/grpc                                       v1.32.0                                Apache 2.0
+201  google.golang.org/protobuf                                   v1.25.0                                New BSD
+202  gopkg.in/DataDog/dd-trace-go.v1                              v1.12.1                                New BSD
+203  gopkg.in/gomail.v2                                           v2.0.0-20160411212932-81ebce5c23df     MIT
+204  gopkg.in/square/go-jose.v2                                   v2.5.1                                 Apache 2.0,New BSD
+205  gopkg.in/yaml.v2                                             v2.4.0                                 Apache 2.0,MIT
+206  github.com/aws/aws-sdk-go                                    v1.36.20                               Apache 2.0,New BSD
+207  github.com/beorn7/perks                                      v1.0.1                                 MIT
+208  github.com/cespare/xxhash/v2                                 v2.1.1                                 MIT
+209  github.com/golang/protobuf                                   v1.4.3                                 New BSD
+210  github.com/jmespath/go-jmespath                              v0.4.0                                 Apache 2.0
+211  github.com/matttproud/golang_protobuf_extensions             v1.0.1                                 Apache 2.0
+212  github.com/prometheus/client_golang                          v1.9.0                                 Apache 2.0
+213  github.com/prometheus/client_model                           v0.2.0                                 Apache 2.0
+214  github.com/prometheus/common                                 v0.15.0                                Apache 2.0,New BSD
+215  github.com/prometheus/procfs                                 v0.2.0                                 Apache 2.0
+216  github.com/sirupsen/logrus                                   v1.6.0                                 MIT
+217  golang.org/x/sys                                             v0.0.0-20201214210602-f9fddec55a1e     New BSD
+218  google.golang.org/protobuf                                   v1.23.0                                New BSD
+219  gopkg.in/yaml.v2                                             v2.3.0                                 Apache 2.0,MIT
+---  -----------------------------------------------------------  -------------------------------------  ------------------------------------------------------
