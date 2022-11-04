@@ -74,5 +74,4 @@ Supabase would not be possible without the work of some other amazing open sourc
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
 - Phoenix - https://www.phoenixframework.org/
-- Docusaurus - https://v2.docusaurus.io/
 - GoTrue - https://github.com/netlify/gotrue
