@@ -30,7 +30,7 @@ const Nav = [
       { name: 'getSession()', url: '/reference/javascript/auth-getsession', items: [] },
       { name: 'getUser()', url: '/reference/javascript/auth-getuser', items: [] },
       { name: 'updateUser()', url: '/reference/javascript/auth-updateuser', items: [] },
-      { name: 'setSession()', url: '/reference/javascript/auth-setSession', items: [] },
+      { name: 'setSession()', url: '/reference/javascript/auth-setsession', items: [] },
       {
         name: 'resetPasswordForEmail()',
         url: '/reference/javascript/auth-resetpasswordforemail',
