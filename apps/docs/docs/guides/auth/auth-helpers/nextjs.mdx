@@ -28,6 +28,7 @@ This library supports the following tooling versions:
 
 - Node.js: `^10.13.0 || >=12.0.0`
 - Next.js: `>=10`
+- Note: Next.js 13 is supported except for the new `app` directory approach. We're working on adding support for this and you can follow along [here](https://github.com/supabase/auth-helpers/issues/341).
 
 Additionally, install the **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
 
@@ -46,6 +47,7 @@ This library supports the following tooling versions:
 
 - Node.js: `^10.13.0 || >=12.0.0`
 - Next.js: `>=10`
+- Note: Next.js 13 is supported except for the new `app` directory approach. We're working on adding support for this and you can follow along [here](https://github.com/supabase/auth-helpers/issues/341).
 
 Additionally, install the **React Auth Helpers** for components and hooks that can be used across all React-based frameworks.
 
@@ -102,7 +104,7 @@ function MyApp({ Component, pageProps }) {
 
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
-```jsx title="pages/_app.tsx"
+```tsx title="pages/_app.tsx"
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 // highlight-next-line
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
@@ -112,7 +114,7 @@ function MyApp({
   pageProps,
 }: AppProps<{
   // highlight-next-line
-  initialSession: Session,
+  initialSession: Session
 }>) {
   // Create a new supabase browser client on every first render.
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
@@ -139,16 +141,18 @@ You can pass types that were [generated with the Supabase CLI](/docs/reference/j
 
 ### Browser client
 
-```ts
-// Creating a new supabase client object:
+Creating a new supabase client object:
+
+```tsx
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { Database } from '../database.types'
 
 const supabaseClient = createBrowserSupabaseClient<Database>()
 ```
 
-```ts
-// Retrieving a supabase client object from the SessionContext:
+Retrieving a supabase client object from the SessionContext:
+
+```tsx
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Database } from '../database.types'
 
@@ -157,7 +161,7 @@ const supabaseClient = useSupabaseClient<Database>()
 
 ### Server client
 
-```ts
+```tsx
 // Creating a new supabase server client object (e.g. in API route):
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Database } from 'types_db'
@@ -179,7 +183,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSupabaseClient` hook and only run your query once the user is defined client-side in the `useUser()` hook:
 
-```js
+```jsx
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
@@ -225,52 +229,58 @@ const LoginPage = () => {
 export default LoginPage
 ```
 
-## Server-side rendering (SSR) - withPageAuth
+## Server-side rendering (SSR)
 
-If you wrap your `getServerSideProps` with `withPageAuth` your props object will be augmented with the user object.
+Create a server supabase client to retrieve the logged in user's session:
 
-```js title="pages/profile.js"
-import { withPageAuth } from '@supabase/auth-helpers-nextjs'
+```jsx title="pages/profile.js"
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
 export default function Profile({ user }) {
   return <div>Hello {user.name}</div>
 }
 
-export const getServerSideProps = withPageAuth({ redirectTo: '/login' })
-```
+export const getServerSideProps = async (ctx) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-If there is no authenticated user, they will be redirect to your home page, unless you specify the `redirectTo` option.
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
 
-You can pass in your own `getServerSideProps` method, the props returned from this will be merged with the
-user props. You can also access the user session data by calling `supabase.auth.getUser()` inside of this method, eg:
-
-```js title="pages/protected-page.js"
-import { withPageAuth } from '@supabase/auth-helpers-nextjs'
-
-export default function ProtectedPage({ user, customProp }) {
-  return <div>Protected content</div>
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+    },
+  }
 }
-
-export const getServerSideProps = withPageAuth({
-  redirectTo: '/foo',
-  async getServerSideProps(ctx, supabase) {
-    // Access the user object
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    return { props: { email: user?.email } }
-  },
-})
 ```
 
 ## Server-side data fetching with RLS
 
-Both `withApiAuth` and `withPageAuth` return a supabase client that you can use to run [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
+You can use the server supabase client to run [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
 
-```js
-import { User, withPageAuth } from '@supabase/auth-helpers-nextjs'
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
-export default function ProtectedPage({ user, data }: { user: User, data: any }) {
+```jsx
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+
+export default function ProtectedPage({ user, data }) {
   return (
     <>
       <div>Protected content for {user.email}</div>
@@ -280,24 +290,100 @@ export default function ProtectedPage({ user, data }: { user: User, data: any })
   )
 }
 
-export const getServerSideProps = withPageAuth({
-  redirectTo: '/',
-  async getServerSideProps(ctx, supabase) {
-    // Run queries with RLS on the server
-    const { data } = await supabase.from('test').select('*')
-    return { props: { data } }
-  },
-})
+export const getServerSideProps = async (ctx) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+
+  // Run queries with RLS on the server
+  const { data } = await supabase.from('users').select('*')
+
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+      data: data ?? [],
+    },
+  }
+}
 ```
 
-## Server-side data fetching to OAuth APIs using `provider_token`
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx
+import { User, createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { GetServerSidePropsContext } from 'next'
+
+export default function ProtectedPage({ user, data }: { user: User; data: any }) {
+  return (
+    <>
+      <div>Protected content for {user.email}</div>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <pre>{JSON.stringify(user, null, 2)}</pre>
+    </>
+  )
+}
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+
+  // Run queries with RLS on the server
+  const { data } = await supabase.from('users').select('*')
+
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+      data: data ?? [],
+    },
+  }
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Server-side data fetching to OAuth APIs using `provider token` {#oauth-provider-token}
 
 When using third-party auth providers, sessions are initiated with an additional `provider_token` field which is persisted in the auth cookie and can be accessed within the session object. The `provider_token` can be used to make API requests to the OAuth provider's API endpoints on behalf of the logged-in user.
 
-```js
-import { User, withPageAuth } from '@supabase/auth-helpers-nextjs'
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
-export default function ProtectedPage({ user, allRepos }: { user: User, allRepos: any }) {
+```jsx
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+
+export default function ProtectedPage({ user, allRepos }) {
   return (
     <>
       <div>Protected content for {user.email}</div>
@@ -309,44 +395,223 @@ export default function ProtectedPage({ user, allRepos }: { user: User, allRepos
   )
 }
 
-export const getServerSideProps = withPageAuth({
-  redirectTo: '/',
-  async getServerSideProps(ctx, supabase) {
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession()
-    if (error) {
-      throw error
+export const getServerSideProps = async (ctx) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
     }
-    if (!session) {
-      return { props: {} }
-    }
 
-    // Retrieve provider_token & logged in user's third-party id from metadata
-    const { provider_token, user } = session
-    const userId = user.user_metadata.user_name
+  // Retrieve provider_token & logged in user's third-party id from metadata
+  const { provider_token, user } = session
+  const userId = user.user_metadata.user_name
 
-    const allRepos = await (
-      await fetch(`https://api.github.com/search/repositories?q=user:${userId}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `token ${provider_token}`,
-        },
-      })
-    ).json()
+  const allRepos = await (
+    await fetch(`https://api.github.com/search/repositories?q=user:${userId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `token ${provider_token}`,
+      },
+    })
+  ).json()
 
-    return { props: { allRepos, user } }
-  },
-})
+  return { props: { user, allRepos } }
+}
 ```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx
+import { User, createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { GetServerSidePropsContext } from 'next'
+
+export default function ProtectedPage({ user, allRepos }: { user: User; allRepos: any }) {
+  return (
+    <>
+      <div>Protected content for {user.email}</div>
+      <p>Data fetched with provider token:</p>
+      <pre>{JSON.stringify(allRepos, null, 2)}</pre>
+      <p>user:</p>
+      <pre>{JSON.stringify(user, null, 2)}</pre>
+    </>
+  )
+}
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+
+  // Retrieve provider_token & logged in user's third-party id from metadata
+  const { provider_token, user } = session
+  const userId = user.user_metadata.user_name
+
+  const allRepos = await (
+    await fetch(`https://api.github.com/search/repositories?q=user:${userId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `token ${provider_token}`,
+      },
+    })
+  ).json()
+
+  return { props: { user, allRepos } }
+}
+```
+
+</TabPanel>
+</Tabs>
 
 ## Protecting API routes
 
-Wrap an API Route to check that the user has a valid session. If they're not logged in the handler will return a
-401 Unauthorized.
+Create a server supabase client to retrieve the logged in user's session:
 
-```js title="pages/api/protected-route.js"
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx title="pages/api/protected-route.js"
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+
+const ProtectedRoute = async (req, res) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient({ req, res })
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return res.status(401).json({
+      error: 'not_authenticated',
+      description: 'The user does not have an active session or is not authenticated',
+    })
+
+  // Run queries with RLS on the server
+  const { data } = await supabase.from('test').select('*')
+  res.json(data)
+}
+
+export default ProtectedRoute
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title="pages/api/protected-route.ts"
+import { NextApiHandler } from 'next'
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+
+const ProtectedRoute: NextApiHandler = async (req, res) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient({ req, res })
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return res.status(401).json({
+      error: 'not_authenticated',
+      description: 'The user does not have an active session or is not authenticated',
+    })
+
+  // Run queries with RLS on the server
+  const { data } = await supabase.from('test').select('*')
+  res.json(data)
+}
+
+export default ProtectedRoute
+```
+
+</TabPanel>
+</Tabs>
+
+## Auth with Next.js Middleware
+
+As an alternative to protecting individual pages you can use a [Next.js Middleware](https://nextjs.org/docs/middleware) to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
+
+```ts title="middleware.ts"
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export async function middleware(req: NextRequest) {
+  // We need to create a response and hand it to the supabase client to be able to modify the response headers.
+  const res = NextResponse.next()
+  // Create authenticated Supabase Client.
+  const supabase = createMiddlewareSupabaseClient({ req, res })
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  // Check auth condition
+  if (session?.user.email?.endsWith('@gmail.com')) {
+    // Authentication successful, forward request to protected route.
+    return res
+  }
+
+  // Auth condition not met, redirect to home page.
+  const redirectUrl = req.nextUrl.clone()
+  redirectUrl.pathname = '/'
+  redirectUrl.searchParams.set(`redirectedFrom`, req.nextUrl.pathname)
+  return NextResponse.redirect(redirectUrl)
+}
+
+export const config = {
+  matcher: '/middleware-protected',
+}
+```
+
+## Migration Guide
+
+### Migrating to v0.5.X
+
+To make these helpers more flexible as well as more maintainable and easier to upgrade for new versions of Next.js, we're stripping them down to the most useful part which is managing the cookies and giving you an authenticated supabase-js client in any environment (client, server, middleware/edge).
+
+Therefore we're marking the `withApiAuth`, `withPageAuth`, and `withMiddlewareAuth` higher order functions as deprectaed and they will be removed in the next **minor** release (v0.6.X).
+
+Please follow the steps below to update your API routes, pages, and middleware handlers. Thanks!
+
+#### `withApiAuth` deprecated!
+
+Use `createServerSupabaseClient` within your `NextApiHandler`:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="before"
+>
+<TabPanel id="before" label="Before">
+
+```tsx title="pages/api/protected-route.ts"
 import { withApiAuth } from '@supabase/auth-helpers-nextjs'
 
 export default withApiAuth(async function ProtectedRoute(req, res, supabase) {
@@ -356,45 +621,173 @@ export default withApiAuth(async function ProtectedRoute(req, res, supabase) {
 })
 ```
 
-If you visit `/api/protected-route` without a valid session cookie, you will get a 401 response.
+</TabPanel>
+<TabPanel id="after" label="After">
 
-## Protecting routes with [Nextjs Middleware](https://nextjs.org/docs/middleware)
+```tsx title="pages/api/protected-route.ts"
+import { NextApiHandler } from 'next'
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
-As an alternative to protecting individual pages using `getServerSideProps` with `withPageAuth`, `withMiddlewareAuth` can be used from inside a `middleware` file to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected to `/login` (defaults to: `/`) with a 307 Temporary Redirect response status:
+const ProtectedRoute: NextApiHandler = async (req, res) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient({ req, res })
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-```ts title="middleware.ts"
-import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs'
+  if (!session)
+    return res.status(401).json({
+      error: 'not_authenticated',
+      description: 'The user does not have an active session or is not authenticated',
+    })
 
-export const middleware = withMiddlewareAuth({ redirectTo: '/login' })
+  // Run queries with RLS on the server
+  const { data } = await supabase.from('test').select('*')
+  res.json(data)
+}
 
-export const config = {
-  matcher: ['/middleware-protected/:path*'],
+export default ProtectedRoute
+```
+
+</TabPanel>
+</Tabs>
+
+#### `withPageAuth` deprecated!
+
+Use `createServerSupabaseClient` within `getServerSideProps`:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="before"
+>
+<TabPanel id="before" label="Before">
+
+```tsx title="pages/profile.tsx"
+import { withPageAuth, User } from '@supabase/auth-helpers-nextjs'
+
+export default function Profile({ user }: { user: User }) {
+  return <pre>{JSON.stringify(user, null, 2)}</pre>
+}
+
+export const getServerSideProps = withPageAuth({ redirectTo: '/' })
+```
+
+</TabPanel>
+<TabPanel id="after" label="After">
+
+```tsx title="pages/profile.js"
+import { createServerSupabaseClient, User } from '@supabase/auth-helpers-nextjs'
+import { GetServerSidePropsContext } from 'next'
+
+export default function Profile({ user }: { user: User }) {
+  return <pre>{JSON.stringify(user, null, 2)}</pre>
+}
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+    },
+  }
 }
 ```
 
-It is also possible to add finer granularity based on the user logged in. I.e. you can specify a promise to determine if a specific user has permission or not.
+</TabPanel>
+</Tabs>
 
-```ts title="middleware.ts"
+#### `withMiddlewareAuth` deprecated!
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="before"
+>
+<TabPanel id="before" label="Before">
+
+```tsx title="middleware.ts"
 import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs'
 
 export const middleware = withMiddlewareAuth({
-  redirectTo: '/login',
+  redirectTo: '/',
   authGuard: {
-    isPermitted: async (user) => user.email?.endsWith('@example.com') ?? false,
+    isPermitted: async (user) => {
+      return user.email?.endsWith('@gmail.com') ?? false
+    },
     redirectTo: '/insufficient-permissions',
   },
 })
 
 export const config = {
-  matcher: ['/middleware-protected/:path*'],
+  matcher: '/middleware-protected',
 }
 ```
 
-## Migrating to version `0.4.X` {#migration}
+</TabPanel>
+<TabPanel id="after" label="After">
 
-- With `supabase-js` v2, the `auth` API routes are no longer required and you can delete the `auth` directory under the `/pages/api/` directory.
-- The `/api/auth/logout` API route has been removed—use the `signout` method instead.
-  ```js
+```tsx title="middleware.ts"
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export async function middleware(req: NextRequest) {
+  // We need to create a response and hand it to the supabase client to be able to modify the response headers.
+  const res = NextResponse.next()
+  // Create authenticated Supabase Client.
+  const supabase = createMiddlewareSupabaseClient({ req, res })
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  // Check auth condition
+  if (session?.user.email?.endsWith('@gmail.com')) {
+    // Authentication successful, forward request to protected route.
+    return res
+  }
+
+  // Auth condition not met, redirect to home page.
+  const redirectUrl = req.nextUrl.clone()
+  redirectUrl.pathname = '/'
+  redirectUrl.searchParams.set(`redirectedFrom`, req.nextUrl.pathname)
+  return NextResponse.redirect(redirectUrl)
+}
+
+export const config = {
+  matcher: '/middleware-protected',
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Migrating to v0.4.X and supabase-js v2
+
+- With the update to `supabase-js` v2 the `auth` API routes are no longer required, therefore you can go ahead and delete your `auth` directory under the `/pages/api/` directory. Please refer to the [v2 migration guide](https://supabase.com/docs/reference/javascript/upgrade-guide) for the full set of changes within supabase-js.
+
+- The `/api/auth/logout` API route has been removed, please use the `signout` method instead:
+
+  ```jsx
   <button
     onClick={async () => {
       await supabaseClient.auth.signOut()
@@ -404,22 +797,26 @@ export const config = {
     Logout
   </button>
   ```
+
 - The `supabaseClient` and `supabaseServerClient` have been removed in favor of the `createBrowserSupabaseClient` and `createServerSupabaseClient` methods. This allows you to provide the CLI-generated types to the client:
 
-  ```js
+  ```tsx
   // client-side
-  import type { Database } from 'types_db';
-  const [supabaseClient] = useState(() =>
-      createBrowserSupabaseClient<Database>()
-    );
+  import type { Database } from 'types_db'
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient<Database>())
 
   // server-side API route
   import type { NextApiRequest, NextApiResponse } from 'next'
-  import type { Database } from 'types_db';
+  import type { Database } from 'types_db'
 
   export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const supabaseServerClient = createServerSupabaseClient<Database>({ req, res })
-    const { data:{ user } } = await supabaseServerClient.auth.getUser()
+    const supabaseServerClient = createServerSupabaseClient<Database>({
+      req,
+      res,
+    })
+    const {
+      data: { user },
+    } = await supabaseServerClient.auth.getUser()
 
     res.status(200).json({ name: user?.name ?? '' })
   }
@@ -429,19 +826,19 @@ export const config = {
 - The `useUser` hook now returns the `user` object or `null`.
 - Usage with TypeScript: You can pass types that were [generated with the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types) to the Supabase Client to get enhanced type safety and auto completion:
 
-  ```js
-  // Creating a new supabase client object:
-  import { Database } from '../database.types';
+Creating a new supabase client object:
 
-  const [supabaseClient] = useState(() =>
-      createBrowserSupabaseClient<Database>()
-    );
-  ```
+```tsx
+import { Database } from '../database.types'
 
-  ```js
-  // Retrieving a supabase client object from the SessionContext:
-  import { useSupabaseClient } from '@supabase/auth-helpers-react';
-  import { Database } from '../database.types';
+const [supabaseClient] = useState(() => createBrowserSupabaseClient<Database>())
+```
 
-  const supabaseClient = useSupabaseClient<Database>();
-  ```
+Retrieving a supabase client object from the SessionContext:
+
+```tsx
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { Database } from '../database.types'
+
+const supabaseClient = useSupabaseClient<Database>()
+```

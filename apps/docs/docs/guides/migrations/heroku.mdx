@@ -41,7 +41,7 @@ Alternatively, use the [Heroku to Supabase migration tool](https://migrate.supab
 
 Use `pg_dump` with your Heroku credentials to export your Heroku database to a file (e.g., `heroku_dump.sql`).
 
-```
+```bash
 pg_dump --clean --if-exists --quote-all-identifiers \
  -h $HEROKU_HOST -U $HEROKU_USER -d $HEROKU_DATABASE \
  --no-owner --no-privileges > heroku_dump.sql
@@ -51,7 +51,7 @@ pg_dump --clean --if-exists --quote-all-identifiers \
 
 Use `psql` to import the Heroku database file to your Supabase project.
 
-```
+```bash
 psql -h $SUPABASE_HOST -U postgres -f heroku_dump.sql
 ```
 

@@ -54,6 +54,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     }
   }
 
+  // [Joshen] Kaizen: Use UI library's SidePanel for this
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
     const sidebar = document.querySelector('.sidebar-menu-container')
@@ -62,10 +63,6 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     sidebar.classList.toggle('hidden')
     contentPane.classList.toggle('hidden')
   }
-
-  useEffect(() => {
-    if (mobileMenuOpen) toggleMobileMenu()
-  }, [asPath])
 
   return (
     <nav
