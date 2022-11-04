@@ -17,6 +17,7 @@ import { useTheme } from '../Providers'
 interface Props {
   title?: string
   language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart'
+  linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
@@ -27,13 +28,13 @@ interface Props {
 const CodeBlock: FC<Props> = ({
   title,
   language,
+  linesToHighlight = [],
   className,
   value,
   children,
   hideCopy = false,
   hideLineNumbers = false,
 }) => {
-  console.log('CodeBlock', { title })
   const { isDarkMode } = useTheme()
   const monokaiTheme = monokaiCustomTheme(isDarkMode)
 
@@ -46,9 +47,9 @@ const CodeBlock: FC<Props> = ({
     }, 1000)
   }
 
-  let xxxlang = language ? language : className ? className.replace('language-', '') : 'js'
+  let lang = language ? language : className ? className.replace('language-', '') : 'js'
   // force jsx to be js highlighted
-  if (xxxlang === 'jsx') xxxlang = 'js'
+  if (lang === 'jsx') lang = 'js'
   SyntaxHighlighter.registerLanguage('js', js)
   SyntaxHighlighter.registerLanguage('ts', ts)
   SyntaxHighlighter.registerLanguage('py', py)
@@ -56,11 +57,9 @@ const CodeBlock: FC<Props> = ({
   SyntaxHighlighter.registerLanguage('bash', bash)
   SyntaxHighlighter.registerLanguage('dart', dart)
 
-  // const large = props.size === 'large' ? true : false
   const large = false
-
   // don't show line numbers if bash == lang
-  const showLineNumbers = hideLineNumbers || xxxlang !== 'bash'
+  const showLineNumbers = hideLineNumbers || lang !== 'bash'
 
   return (
     <div className="relative my-2">
@@ -71,7 +70,7 @@ const CodeBlock: FC<Props> = ({
       )}
       {className ? (
         <SyntaxHighlighter
-          language={xxxlang}
+          language={lang}
           wrapLines={true}
           style={monokaiTheme}
           className={[
@@ -84,6 +83,14 @@ const CodeBlock: FC<Props> = ({
             lineHeight: large ? 1.5 : 1.4,
           }}
           showLineNumbers={showLineNumbers}
+          lineProps={(lineNumber) => {
+            if (linesToHighlight.includes(lineNumber)) {
+              return {
+                style: { display: 'block', backgroundColor: 'var(--colors-scale6)' },
+              }
+            }
+            return {}
+          }}
           lineNumberContainerStyle={{
             paddingTop: '128px',
           }}
