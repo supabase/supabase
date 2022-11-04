@@ -42,8 +42,7 @@ Run `flutter pub get` to install the dependencies.
 
 Now that we have the dependencies installed let's setup deep links so users who have logged in via magic link or OAuth can come back to the app.
 
-1. Go to [Authentication Settings](https://app.supabase.com/project/_/settings/auth) in the Dashboard.
-1. In **Redirect URLs**, add `io.supabase.flutterquickstart://login-callback/` as a new domain.
+Add `io.supabase.flutterquickstart://login-callback/` as a new [redirect URL](https://app.supabase.com/project/_/auth/url-configuration) in the Dashboard.
 
 ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
