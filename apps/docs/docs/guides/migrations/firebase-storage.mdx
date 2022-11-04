@@ -13,11 +13,9 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 ## Set up the migration tool {#set-up-migration-tool}
 
 1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
-
-```
-git clone https://github.com/supabase-community/firebase-to-supabase.git
-```
-
+  ```bash
+  git clone https://github.com/supabase-community/firebase-to-supabase.git
+  ```
 1. In the `/storage` directory, rename [supabase-keys-sample.js](https://github.com/supabase-community/firebase-to-supabase/blob/main/storage/supabase-keys-sample.js) to `supabase-keys.js`.
 1. Go to your Supabase project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard.
 1. Copy the **Project URL** and update the `SUPABASE_URL` value in `supabase-keys.js`.
