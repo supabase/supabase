@@ -18,7 +18,7 @@ import { Tabs } from '~/../../packages/ui'
 
 import { useRouter } from 'next/router'
 
-const marginTop = 64
+const marginTop = 256
 export default function Ref(props) {
   const myRef = useRef(null)
 
@@ -47,50 +47,50 @@ export default function Ref(props) {
     setSections(allSections)
   }, [])
 
-  useEffect(() => {
-    if (sections.length <= 1) return
+  // useEffect(() => {
+  //   if (sections.length <= 1) return
 
-    const onScroll = () => {
-      console.log('SCROLL EVENT')
-      setOffsetY(window.pageYOffset)
-    }
-    window.addEventListener('scroll', debounce(onScroll, 50))
+  //   const onScroll = () => {
+  //     console.log('SCROLL EVENT')
+  //     setOffsetY(window.pageYOffset)
+  //   }
+  //   window.addEventListener('scroll', debounce(onScroll, 500))
 
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [sections])
+  //   return () => window.removeEventListener('scroll', onScroll)
+  // }, [sections])
 
-  useEffect(() => {
-    if (sections.length === 0) return
+  // useEffect(() => {
+  //   if (sections.length === 0) return
 
-    if (sections.length === 1) {
-      sections[0].isActive = true
-      return
-    }
+  //   if (sections.length === 1) {
+  //     sections[0].isActive = true
+  //     return
+  //   }
 
-    sections.forEach((section, index) => {
-      if (index === 0) {
-        section.isActive = sections[index + 1].boundingTop > offsetY + marginTop
-      } else {
-        if (sections[index + 1]) {
-          section.isActive =
-            sections[index + 1].boundingTop > offsetY + marginTop &&
-            sections[index].boundingTop <= offsetY + marginTop
-        } else {
-          section.isActive = sections[index].boundingTop <= offsetY + marginTop
-        }
-      }
-    })
-  }, [sections, offsetY])
+  //   sections.forEach((section, index) => {
+  //     if (index === 0) {
+  //       section.isActive = sections[index + 1].boundingTop > offsetY + marginTop
+  //     } else {
+  //       if (sections[index + 1]) {
+  //         section.isActive =
+  //           sections[index + 1].boundingTop > offsetY + marginTop &&
+  //           sections[index].boundingTop <= offsetY + marginTop
+  //       } else {
+  //         section.isActive = sections[index].boundingTop <= offsetY + marginTop
+  //       }
+  //     }
+  //   })
+  // }, [sections, offsetY])
 
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      // console.log('entries', entries)
-      const entry = entries[0]
-      // console.log('entry', entry)
-    })
-    // console.log('myRef', myRef.current)
-    observer.observe(myRef.current)
-  }, [])
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver((entries) => {
+  //     // console.log('entries', entries)
+  //     const entry = entries[0]
+  //     // console.log('entry', entry)
+  //   })
+  //   // console.log('myRef', myRef.current)
+  //   observer.observe(myRef.current)
+  // }, [])
 
   const router = useRouter()
 
@@ -139,8 +139,27 @@ export default function Ref(props) {
         <div className="ml-64 w-full">
           <div className="flex flex-col gap-32 mx-auto max-w-5xl" ref={myRef}>
             {props.docs.map((x) => {
+              const sectionRef = useRef(null)
+
+              useEffect(() => {
+                const observer = new IntersectionObserver((entries) => {
+                  // console.log('entries', entries)
+                  const entry = entries[0]
+
+                  console.log(
+                    x.id,
+                    'intersectiong',
+                    entry.isIntersecting,
+                    'visible',
+                    entry.isVisible
+                  )
+                })
+                // console.log('myRef', myRef.current)
+                observer.observe(sectionRef.current)
+              }, [])
+
               return (
-                <div className="grid grid-cols-2 pb-32 ref-container" id={x.id}>
+                <div className="grid grid-cols-2 pb-32 ref-container" id={x.id} ref={sectionRef}>
                   <div className="prose" key={x.id}>
                     <h1 className="text-3xl not-prose" onClick={() => updateUrl(x.id)}>
                       {x.title ?? x.id}
