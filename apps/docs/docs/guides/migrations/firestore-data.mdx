@@ -12,19 +12,23 @@ The Firestore `collection` is "flattened" and converted to a table with basic co
 ## Set up the migration tool {#set-up-migration-tool}
 
 1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
-  ```bash
-  git clone https://github.com/supabase-community/firebase-to-supabase.git
-  ```
+
+```bash
+git clone https://github.com/supabase-community/firebase-to-supabase.git
+```
+
 1. In the `/firestore` directory, create a file named `supabase-service.json` with the following contents:
-  ```json
-  {
-    "host": "database.server.com",
-    "password": "secretpassword",
-    "user": "postgres",
-    "database": "postgres",
-    "port": 5432
-  }
-  ```
+
+```json
+{
+  "host": "database.server.com",
+  "password": "secretpassword",
+  "user": "postgres",
+  "database": "postgres",
+  "port": 5432
+}
+```
+
 1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
 1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
@@ -55,17 +59,17 @@ The Firestore `collection` is "flattened" and converted to a table with basic co
 
 You can customize the way your JSON file is written using a [custom hook](#custom-hooks). A common use for this is to "flatten" the JSON file, or to split nested data into separate, related database tables. For example, you could take a Firestore document that looks like this:
 
-```json title="Firestore document"
+```json title=Firestore%20document
 [{ "user": "mark", "score": 100, "items": ["hammer", "nail", "glue"] }]
 ```
 
 And split it into two files (one table for users and one table for items):
 
-```json title="Users table"
+```json title=Users%20table
 [{ "user": "mark", "score": 100 }]
 ```
 
-```json title="Items table"
+```json title=Items%20table
 [
   { "user": "mark", "item": "hammer" },
   { "user": "mark", "item": "nail" },
@@ -181,14 +185,14 @@ module.exports = (collectionName, doc, recordCounters, writeRecord) => {
 
 The result is two separate JSON files:
 
-```json title="users.json"
+```json title=users.json
 [
   { "uid": "abc123", "name": "mark", "score": 100 },
   { "uid": "xyz789", "name": "chuck", "score": 9999999 }
 ]
 ```
 
-```json title="weapons.json"
+```json title=weapons.json
 [
   { "uid": "abc123", "weapon": "toothpick" },
   { "uid": "abc123", "weapon": "needle" },

@@ -28,7 +28,7 @@ npm install @supabase/supabase-js @supabase/auth-ui-react
 
 Pass `supabaseClient` from `@supabase/supabase-js` as a prop to the component.
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -41,19 +41,19 @@ This renders the Auth component without any styling.
 We recommend using one of the predefined themes to style the UI.
 Import the theme you want to use and pass it to the `appearence.theme` prop.
 
-```diff js title="/src/index.js"
+```js title=/src/index.js
 import {
-    Auth,
-    // highlight-next-line
-    ThemeSupa
+  Auth,
+  // highlight-next-line
+  ThemeSupa,
 } from '@supabase/auth-ui-react'
 
 const App = () => (
-    <Auth
-        supabaseClient={supabase}
-        // highlight-next-line
-        appearance={{ theme: ThemeSupa }}
-    />
+  <Auth
+    supabaseClient={supabase}
+    // highlight-next-line
+    appearance={{ theme: ThemeSupa }}
+  />
 )
 ```
 
@@ -72,7 +72,7 @@ There are several ways to customize Auth UI:
 
 Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearence.theme` prop.
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 //highlight-next-line
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
@@ -98,7 +98,7 @@ Currently there is only one predefined theme available, but we plan to add more.
 
 Auth UI comes with two theme variations: `default` and `dark`. You can switch between these themes with the `theme` prop.
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
@@ -120,7 +120,7 @@ If you don't pass a value to `theme` it uses the `"default"` theme. You can pass
 
 Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
@@ -153,7 +153,7 @@ If you created your own theme, you may not need to override any of the them.
 You can create your own theme by following the same structure within a `appearance.theme` property.
 See the list of [tokens within a theme](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -205,7 +205,7 @@ You can swich between different variations of your theme with the ["theme" prop]
 You can use custom CSS classes for the following elements:
 `"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -230,7 +230,7 @@ const App = () => (
 You can use custom CSS inline styles for the following elements:
 `"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -254,7 +254,7 @@ const App = () => (
 
 You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/lib/Localization/en.json) that can be overwritten.
 
-```js title="/src/index.js"
+```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 

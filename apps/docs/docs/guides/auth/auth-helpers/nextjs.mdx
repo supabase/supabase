@@ -62,7 +62,7 @@ yarn add @supabase/auth-helpers-react
 
 Retrieve your project URL and anon key in your project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
 
-```bash title=".env.local"
+```bash title=.env.local
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -79,7 +79,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
-```jsx title="pages/_app.js"
+```jsx title=pages/_app.js
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 
@@ -104,7 +104,7 @@ function MyApp({ Component, pageProps }) {
 
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
-```tsx title="pages/_app.tsx"
+```tsx title=pages/_app.tsx
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 // highlight-next-line
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
@@ -233,7 +233,7 @@ export default LoginPage
 
 Create a server supabase client to retrieve the logged in user's session:
 
-```jsx title="pages/profile.js"
+```jsx title=pages/profile.js
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
 export default function Profile({ user }) {
@@ -495,7 +495,7 @@ Create a server supabase client to retrieve the logged in user's session:
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="pages/api/protected-route.js"
+```jsx title=pages/api/protected-route.js
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
 const ProtectedRoute = async (req, res) => {
@@ -523,7 +523,7 @@ export default ProtectedRoute
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="pages/api/protected-route.ts"
+```tsx title=pages/api/protected-route.ts
 import { NextApiHandler } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
@@ -556,7 +556,7 @@ export default ProtectedRoute
 
 As an alternative to protecting individual pages you can use a [Next.js Middleware](https://nextjs.org/docs/middleware) to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
 
-```ts title="middleware.ts"
+```ts title=middleware.ts
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
@@ -611,7 +611,7 @@ Use `createServerSupabaseClient` within your `NextApiHandler`:
 >
 <TabPanel id="before" label="Before">
 
-```tsx title="pages/api/protected-route.ts"
+```tsx title=pages/api/protected-route.ts
 import { withApiAuth } from '@supabase/auth-helpers-nextjs'
 
 export default withApiAuth(async function ProtectedRoute(req, res, supabase) {
@@ -624,7 +624,7 @@ export default withApiAuth(async function ProtectedRoute(req, res, supabase) {
 </TabPanel>
 <TabPanel id="after" label="After">
 
-```tsx title="pages/api/protected-route.ts"
+```tsx title=pages/api/protected-route.ts
 import { NextApiHandler } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
@@ -665,7 +665,7 @@ Use `createServerSupabaseClient` within `getServerSideProps`:
 >
 <TabPanel id="before" label="Before">
 
-```tsx title="pages/profile.tsx"
+```tsx title=pages/profile.tsx
 import { withPageAuth, User } from '@supabase/auth-helpers-nextjs'
 
 export default function Profile({ user }: { user: User }) {
@@ -678,7 +678,7 @@ export const getServerSideProps = withPageAuth({ redirectTo: '/' })
 </TabPanel>
 <TabPanel id="after" label="After">
 
-```tsx title="pages/profile.js"
+```tsx title=pages/profile.js
 import { createServerSupabaseClient, User } from '@supabase/auth-helpers-nextjs'
 import { GetServerSidePropsContext } from 'next'
 
@@ -724,7 +724,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 >
 <TabPanel id="before" label="Before">
 
-```tsx title="middleware.ts"
+```tsx title=middleware.ts
 import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs'
 
 export const middleware = withMiddlewareAuth({
@@ -745,7 +745,7 @@ export const config = {
 </TabPanel>
 <TabPanel id="after" label="After">
 
-```tsx title="middleware.ts"
+```tsx title=middleware.ts
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
