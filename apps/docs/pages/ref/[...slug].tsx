@@ -17,7 +17,7 @@ import { Tabs } from '~/../../packages/ui'
 
 import { useRouter } from 'next/router'
 
-const marginTop = 300
+const marginTop = 64
 export default function Ref(props) {
   const myRef = useRef(null)
 
@@ -117,15 +117,19 @@ export default function Ref(props) {
         <div className="px-10 fixed">
           {sections.map((x, i) => {
             return (
-              <div
+              <a
                 className={[
-                  'text-sm',
+                  'block text-sm hover:text-scale-1200 text-scale-1100 cursor-pointer',
                   sections && sections[i].isActive ? 'text-brand-900 text-scale-900' : '',
                 ].join(' ')}
                 key={i}
+                onClick={() => {
+                  window.scrollTo(0, x.boundingTop - marginTop)
+                  setOffsetY(x.boundingTop - marginTop)
+                }}
               >
                 {x.topic}
-              </div>
+              </a>
             )
           })}
         </div>
@@ -134,7 +138,7 @@ export default function Ref(props) {
           <div className="flex flex-col gap-32 mx-auto max-w-5xl" ref={myRef}>
             {props.docs.map((x) => {
               return (
-                <div className="grid grid-cols-2 gap-32 ref-container" id={x.id}>
+                <div className="grid grid-cols-2 pb-32 ref-container" id={x.id}>
                   <div className="prose" key={x.id}>
                     <h1 className="text-3xl not-prose" onClick={() => updateUrl(x.id)}>
                       {x.title ?? x.id}
