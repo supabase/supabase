@@ -201,9 +201,8 @@ Because this Quick Start does not use Prisma to manage the database schema, seed
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
 We just need to get the URL as well as the `anon`, `service_role` and `JWT_SECRET` keys from the API settings.
 
-1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
+1. Go to the [API Settings](https://app.supabase.com/project/_/settings/api) page in the Dashboard.
+2. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
@@ -273,7 +272,7 @@ Say, **yes** and it will setup the Supabase client in your app and also provide 
 Next, we want to save the environment variables in a `.env`.
 We need the `API URL` as well as the `anon` and `jwt_secret` keys that you copied [earlier](#get-the-api-keys).
 
-```bash title=".env"
+```bash title=.env
 SUPABASE_URL=YOUR_SUPABASE_URL
 SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
 SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
@@ -281,7 +280,7 @@ SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
 
 And finally, you will also need to save **just** the `web side` environment variables to the `redwood.toml`.
 
-```bash title="redwood.toml"
+```bash title=redwood.toml
 [web]
   title = "Supabase Redwood Quickstart"
   port = 8910
@@ -299,7 +298,7 @@ since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled
 
 You'll see these being used to configure your Supabase client in `web/src/App.js`:
 
-```js title="web/src/App.js"
+```js title=web/src/App.js
 // ... Redwood imports
 import { AuthProvider } from '@redwoodjs/auth'
 import { createClient } from '@supabase/supabase-js'
@@ -365,7 +364,7 @@ You can stop the `dev` server if you want; to see your changes, just be sure to 
 
 You should see the `Home` page route in `web/src/Routes.js`:
 
-```bash title="web/src/Routes.js"
+```bash title=web/src/Routes.js
 import { Router, Route } from '@redwoodjs/router'
 
 const Routes = () => {
@@ -396,7 +395,7 @@ yarn rw g component auth
 
 Now, update the `Auth.js` component to contain:
 
-```jsx title="/web/src/components/Auth/Auth.js"
+```jsx title=/web/src/components/Auth/Auth.js
 import { useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
 
@@ -469,7 +468,7 @@ yarn rw g component account
 
 And then update the file to contain:
 
-```jsx title="web/src/components/Account/Account.js"
+```jsx title=web/src/components/Account/Account.js
 import { useState, useEffect } from 'react'
 import { useAuth } from '@redwoodjs/auth'
 
@@ -605,7 +604,7 @@ of the supabase client to interact with your API.
 
 Now that we have all the components in place, let's update your `HomePage` page to use them:
 
-```jsx title="web/src/pages/HomePage/HomePage.js"
+```jsx title=web/src/pages/HomePage/HomePage.js
 import { useAuth } from '@redwoodjs/auth'
 import { MetaTags } from '@redwoodjs/web'
 
@@ -658,7 +657,7 @@ yarn rw g component avatar
 
 Now, update your Avatar component to contain the following widget:
 
-```jsx title="web/src/components/Avatar/Avatar.js"
+```jsx title=web/src/components/Avatar/Avatar.js
 import { useEffect, useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
 
@@ -751,7 +750,7 @@ export default Avatar
 
 And then we can add the widget to the Account component:
 
-```jsx title="web/src/components/Account/Account.js"
+```jsx title=web/src/components/Account/Account.js
 // Import the new component
 import Avatar from 'src/components/Avatar'
 

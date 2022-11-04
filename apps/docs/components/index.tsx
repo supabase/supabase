@@ -4,6 +4,7 @@ import { Tabs, Alert } from 'ui'
 import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
 import CodeBlock from './CodeBlock/CodeBlock'
+import { parseNumericRange } from './CodeBlock/CodeBlock.utils'
 
 // Page specific components
 import Frameworks from './Frameworks'
@@ -47,7 +48,10 @@ const components = {
       {props.children}
     </Heading>
   ),
-  code: (props: any) => <CodeBlock {...props} />,
+  code: (props: any) => {
+    const linesToHighlight = parseNumericRange(props.lines ?? '')
+    return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
+  },
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
 }
 
