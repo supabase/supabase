@@ -44,41 +44,48 @@ export default function JwtGenerator({}) {
 
   return (
     <div>
-      <div style={styles.inputContainer}>
-        <label>JWT Secret:</label>
+      <div className="grid mb-8">
+        <label for="secret">JWT Secret:</label>
         <input
+          id="secret"
+          className="border rounded bg-gray-200 w-full"
           type="text"
-          style={styles.input}
           placeholder="JWT Secret (at least 32 characters)"
           value={jwtSecret}
           onChange={(e) => setJwtSecret(e.target.value)}
         />
       </div>
-      <div style={styles.inputContainer}>
-        <label>Preconfigured Payload:</label>
-        <select onChange={handleKeySelection} style={styles.input}>
+      <div className="grid mb-8">
+        <label for="service">Preconfigured Payload:</label>
+        <select
+          id="service"
+          onChange={handleKeySelection}
+          className="border rounded bg-gray-200 w-full"
+        >
           <option value="anon">ANON_KEY</option>
           <option value="service">SERVICE_KEY</option>
         </select>
       </div>
-      <div style={styles.inputContainer}>
-        <label>Payload:</label>
+
+      <div className="grid mb-8">
+        <label for="token">Payload:</label>
         <textarea
+          id="token"
           type="text"
-          style={styles.input}
           rows="5"
           placeholder="A valid JWT Token"
           value={token}
           onChange={(e) => setToken(e.target.value)}
         />
       </div>
+
       <Button type="primary" onClick={generate}>
         Generate JWT
       </Button>
 
       {signedToken && (
-        <div style={{ marginTop: 20 }}>
-          <h4>Generated Token</h4>
+        <div className="mt-8">
+          <h4>Generated Token:</h4>
           <CodeBlock language="bash" className="relative">
             {signedToken}
           </CodeBlock>
@@ -86,32 +93,4 @@ export default function JwtGenerator({}) {
       )}
     </div>
   )
-}
-
-const styles = {
-  inputContainer: {
-    marginBottom: '15px',
-  },
-  input: {
-    border: '1px solid var(--colors-gray5)',
-    borderRadius: 4,
-    backgroundColor: 'var(--colors-gray3)',
-    margin: 0,
-    padding: '6px 8px',
-    width: '100%',
-  },
-  card: {
-    border: '1px solid var(--colors-gray5)',
-    borderRadius: 5,
-    padding: 8,
-  },
-  title: {
-    margin: 0,
-    fontSize: '0.9rem',
-    border: '1px solid var(--colors-gray5)',
-  },
-  description: {
-    fontSize: '0.8rem',
-    margin: 0,
-  },
 }
