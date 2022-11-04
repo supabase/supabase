@@ -8,15 +8,7 @@ export default function AuthProviders() {
         <div key={x.name} className="col-span-6">
           <ButtonCard to={x.href} title={x.name}>
             <div className="px-6 py-4">
-              <div
-                className=""
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: 10,
-                }}
-              >
-                {/* {x.logo && <img src={x.logo} alt={x.name} width="20" />} */}
+              <div className="flex justify-between">
                 <p className="mt-0">{x.name}</p>
                 <p className="mt-0">
                   {x.official ? (
