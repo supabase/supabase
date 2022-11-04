@@ -7,6 +7,7 @@ import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components/index'
 import { getAllDocs } from '~/lib/docs'
+import { debounce } from 'lodash'
 
 import ReactMarkdown from 'react-markdown'
 
@@ -50,9 +51,10 @@ export default function Ref(props) {
     if (sections.length <= 1) return
 
     const onScroll = () => {
+      console.log('SCROLL EVENT')
       setOffsetY(window.pageYOffset)
     }
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', debounce(onScroll, 50))
 
     return () => window.removeEventListener('scroll', onScroll)
   }, [sections])
