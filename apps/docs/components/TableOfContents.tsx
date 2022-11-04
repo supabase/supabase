@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
+import { getAnchor, removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
 
 interface TOCHeader {
   id: number
@@ -17,7 +17,7 @@ const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:
   //    ## REST API {#rest-api-overview}
   // At least for now, this was a docusaurus thing.
-  if (slug.includes('#')) return slug.split('-#')[0]
+  if (slug.includes('#')) return slug.split('-#')[1]
   return slug
 }
 
