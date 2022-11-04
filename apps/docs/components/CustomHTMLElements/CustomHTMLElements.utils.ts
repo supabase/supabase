@@ -32,7 +32,7 @@ export const getAnchor = (text: any): string | undefined => {
 export const removeAnchor = (text: any) => {
   if (typeof text === 'object' && Array.isArray(text)) {
     return text.filter((x) => !(typeof x === 'string' && x.includes('{#') && x.endsWith('}')))
-  } else {
+  } else if (typeof text === 'string') {
     if (text.indexOf('{#') > 0) return text.slice(0, text.indexOf('{#'))
     else return text
   }
