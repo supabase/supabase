@@ -187,6 +187,9 @@ pre[class*='language-'] {
 }
 
 // format <code> inside <p>
+h2 code,
+h3 code,
+h4 code,
 p code {
   word-break: keep-all !important;
   white-space: nowrap !important;
@@ -199,9 +202,12 @@ p code {
     display: none;
   }
 }
+
 // code inside admonitions
 .admonition-content p code {
   @apply bg-scale-300;
+  word-break: keep-all !important;
+  white-space: nowrap !important;
 }
 
 article p strong {

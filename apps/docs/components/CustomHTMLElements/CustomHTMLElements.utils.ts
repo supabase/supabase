@@ -1,35 +1,42 @@
+// Check if heading has custom anchor first, before forming the anchor based on the title
 export const getAnchor = (text: any): string | undefined => {
-  let formattedText
   if (typeof text === 'object') {
     if (Array.isArray(text)) {
-      formattedText = text.map((x) => {
-        if (typeof x !== 'string') {
-          return x.props.children
-        } else {
-          return x.trim()
-        }
+      const customAnchor = text.find(
+        (x) => typeof x === 'string' && x.includes('{#') && x.endsWith('}')
+      )
+      if (customAnchor !== undefined) return customAnchor.slice(3, customAnchor.indexOf('}'))
+
+      const formattedText = text.map((x) => {
+        if (typeof x !== 'string') return x.props.children
+        else return x.trim()
       })
       return formattedText.join('-').toLowerCase()
     } else {
       return text.props.children
     }
   } else if (typeof text === 'string') {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9- ]/g, '')
-      .replace(/[ ]/g, '-')
+    if (text.includes('{#') && text.endsWith('}')) {
+      return text.slice(text.indexOf('{#') + 2, text.indexOf('}'))
+    } else {
+      return text
+        .toLowerCase()
+        .replace(/[^a-z0-9- ]/g, '')
+        .replace(/[ ]/g, '-')
+    }
   } else {
     return undefined
   }
 }
 
 export const removeAnchor = (text: any) => {
-  if (typeof text !== 'string') {
-    return text
+  if (typeof text === 'object' && Array.isArray(text)) {
+    return text.filter((x) => !(typeof x === 'string' && x.includes('{#') && x.endsWith('}')))
   } else {
     if (text.indexOf('{#') > 0) return text.slice(0, text.indexOf('{#'))
     else return text
   }
+  return text
 }
 
 export const highlightSelectedTocItem = (id: string) => {
