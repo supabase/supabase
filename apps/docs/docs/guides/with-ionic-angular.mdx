@@ -40,7 +40,7 @@ And finally we want to save the environment variables in the `environment.ts` fi
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```ts title="environment.ts"
+```ts title=environment.ts
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
@@ -50,15 +50,10 @@ export const environment = {
 
 Now that we have the API credentials in place, let's create a **SupabaseService** with `ionic g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
-```ts title="src/app/supabase.service.ts"
+```ts title=src/app/supabase.service.ts
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
-import {
-  AuthChangeEvent,
-  createClient,
-  Session,
-  SupabaseClient,
-} from '@supabase/supabase-js'
+import { AuthChangeEvent, createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { environment } from '../environments/environment'
 
 export interface Profile {
@@ -73,14 +68,8 @@ export interface Profile {
 export class SupabaseService {
   private supabase: SupabaseClient
 
-  constructor(
-    private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController
-  ) {
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
-    )
+  constructor(private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
   get user() {
@@ -99,9 +88,7 @@ export class SupabaseService {
       .single()
   }
 
-  authChanges(
-    callback: (event: AuthChangeEvent, session: Session | null) => void
-  ) {
+  authChanges(callback: (event: AuthChangeEvent, session: Session | null) => void) {
     return this.supabase.auth.onAuthStateChange(callback)
   }
 
@@ -151,7 +138,7 @@ Create an **LoginPage** with `ionic g page login` Ionic CLI command.
 
 > This guide will show the template inline, but the example app will have templateUrls
 
-```ts title="src/app/login/login.page.ts"
+```ts title=src/app/login/login.page.ts
 import { Component, OnInit } from '@angular/core'
 import { SupabaseService } from '../supabase.service'
 
@@ -173,12 +160,7 @@ import { SupabaseService } from '../supabase.service'
         <form (ngSubmit)="handleLogin($event)">
           <ion-item>
             <ion-label position="stacked">Email</ion-label>
-            <ion-input
-              [(ngModel)]="email"
-              name="email"
-              autocomplete
-              type="email"
-            ></ion-input>
+            <ion-input [(ngModel)]="email" name="email" autocomplete type="email"></ion-input>
           </ion-item>
           <div class="ion-text-center">
             <ion-button type="submit" fill="clear">Login</ion-button>
@@ -215,7 +197,7 @@ export class LoginPage implements OnInit {
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Create an **AccountComponent** with `ionic g page account` Ionic CLI command.
 
-```ts title="src/app/account.component.ts"
+```ts title=src/app/account.component.ts
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -238,25 +220,15 @@ import { Profile, SupabaseService } from '../supabase.service'
 
         <ion-item>
           <ion-label position="stacked">Name</ion-label>
-          <ion-input
-            type="text"
-            name="username"
-            [(ngModel)]="profile.username"
-          ></ion-input>
+          <ion-input type="text" name="username" [(ngModel)]="profile.username"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Website</ion-label>
-          <ion-input
-            type="url"
-            name="website"
-            [(ngModel)]="profile.website"
-          ></ion-input>
+          <ion-input type="url" name="website" [(ngModel)]="profile.website"></ion-input>
         </ion-item>
         <div class="ion-text-center">
-          <ion-button fill="clear" (click)="updateProfile()"
-            >Update Profile</ion-button
-          >
+          <ion-button fill="clear" (click)="updateProfile()">Update Profile</ion-button>
         </div>
       </form>
 
@@ -276,10 +248,7 @@ export class AccountPage implements OnInit {
 
   session = this.supabase.session
 
-  constructor(
-    private readonly supabase: SupabaseService,
-    private router: Router
-  ) {}
+  constructor(private readonly supabase: SupabaseService, private router: Router) {}
   ngOnInit() {
     this.getProfile()
   }
@@ -322,7 +291,7 @@ export class AccountPage implements OnInit {
 
 Now that we have all the components in place, let's update **AppComponent**:
 
-```ts title="src/app/app.component.ts"
+```ts title=src/app/app.component.ts
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { SupabaseService } from './supabase.service'
@@ -350,20 +319,18 @@ export class AppComponent {
 
 Then update the **AppRoutingModule**
 
-```ts title="src/app/app.ts"
+```ts title=src/app/app.ts"
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
 const routes: Routes = [
   {
     path: '/',
-    loadChildren: () =>
-      import('./login/login.module').then((m) => m.LoginPageModule),
+    loadChildren: () => import('./login/login.module').then((m) => m.LoginPageModule),
   },
   {
     path: 'account',
-    loadChildren: () =>
-      import('./account/account.module').then((m) => m.AccountPageModule),
+    loadChildren: () => import('./account/account.module').then((m) => m.AccountPageModule),
   },
 ]
 
@@ -408,7 +375,7 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 
 With those packages installed we can update our `main.ts` to include an additional bootstapping call for the Ionic PWA Elements.
 
-```ts title="src/main.ts"
+```ts title=src/main.ts
 import { enableProdMode } from '@angular/core'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
@@ -432,7 +399,7 @@ Then create an **AvatarComponent** with this Ionic CLI command:
  ionic g component avatar --module=/src/app/account/account.module.ts --create-module
 ```
 
-```ts title="src/app/avatar.component.ts"
+```ts title=src/app/avatar.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
@@ -492,19 +459,14 @@ export class AvatarComponent implements OnInit {
 
   @Output() upload = new EventEmitter<string>()
 
-  constructor(
-    private readonly supabase: SupabaseService,
-    private readonly dom: DomSanitizer
-  ) {}
+  constructor(private readonly supabase: SupabaseService, private readonly dom: DomSanitizer) {}
 
   ngOnInit() {}
 
   async downloadImage(path: string) {
     try {
       const { data } = await this.supabase.downLoadImage(path)
-      this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(
-        URL.createObjectURL(data)
-      )
+      this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data))
     } catch (error) {
       console.error('Error downloading image: ', error.message)
     }
@@ -519,14 +481,9 @@ export class AvatarComponent implements OnInit {
 
       const file = await fetch(photo.dataUrl)
         .then((res) => res.blob())
-        .then(
-          (blob) =>
-            new File([blob], 'my-file', { type: `image/${photo.format}` })
-        )
+        .then((blob) => new File([blob], 'my-file', { type: `image/${photo.format}` }))
 
-      const fileName = `${Math.random()}-${new Date().getTime()}.${
-        photo.format
-      }`
+      const fileName = `${Math.random()}-${new Date().getTime()}.${photo.format}`
 
       await loader.present()
       await this.supabase.uploadAvatar(fileName, file)
@@ -545,7 +502,7 @@ export class AvatarComponent implements OnInit {
 
 And then we can add the widget on top of the **AccountComponent** html template:
 
-```ts title="src/app/account.component.ts"
+```ts title=src/app/account.component.ts
 template: `
 <ion-header>
   <ion-toolbar>

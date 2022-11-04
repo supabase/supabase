@@ -43,7 +43,7 @@ npm install @nuxtjs/supabase --save-dev
 And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
-```bash title=".env"
+```bash title=.env
 SUPABASE_URL="YOUR_SUPABASE_URL"
 SUPABASE_KEY="YOUR_SUPABASE_ANON_KEY"
 ```
@@ -55,7 +55,7 @@ No need to initialize Supabase. The library will take care of it automatically.
 And one optional step is to update the CSS file `assets/main.css` to make the app look nice.
 You can find the full contents of this file [here](https://github.com/supabase-community/nuxt3-quickstarter/blob/main/assets/main.css).
 
-```typescript title="nuxt.config.ts"
+```typescript title=nuxt.config.ts
 import { defineNuxtConfig } from 'nuxt'
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
@@ -69,7 +69,7 @@ export default defineNuxtConfig({
 
 Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```html title="/components/Auth.vue"
+```html title=/components/Auth.vue
 <template>
   <form class="row flex-center flex" @submit.prevent="handleLogin">
     <div class="col-6 form-widget">
@@ -119,7 +119,7 @@ To access the user information, use the composable [useSupabaseUser](https://sup
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new component for that called `Account.vue`.
 
-```html title="components/Account.vue"
+```html title=components/Account.vue
 <template>
   <form class="form-widget" @submit.prevent="updateProfile">
     <div>
@@ -214,7 +214,7 @@ Let's create a new component for that called `Account.vue`.
 
 Now that we have all the components in place, let's update `app.vue`:
 
-```html title="app.vue"
+```html title=app.vue
 <template>
   <div class="container" style="padding: 50px 0 100px 0">
     <Account v-if="user" />
@@ -245,7 +245,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
 
-```html title="components/Avatar.vue"
+```html title=components/Avatar.vue
 <template>
   <div>
     <img
@@ -330,7 +330,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 And then we can add the widget to the Account page:
 
-```html title="components/Account.vue"
+```html title=components/Account.vue
 <template>
   <form class="form-widget" @submit.prevent="updateProfile">
     <Avatar v-model:path="avatar_path" @upload="updateProfile" />

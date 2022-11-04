@@ -47,7 +47,10 @@ const components = {
       {props.children}
     </Heading>
   ),
-  code: (props: any) => <CodeBlock {...props} />,
+  code: (props: any) => {
+    console.log('code', props)
+    return <CodeBlock {...props} />
+  },
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
 }
 

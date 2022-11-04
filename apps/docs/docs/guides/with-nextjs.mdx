@@ -72,7 +72,7 @@ npm install @supabase/supabase-js
 And finally we want to save the environment variables in a `.env.local`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
-```bash title=".env.local"
+```bash title=.env.local
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -104,7 +104,7 @@ npm install @supabase/auth-helpers-react @supabase/auth-helpers-nextjs
 
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
-```jsx title="pages/_app.js"
+```jsx title=pages/_app.js
 import '../styles/globals.css'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
@@ -129,7 +129,7 @@ export default MyApp
 
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
-```jsx title="pages/_app.tsx"
+```jsx title=pages/_app.tsx
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 // highlight-next-line
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
@@ -172,7 +172,7 @@ npm install @supabase/auth-ui-react
 
 Add the `Auth` component to your home page
 
-```jsx title="pages/index.js"
+```jsx title=pages/index.js
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
@@ -208,7 +208,7 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.js` within a `components` folder.
 
-```tsx title="components/Account.js"
+```tsx title=components/Account.js
 import { useState, useEffect } from 'react'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 
@@ -324,7 +324,7 @@ export default function Account({ session }) {
 
 Let's create a new component for that called `Account.tsx` within a `components` folder.
 
-```tsx title="components/Account.tsx"
+```tsx title=components/Account.tsx
 import { useState, useEffect } from 'react'
 import { useUser, useSupabaseClient, Session } from '@supabase/auth-helpers-react'
 import { Database } from '../utils/database.types'
@@ -454,7 +454,7 @@ export default function Account({ session }: { session: Session }) {
 
 Now that we have all the components in place, let's update `pages/index.js`:
 
-```jsx title="pages/index.js"
+```jsx title=pages/index.js
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 // highlight-next-line
@@ -504,7 +504,7 @@ Let's create an avatar widget for the user so that they can upload a profile pho
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="components/Avatar.js"
+```jsx title=components/Avatar.js
 import React, { useEffect, useState } from 'react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
@@ -596,7 +596,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="components/Avatar.tsx"
+```tsx title=components/Avatar.tsx
 import React, { useEffect, useState } from 'react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Database } from '../utils/database.types'
@@ -704,7 +704,7 @@ export default function Avatar({
 
 And then we can add the widget to the Account page:
 
-```jsx title="components/Account.js"
+```jsx title=components/Account.js
 // Import the new component
 import Avatar from './Avatar'
 
