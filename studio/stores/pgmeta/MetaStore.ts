@@ -122,6 +122,9 @@ export interface IMetaStore {
   ) => any
 
   setProjectDetails: (details: { ref: string; connectionString?: string }) => void
+
+  addCustomType: (name: string, type: string, args: string[]) => Promise<any | { error: ResponseError }>
+
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
@@ -620,6 +623,8 @@ export default class MetaStore implements IMetaStore {
     }
   }
 
+
+
   async updateTable(
     toastId: string,
     table: PostgresTable,
@@ -863,4 +868,22 @@ export default class MetaStore implements IMetaStore {
     this.types.setUrl(`${this.baseUrl}/types`)
     this.types.setHeaders(this.headers)
   }
+
+  async addCustomType(name: string,type: string, args: string[]) {
+
+    const argument = "'" + args.join("','") + "'"
+    console.log(name)
+    name = name.replace(/\s+/g, '');
+
+    console.log(`CREATE TYPE ${name} AS ENUM(${argument})`)
+    if (type === "Enumerated") {
+      const query = `CREATE TYPE ${name} AS ENUM(${argument})`
+      console.log(query)
+      return await this.query(query)
+    } else {
+      return null
+    }
+
+  }
+
 }

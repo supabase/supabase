@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input, Button, IconExternalLink } from 'ui'
+import { Checkbox, SidePanel, Input, Button, IconExternalLink, IconPlus } from 'ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -26,6 +26,7 @@ import {
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 import Link from 'next/link'
+import CustomTypeManager from './CustomTypeManager'
 
 interface Props {
   column?: PostgresColumn
@@ -60,6 +61,8 @@ const ColumnEditor: FC<Props> = ({
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
+  const [isAddingCustomType, setIsAddingCustomType] = useState<boolean>(false)
+
 
   useEffect(() => {
     if (visible) {
@@ -211,19 +214,30 @@ const ColumnEditor: FC<Props> = ({
             error={errors.format}
             disabled={!isUndefined(columnFields?.foreignKey)}
             description={
-              <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-                <a target="_blank" rel="noreferrer">
-                  <Button
-                    as="span"
-                    type="text"
-                    size="small"
-                    className="text-scale-1000 hover:text-scale-1200"
-                    icon={<IconExternalLink size={14} strokeWidth={2} />}
-                  >
-                    Learn more about data types
-                  </Button>
-                </a>
-              </Link>
+              <div className="flex flex-col">
+                <Link href="https://supabase.com/docs/guides/database/tables#data-types">
+                  <a target="_blank" rel="noreferrer">
+                    <Button
+                      as="span"
+                      type="text"
+                      size="small"
+                      className="text-scale-1000 hover:text-scale-1200"
+                      icon={<IconExternalLink size={14} strokeWidth={2} />}
+                    >
+                      Learn more about data types
+                    </Button>
+                  </a>
+                </Link>
+                <Button
+                  type="text"
+                  size="small"
+                  onClick={() => setIsAddingCustomType(true)}
+                  className="text-scale-1000 hover:text-scale-1200 w-fit"
+                  icon={<IconPlus size={14} strokeWidth={2} />}
+                >
+                  Manage custom types
+                </Button>
+              </div>
             }
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
@@ -287,6 +301,10 @@ const ColumnEditor: FC<Props> = ({
               </div>
             </>
           )}
+          <CustomTypeManager
+            visible={isAddingCustomType}
+            closePanel={() => setIsAddingCustomType(false)}
+          />
 
           <ForeignKeySelector
             tables={tables}
