@@ -3,7 +3,6 @@ import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 import { useEffect, useState } from 'react'
 
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { withPageAuth } from '@supabase/auth-helpers-nextjs'
 import { RealtimePresenceState } from '@supabase/supabase-js'
 
@@ -11,7 +10,6 @@ const HomePage: NextPage = () => {
   const supabaseClient = useSupabaseClient()
   const this_user = useUser()
   const [userState, setUserState] = useState<RealtimePresenceState>({})
-  //const channel = useRef<RealtimeChannel>();
 
   useEffect(() => {
     console.log('user : ', this_user);
