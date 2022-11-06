@@ -9,7 +9,8 @@ User get authenticated using Supabase Auth API. Once Logged-in you can see which
 - Backend:
   - [app.supabase.io](https://app.supabase.io/): hosted postgres database with realtime support.
 
-
+## Real time Presence APIs used.
+This program shows usage of channel presence API calls such as , channel.on('presence', ...), channel.subscribe function usage.
 
 ## Getting Started
 
@@ -38,11 +39,11 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 Create a .env.local file and add following environment variables.
 
+ ```
+ NEXT_PUBLIC_SUPABASE_URL=<<insert-your-db-url-here>>
 
-
-`NEXT_PUBLIC_SUPABASE_URL=<<insert-your-db-url-here>>
-
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<<insert-your-anon-key-here>>`
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<<insert-your-anon-key-here>> 
+```
 
 
 
