@@ -163,6 +163,7 @@ const ColumnEditor: FC<Props> = ({
         <div className="space-y-10 py-6">
           <Input
             label="Name"
+            descriptionText="Recommended to use lowercase and use an underscore to seperate words e.g. column_name"
             layout="horizontal"
             type="text"
             error={errors.name}
