@@ -7,13 +7,27 @@ export const getAnchor = (text: any): string | undefined => {
       )
       if (customAnchor !== undefined) return customAnchor.slice(3, customAnchor.indexOf('}'))
 
-      const formattedText = text.map((x) => {
-        if (typeof x !== 'string') return x.props.children
-        else return x.trim()
-      })
+      const formattedText = text
+        .map((x) => {
+          if (typeof x !== 'string') return x.props.children
+          else return x.trim()
+        })
+        .map((x) =>
+          x
+            .toLowerCase()
+            .replace(/[^a-z0-9- ]/g, '')
+            .replace(/[ ]/g, '-')
+        )
       return formattedText.join('-').toLowerCase()
     } else {
-      return text.props.children
+      const anchor = text.props.children
+      if (typeof anchor === 'string') {
+        return anchor
+          .toLowerCase()
+          .replace(/[^a-z0-9- ]/g, '')
+          .replace(/[ ]/g, '-')
+      }
+      return anchor
     }
   } else if (typeof text === 'string') {
     if (text.includes('{#') && text.endsWith('}')) {
