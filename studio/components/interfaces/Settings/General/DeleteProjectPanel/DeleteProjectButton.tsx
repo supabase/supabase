@@ -22,7 +22,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
 
   const project = ui.selectedProject
   const projectRef = project?.ref
-  const projectTier = project?.subscription_tier
+  const projectTier = project?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE
 
   const isOwner = ui.selectedOrganization?.is_owner
   const isFree = projectTier === PRICING_TIER_PRODUCT_IDS.FREE
@@ -144,52 +144,56 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.
         */}
-        <div className="space-y-1">
-          <h4 className="text-base">We're sad that you're leaving.</h4>
-          <p className="text-sm text-scale-1100">
-            We always strive to improve Supabase as much as we can. Please let us know the reasons
-            you are deleting your project so that we can improve in the future.
-          </p>
-        </div>
-        <div className="space-y-4 pt-4">
-          <div className="flex flex-wrap gap-2" data-toggle="buttons">
-            {CANCELLATION_REASONS.map((option) => {
-              const active = selectedReasons.find((x) => x === option)
-              return (
-                <label
-                  key={option}
-                  className={[
-                    'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                    'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
-                    `${
-                      active
-                        ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
-                        : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
-                    }`,
-                  ].join(' ')}
-                >
-                  <input
-                    type="checkbox"
-                    name="options"
-                    value={option}
-                    className="hidden"
-                    onClick={(event: any) => onSelectCancellationReason(event.target.value)}
-                  />
-                  <div>{option}</div>
-                </label>
-              )
-            })}
-          </div>
-          <div className="text-area-text-sm">
-            <Input.TextArea
-              name="message"
-              label="Anything else that we can improve on?"
-              rows={3}
-              value={cancellationMessage}
-              onChange={(event) => setCancellationMessage(event.target.value)}
-            />
-          </div>
-        </div>
+        {!isFree && (
+          <>
+            <div className="space-y-1">
+              <h4 className="text-base">We're sad that you're leaving.</h4>
+              <p className="text-sm text-scale-1100">
+                We always strive to improve Supabase as much as we can. Please let us know the
+                reasons you are deleting your project so that we can improve in the future.
+              </p>
+            </div>
+            <div className="space-y-4 pt-4">
+              <div className="flex flex-wrap gap-2" data-toggle="buttons">
+                {CANCELLATION_REASONS.map((option) => {
+                  const active = selectedReasons.find((x) => x === option)
+                  return (
+                    <label
+                      key={option}
+                      className={[
+                        'flex cursor-pointer items-center space-x-2 rounded-md py-1',
+                        'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
+                        `${
+                          active
+                            ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
+                            : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
+                        }`,
+                      ].join(' ')}
+                    >
+                      <input
+                        type="checkbox"
+                        name="options"
+                        value={option}
+                        className="hidden"
+                        onClick={(event: any) => onSelectCancellationReason(event.target.value)}
+                      />
+                      <div>{option}</div>
+                    </label>
+                  )
+                })}
+              </div>
+              <div className="text-area-text-sm">
+                <Input.TextArea
+                  name="message"
+                  label="Anything else that we can improve on?"
+                  rows={3}
+                  value={cancellationMessage}
+                  onChange={(event) => setCancellationMessage(event.target.value)}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </TextConfirmModal>
     </>
   )
