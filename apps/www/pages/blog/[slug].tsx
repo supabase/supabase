@@ -124,8 +124,6 @@ function BlogPostPage(props: any) {
     </div>
   )
 
-  console.log('props.blog', props.blog)
-
   return (
     <>
       <NextSeo
