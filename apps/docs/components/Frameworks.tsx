@@ -21,8 +21,8 @@ const Frameworks = () => {
     {
       name: 'Flutter',
       logo: {
-        light: '/docs/img/libraries/dart-icon.svg',
-        dark: '/docs/img/libraries/dart-icon.svg',
+        light: '/docs/img/libraries/flutter-icon.svg',
+        dark: '/docs/img/libraries/flutter-icon.svg',
       },
       href: '/guides/with-flutter',
     },
