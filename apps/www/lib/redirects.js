@@ -1540,4 +1540,9 @@ module.exports = [
     source: '/docs/reference/dart/getsubscriptions',
     destination: '/docs/reference/dart/v0/getsubscriptions',
   },
+  {
+    permanent: true,
+    source: '/docs/going-into-prod',
+    destination: '/docs/guides/platform/going-into-prod',
+  },
 ]
