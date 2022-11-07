@@ -100,7 +100,7 @@ pre[class*='language-'] {
     overflow-wrap: anywhere;
   }
   .method-list-item-validation {
-    @apply flex flex-wrap gap-2;
+    @apply flex flex-wrap gap-2 items-center;
   }
   .method-list-item-description {
     @apply text-sm space-y-2;
