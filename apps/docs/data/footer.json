@@ -1,5 +1,108 @@
 [
   {
+    "title": "Product",
+    "links": [
+      {
+        "text": "Database",
+        "url": "/database"
+      },
+      {
+        "text": "Auth",
+        "url": "/auth"
+      },
+      {
+        "text": "Functions",
+        "url": "/edge-functions"
+      },
+      {
+        "text": "Realtime",
+        "url": "/realtime"
+      },
+      {
+        "text": "Storage",
+        "url": "/storage"
+      },
+      {
+        "text": "Pricing",
+        "url": "/pricing"
+      },
+      {
+        "text": "Beta",
+        "url": "/beta"
+      }
+    ]
+  },
+  {
+    "title": "Resources",
+    "links": [
+      {
+        "text": "Support",
+        "url": "/support"
+      },
+      {
+        "text": "System Status",
+        "url": "https://status.supabase.com/"
+      },
+      {
+        "text": "Integrations",
+        "url": "/partners/integrations"
+      },
+      {
+        "text": "Experts",
+        "url": "/partners/experts"
+      },
+      {
+        "text": "Brand Assets / Logos",
+        "url": "/brand-assets"
+      },
+      {
+        "text": "DPA",
+        "url": "/legal/dpa"
+      },
+      {
+        "text": "SOC2",
+        "url": "/legal/soc2"
+      }
+    ]
+  },
+  {
+    "title": "Developers",
+    "links": [
+      {
+        "text": "Documentation",
+        "url": "/docs"
+      },
+      {
+        "text": "API Reference",
+        "url": "/docs/reference"
+      },
+      {
+        "text": "Changelog",
+        "url": "/changelog"
+      },
+      {
+        "text": "Contributing",
+        "url": "/docs/handbook/contributing"
+      },
+      {
+        "text": "Open Source",
+        "url": "/oss"
+      },
+      {
+        "text": "SupaSquad",
+        "url": "/docs/handbook/supasquad"
+      },
+      {
+        "text": "DevTo",
+        "url": "https://dev.to/supabase"
+      },
+      {
+        "text": "RSS",
+        "url": "/rss.xml"
+      }
+    ]
+  },
+  {
     "title": "Company",
     "links": [
       {
@@ -7,8 +110,12 @@
         "url": "/blog"
       },
       {
-        "text": "Open Source",
-        "url": "/oss"
+        "text": "Careers",
+        "url": "https://about.supabase.com/careers"
+      },
+      {
+        "text": "Company",
+        "url": "/company"
       },
       {
         "text": "Terms of Service",
@@ -25,7 +132,7 @@
       {
         "text": "Service Level Agreement",
         "url": "/docs/company/sla"
-      },      
+      },
       {
         "text": "Humans.txt",
         "url": "/humans.txt"
@@ -33,68 +140,10 @@
       {
         "text": "Lawyers.txt",
         "url": "/lawyers.txt"
-      }
-    ]
-  },
-  {
-    "title": "Resources",
-    "links": [
-      {
-        "text": "Brand Assets",
-        "url": "/brand-assets"
       },
       {
-        "text": "Docs",
-        "url": "/docs/"
-      },
-      {
-        "text": "Pricing",
-        "url": "/pricing"
-      },
-      {
-        "text": "Support",
-        "url": "/docs/support"
-      },
-      {
-        "text": "System Status",
-        "url": "https://status.supabase.com/"
-      }
-    ]
-  },
-  {
-    "title": "Community",
-    "links": [
-      {
-        "text": "SupaSquad",
-        "url": "/docs/handbook/supasquad"
-      },
-      {
-        "text": "Contributing",
-        "url": "/docs/handbook/contributing"
-      },
-      {
-        "text": "GitHub",
-        "url": "https://github.com/supabase/supabase"
-      },
-      {
-        "text": "Twitter",
-        "url": "https://twitter.com/supabase"
-      },
-      {
-        "text": "DevTo",
-        "url": "https://dev.to/supabase"
-      },
-      {
-        "text": "RSS",
-        "url": "/rss.xml"
-      },
-      {
-        "text": "Discord",
-        "url": "https://discord.supabase.com/"
-      },
-      {
-        "text": "Youtube",
-        "url": "https://youtube.com/c/supabase"
+        "text": "Security.txt",
+        "url": "/.well-known/security.txt"
       }
     ]
   }
