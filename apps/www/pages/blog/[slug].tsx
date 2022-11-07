@@ -124,10 +124,13 @@ function BlogPostPage(props: any) {
     </div>
   )
 
+  console.log('props.blog', props.blog)
+
   return (
     <>
       <NextSeo
         title={props.blog.title}
+        description={props.blog.description}
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
