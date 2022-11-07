@@ -21,6 +21,25 @@ const formatSlug = (slug: string) => {
   return slug
 }
 
+const formatTOCHeader = (content: string) => {
+  let begin = false
+  const res = []
+  for (const x of content) {
+    if (x === '`') {
+      if (!begin) {
+        begin = true
+        res.push(`<code class="text-xs border rounded bg-scale-400 border-scale-500">`)
+      } else {
+        begin = false
+        res.push(`</code>`)
+      }
+    } else {
+      res.push(x)
+    }
+  }
+  return res.join('')
+}
+
 const TableOfContents: FC<Props> = ({ toc }) => {
   // [Joshen] markdown-toc doesn't seem to read maxdepth from the options passed in
   // Our first level headers will be H2s (H1 is ignored), and we only show up to H3
@@ -35,9 +54,8 @@ const TableOfContents: FC<Props> = ({ toc }) => {
               <a
                 href={`#${formatSlug(item.slug)}`}
                 className="text-scale-1000 hover:text-brand-900 transition-colors"
-              >
-                {removeAnchor(item.content)}
-              </a>
+                dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.content)) }}
+              />
             </li>
           )
         })}
