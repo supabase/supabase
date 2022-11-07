@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Octokit } from '@octokit/core'
 import Layout from '~/layouts/Default'
 import maintainers from '../data/maintainers.json'
 import { menuItems } from '~/components/Navigation/Navigation.constants'
 import GithubCard from '../components/GithubCard'
 import Sponsors from '../components/Sponsors'
+import Image from 'next/image'
 
 export default function Oss({ meta }) {
   const octokit = new Octokit()
 
-  const [activePill, setActivePill] = React.useState('All')
-  const [repos, setRepos] = React.useState([])
+  const [activePill, setActivePill] = useState('All')
+  const [repos, setRepos] = useState([])
 
   const maintainerTags = maintainers
     .reduce((acc, x) => acc.concat(x.tags), []) // get all tags
@@ -33,7 +34,7 @@ export default function Oss({ meta }) {
       )
     }
     fetchOctoData()
-  }, [repos, octokit])
+  }, [])
 
   return (
     <Layout meta={meta} menuItems={menuItems['docs']} currentPage="docs">
@@ -51,7 +52,6 @@ export default function Oss({ meta }) {
         </div>
       </section>
 
-      {/* Sponsors */}
       <section className={'section-lg'}>
         <div className="container">
           <h2 className="with-underline">Sponsors</h2>
@@ -59,7 +59,6 @@ export default function Oss({ meta }) {
         </div>
       </section>
 
-      {/* Core */}
       <section>
         <div className="">
           <h2>Community Maintainers</h2>
@@ -70,7 +69,7 @@ export default function Oss({ meta }) {
                 <li
                   key={x}
                   className={`mx-4 rounded-sm inline-block p-2 cursor-pointer hover:text-brand-800 ${
-                    activePill == x ? 'bg-gray-400 text-brand-800' : ''
+                    activePill == x ? 'bg-gray-200 dark:bg-gray-400 text-brand-800' : ''
                   }`}
                   onClick={() => setActivePill(x)}
                 >
@@ -91,15 +90,17 @@ export default function Oss({ meta }) {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <div className="grow bg-gray-200 p-4">
+                    <div className="grow bg-gray-200 dark:bg-gray-400 p-4">
                       <div className="flex gap-4">
-                        <img
-                          className="rounded-full w-16 h-16 my-0"
+                        <Image
+                          className="rounded-full my-0"
+                          width={64}
+                          height={64}
                           alt={x.handle}
                           src={`https://github.com/${x.handle}.png`}
                         />
                         <div className="">
-                          <h4 className="text-xl my-0">@{x.handle}</h4>
+                          <h4 className="text-lg my-0">@{x.handle}</h4>
                           <span className="text-sm">{x.description}</span>
                         </div>
                       </div>
@@ -119,7 +120,7 @@ export default function Oss({ meta }) {
             {repos.length < 1 && <div></div>}
             {repos.length >= 1 &&
               repos.map((props, idx) => (
-                <div className="bg-gray-200 p-4" key={idx}>
+                <div className="bg-gray-200 dark:bg-gray-400 p-4" key={idx}>
                   <GithubCard
                     title={props.name}
                     description={props.description}
