@@ -18,20 +18,22 @@ export default function Oss({ meta }) {
     .sort((a, b) => a.localeCompare(b)) // alphabetical
   const maintainerPills = ['All'].concat(maintainerTags)
 
-  useEffect(async () => {
-    const reposResponse = await octokit.request('GET /orgs/{org}/repos', {
-      org: 'supabase',
-      type: 'public',
-      per_page: 6,
-      page: 1,
-    })
-
-    setRepos(
-      reposResponse.data
-        .filter((r) => !!r.stargazers_count)
-        .sort((a, b) => b.stargazers_count - a.stargazers_count)
-    )
-  })
+  useEffect(() => {
+    async function fetchOctoData() {
+      let res = await octokit.request('GET /orgs/{org}/repos', {
+        org: 'supabase',
+        type: 'public',
+        per_page: 6,
+        page: 1,
+      })
+      setRepos(
+        res.data
+          .filter((r) => !!r.stargazers_count)
+          .sort((a, b) => b.stargazers_count - a.stargazers_count)
+      )
+    }
+    fetchOctoData()
+  }, [repos, octokit])
 
   return (
     <Layout meta={meta} menuItems={menuItems['docs']} currentPage="docs">
@@ -39,7 +41,7 @@ export default function Oss({ meta }) {
         <div className="container">
           <div className="flex items-center">
             <div className="col">
-              <h2 className="with-underline">Open source</h2>
+              <h1 className="mt-0">Open source</h1>
               <p className="">
                 Supabase is an open source company, supporting existing open source tools and
                 communities wherever possible.
@@ -62,21 +64,22 @@ export default function Oss({ meta }) {
         <div className="">
           <h2>Community Maintainers</h2>
 
-          <ul className="flex gap-4 items-center overflow-auto p-0">
-            {maintainerPills.map((x) => (
-              <li
-                key={x}
-                className={`mx-4 rounded-sm inline-block p-2 cursor-pointer hover:text-brand-800 ${
-                  activePill == x ? 'bg-gray-400 text-brand-800' : ''
-                }`}
-                onClick={() => setActivePill(x)}
-              >
-                {x}
-              </li>
-            ))}
-          </ul>
-
-          <div className="grid sm:grid-cols-3 grid-cols-3 gap-4">
+          <div className="overflow-auto max-w-[300px] md:max-w-none">
+            <ul className="flex gap-4 items-center p-0">
+              {maintainerPills.map((x) => (
+                <li
+                  key={x}
+                  className={`mx-4 rounded-sm inline-block p-2 cursor-pointer hover:text-brand-800 ${
+                    activePill == x ? 'bg-gray-400 text-brand-800' : ''
+                  }`}
+                  onClick={() => setActivePill(x)}
+                >
+                  {x}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
             {maintainers
               .filter((x) => activePill == 'All' || x.tags.includes(activePill))
               .sort((a, b) => a.handle.localeCompare(b.handle))
