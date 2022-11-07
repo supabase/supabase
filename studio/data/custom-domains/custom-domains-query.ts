@@ -7,6 +7,61 @@ export type CustomDomainsVariables = {
   projectRef?: string
 }
 
+type CustomDomainStatus =
+  | '1_not_started'
+  | '2_initiated'
+  | '3_challenge_verified'
+  | '4_origin_setup_completed'
+  | '5_services_reconfigured'
+
+type Settings = {
+  http2: string
+  tls_1_3: string
+  min_tls_version: string
+}
+
+type Ssl = {
+  id: string
+  type: string
+  method: string
+  status: string
+  txt_name?: string
+  txt_value?: string
+  settings: Settings
+  wildcard: boolean
+  bundle_method: string
+  certificate_authority: string
+  validation_records?: {
+    status: string
+    txt_name: string
+    txt_value: string
+  }[]
+}
+
+type OwnershipVerification = {
+  name: string
+  type: string
+  value: string
+}
+
+type OwnershipVerificationHttp = {
+  http_url: string
+  http_body: string
+}
+
+export type CustomDomainResponse = {
+  id: string
+  ssl: Ssl
+  status: string
+  hostname: string
+  created_at: string
+  custom_metadata: any
+  verification_errors?: string[]
+  custom_origin_server: string
+  ownership_verification?: OwnershipVerification
+  ownership_verification_http?: OwnershipVerificationHttp
+}
+
 export async function getCustomDomains(
   { projectRef }: CustomDomainsVariables,
   signal?: AbortSignal
@@ -15,17 +70,27 @@ export async function getCustomDomains(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(
+  const response = (await get(
     `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/custom-hostname`,
     {
       signal,
     }
-  )
+  )) as {
+    data: {
+      errors: any[]
+      result: CustomDomainResponse
+      success: boolean
+      messages: any[]
+    }
+    status: CustomDomainStatus
+    error: unknown
+  }
+
   if (response.error) {
     throw response.error
   }
 
-  return { customDomains: response }
+  return { customDomain: response?.data?.result, status: response.status }
 }
 
 export type CustomDomainsData = Awaited<ReturnType<typeof getCustomDomains>>
