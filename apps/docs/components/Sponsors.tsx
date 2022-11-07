@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 import sponsors from '../data/sponsors.json'
 
@@ -42,15 +43,18 @@ export default function Sponsors() {
           !!t.transactions.length && (
             <div key={index}>
               <h4 className="font-bold">{t.heading}</h4>
-              <div className="grid sm:grid-cols-3 grid-cols-3 gap-4 pl-4">
+              <div className="grid sm:grid-cols-3 md:grid-cols-3 gap-6 pl-4">
                 {t.transactions.map((x, index) => (
                   <div className="" key={index}>
                     <a
                       className="flex items-center gap-4 shadow-none"
                       href={`https://github.com/${x.sponsor}`}
                     >
-                      <img
+                      <Image
+                        alt="Sponsor"
                         className="mt-4 mb-4 rounded-full w-12 h-12"
+                        width={45}
+                        height={45}
                         src={`https://github.com/${x.sponsor}.png`}
                       />
                       <div className="flex items-center flex-col justify-center text-center">
