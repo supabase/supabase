@@ -11,6 +11,22 @@
         "url": "/oss"
       },
       {
+        "text": "Terms of Service",
+        "url": "/docs/company/terms"
+      },
+      {
+        "text": "Privacy Policy",
+        "url": "/docs/company/privacy"
+      },
+      {
+        "text": "Acceptable Use Policy",
+        "url": "/docs/company/aup"
+      },
+      {
+        "text": "Service Level Agreement",
+        "url": "/docs/company/sla"
+      },      
+      {
         "text": "Humans.txt",
         "url": "/humans.txt"
       },
@@ -49,6 +65,14 @@
     "title": "Community",
     "links": [
       {
+        "text": "SupaSquad",
+        "url": "/docs/handbook/supasquad"
+      },
+      {
+        "text": "Contributing",
+        "url": "/docs/handbook/contributing"
+      },
+      {
         "text": "GitHub",
         "url": "https://github.com/supabase/supabase"
       },
@@ -71,15 +95,6 @@
       {
         "text": "Youtube",
         "url": "https://youtube.com/c/supabase"
-      }
-    ]
-  },
-  {
-    "title": "Beta",
-    "links": [
-      {
-        "text": "Join our beta",
-        "url": "https://app.supabase.com/"
       }
     ]
   }
