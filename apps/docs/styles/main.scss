@@ -218,11 +218,3 @@ article p strong {
 a:has(code) {
   box-shadow: none !important;
 }
-
-pre code {
-  @media screen and (max-width: 375px) {
-  }
-  @media screen and (max-width: 768px) {
-    // white-space: normal !important;
-  }
-}
