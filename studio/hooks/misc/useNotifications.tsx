@@ -3,6 +3,7 @@ import { Notification } from '@supabase/shared-types/out/notifications'
 
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ActionType } from '@supabase/shared-types/out/notifications'
 
 export const useNotifications = () => {
   const { data, error, mutate } = useSWR<Notification[]>(`${API_URL}/notifications`, get)
