@@ -12,12 +12,15 @@ export const getAnchor = (text: any): string | undefined => {
           if (typeof x !== 'string') return x.props.children
           else return x.trim()
         })
-        .map((x) =>
-          x
-            .toLowerCase()
-            .replace(/[^a-z0-9- ]/g, '')
-            .replace(/[ ]/g, '-')
-        )
+        .map((x) => {
+          if (typeof x !== 'string') return x
+          else
+            return x
+              .toLowerCase()
+              .replace(/[^a-z0-9- ]/g, '')
+              .replace(/[ ]/g, '-')
+        })
+
       return formattedText.join('-').toLowerCase()
     } else {
       const anchor = text.props.children
