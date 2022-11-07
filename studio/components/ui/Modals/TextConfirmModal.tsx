@@ -56,7 +56,7 @@ const TextConfirmModal: FC<Props> = ({
         {() => (
           <div className="w-full py-4">
             <div className="space-y-4">
-              {children !== undefined && (
+              {children && (
                 <>
                   <Modal.Content>{children}</Modal.Content>
                   <Modal.Separator />
