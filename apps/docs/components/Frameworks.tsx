@@ -1,6 +1,9 @@
 import ButtonCard from './ButtonCard'
+import { useTheme } from '~/components/Providers'
 
 const Frameworks = () => {
+  const { isDarkMode } = useTheme()
+
   const frameworks = [
     {
       name: 'Angular',
@@ -14,7 +17,7 @@ const Frameworks = () => {
       name: 'Expo',
       logo: {
         light: '/docs/img/libraries/expo-icon.svg',
-        dark: '/docs/img/libraries/expo-icon.svg',
+        dark: '/docs/img/libraries/expo-icon-dark.svg',
       },
       href: '/guides/with-expo',
     },
@@ -92,7 +95,7 @@ const Frameworks = () => {
             to={x.href}
             title={x.name}
             // [Joshen] Nice to have: theming
-            icon={x.logo.dark}
+            icon={isDarkMode ? x.logo.dark : x.logo.light}
           />
         </div>
       ))}
