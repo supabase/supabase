@@ -8,6 +8,7 @@
   "workspaces": [
     "apps/www",
     "apps/docs",
+    "apps/new-docs",
     "studio",
     "tests",
     "packages/*"
@@ -56,6 +57,7 @@
     "auth"
   ],
   "dependencies": {
+    "@code-hike/mdx": "^0.7.4",
     "@mdx-js/react": "^2.1.1",
     "mini-svg-data-uri": "^1.4.4"
   }
