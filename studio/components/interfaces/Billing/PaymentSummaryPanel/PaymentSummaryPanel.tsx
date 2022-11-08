@@ -19,6 +19,7 @@ import { getProductPrice } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
 import { DatabaseAddon } from '../AddOns/AddOns.types'
+import { getPITRDays } from './PaymentSummaryPanel.utils'
 
 interface Props {
   isRefreshingPreview: boolean
@@ -75,6 +76,9 @@ const PaymentSummaryPanel: FC<Props> = ({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
+  const currentPITRDays = getPITRDays(currentPITRDuration)
+  const selectedPITRDays = getPITRDays(selectedPITRDuration)
+
   const isEnterprise = currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   const isChangingPlan =
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG &&
@@ -99,7 +103,7 @@ const PaymentSummaryPanel: FC<Props> = ({
   return (
     <>
       <div
-        className="w-full space-y-8 border-l bg-panel-body-light px-6 py-10 dark:bg-panel-body-dark lg:px-12"
+        className="w-full space-y-8 border-l bg-panel-body-light px-6 py-10 dark:bg-panel-body-dark lg:px-12 overflow-y-auto"
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
@@ -175,8 +179,33 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
-            {isChangingComputeSize && (
-              <div className="!mt-4">
+
+            {/* Show information boxes with regards to change in subscriptions */}
+            <div className="!mt-4 space-y-4">
+              {isChangingPITRDuration && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title={
+                    currentPITRDuration.id === undefined
+                      ? 'Enabling PITR'
+                      : selectedPITRDuration.id === undefined
+                      ? 'Disabling PITR'
+                      : 'Updating PITR duration'
+                  }
+                  description={
+                    selectedPITRDays >= currentPITRDays
+                      ? `The days for which PITR is available for will only start at the time of enabling the add-on (e.g You will have access to the full ${selectedPITRDays} days of PITR after ${
+                          selectedPITRDays - currentPITRDays
+                        } days from today)`
+                      : selectedPITRDays === 0
+                      ? 'All available PITR back ups for your project will be removed and are non-recoverable'
+                      : `Only the latest ${selectedPITRDays} days of PITR from today will be retained (all backups that are later than ${selectedPITRDays} days will be removed and are non-recoverable)`
+                  }
+                />
+              )}
+              {isChangingComputeSize && (
                 <InformationBox
                   hideCollapse
                   defaultVisibility
@@ -184,8 +213,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                   title="Changing your compute size"
                   description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
                 />
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
