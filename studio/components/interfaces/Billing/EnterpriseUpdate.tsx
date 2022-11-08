@@ -164,8 +164,8 @@ const EnterpriseUpdate: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10">
-          <div className="relative space-y-4 px-5">
+        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
+          <div className="relative space-y-4">
             <div className="space-y-8">
               <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
               <div
@@ -209,7 +209,7 @@ const EnterpriseUpdate: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[32rem]">
+        <div className="w-[34rem]">
           <PaymentSummaryPanel
             isSpendCapEnabled={true}
             isSubmitting={isSubmitting}
