@@ -8,6 +8,7 @@ import '../styles/main.scss?v=1.0.0'
 import '../styles/docsearch.scss'
 import '../styles/algolia-search.scss'
 import '../styles/prism-okaidia.scss'
+import '@code-hike/mdx/dist/index.css'
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()

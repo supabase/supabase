@@ -2,15 +2,14 @@ import nextMdx from '@next/mdx'
 import bundleAnalyzer from '@next/bundle-analyzer'
 
 import remarkGfm from 'remark-gfm'
-import admonitions from 'remark-admonitions'
 import rehypeSlug from 'rehype-slug'
 
+import theme from 'shiki/themes/nord.json' assert { type: 'json' }
+import { remarkCodeHike } from '@code-hike/mdx'
+
 import withTM from 'next-transpile-modules'
-
-import withYaml from 'next-plugin-yaml'
-
-// import { remarkCodeHike } from '@code-hike/mdx'
-// import theme from 'shiki/themes/dark-plus.json' assert { type: 'json' }
+// import withYaml from 'next-plugin-yaml'
+// import admonitions from 'remark-admonitions'
 // import codeHikeTheme from './codeHikeTheme.js'
 
 /**
@@ -24,12 +23,14 @@ const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [
-      // [
-      //   remarkCodeHike,
-      //   { theme: codeHikeTheme, autoImport: false },
-      // ],
+      [
+        remarkCodeHike,
+        {
+          theme: theme,
+          autoImport: true,
+        },
+      ],
       remarkGfm,
-      [admonitions, {}],
     ],
     rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
@@ -37,9 +38,9 @@ const withMDX = nextMdx({
   },
 })
 
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-})
+// const withBundleAnalyzer = bundleAnalyzer({
+//   enabled: process.env.ANALYZE === 'true',
+// })
 
 // /** @type {NextConfig} */
 const nextConfig = {
@@ -52,6 +53,7 @@ const nextConfig = {
 
 // next.config.js
 export default () => {
-  const plugins = [withYaml, withMDX, withTM(['ui', 'common'])]
+  // const plugins = [withMDX]/
+  const plugins = [withTM(['ui', 'common']), withMDX]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
