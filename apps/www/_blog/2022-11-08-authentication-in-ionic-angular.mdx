@@ -117,10 +117,10 @@ create policy "The owner can delete a group." on groups for
 
 -- Message Policies
 create policy "Authenticated users can read messages." on messages
-  for select using (auth.role() = 'authenticated');
+  for select to authenticated using (true);
 
 create policy "Authenticated users can create messages." on messages
-  for insert with check (auth.role() = 'authenticated');
+  for insert to authenticated with check (true);
 ```
 
 Now we also add a cool function that will automatically add user data after registration into our table. This is necessary if you want to keep track of some user information, because the Supabase auth table is an internal table that we can't access that easily.
