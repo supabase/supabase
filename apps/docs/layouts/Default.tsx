@@ -52,7 +52,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
                   : 'col-span-12 md:col-span-9'
               } py-2 md:py-4 px-2 md:px-8`}
             >
-              <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[780px] ">
+              <article className="doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[780px] ">
                 {children}
               </article>
             </div>
