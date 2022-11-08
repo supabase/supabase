@@ -245,7 +245,7 @@ export const menuItems: NavMenu = {
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
         {
           name: 'Migrating and upgrading',
-          url: '/guides/platform/migrating-between-projects',
+          url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
