@@ -46,11 +46,6 @@ const components = {
       {props.children}
     </Heading>
   ),
-  h4: (props: any) => (
-    <Heading tag="h4" {...props}>
-      {props.children}
-    </Heading>
-  ),
   code: (props: any) => {
     const linesToHighlight = parseNumericRange(props.lines ?? '')
     return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
