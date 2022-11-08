@@ -20,7 +20,7 @@ export const REFERENCES: References = {
     name: 'Flutter',
     library: 'supabase-dart',
     versions: ['v1', 'v0'],
-    icon: '/docs/img/libraries/dart-icon.svg',
+    icon: '/docs/img/libraries/flutter-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -245,7 +245,7 @@ export const menuItems: NavMenu = {
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
         {
           name: 'Migrating and upgrading',
-          url: '/guides/platform/migrating-between-projects',
+          url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },

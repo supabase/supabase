@@ -67,7 +67,6 @@ article h1 {
 
 .width-full {
   width: 100% !important;
-  max-width: max-content !important;
 }
 
 .p:not(.prose *):not(.overwrite) {
@@ -100,7 +99,7 @@ pre[class*='language-'] {
     overflow-wrap: anywhere;
   }
   .method-list-item-validation {
-    @apply flex flex-wrap gap-2;
+    @apply flex flex-wrap gap-2 items-center;
   }
   .method-list-item-description {
     @apply text-sm space-y-2;
@@ -220,8 +219,11 @@ a:has(code) {
   box-shadow: none !important;
 }
 
-pre code {
-  @media screen and (max-width: 768px) {
-    white-space: normal !important;
-  }
+// fix firefox issue with li wrapping
+.doc-content-container ul li div.relative {
+  display: inline-block;
+}
+
+.doc-content-container ul li a {
+  box-shadow: none !important;
 }
