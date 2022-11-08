@@ -1,9 +1,9 @@
 ---
-title: 'Authentication in Ionic Angular with Supabase'
+title: 'Authentication in Ionic Angular'
 description: Learn how to build an Ionic Angular app with authentication, Row Level Security, and Magic Link auth.
 author: simon_grimm
-image: simon-grimm-angular-realtime/angular-supabase.png
-thumb: simon-grimm-angular-realtime/angular-supabase.png
+image: simmon-grim-ionic-angular-authentication/ionic-angular-supabase.jpg
+thumb: simmon-grim-ionic-angular-authentication/ionic-angular-supabase.jpg
 tags:
   - ionic
   - angular
@@ -16,7 +16,7 @@ Authentication of your apps is one of the most important topics, and by combinin
 
 In this tutorial, we will create an [Ionic Angular application with Supabase](https://supabase.com/docs/guides/with-ionic-angular) backend to build a simple realtime messaging app.
 
-![Ionic Angular Authentication with Supabase](ionic-angular-authentication-supabase.gif)
+![Ionic Angular Authentication with Supabase](/images/blog/simmon-grim-ionic-angular-authentication/ionic-angular-authentication-supabase.gif)
 
 Along the way we will dive into:
 
@@ -43,7 +43,7 @@ In your dashboard, click "New Project" and leave it to the default settings, but
 
 By default Supabase has the standard email/password authentication enabled, which you can find under the menu element **Authentication** and by scrolling down to the **Auth Provider** section.
 
-![Supabase Auth Provider](supabase-auth-provider.png)
+![Supabase Auth Provider](/images/blog/simmon-grim-ionic-angular-authentication/supabase-auth-provider.png)
 
 Need to add another provider in the future? No problem!
 
@@ -51,7 +51,7 @@ Supabase offers a ton of providers that you can easily integrate so your users c
 
 On top of that, you can customize the auth settings and also the **email templates** that users see when they need to confirm their account, get a magic link or want to reset their password.
 
-![Supabase Email Templates](supabase-email-templates.png)
+![Supabase Email Templates](/images/blog/simmon-grim-ionic-angular-authentication/supabase-email-templates.png)
 
 Feel free to play around with the settings, and once you're done let's continue with our database.
 
@@ -265,7 +265,7 @@ By the way: The `anon` key is safe to use in a frontend project since we have en
 
 The big first step is to create the "outside" pages which allow a user to perform different operations:
 
-![Ionic Login Page](ionic-login-page.png)
+![Ionic Login Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-login-page.png)
 
 Before we dive into the UI of these pages we should define all the required logic in a service to easily inject it into our pages.
 
@@ -680,11 +680,11 @@ ion-content {
 
 At this point you can already try our authentication by using the magic link button, so run the Ionic app with `ionic serve` for the web preview and then enter your email.
 
-![Magic Link Alert](magic-link-input.png)
+![Magic Link Alert](/images/blog/simmon-grim-ionic-angular-authentication/magic-link-input.png)
 
 Make sure you use a valid email since you do need to click on the link in the email. If everything works correctly you should receive an email like this quickly:
 
-![Magic Link Email](magic-link-email.png)
+![Magic Link Email](/images/blog/simmon-grim-ionic-angular-authentication/magic-link-email.png)
 
 Keep in mind that you can easily change those email templates inside the settings of your Supabase project.
 
@@ -868,7 +868,7 @@ ion-content {
 
 As a result, we have a clean registration page with decent error messages!
 
-![Ionic Registration Page](ionic-registration-page.png)
+![Ionic Registration Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-registration-page.png)
 
 Give the default registration process a try with another email, and you should see another user inside the **Authentication** area of your Supabase project as well as inside the `users` table inside the **Table Editor**.
 
@@ -878,7 +878,7 @@ Before we make the magic link authentication work on mobile devices, let's focus
 
 The groups screen is the first "inside" screen, but it's not protected by default: On the login page we have the option to start without an account, so unauthorized users can enter this page - but they should only be allowed to see the chat groups, nothing more.
 
-![App Groups Page](ionic-groups-page.png)
+![App Groups Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-groups-page.png)
 
 Authenticated users should have controls to create a new group and to sign out, but before we get to the UI we need a way to interact with our Supabase tables.
 
@@ -1422,7 +1422,7 @@ ion-textarea {
 
 You can [find the full code of this tutorial on Github](https://github.com/saimon24/supa-chat) including the file for that pattern so your page looks almost like WhatsApp!
 
-![Ionic Supabase Chat Page](ionic-supabase-chat-page.png)
+![Ionic Supabase Chat Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-supabase-chat-page.png)
 
 Now we have a well-working Ionic app with Supabase authentication and database integration, but there are two small but important additions we still need to make.
 
@@ -1484,7 +1484,7 @@ export class AuthGuard implements CanActivate {
 
 In case the user is not allowed to activate a page, we display a toast and at the same time route to the groups page since that page is visible to everyone. Normally you might even bring users simply back to the login screen if you wanted to protect all internal pages of your Ionic app.
 
-![Ionic unauthorized message](ionic-supabase-unauthorized.png)
+![Ionic unauthorized message](/images/blog/simmon-grim-ionic-angular-authentication/ionic-supabase-unauthorized.png)
 
 We already applied this guard to our routing in the beginning, but now it finally serves the real purpose!
 
@@ -1618,7 +1618,7 @@ If you would run the app now it still wouldn't work, because we haven't added ou
 
 To finish this open your Supabase project again and go to the **Settings** of the **Authentication** menu entry where you can add a domain under **Redirect URLs**:
 
-![Supabase Auth Redirect URL](supabase-auth-redirect-url.png)
+![Supabase Auth Redirect URL](/images/blog/simmon-grim-ionic-angular-authentication/supabase-auth-redirect-url.png)
 
 This was the last missing piece, and now you even got seamless Supabase authentication with magic links working inside your iOS and Android app!
 
