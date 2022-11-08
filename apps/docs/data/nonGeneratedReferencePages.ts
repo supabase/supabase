@@ -1,6 +1,7 @@
 const nonGeneratedReferencePages = [
   'docs/reference/javascript',
   'docs/reference/javascript/installing',
+  'docs/reference/javascript/initializing',
   'docs/reference/javascript/release-notes',
   'docs/reference/javascript/upgrade-guide',
   'docs/reference/javascript/typescript-support',
