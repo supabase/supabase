@@ -1,20 +1,19 @@
 import dayjs from 'dayjs'
 import useSWR from 'swr'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 
-import { useStore } from 'hooks'
+import { useStore, useNotifications } from 'hooks'
 import { Project } from 'types'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 import NotificationActions from './NotificationActions'
-import { get } from 'lib/common/fetch'
+import { get, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Button, IconX } from 'ui'
 
 interface Props {
   notification: Notification
-  onSelectDismissNotification: (notificationId: string) => void
   onSelectRestartProject: (project: Project, notification: Notification) => void
   onSelectApplyMigration: (project: Project, notification: Notification) => void
   onSelectRollbackMigration: (project: Project, notification: Notification) => void
@@ -23,13 +22,14 @@ interface Props {
 
 const NotificationRow: FC<Props> = ({
   notification,
-  onSelectDismissNotification,
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
   onSelectFinalizeMigration,
 }) => {
-  const { app } = useStore()
+  const { app, ui } = useStore()
+  const { refresh } = useNotifications()
+  const [dismissing, setDismissing] = useState(false)
   const [project] = app.projects.list((project: Project) => project.id === notification.project_id)
 
   const insertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mma')
@@ -45,6 +45,23 @@ const NotificationRow: FC<Props> = ({
       : null,
     get
   )
+
+  const dismissNotification = async (notificationId: string) => {
+    if (!notificationId) return
+    setDismissing(true)
+    const { error } = await delete_(`${API_URL}/notifications`, { ids: [notificationId] })
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Failed to dismiss notification',
+        error,
+        duration: 4000,
+      })
+    } else {
+      refresh()
+    }
+    setDismissing(false)
+  }
 
   return (
     <div className="flex py-2">
@@ -67,6 +84,7 @@ const NotificationRow: FC<Props> = ({
                   <Button
                     className="!px-1 group"
                     type="text"
+                    loading={dismissing}
                     icon={
                       <IconX
                         size={14}
@@ -74,7 +92,7 @@ const NotificationRow: FC<Props> = ({
                         className="text-scale-1100 group-hover:text-scale-1200 transition"
                       />
                     }
-                    onClick={() => onSelectDismissNotification(notification.id)}
+                    onClick={() => dismissNotification(notification.id)}
                   />
                 </Tooltip.Trigger>
                 <Tooltip.Content side="bottom">
@@ -92,21 +110,20 @@ const NotificationRow: FC<Props> = ({
             </div>
           </div>
         </div>
-        {availableActions.length > 0 ||
-          (changelogLink !== undefined && (
-            <div className="flex items-center">
-              <NotificationActions
-                project={project}
-                changelogLink={changelogLink}
-                ownerReassignStatus={ownerReassignStatus}
-                availableActions={availableActions}
-                onSelectRestartProject={() => onSelectRestartProject(project, notification)}
-                onSelectApplyMigration={() => onSelectApplyMigration(project, notification)}
-                onSelectRollbackMigration={() => onSelectRollbackMigration(project, notification)}
-                onSelectFinalizeMigration={() => onSelectFinalizeMigration(project, notification)}
-              />
-            </div>
-          ))}
+        {(availableActions.length > 0 || changelogLink !== undefined) && (
+          <div className="flex items-center">
+            <NotificationActions
+              project={project}
+              changelogLink={changelogLink}
+              ownerReassignStatus={ownerReassignStatus}
+              availableActions={availableActions}
+              onSelectRestartProject={() => onSelectRestartProject(project, notification)}
+              onSelectApplyMigration={() => onSelectApplyMigration(project, notification)}
+              onSelectRollbackMigration={() => onSelectRollbackMigration(project, notification)}
+              onSelectFinalizeMigration={() => onSelectFinalizeMigration(project, notification)}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
