@@ -49,16 +49,6 @@ const NotificationsPopover: FC<Props> = () => {
     }
   }
 
-  const dismissNotification = async (notificationId: string) => {
-    if (!notificationId) return
-    const { error } = await delete_(`${API_URL}/notifications`, { ids: [notificationId] })
-    if (error) {
-      ui.setNotification({ category: 'error', message: 'Failed to dismiss notification', error })
-    } else {
-      refresh()
-    }
-  }
-
   const onConfirmProjectRestart = async () => {
     if (!projectToRestart || !targetNotification) return
 
@@ -203,7 +193,6 @@ const NotificationsPopover: FC<Props> = () => {
                     <Fragment key={notification.id}>
                       <NotificationRow
                         notification={notification}
-                        onSelectDismissNotification={dismissNotification}
                         onSelectRestartProject={(project, notification) => {
                           setProjectToRestart(project)
                           setTargetNotification(notification)
