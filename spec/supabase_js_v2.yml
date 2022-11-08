@@ -81,6 +81,23 @@ pages:
           `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
           but an alternative `fetch` implementation can be provided as an option.
           This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
+      - name: React Native options
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+          import AsyncStorage from "@react-native-async-storage/async-storage";
+
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+            auth: {
+              storage: AsyncStorage,
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: false,
+            },
+          });
+          ```
+
+          For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
   auth.signUp():
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -318,7 +335,7 @@ pages:
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
-      - Refresh token rotation (see [`REFRESH_TOKEN_ROTATION_ENABLED`](https://supabase.com/docs/reference/auth/config#refresh_token_rotation_enabled)) is enabled by default on all projects to guard against replay attacks. 
+      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - name: Refresh the session
@@ -327,6 +344,25 @@ pages:
         js: |
           ```js
             const { data, error } = supabase.auth.setSession(refresh_token)
+          ```
+  auth.refreshSession():
+    title: 'refreshSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
+    notes: |
+      - This method will refresh the session whether the current one is expired or not.
+      - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
+    examples:
+      - name: Refresh session using the current session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: { user, session }, error } = await supabase.auth.refreshSession()
+          ```
+      - name: Refresh session using a passed-in session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
           ```
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
@@ -504,9 +540,9 @@ pages:
            */
           const { data, error } = await supabase.auth
             .resetPasswordForEmail('user@email.com')
-            
+
           /**
-           * Step 2: Once the user is redirected back to your application, 
+           * Step 2: Once the user is redirected back to your application,
            * ask the user to reset their password.
            */
            useEffect(() => {
@@ -515,10 +551,10 @@ pages:
                  const newPassword = prompt("What would you like your new password to be?");
                  const { data, error } = await supabase.auth
                    .updateUser({ password: newPassword })
-                   
+
                  if (data) alert("Password updated successfully!")
                  if (error) alert("There was an error updating your password.")
-               } 
+               }
              })
            }, [])
           ```
@@ -566,13 +602,21 @@ pages:
             email: 'email@example.com'
           })
           ```
-      - name: Generate a link to change email addresses
+      - name: Generate links to change current email address
         isSpotlight: false
         js: |
           ```js
+          // generate an email change link to be sent to the current email address
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'email_change_current',
-            email: 'old.email@example.com',
+            email: 'current.email@example.com',
+            newEmail: 'new.email@example.com'
+          })
+
+          // generate an email change link to be sent to the new email address
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'email_change_new',
+            email: 'current.email@example.com',
             newEmail: 'new.email@example.com'
           })
           ```
@@ -999,7 +1043,7 @@ pages:
       - name: Filtering through foreign tables
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
-          table returns `[]` or `null` but the parent table is not filtered out. 
+          table returns `[]` or `null` but the parent table is not filtered out.
 
           <Tabs>
           <TabItem value="schema" label="Schema">
@@ -3711,6 +3755,13 @@ pages:
 
   not():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
+    notes: |
+      not() expects you to use the raw PostgREST syntax for the filter values.
+
+      ```ts
+      .not('id', 'in', '(5,6,7)')  // Use `()` for `in` filter
+      .not('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
+      ```
     examples:
       - name: With `select()`
         description: |
@@ -3768,6 +3819,13 @@ pages:
 
   or():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
+    notes: |
+      or() expects you to use the raw PostgREST syntax for the filter names and values.
+
+      ```ts
+      .or('id.in.(5,6,7), arraycol.cs.{"a","b"}')  // Use `()` for `in` filter, `{}` for array values and `cs` for `contains()`.
+      .or('id.in.(5,6,7), arraycol.cd.{"a","b"}')  // Use `cd` for `containedBy()`
+      ```
     examples:
       - name: With `select()`
         description: |
@@ -3939,6 +3997,13 @@ pages:
 
   filter():
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
+    notes: |
+      filter() expects you to use the raw PostgREST syntax for the filter values.
+
+      ```ts
+      .filter('id', 'in', '(5,6,7)')  // Use `()` for `in` filter
+      .filter('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
+      ```
     examples:
       - name: With `select()`
         description: |
@@ -4076,7 +4141,7 @@ pages:
     description: |
       Filters work on the row level—they allows you to return rows that
       only match certain conditions without changing the shape of the rows.
-      Modifiers are everything that don't fit that definition—allowing you to 
+      Modifiers are everything that don't fit that definition—allowing you to
       change the format of the response (e.g., returning a CSV string).
 
       Modifiers must be specified after filters. Some modifiers only apply for
@@ -4787,7 +4852,7 @@ pages:
     title: 'invoke()'
     description: |
       Invoke a Supabase Function.
-    $ref: '@supabase/functions-js.index.FunctionsClient.invoke'
+    $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
@@ -4799,7 +4864,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             body: { foo: 'bar' }
           })
           ```
@@ -4811,7 +4876,7 @@ pages:
           ```js
           import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
 
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             headers: {
               "my-custom-header": 'my-custom-header-value'
             },
@@ -4832,7 +4897,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             headers: {
               "my-custom-header": 'my-custom-header-value'
             },

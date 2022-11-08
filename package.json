@@ -7,6 +7,7 @@
   "private": true,
   "workspaces": [
     "apps/www",
+    "apps/docs",
     "studio",
     "tests",
     "packages/*"
@@ -16,6 +17,8 @@
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
+    "dev:docs": "turbo run dev --filter=docs --parallel",
+    "dev:www": "turbo run dev --filter=www --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "docker:dev": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
@@ -28,11 +31,13 @@
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables"
   },
   "devDependencies": {
+    "@types/json-stringify-safe": "^5.0.0",
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
+    "json-stringify-safe": "^5.0.1",
     "prettier": "^2.5.1",
-    "turbo": "1.4.7",
-    "ts-jest": "^27.0.7"
+    "ts-jest": "^27.0.7",
+    "turbo": "1.4.7"
   },
   "repository": {
     "type": "git",

@@ -6,8 +6,8 @@ import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { usageBasedItems } from './ProjectUsageBars.constants'
 import InformationBox from 'components/ui/InformationBox'
+import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 
 interface Props {
   projectRef?: string
@@ -48,7 +48,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     <Loading active={isLoading}>
       {usage && (
         <div>
-          {usageBasedItems.map((product) => {
+          {USAGE_BASED_PRODUCTS.map((product) => {
             const isExceededUsage =
               showUsageExceedMessage &&
               product.features
@@ -100,7 +100,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                     <tbody>
                       {product.features.map((feature) => {
                         const featureUsage = usage[feature.key]
-                        const usageRatio = featureUsage.usage / featureUsage.limit
+                        const usageValue = featureUsage.usage || 0
+                        const usageRatio = usageValue / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
                         const isExceeded = showUsageExceedMessage && usageRatio >= 1
 
@@ -130,12 +131,12 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                           ? 'bg-yellow-900'
                                           : 'bg-brand-900'
                                       }`}
-                                      value={featureUsage.usage}
+                                      value={usageValue}
                                       max={featureUsage.limit}
                                       labelBottom={
                                         feature.units === 'bytes'
-                                          ? formatBytes(featureUsage.usage)
-                                          : featureUsage.usage.toLocaleString()
+                                          ? formatBytes(usageValue)
+                                          : usageValue.toLocaleString()
                                       }
                                       labelTop={
                                         feature.units === 'bytes'
@@ -145,9 +146,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                     />
                                   ) : (
                                     <span>
-                                      {feature.units === 'bytes'
-                                        ? formatBytes(featureUsage.usage)
-                                        : ''}
+                                      {feature.units === 'bytes' ? formatBytes(usageValue) : ''}
                                     </span>
                                   )}
                                 </td>

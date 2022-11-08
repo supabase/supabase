@@ -186,12 +186,12 @@ function Content({ children }: { children: React.ReactNode }) {
   return <div className={__styles.content}>{children}</div>
 }
 
-export function Seperator() {
+export function Separator() {
   const __styles = styleHandler('modal')
 
-  return <div className={__styles.seperator}></div>
+  return <div className={__styles.separator}></div>
 }
 
 Modal.Content = Content
-Modal.Seperator = Seperator
+Modal.Separator = Separator
 export default Modal

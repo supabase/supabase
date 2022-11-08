@@ -2,6 +2,8 @@ name: Publish to Image Registry
 
 on:
   push:
+    branches:
+      - 'studio'
     tags:
       - '*'
   workflow_dispatch:
@@ -25,6 +27,7 @@ jobs:
             latest=false
           tags: |
             type=ref,event=tag
+            type=sha,prefix={{date 'YYYYMMDD'}},enable=${{ github.ref_type == 'branch' }}
             type=raw,value=${{ inputs.version }},enable=${{ github.event_name != 'push' }}
 
       - uses: docker/setup-qemu-action@v2

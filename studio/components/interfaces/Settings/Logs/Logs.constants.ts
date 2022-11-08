@@ -163,6 +163,7 @@ limit 100
   },
   {
     label: 'Error Count by User',
+    description: 'Count of errors by users',
     mode: 'custom',
     searchString: `select
   count(t.timestamp) as count,
@@ -178,6 +179,21 @@ group by
   p.error_severity
 order by
   count desc
+limit 100
+`,
+    for: ['database'],
+  },
+  {
+    label: 'Auth Endpoint Events',
+    description: 'Endpoint events filtered by path',
+    mode: 'custom',
+    searchString: `select
+  t.timestamp,
+  event_message
+from auth_logs as t
+where
+  regexp_contains(event_message,"level.{3}(info|warning||error|fatal)")
+  -- and regexp_contains(event_message,"path.{3}(/token|/recover|/signup|/otp)")
 limit 100
 `,
     for: ['database'],
@@ -214,7 +230,9 @@ export const SQL_FILTER_TEMPLATES: any = {
 
     'method.get': `request.method = 'GET'`,
     'method.post': `request.method = 'POST'`,
-    'method.del': `request.method = 'DEL'`,
+    'method.put': `request.method = 'PUT'`,
+    'method.patch': `request.method = 'PATCH'`,
+    'method.delete': `request.method = 'DELETE'`,
     'method.options': `request.method = 'OPTIONS'`,
   },
   function_edge_logs: {
@@ -233,6 +251,19 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
+    "severity.error": `REGEXP_CONTAINS(event_message, "level.{3}error|level.{3}fatal")`,
+    "severity.warning": `REGEXP_CONTAINS(event_message, "level.{3}warning")`,
+    "severity.info": `REGEXP_CONTAINS(event_message, "level.{3}info")`,
+    "status_code.server_error": `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}`,
+    "status_code.client_error": `REGEXP_CONTAINS(event_message, "status.{3}4[0-9]{2}")`,
+    "status_code.redirection": `REGEXP_CONTAINS(event_message, "status.{3}3[0-9]{2}")`,
+    "status_code.success": `REGEXP_CONTAINS(event_message, "status.{3}2[0-9]{2}")`,
+    "endpoints.admin": `REGEXP_CONTAINS(event_message, "path.{3}/admin")`,
+    "endpoints.signup": `REGEXP_CONTAINS(event_message, "path.{3}/signup|path.{3}/invite|path.{3}/verify")`,
+    "endpoints.authentication": `REGEXP_CONTAINS(event_message, "path.{3}/token|path.{3}/authorize|path.{3}/callback|path.{3}/otp|path.{3}/magiclink")`,
+    "endpoints.recover": `REGEXP_CONTAINS(event_message, "path.{3}/recover")`,
+    "endpoints.user": `REGEXP_CONTAINS(event_message, "path.{3}/user")`,
+    "endpoints.logout": `REGEXP_CONTAINS(event_message, "path.{3}/logout")`,
   },
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
@@ -240,6 +271,12 @@ export const SQL_FILTER_TEMPLATES: any = {
   storage_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  postgrest_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  pgbouncer_logs: {
+    ..._SQL_FILTER_COMMON,
+  }
 }
 
 export enum LogsTableName {
@@ -250,6 +287,8 @@ export enum LogsTableName {
   AUTH = 'auth_logs',
   REALTIME = 'realtime_logs',
   STORAGE = 'storage_logs',
+  PGBOUNCER = "pgbouncer_logs",
+  POSTGREST = "postgrest_logs"
 }
 
 export const LOGS_TABLES = {
@@ -260,6 +299,8 @@ export const LOGS_TABLES = {
   auth: LogsTableName.AUTH,
   realtime: LogsTableName.REALTIME,
   storage: LogsTableName.STORAGE,
+  postgrest: LogsTableName.POSTGREST,
+  pgbouncer: LogsTableName.PGBOUNCER
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -270,6 +311,8 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
+  [LogsTableName.PGBOUNCER]: 'Postgres connection pooler logs',
+  [LogsTableName.POSTGREST]: 'RESTful API web server logs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {
@@ -373,8 +416,23 @@ export const FILTER_OPTIONS: FilterTableSet = {
           description: '',
         },
         {
+          key: 'put',
+          label: 'PUT',
+          description: '',
+        },
+        {
           key: 'post',
           label: 'POST',
+          description: '',
+        },
+        {
+          key: 'patch',
+          label: 'PATCH',
+          description: '',
+        },
+        {
+          key: 'delete',
+          label: 'DELETE',
           description: '',
         },
       ],
@@ -433,6 +491,93 @@ export const FILTER_OPTIONS: FilterTableSet = {
       ],
     },
   },
+
+  // auth logs
+  auth_logs: {
+    severity: {
+      label: 'Severity',
+      key: 'severity',
+      options: [
+        {
+          key: 'error',
+          label: 'Error',
+          description: 'Show all events that have error or fatal severity',
+        },
+        {
+          key: 'warning',
+          label: 'Warning',
+          description: 'Show all events that have warning severity',
+        },
+        {
+          key: 'info',
+          label: 'Info',
+          description: 'Show all events that have error severity',
+        },
+      ],
+    },
+    status_code: {
+      label: 'Status Code',
+      key: 'status_code',
+      options: [
+        {
+          key: 'server_error',
+          label: 'Server Error',
+          description: 'Show all requests with 5XX status code',
+        },
+        {
+          key: 'client_error',
+          label: 'Client Error',
+          description: 'Show all requests with 4XX status code',
+        },
+        {
+          key: 'redirection',
+          label: 'Redirection',
+          description: 'Show all requests that have 3XX status code',
+        },
+        {
+          key: 'success',
+          label: 'Success',
+          description: 'Show all requests that have 2XX status code',
+        },
+      ],
+    },
+    endpoints: {
+      label: 'Endpoints',
+      key: 'endpoints',
+      options: [
+        {
+          key: 'admin',
+          label: 'Admin',
+          description: 'Show all admin requests',
+        },
+        {
+          key: 'signup',
+          label: 'Sign up',
+          description: 'Show all signup and authorization requests',
+        },
+        {
+          key: 'recover',
+          label: "Password Recovery",
+          description: 'Show all password recovery requests',
+        },
+        {
+          key: 'authentication',
+          label: 'Authentication',
+          description: 'Show all authentication flow requests (login, otp, and Oauth2)',
+        },
+        {
+          key: 'user',
+          label: 'User',
+          description: 'Show all user data requests',
+        },
+        {
+          key: 'logout',
+          label: 'Logout',
+          description: 'Show all logout requests',
+        },
+      ],
+    },
+  }
 }
 
 export const LOGS_TAILWIND_CLASSES = {

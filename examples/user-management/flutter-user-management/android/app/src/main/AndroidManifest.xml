@@ -1,10 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.supabase.supabase_demo">
+    package="com.example.supabase_flutter_quickstart">
    <application
-        android:label="Supabase Demo"
-        android:icon="@mipmap/launcher_icon"
-        android:allowBackup="false"
-        android:fullBackupContent="false">
+        android:label="supabase_flutter_quickstart"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -26,14 +25,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-             <!-- Deep Links -->
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- TODO: Add your SCHEME and HOST here -->
-                <data android:scheme="io.supabase.flutterdemo"
-                      android:host="login-callback" />
+              <action android:name="android.intent.action.VIEW" />
+              <category android:name="android.intent.category.DEFAULT" />
+              <category android:name="android.intent.category.BROWSABLE" />
+              <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+              <data
+                android:scheme="io.supabase.flutterquickstart"
+                android:host="login-callback" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

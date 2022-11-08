@@ -18,7 +18,6 @@ import {
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import Flag from 'components/ui/Flag/Flag'
 
 interface Props {}
 
@@ -96,26 +95,14 @@ const StorageMenu: FC<Props> = () => {
             )}
           </div>
         </div>
-
+        <div className="h-px w-full bg-scale-500"></div>
         <div className="">
           <Menu.Group title="Configuration" />
-          <Link href={`/project/${projectRef}/storage/settings`}>
-            <Menu.Item rounded active={page === 'settings'}>
-              <p className="truncate">Settings</p>
-            </Menu.Item>
-          </Link>
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
               <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
-          <Flag name="logsStorage">
-            <Link href={`/project/${projectRef}/storage/logs`}>
-              <Menu.Item rounded active={page === 'logs'}>
-                <p className="truncate">Logs</p>
-              </Menu.Item>
-            </Link>
-          </Flag>
         </div>
       </div>
     </Menu>
@@ -156,7 +143,7 @@ const BucketRow = ({
               >
                 {bucket.public ? 'Make private' : 'Make public'}
               </Dropdown.Item>,
-              <Dropdown.Seperator key="bucket-separator" />,
+              <Dropdown.Separator key="bucket-separator" />,
               <Dropdown.Item
                 icon={<IconTrash size="tiny" />}
                 key="delete-bucket"

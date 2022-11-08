@@ -361,7 +361,7 @@ const ProUpgrade: FC<Props> = ({
               </div>
             </div>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
               <Button block type="primary" onClick={() => setShowSpendCapHelperModal(false)}>

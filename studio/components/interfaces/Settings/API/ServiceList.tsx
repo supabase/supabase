@@ -1,11 +1,8 @@
-import useSWR from 'swr'
 import { FC, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { IconAlertCircle, Input } from 'ui'
 
-import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
 import {
   useStore,
   useProjectSettings,
@@ -65,6 +62,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   return (
     <>
       <div className="">
+        <h3 className="text-scale-1200 mb-6 text-xl">API Settings</h3>
         <section>
           <Panel title={<h5 className="mb-0">Project URL</h5>}>
             <Panel.Content>

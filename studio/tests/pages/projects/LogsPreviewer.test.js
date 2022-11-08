@@ -102,6 +102,35 @@ test.each([
     selectionTexts: [/POST/],
   },
   // TODO: add more tests for each type of ui
+
+  {
+    queryType: 'auth',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      id: 'some-id',
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+      timestamp: 1659545029083869,
+      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+    }),
+    selectionLog: logDataFixture({
+      id: 'some-id',
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+      timestamp: 1659545029083869,
+      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+    }),
+    tableTexts: [/auth\-path/, /some message/, /INFO/],
+    selectionTexts: [/auth\-path/, /some message/, /INFO/, /300/],
+  },
 ])(
   'selection $queryType $tableName , can display log data and metadata',
   async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
@@ -299,7 +328,7 @@ test('bug: load older btn does not error out when previous page is empty', async
   // clicking load older multiple times should not give error
   await waitFor(() => {
     expect(screen.queryByText(/Sorry/)).toBeNull()
-    expect(screen.queryByText(/An error occured/)).toBeNull()
+    expect(screen.queryByText(/An error occurred/)).toBeNull()
     expect(screen.queryByText(/undefined/)).toBeNull()
   })
 })
@@ -309,7 +338,7 @@ test('log event chart hide', async () => {
     return { result: [] }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await screen.findByText('Events')
+  await screen.findByText(/Logs \/ Time/)
   const toggle = await screen.findByText(/Chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()

@@ -53,7 +53,7 @@ const ConfirmModal = ({
               <Modal.Content>
                 <p className="text-sm text-scale-1100">{description}</p>
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center gap-2">
                   <Button htmlType="button" type="default" onClick={onSelectCancel} block>
