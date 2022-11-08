@@ -14,7 +14,7 @@ export const formatComputeSizes = (addons: DatabaseAddon[]) => {
   ]
 
   const microOption: DatabaseAddon = {
-    id: 'micro-add-on',
+    id: undefined,
     name: 'Micro Add-on',
     metadata: {
       default_price_id: undefined,
@@ -47,15 +47,10 @@ export const formatComputeSizes = (addons: DatabaseAddon[]) => {
 }
 
 export const formatPITROptions = (addons: DatabaseAddon[]) => {
-  const pitrOrder = [
-    'addon_pitr_0days',
-    'addon_pitr_7days',
-    'addon_pitr_14days',
-    'addon_pitr_28days',
-  ]
+  const pitrOrder = ['addon_pitr_7days', 'addon_pitr_14days', 'addon_pitr_28days']
 
   const noPITROption: DatabaseAddon = {
-    id: 'pitr-disabled',
+    id: undefined,
     name: 'Disable PITR',
     metadata: {
       default_price_id: undefined,

@@ -1,5 +1,5 @@
 export interface DatabaseAddon {
-  id: string
+  id?: string
   name: string
   description?: string | null
   prices: AddonPrice[]

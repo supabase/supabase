@@ -1,10 +1,11 @@
 import { FC } from 'react'
-import { Badge, Radio } from 'ui'
+import { Badge, IconAlertCircle, Radio } from 'ui'
 
 import { useFlag } from 'hooks'
 import { DatabaseAddon } from './AddOns.types'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   pitrDurationOptions: DatabaseAddon[]
@@ -31,6 +32,13 @@ const PITRDurationSelection: FC<Props> = ({
         <p className="text-sm text-scale-1100">
           Restore your database from a specific point in time
         </p>
+        <div className="mt-2">
+          <InformationBox
+            icon={<IconAlertCircle strokeWidth={2} />}
+            title="Your project is required to minimally be on a Small Add-on to enable PITR"
+            description="This is to ensure that your project has enough resources to execute PITR successfully"
+          />
+        </div>
       </div>
       {addonUpdateDisabled ? (
         <DisabledWarningDueToIncident title="Updating database add-ons is currently disabled" />
@@ -41,7 +49,7 @@ const PITRDurationSelection: FC<Props> = ({
             return (
               <Radio
                 hidden
-                key={option.id}
+                key={option.id || 'pitr-disabled'}
                 align="vertical"
                 // @ts-ignore
                 label={

@@ -11,6 +11,16 @@ export const getProductPrice = (product: any) => {
   return price
 }
 
+export const validateSubscriptionUpdatePayload = (
+  selectedComputeSize: DatabaseAddon,
+  selectedPITRDuration: DatabaseAddon
+) => {
+  if (selectedPITRDuration.id !== undefined && selectedComputeSize.id === undefined) {
+    return 'To enable PITR for your project, your project must minimally be on a Small Add-on.'
+  }
+  return undefined
+}
+
 export const formSubscriptionUpdatePayload = (
   selectedTier: any,
   selectedComputeSize: DatabaseAddon,
