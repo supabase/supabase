@@ -228,7 +228,7 @@ pre code {
 
 // fix firefox issue with li wrapping
 .doc-content-container ul li div.relative {
-  display: inline-block !important;
+  display: inline-block;
 }
 
 .doc-content-container ul li a {
