@@ -40,7 +40,7 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
                   </div>
                 }
                 containerHeightClassName="h-40"
-                linkHref={`/project/${ref}/logs-explorer?q=${encodeURI(template.searchString)}`}
+                linkHref={`/project/${ref}/logs/explorer?q=${encodeURI(template.searchString)}`}
                 description={template.description}
                 footer={
                   <div className="flex flex-row justify-end">
