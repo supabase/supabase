@@ -25,33 +25,33 @@ Connecting social logins such as Google, GitHub, or Facebook couldn't be easier.
 
 First you'll need to create a google project inside their [cloud console](https://console.cloud.google.com/home/dashboard), in other providers they may refer to this as an "app" and is usually available on the company's developer portal.
 
-![Create a new Google Project inside cloud console](/img/auth-5-1.png)
+![Create a new Google Project inside cloud console](/docs/img/auth-5-1.png)
 
 Once you have a project, type "OAuth" into the search bar and open up "OAuth Consent Screen"
 
-![Open the OAuth consent screen](/img/auth-5-2.png)
+![Open the OAuth consent screen](/docs/img/auth-5-2.png)
 
 Select 'External' and proceed to fill out the rest of the form fields
 
-![Select External on the OAuth form](/img/auth-5-3.png)
+![Select External on the OAuth form](/docs/img/auth-5-3.png)
 
 Next open up Credentials page on the left
 
-![Open up Credentials page](/img/auth-5-4.png)
+![Open up Credentials page](/docs/img/auth-5-4.png)
 
 And click to create a new set of credentials, select OAuth client ID as the option
 
-![Create new oauth client id credentials](/img/auth-5-5.png)
+![Create new oauth client id credentials](/docs/img/auth-5-5.png)
 
 Now choose Web Application (assuming you're creating a web app) and in the Authorized redirect URI section you need to add: `https://<your-ref>.supabase.co/auth/v1/callback`. You can find your Supabase URL in Settings > API inside the Supabase dashboard.
 
-![Add your redirect URI](/img/auth-5-6.png)
+![Add your redirect URI](/docs/img/auth-5-6.png)
 
 Now you can grab the client ID and secret from the popup, and insert them into the google section inside the Supabase dashboard in Auth > Settings:
 
-![take client id and secret](/img/auth-5-7.png)
+![take client id and secret](/docs/img/auth-5-7.png)
 
-![insert client id and secret into supabase dashboard in auth > auth](/img/auth-5-8.png)
+![insert client id and secret into supabase dashboard in auth > auth](/docs/img/auth-5-8.png)
 
 Hit save. Now you should be able to navigate in the browser to:
 

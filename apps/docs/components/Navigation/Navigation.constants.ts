@@ -20,7 +20,7 @@ export const REFERENCES: References = {
     name: 'Flutter',
     library: 'supabase-dart',
     versions: ['v1', 'v0'],
-    icon: '/docs/img/libraries/dart-icon.svg',
+    icon: '/docs/img/libraries/flutter-icon.svg',
   },
   cli: {
     name: 'CLI',

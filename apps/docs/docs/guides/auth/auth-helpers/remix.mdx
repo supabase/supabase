@@ -46,7 +46,7 @@ This library supports the following tooling versions:
 
 Retrieve your project URL and anon key in your project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
 
-```bash title=".env"
+```bash title=.env
 SUPABASE_URL=YOUR_SUPABASE_URL
 SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -228,7 +228,7 @@ const user = session?.user
 
 In order to use the Supabase client in the browser - fetching data in `useEffect` or subscribing to realtime events - we need to do a little more plumbing. Remix does not include a way to make environment variables available to the browser, so we need to pipe them through from a `loader` function in our `root.jsx` route and attach them to the `window`.
 
-```jsx title="app/root.jsx"
+```jsx title=app/root.jsx
 export const loader = () => {
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env
   return json({
@@ -244,13 +244,13 @@ export const loader = () => {
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
-```jsx title="app/root.jsx"
+```jsx title=app/root.jsx
 const { env } = useLoaderData()
 ```
 
 And then, add a `<script>` tag to attach these environment variables to the `window`. This should be placed immediately before the `<Scripts />` component in `app/root.jsx`
 
-```jsx title="app/root.jsx"
+```jsx title=app/root.jsx
 <script
   dangerouslySetInnerHTML={{
     __html: `window.env = ${JSON.stringify(env)}`,
@@ -260,7 +260,7 @@ And then, add a `<script>` tag to attach these environment variables to the `win
 
 Full example for Node:
 
-```jsx title="app/root.jsx"
+```jsx title=app/root.jsx
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import {
   Form,
@@ -322,7 +322,7 @@ Now we can call `createBrowserClient` in our components to fetch data client-sid
 
 In order to use the Supabase client in the browser - fetching data in `useEffect` or subscribing to realtime events - we need to do a little more plumbing. Remix does not include a way to make environment variables available to the browser, so we need to pipe them through from a `loader` function in our `root.tsx` route and attach them to the `window`.
 
-```jsx title="app/root.tsx"
+```jsx title=app/root.tsx
 export const loader = () => {
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env
   return json({
@@ -338,13 +338,13 @@ export const loader = () => {
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
-```jsx title="app/root.tsx"
+```jsx title=app/root.tsx
 const { env } = useLoaderData()
 ```
 
 And then, add a `<script>` tag to attach these environment variables to the `window`. This should be placed immediately before the `<Scripts />` component in `app/root.tsx`
 
-```jsx title="app/root.tsx"
+```jsx title=app/root.tsx
 <script
   dangerouslySetInnerHTML={{
     __html: `window.env = ${JSON.stringify(env)}`,
@@ -354,7 +354,7 @@ And then, add a `<script>` tag to attach these environment variables to the `win
 
 Full example for Node:
 
-```jsx title="app/root.tsx"
+```jsx title=app/root.tsx
 import { json, MetaFunction, LoaderFunction } from '@remix-run/node' // change this import to whatever runtime you are using
 import {
   Form,
