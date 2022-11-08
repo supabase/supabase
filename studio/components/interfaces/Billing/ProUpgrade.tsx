@@ -180,7 +180,7 @@ const ProUpgrade: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10 px-36">
+        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
           <div className="relative space-y-4">
             <BackButton onClick={() => onSelectBack()} />
             <div className="space-y-8">
@@ -254,7 +254,7 @@ const ProUpgrade: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[32rem]">
+        <div className="w-[34rem]">
           <PaymentSummaryPanel
             isRefreshingPreview={isRefreshingPreview}
             subscriptionPreview={subscriptionPreview}
