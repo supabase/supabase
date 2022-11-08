@@ -3,7 +3,7 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.0.0'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@latest'
 import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "select-from-table-with-auth-rls" up and running!`)
@@ -48,6 +48,6 @@ serve(async (req: Request) => {
 
 // To invoke:
 // curl -i --location --request POST 'http://localhost:54321/functions/v1/select-from-table-with-auth-rls' \
-//   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs' \
+//   --header 'Authorization: Bearer <token> \
 //   --header 'Content-Type: application/json' \
 //   --data '{"name":"Functions"}'
