@@ -149,7 +149,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
-            {currentPITRDuration.id !== 'pitr-disabled' && (
+            {currentPITRDuration.id !== undefined && (
               <div className="flex items-center justify-between">
                 <p
                   className={`${
