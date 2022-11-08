@@ -110,7 +110,7 @@ create policy "Groups are viewable by everyone." on groups
   for select using (true);
 
 create policy "Authenticated users can create groups." on groups for
-  insert with check (auth.role() = 'authenticated');
+  insert to authenticated with check (true);  
 
 create policy "The owner can delete a group." on groups for
     delete using (auth.uid() = creator);
