@@ -130,13 +130,14 @@ const OrganizationSettings: NextPageWithLayout = () => {
       // It is just here in case they are the flash.
       return ui.setNotification({
         category: 'error',
-        message: 'Please try again',
+        message: 'Could not navigate to organization settings, please try again or contact support',
       })
     }
 
     setSelectedTab(id)
     router.push({
-      pathname: `/org/${slug}/settings`,
+      pathname: `/org/[slug]/settings`,
+      query: { slug },
       hash: id.toLowerCase(),
     })
   }

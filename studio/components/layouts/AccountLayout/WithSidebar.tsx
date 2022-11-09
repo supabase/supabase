@@ -19,7 +19,7 @@ interface Props {
 }
 
 /*
-The information heirarchy for WithSidebar is:
+The information hierarchy for WithSidebar is:
   WithSidebar
     SectionsWithHeaders
       SidebarItem
