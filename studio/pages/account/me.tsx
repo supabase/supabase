@@ -1,14 +1,17 @@
-import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Input, Listbox } from 'ui'
+import { useEffect, useState } from 'react'
+import { IconArrowRight, IconMoon, IconSun, Input, Listbox } from 'ui'
 
+import { Session } from '@supabase/supabase-js'
+import { AccountLayout } from 'components/layouts'
+import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import Panel from 'components/ui/Panel'
 import { useProfile, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { AccountLayout } from 'components/layouts'
-import Panel from 'components/ui/Panel'
-import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import { auth } from 'lib/gotrue'
 import { NextPageWithLayout } from 'types'
+import Link from 'next/link'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -54,12 +57,72 @@ const ProfileCard = observer(() => {
     }
   }
 
+  const [session, setSession] = useState<Session | null>(null)
+
+  useEffect(() => {
+    ;(async () => {
+      const {
+        data: { session },
+      } = await auth.getSession()
+
+      if (session) {
+        setSession(session)
+      }
+    })()
+  }, [])
+
+  // const updatePassword = async (model: { password: string }) => {
+  //   try {
+  //     const { password } = await passwordSchema.validate(model)
+
+  //     console.log('password:', password)
+
+  //     ui.setNotification({ category: 'success', message: 'Successfully updated password' })
+  //   } catch (error) {
+  //     if (error instanceof ValidationError) {
+  //       return ui.setNotification({
+  //         category: 'error',
+  //         message: error.message,
+  //       })
+  //     }
+
+  //     ui.setNotification({
+  //       category: 'error',
+  //       message: 'Something went wrong. Please try again later',
+  //     })
+  //   }
+  // }
+
   return (
     <article className="max-w-4xl p-4">
       <section>
-        <GithubProfile />
+        <Profile />
       </section>
-      <section className="">
+
+      {session?.user.app_metadata.provider === 'email' && (
+        <section>
+          <Panel
+            title={
+              <h5 key="panel-title" className="mb-0">
+                Password
+              </h5>
+            }
+          >
+            <Panel.Content>
+              <div>
+                You can change your password on the{' '}
+                <Link href="/reset-password">
+                  <a className="text-blue-1000 hover:text-blue-1100 transition">
+                    password reset page <IconArrowRight width={16} height={16} className="inline" />
+                  </a>
+                </Link>
+              </div>
+            </Panel.Content>
+          </Panel>
+        </section>
+      )}
+
+      <section>
         {/* @ts-ignore */}
         <SchemaFormPanel
           title="Profile"
@@ -78,6 +141,7 @@ const ProfileCard = observer(() => {
           onSubmit={updateUser}
         />
       </section>
+
       <section>
         <ThemeSettings />
       </section>
@@ -85,7 +149,7 @@ const ProfileCard = observer(() => {
   )
 })
 
-const GithubProfile = observer(() => {
+const Profile = observer(() => {
   const { ui } = useStore()
 
   return (

@@ -1,16 +1,8 @@
 import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
+import { passwordSchema } from 'lib/schemas'
 import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
-import * as yup from 'yup'
-import YupPassword from 'yup-password'
-
-// extend yup with password validation
-YupPassword(yup)
-
-const resetPasswordSchema = yup.object({
-  password: yup.string().password().required().label('Password'),
-})
 
 const ResetPasswordForm = () => {
   const { ui } = useStore()
@@ -46,7 +38,7 @@ const ResetPasswordForm = () => {
       validateOnBlur
       id="reset-password-form"
       initialValues={{ password: '' }}
-      validationSchema={resetPasswordSchema}
+      validationSchema={passwordSchema}
       onSubmit={onResetPassword}
     >
       {({ isSubmitting }: { isSubmitting: boolean }) => {
