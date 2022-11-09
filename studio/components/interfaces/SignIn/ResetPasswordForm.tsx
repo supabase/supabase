@@ -51,6 +51,7 @@ const ResetPasswordForm = () => {
               label="Password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
               disabled={isSubmitting}
+              autoComplete="new-password"
             />
 
             <div className="border-overlay-border border-t" />
