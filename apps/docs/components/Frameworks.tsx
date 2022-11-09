@@ -1,6 +1,9 @@
 import ButtonCard from './ButtonCard'
+import { useTheme } from '~/components/Providers'
 
 const Frameworks = () => {
+  const { isDarkMode } = useTheme()
+
   const frameworks = [
     {
       name: 'Angular',
@@ -14,15 +17,15 @@ const Frameworks = () => {
       name: 'Expo',
       logo: {
         light: '/docs/img/libraries/expo-icon.svg',
-        dark: '/docs/img/libraries/expo-icon.svg',
+        dark: '/docs/img/libraries/expo-icon-dark.svg',
       },
       href: '/guides/with-expo',
     },
     {
       name: 'Flutter',
       logo: {
-        light: '/docs/img/libraries/dart-icon.svg',
-        dark: '/docs/img/libraries/dart-icon.svg',
+        light: '/docs/img/libraries/flutter-icon.svg',
+        dark: '/docs/img/libraries/flutter-icon.svg',
       },
       href: '/guides/with-flutter',
     },
@@ -92,7 +95,7 @@ const Frameworks = () => {
             to={x.href}
             title={x.name}
             // [Joshen] Nice to have: theming
-            icon={x.logo.dark}
+            icon={isDarkMode ? x.logo.dark : x.logo.light}
           />
         </div>
       ))}
