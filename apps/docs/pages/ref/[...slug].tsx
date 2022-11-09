@@ -2,21 +2,25 @@ import { useEffect, useRef, useState } from 'react'
 // pages/index.js
 
 import fs from 'fs'
+
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components/index'
 import { getAllDocs } from '~/lib/docs'
-import { debounce } from 'lodash'
 
 import ReactMarkdown from 'react-markdown'
 
 // @ts-ignore
+import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 import jsSpec from '~/../../spec/supabase_js_v2_temp.yaml'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+
 import { Tabs } from '~/../../packages/ui'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
+import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
+import assert from 'assert'
 
 const marginTop = 256
 export default function Ref(props) {
@@ -43,7 +47,7 @@ export default function Ref(props) {
       }
     })
 
-    console.log('allSections', allSections)
+    // console.log('allSections', allSections)
     setSections(allSections)
   }, [])
 
@@ -141,22 +145,32 @@ export default function Ref(props) {
             {props.docs.map((x) => {
               const sectionRef = useRef(null)
 
+              // console.log('x', jsSpec.pages[x.id])
+              const hasTsRef = jsSpec.pages[x.id]['$ref'] || null
+              // console.log('hasTsRef', hasTsRef)
+              // console.log('jsTypeSpec', jsTypeSpec)
+              const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
+              // console.log('tsDefinition', tsDefinition)
+              console.log(`tsDefinition for ${x.title ?? x.id}`, tsDefinition)
+
               useEffect(() => {
                 const observer = new IntersectionObserver((entries) => {
                   // console.log('entries', entries)
                   const entry = entries[0]
 
-                  console.log(
-                    x.id,
-                    'intersectiong',
-                    entry.isIntersecting,
-                    'visible',
-                    entry.isVisible
-                  )
+                  // console.log(
+                  //   x.id,
+                  //   'intersectiong',
+                  //   entry.isIntersecting,
+                  //   'visible',
+                  //   entry.isVisible
+                  // )
                 })
                 // console.log('myRef', myRef.current)
                 observer.observe(sectionRef.current)
               }, [])
+
+              const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
               return (
                 <div className="grid grid-cols-2 pb-32 ref-container" id={x.id} ref={sectionRef}>
@@ -164,6 +178,7 @@ export default function Ref(props) {
                     <h1 className="text-3xl not-prose" onClick={() => updateUrl(x.id)}>
                       {x.title ?? x.id}
                     </h1>
+
                     {x.content && (
                       <div className="prose">
                         <MDXRemote {...x.content} components={components} />
@@ -174,6 +189,9 @@ export default function Ref(props) {
                         <ReactMarkdown>{jsSpec.pages[x.id].notes}</ReactMarkdown>
                       </div>
                     )}
+
+                    {/* // parameters */}
+                    {parameters && <div dangerouslySetInnerHTML={{ __html: parameters }}></div>}
                   </div>
                   <div className="w-full">
                     {jsSpec.pages[x.id].examples && (
