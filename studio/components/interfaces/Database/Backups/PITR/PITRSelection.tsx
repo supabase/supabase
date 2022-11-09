@@ -290,23 +290,28 @@ const PITRSelection = ({}) => {
                         </p>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-sm text-scale-1100">Time of recovery</p>
-                        <div className="w-[350px]">
-                          <TimezoneSelection
-                            hideLabel
-                            dropdownWidth="w-[400px]"
-                            selectedTimezone={selectedTimezone}
-                            onSelectTimezone={setSelectedTimezone}
+                        <div className="space-y-1">
+                          <p className="text-sm text-scale-1100">Time zone</p>
+                          <div className="w-[350px]">
+                            <TimezoneSelection
+                              hideLabel
+                              dropdownWidth="w-[400px]"
+                              selectedTimezone={selectedTimezone}
+                              onSelectTimezone={setSelectedTimezone}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm text-scale-1100">Time of recovery</p>
+                          <TimeInput
+                            defaultTime={selectedTime}
+                            minimumTime={
+                              isSelectedOnEarliest ? earliestAvailableBackupTime : undefined
+                            }
+                            maximumTime={isSelectedOnLatest ? latestAvailableBackupTime : undefined}
+                            onChange={setSelectedTime}
                           />
                         </div>
-                        <TimeInput
-                          defaultTime={selectedTime}
-                          minimumTime={
-                            isSelectedOnEarliest ? earliestAvailableBackupTime : undefined
-                          }
-                          maximumTime={isSelectedOnLatest ? latestAvailableBackupTime : undefined}
-                          onChange={setSelectedTime}
-                        />
                         <div className="!mt-4 space-y-1">
                           {isSelectedOnEarliest && (
                             <p className="text-sm text-scale-1000">
