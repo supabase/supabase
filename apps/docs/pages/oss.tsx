@@ -64,7 +64,7 @@ export default function Oss({ meta }) {
           <h2>Community Maintainers</h2>
 
           <div className="overflow-auto max-w-[300px] md:max-w-none">
-            <ul className="flex gap-4 items-center p-0">
+            <ul className="flex 2xl:gap-4 items-center p-0">
               {maintainerPills.map((x) => (
                 <li
                   key={x}
