@@ -43,11 +43,11 @@ export default function Sponsors() {
           !!t.transactions.length && (
             <div key={index}>
               <h4 className="font-bold">{t.heading}</h4>
-              <div className="grid sm:grid-cols-3 md:grid-cols-3 gap-6 pl-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 pl-4">
                 {t.transactions.map((x, index) => (
                   <div className="" key={index}>
                     <a
-                      className="flex items-center gap-4 shadow-none"
+                      className="flex items-center gap-4 shadow-none shrink-0"
                       href={`https://github.com/${x.sponsor}`}
                     >
                       <Image
