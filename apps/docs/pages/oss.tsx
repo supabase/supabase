@@ -78,7 +78,7 @@ export default function Oss({ meta }) {
               ))}
             </ul>
           </div>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid lg:grid-cols-2 gap-4">
             {maintainers
               .filter((x) => activePill == 'All' || x.tags.includes(activePill))
               .sort((a, b) => a.handle.localeCompare(b.handle))
@@ -91,11 +91,12 @@ export default function Oss({ meta }) {
                     rel="noreferrer"
                   >
                     <div className="grow bg-gray-200 dark:bg-gray-400 p-4">
-                      <div className="flex gap-4">
+                      <div className="flex gap-4 shrink-0">
                         <Image
                           className="rounded-full my-0"
-                          width={64}
-                          height={64}
+                          width={50}
+                          height={50}
+                          layout="fixed"
                           alt={x.handle}
                           src={`https://github.com/${x.handle}.png`}
                         />
