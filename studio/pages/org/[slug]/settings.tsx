@@ -1,7 +1,7 @@
 import { Tabs } from 'ui'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 import { Member, NextPageWithLayout, Organization, Project, Role, User } from 'types'
 import {
@@ -23,7 +23,7 @@ import {
 export const PageContext = createContext(null)
 
 const OrgSettingsLayout = withAuth(
-  observer(({ children }) => {
+  observer<PropsWithChildren<{}>>(({ children }) => {
     const { app, ui } = useStore()
     const router = useRouter()
     const { slug } = useParams()
@@ -184,4 +184,5 @@ const OrganizationSettings: NextPageWithLayout = () => {
 }
 
 OrganizationSettings.getLayout = (page) => <OrgSettingsLayout>{page}</OrgSettingsLayout>
+
 export default observer(OrganizationSettings)
