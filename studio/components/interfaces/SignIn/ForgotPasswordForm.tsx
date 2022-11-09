@@ -45,6 +45,7 @@ const ForgotPasswordForm = () => {
 
       await router.push('/sign-in')
     } else {
+      setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
 
       ui.setNotification({

@@ -54,6 +54,7 @@ const SignInForm = () => {
 
       await router.push(returnTo ?? '/projects')
     } else {
+      setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
 
       ui.setNotification({
