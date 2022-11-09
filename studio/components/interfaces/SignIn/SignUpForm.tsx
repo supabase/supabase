@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import * as yup from 'yup'
+import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),
@@ -66,7 +67,7 @@ const SignUpForm = () => {
       validationSchema={signUpSchema}
       onSubmit={onSignUp}
     >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
+      {({ isSubmitting, values }: { isSubmitting: boolean; values: any }) => {
         return (
           <div className="flex flex-col gap-4">
             <Input
@@ -86,6 +87,8 @@ const SignUpForm = () => {
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
               disabled={isSubmitting}
             />
+
+            <PasswordConditionsHelper password={values.password} />
 
             <div className="self-center">
               <HCaptcha

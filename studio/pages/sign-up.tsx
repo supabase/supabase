@@ -33,7 +33,7 @@ const SignUpPage: NextPageWithLayout = () => {
 }
 
 SignUpPage.getLayout = (page) => (
-  <SignInLayout heading="Get Started" subheading="Create a New Account">
+  <SignInLayout heading="Get started" subheading="Create a new account">
     {page}
   </SignInLayout>
 )
