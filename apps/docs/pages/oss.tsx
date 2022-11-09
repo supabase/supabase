@@ -63,7 +63,7 @@ export default function Oss({ meta }) {
         <div className="">
           <h2>Community Maintainers</h2>
 
-          <div className="overflow-auto max-w-[300px] md:max-w-none">
+          <div className="overflow-auto md:max-w-none hidden sm:block">
             <ul className="flex 2xl:gap-4 items-center p-0">
               {maintainerPills.map((x) => (
                 <li
