@@ -115,8 +115,8 @@ AUTH0_ISSUER_BASE_URL=https://<name-of-your-tenant>.<region-you-selected>.auth0.
 AUTH0_CLIENT_ID=get-from-auth0-dashboard
 AUTH0_CLIENT_SECRET=get-from-auth0-dashboard
 NEXT_PUBLIC_SUPABASE_URL=get-from-supabase-dashboard
-NEXT_PUBLIC_SUPABASE_KEY=get-from-supabase-dashboard
-SUPABASE_SIGNING_SECRET=get-from-supabase-dashboard
+NEXT_PUBLIC_SUPABASE_ANON_KEY=get-from-supabase-dashboard
+SUPABASE_JWT_SECRET=get-from-supabase-dashboard
 ```
 
 > Note: Auth0 values can be found under `Settings > Basic Information` for your application.
@@ -239,7 +239,7 @@ const afterCallback = async (req, res, session) => {
     exp: Math.floor(Date.now() / 1000) + 60 * 60,
   }
 
-  session.user.accessToken = jwt.sign(payload, process.env.SUPABASE_SIGNING_SECRET)
+  session.user.accessToken = jwt.sign(payload, process.env.SUPABASE_JWT_SECRET)
 
   return session
 }
@@ -273,16 +273,21 @@ Create a new file called `utils/supabase.js` and add the following:
 import { createClient } from '@supabase/supabase-js'
 
 const getSupabase = (access_token) => {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_KEY
-  )
+  const options = {}
 
   if (access_token) {
-    supabase.auth.session = () => ({
-      access_token,
-    })
+    options.global = {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }
   }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    options
+  )
 
   return supabase
 }
