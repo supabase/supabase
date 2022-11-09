@@ -55,7 +55,7 @@ article h1 {
 .docs-width {
   max-width: calc(100% - var(--sidebar-width));
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     max-width: none;
   }
 }
@@ -188,9 +188,7 @@ pre[class*='language-'] {
 // format <code> inside <p>
 h2 code,
 h3 code,
-h4 code,
-li code,
-p code {
+h4 code {
   word-break: keep-all !important;
   white-space: nowrap !important;
   padding: 0.1rem 0.35rem !important;
