@@ -2,12 +2,14 @@ import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
-import { object, string } from 'yup'
+import * as yup from 'yup'
+import YupPassword from 'yup-password'
 
-const resetPasswordSchema = object({
-  password: string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters long'),
+// extend yup with password validation
+YupPassword(yup)
+
+const resetPasswordSchema = yup.object({
+  password: yup.string().password().required().label('Password'),
 })
 
 const ResetPasswordForm = () => {

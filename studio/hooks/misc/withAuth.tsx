@@ -6,17 +6,18 @@ import { STORAGE_KEY } from 'lib/gotrue'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile, useStore, usePermissions } from 'hooks'
 import Error500 from '../../pages/500'
+import { NextPageWithLayout } from 'types'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
 export function withAuth<T>(
-  WrappedComponent: ComponentType<T>,
+  WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
   options?: {
     redirectTo: string
     redirectIfFound?: boolean
   }
 ) {
-  return (props: any) => {
+  const WithAuthHOC: ComponentType<T> = (props: any) => {
     const router = useRouter()
     const rootStore = useStore()
 
@@ -93,6 +94,14 @@ export function withAuth<T>(
       </>
     )
   }
+
+  WithAuthHOC.displayName = `WithAuth(${WrappedComponent.displayName})`
+
+  if ('getLayout' in WrappedComponent) {
+    ;(WithAuthHOC as any).getLayout = WrappedComponent.getLayout
+  }
+
+  return WithAuthHOC
 }
 
 function defaultRedirectTo(ref: string | string[] | undefined) {
