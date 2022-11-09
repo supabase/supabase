@@ -2,18 +2,14 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { passwordSchema } from 'lib/schemas'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import * as yup from 'yup'
-import YupPassword from 'yup-password'
 
-// extend yup with password validation
-YupPassword(yup)
-
-const signUpSchema = yup.object({
+const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),
-  password: yup.string().password().required().label('Password'),
 })
 
 const SignUpForm = () => {
