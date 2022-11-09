@@ -57,6 +57,14 @@ const SignInForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
 
+      if (error.message.toLowerCase() === 'email not confirmed') {
+        return ui.setNotification({
+          id: toastId,
+          category: 'error',
+          message: 'Please click the link sent to your email to confirm your account',
+        })
+      }
+
       ui.setNotification({
         id: toastId,
         category: 'error',
