@@ -8,9 +8,9 @@ import theme from 'shiki/themes/nord.json' assert { type: 'json' }
 import { remarkCodeHike } from '@code-hike/mdx'
 
 import withTM from 'next-transpile-modules'
-// import withYaml from 'next-plugin-yaml'
+import withYaml from 'next-plugin-yaml'
 // import admonitions from 'remark-admonitions'
-// import codeHikeTheme from './codeHikeTheme.js'
+import codeHikeTheme from './codeHikeTheme.js'
 
 /**
  * Rewrites and redirects are handled by
@@ -26,8 +26,9 @@ const withMDX = nextMdx({
       [
         remarkCodeHike,
         {
-          theme: theme,
+          theme: codeHikeTheme,
           autoImport: true,
+          lineNumbers: true,
         },
       ],
       remarkGfm,
@@ -46,14 +47,14 @@ const withMDX = nextMdx({
 const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  reactStrictMode: true,
-  swcMinify: true,
+  // reactStrictMode: true,
+  // swcMinify: true,
   basePath: '/docs',
 }
 
 // next.config.js
 export default () => {
   // const plugins = [withMDX]/
-  const plugins = [withTM(['ui', 'common']), withMDX]
+  const plugins = [withTM(['ui', 'common']), withMDX, withYaml]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
