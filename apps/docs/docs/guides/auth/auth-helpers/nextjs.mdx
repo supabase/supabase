@@ -179,7 +179,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 ## Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSupabaseClient` hook and only run your query once the user is defined client-side in the `useUser()` hook:
+For [row level security](/docs/learn/auth-deep-dive/row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSupabaseClient` hook and only run your query once the user is defined client-side in the `useUser()` hook:
 
 ```jsx lines=10-17
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
@@ -263,7 +263,7 @@ export const getServerSideProps = async (ctx) => {
 
 ## Server-side data fetching with RLS
 
-You can use the server supabase client to run [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
+You can use the server supabase client to run [row level security](/docs/learn/auth-deep-dive/row-level-security) authenticated queries server-side:
 
 <Tabs
   scrollable

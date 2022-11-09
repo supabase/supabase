@@ -81,7 +81,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
               <a
                 target="_blank"
-                href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+                href="https://supabase.com/docs/learn/auth-deep-dive/row-level-security"
               >
                 What is RLS?
               </a>
