@@ -1540,4 +1540,30 @@ module.exports = [
     source: '/docs/going-into-prod',
     destination: '/docs/guides/platform/going-into-prod',
   },
+  // Auth deep dive docs
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-deep-dive-jwts',
+    destination: '/docs/learn/auth-deep-dive/jwts',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-row-level-security',
+    destination: '/docs/learn/auth-deep-dive/row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-policies',
+    destination: '/docs/learn/auth-deep-dive/policies',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-gotrue',
+    destination: '/docs/learn/auth-deep-dive/gotrue',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-google-oauth',
+    destination: '/docs/learn/auth-deep-dive/google-oauth',
+  },
 ]
