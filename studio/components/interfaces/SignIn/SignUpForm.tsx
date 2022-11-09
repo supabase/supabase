@@ -5,7 +5,7 @@ import { API_URL } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Button, Form, Input } from 'ui'
+import { Button, Form, IconEye, IconEyeOff, Input } from 'ui'
 import * as yup from 'yup'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
@@ -59,6 +59,8 @@ const SignUpForm = () => {
     }
   }
 
+  const [passwordHidden, setPasswordHidden] = useState(true)
+
   return (
     <Form
       validateOnBlur
@@ -77,15 +79,24 @@ const SignUpForm = () => {
               label="Email"
               placeholder="you@example.com"
               disabled={isSubmitting}
+              autoComplete="email"
             />
 
             <Input
               id="password"
               name="password"
-              type="password"
+              type={passwordHidden ? 'password' : 'text'}
               label="Password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
               disabled={isSubmitting}
+              autoComplete="new-password"
+              actions={
+                <Button
+                  icon={passwordHidden ? <IconEye /> : <IconEyeOff />}
+                  type="default"
+                  onClick={() => setPasswordHidden((prev) => !prev)}
+                />
+              }
             />
 
             <PasswordConditionsHelper password={values.password} />
