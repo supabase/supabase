@@ -1,5 +1,14 @@
 import { DatabaseAddon } from './AddOns.types'
 
+// e.g supabase-postgres-14.1.0.88 (There's 4 segments instead, so we can't use semver)
+export const getSemanticVersion = (version: string) => {
+  if (!version) return 0
+
+  const segments = version.split('-')
+  const semver = segments[segments.length - 1]
+  return Number(semver.split('.').join(''))
+}
+
 export const formatComputeSizes = (addons: DatabaseAddon[]) => {
   const addonsOrder = [
     'addon_instance_small',
