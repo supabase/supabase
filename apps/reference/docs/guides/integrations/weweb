@@ -1,3 +1,9 @@
+---
+id: weweb
+title: 'WeWeb'
+description: 'Build user interfaces on top of existing databases.'
+---
+
 This guide explains how to connect a Supabase back-end to a WeWeb front-end and then configure all the CRUD operations necessary to build an Admin Portal with user authentication, roles, and permissions.
 
 [WeWeb](https://dashboard.weweb.io/sign-up) is a low-code front-end builder that allies the short learning curve of no-code with the freedom of code. 
