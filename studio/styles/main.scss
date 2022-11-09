@@ -215,3 +215,7 @@ div.fixed.inset-0 {
     @apply text-sm;
   }
 }
+
+.capitalize-sentence:first-letter {
+  text-transform: capitalize;
+}
