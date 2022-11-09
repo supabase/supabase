@@ -61,10 +61,10 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/career`,
+          url: `https://supabase.com/careers`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/career/careers_og.png`,
+              url: `https://supabase.com${basePath}/images/career/careers_og.jpg`,
             },
           ],
         }}
@@ -80,7 +80,14 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
               Explore remote opportunities and join our mission to become the world's most
               productive developer platform.
             </p>
-            <Button className="text-white xl:text-sm">Open positions</Button>
+            <Button
+              as="a"
+              // @ts-ignore
+              href="#positions"
+              className="text-white xl:text-sm"
+            >
+              Open positions
+            </Button>
           </div>
 
           <SectionContainer>
@@ -102,7 +109,8 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
             </div>
           </SectionContainer>
 
-          <div className="border-y-2 border-scale-400 bg-scale-100 overflow-clip">
+          <div className="h-[2px] bg-gradient-to-r from-[#252525] via-[#454545] to-[#252525]"></div>
+          <div className="bg-scale-100 overflow-clip">
             <SectionContainer className="!py-0 !pb-16 lg:!pt-16">
               <div className="lg:flex lg:h-[500px]">
                 <div className="relative aspect-square -top-[110px] -left-[200px] w-[575px] sm:-top-[150px] sm:-left-[300px] sm:w-[850px] lg:-top-[225px] lg:-left-[330px] lg:w-[800px] lg:h-[800px] xl:-left-[200px] xl:-top-[210px] xl:w-[1000px]">
@@ -135,7 +143,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     <p className="text-scale-1100 text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
                       Supabase is an open source Firebase alternative, built by developers for
                       developers. Supabase adds auth, realtime, storage, restful APIs, and edge
-                      functions to Postgres without a single line of code. Supabase was orn-remote.
+                      functions to Postgres without a single line of code. Supabase was born-remote.
                       Having a globally distributed, open source company is our secret weapon to
                       hiring top-tier talent.
                     </p>
@@ -219,7 +227,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
             <SectionContainer>
               <h1 className="text-2xl sm:text-3xl xl:text-4xl">Human powered</h1>
               <p className="text-scale-1100 text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
-                As a completely remote and asynchronous team, we focus on these four traits to keep
+                As a completely remote and asynchronous team, we focus on these five traits to keep
                 our team effective:
               </p>
               <div className="sm:flex items-start justify-between pt-10 space-y-6 sm:space-y-0 md:space-x-4">
@@ -270,9 +278,9 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                 </h1>
                 <p className="text-scale-1100 text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                   We're building a community of communities, bringing together developers from many
-                  different backgrounds, t woll as new developers looking to get involved with open
+                  different backgrounds, as well as new developers looking to get involved with open
                   source. We love celebrating everyone who contributes their time to the Supabase
-                  mission. to
+                  mission.
                 </p>
               </div>
               <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
@@ -281,7 +289,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     <div
                       className={`${
                         Styles[`contributors-${i}`]
-                      } absolute z-10 w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600`}
+                      } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600`}
                       key={i}
                     >
                       <div className="relative w-full h-full">
@@ -387,7 +395,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                     className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
                   >
                     <div className="lg:flex items-center">
-                      <h3 className="bg-brand-600 border-2 border-brand-800 text-brand-800 text-xl text-center w-[44px] px-3.5 py-1 rounded-md">
+                      <h3 className="bg-brand-600 border-[1px] border-brand-800 text-brand-800 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
                         {i + 1}
                       </h3>
                       <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-800 lg:pr-6"></div>
@@ -403,59 +411,61 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                   </div>
                 )
               })}
-              <h3 className="bg-brand-600 border-2 border-brand-800 text-brand-800 text-xl w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
+              <h3 className="bg-brand-600 border-[1px] border-brand-800 text-brand-800 text-xl w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
                 <IconCheck />
               </h3>
             </div>
           </SectionContainer>
 
-          <SectionContainer>
-            <h1 className="text-2xl sm:text-3xl xl:text-4xl">Open positions</h1>
-            <div className="mt-10 space-y-6">
-              {job_data.jobs.map(
-                (
-                  job: {
-                    title: string
-                    location: any
-                    employment: string
-                    description: string
-                    absolute_url: string
-                  },
-                  i: number
-                ) => {
-                  return (
-                    <div className="cursor-pointer md:cursor-default" key={i}>
-                      <Link href={job.absolute_url}>
-                        <div className="text-xs bg-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center">
-                          <h2 className="text-2xl min-w-[300px] lg:min-w-[316px] truncate mr-6">
-                            {job.title}
-                          </h2>
-                          <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
-                            <div className="flex items-center space-x-4">
-                              <Badge className="rounded-md flex items-center lg:text-sm">
-                                <div className="relative w-3 h-3 mx-auto">
-                                  <Image
-                                    src="/images/career/icon/globe.svg"
-                                    alt="globe icon"
-                                    layout="fill"
-                                    objectFit="cover"
-                                  />
-                                </div>
-                                <span className="ml-1">{job.location.name}</span>
-                              </Badge>
-                              <span className="hidden md:block">{job.employment}</span>
+          <div id="positions" className="positions">
+            <SectionContainer>
+              <h1 className="text-2xl sm:text-3xl xl:text-4xl">Open positions</h1>
+              <div className="mt-10 space-y-6">
+                {job_data.jobs.map(
+                  (
+                    job: {
+                      title: string
+                      location: any
+                      employment: string
+                      description: string
+                      absolute_url: string
+                    },
+                    i: number
+                  ) => {
+                    return (
+                      <div className="cursor-pointer md:cursor-default" key={i}>
+                        <Link href={job.absolute_url}>
+                          <div className="text-xs bg-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center">
+                            <h2 className="text-2xl min-w-[300px] lg:min-w-[316px] truncate mr-6">
+                              {job.title}
+                            </h2>
+                            <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
+                              <div className="flex items-center space-x-4">
+                                <Badge className="rounded-md flex items-center lg:text-sm">
+                                  <div className="relative w-3 h-3 mx-auto">
+                                    <Image
+                                      src="/images/career/icon/globe.svg"
+                                      alt="globe icon"
+                                      layout="fill"
+                                      objectFit="cover"
+                                    />
+                                  </div>
+                                  <span className="ml-1">{job.location.name}</span>
+                                </Badge>
+                                <span className="hidden md:block">{job.employment}</span>
+                              </div>
+                              <p className="hidden lg:block lg:text-sm">{job.description}</p>
+                              <Button className="text-white">Apply for position</Button>
                             </div>
-                            <p className="hidden lg:block lg:text-sm">{job.description}</p>
-                            <Button className="text-white">Apply for position</Button>
                           </div>
-                        </div>
-                      </Link>
-                    </div>
-                  )
-                }
-              )}
-            </div>
-          </SectionContainer>
+                        </Link>
+                      </div>
+                    )
+                  }
+                )}
+              </div>
+            </SectionContainer>
+          </div>
         </div>
       </DefaultLayout>
     </>
