@@ -83,15 +83,17 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
       })
     }
 
-    // Submit exit survey to Hubspot
-    const feedbackRes = await post(`${API_URL}/feedback/send`, {
-      projectRef,
-      subject: 'Subscription cancellation - Exit survey',
-      tags: ['dashboard-exitsurvey'],
-      category: 'Billing',
-      message: generateFeedbackMessage(selectedReasons, cancellationMessage),
-    })
-    if (feedbackRes.error) throw feedbackRes.error
+    // Submit exit survey to Hubspot for paid projects
+    if (!isFree) {
+      const feedbackRes = await post(`${API_URL}/feedback/send`, {
+        projectRef,
+        subject: 'Subscription cancellation - Exit survey [Delete]',
+        tags: ['dashboard-exitsurvey'],
+        category: 'Billing',
+        message: generateFeedbackMessage(selectedReasons, cancellationMessage),
+      })
+      if (feedbackRes.error) throw feedbackRes.error
+    }
   }
 
   return (
