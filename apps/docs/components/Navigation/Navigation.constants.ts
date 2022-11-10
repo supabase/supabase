@@ -134,17 +134,21 @@ export const menuItems: NavMenu = {
           name: 'Deep Dive',
           url: undefined,
           items: [
-            { name: 'Part One: JWTs', url: '/learn/auth-deep-dive/jwts', items: [] },
             {
-              name: 'Part Two: Row Level Security',
-              url: '/learn/auth-deep-dive/row-level-security',
+              name: 'Part One: JWTs',
+              url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
               items: [],
             },
-            { name: 'Part Three: Policies', url: '/learn/auth-deep-dive/policies', items: [] },
-            { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/gotrue', items: [] },
+            {
+              name: 'Part Two: Row Level Security',
+              url: '/learn/auth-deep-dive/auth-row-level-security',
+              items: [],
+            },
+            { name: 'Part Three: Policies', url: '/learn/auth-deep-dive/auth-policies', items: [] },
+            { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/auth-gotrue', items: [] },
             {
               name: 'Part Five: Google OAuth',
-              url: '/learn/auth-deep-dive/google-oauth',
+              url: '/learn/auth-deep-dive/auth-google-oauth',
               items: [],
             },
           ],
