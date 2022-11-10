@@ -19,11 +19,7 @@ import {
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import UpdateSuccess from './UpdateSuccess'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
-import {
-  validateSubscriptionUpdatePayload,
-  formSubscriptionUpdatePayload,
-  getCurrentAddons,
-} from './Billing.utils'
+import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
 import { DatabaseAddon } from './AddOns/AddOns.types'
 import { formatComputeSizes, formatPITROptions } from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
@@ -120,15 +116,6 @@ const ProUpgrade: FC<Props> = ({
   }
 
   const onConfirmPayment = async () => {
-    const error = validateSubscriptionUpdatePayload(selectedComputeSize, selectedPITRDuration)
-    if (error) {
-      return ui.setNotification({
-        duration: 4000,
-        category: 'error',
-        message: error,
-      })
-    }
-
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
       selectedComputeSize,
