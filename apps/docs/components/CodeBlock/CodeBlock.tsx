@@ -62,7 +62,7 @@ const CodeBlock: FC<Props> = ({
   const showLineNumbers = hideLineNumbers || lang !== 'bash'
 
   return (
-    <div className="relative my-2">
+    <div className="relative my-2 max-w-[90vw] md:max-w-none overflow-auto">
       {title && (
         <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
           {title.replace(/%20/g, ' ')}
@@ -125,7 +125,7 @@ const CodeBlock: FC<Props> = ({
               icon={copied ? <IconCheck /> : <IconCopy />}
               onClick={() => handleCopy()}
             >
-              {copied ? 'Copied' : 'Copy'}
+              {copied ? 'Copied' : ''}
             </Button>
           </CopyToClipboard>
         </div>

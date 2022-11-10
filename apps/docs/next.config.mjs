@@ -50,6 +50,10 @@ const nextConfig = {
   // reactStrictMode: true,
   // swcMinify: true,
   basePath: '/docs',
+  images: {
+    dangerouslyAllowSVG: true,
+    domains: ['avatars.githubusercontent.com', 'github.com', 'user-images.githubusercontent.com'],
+  },
 }
 
 // next.config.js
