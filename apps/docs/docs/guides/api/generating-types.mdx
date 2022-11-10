@@ -6,7 +6,7 @@ description: How to generate types for your API and Supabase libraries.
 
 Supabase APIs are generated from your database, which means that we can use database introspection to generate type-safe API definitions.
 
-### Generating types using Supabase CLI
+## Generating types using Supabase CLI
 
 The Supabase CLI is a single binary Go application that provides everything you need to setup a local development environment.
 
@@ -16,13 +16,13 @@ You can [install the CLI](https://www.npmjs.com/package/supabase) via npm or oth
 npm i supabase@">=1.8.1" --save-dev
 ```
 
-Login with your Personal Access Token
+Login with your Personal Access Token:
 
 ```bash
 npx supabase login
 ```
 
-Generate types for your project to produce the file `types/supabase.ts`
+Generate types for your project to produce the `types/supabase.ts` file:
 
 ```bash
 npx supabase gen types typescript --project-id "$PROJECT_ID" --schema public > types/supabase.ts
