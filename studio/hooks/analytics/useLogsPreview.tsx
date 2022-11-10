@@ -111,7 +111,7 @@ function useLogsPreview(
 
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
       ...params,
-      sql: genCountQuery(table),
+      sql: genCountQuery(table, filters),
       iso_timestamp_start: latestRefresh,
     } as any)}`
   }
