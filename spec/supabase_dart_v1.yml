@@ -836,7 +836,6 @@ pages:
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -855,7 +854,6 @@ pages:
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -945,7 +943,6 @@ pages:
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1020,6 +1017,24 @@ pages:
               .storage
               .from('avatars')
               .createSignedUrl('avatar1.png', 60);
+          ```
+
+  storage.from.createSignedUrls():
+    title: 'from.createSignedUrls()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - name: Create Signed URLs
+        isSpotlight: true
+        dart: |
+          ```dart
+            final List<String> signedUrl = await supabase
+              .storage
+              .from('avatars')
+              .createSignedUrls(['avatar1.png', 'avatar2.png'], 60);
           ```
 
   storage.from.getPublicUrl():
@@ -1521,7 +1536,6 @@ pages:
   .lte():
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1560,7 +1574,6 @@ pages:
   .like():
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1895,7 +1908,6 @@ pages:
           ```
 
   .rangeLte():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - name: With `select()`
         isSpotlight: true
