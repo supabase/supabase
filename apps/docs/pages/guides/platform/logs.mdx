@@ -40,31 +40,6 @@ To update the screenshots, ensure that at least one log line is selected to disp
 
 [Postgres logs](https://app.supabase.com/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
 
-By default, query logs are disabled for all new Supabase projects, as they can reveal metadata about the contents of your database (e.g. table and column names). If you'd like to enable query logs, you can enable and configure the [pgAudit extension](https://www.pgaudit.org/):
-
-- [Enable the pgAudit extension for your project](https://app.supabase.com/project/_/database/extensions)
-- [Reboot the DB](https://app.supabase.com/project/_/settings/general); a "Fast database reboot" is sufficient, and faster than a full project restart
-- Configure `pgaudit.log` to the [appropriate value](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog)
-- You should be able to view query logs in your [log explorer](https://app.supabase.com/project/_/logs/explorer) now
-
-As an example, if you wanted to enable logs for writes and DDL statements for a single session, you could execute within the session:
-
-```sql
-set pgaudit.log = 'write, ddl';
-```
-
-To _permanently_ enable logs for all statements that relate to roles and privileges, you could execute (followed by a db reboot):
-
-```sql
-alter system set pgaudit.log to 'role';
-```
-
-To remove a system-wide setting, you can use (followed by a db reboot):
-
-```sql
-alter system reset pgaudit.log
-```
-
 ![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
 
 </TabPanel>
@@ -107,6 +82,37 @@ The Logs tab displays logs emitted during function execution.
 
 </TabPanel>
 </Tabs>
+
+---
+
+## Advanced Configuration
+
+### Logging Postgres Queries
+
+By default, query logs are disabled for all new Supabase projects, as they can reveal metadata about the contents of your database (e.g. table and column names). To enable query logs, enable and configure the [pgAudit extension](https://www.pgaudit.org/):
+
+1. [Enable the pgAudit extension](https://app.supabase.com/project/_/database/extensions)
+2. [Reboot the database](https://app.supabase.com/project/_/settings/general); a "Fast database reboot" is sufficient, and faster than a full project restart
+3. Configure `pgaudit.log` to the [appropriate value](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog)
+4. View your query logs under [Logs > Postgres Logs](https://app.supabase.com/project/_/logs/postgres-logs) now
+
+For example, to enable logs for writes and DDL statements for a single session, execute the following within the session:
+
+```sql
+set pgaudit.log = 'write, ddl';
+```
+
+To _permanently_ enable logs for all statements that relate to roles and privileges (followed by a reboot):
+
+```sql
+alter system set pgaudit.log to 'role';
+```
+
+To remove a system-wide setting (followed by a reboot):
+
+```sql
+alter system reset pgaudit.log;
+```
 
 ## Logs Explorer
 
