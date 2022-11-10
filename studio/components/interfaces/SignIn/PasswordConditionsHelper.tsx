@@ -11,14 +11,11 @@ const PasswordConditionsHelper = ({ password }: PasswordConditionsHelperProps) =
 
   return (
     <div className="text-sm">
-      <PasswordCondition title="Must contain at least one uppercase letter" isMet={hasUppercase} />
-      <PasswordCondition title="Must contain at least one lowercase letter" isMet={hasLowercase} />
-      <PasswordCondition title="Must contain at least one number" isMet={hasNumber} />
-      <PasswordCondition
-        title="Must contain at least one special character"
-        isMet={hasSpecialCharacter}
-      />
-      <PasswordCondition title="Must be at least 8 characters long" isMet={isEightCharactersLong} />
+      <PasswordCondition title="One or more uppercase letters" isMet={hasUppercase} />
+      <PasswordCondition title="One or more lowercase letters" isMet={hasLowercase} />
+      <PasswordCondition title="One or more numbers" isMet={hasNumber} />
+      <PasswordCondition title="One or more special characters" isMet={hasSpecialCharacter} />
+      <PasswordCondition title="At least 8 characters long" isMet={isEightCharactersLong} />
     </div>
   )
 }
