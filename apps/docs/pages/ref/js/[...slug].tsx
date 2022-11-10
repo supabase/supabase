@@ -218,10 +218,18 @@ export default function Ref(props) {
                           jsSpec.pages[x.id].examples.map((x, i) => {
                             return (
                               <Tabs.Panel id={x.name} label={x.name}>
-                                <CodeBlock className="useless-code-block-class" language="js">
+                                <CodeBlock
+                                  className="useless-code-block-class"
+                                  language="js"
+                                  hideLineNumbers={true}
+                                >
                                   {x.js && x.js.replace('```', '').replace('js', '')}
                                 </CodeBlock>
-                                <CodeBlock className="useless-code-block-class" language="json">
+                                <CodeBlock
+                                  className="useless-code-block-class"
+                                  language="json"
+                                  hideLineNumbers={true}
+                                >
                                   {`{ 
   data: [
     {
