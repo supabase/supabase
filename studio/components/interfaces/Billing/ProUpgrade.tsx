@@ -219,15 +219,19 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
-                    <Divider light />
-                    <PITRDurationSelection
-                      pitrDurationOptions={pitrDurationOptions || []}
-                      currentPitrDuration={
-                        isManagingProSubscription ? currentPITRDuration : undefined
-                      }
-                      selectedPitrDuration={selectedPITRDuration}
-                      onSelectOption={setSelectedPITRDuration}
-                    />
+                    {pitrDurationOptions.length > 0 && (
+                      <>
+                        <Divider light />
+                        <PITRDurationSelection
+                          pitrDurationOptions={pitrDurationOptions}
+                          currentPitrDuration={
+                            isManagingProSubscription ? currentPITRDuration : undefined
+                          }
+                          selectedPitrDuration={selectedPITRDuration}
+                          onSelectOption={setSelectedPITRDuration}
+                        />
+                      </>
+                    )}
                     <Divider light />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}

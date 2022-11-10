@@ -82,11 +82,12 @@ export const formatPITROptions = (addons: DatabaseAddon[]) => {
     ],
   }
 
-  return [noPITROption]
-    .concat(
-      pitrOrder.map((id: string) => {
-        return addons.find((option) => option.metadata.supabase_prod_id === id)
-      }) as DatabaseAddon[]
-    )
-    .filter((option) => option !== undefined)
+  const pitrOptions = pitrOrder
+    .map((id: string) => {
+      return addons.find((option) => option.metadata.supabase_prod_id === id)
+    })
+    .filter((option) => option !== undefined) as DatabaseAddon[]
+
+  if (pitrOptions.length === 0) return []
+  else return [noPITROption].concat(pitrOptions)
 }
