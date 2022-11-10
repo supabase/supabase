@@ -1,4 +1,3 @@
-import { MDXProvider } from '@mdx-js/react'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components'
@@ -15,9 +14,7 @@ export default function Home({
 }) {
   return (
     <Layout meta={meta} menuItems={menuItems['docs']} currentPage="docs">
-      <MDXProvider components={components}>
-        <MDXRemote {...content} />
-      </MDXProvider>
+      <MDXRemote {...content} components={components} />
     </Layout>
   )
 }
