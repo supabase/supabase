@@ -21,15 +21,17 @@ import InformationBox from 'components/ui/InformationBox'
 import { DatabaseAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 
+// [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
+
 interface Props {
   isRefreshingPreview: boolean
   subscriptionPreview?: SubscriptionPreview
   currentPlan: any
   currentComputeSize: DatabaseAddon
-  currentPITRDuration: DatabaseAddon
+  currentPITRDuration: DatabaseAddon | undefined
   selectedPlan?: any
   selectedComputeSize: DatabaseAddon
-  selectedPITRDuration: DatabaseAddon
+  selectedPITRDuration: DatabaseAddon | undefined
   isSpendCapEnabled: boolean
   paymentMethods?: any
   selectedPaymentMethod: any
@@ -76,8 +78,9 @@ const PaymentSummaryPanel: FC<Props> = ({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  const currentPITRDays = getPITRDays(currentPITRDuration)
-  const selectedPITRDays = getPITRDays(selectedPITRDuration)
+  const currentPITRDays = currentPITRDuration !== undefined ? getPITRDays(currentPITRDuration) : 0
+  const selectedPITRDays =
+    selectedPITRDuration !== undefined ? getPITRDays(selectedPITRDuration) : 0
 
   const isEnterprise = currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   const isChangingPlan =
@@ -87,7 +90,7 @@ const PaymentSummaryPanel: FC<Props> = ({
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
-  const isChangingPITRDuration = currentPITRDuration.id !== selectedPITRDuration.id
+  const isChangingPITRDuration = currentPITRDuration?.id !== selectedPITRDuration?.id
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
@@ -166,14 +169,14 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
-            {currentPITRDuration.id !== undefined && (
+            {currentPITRDuration?.id !== undefined && (
               <div className="flex items-center justify-between">
                 <p
                   className={`${
                     isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  {currentPITRDuration.name}
+                  {currentPITRDuration?.name}
                 </p>
                 <p
                   className={`${
@@ -186,7 +189,7 @@ const PaymentSummaryPanel: FC<Props> = ({
             )}
             {isChangingPITRDuration && (
               <div className="flex items-center justify-between">
-                <p className="text-sm">{selectedPITRDuration.name}</p>
+                <p className="text-sm">{selectedPITRDuration?.name}</p>
                 <p className="text-sm">
                   ${(getProductPrice(selectedPITRDuration).unit_amount / 100).toFixed(2)}
                 </p>
@@ -201,9 +204,9 @@ const PaymentSummaryPanel: FC<Props> = ({
                   defaultVisibility
                   icon={<IconAlertCircle strokeWidth={2} />}
                   title={
-                    currentPITRDuration.id === undefined
+                    currentPITRDuration?.id === undefined
                       ? 'Enabling PITR'
-                      : selectedPITRDuration.id === undefined
+                      : selectedPITRDuration?.id === undefined
                       ? 'Disabling PITR'
                       : 'Updating PITR duration'
                   }
