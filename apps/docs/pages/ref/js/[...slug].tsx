@@ -21,7 +21,7 @@ import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-ignore
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape--reduced.yml' assert { type: 'yml' }
 
 import { IconDatabase, Tabs } from '~/../../packages/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -208,136 +208,144 @@ export default function Ref(props) {
               console.log('serialFunctionMarkdownContent', serialFunctionMarkdownContent)
 
               return (
-                <div
-                  className="grid grid-cols-2 pb-32 ref-container gap-10"
-                  id={item.id}
-                  // ref={sectionRef}
-                >
-                  <div className="prose" key={item.id}>
+                <>
+                  <header className="sticky top-0 bg-gray-600 z-10 p-4">
                     <h1 className="text-3xl not-prose" onClick={() => updateUrl(item.id)}>
                       {examples.functions[itemIndex].title ??
                         examples.functions[itemIndex].id ??
                         item.name ??
                         item.id}
                     </h1>
-                    <p className="text-lg not-prose">{examples.functions[itemIndex].description}</p>
+                  </header>
+                  <div
+                    className="grid grid-cols-2 pb-32 ref-container gap-10"
+                    id={item.id}
+                    // ref={sectionRef}
+                  >
+                    <div className="prose" key={item.id}>
+                      <p className="text-lg not-prose">
+                        {examples.functions[itemIndex].description}
+                      </p>
 
-                    <hr />
-                    {functionMarkdownContent && (
-                      <MDXRemote {...functionMarkdownContent} components={components} />
-                    )}
+                      <hr />
+                      {functionMarkdownContent && (
+                        <MDXRemote {...functionMarkdownContent} components={components} />
+                      )}
 
-                    {item.notes && (
-                      <div>
-                        <ReactMarkdown>{item.notes}</ReactMarkdown>
-                      </div>
-                    )}
+                      {item.notes && (
+                        <div>
+                          <ReactMarkdown>{item.notes}</ReactMarkdown>
+                        </div>
+                      )}
 
-                    {/* // parameters */}
-                    {parameters && <div dangerouslySetInnerHTML={{ __html: parameters }}></div>}
-                  </div>
-                  <div className="w-full">
-                    {item.examples && (
-                      <Tabs
-                        defaultActiveId={item.examples[0].id}
-                        size="small"
-                        type="underlined"
-                        scrollable
-                      >
-                        {item.examples &&
-                          item.examples.map((example, exampleIndex) => {
-                            const exampleString = `
+                      {/* // parameters */}
+                      {parameters && <div dangerouslySetInnerHTML={{ __html: parameters }}></div>}
+                    </div>
+                    <div className="w-full">
+                      <div className="sticky top-24">
+                        {item.examples && (
+                          <Tabs
+                            defaultActiveId={item.examples[0].id}
+                            size="small"
+                            type="underlined"
+                            scrollable
+                          >
+                            {item.examples &&
+                              item.examples.map((example, exampleIndex) => {
+                                const exampleString = `
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 `
-                            const currentExampleId = example.id
-                            const staticExample =
-                              examples.functions[itemIndex].examples[exampleIndex]
+                                const currentExampleId = example.id
+                                const staticExample =
+                                  examples.functions[itemIndex].examples[exampleIndex]
 
-                            const response = staticExample.response
-                            const sql = staticExample?.data?.sql
-                            const tables = staticExample?.data?.tables
+                                const response = staticExample.response
+                                const sql = staticExample?.data?.sql
+                                const tables = staticExample?.data?.tables
 
-                            return (
-                              <Tabs.Panel id={example.id} label={example.name}>
-                                {tables &&
-                                  tables.length > 0 &&
-                                  tables.map((table) => {
-                                    console.log(table)
+                                return (
+                                  <Tabs.Panel id={example.id} label={example.name}>
+                                    {tables &&
+                                      tables.length > 0 &&
+                                      tables.map((table) => {
+                                        console.log(table)
 
-                                    const [content, setContent] = useState(null)
+                                        const [content, setContent] = useState(null)
 
-                                    useEffect(() => {
-                                      async function makeContent() {
-                                        setContent(
-                                          await serialize(table.content, {
-                                            mdxOptions: {
-                                              remarkPlugins: [remarkGfm],
-                                              format: 'mdx',
-                                            },
-                                          })
-                                        )
-                                      }
-                                      makeContent()
-                                    }, [])
+                                        useEffect(() => {
+                                          async function makeContent() {
+                                            setContent(
+                                              await serialize(table.content, {
+                                                mdxOptions: {
+                                                  remarkPlugins: [remarkGfm],
+                                                  format: 'mdx',
+                                                },
+                                              })
+                                            )
+                                          }
+                                          makeContent()
+                                        }, [])
 
-                                    return (
-                                      <div className="bg-scale-300 border rounded prose max-w-none">
-                                        <div className="bg-scale-200 px-5 py-2">
-                                          <div className="flex gap-2 items-center">
-                                            <div className="text-brand-900">
-                                              <IconDatabase size={16} />
+                                        return (
+                                          <div className="bg-scale-300 border rounded prose max-w-none">
+                                            <div className="bg-scale-200 px-5 py-2">
+                                              <div className="flex gap-2 items-center">
+                                                <div className="text-brand-900">
+                                                  <IconDatabase size={16} />
+                                                </div>
+                                                <h5 className="text-xs text-scale-1200">
+                                                  {table.name}
+                                                </h5>
+                                              </div>
                                             </div>
-                                            <h5 className="text-xs text-scale-1200">
-                                              {table.name}
-                                            </h5>
-                                          </div>
-                                        </div>
 
-                                        {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
-                                        {content && <MDXRemote {...content} />}
-                                      </div>
-                                    )
-                                  })}
-                                {sql && (
-                                  <CodeBlock
-                                    className="useless-code-block-class"
-                                    language="sql"
-                                    hideLineNumbers={true}
-                                  >
-                                    {sql}
-                                  </CodeBlock>
-                                )}
-                                <CodeBlock
-                                  className="useless-code-block-class"
-                                  language="js"
-                                  hideLineNumbers={true}
-                                >
-                                  {exampleString +
-                                    (example.code &&
-                                      example.code
-                                        .replace('```', '')
-                                        .replace('js', '')
-                                        .replace('```', ''))}
-                                </CodeBlock>
-                                {response && (
-                                  <CodeBlock
-                                    className="useless-code-block-class"
-                                    language="json"
-                                    hideLineNumbers={true}
-                                  >
-                                    {response}
-                                  </CodeBlock>
-                                )}
-                              </Tabs.Panel>
-                            )
-                          })}
-                      </Tabs>
-                    )}
+                                            {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
+                                            {content && <MDXRemote {...content} />}
+                                          </div>
+                                        )
+                                      })}
+                                    {sql && (
+                                      <CodeBlock
+                                        className="useless-code-block-class"
+                                        language="sql"
+                                        hideLineNumbers={true}
+                                      >
+                                        {sql}
+                                      </CodeBlock>
+                                    )}
+                                    <CodeBlock
+                                      className="useless-code-block-class"
+                                      language="js"
+                                      hideLineNumbers={true}
+                                    >
+                                      {exampleString +
+                                        (example.code &&
+                                          example.code
+                                            .replace('```', '')
+                                            .replace('js', '')
+                                            .replace('```', ''))}
+                                    </CodeBlock>
+                                    {response && (
+                                      <CodeBlock
+                                        className="useless-code-block-class"
+                                        language="json"
+                                        hideLineNumbers={true}
+                                      >
+                                        {response}
+                                      </CodeBlock>
+                                    )}
+                                  </Tabs.Panel>
+                                )
+                              })}
+                          </Tabs>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </>
               )
             })}
           </div>
