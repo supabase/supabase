@@ -19,11 +19,7 @@ import {
   UpdateSuccess,
 } from './'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
-import {
-  validateSubscriptionUpdatePayload,
-  formSubscriptionUpdatePayload,
-  getCurrentAddons,
-} from './Billing.utils'
+import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
 
 interface Props {
   products: { tiers: any[]; addons: DatabaseAddon[] }
@@ -101,15 +97,6 @@ const EnterpriseUpdate: FC<Props> = ({
 
   // Last todo to support enterprise billing on dashboard + E2E test
   const onConfirmPayment = async () => {
-    const error = validateSubscriptionUpdatePayload(selectedComputeSize, selectedPITRDuration)
-    if (error) {
-      return ui.setNotification({
-        duration: 4000,
-        category: 'error',
-        message: error,
-      })
-    }
-
     const payload = {
       ...formSubscriptionUpdatePayload(
         null,
