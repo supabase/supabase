@@ -55,14 +55,6 @@ Use `psql` to import the Heroku database file to your Supabase project.
 psql -h $SUPABASE_HOST -U postgres -f heroku_dump.sql
 ```
 
-## (Optional) Post processing {#post-processing}
-
-If you're using GraphQL with your Supabase project, you may need to run the following SQL command in the Supabase Dashboard (SQL Editor) to make sure the new tables show up:
-
-```sql
-select graphql.rebuild_schema();
-```
-
 ## Additional options
 
 - To only migrate a single database schema, add the `--schema=PATTERN` parameter to your `pg_dump` command.
