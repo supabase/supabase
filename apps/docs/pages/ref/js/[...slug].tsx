@@ -1,26 +1,36 @@
-import { useEffect, useRef, useState } from 'react'
+import {
+  useEffect,
+  // useRef,
+  useState,
+} from 'react'
 // pages/index.js
 
 import fs from 'fs'
+
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components/index'
 import { getAllDocs } from '~/lib/docs'
-import { debounce } from 'lodash'
 
 import ReactMarkdown from 'react-markdown'
 
 // @ts-ignore
-import jsSpec from '~/../../spec/supabase_js_v2_temp.yaml'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
+
+// @ts-expect-error
+import jsSpec from '~/../../spec/supabase_js_v2_temp.yml' assert { type: 'yml' }
+
 import { Tabs } from '~/../../packages/ui'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
+import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
+import assert from 'assert'
 
 const marginTop = 256
 export default function Ref(props) {
-  const myRef = useRef(null)
+  // const myRef = useRef(null)
 
   const [offsetY, setOffsetY] = useState(0)
   const [sections, setSections] = useState([])
@@ -43,7 +53,7 @@ export default function Ref(props) {
       }
     })
 
-    console.log('allSections', allSections)
+    // console.log('allSections', allSections)
     setSections(allSections)
   }, [])
 
@@ -137,33 +147,51 @@ export default function Ref(props) {
         </div>
 
         <div className="ml-64 w-full">
-          <div className="flex flex-col gap-32 mx-auto max-w-5xl" ref={myRef}>
+          <div
+            className="flex flex-col gap-32 mx-auto max-w-5xl"
+            // ref={myRef}
+          >
             {props.docs.map((x) => {
-              const sectionRef = useRef(null)
+              // const sectionRef = useRef(null)
 
-              useEffect(() => {
-                const observer = new IntersectionObserver((entries) => {
-                  // console.log('entries', entries)
-                  const entry = entries[0]
+              // console.log('x', jsSpec.pages[x.id])
+              const hasTsRef = jsSpec.pages[x.id]['$ref'] || null
+              // console.log('hasTsRef', hasTsRef)
+              // console.log('jsTypeSpec', jsTypeSpec)
+              const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
+              // console.log('tsDefinition', tsDefinition)
+              console.log(`tsDefinition for ${x.title ?? x.id}`, tsDefinition)
 
-                  console.log(
-                    x.id,
-                    'intersectiong',
-                    entry.isIntersecting,
-                    'visible',
-                    entry.isVisible
-                  )
-                })
-                // console.log('myRef', myRef.current)
-                observer.observe(sectionRef.current)
-              }, [])
+              // useEffect(() => {
+              //   const observer = new IntersectionObserver((entries) => {
+              //     // console.log('entries', entries)
+              //     const entry = entries[0]
+
+              //     // console.log(
+              //     //   x.id,
+              //     //   'intersectiong',
+              //     //   entry.isIntersecting,
+              //     //   'visible',
+              //     //   entry.isVisible
+              //     // )
+              //   })
+              //   // console.log('myRef', myRef.current)
+              //   observer.observe(sectionRef.current)
+              // }, [])
+
+              const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
               return (
-                <div className="grid grid-cols-2 pb-32 ref-container" id={x.id} ref={sectionRef}>
+                <div
+                  className="grid grid-cols-2 pb-32 ref-container gap-10"
+                  id={x.id}
+                  // ref={sectionRef}
+                >
                   <div className="prose" key={x.id}>
                     <h1 className="text-3xl not-prose" onClick={() => updateUrl(x.id)}>
                       {x.title ?? x.id}
                     </h1>
+
                     {x.content && (
                       <div className="prose">
                         <MDXRemote {...x.content} components={components} />
@@ -174,6 +202,9 @@ export default function Ref(props) {
                         <ReactMarkdown>{jsSpec.pages[x.id].notes}</ReactMarkdown>
                       </div>
                     )}
+
+                    {/* // parameters */}
+                    {parameters && <div dangerouslySetInnerHTML={{ __html: parameters }}></div>}
                   </div>
                   <div className="w-full">
                     {jsSpec.pages[x.id].examples && (
@@ -185,31 +216,49 @@ export default function Ref(props) {
                       >
                         {jsSpec.pages[x.id].examples &&
                           jsSpec.pages[x.id].examples.map((x, i) => {
+                            const exampleString = `
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+`
+
                             return (
                               <Tabs.Panel id={x.name} label={x.name}>
-                                <CodeBlock lang="js" className="useless-code-block-class">
-                                  {x.js && x.js.replace('```', '').replace('js', '')}
+                                <CodeBlock
+                                  className="useless-code-block-class"
+                                  language="js"
+                                  hideLineNumbers={true}
+                                >
+                                  {exampleString +
+                                    (x.js &&
+                                      x.js.replace('```', '').replace('js', '').replace('```', ''))}
                                 </CodeBlock>
-                                <CodeBlock lang="js" className="useless-code-block-class">
-                                  {`{ 
+                                <CodeBlock
+                                  className="useless-code-block-class"
+                                  language="json"
+                                  hideLineNumbers={true}
+                                >
+                                  {`{
   data: [
     {
       id: 1,
-      name: 'Afghanistan',
+      name: "Afghanistan",
     },
     {
       id: 2,
-      name: 'Albania',
+      name: "Albania",
     },
     {
       id: 3,
-      name: 'Algeria',
+      name: "Algeria",
     },
   ],
   status: 200,
-  statusText: 'OK',
+  statusText: "OK",
 }
-                              `}
+
+                                  `}
                                 </CodeBlock>
                               </Tabs.Panel>
                             )

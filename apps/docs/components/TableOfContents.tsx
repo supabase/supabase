@@ -11,6 +11,7 @@ interface TOCHeader {
 
 interface Props {
   toc: any
+  video?: string
 }
 
 const formatSlug = (slug: string) => {
@@ -40,26 +41,38 @@ const formatTOCHeader = (content: string) => {
   return res.join('')
 }
 
-const TableOfContents: FC<Props> = ({ toc }) => {
+const TableOfContents: FC<Props> = ({ toc, video }) => {
   // [Joshen] markdown-toc doesn't seem to read maxdepth from the options passed in
   // Our first level headers will be H2s (H1 is ignored), and we only show up to H3
 
   return (
-    <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-12">
-      {(toc.json as TOCHeader[])
-        .filter((item) => item.lvl !== 1 && item.lvl <= 3)
-        .map((item: any, i: number) => {
-          return (
-            <li key={i} id={item.lvl} style={{ marginLeft: `${(item.lvl - 2) * 1}rem` }}>
-              <a
-                href={`#${formatSlug(item.slug)}`}
-                className="text-scale-1000 hover:text-brand-900 transition-colors"
-                dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.content)) }}
-              />
-            </li>
-          )
-        })}
-    </ul>
+    <>
+      {video && (
+        <div className="video-container">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/0Fs96oZ4se0"
+            frameBorder="1"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
+      )}
+      <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-12">
+        {(toc.json as TOCHeader[])
+          .filter((item) => item.lvl !== 1 && item.lvl <= 3)
+          .map((item: any, i: number) => {
+            return (
+              <li key={i} id={item.lvl} style={{ marginLeft: `${(item.lvl - 2) * 1}rem` }}>
+                <a
+                  href={`#${formatSlug(item.slug)}`}
+                  className="text-scale-1000 hover:text-brand-900 transition-colors"
+                  dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.content)) }}
+                />
+              </li>
+            )
+          })}
+      </ul>
+    </>
   )
 }
 

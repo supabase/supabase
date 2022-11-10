@@ -29,9 +29,8 @@ export default function Doc({ meta, content, toc }: Props) {
   return (
     // @ts-ignore
     <Layout meta={meta} toc={toc} menuItems={menuItems[page]} currentPage={page}>
-      <MDXProvider components={components}>
-        <MDXRemote {...content} components={components} />
-      </MDXProvider>
+      <h1 className="text-7xl text-white">helo world</h1>
+      <MDXRemote {...content} components={components} />
     </Layout>
   )
 }
