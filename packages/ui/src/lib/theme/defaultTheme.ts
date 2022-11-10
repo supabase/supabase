@@ -1111,7 +1111,7 @@ export default {
       },
     },
     description: {
-      base: 'mt-2 text-scale-900',
+      base: 'mt-2 text-scale-900 leading-normal',
       size: {
         ...defaults.size.text,
       },
