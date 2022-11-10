@@ -45,7 +45,6 @@ To contribute code to Supabase, you must fork the [Supabase Repository](https://
 
 ### Run the docs locally
 
-
 1. Build the development server
 
    npm
