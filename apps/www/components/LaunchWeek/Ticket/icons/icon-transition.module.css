@@ -1,0 +1,48 @@
+/**
+ * Copyright 2020 Vercel Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.fill-black {
+  fill: black;
+  transition: stroke fill 0.2s ease;
+}
+
+.stroke-black {
+  stroke: black;
+  transition: stroke fill 0.2s ease;
+}
+
+.stroke-white {
+  stroke: #fff;
+  transition: stroke fill 0.2s ease;
+}
+
+:global(.icon-button:hover) .fill-black,
+:global(.icon-button:focus) .fill-black {
+  fill: #fff;
+  transition: stroke fill 0.2s ease;
+}
+
+:global(.icon-button:hover) .stroke-black,
+:global(.icon-button:focus) .stroke-black {
+  stroke: #fff;
+  transition: stroke fill 0.2s ease;
+}
+
+:global(.icon-button:hover) .stroke-white,
+:global(.icon-button:focus) .stroke-white {
+  stroke: black;
+  transition: stroke fill 0.2s ease;
+}

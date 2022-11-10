@@ -19,17 +19,8 @@ module.exports = [
   },
   // rewrite to keep existing ticket urls working
   {
-    source: '/launch-week/tickets/:path',
-    destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/tickets/:path`,
-  },
-  // rewrite to move ticket website to another path
-  {
-    source: '/launch-week-register',
-    destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
-  },
-  {
-    source: '/launch-week-register/:path*',
-    destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path*`,
+    source: '/launch-week/tickets',
+    destination: `/launch-week/tickets/register`,
   },
   {
     source: '/new-docs',

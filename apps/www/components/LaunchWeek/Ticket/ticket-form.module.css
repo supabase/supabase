@@ -1,0 +1,81 @@
+/**
+ * Copyright 2020 Vercel Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.githubIcon {
+  margin-left: 12px;
+  margin-right: var(--space-4x);
+  display: inline-flex;
+}
+
+.checkIcon {
+  position: absolute;
+  right: var(--space-4x);
+  display: inline-flex;
+}
+
+.generateWithGithub {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.stageIcon {
+  position: absolute;
+  left: var(--space-4x);
+  display: inline-flex;
+}
+
+.form-row {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 600px;
+}
+
+.description {
+  color: var(--secondary-color);
+  margin: 0;
+  text-align: center;
+  margin-left: var(--space-4x);
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .form-row {
+    margin: 0;
+  }
+
+  .description {
+    text-align: left;
+  }
+
+  .generateWithGithub {
+    width: 100%;
+  }
+}
+
+.learn-more {
+  color: #fff;
+}
+
+.learn-more:hover {
+  text-decoration: underline;
+  color: #fff;
+}
