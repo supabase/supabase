@@ -10,13 +10,14 @@ import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 
 import { useState } from 'react'
 import { useTheme } from '../Providers'
 
 interface Props {
   title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart'
+  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -56,6 +57,7 @@ const CodeBlock: FC<Props> = ({
   SyntaxHighlighter.registerLanguage('sql', sql)
   SyntaxHighlighter.registerLanguage('bash', bash)
   SyntaxHighlighter.registerLanguage('dart', dart)
+  SyntaxHighlighter.registerLanguage('json', json)
 
   const large = false
   // don't show line numbers if bash == lang

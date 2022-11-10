@@ -11,7 +11,7 @@ interface TOCHeader {
 
 interface Props {
   toc: any
-  video: string
+  video?: string
 }
 
 const formatSlug = (slug: string) => {

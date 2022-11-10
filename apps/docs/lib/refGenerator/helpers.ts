@@ -39,6 +39,7 @@ export function generateParameters(tsDefinition: any) {
 
 function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
   // If this is a reference to another Param, let's use the reference instead
+  // @ts-ignore
   let param = isDereferenced(paramDefinition) ? paramDefinition.type?.dereferenced : paramDefinition
   const labelParams = generateLabelParam(param)
   let subContent = ''
@@ -73,6 +74,7 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
 }
 
 const isDereferenced = (paramDefinition: TsDoc.TypeDefinition) => {
+  // @ts-ignore
   return paramDefinition.type?.type == 'reference' && paramDefinition.type?.dereferenced?.id
 }
 
@@ -81,6 +83,7 @@ const isUnion = (paramDefinition: TsDoc.TypeDefinition) => {
 }
 
 const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
+  // @ts-ignore
   const joined = paramDefinition.type.types.reduce((acc, x) => {
     acc.push(...(x.declaration?.children || []))
     return acc
@@ -118,7 +121,7 @@ ${description ? description : 'No description provided. '}
 `
 
 function generateLabelParam(param: any) {
-  let labelParams = {}
+  let labelParams: any = {}
   if (typeof param.type === 'string' && param.type === 'literal') {
     labelParams = {
       name: param.name ?? param.value,
