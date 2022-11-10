@@ -16,13 +16,13 @@ Just so we are on the same page, here are some of the terms we use:
 - **Dashboard:** This is the friendly interface that you build on top of your Supabase database using Dashibase.
 - **Page:** Each dashboard can have multiple pages. Each page can have multiple blocks of text or tables.
 
-Now that is out of the way, let's build our customer admin panel. 
+Now that is out of the way, let's build our customer admin panel.
 
 (Start your stopwatch!)
 
 ## Step 1. Connect Supabase to Dashibase
 
-First, in Dashibase, go to “Data Sources” via the left sidebar and click on “Connect data source” in the upper-right corner. 
+First, in Dashibase, go to “Data Sources” via the left sidebar and click on “Connect data source” in the upper-right corner.
 
 Note: We do not download or store any of your database data.
 
@@ -36,7 +36,7 @@ Enter your database credentials, which you can find in Supabase under Settings >
 
 Once you have connected your database, you can also control what your team can see and edit in your database via Dashibase. There are usually certain data that you don’t want others to edit or even see (e.g. address, email, identification number).
 
-Note: If you prefer to restrict access to your database _before_ you connect to Dashibase for security reasons, you can [create a restricted user](https://aws.amazon.com/blogs/database/managing-postgresql-users-and-roles/) via [Supabase's SQL Editor](https://supabase.com/docs/guides/database#the-sql-editor). The slight advantage of doing this in Dashibase is that there is a GUI, which makes it easier to set up the access control (but we understand some developers might find it more secure to restrict the access themselves).
+Note: If you prefer to restrict access to your database _before_ you connect to Dashibase for security reasons, you can [create a restricted user](https://aws.amazon.com/blogs/database/managing-postgresql-users-and-roles/) via [Supabase's SQL Editor](/docs/guides/database#the-sql-editor). The slight advantage of doing this in Dashibase is that there is a GUI, which makes it easier to set up the access control (but we understand some developers might find it more secure to restrict the access themselves).
 
 ![Set data access in Dashibase](/docs/img/guides/integrations/dashibase/set-data-access.png)
 
@@ -50,7 +50,7 @@ Once you are happy with the data access control, you can decide who in your orga
 
 ## Step 3. Build your dashboard
 
-To create a dashboard, go to “Dashboards” via the left sidebar in Dashibase and click on “Create dashboard” in the upper-right corner. 
+To create a dashboard, go to “Dashboards” via the left sidebar in Dashibase and click on “Create dashboard” in the upper-right corner.
 
 Here’s where the fun begins. There are many ways to build your dashboards in Dashibase using features such as markdown formatting and slash command.
 
@@ -62,11 +62,11 @@ Using our Notion-like UI, you can quickly build out your dashboard through typin
 
 ![Automatically-generated content for your dashboard](/docs/img/guides/integrations/dashibase/slash-command.gif)
 
-If you have set up [foreign keys in your Supabase database](https://supabase.com/docs/guides/database/tables#joining-tables-with-foreign-keys), you can easily show data from multiple tables on the table in your Dashibase dashboard. Simply click on the "Columns" button beside the "Filter" button and select the columns you want to show or hide. For this example, we want to show the customers' country and plan price, which are in separate `countries` and `plans` tables.
+If you have set up [foreign keys in your Supabase database](/docs/guides/database/tables#joining-tables-with-foreign-keys), you can easily show data from multiple tables on the table in your Dashibase dashboard. Simply click on the "Columns" button beside the "Filter" button and select the columns you want to show or hide. For this example, we want to show the customers' country and plan price, which are in separate `countries` and `plans` tables.
 
 ![Setting up the Customers table](/docs/img/guides/integrations/dashibase/customers-table.png)
 
-For all the tables in your dashboard, you can rename the column headers, add filter and sort, adjust the column width, and more. 
+For all the tables in your dashboard, you can rename the column headers, add filter and sort, adjust the column width, and more.
 
 You can also add text to provide context or instructions for the rest of your team as they are using your dashboard. This saves you the trouble of having your dashboard and documentation in separate places.
 
@@ -87,7 +87,7 @@ Click on the “Share” button in the upper-right corner of your dashboard to s
 
 ![Share dashboard access](/docs/img/guides/integrations/dashibase/share-dashboard.png)
 
-Now your team can use this customer admin panel to find and update customer information easily! 
+Now your team can use this customer admin panel to find and update customer information easily!
 
 P.S. How long did we take? :)
 
