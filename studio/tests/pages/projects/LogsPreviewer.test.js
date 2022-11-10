@@ -47,7 +47,36 @@ test.each([
     tableTexts: [/POST/, /some\-path/, /400/],
     selectionTexts: [/POST/, /Timestamp/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
   },
-  // TODO: add more tests for each type of ui
+  {
+    queryType: 'database',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      error_severity: 'ERROR',
+      event_message: 'some db event',
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      metadata: [
+        {
+          parsed: [
+            {
+              application_type: 'client backend',
+              error_severity: 'ERROR',
+              hint: 'some pg hint',
+            },
+          ],
+        },
+      ],
+    }),
+    tableTexts: [/ERROR/, /some db event/],
+    selectionTexts: [
+      /client backend/,
+      /some pg hint/,
+      /ERROR/,
+      /Timestamp/,
+      RegExp(`${new Date().getFullYear()}.+`, 'g'),
+    ],
+  },
   {
     queryType: 'auth',
     tableName: undefined,
@@ -77,6 +106,20 @@ test.each([
       RegExp(`${new Date().getFullYear()}.+`, 'g'),
     ],
   },
+  // these all use teh default selection/table renderers
+  ...['pgbouncer', 'postgrest', 'storage', 'realtime'].map((queryType) => ({
+    queryType,
+    tableName: undefined,
+    tableLog: logDataFixture({
+      event_message: 'some message',
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      metadata: [{ some: [{ nested: 'value' }] }],
+    }),
+    tableTexts: [/some message/],
+    selectionTexts: [/some/, /nested/, /value/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
+  })),
 ])(
   'selection $queryType $tableName , can display log data and metadata',
   async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
