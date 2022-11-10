@@ -85,7 +85,7 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
         actions={
           minimal ? (
             <div className="flex h-full items-center">
-              <Link href={`/project/${ref}/settings/billing`}>
+              <Link href={`/project/${ref}/settings/billing/subscription`}>
                 <a>
                   <Button type="default">Explore usage details</Button>
                 </a>

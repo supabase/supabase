@@ -1,6 +1,6 @@
 import React, { useState, FC } from 'react'
 import { isEmpty } from 'lodash'
-import { Button, IconSearch, Input, IconHelpCircle } from 'ui'
+import { Button, IconSearch, Input, IconHelpCircle, IconExternalLink } from 'ui'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { checkPermissions, useStore } from 'hooks'
@@ -78,7 +78,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               onChange={(e) => setPoliciesFilter(e.target.value)}
               icon={<IconSearch size="tiny" />}
             />
-            <Button type="link">
+            <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
               <a
                 target="_blank"
                 href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
