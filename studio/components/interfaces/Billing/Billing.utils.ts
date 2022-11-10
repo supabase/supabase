@@ -13,9 +13,9 @@ export const getProductPrice = (product: any) => {
 
 export const validateSubscriptionUpdatePayload = (
   selectedComputeSize: DatabaseAddon,
-  selectedPITRDuration: DatabaseAddon
+  selectedPITRDuration?: DatabaseAddon
 ) => {
-  if (selectedPITRDuration.id !== undefined && selectedComputeSize.id === undefined) {
+  if (selectedPITRDuration?.id !== undefined && selectedComputeSize.id === undefined) {
     return 'To enable PITR for your project, your project must minimally be on a Small Add-on.'
   }
   return undefined
@@ -24,7 +24,7 @@ export const validateSubscriptionUpdatePayload = (
 export const formSubscriptionUpdatePayload = (
   selectedTier: any,
   selectedComputeSize: DatabaseAddon,
-  selectedPITRDuration: DatabaseAddon,
+  selectedPITRDuration: DatabaseAddon | undefined,
   selectedPaymentMethod: string,
   region: string
 ) => {
@@ -32,7 +32,7 @@ export const formSubscriptionUpdatePayload = (
   const addons =
     region === 'af-south-1'
       ? []
-      : [selectedComputeSize.prices[0].id, selectedPITRDuration.prices[0].id].filter(
+      : [selectedComputeSize.prices[0].id, selectedPITRDuration?.prices?.[0].id].filter(
           (x) => x !== undefined
         )
   const proration_date = Math.floor(Date.now() / 1000)
