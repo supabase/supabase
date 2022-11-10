@@ -10,13 +10,14 @@ import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 
 import { useState } from 'react'
 import { useTheme } from '../Providers'
 
 interface Props {
   title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart'
+  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -38,6 +39,8 @@ const CodeBlock: FC<Props> = ({
   const { isDarkMode } = useTheme()
   const monokaiTheme = monokaiCustomTheme(isDarkMode)
 
+  console.log(children, hideLineNumbers)
+
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -56,13 +59,17 @@ const CodeBlock: FC<Props> = ({
   SyntaxHighlighter.registerLanguage('sql', sql)
   SyntaxHighlighter.registerLanguage('bash', bash)
   SyntaxHighlighter.registerLanguage('dart', dart)
+  SyntaxHighlighter.registerLanguage('json', json)
 
   const large = false
   // don't show line numbers if bash == lang
-  const showLineNumbers = hideLineNumbers || lang !== 'bash'
+  if (lang !== 'bash') hideLineNumbers = true
+  const showLineNumbers = !hideLineNumbers
+
+  console.log(showLineNumbers)
 
   return (
-    <div className="relative my-2">
+    <div className="relative my-2 max-w-[90vw] md:max-w-none overflow-auto">
       {title && (
         <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
           {title.replace(/%20/g, ' ')}
@@ -125,7 +132,7 @@ const CodeBlock: FC<Props> = ({
               icon={copied ? <IconCheck /> : <IconCopy />}
               onClick={() => handleCopy()}
             >
-              {copied ? 'Copied' : 'Copy'}
+              {copied ? 'Copied' : ''}
             </Button>
           </CopyToClipboard>
         </div>

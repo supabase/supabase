@@ -49,10 +49,10 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               className={`${
                 meta?.hide_table_of_contents || !hasTableOfContents
                   ? 'col-span-12 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8'
-                  : 'col-span-12 md:col-span-9'
-              } py-2 md:py-4 px-2 md:px-8`}
+                  : 'col-span-12 lg:col-span-9'
+              } py-2 lg:py-4 px-2 lg:px-8 mx-auto`}
             >
-              <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
+              <article className="doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[880px] ">
                 {children}
               </article>
             </div>
@@ -60,7 +60,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               <div
                 className={[
                   'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
-                  'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+                  'thin-scrollbar overflow-y-auto sticky hidden xl:block md:col-span-3 px-2',
                 ].join(' ')}
               >
                 <TableOfContents toc={toc} />

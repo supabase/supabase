@@ -6,10 +6,10 @@ description: 'Get started with Supabase and Plasmic, an open-source framework fo
 
 In this guide, we will show you how to build a crowd-sourced Pokemon Pokedex, by connecting **Supabase**, an open source Firebase backend alternative, with **Plasmic**, a visual builder for the web. While many users leverage Plasmic to quickly launch and iterate on landing pages, in this tutorial we’ll show just how powerful Plasmic can be as a general-purpose visual builder for React, which can be used to design and implement fully featured read-write applications.
 
-You can play with the live demo here:  
+You can play with the live demo here:
 [https://plasmic-supabase-demo.vercel.app/](https://plasmic-supabase-demo.vercel.app/)
 
-You can also take a look at the Plasmic project here:  
+You can also take a look at the Plasmic project here:
 [https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6](https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6)
 
 > You’ll need to enable 3rd-party cookies in your browser for the project to properly load.
@@ -35,7 +35,7 @@ At a high level,
   - `name`, `description`, `imageUrl`: This will store the name, description, and imageUrl for each Pokemon.
   - `inserted_at` : This will be an automatically populated column, set to when the row was first inserted.
 
-> Note: In this tutorial we’ve turned off “[Row Level Security (RLS)](https://supabase.com/docs/guides/auth/row-level-security)”. In practice, you will want to create policies that restrict who gets to create, edit, and delete posts. By turning this off, any user can modify the database without restrictions.
+> Note: In this tutorial we’ve turned off “[Row Level Security (RLS)](/docs/guides/auth/row-level-security)”. In practice, you will want to create policies that restrict who gets to create, edit, and delete posts. By turning this off, any user can modify the database without restrictions.
 
 ![create-table-supabase](/docs/img/guides/integrations/plasmic/create-table-supabase-02.png)
 
@@ -77,7 +77,7 @@ If you pre-populated the database in Step 1. you should see the following homepa
 
 Now let’s try to make some additions! The code base is currently configured to a read-only copy of the Plasmic project. Let’s make an editable copy first.
 
-Open the default starter Plasmic project here:  
+Open the default starter Plasmic project here:
 [https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6](https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6)
 
 ![clone-project-plasmic](/docs/img/guides/integrations/plasmic/clone-project-plasmic-04.png)

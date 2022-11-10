@@ -50,13 +50,13 @@ function Tabs({
   )
 
   const router = useRouter()
-  const hash = router.asPath?.split('#')[1]?.toUpperCase()
+  const hash = router?.asPath?.split('#')[1]?.toUpperCase()
 
   let __styles = styleHandler('tabs')
 
   // activeId state can be overriden externally with `active`
-  // defaults to use a url #hash if we have one or activeTab if not
-  const active = activeId ? activeId : hash ? hash : activeTab
+  // defaults to the first panelif we have one or url hash if not
+  const active = activeId ? activeId : activeTab ? activeTab : hash
 
   function onTabClick(id: string) {
     const newTabSelected = id !== active

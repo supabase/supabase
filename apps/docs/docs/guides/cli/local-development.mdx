@@ -82,6 +82,12 @@ For example:
 psql 'postgresql://postgres:postgres@localhost:54322/postgres'
 ```
 
+<Admonition type="note">
+
+To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
+
+</Admonition>
+
 </TabPanel>
 <TabPanel id="kong" label="API Gateway">
 
@@ -91,7 +97,7 @@ http://localhost:54321
 ```
 
 If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header.
-Learn more about JWT headers in our [Resources](/learn/auth-deep-dive/auth-deep-dive-jwts).
+Learn more about [JWT headers](/docs/learn/auth-deep-dive/auth-deep-dive-jwts).
 
 ```sh
 curl 'http://localhost:54321/rest/v1/' \
@@ -104,14 +110,14 @@ http://localhost:54321/storage/v1/        # Storage
 http://localhost:54321/auth/v1/           # Auth (GoTrue)
 ```
 
-</TabPanel>
-</Tabs>
-
 <Admonition type="note">
 
-To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
+`<anon key>` is provided when you run the command `supabase start`.
 
 </Admonition>
+
+</TabPanel>
+</Tabs>
 
 ## Database migrations
 

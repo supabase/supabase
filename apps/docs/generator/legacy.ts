@@ -265,7 +265,7 @@ function extractParamTypeAsString(paramDefinition) {
  * Iterates through the definition to find the correct definition.
  * You can pass it a deeply nested node using dot notation. eg: 'LoggedInUser.data.email'
  */
-function extractTsDocNode(nodeToFind: string, definition: any) {
+export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
   let i = 0
   let previousNode = definition
