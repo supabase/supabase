@@ -118,6 +118,7 @@ const sidebars = {
         'generated/storage-from-move',
         'generated/storage-from-remove',
         'generated/storage-from-createsignedurl',
+        'generated/storage-from-createsignedurls',
         'generated/storage-from-getpublicurl',
       ],
       collapsed: true,
