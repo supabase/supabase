@@ -168,7 +168,7 @@ const ChartHandler: FC<Props> = ({
         <AreaChart
           data={chartData?.data ?? []}
           format={format || chartData?.format}
-          xAxisKey="timestamp"
+          xAxisKey="period_start"
           yAxisKey={attribute}
           highlightedValue={highlightedValue}
           title={label}
