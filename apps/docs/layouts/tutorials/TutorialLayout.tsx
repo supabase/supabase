@@ -1,12 +1,10 @@
 import { MDXProvider } from '@mdx-js/react'
 import Head from 'next/head'
 import { FC, useEffect } from 'react'
+import components from '~/components'
 import Footer from '~/components/Footer'
 import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
-import { Tabs } from 'ui'
-
-// var toc = require('markdown-toc')
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean; video?: string }
@@ -17,6 +15,8 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props: Props) => {
+  // const contentString = renderToString(props.children)
+
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -31,13 +31,9 @@ const Layout: FC<Props> = (props: Props) => {
 
   // const content = serialize(contentString || '')
 
-  // console.log(props)
+  // console.log('contentString', contentString)
 
-  // const _toc = /toc(children, { maxdepth: 1, firsth1: false })
-
-  const MDXComponents = {
-    Tabs: Tabs,
-  }
+  // const _toc = toc('#hello world', { maxdepth: 1, firsth1: false })
 
   const hasTableOfContents =
     props.toc !== undefined &&
@@ -72,7 +68,8 @@ const Layout: FC<Props> = (props: Props) => {
               <article className="prose dark:prose-dark dark:bg-scale-200 max-w-4xl mt-8">
                 <h1>{props.meta.title}</h1>
                 <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
-                <MDXProvider components={MDXComponents} children={props.children} />
+
+                <MDXProvider components={components} children={props.children} />
               </article>
             </div>
             {hasTableOfContents && !props.meta?.hide_table_of_contents && (
