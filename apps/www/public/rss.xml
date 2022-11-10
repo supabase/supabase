@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 01 Nov 2022 16:04:00 +0000</lastBuildDate>
+      <lastBuildDate>Mon, 07 Nov 2022 16:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/authentication-in-ionic-angular</guid>
+  <title>Authentication in Ionic Angular with Supabase</title>
+  <link>https://supabase.com/blog/authentication-in-ionic-angular</link>
+  <description>Learn how to build an Ionic Angular app with authentication, Row Level Security, and Magic Link auth.</description>
+  <pubDate>Mon, 07 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-beta-update-october-2022</guid>
   <title>Supabase Beta October 2022</title>
   <link>https://supabase.com/blog/supabase-beta-update-october-2022</link>
@@ -207,7 +214,7 @@
   <guid>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</guid>
   <title>Flutter Tutorial: building a Flutter chat app</title>
   <link>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</link>
-  <description>How to create a real time chat app using Flutter.</description>
+  <description>Learn how to build a Flutter chat app with open source and scalable backend (inc. auth, realtime, database, and more).</description>
   <pubDate>Wed, 29 Jun 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
