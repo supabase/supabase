@@ -469,7 +469,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                                       },
                                       "sources": [
                                         {
@@ -1766,7 +1766,7 @@
                                                         "isOptional": true
                                                       },
                                                       "comment": {
-                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                                                       },
                                                       "sources": [
                                                         {
@@ -2131,7 +2131,7 @@
                               "kindString": "Call signature",
                               "flags": {},
                               "comment": {
-                                "shortText": "Retuns `true` is the connection is open."
+                                "shortText": "Returns `true` is the connection is open."
                               },
                               "type": {
                                 "type": "intrinsic",
@@ -2162,7 +2162,7 @@
                               "flags": {},
                               "comment": {
                                 "shortText": "Logs the message.",
-                                "text": "For customized logging, `this.logger` can be overriden.\n"
+                                "text": "For customized logging, `this.logger` can be overridden.\n"
                               },
                               "parameters": [
                                 {
@@ -6327,7 +6327,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                                       },
                                       "sources": [
                                         {
@@ -6692,7 +6692,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Retuns `true` is the connection is open."
+                "shortText": "Returns `true` is the connection is open."
               },
               "type": {
                 "type": "intrinsic",
@@ -6723,7 +6723,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Logs the message.",
-                "text": "For customized logging, `this.logger` can be overriden.\n"
+                "text": "For customized logging, `this.logger` can be overridden.\n"
               },
               "parameters": [
                 {
@@ -7130,7 +7130,7 @@
                                                         "isOptional": true
                                                       },
                                                       "comment": {
-                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                                                       },
                                                       "sources": [
                                                         {
@@ -10229,7 +10229,7 @@
                                                         "isOptional": true
                                                       },
                                                       "comment": {
-                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                                                       },
                                                       "sources": [
                                                         {
@@ -11527,7 +11527,7 @@
                                                                         "isOptional": true
                                                                       },
                                                                       "comment": {
-                                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                                                                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                                                                       },
                                                                       "sources": [
                                                                         {
@@ -11892,7 +11892,7 @@
                                               "kindString": "Call signature",
                                               "flags": {},
                                               "comment": {
-                                                "shortText": "Retuns `true` is the connection is open."
+                                                "shortText": "Returns `true` is the connection is open."
                                               },
                                               "type": {
                                                 "type": "intrinsic",
@@ -11923,7 +11923,7 @@
                                               "flags": {},
                                               "comment": {
                                                 "shortText": "Logs the message.",
-                                                "text": "For customized logging, `this.logger` can be overriden.\n"
+                                                "text": "For customized logging, `this.logger` can be overridden.\n"
                                               },
                                               "parameters": [
                                                 {
@@ -15244,7 +15244,7 @@
                         "isOptional": true
                       },
                       "comment": {
-                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowlege that broadcast message was received"
+                        "shortText": "self option enables client to receive message it broadcast\nack option instructs server to acknowledge that broadcast message was received"
                       },
                       "sources": [
                         {
