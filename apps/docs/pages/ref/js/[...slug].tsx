@@ -7,6 +7,7 @@ import {
 
 import fs from 'fs'
 
+import remarkGfm from 'remark-gfm'
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -17,11 +18,12 @@ import ReactMarkdown from 'react-markdown'
 
 // @ts-ignore
 import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
-
+// @ts-ignore
+import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v2_temp.yml' assert { type: 'yml' }
+import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 
-import { Tabs } from '~/../../packages/ui'
+import { IconDatabase, Tabs } from '~/../../packages/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
@@ -32,13 +34,15 @@ const marginTop = 256
 export default function Ref(props) {
   // const myRef = useRef(null)
 
+  console.log('props', props)
+
   const [offsetY, setOffsetY] = useState(0)
   const [sections, setSections] = useState([])
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-    setOffsetY(0)
-  }, [])
+  // useEffect(() => {
+  //   window.scrollTo(0, 0)
+  //   setOffsetY(0)
+  // }, [])
 
   useEffect(() => {
     const els: HTMLElement[] = Array.from(document.querySelectorAll('div.ref-container'))
@@ -151,16 +155,17 @@ export default function Ref(props) {
             className="flex flex-col gap-32 mx-auto max-w-5xl"
             // ref={myRef}
           >
-            {props.docs.map((x) => {
+            {jsSpec.functions.map((item, itemIndex) => {
+              // if (item.id !== 'select()') return <div>hidden section</div>
               // const sectionRef = useRef(null)
 
-              // console.log('x', jsSpec.pages[x.id])
-              const hasTsRef = jsSpec.pages[x.id]['$ref'] || null
+              // console.log('x', x)
+              const hasTsRef = item['$ref'] || null
               // console.log('hasTsRef', hasTsRef)
               // console.log('jsTypeSpec', jsTypeSpec)
               const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
               // console.log('tsDefinition', tsDefinition)
-              console.log(`tsDefinition for ${x.title ?? x.id}`, tsDefinition)
+              // console.log(`tsDefinition for ${item.title ?? item.id}`, tsDefinition)
 
               // useEffect(() => {
               //   const observer = new IntersectionObserver((entries) => {
@@ -181,25 +186,50 @@ export default function Ref(props) {
 
               const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
+              const [serialFunctionMarkdownContent, setSerialFunctionMarkdownContent] =
+                useState(null)
+
+              const functionMarkdownContent = props?.docs[itemIndex]?.content
+
+              useEffect(() => {
+                async function makeContent() {
+                  setSerialFunctionMarkdownContent(
+                    await serialize(functionMarkdownContent, {
+                      mdxOptions: {
+                        remarkPlugins: [remarkGfm],
+                        format: 'mdx',
+                      },
+                    })
+                  )
+                }
+                makeContent()
+              }, [])
+
+              console.log('serialFunctionMarkdownContent', serialFunctionMarkdownContent)
+
               return (
                 <div
                   className="grid grid-cols-2 pb-32 ref-container gap-10"
-                  id={x.id}
+                  id={item.id}
                   // ref={sectionRef}
                 >
-                  <div className="prose" key={x.id}>
-                    <h1 className="text-3xl not-prose" onClick={() => updateUrl(x.id)}>
-                      {x.title ?? x.id}
+                  <div className="prose" key={item.id}>
+                    <h1 className="text-3xl not-prose" onClick={() => updateUrl(item.id)}>
+                      {examples.functions[itemIndex].title ??
+                        examples.functions[itemIndex].id ??
+                        item.name ??
+                        item.id}
                     </h1>
+                    <p className="text-lg not-prose">{examples.functions[itemIndex].description}</p>
 
-                    {x.content && (
-                      <div className="prose">
-                        <MDXRemote {...x.content} components={components} />
-                      </div>
+                    <hr />
+                    {functionMarkdownContent && (
+                      <MDXRemote {...functionMarkdownContent} components={components} />
                     )}
-                    {jsSpec.pages[x.id].notes && (
+
+                    {item.notes && (
                       <div>
-                        <ReactMarkdown>{jsSpec.pages[x.id].notes}</ReactMarkdown>
+                        <ReactMarkdown>{item.notes}</ReactMarkdown>
                       </div>
                     )}
 
@@ -207,59 +237,100 @@ export default function Ref(props) {
                     {parameters && <div dangerouslySetInnerHTML={{ __html: parameters }}></div>}
                   </div>
                   <div className="w-full">
-                    {jsSpec.pages[x.id].examples && (
+                    {item.examples && (
                       <Tabs
-                        defaultActiveId={jsSpec.pages[x.id].examples[0].name}
+                        defaultActiveId={item.examples[0].id}
                         size="small"
                         type="underlined"
                         scrollable
                       >
-                        {jsSpec.pages[x.id].examples &&
-                          jsSpec.pages[x.id].examples.map((x, i) => {
+                        {item.examples &&
+                          item.examples.map((example, exampleIndex) => {
                             const exampleString = `
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 `
+                            const currentExampleId = example.id
+                            const staticExample =
+                              examples.functions[itemIndex].examples[exampleIndex]
+
+                            const response = staticExample.response
+                            const sql = staticExample?.data?.sql
+                            const tables = staticExample?.data?.tables
 
                             return (
-                              <Tabs.Panel id={x.name} label={x.name}>
+                              <Tabs.Panel id={example.id} label={example.name}>
+                                {tables &&
+                                  tables.length > 0 &&
+                                  tables.map((table) => {
+                                    console.log(table)
+
+                                    const [content, setContent] = useState(null)
+
+                                    useEffect(() => {
+                                      async function makeContent() {
+                                        setContent(
+                                          await serialize(table.content, {
+                                            mdxOptions: {
+                                              remarkPlugins: [remarkGfm],
+                                              format: 'mdx',
+                                            },
+                                          })
+                                        )
+                                      }
+                                      makeContent()
+                                    }, [])
+
+                                    return (
+                                      <div className="bg-scale-300 border rounded prose max-w-none">
+                                        <div className="bg-scale-200 px-5 py-2">
+                                          <div className="flex gap-2 items-center">
+                                            <div className="text-brand-900">
+                                              <IconDatabase size={16} />
+                                            </div>
+                                            <h5 className="text-xs text-scale-1200">
+                                              {table.name}
+                                            </h5>
+                                          </div>
+                                        </div>
+
+                                        {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
+                                        {content && <MDXRemote {...content} />}
+                                      </div>
+                                    )
+                                  })}
+                                {sql && (
+                                  <CodeBlock
+                                    className="useless-code-block-class"
+                                    language="sql"
+                                    hideLineNumbers={true}
+                                  >
+                                    {sql}
+                                  </CodeBlock>
+                                )}
                                 <CodeBlock
                                   className="useless-code-block-class"
                                   language="js"
                                   hideLineNumbers={true}
                                 >
                                   {exampleString +
-                                    (x.js &&
-                                      x.js.replace('```', '').replace('js', '').replace('```', ''))}
+                                    (example.code &&
+                                      example.code
+                                        .replace('```', '')
+                                        .replace('js', '')
+                                        .replace('```', ''))}
                                 </CodeBlock>
-                                <CodeBlock
-                                  className="useless-code-block-class"
-                                  language="json"
-                                  hideLineNumbers={true}
-                                >
-                                  {`{
-  data: [
-    {
-      id: 1,
-      name: "Afghanistan",
-    },
-    {
-      id: 2,
-      name: "Albania",
-    },
-    {
-      id: 3,
-      name: "Algeria",
-    },
-  ],
-  status: 200,
-  statusText: "OK",
-}
-
-                                  `}
-                                </CodeBlock>
+                                {response && (
+                                  <CodeBlock
+                                    className="useless-code-block-class"
+                                    language="json"
+                                    hideLineNumbers={true}
+                                  >
+                                    {response}
+                                  </CodeBlock>
+                                )}
                               </Tabs.Panel>
                             )
                           })}
@@ -288,8 +359,8 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     { title: 'Deleting data', id: 'delete()' },
   ]
 
-  const pages = Object.keys(jsSpec.pages)
-  // console.log('pages', pages)
+  const pages = jsSpec.functions.map((x) => x.id)
+  console.log('pages', pages)
 
   /**
    * Read all the markdown files that might have
@@ -306,7 +377,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
       const pathName = `docs/ref/js/${x}.mdx`
 
       function checkFileExists(x) {
-        console.log('checking this ', x)
+        // console.log('checking this ', x)
         if (fs.existsSync(x)) {
           return true
         } else {
@@ -316,10 +387,14 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
       const markdownExists = checkFileExists(pathName)
 
+      console.log(x, 'markdownExists', markdownExists)
+
       const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
       const { data, content } = matter(fileContents)
-      console.log('docBySlug', content)
+      // console.log('docBySlug', content)
       // console.log()
+
+      if (content) console.log(content)
       return {
         id: x,
         title: x,
@@ -330,7 +405,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     })
   )
 
-  console.log('allMarkdownDocs', allMarkdownDocs)
+  // console.log('allMarkdownDocs', allMarkdownDocs)
 
   return {
     props: {

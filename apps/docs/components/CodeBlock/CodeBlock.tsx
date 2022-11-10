@@ -39,8 +39,6 @@ const CodeBlock: FC<Props> = ({
   const { isDarkMode } = useTheme()
   const monokaiTheme = monokaiCustomTheme(isDarkMode)
 
-  console.log(children, hideLineNumbers)
-
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -65,8 +63,6 @@ const CodeBlock: FC<Props> = ({
   // don't show line numbers if bash == lang
   if (lang !== 'bash') hideLineNumbers = true
   const showLineNumbers = !hideLineNumbers
-
-  console.log(showLineNumbers)
 
   return (
     <div className="relative my-2 max-w-[90vw] md:max-w-none overflow-auto">

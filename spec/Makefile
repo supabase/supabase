@@ -94,6 +94,16 @@ combine.tsdoc.v2:
 	$(REPO_DIR)/enrichments/tsdoc_v2/functions_dereferenced.json \
 	> $(REPO_DIR)/enrichments/tsdoc_v2/combined.json
 
+combine-raw.tsdoc.v2:
+	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4], .[5]] }' \
+	$(REPO_DIR)/enrichments/tsdoc_v2/supabase.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/realtime.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/storage.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/functions.json \
+	> $(REPO_DIR)/enrichments/tsdoc_v2/combined_raw.json
+
 ###############################################################################
 # Format everything - easier for git to track changes
 ###############################################################################
