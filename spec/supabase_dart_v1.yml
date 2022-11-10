@@ -1019,6 +1019,24 @@ pages:
               .createSignedUrl('avatar1.png', 60);
           ```
 
+  storage.from.createSignedUrls():
+    title: 'from.createSignedUrls()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - name: Create Signed URLs
+        isSpotlight: true
+        dart: |
+          ```dart
+            final List<String> signedUrls = await supabase
+              .storage
+              .from('avatars')
+              .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60);
+          ```
+
   storage.from.getPublicUrl():
     description: |
       Retrieve URLs for assets in public buckets
