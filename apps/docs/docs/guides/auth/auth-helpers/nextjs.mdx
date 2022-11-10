@@ -179,7 +179,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 ## Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSupabaseClient` hook and only run your query once the user is defined client-side in the `useUser()` hook:
+For [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to use the `supabaseClient` from the `useSupabaseClient` hook and only run your query once the user is defined client-side in the `useUser()` hook:
 
 ```jsx lines=10-17
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
@@ -263,7 +263,7 @@ export const getServerSideProps = async (ctx) => {
 
 ## Server-side data fetching with RLS
 
-You can use the server supabase client to run [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
+You can use the server supabase client to run [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
 
 <Tabs
   scrollable
@@ -779,44 +779,44 @@ export const config = {
 
 ### Migrating to v0.4.X and supabase-js v2
 
-- With the update to `supabase-js` v2 the `auth` API routes are no longer required, therefore you can go ahead and delete your `auth` directory under the `/pages/api/` directory. Please refer to the [v2 migration guide](https://supabase.com/docs/reference/javascript/upgrade-guide) for the full set of changes within supabase-js.
+With the update to `supabase-js` v2 the `auth` API routes are no longer required, therefore you can go ahead and delete your `auth` directory under the `/pages/api/` directory. Please refer to the [v2 migration guide](/docs/reference/javascript/upgrade-guide) for the full set of changes within supabase-js.
 
-- The `/api/auth/logout` API route has been removed, please use the `signout` method instead:
+The `/api/auth/logout` API route has been removed, please use the `signout` method instead:
 
-  ```jsx
-  <button
-    onClick={async () => {
-      await supabaseClient.auth.signOut()
-      router.push('/')
-    }}
-  >
-    Logout
-  </button>
-  ```
+```jsx
+<button
+  onClick={async () => {
+    await supabaseClient.auth.signOut()
+    router.push('/')
+  }}
+>
+  Logout
+</button>
+```
 
-- The `supabaseClient` and `supabaseServerClient` have been removed in favor of the `createBrowserSupabaseClient` and `createServerSupabaseClient` methods. This allows you to provide the CLI-generated types to the client:
+The `supabaseClient` and `supabaseServerClient` have been removed in favor of the `createBrowserSupabaseClient` and `createServerSupabaseClient` methods. This allows you to provide the CLI-generated types to the client:
 
-  ```tsx
-  // client-side
-  import type { Database } from 'types_db'
-  const [supabaseClient] = useState(() => createBrowserSupabaseClient<Database>())
+```tsx
+// client-side
+import type { Database } from 'types_db'
+const [supabaseClient] = useState(() => createBrowserSupabaseClient<Database>())
 
-  // server-side API route
-  import type { NextApiRequest, NextApiResponse } from 'next'
-  import type { Database } from 'types_db'
+// server-side API route
+import type { NextApiRequest, NextApiResponse } from 'next'
+import type { Database } from 'types_db'
 
-  export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const supabaseServerClient = createServerSupabaseClient<Database>({
-      req,
-      res,
-    })
-    const {
-      data: { user },
-    } = await supabaseServerClient.auth.getUser()
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const supabaseServerClient = createServerSupabaseClient<Database>({
+    req,
+    res,
+  })
+  const {
+    data: { user },
+  } = await supabaseServerClient.auth.getUser()
 
-    res.status(200).json({ name: user?.name ?? '' })
-  }
-  ```
+  res.status(200).json({ name: user?.name ?? '' })
+}
+```
 
 - The `UserProvider` has been replaced by the `SessionContextProvider`. Make sure to wrap your `pages/_app.js` componenent with the `SessionContextProvider`. Then, throughout your application you can use the `useSessionContext` hook to get the `session` and the `useSupabaseClient` hook to get an authenticated `supabaseClient`.
 - The `useUser` hook now returns the `user` object or `null`.
