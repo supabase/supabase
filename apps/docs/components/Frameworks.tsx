@@ -87,7 +87,7 @@ const Frameworks = () => {
     },
   ]
   return (
-    <div className="grid md:grid-cols-12 gap-4">
+    <div className="grid md:grid-cols-12 gap-4 not-prose">
       {frameworks.map((x) => (
         <div key={x.name} className="col-span-3">
           <ButtonCard
