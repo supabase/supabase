@@ -183,7 +183,7 @@ export default function Ref(props) {
 
               return (
                 <div
-                  className="grid grid-cols-2 pb-32 ref-container"
+                  className="grid grid-cols-2 pb-32 ref-container gap-10"
                   id={x.id}
                   // ref={sectionRef}
                 >
@@ -216,6 +216,13 @@ export default function Ref(props) {
                       >
                         {jsSpec.pages[x.id].examples &&
                           jsSpec.pages[x.id].examples.map((x, i) => {
+                            const exampleString = `
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+`
+
                             return (
                               <Tabs.Panel id={x.name} label={x.name}>
                                 <CodeBlock
@@ -223,32 +230,35 @@ export default function Ref(props) {
                                   language="js"
                                   hideLineNumbers={true}
                                 >
-                                  {x.js && x.js.replace('```', '').replace('js', '')}
+                                  {exampleString +
+                                    (x.js &&
+                                      x.js.replace('```', '').replace('js', '').replace('```', ''))}
                                 </CodeBlock>
                                 <CodeBlock
                                   className="useless-code-block-class"
                                   language="json"
                                   hideLineNumbers={true}
                                 >
-                                  {`{ 
+                                  {`{
   data: [
     {
       id: 1,
-      name: 'Afghanistan',
+      name: "Afghanistan",
     },
     {
       id: 2,
-      name: 'Albania',
+      name: "Albania",
     },
     {
       id: 3,
-      name: 'Algeria',
+      name: "Algeria",
     },
   ],
   status: 200,
-  statusText: 'OK',
+  statusText: "OK",
 }
-                              `}
+
+                                  `}
                                 </CodeBlock>
                               </Tabs.Panel>
                             )
