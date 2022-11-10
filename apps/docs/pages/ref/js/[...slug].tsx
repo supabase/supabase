@@ -156,7 +156,7 @@ export default function Ref(props) {
             // ref={myRef}
           >
             {jsSpec.functions.map((item, itemIndex) => {
-              if (item.id !== 'select()') return <div>hidden section</div>
+              // if (item.id !== 'select()') return <div>hidden section</div>
               // const sectionRef = useRef(null)
 
               // console.log('x', x)
