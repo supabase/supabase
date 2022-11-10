@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Tabs } from 'ui'
+import { IconAlertCircle, Tabs } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -10,7 +10,8 @@ import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import InformationBox from 'components/ui/InformationBox'
+import Link from 'next/link'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -57,11 +58,30 @@ const PITR = () => {
   if (error) return <BackupsError />
   if (!isEnabled)
     return (
-      <UpgradeToPro
-        projectRef={ref}
-        primaryText="Free Plan does not include point in time recovery."
-        secondaryText="Please upgrade to the Pro plan to enable point in time recovery for your project."
+      <InformationBox
+        hideCollapse
+        defaultVisibility
+        title={
+          <div>
+            <p>
+              Point in time backups is an Enterprise feature. Reach out to us{' '}
+              <Link
+                href={`/support/new?ref=${ref}&category=sales&subject=Interest%20in%20enabling%20PITR%20for%20my%20project`}
+              >
+                <a className="text-brand-900">here</a>
+              </Link>{' '}
+              if you're interested!
+            </p>
+          </div>
+        }
+        icon={<IconAlertCircle size={18} strokeWidth={2} />}
       />
+      // [Joshen] Once PITR is ready for self-serve
+      // <UpgradeToPro
+      //   projectRef={ref}
+      //   primaryText="Free Plan does not include point in time recovery."
+      //   secondaryText="Please upgrade to the Pro plan to enable point in time recovery for your project."
+      // />
     )
 
   return (
