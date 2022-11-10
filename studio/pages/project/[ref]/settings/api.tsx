@@ -38,9 +38,9 @@ const ApiSettings: NextPageWithLayout = () => {
 
   return (
     <PageContext.Provider value={PageState}>
-      <FormsContainer>
+      <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
         <ServiceList projectRef={ref as string} />
-      </FormsContainer>
+      </div>
     </PageContext.Provider>
   )
 }

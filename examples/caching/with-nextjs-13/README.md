@@ -1,12 +1,18 @@
-# Caching data at the edge with Next.js 13 and Supabase
+# Caching data with Next.js 13 and Supabase
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-It showcases how to [fetch and cache data](// See the docs: https://beta.nextjs.org/docs/data-fetching/caching) at the Edge with Next.js and Supabase.
+It showcases how to [fetch and cache data](https://beta.nextjs.org/docs/data-fetching/caching) with Next.js and Supabase.
 
 ## Getting Started
 
-First, start Supabase locally and seed your local development database with the [Supabase CLI](https://supabase.com/docs/reference/cli):
+Download this example:
+
+```
+curl https://codeload.github.com/supabase/supabase/tar.gz/master | tar -xz --strip=3 supabase-master/examples/caching/with-nextjs-13
+```
+
+Then, start Supabase locally and seed your local development database with the [Supabase CLI](https://supabase.com/docs/reference/cli):
 
 ```bash
 supabase start

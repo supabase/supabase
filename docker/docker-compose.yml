@@ -9,7 +9,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:latest
+    image: supabase/studio:0.22.08
     restart: unless-stopped
     ports:
       - ${STUDIO_PORT}:3000/tcp
@@ -27,7 +27,7 @@ services:
 
   kong:
     container_name: supabase-kong
-    image: kong:2.1
+    image: kong:2.8.1
     restart: unless-stopped
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
@@ -41,13 +41,14 @@ services:
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
-      - ./volumes/api:/var/lib/kong
+      - ./volumes/api:/var/lib/kong:ro
 
   auth:
     container_name: supabase-auth
     image: supabase/gotrue:v2.19.4
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
     restart: unless-stopped
     environment:
       GOTRUE_API_HOST: 0.0.0.0
@@ -55,7 +56,7 @@ services:
       API_EXTERNAL_URL: ${API_EXTERNAL_URL}
 
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?search_path=auth
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 
       GOTRUE_SITE_URL: ${SITE_URL}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
@@ -69,6 +70,8 @@ services:
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+      # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
+      # GOTRUE_SMTP_MAX_FREQUENCY: 1s
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
       GOTRUE_SMTP_HOST: ${SMTP_HOST}
       GOTRUE_SMTP_PORT: ${SMTP_PORT}
@@ -85,12 +88,13 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v9.0.1
+    image: postgrest/postgrest:v9.0.1.20220717
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
     restart: unless-stopped
     environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
@@ -100,13 +104,14 @@ services:
     container_name: supabase-realtime
     image: supabase/realtime:v0.25.1
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
     restart: unless-stopped
     environment:
       DB_HOST: ${POSTGRES_HOST}
       DB_PORT: ${POSTGRES_PORT}
       DB_NAME: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
+      DB_USER: supabase_admin
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_SSL: "false"
       PORT: 4000
@@ -122,18 +127,19 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.10.0
+    image: supabase/storage-api:v0.21.4
     depends_on:
-      - db # Disable this if you are using an external Postgres database
-      - rest
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
+      rest:
+        condition: service_started
     restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-      PGOPTIONS: -c search_path=storage,public
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
       FILE_STORAGE_BACKEND_PATH: /var/lib/storage
@@ -146,22 +152,28 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.29.0
+    image: supabase/postgres-meta:v0.50.2
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
     restart: unless-stopped
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
       PG_META_DB_PORT: ${POSTGRES_PORT}
       PG_META_DB_NAME: ${POSTGRES_DB}
-      PG_META_DB_USER: ${POSTGRES_USER}
+      PG_META_DB_USER: supabase_admin
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.77
+    image: supabase/postgres:14.1.0.82
+    healthcheck:
+      test: pg_isready -U postgres -h localhost
+      interval: 5s
+      timeout: 5s
+      retries: 10
     command:
       - postgres
       - -c
@@ -172,7 +184,7 @@ services:
     ports:
       - ${POSTGRES_PORT}:5432
     environment:
+      POSTGRES_HOST: /var/run/postgresql
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      # - ./volumes/db/data:/var/lib/postgresql/data
-      - ./volumes/db/init:/docker-entrypoint-initdb.d
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql
