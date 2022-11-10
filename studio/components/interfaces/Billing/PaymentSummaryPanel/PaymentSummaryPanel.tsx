@@ -15,7 +15,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
-import { getProductPrice } from '../Billing.utils'
+import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
 import { DatabaseAddon } from '../AddOns/AddOns.types'
@@ -98,6 +98,19 @@ const PaymentSummaryPanel: FC<Props> = ({
     if (plan.prod_id === STRIPE_PRODUCT_IDS.PAYG || plan.id === STRIPE_PRODUCT_IDS.PAYG) {
       return 'Pro tier (No spend caps)'
     } else return plan.name
+  }
+
+  const validateOrder = () => {
+    const error = validateSubscriptionUpdatePayload(selectedComputeSize, selectedPITRDuration)
+    if (error) {
+      return ui.setNotification({
+        duration: 4000,
+        category: 'error',
+        message: error,
+      })
+    } else {
+      isChangingComputeSize ? setShowConfirmModal(true) : onConfirmPayment()
+    }
   }
 
   return (
@@ -315,7 +328,7 @@ const PaymentSummaryPanel: FC<Props> = ({
             size="medium"
             loading={isSubmitting}
             disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
-            onClick={() => (isChangingComputeSize ? setShowConfirmModal(true) : onConfirmPayment())}
+            onClick={() => validateOrder()}
           >
             Confirm payment
           </Button>
