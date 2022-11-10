@@ -1,4 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import {
+  useEffect,
+  // useRef,
+  useState,
+} from 'react'
 // pages/index.js
 
 import fs from 'fs'
@@ -13,7 +17,9 @@ import ReactMarkdown from 'react-markdown'
 
 // @ts-ignore
 import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
-import jsSpec from '~/../../spec/supabase_js_v2_temp.yaml'
+
+// @ts-expect-error
+import jsSpec from '~/../../spec/supabase_js_v2_temp.yml' assert { type: 'yml' }
 
 import { Tabs } from '~/../../packages/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -24,7 +30,7 @@ import assert from 'assert'
 
 const marginTop = 256
 export default function Ref(props) {
-  const myRef = useRef(null)
+  // const myRef = useRef(null)
 
   const [offsetY, setOffsetY] = useState(0)
   const [sections, setSections] = useState([])
@@ -141,9 +147,12 @@ export default function Ref(props) {
         </div>
 
         <div className="ml-64 w-full">
-          <div className="flex flex-col gap-32 mx-auto max-w-5xl" ref={myRef}>
+          <div
+            className="flex flex-col gap-32 mx-auto max-w-5xl"
+            // ref={myRef}
+          >
             {props.docs.map((x) => {
-              const sectionRef = useRef(null)
+              // const sectionRef = useRef(null)
 
               // console.log('x', jsSpec.pages[x.id])
               const hasTsRef = jsSpec.pages[x.id]['$ref'] || null
@@ -153,27 +162,31 @@ export default function Ref(props) {
               // console.log('tsDefinition', tsDefinition)
               console.log(`tsDefinition for ${x.title ?? x.id}`, tsDefinition)
 
-              useEffect(() => {
-                const observer = new IntersectionObserver((entries) => {
-                  // console.log('entries', entries)
-                  const entry = entries[0]
+              // useEffect(() => {
+              //   const observer = new IntersectionObserver((entries) => {
+              //     // console.log('entries', entries)
+              //     const entry = entries[0]
 
-                  // console.log(
-                  //   x.id,
-                  //   'intersectiong',
-                  //   entry.isIntersecting,
-                  //   'visible',
-                  //   entry.isVisible
-                  // )
-                })
-                // console.log('myRef', myRef.current)
-                observer.observe(sectionRef.current)
-              }, [])
+              //     // console.log(
+              //     //   x.id,
+              //     //   'intersectiong',
+              //     //   entry.isIntersecting,
+              //     //   'visible',
+              //     //   entry.isVisible
+              //     // )
+              //   })
+              //   // console.log('myRef', myRef.current)
+              //   observer.observe(sectionRef.current)
+              // }, [])
 
               const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
               return (
-                <div className="grid grid-cols-2 pb-32 ref-container" id={x.id} ref={sectionRef}>
+                <div
+                  className="grid grid-cols-2 pb-32 ref-container"
+                  id={x.id}
+                  // ref={sectionRef}
+                >
                   <div className="prose" key={x.id}>
                     <h1 className="text-3xl not-prose" onClick={() => updateUrl(x.id)}>
                       {x.title ?? x.id}
@@ -205,10 +218,10 @@ export default function Ref(props) {
                           jsSpec.pages[x.id].examples.map((x, i) => {
                             return (
                               <Tabs.Panel id={x.name} label={x.name}>
-                                <CodeBlock lang="js" className="useless-code-block-class">
+                                <CodeBlock className="useless-code-block-class" language="js">
                                   {x.js && x.js.replace('```', '').replace('js', '')}
                                 </CodeBlock>
-                                <CodeBlock lang="js" className="useless-code-block-class">
+                                <CodeBlock className="useless-code-block-class" language="json">
                                   {`{ 
   data: [
     {
