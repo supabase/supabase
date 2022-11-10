@@ -8,12 +8,14 @@ type ForgotPasswordLayoutProps = {
   heading: string
   subheading: string
   logoLinkToMarketingSite?: boolean
+  showHeadings?: boolean
 }
 
 const ForgotPasswordLayout = ({
   heading,
   subheading,
   logoLinkToMarketingSite = false,
+  showHeadings = true,
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
   const {
@@ -52,10 +54,12 @@ const ForgotPasswordLayout = ({
 
       <div className="flex flex-col justify-center items-center">
         <main className="max-w-[448px] w-full flex flex-col px-5">
-          <div className="mb-6">
-            <h1 className="text-2xl lg:text-3xl mt-8 mb-2">{heading}</h1>
-            <h2 className="text-scale-1100 text-sm">{subheading}</h2>
-          </div>
+          {showHeadings && (
+            <div className="mb-6">
+              <h1 className="text-2xl lg:text-3xl mt-8 mb-2">{heading}</h1>
+              <h2 className="text-scale-1100 text-sm">{subheading}</h2>
+            </div>
+          )}
 
           {children}
         </main>

@@ -46,7 +46,7 @@ const SignUpForm = () => {
         message: `Signed successfully! Please confirm your email before signing in`,
       })
 
-      await router.push('/sign-in')
+      await router.push('/sign-up/success')
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
