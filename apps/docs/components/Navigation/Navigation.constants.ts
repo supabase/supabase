@@ -178,11 +178,6 @@ export const menuItems: NavMenu = {
           url: undefined,
           items: [
             { name: 'Overview', url: '/guides/database/extensions', items: [] },
-            {
-              name: 'plv8: Javascript Language',
-              url: '/guides/database/extensions/plv8',
-              items: [],
-            },
             { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
             {
               name: 'pg_cron: Job Scheduling',
@@ -195,6 +190,11 @@ export const menuItems: NavMenu = {
               items: [],
             },
             { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
+            {
+              name: 'plv8: Javascript Language',
+              url: '/guides/database/extensions/plv8',
+              items: [],
+            },
             {
               name: 'uuid-ossp: Unique Identifiers',
               url: '/guides/database/extensions/uuid-ossp',
