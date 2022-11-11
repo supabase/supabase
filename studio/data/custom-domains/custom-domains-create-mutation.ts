@@ -25,7 +25,7 @@ export async function createCustomDomain({
     throw response.error
   }
 
-  return { customDomain }
+  return response
 }
 
 type CustomDomainCreateData = Awaited<ReturnType<typeof createCustomDomain>>
