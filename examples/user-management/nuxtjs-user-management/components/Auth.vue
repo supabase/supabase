@@ -1,9 +1,18 @@
 <template>
-  <div>
-    <form @submit.prevent="handleSubmit" class="auth-container">
+  <div class="row">
+    <div class="col-6">
+      <h1 class="header">Supabase Auth + Storage</h1>
+      <p className="">
+        Experience our Auth and Storage through a simple profile management example. Create a user
+        profile and upload an avatar image. Fast, simple, secure.
+      </p>
+    </div>
+    <form class="col-6 auth-widget" @submit.prevent="handleSubmit">
+      <p class="description">Sign in via magic link with your email below</p>
       <div>
         <label for="email-register">Email</label>
         <input
+          class="inputField"
           v-model="formValues.email"
           id="email-register"
           type="email"
@@ -11,8 +20,8 @@
         />
       </div>
 
-      <div style="margin-top: 50px">
-        <button class="button block primary" :disabled="formValues.loader">
+      <div>
+        <button class="button block" :disabled="formValues.loader">
           {{ formValues.loader ? "Loading ..." : "Sign up with magic link" }}
         </button>
       </div>
@@ -34,10 +43,9 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      console.log("ENV", process.env.NUXT_PUBLIC_SUPABASE_URL);
       try {
         this.formValues.loader = true;
-        const { error, user } = await supabase.auth.signIn({
+        const { error, data: { user } } = await supabase.auth.signInWithOtp({
           email: this.formValues.email,
         });
 
@@ -47,7 +55,7 @@ export default {
 
         alert("Check your email for the login link!");
       } catch (error) {
-        alert(error.error_description || error.message);
+        alert(error.message);
       } finally {
         this.formValues.loader = false;
       }

@@ -19,16 +19,6 @@ const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
   },
 })
 
-export function formReducer(state: any, action: any) {
-  return {
-    ...state,
-    [action.name]: {
-      value: action.value,
-      error: action.error,
-    },
-  }
-}
-
 export const uploadAttachments = async (ref: string, files: File[]) => {
   const filesToUpload = Array.from(files)
   const uploadedFiles = await Promise.all(
@@ -57,15 +47,10 @@ export const uploadAttachments = async (ref: string, files: File[]) => {
 }
 
 export const formatMessage = (message: string, attachments: string[]) => {
-  const formattedMessage = message.replace(/\n/g, '<br/>')
   if (attachments.length > 0) {
-    const attachmentsImg = attachments.map(
-      (url) => `<img src=${url} width="200" style="margin-right:10px" />`
-    )
-    return `${formattedMessage}<br/><hr/><b>Uploaded attachments:</b><br/><div style="display:flex;align-items:center">${attachmentsImg.join(
-      ''
-    )}</div>`
+    const attachmentsImg = attachments.map((url) => `\n${url}`)
+    return `${message}\n${attachmentsImg.join('')}`
   } else {
-    return formattedMessage
+    return message
   }
 }

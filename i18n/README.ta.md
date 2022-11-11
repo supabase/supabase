@@ -45,7 +45,7 @@
 
 நாங்கள் தற்போது பொது பீட்டாவில் இருக்கிறோம். முக்கிய துப்பிப்புகளைப் பற்றி அறிவிக்க இந்த ரெப்போவின் "வெளியீடுகளைப்" பாருங்கள்.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="இந்த ரெப்போவைப் பாருங்கள்"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="இந்த ரெப்போவைப் பாருங்கள்"/></kbd>
 
 ---
 
@@ -58,7 +58,7 @@
 சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://app.supabase.com). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
 நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/hosting/overview) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
 
-![கட்டிடக்கலை](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![கட்டிடக்கலை](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [பூஸ்ட்ஜீஆர்இஎஸ்கியூஎல்](https://www.postgresql.org/) என்பது 30 ஆண்டுகளுக்கும் மேலான செயலில் உள்ள வளர்ச்சியுடன் கூடிய ஒரு பொருள்-தொடர்புடைய தரவுத்தள அமைப்பாகும், இது நம்பகத்தன்மை, அம்ச உறுதிப்பாடு மற்றும் செயல்திறனுக்கான வலுவான நற்பெயரைப் பெற்றுள்ளது.
 - [நிகழ்நேரம்](https://github.com/supabase/realtime) என்பது ஒரு எலிக்சர் சேவையகமாகும், இது வெப்சாக்கெட்டுகளைப் பயன்படுத்தி பூஸ்ட்ஜீஆர்இஎஸ்கியூஎல் செருகல்கள், புதுப்பிப்புகள் மற்றும் நீக்குதல்களைக் கேட்க உங்களை அனுமதிக்கிறது. நிகழ்நேர கருத்துக் கணிப்புகள் தரவுத்தள மாற்றங்களுக்கான போஸ்ட்கிரஸின் உள்ளமைக்கப்பட்ட பிரதிபலிப்பு செயல்பாடு, ஜே.எஸ்.ஆனுக்கு மாற்றங்களை மாற்றுகிறது, பின்னர் அங்கீகரிக்கப்பட்ட வாடிக்கையாளர்களுக்கு வெப்சாக்கெட்டுகள் மூலம் ஜே.எஸ்.என் ஐ ஒளிபரப்புகிறது.
@@ -117,8 +117,8 @@
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">சேமிப்பு-ஸேசர்ப</a></td>
   </tr>
   <tr>
-    <td>டார்ட் (ஃப்ளடர்)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-டார்ட்</a></td>
+    <td>ஃப்ளடர்</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-டார்ட்</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">போஸ்ட்ஜீராஸ்ட்-டார்ட்</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">கூட்ரூ-டார்ட்</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">நிகழ்நேரம்-டார்ட்</a></td>

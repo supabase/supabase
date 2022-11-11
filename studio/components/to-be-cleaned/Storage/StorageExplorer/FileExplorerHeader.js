@@ -16,7 +16,8 @@ import {
   IconEdit2,
   IconLoader,
   IconChevronsUp,
-} from '@supabase/ui'
+  IconList,
+} from 'ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
 
@@ -198,9 +199,9 @@ const FileExplorerHeader = ({
   return (
     <div
       className="
-    bg-panel-header-light dark:bg-panel-header-dark
-    border-panel-border-light dark:border-panel-border-dark
-    flex h-[40px] items-center justify-between rounded-t-md border-b px-2"
+    flex h-[40px]
+    items-center justify-between
+    rounded-t-md border-b border-panel-border-light bg-panel-header-light px-2 dark:border-panel-border-dark dark:bg-panel-header-dark"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
@@ -284,11 +285,18 @@ const FileExplorerHeader = ({
           >
             <Button
               as="span"
-              icon={<IconColumns size={16} strokeWidth={2} />}
+              icon={
+                view === 'LIST' ? (
+                  <IconList size={16} strokeWidth={2} />
+                ) : (
+                  <IconColumns size={16} strokeWidth={2} />
+                )
+              }
               type="text"
               disabled={breadcrumbs.length === 0}
+              onChange={onChangeView}
             >
-              Views
+              View as
             </Button>
           </Dropdown>
           <Dropdown
@@ -340,7 +348,7 @@ const FileExplorerHeader = ({
             </Button>
           </Dropdown>
         </div>
-        <div className="border-panel-border-light dark:border-panel-border-dark h-6 border-r" />
+        <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
         <div className="flex items-center space-x-1">
           <div className="hidden">
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
@@ -366,7 +374,7 @@ const FileExplorerHeader = ({
         {/* Search: Disabled for now */}
         {view === STORAGE_VIEWS.LIST && (
           <>
-            <div className="border-panel-border-light dark:border-panel-border-dark h-6 border-r" />
+            <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
             <div className="flex items-center">
               {isSearching ? (
                 <Input

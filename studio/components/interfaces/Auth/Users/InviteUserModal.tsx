@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Modal, Input, IconPlus, IconMail, Form } from '@supabase/ui'
+import { Button, Modal, Input, IconPlus, IconMail, Form } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -67,11 +67,11 @@ const InviteUserModal = () => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">
+              <span className="text-xs text-scale-1200">
                 You need additional permissions to invite users
               </span>
             </div>
@@ -94,7 +94,7 @@ const InviteUserModal = () => {
           onSubmit={onInviteuser}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="py-4 space-y-6">
+            <div className="space-y-6 py-4">
               <Modal.Content>
                 <Input
                   autoFocus

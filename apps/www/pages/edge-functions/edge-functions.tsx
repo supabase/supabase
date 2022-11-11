@@ -1,4 +1,4 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from '@supabase/ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
@@ -139,9 +139,12 @@ function Database() {
         <SectionContainer>
           <div className="col-span-12 mb-10 space-y-12 lg:col-span-3 lg:mb-0 ">
             <div className="grid gap-8 rounded md:grid-cols-2 xl:grid-cols-4">
-              {featureBlocks.map((item) => {
+              {featureBlocks.map((item, i) => {
                 return (
-                  <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6">
+                  <div
+                    className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"
+                    key={i}
+                  >
                     <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                       {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                     </div>

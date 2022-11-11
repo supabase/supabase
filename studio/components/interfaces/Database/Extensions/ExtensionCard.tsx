@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconLoader, Toggle } from '@supabase/ui'
+import { Badge, IconLoader, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -18,7 +18,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const canUpdateExtentions = checkPermissions(
+  const canUpdateExtensions = checkPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -62,19 +62,19 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
     <>
       <div
         className={[
-          'border-panel-border-light dark:border-panel-border-dark flex',
+          'flex border-panel-border-light dark:border-panel-border-dark',
           'flex-col overflow-hidden rounded border shadow-sm',
         ].join(' ')}
       >
         <div
           className={[
-            'bg-panel-header-light dark:bg-panel-header-dark border-panel-border-light',
-            'dark:border-panel-border-dark flex border-b p-4 px-6',
+            'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
+            'flex border-b p-4 px-6 dark:border-panel-border-dark',
           ].join(' ')}
         >
           <h3
             title={extension.name}
-            className="text-scale-1200 m-0 h-5 flex-1 truncate text-base uppercase"
+            className="m-0 h-5 flex-1 truncate text-base uppercase text-scale-1200"
           >
             {extension.name}
           </h3>
@@ -84,7 +84,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
             <Toggle
               size="tiny"
               checked={isOn}
-              disabled={!canUpdateExtentions}
+              disabled={!canUpdateExtensions}
               onChange={() => (isOn ? disableExtension() : enableExtension())}
             />
           )}
@@ -96,13 +96,11 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           ].join(' ')}
         >
           <div className="p-4 px-6">
-            <p className="text-scale-1100 text-sm">
-              <span className="flex-grow capitalize">{extension.comment}</span>
-            </p>
+            <p className="text-sm text-scale-1100 capitalize-sentence">{extension.comment}</p>
           </div>
           {isOn && extension.schema && (
             <div className="p-4 px-6">
-              <div className="text-scale-1100 text-sm flex-grow space-x-2 flex items-center">
+              <div className="flex flex-grow items-center space-x-2 text-sm text-scale-1100">
                 <span>Schema:</span>
                 <Badge>{`${extension.schema}`}</Badge>
               </div>

@@ -20,10 +20,10 @@ const TriggersPage: NextPageWithLayout = () => {
   const canReadTriggers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       fetchTriggers()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   const fetchTriggers = async () => {
     meta.triggers.load()

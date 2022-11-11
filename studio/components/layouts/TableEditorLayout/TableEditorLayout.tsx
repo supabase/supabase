@@ -36,14 +36,14 @@ const TableEditorLayout: FC<Props> = ({
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       meta.schemas.load()
       meta.tables.load()
       meta.types.load()
       meta.policies.load()
       meta.publications.load()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   useEffect(() => {
     let cancel = false

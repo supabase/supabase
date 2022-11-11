@@ -38,7 +38,7 @@ For fuld dokumentation, besøg [supabase.com/docs](https://supabase.com/docs)
 
 Vi er i øjeblikket i Offentlig beta. Hold øje med udgivelser på denne side for notifkationer om større opdateringer.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Hold øje med dette repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Hold øje med dette repo"/></kbd>
 
 ---
 
@@ -50,7 +50,7 @@ Supabase er en kombination af open source værktøjer. Vi bygger Firebase fuktio
 
 Supabase er en [hosted platform](https://app.supabase.com). Du kan skrive dig op og starte med at anvende Supabase uden nogen form for installation. Vi er stadig i gang med at forbedre den lokale udvikleroplevelse - dette er pt vores hovedfokus sammen med platformens generelle stabilitet.
 
-![Arkitektur](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arkitektur](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) er en objektorienteret relationel database med mere end 30 års aktiv udvikling der har givet et stærkt omdømme for pålidelighed, funktionel robusthed og ydeevne.
 - [Realtime](https://github.com/supabase/realtime) er en Elixir server der giver mulighed for at lytte efter PostgreSQL oprettelser, opdateringer og sletninger ved hjælp af websockets. Supabase lytter efter Postgres' indbyggede replikeringsmekanisme, konverterer replika byte-strømmen til JSON og udsender derefter JSON gennem websockets.
@@ -71,7 +71,7 @@ Vores klientbibliotek er opbygget modulært. Hvert underbibliotek er en selvstæ
 
 | Repo                  | Officielt                                        | Fællesskab                                                                                                                                                                                                                                                                       |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Dart`](https://github.com/supabase/supabase-dart) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb)                                                 |
+| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-Flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb)                                           |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` \| `Ruby`                                                                                            |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust` \| `Ruby`                                                                                                  |

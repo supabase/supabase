@@ -13,7 +13,7 @@ import {
   IconChevronDown,
   Modal,
   IconEdit2,
-} from '@supabase/ui'
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useOptimisticSqlSnippetCreate, useStore, checkPermissions } from 'hooks'
@@ -73,7 +73,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
         <Dropdown.Item onClick={renameQuery} icon={<IconEdit2 size="tiny" />}>
           Rename query
         </Dropdown.Item>
-        <Dropdown.Seperator />
+        <Dropdown.Separator />
         <Dropdown.Item onClick={() => setDeleteModalOpen(true)} icon={<IconTrash size="tiny" />}>
           Remove query
         </Dropdown.Item>
@@ -121,7 +121,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
         <Modal.Content>
-          <p className="text-scale-1100 py-4 text-sm">{`Are you sure you want to remove '${name}' ?`}</p>
+          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to remove '${name}' ?`}</p>
         </Modal.Content>
       </ConfirmationModal>
     </div>

@@ -4,12 +4,6 @@ A dashboard for managing your self-hosted Supabase project, and used on our [hos
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind](https://tailwindcss.com/)
-- [Supabase UI](https://ui.supabase.com/)
-- [MobX](https://www.mobxjs.com/)
-
-## Disclaimer
-
-Supabase Studio is under heavy development. Apologies for any confusing patterns used while we're refactoring the codebase. If you're planning to contribute, it is advised that you run `git pull` frequently to retrieve the latest updates.
 
 ## What's included
 
@@ -35,6 +29,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
     - The branch name is arbitrary — just make sure it summarizes the work.
 - When you send a PR to `master`, it will automatically tag members of the frontend team for review.
 - Review the [contributing checklists](contributing/contributing-checklists.md) to help test your feature before sending a PR.
+- The Dashboard is under active development. You should run `git pull` frequently to make sure you're up to date.
 
 ### Developer Quickstart
 
@@ -42,7 +37,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
 # You'll need to be on Node v14
 # in /studio
 
-npm i # install deps
+npm i # install dependencies
 npm run dev # start dev server
 npm run test # run tests
 npm run -- --watch # run tests in watch mode
@@ -50,7 +45,7 @@ npm run -- --watch # run tests in watch mode
 
 ## Running within a self-hosted environment
 
-Firstly, follow the guide [here](https://supabase.com/docs/guides/hosting/docker) to get started with self-hosted Supabase.
+Follow the [self-hosting guide](https://supabase.com/docs/guides/hosting/docker) to get started.
 
 ```
 cd ..
@@ -73,18 +68,9 @@ npm install
 npm run dev
 ```
 
-## UI Testing Notes
+If you would like to configure different defaults for "Default Organization" and "Default Project", you will need to update the `.env` in the studio folder with the corresponding values.
 
-### `<Popover>` vs `<Dropdown>`
-
-When simulating clicks on these components, do the following:
-
-```js
-// for Popovers
-import userEvent from '@testing-library/user-event'
-userEvent.click('Hello world')
-
-// for Dropdowns
-import clickDropdown from 'tests/helpers'
-clickDropdown('Hello world')
+```
+DEFAULT_ORGANIZATION_NAME=
+DEFAULT_PROJECT_NAME=
 ```

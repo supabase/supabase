@@ -12,11 +12,11 @@ Supabase provides several options for programmatically connecting to your Postgr
 - Direct connections using Postgres' standard connection system.
 - Connection pooling using PgBouncer.
 
-### API vs Direct vs Pooling
+### Direct vs Pooling vs API
 
-- The API is an auto-generated REST interface. You should use this for all browser and application interactions.
 - A "direct connection" is when a connection is made to the database using Postgres' native connection implementation. You should use this for tools which are always alive - usually installed on a long-running server.
 - A "connection pool" is a system (external to Postgres) which keeps connections "open". You should use this for serverless functions and tools which disconnect from the database frequently.
+- The API is an auto-generated REST interface. You should use this for all browser and application interactions. The API server internally handles a connection pool.
 
 Why would you use a connection pool? Primarily because the way that Postgres handles connections isn't very scalable for a large number of _temporary_ connections.
 You can use these simple questions to determine which connection method to use:
@@ -112,7 +112,12 @@ This is the most granular option. Connections are returned to the pool after eve
 3. Find your Connection Info and Connection String. Connection pooling is on port `6543`.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/connection-pool-config.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/connection-pool-config.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Connecting with SSL

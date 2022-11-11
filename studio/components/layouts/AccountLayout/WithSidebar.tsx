@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import { isUndefined } from 'lodash'
-import { Menu, IconArrowUpRight, Badge, IconLogOut } from '@supabase/ui'
+import { Menu, IconArrowUpRight, Badge, IconLogOut } from 'ui'
 import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
@@ -19,7 +19,7 @@ interface Props {
 }
 
 /*
-The information heirarchy for WithSidebar is:
+The information hierarchy for WithSidebar is:
   WithSidebar
     SectionsWithHeaders
       SidebarItem
@@ -49,14 +49,14 @@ const WithSidebar: FC<Props> = ({
           id="with-sidebar"
           style={{ height: maxHeight, maxHeight }}
           className={[
-            'bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark h-full',
-            'hide-scrollbar dark:border-dark w-64 overflow-auto border-r',
+            'h-full bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark',
+            'hide-scrollbar w-64 overflow-auto border-r dark:border-dark',
           ].join(' ')}
         >
           {title && (
             <div className="mb-2">
-              <div className="dark:border-dark flex h-12 max-h-12 items-center border-b px-6">
-                <h4 className="text-lg mb-0">{title}</h4>
+              <div className="flex h-12 max-h-12 items-center border-b px-6 dark:border-dark">
+                <h4 className="mb-0 text-lg">{title}</h4>
               </div>
             </div>
           )}
@@ -73,7 +73,7 @@ const WithSidebar: FC<Props> = ({
                     subitemsParentKey={subitemsParentKey}
                   />
                 ) : (
-                  <div className="dark:border-dark border-b py-5 px-6" key={section.key}>
+                  <div className="border-b py-5 px-6 dark:border-dark" key={section.key}>
                     <SidebarItem
                       links={section.links}
                       subitems={subitems}
@@ -106,7 +106,7 @@ const SectionWithHeaders: FC<SectionWithHeadersProps> = ({
   subitems,
   subitemsParentKey,
 }) => (
-  <div key={section.heading} className="dark:border-dark border-b py-5 px-6">
+  <div key={section.heading} className="border-b py-5 px-6 dark:border-dark">
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
       <div className="mb-1 px-3">
@@ -210,17 +210,17 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
     <Link href={href || ''}>
       <a className="block" target={isExternal ? '_blank' : '_self'}>
         <button
-          className="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
+          className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900"
           onClick={onClick || (() => {})}
         >
           {isExternal && (
-            <span className="text-scale-900 group-hover:text-scale-1100 truncate text-sm transition">
+            <span className="truncate text-sm text-scale-900 transition group-hover:text-scale-1100">
               <IconArrowUpRight size={'tiny'} />
             </span>
           )}
           <span
             title={label}
-            className="text-scale-1100 group-hover:text-scale-1200 w-full truncate text-sm transition"
+            className="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>

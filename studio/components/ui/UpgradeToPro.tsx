@@ -1,4 +1,4 @@
-import { Button, IconClock } from '@supabase/ui'
+import { Button, IconClock } from 'ui'
 import Link from 'next/link'
 import { FC } from 'react'
 
@@ -24,10 +24,10 @@ const UpgradeToPro: FC<Props> = ({ primaryText, projectRef, secondaryText }) => 
         <div className="space-y-1">
           <p className="text-sm">{primaryText}</p>
           <div>
-            <p className="text-scale-1100 text-sm">{secondaryText}</p>
+            <p className="text-sm text-scale-1100">{secondaryText}</p>
           </div>
         </div>
-        <Link href={`/project/${projectRef}/settings/billing`}>
+        <Link href={`/project/${projectRef}/settings/billing/subscription`}>
           <Button type="primary">Upgrade to Pro</Button>
         </Link>
       </div>

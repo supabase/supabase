@@ -7,135 +7,18 @@ sidebar_label: Nuxt 3
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import QuickstartIntro from './_partials/quickstart_intro.md'
+import ProjectSetup from './_partials/project_setup.mdx'
 
-## Intro
-
-This example provides the steps to build a simple user management app (from scratch!) using Supabase and Nuxt 3. It includes:
-
-- Supabase [Database](/docs/guides/database): a Postgres database for storing your user data.
-- Supabase [Auth](/docs/guides/auth): users can sign in with magic links (no passwords, only email).
-- Supabase [Storage](/docs/guides/storage): users can upload a photo.
-- [Row Level Security](/docs/guides/auth#row-level-security): data is protected so that individuals can only access their own data.
-- Instant [APIs](/docs/guides/api): APIs will be automatically generated when you create your database tables.
-
-By the end of this guide you'll have an app which allows users to login and update some basic profile details:
+<QuickstartIntro />
 
 ![Supabase User Management example](/img/user-management-demo.png)
 
 ### Github
 
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/supabase-community/nuxt3-quickstarter).
+Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/nuxt3-user-management).
 
-## Project set up
-
-Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase
-and then creating a "schema" inside the database.
-
-### Create a project
-
-1. Go to [app.supabase.com](https://app.supabase.com).
-1. Click on "New Project".
-1. Enter your project details.
-1. Wait for the new database to launch.
-
-### Set up the database schema
-
-Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
-or you can just copy/paste the SQL from below and run it yourself.
-
-<Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-<TabItem value="dashboard">
-
-1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
-2. Click **User Management Starter**.
-3. Click **Run**.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/sql-user-management-starter.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
-
-</TabItem>
-<TabItem value="sql">
-
-```sql
--- Create a table for public "profiles"
-create table profiles (
-  id uuid references auth.users not null,
-  updated_at timestamp with time zone,
-  username text unique,
-  avatar_url text,
-  website text,
-
-  primary key (id),
-  unique(username),
-  constraint username_length check (char_length(username) >= 3)
-);
-
-alter table profiles enable row level security;
-
-create policy "Public profiles are viewable by everyone."
-  on profiles for select
-  using ( true );
-
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
-
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime add table profiles;
-
--- Set up Storage!
-insert into storage.buckets (id, name)
-values ('avatars', 'avatars');
-
-create policy "Avatar images are publicly accessible."
-  on storage.objects for select
-  using ( bucket_id = 'avatars' );
-
-create policy "Anyone can upload an avatar."
-  on storage.objects for insert
-  with check ( bucket_id = 'avatars' );
-
-```
-
-</TabItem>
-</Tabs>
-
-### Get the API Keys
-
-Now that you've created some database tables, you are ready to insert data using the auto-generated API.
-We just need to get the URL and `anon` key from the API settings.
-
-1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/api/api-url-and-key.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
+<ProjectSetup />
 
 ## Building the App
 
@@ -188,7 +71,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
 ```html title="/components/Auth.vue"
 <template>
-  <form class="flex row flex-center" @submit.prevent="handleLogin">
+  <form class="row flex-center flex" @submit.prevent="handleLogin">
     <div class="col-6 form-widget">
       <h1 class="header">Supabase + Nuxt 3</h1>
       <p class="description">Sign in via magic link with your email below</p>
@@ -203,7 +86,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
       <div>
         <input
           type="submit"
-          class="block button"
+          class="button block"
           :value="loading ? 'Loading' : 'Send magic link'"
           :disabled="loading"
         />
@@ -220,7 +103,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
   const handleLogin = async () => {
     try {
       loading.value = true
-      const { error } = await supabase.auth.signIn({ email: email.value })
+      const { error } = await supabase.auth.signInWithOtp({ email: email.value })
       if (error) throw error
       alert('Check your email for the login link!')
     } catch (error) {
@@ -260,14 +143,14 @@ Let's create a new component for that called `Account.vue`.
     <div>
       <input
         type="submit"
-        class="block button primary"
+        class="button primary block"
         :value="loading ? 'Loading ...' : 'Update'"
         :disabled="loading"
       />
     </div>
 
     <div>
-      <button class="block button" @click="signOut" :disabled="loading">
+      <button class="button block" @click="signOut" :disabled="loading">
         Sign Out
       </button>
     </div>
@@ -324,6 +207,7 @@ Let's create a new component for that called `Account.vue`.
           loading.value = true
           let { error } = await supabase.auth.signOut()
           if (error) throw error
+          user.value = null
       } catch (error) {
           alert(error.message)
       } finally {
@@ -346,7 +230,7 @@ Now that we have all the components in place, let's update `app.vue`:
 </template>
 
 <script setup>
-  const user = useSupabaseUser();
+  const user = useSupabaseUser()
 </script>
 ```
 
@@ -385,7 +269,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
     />
 
     <div style="width: 10em; position: relative;">
-      <label class="block button primary" for="single">
+      <label class="button primary block" for="single">
         {{ uploading ? "Uploading ..." : "Upload" }}
       </label>
       <input
@@ -481,14 +365,14 @@ And then we can add the widget to the Account page:
     <div>
       <input
         type="submit"
-        class="block button primary"
+        class="button primary block"
         :value="loading ? 'Loading ...' : 'Update'"
         :disabled="loading"
       />
     </div>
 
     <div>
-      <button class="block button" @click="signOut" :disabled="loading">
+      <button class="button block" @click="signOut" :disabled="loading">
         Sign Out
       </button>
     </div>

@@ -1,31 +1,15 @@
 ---
 id: initializing
 title: 'Initializing'
-slug: /initializing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+slug: initializing
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-## Dart
-
-You can initialize a new Supabase client using the `SupabaseClient()` method.
-
-The Supabase client is your entrypoint to the rest of the Supabase functionality
-and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
 ## Flutter
 
-For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
-
-## Examples
-
-### Dart `SupabaseClient()`
-
-```dart
-final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
-```
+For `supabase-flutter`, you will be using the static `initialize()` method on `Supabase` class.
 
 ### Flutter `initialize()`
 
@@ -35,3 +19,25 @@ Future<void> main() async {
   runApp(MyApp());
 }
 ```
+
+### Access `SupabaseClient` instance
+
+Once you initialize Supabase in your `main()` method, you can access the `SupabaseClient` instance from anywhere in your app.
+
+```dart
+final supabase = Supabase.instance.client;
+```
+
+## Other Dart Projects
+
+You can initialize a new Supabase client using the `SupabaseClient()` method.
+
+The Supabase client is your entrypoint to the rest of the Supabase functionality
+and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+### Dart `SupabaseClient()`
+
+```dart
+final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
+```
+

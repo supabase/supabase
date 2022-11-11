@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Button, IconGitHub } from '@supabase/ui'
+import { Button, IconGitHub } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
 import ExampleCard from '../ExampleCard'
 
@@ -21,8 +21,8 @@ const BuiltExamples = () => {
             </Button>
           </Link>
           <Link
-            href="https://github.com/supabase/examples"
-            as="https://github.com/supabase/examples"
+            href="https://github.com/supabase/supabase/tree/master/examples"
+            as="https://github.com/supabase/supabase/tree/master/examples"
             passHref
           >
             <Button as="a" type="default" icon={<IconGitHub />} size="small">

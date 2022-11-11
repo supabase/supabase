@@ -145,6 +145,7 @@ values={[
 let { session, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456',
+  type: 'sms',
 })
 ```
 
@@ -189,7 +190,7 @@ values={[
 <TabItem value="JS">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithPassword({
   phone: '+13334445555',
   password: 'some-password',
 })
@@ -226,7 +227,7 @@ values={[
 <TabItem value="JS">
 
 ```js
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555',
 })
 ```
@@ -260,6 +261,7 @@ values={[
 let { session, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456',
+  type: 'sms',
 })
 ```
 

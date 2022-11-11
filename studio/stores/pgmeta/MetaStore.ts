@@ -84,12 +84,17 @@ export interface IMetaStore {
 
   /** The methods below involve several contexts due to the UI flow of the
    *  dashboard and hence do not sit within their own stores */
-  createColumn: (payload: CreateColumnPayload, foreignKey?: Partial<PostgresRelationship>) => any
+  createColumn: (
+    payload: CreateColumnPayload,
+    selectedTable: PostgresTable,
+    foreignKey?: Partial<PostgresRelationship>
+  ) => any
   updateColumn: (
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>
+    foreignKey?: Partial<PostgresRelationship>,
+    skipPKCreation?: boolean
   ) => any
   duplicateTable: (
     payload: any,
@@ -115,6 +120,8 @@ export interface IMetaStore {
     columns: ColumnField[],
     isRealtimeEnabled: boolean
   ) => any
+
+  setProjectDetails: (details: { ref: string; connectionString?: string }) => void
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
@@ -135,6 +142,7 @@ export default class MetaStore implements IMetaStore {
   projectRef?: string
   connectionString?: string
   baseUrl: string
+  headers: { [prop: string]: any }
 
   // [Joshen] I'm going to treat this as a list of system schemas
   excludedSchemas = [
@@ -153,33 +161,45 @@ export default class MetaStore implements IMetaStore {
     'graphql_public',
   ]
 
-  constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
+  constructor(rootStore: IRootStore, options: { projectRef: string; connectionString?: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
     this.projectRef = projectRef
     this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
-    const headers: any = {}
+    this.headers = {}
     if (IS_PLATFORM && connectionString) {
       this.connectionString = connectionString
-      headers['x-connection-encrypted'] = connectionString
+      this.headers['x-connection-encrypted'] = connectionString
     }
 
-    this.openApi = new OpenApiStore(rootStore, `${API_URL}/props/project/${projectRef}/api`)
-    this.tables = new TableStore(rootStore, `${this.baseUrl}/tables`, headers)
-    this.columns = new ColumnStore(rootStore, `${this.baseUrl}/columns`, headers)
-    this.schemas = new SchemaStore(rootStore, `${this.baseUrl}/schemas`, headers)
+    this.openApi = new OpenApiStore(
+      this.rootStore,
+      `${API_URL}/props/project/${this.projectRef}/api`
+    )
+    this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
+    this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
+    this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
 
-    this.roles = new RolesStore(rootStore, `${this.baseUrl}/roles`, headers)
-    this.policies = new PoliciesStore(rootStore, `${this.baseUrl}/policies`, headers)
-    this.hooks = new HooksStore(rootStore, `${this.baseUrl}/triggers`, headers)
-    this.triggers = new TriggersStore(rootStore, `${this.baseUrl}/triggers`, headers)
-    this.functions = new FunctionsStore(rootStore, `${this.baseUrl}/functions`, headers)
-    this.extensions = new ExtensionsStore(rootStore, `${this.baseUrl}/extensions`, headers, {
-      identifier: 'name',
-    })
-    this.publications = new PublicationStore(rootStore, `${this.baseUrl}/publications`, headers)
-    this.types = new TypesStore(rootStore, `${this.baseUrl}/types`, headers)
+    this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
+    this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
+    this.hooks = new HooksStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
+    this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
+    this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
+    this.extensions = new ExtensionsStore(
+      this.rootStore,
+      `${this.baseUrl}/extensions`,
+      this.headers,
+      {
+        identifier: 'name',
+      }
+    )
+    this.publications = new PublicationStore(
+      this.rootStore,
+      `${this.baseUrl}/publications`,
+      this.headers
+    )
+    this.types = new TypesStore(this.rootStore, `${this.baseUrl}/types`, this.headers)
 
     makeObservable(this, {
       excludedSchemas: observable,
@@ -314,10 +334,33 @@ export default class MetaStore implements IMetaStore {
     }
   }
 
-  async createColumn(payload: CreateColumnPayload, foreignKey?: Partial<PostgresRelationship>) {
+  async createColumn(
+    payload: CreateColumnPayload,
+    selectedTable: PostgresTable,
+    foreignKey?: Partial<PostgresRelationship>
+  ) {
     try {
-      const column: any = await this.columns.create(payload)
+      // Once pg-meta supports composite keys, we can remove this logic
+      const { isPrimaryKey, ...formattedPayload } = payload
+
+      const column: any = await this.columns.create(formattedPayload)
       if (column.error) throw column.error
+
+      // Firing createColumn in createTable will bypass this block
+      if (isPrimaryKey) {
+        // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
+        // @ts-ignore
+        const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
+
+        if (existingPrimaryKeys.length > 0) {
+          const removePK = await this.removePrimaryKey(column.schema, column.table)
+          if (removePK.error) throw removePK.error
+        }
+
+        const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
+        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
+        if (addPK.error) throw addPK.error
+      }
 
       if (!isUndefined(foreignKey)) {
         const relation: any = await this.addForeignKey(foreignKey)
@@ -332,16 +375,33 @@ export default class MetaStore implements IMetaStore {
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>
+    foreignKey?: Partial<PostgresRelationship>,
+    skipPKCreation?: boolean
   ) {
     try {
-      const column: any = await this.columns.update(id, payload)
+      const { isPrimaryKey, ...formattedPayload } = payload
+      const column: any = await this.columns.update(id, formattedPayload)
       if (column.error) throw column.error
 
       const originalColumn = find(selectedTable.columns, { id })
       const existingForeignKey = find(selectedTable.relationships, {
         source_column_name: originalColumn!.name,
       })
+
+      if (!skipPKCreation && isPrimaryKey !== undefined) {
+        const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
+
+        // Primary key is getting updated for the column
+        if (existingPrimaryKeys.length > 0) {
+          const removePK = await this.removePrimaryKey(column.schema, column.table)
+          if (removePK.error) throw removePK.error
+        }
+        const primaryKeyColumns = isPrimaryKey
+          ? existingPrimaryKeys.concat([column.name])
+          : existingPrimaryKeys.filter((x) => x !== column.name)
+        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
+        if (addPK.error) throw addPK.error
+      }
 
       // For updating of foreign key relationship, we remove the original one by default
       // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
@@ -623,11 +683,11 @@ export default class MetaStore implements IMetaStore {
           ...column,
           isPrimaryKey: false,
         })
-        await this.createColumn(columnPayload, column.foreignKey)
+        await this.createColumn(columnPayload, updatedTable, column.foreignKey)
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
         if (originalColumn) {
-          const columnPayload = generateUpdateColumnPayload(originalColumn, column)
+          const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
           const originalForeignKey = find(table.relationships, {
             source_schema: originalColumn.schema,
             source_table_name: originalColumn.table,
@@ -640,11 +700,13 @@ export default class MetaStore implements IMetaStore {
               category: 'loading',
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
+            const skipPKCreation = true
             const res: any = await this.updateColumn(
               column.id,
               columnPayload,
               updatedTable,
-              column.foreignKey
+              column.foreignKey,
+              skipPKCreation
             )
             if (res?.error) {
               hasError = true
@@ -755,5 +817,50 @@ export default class MetaStore implements IMetaStore {
       }
       onProgressUpdate(insertProgress * 100)
     }
+  }
+
+  setProjectDetails({ ref, connectionString }: { ref: string; connectionString?: string }) {
+    this.projectRef = ref
+    this.baseUrl = `${API_URL}/pg-meta/${ref}`
+    if (IS_PLATFORM && connectionString) {
+      this.connectionString = connectionString
+      this.headers['x-connection-encrypted'] = connectionString
+    }
+
+    this.openApi.setUrl(`${API_URL}/props/project/${this.projectRef}/api`)
+    this.openApi.setHeaders(this.headers)
+
+    this.tables.setUrl(`${this.baseUrl}/tables`)
+    this.tables.setHeaders(this.headers)
+
+    this.columns.setUrl(`${this.baseUrl}/columns`)
+    this.columns.setHeaders(this.headers)
+
+    this.schemas.setUrl(`${this.baseUrl}/schemas`)
+    this.schemas.setHeaders(this.headers)
+
+    this.roles.setUrl(`${this.baseUrl}/roles`)
+    this.roles.setHeaders(this.headers)
+
+    this.policies.setUrl(`${this.baseUrl}/policies`)
+    this.policies.setHeaders(this.headers)
+
+    this.hooks.setUrl(`${this.baseUrl}/triggers`)
+    this.hooks.setHeaders(this.headers)
+
+    this.triggers.setUrl(`${this.baseUrl}/triggers`)
+    this.triggers.setHeaders(this.headers)
+
+    this.functions.setUrl(`${this.baseUrl}/functions`)
+    this.functions.setHeaders(this.headers)
+
+    this.extensions.setUrl(`${this.baseUrl}/extensions`)
+    this.extensions.setHeaders(this.headers)
+
+    this.publications.setUrl(`${this.baseUrl}/publications`)
+    this.publications.setHeaders(this.headers)
+
+    this.types.setUrl(`${this.baseUrl}/types`)
+    this.types.setHeaders(this.headers)
   }
 }

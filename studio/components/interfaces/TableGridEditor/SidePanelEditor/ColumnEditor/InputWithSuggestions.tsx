@@ -6,11 +6,11 @@
 // the component over to the UI library
 
 import { FC, useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconList, Input } from '@supabase/ui'
+import { Button, Dropdown, IconList, Input } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
-const DEFAULT_SUGGESTIONS_WIDTH = 400
 
 interface Props {
   label?: string
@@ -22,9 +22,9 @@ interface Props {
   className?: string
   value: string
   format?: string
-  suggestionsHeader?: string
-  suggestionsWidth?: number
   suggestions: Suggestion[]
+  suggestionsTooltip?: string
+  suggestionsHeader?: string
   onChange: (event: any) => void
   onSelectSuggestion: (suggestion: Suggestion) => void
 }
@@ -40,6 +40,8 @@ const InputWithSuggestions: FC<Props> = ({
   value = '',
   format,
   suggestions = [],
+  suggestionsTooltip,
+  suggestionsHeader,
   onChange = () => {},
   onSelectSuggestion = () => {},
 }) => {
@@ -75,7 +77,7 @@ const InputWithSuggestions: FC<Props> = ({
         size={size}
         layout={layout}
         disabled={disabled}
-        className={`${className} ${format?.includes('json') ? 'input-mono' : ''}`}
+        className={className}
         type="text"
         value={value}
         onChange={onInputChange}
@@ -87,21 +89,43 @@ const InputWithSuggestions: FC<Props> = ({
               side="bottom"
               overlay={
                 <>
-                  <Dropdown.Label>Suggestions</Dropdown.Label>
-                  <Dropdown.Seperator />
+                  <Dropdown.Label>{suggestionsHeader || 'Suggestions'}</Dropdown.Label>
+                  <Dropdown.Separator />
                   {filteredSuggestions.map((suggestion: Suggestion) => (
                     <Dropdown.Item
                       key={suggestion.name}
                       onClick={() => onSelectSuggestion(suggestion)}
                     >
                       <div className="text-sm">{suggestion.name}</div>
-                      <div className="text-scale-900 text-xs">{suggestion.description}</div>
+                      <div className="text-xs text-scale-900">{suggestion.description}</div>
                     </Dropdown.Item>
                   ))}
                 </>
               }
             >
-              <Button as="span" type="default" icon={<IconList strokeWidth={1.5} />}></Button>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    as="span"
+                    type="default"
+                    className="!px-1 mr-1"
+                    icon={<IconList strokeWidth={1.5} />}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                      'border-scale-200 border',
+                    ].join(' ')}
+                  >
+                    <span className="text-scale-1200 text-xs">
+                      {suggestionsTooltip || 'Suggestions'}
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Root>
             </Dropdown>
           )
         }

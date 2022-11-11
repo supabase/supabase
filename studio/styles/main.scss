@@ -126,6 +126,10 @@ input[type='submit']:hover {
   @apply btn-primary-hover;
 }
 
+input::placeholder {
+  @apply text-scale-900;
+}
+
 .form-group input::placeholder {
   @apply text-scale-900;
 }
@@ -210,4 +214,8 @@ div.fixed.inset-0 {
   textarea {
     @apply text-sm;
   }
+}
+
+.capitalize-sentence:first-letter {
+  text-transform: capitalize;
 }

@@ -12,6 +12,7 @@ import LayoutHeader from './LayoutHeader'
 import ConnectingState from './ConnectingState'
 import PausingState from './PausingState'
 import BuildingState from './BuildingState'
+import RestoringState from './RestoringState'
 
 interface Props {
   title?: string
@@ -103,7 +104,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     '/project/[ref]/reports',
     '/project/[ref]/settings/general',
     '/project/[ref]/settings/database',
-    '/project/[ref]/settings/billing',
+    '/project/[ref]/settings/billing/subscription',
     '/project/[ref]/settings/billing/update',
     '/project/[ref]/settings/billing/update/free',
     '/project/[ref]/settings/billing/update/pro',
@@ -112,6 +113,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
 
+  const isProjectRestoring = ui.selectedProject?.status === PROJECT_STATUS.RESTORING
   const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
     ui.selectedProject?.status ?? ''
   )
@@ -126,6 +128,8 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
         <PausingState project={ui.selectedProject} />
       ) : requiresPostgrestConnection && isProjectOffline ? (
         <ConnectingState project={ui.selectedProject} />
+      ) : requiresDbConnection && isProjectRestoring ? (
+        <RestoringState />
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={ui.selectedProject} />
       ) : (
