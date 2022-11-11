@@ -15,9 +15,9 @@
  */
 
 export default function TicketMono({ golden = false }: { golden?: boolean }) {
-  const frameColor = golden ? '#F2C94C' : '#252729';
+  const frameColor = golden ? '#F2C94C' : '#252729'
 
-  const perforationColor = golden ? 'var(--gold-accent)' : '#252729';
+  const perforationColor = golden ? 'var(--gold-accent)' : '#252729'
 
   return (
     <svg
@@ -35,5 +35,5 @@ export default function TicketMono({ golden = false }: { golden?: boolean }) {
       />
       <path d="M512 5V326" stroke={perforationColor} strokeDasharray="4 4" />
     </svg>
-  );
+  )
 }

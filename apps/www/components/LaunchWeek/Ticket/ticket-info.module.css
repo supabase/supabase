@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
- .info {
+.info {
   display: flex;
   flex-direction: column;
   gap: 0px;
   margin-bottom: 64px;
   padding: 32px;
- }
+}
 
 @media (min-width: 768px) {
   .info {
@@ -51,8 +51,8 @@
 .date {
   /* text-transform: uppercase; */
   font-size: calc(18px * var(--size));
-  
-  color: var(--secondary-color); 
+
+  color: var(--secondary-color);
 }
 
 .date-golden {
@@ -92,7 +92,7 @@
 .url {
   margin-bottom: var(--space-12x);
   font-size: calc(18px * var(--size));
-  
+
   color: var(--secondary-color);
 }
 

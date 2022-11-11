@@ -23,7 +23,7 @@
   /* background-color: black; */
   border: 2px solid rgba(0, 0, 0, 0.1);
   border-radius: 16px;
-  
+
   background-color: rgba(0, 0, 0, 1);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
@@ -31,8 +31,6 @@
   /* background: linear-gradient(#fff000, var(--gold-secondary)); */
   border: 1px solid rgba(255, 255, 0, 0.629);
   animation: blank-svg-shadow 2s ease-in-out infinite alternate;
-
-  
 }
 
 .visual--gold {
@@ -48,29 +46,28 @@
   /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
 }
 
-
 /* .svg-shadow {
 } */
 
 @keyframes svg-shadow {
   from {
-    filter: drop-shadow( 0 0 5px #fff) drop-shadow( 0 0 15px var(--gold-primary)) drop-shadow( 0 0 20px var(--gold-accent));
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 15px var(--gold-primary))
+      drop-shadow(0 0 20px var(--gold-accent));
   }
 
   to {
-    
-    filter: drop-shadow( 0 0 20px #fff) drop-shadow( 0 0 10px var(--gold-accent)) drop-shadow( 0 0 40px var(--gold-primary));
+    filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 10px var(--gold-accent))
+      drop-shadow(0 0 40px var(--gold-primary));
   }
 }
 
 @keyframes blank-svg-shadow {
   from {
-    filter: drop-shadow( 0 0 5px #fff) drop-shadow( 0 0 15px #12F28D) drop-shadow( 0 0 20px #12F28D);
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 15px #12f28d) drop-shadow(0 0 20px #12f28d);
   }
 
   to {
-    
-    filter: drop-shadow( 0 0 20px #fff) drop-shadow( 0 0 10px #12F28D) drop-shadow( 0 0 40px #12F28D);
+    filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 10px #12f28d) drop-shadow(0 0 40px #12f28d);
   }
 }
 
@@ -103,23 +100,21 @@
 
 .logo img {
   /* margin-top: 64px; */
-  margin-top: calc( 64px * var(--size));
-  margin-left: calc( 32px * var(--size));
-  margin-left: calc( 32px * var(--size));
+  margin-top: calc(64px * var(--size));
+  margin-left: calc(32px * var(--size));
+  margin-left: calc(32px * var(--size));
   /* width: 272px; */
-  width: calc(272px * var(--size))
+  width: calc(272px * var(--size));
 }
 
 @media (min-width: 768px) {
   .logo img {
-    margin-top: calc( 32px * var(--size));
+    margin-top: calc(32px * var(--size));
     /* width: 280px; */
     width: calc(280px * var(--size));
-    margin-left:calc( 160px * var(--size));
+    margin-left: calc(160px * var(--size));
   }
 }
-
-
 
 .profile {
   z-index: 1;
@@ -181,7 +176,6 @@
 .ticket-number-golden {
   color: var(--gold-primary);
 }
-
 
 @media (min-width: 768px) {
   .ticket-number {

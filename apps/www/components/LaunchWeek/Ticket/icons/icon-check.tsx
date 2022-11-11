@@ -15,9 +15,9 @@
  */
 
 type Props = {
-  color: string;
-  size: number;
-};
+  color: string
+  size: number
+}
 
 export default function IconCheck({ color, size }: Props) {
   return (
@@ -29,5 +29,5 @@ export default function IconCheck({ color, size }: Props) {
         />
       </g>
     </svg>
-  );
+  )
 }

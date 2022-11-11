@@ -24,9 +24,9 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
   return (
     <>
       <NextSeo
-        title={`${name}’s #SupaLaunchWeek Ticket`}
+        title={`${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`}
         openGraph={{
-          title: `${name}’s #SupaLaunchWeek Ticket`,
+          title: `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`,
           description: description,
           url: `${SITE_URL}/tickets/${username}`,
           images: [

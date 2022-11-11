@@ -76,7 +76,6 @@
   color: var(--gold-secondary);
 }
 
-
 .githubIcon {
   margin-right: calc(5px * var(--size));
   display: inline-flex;
