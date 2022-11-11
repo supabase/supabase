@@ -10,13 +10,14 @@ import Panel from 'components/ui/Panel'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import { useParams, useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button, Form, IconAlertCircle, IconRefreshCw, Input } from 'ui'
+import { Alert, Button, Form, IconAlertCircle, IconRefreshCw, IconTrash, Input } from 'ui'
 import * as yup from 'yup'
 
 const FORM_ID = 'custom-domains-form'
@@ -75,6 +76,11 @@ const CustomDomainConfig = () => {
         projectRef: ref,
         customDomain: values.domain,
       })
+
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created custom domain. Please verify the domain by adding the listed records to your domain's DNS settings.`,
+      })
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -96,8 +102,7 @@ const CustomDomainConfig = () => {
 
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
-  const { mutateAsync: activateCustomDomain, isLoading: isActivateLoading } =
-    useCustomDomainActivateMutation()
+  const { mutateAsync: activateCustomDomain } = useCustomDomainActivateMutation()
 
   const onActivateCustomDomain = async () => {
     if (!ref) {
@@ -106,6 +111,35 @@ const CustomDomainConfig = () => {
 
     try {
       await activateCustomDomain({ projectRef: ref })
+
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully activated custom domain`,
+      })
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: error.message,
+      })
+    }
+  }
+
+  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
+
+  const { mutateAsync: deleteCustomDomain } = useCustomDomainDeleteMutation()
+
+  const onDeleteCustomDomain = async () => {
+    if (!ref) {
+      throw new Error('Project ref is required')
+    }
+
+    try {
+      await deleteCustomDomain({ projectRef: ref })
+
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted custom domain`,
+      })
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -211,55 +245,54 @@ const CustomDomainConfig = () => {
 
           {isSuccess && (
             <div className="flex flex-col gap-6">
-              {data.status === '2_initiated' && (
-                <div>
-                  <h4 className="text-scale-1200">
-                    Set the following record(s) to your DNS provider:
-                  </h4>
-                  <span className="text-sm text-scale-1100">
-                    Please note that it may take up to 24 hours for the DNS records to propagate.
-                  </span>
-                </div>
-              )}
-
-              {(data.status === '2_initiated' || data.status === '3_challenge_verified') &&
-                data.customDomain.verification_errors?.includes(
-                  'custom hostname does not CNAME to this zone.'
-                ) && (
-                  <DNSRecord
-                    type="CNAME"
-                    name={data.customDomain.hostname}
-                    value={settings?.autoApiService.app_config.endpoint ?? 'Loading...'}
-                  />
-                )}
-
-              {(data.status === '2_initiated' || data.status === '3_challenge_verified') &&
-                data.customDomain.ownership_verification && (
-                  <DNSRecord
-                    type={data.customDomain.ownership_verification.type}
-                    name={data.customDomain.ownership_verification.name}
-                    value={data.customDomain.ownership_verification.value}
-                  />
-                )}
-
-              {(data.status === '2_initiated' || data.status === '3_challenge_verified') &&
-                data.customDomain.ssl.status === 'pending_validation' && (
-                  <DNSRecord
-                    type="TXT"
-                    name={data.customDomain.ssl.txt_name ?? 'Loading...'}
-                    value={data.customDomain.ssl.txt_value ?? 'Loading...'}
-                  />
-                )}
-
               {(data.status === '2_initiated' || data.status === '3_challenge_verified') && (
-                <Button
-                  icon={<IconRefreshCw />}
-                  onClick={onReverifyCustomDomain}
-                  loading={isReverifyLoading}
-                  className="self-end"
-                >
-                  Verify
-                </Button>
+                <>
+                  <div>
+                    <h4 className="text-scale-1200">
+                      Set the following record(s) to your DNS provider:
+                    </h4>
+                    <span className="text-sm text-scale-1100">
+                      Please note that it may take up to 24 hours for the DNS records to propagate.
+                    </span>
+                  </div>
+
+                  {data.customDomain.verification_errors?.includes(
+                    'custom hostname does not CNAME to this zone.'
+                  ) && (
+                    <DNSRecord
+                      type="CNAME"
+                      name={data.customDomain.hostname}
+                      value={settings?.autoApiService.app_config.endpoint ?? 'Loading...'}
+                    />
+                  )}
+
+                  {data.customDomain.ownership_verification && (
+                    <DNSRecord
+                      type={data.customDomain.ownership_verification.type}
+                      name={data.customDomain.ownership_verification.name}
+                      value={data.customDomain.ownership_verification.value}
+                    />
+                  )}
+
+                  {data.customDomain.ssl.status === 'pending_validation' && (
+                    <DNSRecord
+                      type="TXT"
+                      name={data.customDomain.ssl.txt_name ?? 'Loading...'}
+                      value={data.customDomain.ssl.txt_value ?? 'Loading...'}
+                    />
+                  )}
+
+                  {
+                    <Button
+                      icon={<IconRefreshCw />}
+                      onClick={onReverifyCustomDomain}
+                      loading={isReverifyLoading}
+                      className="self-end"
+                    >
+                      Verify
+                    </Button>
+                  }
+                </>
               )}
 
               {data.status === '4_origin_setup_completed' && (
@@ -302,22 +335,51 @@ const CustomDomainConfig = () => {
                   </Button>
                 </div>
               )}
+
+              {data.status === '5_services_reconfigured' && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <code className="text-sm">{data.customDomain.hostname}</code> is activate and
+                    serving traffic.
+                  </div>
+
+                  <Button
+                    type="danger"
+                    icon={<IconTrash />}
+                    onClick={() => setIsDeleteConfirmModalVisible(true)}
+                  >
+                    Delete Custom Domain
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </Panel.Content>
       </Panel>
 
       <ConfirmModal
-        danger
         visible={isActivateConfirmModalVisible}
         title={`Are you sure you want to activate ${
           data?.customDomain.hostname ?? 'your custom hostname'
         }?`}
-        description="Your existing supabase will be deactivated."
+        description="Your existing supabase subdomain will be deactivated."
         buttonLabel="Activate"
         buttonLoadingLabel="Activating"
         onSelectCancel={() => setIsActivateConfirmModalVisible(false)}
         onSelectConfirm={onActivateCustomDomain}
+      />
+
+      <ConfirmModal
+        danger
+        visible={isDeleteConfirmModalVisible}
+        title={`Are you sure you want to delete ${
+          data?.customDomain.hostname ?? 'your custom hostname'
+        }?`}
+        description="Your custom domain will be deactivated. You will need to re-verify your domain if you want to use it again."
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setIsDeleteConfirmModalVisible(false)}
+        onSelectConfirm={onDeleteCustomDomain}
       />
     </>
   )
