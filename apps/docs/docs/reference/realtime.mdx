@@ -23,7 +23,7 @@ There are two versions of this server: `Realtime` and `Realtime RLS`.
 3. converting the changes into JSON
 4. broadcasting to authorized subscribers over WebSockets
 
-### Why not just use PostgreSQL's `NOTIFY`?
+## Why not just use PostgreSQL's `NOTIFY`?
 
 A few reasons:
 
@@ -31,13 +31,13 @@ A few reasons:
 2. `NOTIFY` has a payload limit of 8000 bytes and will fail for anything larger. The usual solution is to send an ID and then fetch the record, but that's heavy on the database.
 3. `Realtime` server consumes two connections to the database, then you can connect many clients to this server. Easier on your database, and to scale up you just add additional `Realtime` servers.
 
-### Benefits
+## Benefits
 
 1. The beauty of listening to the replication functionality is that you can make changes to your database from anywhere - your API, directly in the DB, via a console, etc. - and you will still receive the changes via WebSockets.
 2. Decoupling. For example, if you want to send a new slack message every time someone makes a new purchase you might build that functionality directly into your API. This allows you to decouple your async functionality from your API.
 3. This is built with Phoenix, an [extremely scalable Elixir framework](https://www.phoenixframework.org/blog/the-road-to-2-million-websocket-connections).
 
-### Does this server guarantee delivery of every data change?
+## Does this server guarantee delivery of every data change?
 
 Not yet! Due to the following limitations:
 
@@ -52,7 +52,6 @@ Not yet! Due to the following limitations:
 
 ## Additional Links
 
-- [Source Code](https://github.com/supabase/storage-api)
-- [Known bugs and issues](https://github.com/supabase/storage-js/issues)
-- [Storage Guides](https://supabase.com/docs/guides/storage)
-- [OpenAPI Docs](https://supabase.github.io/storage-api/)
+- [Source Code](https://github.com/supabase/realtime)
+- [Known bugs and issues](https://github.com/supabase/realtime/issues)
+- [Realtime Guides](https://supabase.com/docs/guides/realtime)
