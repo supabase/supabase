@@ -3,16 +3,17 @@ import { NextPageWithLayout } from 'types'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import Reports from 'components/interfaces/Reports/Reports'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 
 const PageLayout: NextPageWithLayout = () => (
   <>
-    <div className="mx-auto my-8 w-full max-w-7xl h-full">
+    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <Reports />
     </div>
     <EditReportModal />
   </>
 )
 
-PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+PageLayout.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
 export default observer(PageLayout)

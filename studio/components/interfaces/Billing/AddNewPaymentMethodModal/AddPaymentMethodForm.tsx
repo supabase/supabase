@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Button, Modal } from '@supabase/ui'
+import { Button, Modal } from 'ui'
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import { useStore } from 'hooks'
 
@@ -56,12 +56,12 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
     <form onSubmit={handleSubmit}>
       <Modal.Content>
         <div
-          className={`transition ${isSaving ? 'opacity-75 pointer-events-none' : 'opacity-100'}`}
+          className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
         >
           <PaymentElement />
         </div>
       </Modal.Content>
-      <Modal.Seperator />
+      <Modal.Separator />
       <Modal.Content>
         <div className="flex items-center space-x-2 pt-2">
           <Button block htmlType="submit" type="primary" loading={isSaving}>

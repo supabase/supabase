@@ -36,6 +36,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     createBucket,
     deleteBucket,
     toggleBucketPublic,
+    buckets,
   } = storageExplorerStore || {}
 
   const { services, isLoading } = useProjectSettings(ref as string | undefined)
@@ -64,6 +65,11 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     storageExplorerStore.setLoaded(true)
   }
 
+  const onSelectCreateBucket = async (bucketName: string, isPublic: boolean) => {
+    const bucket = await createBucket(bucketName, isPublic)
+    if (bucket.name) router.push(`/project/${ref}/storage/buckets/${bucket.name}`)
+  }
+
   const onSelectDeleteBucket = async (bucket: any) => {
     const res = await deleteBucket(bucket)
     // Ideally this should be within deleteBucket as its a necessary side effect
@@ -71,7 +77,10 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     if (res) {
       const policies = meta.policies.list()
       const storageObjectsPolicies = filter(policies, { table: 'objects' })
-      const formattedStorageObjectPolicies = formatPoliciesForStorage(storageObjectsPolicies)
+      const formattedStorageObjectPolicies = formatPoliciesForStorage(
+        buckets,
+        storageObjectsPolicies
+      )
       const bucketPolicies = _get(
         find(formattedStorageObjectPolicies, { name: bucket.name }),
         ['policies'],
@@ -101,7 +110,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
       <CreateBucketModal
         visible={showCreateBucketModal}
         onSelectCancel={closeCreateBucketModal}
-        onSelectSave={createBucket}
+        onSelectSave={onSelectCreateBucket}
       />
       <DeleteBucketModal
         visible={showDeleteBucketModal}

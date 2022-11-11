@@ -1,25 +1,22 @@
 import authors from 'lib/authors.json'
-import hydrate from 'next-mdx-remote/hydrate'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
-import { Gfm } from 'remark-gfm'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { generateReadingTime } from '~/lib/helpers'
+import { MDXRemote } from 'next-mdx-remote'
 
 interface Props {
   components: React.ReactNode
   props: any
-  gfm: Gfm
-  slug: string
 }
 
-const LayoutComparison = ({ components, props, gfm, slug }: Props) => {
+const LayoutComparison = ({ components, props }: Props) => {
   // @ts-ignore
-  const content = hydrate(props.blog.content, { components })
+  const content = props.blog.content
 
   const authorArray = props.blog.author.split(',')
 
@@ -98,7 +95,7 @@ const LayoutComparison = ({ components, props, gfm, slug }: Props) => {
               <div className="text-scale-900 flex justify-center space-x-3 text-sm">
                 <p>{props.blog.date}</p>
                 <p>•</p>
-                <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
+                <p>{generateReadingTime(props.blog.source)}</p>
               </div>
               <div className="flex justify-center gap-3">
                 {author.map((author: any) => {
@@ -133,7 +130,9 @@ const LayoutComparison = ({ components, props, gfm, slug }: Props) => {
           </div>
           <div className="">
             {/* Content */}
-            <div className="prose prose-docs max-w-none">{content}</div>
+            <div className="prose prose-docs max-w-none">
+              <MDXRemote {...content} components={components} />
+            </div>
             <div className="py-16">
               <div className="text-scale-900 dark:text-scale-1000 text-sm">Share this article</div>
               <div className="mt-4 flex items-center space-x-4">

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { partition, isNull } from 'lodash'
-import { Input, IconSearch, IconAlertCircle } from '@supabase/ui'
+import { Input, IconSearch, IconAlertCircle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, useFlag, checkPermissions } from 'hooks'
@@ -33,7 +33,7 @@ const Extensions: FC<Props> = ({}) => {
     (ext: any) => !isNull(ext.installed_version)
   )
 
-  const canUpdateExtentions = checkPermissions(
+  const canUpdateExtensions = checkPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -49,7 +49,7 @@ const Extensions: FC<Props> = ({}) => {
             onChange={(e) => setFilterString(e.target.value)}
             icon={<IconSearch size="tiny" />}
           />
-          {!canUpdateExtentions && (
+          {!canUpdateExtensions && (
             <div className="w-[500px]">
               <InformationBox
                 icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}

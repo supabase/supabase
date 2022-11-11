@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -32,7 +32,7 @@ const Infrastructure: FC<Props> = ({}) => {
               <div>
                 <p className="text-sm">Restart server</p>
                 <div className="max-w-[420px]">
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-sm text-scale-1100">
                     Your project will not be available for a few minutes.
                   </p>
                 </div>
@@ -47,7 +47,7 @@ const Infrastructure: FC<Props> = ({}) => {
                   <div>
                     <p className="text-sm">Pause project</p>
                     <div className="max-w-[420px]">
-                      <p className="text-scale-1100 text-sm">
+                      <p className="text-sm text-scale-1100">
                         Your project will not be accessible while it is paused.
                       </p>
                     </div>

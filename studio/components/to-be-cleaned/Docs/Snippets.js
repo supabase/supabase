@@ -33,6 +33,28 @@ const supabaseUrl = '${endpoint}'
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)`,
     },
+    python: {
+      language: 'python',
+      code: `
+import os
+from supabase import create_client, Client
+
+url: str = '${endpoint}'
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+`,
+    },
+    dart: {
+      language: 'dart',
+      code: `
+final supabaseUrl = '${endpoint}'
+final supabaseKey = String.fromEnvironment('SUPABASE_KEY')
+
+Future<void> main() async {
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  runApp(MyApp());
+}`,
+    },
   }),
   authKey: (title, varName, apikey) => ({
     title: `${title}`,
@@ -118,11 +140,14 @@ else console.log(data)
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('*', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-all-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -135,11 +160,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('INSERT', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-insert-channel')
+  .on(
+    'postgres_changes', 
+    { event: 'INSERT', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -152,11 +180,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('UPDATE', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-update-channel')
+  .on(
+    'postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -169,11 +200,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('DELETE', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-delete-channel')
+  .on(
+    'postgres_changes',
+    { event: 'DELETE', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -186,11 +220,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}:${columnName}=eq.${value}')
-  .on('*', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-filter-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: '${resourceId}', filter: '${columnName}=eq.${value}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),

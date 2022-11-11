@@ -346,6 +346,7 @@
 
 .sb-grid-checkbox-editor__input {
   @apply h-4 w-4;
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 /*
@@ -385,7 +386,10 @@
 */
 
 .sb-grid-select-editor {
-  @apply h-full w-full;
+  button {
+    @apply border-none rounded-none shadow-none;
+    box-shadow: none !important
+  }
 }
 
 /*

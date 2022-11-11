@@ -1,4 +1,4 @@
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import { useFlag } from 'hooks'
 import { useRouter } from 'next/router'
 
@@ -8,7 +8,7 @@ interface TabItem {
 }
 const LogsNavigation = () => {
   const router = useRouter()
-  const activeRoute = router.pathname.split('/')[4]
+  const activeRoute = router.pathname.split('/')[5]
   const { ref } = router.query
 
   const indexRoute = 'query'
@@ -27,7 +27,7 @@ const LogsNavigation = () => {
       size="medium"
       activeId={!activeRoute ? indexRoute : activeRoute}
       onClick={(e: string) => {
-        router.push(`/project/${ref}/logs-explorer/${e === indexRoute ? '' : e}`)
+        router.push(`/project/${ref}/logs/explorer/${e === indexRoute ? '' : e}`)
       }}
     >
       {tabs.map((item) => (

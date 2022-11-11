@@ -34,7 +34,7 @@ export function isArrayColumn(type: string) {
   return ARRAY_TYPES.indexOf(type.toLowerCase()) > -1
 }
 
-const TEXT_TYPES = ['text', 'character varying']
+const TEXT_TYPES = ['uuid', 'text', 'character varying']
 export function isTextColumn(type: string) {
   return TEXT_TYPES.indexOf(type.toLowerCase()) > -1
 }

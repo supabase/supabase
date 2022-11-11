@@ -87,13 +87,14 @@ test.each([
   {
     queryType: 'api',
     tableName: undefined,
-    allLog: logDataFixture({
+    tableLog: logDataFixture({
       id: 'some-id',
-      request: { path: 'some-path', method: 'POST' },
+      path: 'some-path',
+      method: 'POST',
       status_code: '400',
       metadata: undefined,
     }),
-    singleLog: {
+    selectionLog: {
       id: 'some-id',
       metadata: [{ request: [{ method: 'POST' }] }],
     },
@@ -101,9 +102,38 @@ test.each([
     selectionTexts: [/POST/],
   },
   // TODO: add more tests for each type of ui
+
+  {
+    queryType: 'auth',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      id: 'some-id',
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+      timestamp: 1659545029083869,
+      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+    }),
+    selectionLog: logDataFixture({
+      id: 'some-id',
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+      timestamp: 1659545029083869,
+      id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+    }),
+    tableTexts: [/auth\-path/, /some message/, /INFO/],
+    selectionTexts: [/auth\-path/, /some message/, /INFO/, /300/],
+  },
 ])(
   'selection $queryType $tableName , can display log data and metadata',
-  async ({ queryType, tableName, allLog, singleLog, tableTexts, selectionTexts }) => {
+  async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
     get.mockImplementation((url) => {
       // counts
       if (url.includes('count')) {
@@ -111,10 +141,10 @@ test.each([
       }
       // single
       if (url.includes('where+id')) {
-        return { result: [singleLog] }
+        return { result: [selectionLog] }
       }
-      // all
-      return { result: [allLog] }
+      // table
+      return { result: [tableLog] }
     })
     render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 
@@ -298,7 +328,7 @@ test('bug: load older btn does not error out when previous page is empty', async
   // clicking load older multiple times should not give error
   await waitFor(() => {
     expect(screen.queryByText(/Sorry/)).toBeNull()
-    expect(screen.queryByText(/An error occured/)).toBeNull()
+    expect(screen.queryByText(/An error occurred/)).toBeNull()
     expect(screen.queryByText(/undefined/)).toBeNull()
   })
 })
@@ -308,7 +338,7 @@ test('log event chart hide', async () => {
     return { result: [] }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await screen.findByText('Events')
+  await screen.findByText(/Logs \/ Time/)
   const toggle = await screen.findByText(/Chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
@@ -350,9 +380,30 @@ test('filters alter generated query', async () => {
   userEvent.click(await screen.findByText(/Save/))
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('599'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+  })
+
+  // should be able to clear the filters
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByRole('button', { name: 'Clear' }))
+  get.mockClear()
+
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByText(/400 codes/))
+  userEvent.click(await screen.findByText(/Save/))
+
+  await waitFor(() => {
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('400'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('499'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
   })
@@ -369,5 +420,30 @@ test('filters accept filterOverride', async () => {
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
+  })
+})
+
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
+        },
+      },
+    })
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(4, 'months').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+    await screen.findByText('Log retention') // assert modal title is present
   })
 })

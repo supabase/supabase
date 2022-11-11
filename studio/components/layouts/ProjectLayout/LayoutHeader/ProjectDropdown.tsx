@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, IconPlus, Popover } from '@supabase/ui'
+import { Button, Dropdown, IconPlus, Popover } from 'ui'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
 
@@ -52,7 +52,7 @@ const ProjectDropdown = () => {
                 </a>
               </Link>
             ))}
-          <Popover.Seperator />
+          <Popover.Separator />
           <Link href={`/new/${selectedOrganizationSlug}`}>
             <a className="block">
               <Dropdown.Item icon={<IconPlus size="tiny" />}>New project</Dropdown.Item>

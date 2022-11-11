@@ -1,5 +1,5 @@
 import { ServerIcon, SupportIcon } from '@heroicons/react/outline'
-import { Accordion, Button, IconCheck } from '@supabase/ui'
+import { Accordion, Button, IconCheck } from 'ui'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
@@ -344,6 +344,11 @@ export default function IndexPage() {
                 icon={Solutions['storage'].icon}
               />
               <PricingTableRowMobile
+                category={pricing.realtime}
+                tier={'free'}
+                icon={Solutions['realtime'].icon}
+              />
+              <PricingTableRowMobile
                 category={pricing['edge-functions']}
                 tier={'free'}
                 icon={Solutions['edge-functions'].icon}
@@ -352,6 +357,11 @@ export default function IndexPage() {
                 category={pricing.dashboard}
                 tier={'free'}
                 icon={pricing.dashboard.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.security}
+                tier={'free'}
+                icon={pricing.security.icon}
               />
               <PricingTableRowMobile
                 category={pricing.support}
@@ -383,6 +393,11 @@ export default function IndexPage() {
                 icon={Solutions['storage'].icon}
               />
               <PricingTableRowMobile
+                category={pricing.realtime}
+                tier={'pro'}
+                icon={Solutions['realtime'].icon}
+              />
+              <PricingTableRowMobile
                 category={pricing['edge-functions']}
                 tier={'pro'}
                 icon={Solutions['edge-functions'].icon}
@@ -391,6 +406,11 @@ export default function IndexPage() {
                 category={pricing.dashboard}
                 tier={'pro'}
                 icon={pricing.dashboard.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.security}
+                tier={'pro'}
+                icon={pricing.security.icon}
               />
               <PricingTableRowMobile
                 category={pricing.support}
@@ -423,6 +443,11 @@ export default function IndexPage() {
                 icon={Solutions['storage'].icon}
               />
               <PricingTableRowMobile
+                category={pricing.realtime}
+                tier={'enterprise'}
+                icon={Solutions['realtime'].icon}
+              />
+              <PricingTableRowMobile
                 category={pricing['edge-functions']}
                 tier={'enterprise'}
                 icon={Solutions['edge-functions'].icon}
@@ -431,6 +456,11 @@ export default function IndexPage() {
                 category={pricing.dashboard}
                 tier={'enterprise'}
                 icon={pricing.dashboard.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.security}
+                tier={'enterprise'}
+                icon={pricing.security.icon}
               />
               <PricingTableRowMobile
                 category={pricing.support}
@@ -569,12 +599,20 @@ export default function IndexPage() {
                     icon={Solutions['storage'].icon}
                   />
                   <PricingTableRowDesktop
+                    category={pricing.realtime}
+                    icon={Solutions['realtime'].icon}
+                  />
+                  <PricingTableRowDesktop
                     category={pricing['edge-functions']}
                     icon={Solutions['edge-functions'].icon}
                   />
                   <PricingTableRowDesktop
                     category={pricing.dashboard}
                     icon={pricing.dashboard.icon}
+                  />
+                  <PricingTableRowDesktop
+                    category={pricing.security}
+                    icon={pricing.security.icon}
                   />
                   <PricingTableRowDesktop category={pricing.support} icon={pricing.support.icon} />
                 </tbody>
@@ -653,9 +691,8 @@ export default function IndexPage() {
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
-                      <div className="border-b pb-3">
+                      <div className="border-b pb-3" key={i}>
                         <Accordion.Item
-                          key={i}
                           header={<span className="text-scale-1200">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
                         >

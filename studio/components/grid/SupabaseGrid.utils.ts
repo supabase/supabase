@@ -79,10 +79,20 @@ export function initTable(
       ? onLoadStorage(props.storageRef, table.name, table.schema)
       : undefined
 
-    // Load sort and filters via URL param only if given
+    // Check for saved state on initial load and also, load sort and filters via URL param only if given
     // Otherwise load from local storage to resume user session
-    if (sort === undefined && filter === undefined && (savedState?.sorts || savedState?.filters)) {
-      return { savedState: { sorts: savedState.sorts, filters: savedState.filters } }
+    if (
+      !state.isInitialComplete &&
+      sort === undefined &&
+      filter === undefined &&
+      (savedState?.sorts || savedState?.filters)
+    ) {
+      return {
+        savedState: {
+          sorts: savedState.sorts,
+          filters: savedState.filters,
+        },
+      }
     }
 
     const gridColumns = getGridColumns(table, {
