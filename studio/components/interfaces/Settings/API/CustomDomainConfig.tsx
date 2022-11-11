@@ -210,7 +210,7 @@ const CustomDomainConfig = () => {
                   </div>
                 }
               >
-                <FormSection header={<FormSectionLabel>Add Custom Domain</FormSectionLabel>}>
+                <FormSection header={<FormSectionLabel>Add a Custom Domain</FormSectionLabel>}>
                   <FormSectionContent loading={false}>
                     <Input
                       id="domain"
@@ -243,7 +243,7 @@ const CustomDomainConfig = () => {
     <>
       <Panel title={CUSTOM_DOMAINS_TITLE}>
         <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-          {isLoading && <div>Loading...</div>}
+          {isLoading && <CustomDomainsShimmerLoader />}
 
           {isNotAllowedError && (
             <div className="flex items-center justify-center space-x-2 py-8">
@@ -450,6 +450,20 @@ const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
         value={value}
         layout="vertical"
       />
+    </div>
+  )
+}
+
+const CustomDomainsShimmerLoader = () => {
+  return (
+    <div className="grid grid-cols-12 gap-6 px-8 py-8">
+      <div className="col-span-12 lg:col-span-5">
+        <div className="h-6 w-1/3 bg-scale-1000 rounded shimmering-loader" />
+      </div>
+
+      <div className="col-span-12 lg:col-span-7">
+        <div className="h-[38px] w-full bg-scale-1000 rounded shimmering-loader" />
+      </div>
     </div>
   )
 }
