@@ -15,7 +15,7 @@ import PostgrestConfig from './PostgrestConfig'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
-import CustomDomainConfig from './CustomDomainConfig'
+import CustomDomainConfig from './CustomDomainConfig/CustomDomainConfig'
 
 interface Props {
   projectRef: string
