@@ -104,8 +104,7 @@ If some data is not updated on signin/signout you can fall back to `invalidateAl
 
 To make the session available to the UI (pages, layouts), pass the session in the root layout server load function:
 
-```ts
-// src/routes/+layout.server.ts
+```ts title=src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types';
 import { getServerSession } from '@supabase/auth-helpers-sveltekit';
 
@@ -118,8 +117,7 @@ export const load: LayoutServerLoad = async (event) => {
 
 In addition you can create a layout load function if you are using `invalidate('supabase:auth')`:
 
-```ts
-// src/routes/+layout.ts
+```ts title=src/routes/+layout.ts
 import type { LayoutLoad } from './$types';
 import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 
@@ -129,14 +127,13 @@ export const load: LayoutLoad = async (event) => {
 };
 ```
 
-This results in less server calls as the client manages the session on it's own.
+This results in fewer server calls as the client manages the session on its own.
 
 ### Typings
 
 In order to get the most out of TypeScript and it´s intellisense, you should import our types into the `app.d.ts` type definition file that comes with your SvelteKit project.
 
-```ts
-// src/app.d.ts
+```ts title=src/app.d.ts
 
 /// <reference types="@sveltejs/kit" />
 
@@ -162,8 +159,7 @@ declare namespace App {
 
 You can now determine if a user is authenticated on the client-side by checking that the `session` object in `$page.data` is defined.
 
-```html
-<!-- src/routes/+page.svelte -->
+```html title=src/routes/+page.svelte
 <script>
   import { page } from '$app/stores';
 </script>
@@ -178,7 +174,7 @@ You can now determine if a user is authenticated on the client-side by checking 
 
 ## Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to import the `{ supabaseClient }` from `$lib/db` and only run your query once the session is defined client-side in `$page.data`:
+For [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to import the `{ supabaseClient }` from `$lib/db` and only run your query once the session is defined client-side in `$page.data`:
 
 ```html
 <script>
@@ -204,8 +200,7 @@ For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row
 
 ## Server-side data fetching with RLS
 
-```html
-<!-- src/routes/profile/+page.svelte -->
+```html title=src/routes/profile/+page.svelte
 <script>
   /** @type {import('./$types').PageData} */
   export let data;
@@ -217,10 +212,9 @@ For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row
 <pre>{JSON.stringify(user, null, 2)}</pre>
 ```
 
-For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work in a server environment, you need to use the `getSupabase` helper to check if the user is authenticated. The helper requires the `event` and returns `session` and `supabaseClient`:
+For [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) to work in a server environment, you need to use the `getSupabase` helper to check if the user is authenticated. The helper requires the `event` and returns `session` and `supabaseClient`:
 
-```ts
-// src/routes/profile/+page.ts
+```ts title=src/routes/profile/+page.ts
 import type { PageLoad } from './$types';
 import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { redirect } from '@sveltejs/kit';
@@ -243,8 +237,7 @@ export const load: PageLoad = async (event) => {
 
 Wrap an API Route to check that the user has a valid session. If they're not logged in the session is `null`.
 
-```ts
-// src/routes/api/protected-route/+server.ts
+```ts title=src/routes/api/protected-route/+server.ts
 import type { RequestHandler } from './$types';
 import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { json, redirect } from '@sveltejs/kit';
@@ -266,8 +259,7 @@ If you visit `/api/protected-route` without a valid session cookie, you will get
 
 Wrap an Action to check that the user has a valid session. If they're not logged in the session is `null`.
 
-```ts
-// src/routes/posts/+page.server.ts
+```ts title=src/routes/posts/+page.server.ts
 import type { Actions } from './$types';
 import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { error, invalid } from '@sveltejs/kit';
@@ -356,8 +348,7 @@ export const actions: Actions = {
 To avoid writing the same auth logic in every single route you can use the handle hook to
 protect multiple routes at once.
 
-```ts
-// src/hooks.server.ts
+```ts title=src/hooks.server.ts
 import type { RequestHandler } from './$types';
 import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { redirect, error } from '@sveltejs/kit';
