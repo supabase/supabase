@@ -24,6 +24,7 @@
     "common": "*",
     "config": "*",
     "date-fns": "2.10.0",
+    "htmlescape": "1.1.1",
     "dayjs": "^1.11.4",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",

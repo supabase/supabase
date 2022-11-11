@@ -80,7 +80,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
                   )}`
               )
               .join('&')
-            await router.replace(`/?${queryString}`, '/')
+            await router.replace(`/launch-week/tickets?${queryString}`, '/launch-week/tickets')
           } else {
             setUserData(params)
             setPageState('ticket')

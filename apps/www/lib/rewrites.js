@@ -17,11 +17,6 @@ module.exports = [
     source: '/docs/:path*',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
   },
-  // rewrite to keep existing ticket urls working
-  {
-    source: '/launch-week/tickets',
-    destination: `/launch-week/tickets/register`,
-  },
   {
     source: '/new-docs',
     destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,

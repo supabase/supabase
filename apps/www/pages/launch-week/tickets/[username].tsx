@@ -3,14 +3,9 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 import Error from 'next/error'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import Ticket from '~/components/LaunchWeek/Ticket/ticket'
-import {
-  PageState,
-  ConfDataContext,
-  UserData,
-} from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
+import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
-import { useState } from 'react'
+import { getUserByUsername } from '~/lib/launch-week-ticket/db-api'
 
 type Props = {
   username: string | null
@@ -21,21 +16,13 @@ type Props = {
 
 export default function TicketShare({ username, ticketNumber, name, golden }: Props) {
   const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
-  const [userData, setUserData] = useState<UserData>({ username, ticketNumber, name, golden })
-  const [pageState, setPageState] = useState<PageState>(ticketNumber ? 'ticket' : 'registration')
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
   }
 
   return (
-    <ConfDataContext.Provider
-      value={{
-        userData,
-        setUserData,
-        setPageState,
-      }}
-    >
+    <>
       <NextSeo
         title={`${name}’s #SupaLaunchWeek Ticket`}
         openGraph={{
@@ -60,16 +47,18 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
             src="/images/launchweek/launchweek-logo--dark.svg"
             className="md:40 hidden w-28 dark:block lg:w-48"
           />
-          <Ticket
-            username={username}
-            name={name}
-            ticketNumber={ticketNumber}
-            sharePage={true}
-            golden={golden}
+          <TicketContainer
+            defaultUserData={{
+              username: username || undefined,
+              name: name || '',
+              ticketNumber,
+              golden,
+            }}
+            sharePage
           />
         </SectionContainer>
       </DefaultLayout>
-    </ConfDataContext.Provider>
+    </>
   )
 }
 
@@ -79,10 +68,10 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   let ticketNumber: number | null | undefined
   const GOLDEN_TICKETS = (process.env.GOLDEN_TICKETS?.split(',') ?? []).map((n) => Number(n))
 
-  if (username) {
-    // const user = await getUserByUsername(username)
-    // name = user.name ?? user.username
-    // ticketNumber = user.ticketNumber
+  if (username && username !== 'register') {
+    const user = await getUserByUsername(username)
+    name = user.name ?? user.username
+    ticketNumber = user.ticketNumber
   }
   return {
     props: {

@@ -12,13 +12,14 @@ import TicketActions from './ticket-actions'
 import TicketCopy from './ticket-copy'
 import { DATE, SITE_NAME } from '~/lib/constants'
 import Form from './form'
+import { UserData } from './hooks/use-conf-data'
 
 type TicketGenerationState = 'default' | 'loading'
 type Props = {
-  username: string | null
-  name: string | null
-  ticketNumber: number | null
-  golden: boolean
+  username: UserData['username']
+  ticketNumber: UserData['ticketNumber']
+  name: UserData['name']
+  golden: UserData['golden']
   sharePage?: boolean
 }
 
@@ -74,7 +75,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           <p className={cn(styles.description, styleUtils.appear, styleUtils['appear-second'])}>
             {sharePage ? (
               <>
-                Join {name ?? 'them'} on {DATE}.
+                Join {name ?? 'us'} on {DATE}.
               </>
             ) : golden ? (
               <>Claim your ticket with GitHub and Tweet it to redeem your swag pack!</>
