@@ -58,6 +58,12 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
               },
             ]
           : []),
+        {
+          name: 'Vault',
+          key: 'vault',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault`,
+          items: [],
+        },
       ],
     },
     ...(IS_PLATFORM

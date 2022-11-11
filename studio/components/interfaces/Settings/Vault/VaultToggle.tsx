@@ -10,11 +10,10 @@ import {
 } from 'components/ui/Forms'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions } from 'hooks'
-import InformationBox from 'components/ui/InformationBox'
 
 interface Props {}
 
-const Vault: FC<Props> = () => {
+const VaultToggle: FC<Props> = () => {
   const formId = 'project-vault-settings'
   const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
@@ -60,34 +59,20 @@ const Vault: FC<Props> = () => {
                     id="enabled"
                     size="small"
                     layout="flex"
-                    label="Enable Supabase Vault"
+                    label="Enable Vault"
                     descriptionText="Vault provides secret management and data encryption for your project"
                     disabled={!canToggleVault}
                   />
-                  {hasChanges && (
-                    <>
-                      {values.enabled ? (
-                        <InformationBox
-                          defaultVisibility
-                          hideCollapse
-                          icon={<IconAlertCircle strokeWidth={2} />}
-                          title="Enabling Vault for your project"
-                          description={
-                            <div>
-                              <p className="text-sm">
-                                A new schema <code>vault</code> will be created in your database,
-                                where you will be able to manage your secrets.
-                              </p>
-                            </div>
-                          }
-                        />
-                      ) : (
-                        <Alert withIcon variant="warning" title="Disabling Vault for your project">
-                          The schema <code>vault</code> will be removed from your database and
-                          [highlight other side effects]
-                        </Alert>
-                      )}
-                    </>
+                  {hasChanges && !values.enabled && (
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      title="Warning: Disabling Vault for your project"
+                    >
+                      All of your current secrets that are stored in the Vault will be removed from
+                      and cannot be recovered. If you have tables which are currently using any
+                      secrets, you may not be able to decrypt them. This action cannot be undone.
+                    </Alert>
                   )}
                 </FormSectionContent>
               </FormSection>
@@ -99,4 +84,4 @@ const Vault: FC<Props> = () => {
   )
 }
 
-export default Vault
+export default VaultToggle
