@@ -17,10 +17,35 @@ import { useParams, useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button, Form, IconAlertCircle, IconRefreshCw, IconTrash, Input } from 'ui'
+import {
+  Alert,
+  Button,
+  Form,
+  IconAlertCircle,
+  IconExternalLink,
+  IconRefreshCw,
+  IconTrash,
+  Input,
+} from 'ui'
 import * as yup from 'yup'
 
 const FORM_ID = 'custom-domains-form'
+
+const CUSTOM_DOMAINS_TITLE = (
+  <div className="flex-1 flex items-center justify-between">
+    <h5 className="mb-0">Custom Domain</h5>
+
+    <a
+      href="https://supabase.com/docs/guides/platform/custom-domains"
+      target="_blank"
+      rel="noreferrer noopener"
+      className="flex items-center gap-1 text-sm text-scale-1000 hover:text-scale-1100"
+    >
+      <span>Docs</span>
+      <IconExternalLink className="inline w-4 h-4" />
+    </a>
+  </div>
+)
 
 const schema = yup.object({
   domain: yup.string().required('Custom domain is required'),
@@ -166,7 +191,7 @@ const CustomDomainConfig = () => {
             <>
               <FormPanel
                 disabled={true}
-                header={<p>Custom Domain</p>}
+                header={CUSTOM_DOMAINS_TITLE}
                 footer={
                   <div className="flex py-4 px-8">
                     <FormActions
@@ -216,7 +241,7 @@ const CustomDomainConfig = () => {
 
   return (
     <>
-      <Panel title={<h5 className="mb-0">Custom Domain</h5>}>
+      <Panel title={CUSTOM_DOMAINS_TITLE}>
         <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
           {isLoading && <div>Loading...</div>}
 
