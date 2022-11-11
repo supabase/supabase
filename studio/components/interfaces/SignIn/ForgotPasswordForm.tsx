@@ -33,6 +33,11 @@ const ForgotPasswordForm = () => {
     const response = await post(`${API_URL}/reset-password`, {
       email,
       hcaptchaToken: token ?? undefined,
+      redirectTo: `${
+        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+          ? process.env.NEXT_PUBLIC_VERCEL_URL
+          : process.env.NEXT_PUBLIC_SITE_URL
+      }/forgot-password`,
     })
     const error = response.error
 

@@ -36,6 +36,11 @@ const SignUpForm = () => {
       email,
       password,
       hcaptchaToken: token ?? null,
+      redirectTo: `${
+        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+          ? process.env.NEXT_PUBLIC_VERCEL_URL
+          : process.env.NEXT_PUBLIC_SITE_URL
+      }/sign-in`,
     })
     const error = response.error
 
