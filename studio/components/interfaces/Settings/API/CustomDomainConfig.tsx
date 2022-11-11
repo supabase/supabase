@@ -48,8 +48,6 @@ const CustomDomainConfig = () => {
     }
   )
 
-  console.log(data)
-
   const isLoading = isSettingsLoading || isCustomDomainsLoading
 
   const isNoHostnameConfiguredError =
@@ -80,6 +78,7 @@ const CustomDomainConfig = () => {
       ui.setNotification({
         category: 'success',
         message: `Successfully created custom domain. Please verify the domain by adding the listed records to your domain's DNS settings.`,
+        duration: 10000,
       })
     } catch (error: any) {
       ui.setNotification({
@@ -116,6 +115,8 @@ const CustomDomainConfig = () => {
         category: 'success',
         message: `Successfully activated custom domain`,
       })
+
+      setIsActivateConfirmModalVisible(false)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -140,6 +141,8 @@ const CustomDomainConfig = () => {
         category: 'success',
         message: `Successfully deleted custom domain`,
       })
+
+      setIsDeleteConfirmModalVisible(false)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -163,7 +166,7 @@ const CustomDomainConfig = () => {
             <>
               <FormPanel
                 disabled={true}
-                header={<p>Custom Domains</p>}
+                header={<p>Custom Domain</p>}
                 footer={
                   <div className="flex py-4 px-8">
                     <FormActions
@@ -213,7 +216,7 @@ const CustomDomainConfig = () => {
 
   return (
     <>
-      <Panel title={<h5 className="mb-0">Custom Domains</h5>}>
+      <Panel title={<h5 className="mb-0">Custom Domain</h5>}>
         <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
           {isLoading && <div>Loading...</div>}
 
@@ -221,7 +224,7 @@ const CustomDomainConfig = () => {
             <div className="flex items-center justify-center space-x-2 py-8">
               <IconAlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-scale-1100">
-                Custom domains are not enabled for this project. Please{' '}
+                Custom domain is not enabled for this project. Please{' '}
                 <Link href={`/support/new?ref=${ref}&category=sales`}>
                   <a className="underline">contact support</a>
                 </Link>{' '}
@@ -249,7 +252,7 @@ const CustomDomainConfig = () => {
                 <>
                   <div>
                     <h4 className="text-scale-1200">
-                      Set the following record(s) to your DNS provider:
+                      Set the following record(s) in your DNS provider:
                     </h4>
                     <span className="text-sm text-scale-1100">
                       Please note that it may take up to 24 hours for the DNS records to propagate.
@@ -339,8 +342,8 @@ const CustomDomainConfig = () => {
               {data.status === '5_services_reconfigured' && (
                 <div className="flex items-center justify-between">
                   <div>
-                    <code className="text-sm">{data.customDomain.hostname}</code> is activate and
-                    serving traffic.
+                    <code className="text-sm bg-green-400">{data.customDomain.hostname}</code> is
+                    activate and serving traffic.
                   </div>
 
                   <Button
