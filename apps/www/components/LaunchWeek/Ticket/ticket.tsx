@@ -24,7 +24,6 @@ type Props = {
 }
 
 export default function Ticket({ username, name, ticketNumber, sharePage, golden }: Props) {
-  // golden = false;
   const ticketRef = useRef<HTMLDivElement>(null)
   const [ticketGenerationState, setTicketGenerationState] =
     useState<TicketGenerationState>('default')

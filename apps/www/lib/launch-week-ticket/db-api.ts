@@ -18,7 +18,7 @@ const supabase =
 
 export async function getUserByUsername(username: string): Promise<ConfUser> {
   const { data } = await supabase!
-    .from('users')
+    .from('lw6_tickets')
     .select('name, ticketNumber')
     .eq('username', username)
     .single()
@@ -28,7 +28,7 @@ export async function getUserByUsername(username: string): Promise<ConfUser> {
 
 export async function getUserById(id: string): Promise<ConfUser> {
   const { data, error } = await supabase!
-    .from('users')
+    .from('lw6_tickets')
     .select('name, username, createdAt')
     .eq('id', id)
     .single()
@@ -38,14 +38,18 @@ export async function getUserById(id: string): Promise<ConfUser> {
 }
 
 export async function createUser(id: string, email: string): Promise<ConfUser> {
-  const { data, error } = await supabase!.from('users').insert({ id, email }).single()
+  const { data, error } = await supabase!
+    .from('lw6_tickets')
+    .insert({ id, email })
+    .select()
+    .single()
   if (error) throw new Error(error.message)
 
   return data ?? {}
 }
 
 export async function getTicketNumberByUserId(id: string): Promise<string | null> {
-  const { data } = await supabase!.from('users').select('ticketNumber').eq('id', id).single()
+  const { data } = await supabase!.from('lw6_tickets').select('ticketNumber').eq('id', id).single()
 
   return data?.ticketNumber!.toString() ?? null
 }
@@ -68,7 +72,12 @@ export async function updateUserWithGitHubUser(id: string, token: string): Promi
     throw new Error('Invalid or expired token')
   }
 
-  const { error } = await supabase!.from('users').update({ username, name }).eq('id', id).single()
+  const { error } = await supabase!
+    .from('lw6_tickets')
+    .update({ username, name })
+    .eq('id', id)
+    .select()
+    .single()
   if (error) console.log(error.message)
 
   return { username, name }
