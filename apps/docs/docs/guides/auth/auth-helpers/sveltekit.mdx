@@ -74,8 +74,7 @@ import '$lib/db';
 
 Edit your `+layout.svelte` file and set up the client side.
 
-```html
-<!-- src/routes/+layout.svelte -->
+```html title=src/routes/+layout.svelte
 <script>
   import { supabaseClient } from '$lib/db';
   import { invalidate } from '$app/navigation';
