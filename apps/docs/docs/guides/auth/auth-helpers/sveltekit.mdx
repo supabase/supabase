@@ -102,7 +102,7 @@ If some data is not updated on signin/signout you can fall back to `invalidateAl
 
 ### Send session to client
 
-In order to make the session available to the UI (pages, layouts) we need to pass the session in the root layout server load function:
+To make the session available to the UI (pages, layouts), pass the session in the root layout server load function:
 
 ```ts
 // src/routes/+layout.server.ts
