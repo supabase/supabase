@@ -15,22 +15,26 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
   const job_data = await job_res.json()
 
-  const contributor_res = await fetch('https://api.github.com/repos/supabase/supabase/contributors')
+  const contributor_res = await fetch(
+    'https://api.github.com/repos/supabase/supabase/contributors?per_page=100'
+  )
   const contributor_arr = await contributor_res.json()
 
-  const contributor_data = contributor_arr.filter((object: any) => {
-    return (
-      object.login !== 'saltcod' &&
-      object.login !== 'inian' &&
-      object.login !== 'thorwebdev' &&
-      object.login !== 'dependabot[bot]' &&
-      object.login !== 'soedirgo' &&
-      object.login !== 'dragarcia' &&
-      object.login !== 'stavares843'
-    )
-  })
+  const contributor_data = await contributor_arr.map(
+    (contributor: { login: string; avatar_url: string; html_url: string }) => {
+      return {
+        login: contributor.login,
+        avatar_url: contributor.avatar_url,
+        html_url: contributor.html_url,
+      }
+    }
+  )
 
-  if (!job_data && !contributor_data) {
+  const contributors = await contributor_data.filter((contributor: any) =>
+    career.contributors.includes(contributor.login)
+  )
+
+  if (!job_data && !contributors) {
     return {
       props: {
         notFound: true,
@@ -40,13 +44,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   return {
     props: {
-      job_data,
-      contributor_data,
+      jobs: job_data.jobs,
+      contributors: contributors,
     },
   }
 }
 
-const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
+const CareerPage: NextPage = ({ jobs, contributors }: any) => {
   // base path for images
   const { basePath } = useRouter()
 
@@ -284,23 +288,27 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
                 </p>
               </div>
               <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
-                {contributor_data.slice(0, 19).map((contributor: any, i: number) => {
+                {contributors.map((contributor: any, i: number) => {
                   return (
                     <div
                       className={`${
                         Styles[`contributors-${i}`]
-                      } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600`}
+                      } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10`}
                       key={i}
                     >
-                      <div className="relative w-full h-full">
-                        <Image
-                          src={contributor.avatar_url}
-                          alt={`${contributor.login} github avatar`}
-                          className="rounded-full"
-                          layout="fill"
-                          objectFit="cover"
-                        />
-                      </div>
+                      <Link href={contributor.html_url}>
+                        <a target="_blank">
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={contributor.avatar_url}
+                              alt={`${contributor.login} github avatar`}
+                              className="rounded-full"
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
+                        </a>
+                      </Link>
                     </div>
                   )
                 })}
@@ -421,7 +429,7 @@ const CareerPage: NextPage = ({ job_data, contributor_data }: any) => {
             <SectionContainer>
               <h1 className="text-2xl sm:text-3xl xl:text-4xl">Open positions</h1>
               <div className="mt-10 space-y-6">
-                {job_data.jobs.map(
+                {jobs.map(
                   (
                     job: {
                       title: string
