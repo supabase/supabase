@@ -1,3 +1,5 @@
+// [Terry] Also need to look at getPageType() in ./lib/helpers
+// to set a menu to a page
 import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
 import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
 import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
@@ -5,6 +7,7 @@ import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
 import SupabaseCLINav from 'data/nav/supabase-cli'
 import SupabaseAPINav from 'data/nav/supabase-api'
 import AuthServerNav from 'data/nav/auth-server'
+import RealtimeServerNav from 'data/nav/realtime-server'
 import StorageServerNav from 'data/nav/storage-server'
 
 import { NavMenu, References } from './Navigation.types'
@@ -335,6 +338,7 @@ export const menuItems: NavMenu = {
       label: 'Self-hosting',
       items: [
         { name: 'Auth Server', url: '/reference/auth', items: [] },
+        { name: 'Realtime Server', url: '/reference/realtime', items: [] },
         { name: 'Storage Server', url: '/reference/storage', items: [] },
       ],
     },
@@ -346,5 +350,6 @@ export const menuItems: NavMenu = {
   'reference/cli': SupabaseCLINav,
   'reference/api': SupabaseAPINav,
   'reference/auth': AuthServerNav,
+  'reference/realtime': RealtimeServerNav,
   'reference/storage': StorageServerNav,
 }

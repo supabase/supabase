@@ -22,11 +22,11 @@ toc_max_heading_level: 3
 
 <%- parameter.description %>
 
-<ul>
-<li>Required: <code><%= parameter.required %></code></li>
-<li>Default: <code><%- parameter?.default ? parameter?.default : 'None' %></code></li><% if(parameter?.links?.length){ %>
+<ul class="method-list-group">
+<li class="method-list-item-label flex items-center gap-4">Required: <code><%= parameter.required %></code></li>
+<li class="method-list-item-label flex items-center gap-4">Default: <code><%- parameter?.default ? parameter?.default : 'None' %></code></li><% if(parameter?.links?.length){ %>
 <li>
-<span>See also:</span>
+<h3>See also:</h3>
 <ul><% parameter.links?.forEach(function(link){ %><li><a href="<%- link.link %>"><%- link.name %></a></li><% }); %></ul>
 </li>
 <% } %>
