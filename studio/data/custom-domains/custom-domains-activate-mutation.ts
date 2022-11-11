@@ -19,7 +19,6 @@ export async function activateCustomDomain({ projectRef }: CustomDomainActivateV
     throw response.error
   }
 
-  console.log('activate response:', response)
   return response
 }
 
