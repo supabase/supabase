@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown'
 import career from '~/data/career.json'
 import Globe from '~/components/Globe'
 import Styles from './career.module.css'
+import { useTheme } from '~/components/Providers'
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
@@ -51,7 +52,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 }
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
-  // base path for images
+  const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
 
   const meta_title = 'Careers | Supabase'
@@ -113,7 +114,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             </div>
           </SectionContainer>
 
-          <div className="h-[2px] bg-gradient-to-r from-[#252525] via-[#454545] to-[#252525]"></div>
+          <div className="h-[2px] bg-gradient-to-r from-scale-100 via-scale-700 to-scale-100"></div>
           <div className="bg-scale-100 overflow-clip">
             <SectionContainer className="!py-0 !pb-16 lg:!pt-16">
               <div className="lg:flex lg:h-[500px]">
@@ -242,11 +243,13 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         key={i}
                         className="flex sm:block items-center space-x-6 sm:space-x-0 sm:space-y-4 md:w-full"
                       >
-                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-brand-700 rounded-lg flex items-center">
+                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-brand-500 dark:bg-brand-700 rounded-lg flex items-center">
                           <div className="relative w-[80%] h-[80%] mx-auto">
                             <Image
-                              src={human.icon}
-                              alt={`${human.title} icon`}
+                              src={`/images/career/icons/${human.icon}${
+                                isDarkMode ? '-dark' : '-light'
+                              }.svg`}
+                              alt={`${human.icon} icon`}
                               layout="fill"
                               objectFit="cover"
                             />
@@ -266,11 +269,11 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             </SectionContainer>
 
             <SectionContainer className="!pb-0">
-              <div className="w-14 h-14 bg-brand-700 rounded-lg flex items-center mx-auto mb-6">
+              <div className="w-14 h-14 bg-brand-500 dark:bg-brand-700 rounded-lg flex items-center mx-auto mb-6">
                 <div className="relative w-[80%] h-[80%] mx-auto">
                   <Image
-                    src="/images/career/icon/contributors.svg"
-                    alt="contributor icon"
+                    src={`/images/career/icons/open_source${isDarkMode ? '-dark' : '-light'}.svg`}
+                    alt="open source icon"
                     layout="fill"
                     objectFit="cover"
                   />
@@ -351,11 +354,13 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         className="h-full bg-scale-300 border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
-                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square bg-brand-700 rounded-lg flex items-center">
+                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square bg-brand-500 dark:bg-brand-700 rounded-lg flex items-center">
                           <div className="relative w-[80%] h-[80%] mx-auto">
                             <Image
-                              src={benefits.icon}
-                              alt={`${benefits.title} icon`}
+                              src={`/images/career/icons/${benefits.icon}${
+                                isDarkMode ? '-dark' : '-light'
+                              }.svg`}
+                              alt={`${benefits.icon} icon`}
                               layout="fill"
                               objectFit="cover"
                             />
@@ -376,11 +381,11 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
           </SectionContainer>
 
           <SectionContainer>
-            <div className="w-14 h-14 bg-brand-700 rounded-lg flex items-center mx-auto mb-6">
+            <div className="w-14 h-14 bg-brand-500 dark:bg-brand-700 rounded-lg flex items-center mx-auto mb-6">
               <div className="relative w-[80%] h-[80%] mx-auto">
                 <Image
-                  src="/images/career/icon/person.svg"
-                  alt="how we hire icon"
+                  src={`/images/career/icons/jobs${isDarkMode ? '-dark' : '-light'}.svg`}
+                  alt="jobs icon"
                   layout="fill"
                   objectFit="cover"
                 />
@@ -452,7 +457,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                                 <Badge className="rounded-md flex items-center lg:text-sm">
                                   <div className="relative w-3 h-3 mx-auto">
                                     <Image
-                                      src="/images/career/icon/globe.svg"
+                                      src="/images/career/icons/globe-dark.svg"
                                       alt="globe icon"
                                       layout="fill"
                                       objectFit="cover"

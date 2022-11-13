@@ -23,27 +23,27 @@
   ],
   "humanPowered": [
     {
-      "icon": "/images/career/icon/supabase.svg",
+      "icon": "egoless",
       "title": "Egoless",
       "text": "Willing to do the schlep, the team goals come first."
     },
     {
-      "icon": "/images/career/icon/eye.svg",
+      "icon": "curious",
       "title": "Polyglot",
       "text": "Broad skillets. Growth mindset."
     },
     {
-      "icon": "/images/career/icon/process.svg",
+      "icon": "process",
       "title": "Process Driven",
       "text": "Engineer yourself out of the job."
     },
     {
-      "icon": "/images/career/icon/hands.svg",
+      "icon": "honesty",
       "title": "Intellectual Honesty",
       "text": "Put our own biases aside."
     },
     {
-      "icon": "/images/career/icon/check.svg",
+      "icon": "flexibility",
       "title": "Kaizen mindset",
       "text": "Continuously improve all functions."
     }
@@ -73,32 +73,32 @@
   ],
   "benefits": [
     {
-      "icon": "/images/career/icon/chair.svg",
+      "icon": "remote",
       "title": "Fully Remote",
       "text": "We hire globally. We believe you can do your best work from anywhere. There are no Supabase offices, but we provide a co-working membership that you can use anywhere in the world."
     },
     {
-      "icon": "/images/career/icon/headphones.svg",
+      "icon": "tech_allowance",
       "title": "Hardware Budget",
       "text": "Use this budget for anything you need to set up your work environment from tech to office setup."
     },
     {
-      "icon": "/images/career/icon/health.svg",
+      "icon": "healthcare",
       "title": "Health Benefits",
       "text": "We provide 100% health coverage for employees and 80% for dependants. It's important to us that you & your family have health care covered."
     },
     {
-      "icon": "/images/career/icon/island.svg",
+      "icon": "offsite",
       "title": "Annual Off-Sites",
       "text": "We believe in the value of in-person time, so we all come together annually for a week. Each year we pick somewhere different in the world. It's a highlight of the year!"
     },
     {
-      "icon": "/images/career/icon/clock.svg",
+      "icon": "flexibility",
       "title": "Flexible Work",
       "text": "Work remotely from anywhere in the world. We work in teams, but we work asynchronously. You know what you need to do and when it needs to be done."
     },
     {
-      "icon": "/images/career/icon/mortarboard.svg",
+      "icon": "education",
       "title": "Professional Development",
       "text": "An annual allowance to spend on professional development and education. Use this for courses, books, conferences, or anything that supports your continuous learning."
     }

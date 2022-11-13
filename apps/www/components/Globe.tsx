@@ -1,8 +1,9 @@
-import career from '../data/career.json'
 import createGlobe from 'cobe'
 import { useEffect, useRef } from 'react'
+import { useTheme } from './Providers/index'
 
 const Globe = () => {
+  const { isDarkMode } = useTheme()
   const canvasRef = useRef<any>()
 
   useEffect(() => {
@@ -17,12 +18,13 @@ const Globe = () => {
       height: width * 2,
       phi: 0,
       theta: 0.3,
-      dark: 1,
+      dark: isDarkMode ? 1 : 0,
       diffuse: 3,
       scale: 1,
+      opacity: 0.8,
       mapSamples: 20000,
       mapBrightness: 4,
-      baseColor: [1, 1, 1],
+      baseColor: [255 / 255, 255 / 255, 255 / 255],
       markerColor: [62 / 255, 207 / 255, 142 / 255],
       glowColor: [255 / 255, 255 / 255, 255 / 255],
       markers: [
@@ -50,7 +52,7 @@ const Globe = () => {
     })
     setTimeout(() => (canvasRef.current.style.opacity = '1'))
     return () => cobe.destroy()
-  }, [])
+  }, [isDarkMode])
 
   return (
     <canvas
