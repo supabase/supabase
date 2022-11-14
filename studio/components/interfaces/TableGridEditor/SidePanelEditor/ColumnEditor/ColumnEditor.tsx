@@ -164,8 +164,10 @@ const ColumnEditor: FC<Props> = ({
           <Input
             label="Name"
             descriptionText="Recommended to use lowercase and use an underscore to seperate words e.g. column_name"
+            placeholder='column_name'
             layout="horizontal"
             type="text"
+
             error={errors.name}
             value={columnFields?.name ?? ''}
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
