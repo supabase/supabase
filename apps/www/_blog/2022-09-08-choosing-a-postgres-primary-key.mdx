@@ -164,9 +164,9 @@ So how does *this* work? Postgres does the same thing under the covers -- it gen
 
 Let's say the application using the DB has some [Python](https://python.org) code like the following:
 
-```sql
-import randrange from random
-import User from models;
+```python
+from random import randrange 
+from models import User 
 MAX_RANDOM_USER_ID = 1_000_000_000
 def create_user():
     """
@@ -175,7 +175,6 @@ def create_user():
     user_id = randrange(1, MAX_RANDOM_USER_ID)
     user = User(id=user_id, email="new@example.com", name="new user")
     db.save(user)
-
 ```
 
 That *looks* good, but there's a problem -- [random](https://docs.python.org/3/library/random.html) is a *pseudorandom* generator.
