@@ -1,0 +1,11 @@
+import Layout from '~/layouts/DefaultLayout'
+
+export const meta = {
+  title: 'Supabase Docs',
+}
+
+In this 25-minute guide, we’ll be building a collaborative user managment app using NextJS and Supabase.
+As users add and move rectangles in a canvas, changes will be automatically synced and persisted, allowing for a canvas that updates in real-time across clients.
+Users will also be able to see other users selections, and undo and redo actions.
+
+export default ({ children }) => <Layout meta={meta} children={children} />

@@ -1,13 +1,10 @@
 import toc from 'markdown-toc'
-import { MDXProvider } from '@mdx-js/react'
-import { useRouter } from 'next/router'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '../components/index'
-import { menuItems } from '../components/Navigation/Navigation.constants'
-import { getPageType } from '../lib/helpers'
-import { getAllDocs, getDocsBySlug } from '../lib/docs'
+
 import Layout from '~/layouts/Default'
+import { getAllDocs, getDocsBySlug } from '../lib/docs'
 
 interface Meta {
   id: string
@@ -23,12 +20,9 @@ interface Props {
 }
 
 export default function Doc({ meta, content, toc }: Props) {
-  const { asPath } = useRouter()
-  const page = getPageType(asPath)
-
   return (
     // @ts-ignore
-    <Layout meta={meta} toc={toc} menuItems={menuItems[page]} currentPage={page}>
+    <Layout meta={meta} toc={toc}>
       <h1 className="text-7xl text-white">helo world</h1>
       <MDXRemote {...content} components={components} />
     </Layout>

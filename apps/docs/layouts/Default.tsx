@@ -4,6 +4,9 @@ import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
 import TableOfContents from '~/components/TableOfContents'
+import { menuItems } from '~/components/Navigation/Navigation.constants'
+import { useRouter } from 'next/router'
+import { getPageType } from '~/lib/helpers'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
@@ -13,7 +16,9 @@ interface Props {
   currentPage: string
 }
 
-const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
+const Layout: FC<Props> = ({ meta, children, toc }) => {
+  const { asPath } = useRouter()
+
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -26,6 +31,8 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
 
   const hasTableOfContents =
     toc !== undefined && toc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
+
+  const pageType = getPageType(asPath)
 
   return (
     <>
@@ -41,9 +48,9 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
       </Head>
 
       <main>
-        <NavBar currentPage={currentPage} />
+        <NavBar />
         <div className="flex w-full flex-row">
-          <SideBar menuItems={menuItems} />
+          <SideBar menuItems={menuItems[pageType]} />
           <div className="main-content-pane docs-width grid md:grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${
