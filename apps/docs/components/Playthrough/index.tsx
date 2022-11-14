@@ -17,8 +17,8 @@ export function Playthrough() {
           className="overflow-hidden rounded m-3"
           style={{ width: '40%', background: '#232323', colorScheme: 'dark' }}
         >
-          <section className="relative overflow-auto text-white h-full">
-            <h1 className="text-4xl p-4 mt-4">Quickstart: Next.js</h1>
+          <section className="prose relative overflow-auto text-white h-full">
+            <h1 className="px-4 mt-8">Quickstart: Next.js</h1>
             <Chapters
               chapters={chapters}
               stepIndex={step.stepIndex}

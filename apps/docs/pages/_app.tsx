@@ -11,6 +11,9 @@ import '../styles/docsearch.scss'
 import '../styles/algolia-search.scss'
 import '../styles/prism-okaidia.scss'
 
+// TODO try to import this only on the page that needs it
+import 'xterm/css/xterm.css'
+
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 

@@ -46,7 +46,7 @@
     "@radix-ui/react-accordion": "^1.0.1",
     "@radix-ui/react-collapsible": "^1.0.1",
     "@radix-ui/react-icons": "^1.1.1",
-    "@radix-ui/react-progress": "^1.0.1",
+    "@radix-ui/react-progress": "1.0.0",
     "@tailwindcss/typography": "^0.4.1",
     "@webcontainer/api": "^0.0.8",
     "algoliasearch": "^4.14.2",
