@@ -43,6 +43,7 @@ export const generateColumnField = (field: any = {}): ColumnField => {
     isPrimaryKey: false,
     isIdentity: false,
     isNewColumn: true,
+    isEncrypted: false,
   }
 }
 
@@ -69,6 +70,7 @@ export const generateColumnFieldFromPostgresColumn = (
     isUnique: column.is_unique,
 
     isNewColumn: false,
+    isEncrypted: false,
     isPrimaryKey: primaryKeyColumns.includes(column.name),
   }
 }

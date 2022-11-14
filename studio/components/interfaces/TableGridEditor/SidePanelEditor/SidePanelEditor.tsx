@@ -280,6 +280,13 @@ const SidePanelEditor: FC<Props> = ({
           saveChanges={saveColumn}
           updateEditorDirty={() => setIsEdited(true)}
         />
+        // <ColumnEditorV2
+        //   visible={sidePanelKey === 'column'}
+        //   column={selectedColumnToEdit}
+        //   selectedTable={selectedTable}
+        //   enumTypes={enumTypes}
+        //   closePanel={onClosePanel}
+        // />
       )}
       <TableEditor
         table={selectedTableToEdit}

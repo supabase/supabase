@@ -69,6 +69,7 @@ export interface ColumnField {
   isIdentity: boolean
   isPrimaryKey: boolean
   isNewColumn: boolean
+  isEncrypted: boolean
 }
 
 // export interface ForeignKey {

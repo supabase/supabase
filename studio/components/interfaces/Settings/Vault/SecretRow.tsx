@@ -53,7 +53,7 @@ const SecretRow: FC<Props> = ({ secret, onSelectRemove }) => {
       </div>
       <div className="flex items-center justify-end w-[25%] space-x-4">
         <p className="text-sm text-scale-1100">
-          Added on {dayjs(secret.created_at).format('MMM D, YYYY')}.
+          Added on {dayjs(secret.created_at).format('MMM D, YYYY')}
         </p>
         <Button
           type="default"

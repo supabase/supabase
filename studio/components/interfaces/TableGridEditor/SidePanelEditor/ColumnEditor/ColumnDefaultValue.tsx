@@ -51,7 +51,7 @@ const ColumnDefaultValue: FC<Props> = ({
   return (
     <InputWithSuggestions
       label="Default Value"
-      layout="horizontal"
+      layout="vertical"
       description="Can either be a literal or an expression (e.g uuid_generate_v4())"
       placeholder={
         typeof columnFields.defaultValue === 'string' && columnFields.defaultValue.length === 0

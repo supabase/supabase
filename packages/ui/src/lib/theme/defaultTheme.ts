@@ -969,6 +969,7 @@ export default {
     size: {
       medium: `w-screen max-w-md h-full`,
       large: `w-screen max-w-2xl h-full`,
+      xlarge: `w-screen max-w-3xl h-full`,
     },
     align: {
       left: `

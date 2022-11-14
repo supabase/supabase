@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { FC } from 'react'
 import { Form, Button, Toggle, IconExternalLink, Alert, IconHelpCircle, IconAlertCircle } from 'ui'
 
@@ -19,7 +20,9 @@ const VaultToggle: FC<Props> = () => {
 
   const initialValues = { enabled: true }
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {}
+  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+    console.log('onSubmit', values)
+  }
 
   return (
     <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
@@ -36,9 +39,13 @@ const VaultToggle: FC<Props> = () => {
               disabled={!canToggleVault}
               footer={
                 <div className="flex py-4 px-8">
-                  <Button type="default" icon={<IconExternalLink />}>
-                    What is Supabase Vault?
-                  </Button>
+                  <Link href="https://supabase.com/docs">
+                    <a target="_blank">
+                      <Button type="default" icon={<IconExternalLink />}>
+                        What is Supabase Vault?
+                      </Button>
+                    </a>
+                  </Link>
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}

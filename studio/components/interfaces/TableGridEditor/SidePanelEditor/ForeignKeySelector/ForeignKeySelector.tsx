@@ -111,8 +111,12 @@ const ForeignKeySelector: FC<Props> = ({
       // @ts-ignore
       header={
         <span>
-          Edit foreign key relation for{' '}
-          <span className="text-code">{get(column, ['name'], '')}</span>
+          Edit foreign key relation{' '}
+          {column?.name && (
+            <>
+              for <span className="text-code">{get(column, ['name'], '')}</span>
+            </>
+          )}
         </span>
       }
       customFooter={
@@ -125,7 +129,7 @@ const ForeignKeySelector: FC<Props> = ({
       }
     >
       <SidePanel.Content>
-        <div className="space-y-6">
+        <div className="py-6 space-y-6">
           <InformationBox
             icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
             title="What are foreign keys?"
