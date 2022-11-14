@@ -9,68 +9,58 @@ import prettier from 'prettier'
 
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
-  const pages = await globby([
-    'pages/*.js',
-    'pages/*.tsx',
-    'pages/*/*.tsx',
-    'data/**/*.mdx',
-    '_blog/*.mdx',
-    '_alternatives/*.mdx',
-    '!pages/index.tsx',
-    '!data/*.mdx',
-    '!pages/_*.js',
-    '!pages/*/index.tsx',
-    '!pages/api',
-    '!pages/404.js',
+
+  const guidesPages = await globby(['docs/*.mdx', 'docs/guides/**/*.mdx', 'docs/handbook/**/*.mdx'])
+
+  const rawReferencePages = await globby([
+    // guides
+    'docs/*.mdx',
+    '!docs/404.mdx',
+    'docs/guides/**/*.mdx',
+    'docs/handbook/**/*.mdx',
+    // reference
+    'docs/reference/*.mdx',
+    'docs/reference/javascript/*.mdx',
+    'docs/reference/javascript/generated/*.mdx',
+    '!docs/reference/javascript/v1.mdx', // ignore this
+    'docs/reference/dart/*.mdx',
+    'docs/reference/dart/generated/*.mdx',
+    '!docs/reference/dart/v0.mdx', // ignore this
+    'docs/reference/api/*.mdx',
+    'docs/reference/api/generated/*.mdx',
+    'docs/reference/cli/*.mdx',
+    'docs/reference/cli/generated/*.mdx',
+    // misc reference
+    'docs/reference/postgres/*.mdx',
+    'docs/reference/postgres/generated/*.mdx',
+    'docs/reference/realtime/*.mdx',
+    'docs/reference/realtime/generated/*.mdx',
+    'docs/reference/storage/*.mdx',
+    'docs/reference/storage/generated/*.mdx',
+    'docs/reference/auth/*.mdx',
+    'docs/reference/auth/generated/*.mdx',
   ])
+
+  const pages = rawReferencePages.map((x) => {
+    let string = x
+    string = string.replace('/generated', '')
+    string = string.replace('.mdx', '')
+    return string
+  })
+
+  // add static OSS page
+  pages.unshift('docs/oss')
+  // add static homepage
+  pages.unshift('docs')
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         ${pages
-          .filter((page) => !page.includes('_document.tsx'))
-          .map((page) => {
-            const path = page
-              .replace('pages', '')
-              // add a `/` for blog posts
-              .replace('_blog', '/blog')
-              .replace('_alternatives', '/alternatives')
-              .replace('.tsx', '')
-              .replace('.mdx', '')
-              // replace the paths for nested 'index' based routes
-              .replace('/auth/Auth', '/auth')
-              .replace('/database/Database', '/database')
-              .replace('/storage/Storage', '/storage')
-              .replace('/realtime/Realtime', '/realtime')
-              .replace('/edge-functions/edge-functions', '/edge-functions')
-              .replace('/nextjs/Nextjs', '/nextjs')
-
-            let route = path === '/index' ? '' : path
-
-            if (route === '/alternatives/[slug]') return null
-            if (route === '/partners/[slug]') return null
-
-            /**
-             * Blog based urls
-             */
-            if (route.includes('/blog/')) {
-              /**
-               * remove directory from route
-               */
-              const _route = route.replace('/blog/', '')
-              /**
-               * remove the date from the file name
-               */
-              const substring = _route.substring(11)
-              /**
-               * reconsruct the route
-               */
-              route = '/blog/' + substring
-            }
-
+          .map((path) => {
             return `
               <url>
-                  <loc>${`https://supabase.com${route}`}</loc>
+                  <loc>${`https://supabase.com/${path}`}</loc>
                   <changefreq>weekly</changefreq>
                   <changefreq>0.5</changefreq>
               </url>
@@ -85,8 +75,11 @@ async function generate() {
     parser: 'html',
   })
 
+  const sitemapFilePath = `public/sitemap.xml`
+  console.log(`Total of ${pages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`)
+
   // eslint-disable-next-line no-sync
-  writeFileSync('public/sitemap_www.xml', formatted)
+  writeFileSync(sitemapFilePath, formatted)
 }
 
 generate()
