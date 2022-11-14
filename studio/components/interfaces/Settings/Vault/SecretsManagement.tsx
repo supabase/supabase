@@ -3,6 +3,7 @@ import Divider from 'components/ui/Divider'
 import { IconSearch, Input, Button, Listbox, Modal, Form, IconHelpCircle } from 'ui'
 import SecretRow from './SecretRow'
 import InformationBox from 'components/ui/InformationBox'
+import EncryptionKeySelector from 'components/interfaces/Vault/EncryptionKeySelector'
 
 interface Props {}
 
@@ -147,13 +148,14 @@ const SecretsManagement: FC<Props> = ({}) => {
       <Modal
         closable
         hideFooter
+        size="medium"
         visible={showAddSecretModal}
         onCancel={() => setShowAddSecretModal(false)}
         header={<h5 className="text-sm text-scale-1200">Add new secret</h5>}
       >
         <Form
           id="add-new-secret-form"
-          initialValues={{ secret: '', description: '', keyId: '' }}
+          initialValues={{ secret: '', description: '', keyId: '', newKeyName: '' }}
           validate={validate}
           onSubmit={onAddNewSecret}
         >
@@ -168,8 +170,12 @@ const SecretsManagement: FC<Props> = ({}) => {
                 </Modal.Content>
                 <Modal.Separator />
                 <Modal.Content>
-                  <div className="py-4 space-y-2">
-                    <Input id="keyId" label="Key ID" labelOptional="Optional" />
+                  <div className="py-4 space-y-4">
+                    <EncryptionKeySelector
+                      id="keyId"
+                      labelOptional="Optional"
+                      onSelectKey={(key) => console.log(key)}
+                    />
                     <InformationBox
                       icon={<IconHelpCircle size={18} strokeWidth={2} />}
                       url="asd"
