@@ -2712,7 +2712,7 @@ pages:
     examples:
       - name: Checking nullness
         description: |
-          Using the `eq()` filter doesn't work when filtering for `null`, `true`, or `false`:
+          Using the `eq()` filter doesn't work when filtering for `null`:
 
           <Tabs>
           <TabItem value="schema" label="Schema">
