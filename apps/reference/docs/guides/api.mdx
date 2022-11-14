@@ -221,13 +221,6 @@ JS Reference: [select()](../reference/javascript/select),
 
 ### GraphQL API
 
-:::note
-
-To rebuild your GraphQL schema from the SQL schema, call `select graphql.rebuild_schema();`.
-Be sure to rebuild the GraphQL schema after altering the SQL schema.
-
-:::
-
 You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urql](https://formidable.com/open-source/urql/docs/).
 
 <Tabs
@@ -391,6 +384,12 @@ alter table todos enable row level security;
 ### The `service_role` key
 
 Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key is designed to bypass Row Level Security - so it should only be used on a private server.
+
+A common use case for the `service_role` key is to run data analytics jobs on the backend. To support joins on user id, it is often useful to grant the service role read access to `auth.users` table.
+
+```sql
+grant select on table auth.users to service_role;
+```
 
 We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase `service_role` keys pushed to public repositories.
 If they detect any keys with service_role privileges being pushed to GitHub, they will forward the API key to us, so that we can automatically revoke the detected secrets and notify you, protecting your data against malicious actors.
