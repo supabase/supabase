@@ -147,7 +147,7 @@ We achieve this by mounting a compressed [9P filesystem](<https://en.wikipedia.o
 renames every file an 8-character name and produces a `filesystem.json` file representing a nested structure with files, original file names, sizes, etc.
 We then [copy this compressed output](https://github.com/supabase-community/postgres-wasm/blob/main/packages/buildroot/config/board/pg-browser/post-image.sh) to the VM.
 We modified the kernel command line and v86 boot parameters to boot directly from the 9P filesystem, and even put our kernel file into the p9 filesystem.
-All non-essential files are loaded asyncrhonously over HTTPS in the browser as needed.
+All non-essential files are loaded asynchronously over HTTPS in the browser as needed.
 
 The initial state was smaller, but still 15-20mb in size. We discussed this with Fabian who pointed us towards the `page_poison=on` kernel parameter.
 This parameter allowed us to clear caches before creating the snapshots, by forcing Linux to write arbitrary bytes on freed memory instead of random bytes,
