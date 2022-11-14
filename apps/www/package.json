@@ -24,10 +24,10 @@
     "common": "*",
     "config": "*",
     "date-fns": "2.10.0",
-    "htmlescape": "1.1.1",
     "dayjs": "^1.11.4",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
+    "htmlescape": "^1.1.1",
     "markdown-toc": "^1.2.0",
     "marked": "^4.0.12",
     "next": "12.1.0",
@@ -56,8 +56,8 @@
     "ui": "*",
     "use-debounce": "^7.0.1",
     "uuid": "^8.3.2",
-    "yup": "^0.32.11",
-    "vanilla-tilt": "1.7.0"
+    "vanilla-tilt": "1.7.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.7",
