@@ -62,6 +62,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.7",
     "@types/classnames": "^2.3.1",
+    "@types/htmlescape": "^1.1.1",
     "@types/jest": "^25.2.2",
     "@types/marked": "^4.0.3",
     "@types/mdx-js__react": "^1.5.5",
