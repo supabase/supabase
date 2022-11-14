@@ -1,45 +1,40 @@
-import { Code, Console, GoToFile } from "./console";
+import { Code, Console, GoToFile } from './console'
 
 const envContents = `NEXT_PUBLIC_SUPABASE_URL=https://fwobemhztvkziokpwsfc.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3b2JlbWh6dHZremlva3B3c2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY3MzUzNjUsImV4cCI6MTk4MjMxMTM2NX0.8OmPbKgfLNzrvZjpAf7SZRBH4tum5hHd1nOIPlTynlU`;
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3b2JlbWh6dHZremlva3B3c2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY3MzUzNjUsImV4cCI6MTk4MjMxMTM2NX0.8OmPbKgfLNzrvZjpAf7SZRBH4tum5hHd1nOIPlTynlU`
 
 export default {
-  title: "Step 2: Building the App",
+  title: 'Step 2: Building the App',
   content: [
     <>
       <p>Let's start building the Next.js app from scratch.</p>
       <h3>Initialize a Next.js app</h3>
-      <p>
-        We can use create-next-app to initialize an app called supabase-nextjs
-      </p>
+      <p>We can use create-next-app to initialize an app called supabase-nextjs</p>
     </>,
     {
-      type: "step",
-      header: "Initialize the app with create-next-app",
-      solution: [
-        { command: "npx create-next-app --use-npm --no-eslint --js ." },
-      ],
+      type: 'step',
+      header: 'Initialize the app with create-next-app',
+      solution: [{ command: 'npx create-next-app --use-npm --no-eslint --js .' }],
       show: () => <Console />,
       children: (
         <>
           <p>Run:</p>
-          <Code>npx create-next-app --use-npm --no-eslint --js .</Code>
+          <Code language="bash">npx create-next-app --use-npm --no-eslint --js .</Code>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-            condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut
+            aliquam lacinia, nunc nisl aliquet nisl.
           </p>
         </>
       ),
     },
     <p>
-      Now we need to add a dependency. Lorem ipsum dolor sit amet, consectetur
-      adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl
-      aliquet nisl.
+      Now we need to add a dependency. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+      condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
     </p>,
     {
-      type: "step",
-      header: "Install the Supabase client library",
-      solution: [{ command: "npm install @supabase/supabase-js" }],
+      type: 'step',
+      header: 'Install the Supabase client library',
+      solution: [{ command: 'npm install @supabase/supabase-js' }],
       show: () => <Console />,
       children: (
         <>
@@ -50,25 +45,25 @@ export default {
       ),
     },
     {
-      type: "step",
-      header: "Add environment variables",
+      type: 'step',
+      header: 'Add environment variables',
       intro: [
         {
-          path: ".env.local",
+          path: '.env.local',
           contents: `NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY`,
         },
       ],
-      solution: [{ path: ".env.local", contents: envContents }],
+      solution: [{ path: '.env.local', contents: envContents }],
       show: () => <Console />,
       children: (
         <>
           <p>
             Go to <GoToFile path="/.env.local" /> and put your API keys
           </p>
-          <Code>{envContents}</Code>
+          <Code language="py">{envContents}</Code>
         </>
       ),
     },
   ],
-};
+}

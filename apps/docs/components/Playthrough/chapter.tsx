@@ -82,7 +82,7 @@ function Step({ currentIndex, step }) {
   return (
     <Collapsible.Root
       className={`border rounded-lg p-4 my-4 ${
-        current ? 'bg-neutral-800 border-brand-900 text-white' : 'border-neutral-600'
+        current ? 'bg-neutral-800 border-brand-900 text-white z-10' : 'border-neutral-600'
       }`}
       style={{
         padding: 6,

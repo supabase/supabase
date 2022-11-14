@@ -1,4 +1,4 @@
-import { Code, Console, GoToFile } from "./console";
+import { Code, Console, GoToFile } from './console'
 
 const accountContents = `import { useState, useEffect } from 'react'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -110,7 +110,7 @@ export default function Account({ session }) {
       </div>
     </div>
   )
-}`;
+}`
 
 const indexContents = `import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -135,7 +135,7 @@ const Home = () => {
   )
 }
 
-export default Home`;
+export default Home`
 
 const stylesContents = `html,
 body {
@@ -569,56 +569,56 @@ button.primary,
   color: var(--custom-color-brand);
   margin-bottom: 10px;
   text-decoration: none;
-}`;
+}`
 
 export default {
-  title: "Step 4: The Account component",
+  title: 'Step 4: The Account component',
   content: [
     {
-      type: "step",
-      header: "Create the Account component",
+      type: 'step',
+      header: 'Create the Account component',
       intro: [
         {
-          path: "components/Account.js",
+          path: 'components/Account.js',
           contents: ``,
         },
       ],
-      solution: [{ path: "components/Account.js", contents: accountContents }],
+      solution: [{ path: 'components/Account.js', contents: accountContents }],
       show: () => <Console />,
       children: (
         <>
           <p>
             Add a <GoToFile path="components/Account.js" /> file and put this:
           </p>
-          <Code>{accountContents}</Code>
+          <Code language="jsx">{accountContents}</Code>
         </>
       ),
     },
     {
       ref: {},
-      type: "step",
-      header: "Update index.js",
-      solution: [{ path: "pages/index.js", contents: indexContents }],
+      type: 'step',
+      header: 'Update index.js',
+      solution: [{ path: 'pages/index.js', contents: indexContents }],
       show: () => <Console />,
       children: (
         <>
           <p>
             Now in <GoToFile path="pages/index.js" /> add:
           </p>
-          <Code>{indexContents}</Code>
+          <Code language="jsx">{indexContents}</Code>
         </>
       ),
     },
     {
-      type: "step",
-      header: "Update styles",
-      solution: [{ path: "styles/globals.css", contents: stylesContents }],
+      type: 'step',
+      header: 'Update styles',
+      solution: [{ path: 'styles/globals.css', contents: stylesContents }],
       show: () => <Console />,
     },
     {
-      type: "step",
-      header: "Test",
+      type: 'step',
+      header: 'Test',
       show: () => <Console />,
     },
   ],
-};
+}
