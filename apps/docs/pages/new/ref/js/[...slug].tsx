@@ -7,10 +7,10 @@ import {
 
 import fs from 'fs'
 
-import remarkGfm from 'remark-gfm'
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
+import remarkGfm from 'remark-gfm'
 import components from '~/components/index'
 import { getAllDocs } from '~/lib/docs'
 
@@ -23,12 +23,11 @@ import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 
-import { IconDatabase, Tabs } from '~/../../packages/ui'
+import { IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-import assert from 'assert'
 
 const marginTop = 256
 export default function Ref(props) {
@@ -186,26 +185,27 @@ export default function Ref(props) {
 
               const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
-              const [serialFunctionMarkdownContent, setSerialFunctionMarkdownContent] =
-                useState(null)
+              // @ts-ignore
+              // const [serialFunctionMarkdownContent, setSerialFunctionMarkdownContent] =
+              //   useState(null)
 
               const functionMarkdownContent = props?.docs[itemIndex]?.content
 
-              useEffect(() => {
-                async function makeContent() {
-                  setSerialFunctionMarkdownContent(
-                    await serialize(functionMarkdownContent, {
-                      mdxOptions: {
-                        remarkPlugins: [remarkGfm],
-                        format: 'mdx',
-                      },
-                    })
-                  )
-                }
-                makeContent()
-              }, [])
+              // useEffect(() => {
+              //   async function makeContent() {
+              //     setSerialFunctionMarkdownContent(
+              //       await serialize(functionMarkdownContent, {
+              //         mdxOptions: {
+              //           remarkPlugins: [remarkGfm],
+              //           format: 'mdx',
+              //         },
+              //       })
+              //     )
+              //   }
+              //   makeContent()
+              // }, [])
 
-              console.log('serialFunctionMarkdownContent', serialFunctionMarkdownContent)
+              // console.log('serialFunctionMarkdownContent', serialFunctionMarkdownContent)
 
               return (
                 <>
@@ -273,21 +273,23 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                       tables.map((table) => {
                                         console.log(table)
 
-                                        const [content, setContent] = useState(null)
+                                        // @ts-ignore
+                                        // const [content, setContent] = useState(null)
 
-                                        useEffect(() => {
-                                          async function makeContent() {
-                                            setContent(
-                                              await serialize(table.content, {
-                                                mdxOptions: {
-                                                  remarkPlugins: [remarkGfm],
-                                                  format: 'mdx',
-                                                },
-                                              })
-                                            )
-                                          }
-                                          makeContent()
-                                        }, [])
+                                        // // @ts-ignore
+                                        // useEffect(() => {
+                                        //   async function makeContent() {
+                                        //     setContent(
+                                        //       await serialize(table.content, {
+                                        //         mdxOptions: {
+                                        //           remarkPlugins: [remarkGfm],
+                                        //           format: 'mdx',
+                                        //         },
+                                        //       })
+                                        //     )
+                                        //   }
+                                        //   makeContent()
+                                        // }, [])
 
                                         return (
                                           <div className="bg-scale-300 border rounded prose max-w-none">
@@ -303,7 +305,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                             </div>
 
                                             {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
-                                            {content && <MDXRemote {...content} />}
+                                            {/* {content && <MDXRemote {...content} />} */}
                                           </div>
                                         )
                                       })}
