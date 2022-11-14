@@ -21,7 +21,7 @@ import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-ignore
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape--reduced.yml' assert { type: 'yml' }
+import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 
 import { IconDatabase, Tabs } from '~/../../packages/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'

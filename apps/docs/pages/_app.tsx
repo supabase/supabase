@@ -1,17 +1,19 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import type { AppProps } from 'next/app'
 import { post } from 'lib/fetchWrappers'
-import { ThemeProvider } from '../components/Providers'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { AppPropsWithLayout } from 'types'
 import { SearchProvider } from '~/components/DocSearch'
-import '../styles/main.scss?v=1.0.0'
-import '../styles/docsearch.scss'
+import { ThemeProvider } from '../components/Providers'
 import '../styles/algolia-search.scss'
-import '../styles/prism-okaidia.scss'
 import '../styles/ch.scss'
+import '../styles/docsearch.scss'
+import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
+import '../styles/prism-okaidia.scss'
 
-function MyApp({ Component, pageProps }: AppProps) {
+import SiteLayout from '~/layouts/SiteLayout'
+
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
 
   function telemetry(route: string) {
@@ -34,10 +36,12 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [router.events])
 
+  const getLayout = Component.getLayout || ((page) => page)
+
   return (
     <ThemeProvider>
       <SearchProvider>
-        <Component {...pageProps} />
+        <SiteLayout>{getLayout(<Component {...pageProps}></Component>)}</SiteLayout>
       </SearchProvider>
     </ThemeProvider>
   )

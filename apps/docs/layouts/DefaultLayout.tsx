@@ -12,7 +12,6 @@ interface Props {
   children: any
   toc?: any
   menuItems: any
-  currentPage: string
 }
 
 const Layout: FC<Props> = (props: Props) => {
@@ -53,41 +52,33 @@ const Layout: FC<Props> = (props: Props) => {
         <meta property="og:title" content={props.meta?.title} />
       </Head>
 
-      <main>
-        {/* <NavBar currentPage={currentPage} /> */}
-        <div className="flex w-full flex-row">
-          <NavBar currentPage={null} />
-          <SideBar menuItems={props.menuItems} />
-          <div className="main-content-pane docs-width grid md:grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
-            <div
-              className={`${
-                props.meta?.hide_table_of_contents || !hasTableOfContents
-                  ? 'col-span-12 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8'
-                  : 'col-span-12 md:col-span-9'
-              } py-2 md:py-4 px-2 md:px-8`}
-            >
-              <p className="text-brand-900 tracking-wider">Tutorials</p>
-              <article className="prose dark:prose-dark dark:bg-scale-200 max-w-4xl mt-8">
-                <h1>{props.meta.title}</h1>
-                <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
+      <div className="main-content-pane docs-width grid md:grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
+        <div
+          className={`${
+            props.meta?.hide_table_of_contents || !hasTableOfContents
+              ? 'col-span-12 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8'
+              : 'col-span-12 md:col-span-9'
+          } py-2 md:py-4 px-2 md:px-8`}
+        >
+          <p className="text-brand-900 tracking-wider">Tutorials</p>
+          <article className="prose dark:prose-dark dark:bg-scale-200 max-w-4xl mt-8">
+            <h1>{props.meta.title}</h1>
+            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
 
-                <MDXProvider components={components} children={props.children} />
-              </article>
-            </div>
-            {hasTableOfContents && !props.meta?.hide_table_of_contents && (
-              <div
-                className={[
-                  'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
-                  'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
-                ].join(' ')}
-              >
-                <TableOfContents toc={props.toc} video={props.meta.video} />
-              </div>
-            )}
-          </div>
+            <MDXProvider components={components} children={props.children} />
+          </article>
         </div>
-        <Footer />
-      </main>
+        {hasTableOfContents && !props.meta?.hide_table_of_contents && (
+          <div
+            className={[
+              'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
+              'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+            ].join(' ')}
+          >
+            <TableOfContents toc={props.toc} video={props.meta.video} />
+          </div>
+        )}
+      </div>
     </>
   )
 }
