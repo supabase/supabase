@@ -21,6 +21,10 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
     return <Error statusCode={404} />
   }
 
+  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?ticketNumber=${encodeURIComponent(
+    ticketNumber
+  )}&username=${encodeURIComponent(username ?? '')}&name=${encodeURIComponent(name ?? '')}`
+
   return (
     <>
       <NextSeo
@@ -31,7 +35,7 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
           url: `${SITE_URL}/tickets/${username}`,
           images: [
             {
-              url: `https://supabase.com/images/launchweek/og-image.jpg`, // TODO
+              url: ogImageUrl,
             },
           ],
         }}
