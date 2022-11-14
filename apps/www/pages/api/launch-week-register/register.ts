@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import { NextApiRequest, NextApiResponse } from 'next'
 import { nanoid } from 'nanoid'
-import { ConfUser } from '~/lib/launch-week-ticket/db-api'
-import ms from 'ms'
-import { getTicketNumberByUserId, getUserById, createUser } from '~/lib/launch-week-ticket/db-api'
+import { NextApiRequest, NextApiResponse } from 'next'
+import {
+  ConfUser,
+  createUser,
+  getTicketNumberByUserId,
+  getUserById,
+} from '~/lib/launch-week-ticket/db-api'
 import { emailToId } from '~/lib/launch-week-ticket/user-api'
 
 type ErrorResponse = {

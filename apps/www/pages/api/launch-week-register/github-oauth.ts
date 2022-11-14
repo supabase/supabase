@@ -15,7 +15,7 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next'
-import * as qs from 'querystring'
+import { stringify } from 'querystring'
 import { renderSuccess, renderError } from '~/lib/launch-week-ticket/render-github-popup'
 import { createGitHubUser } from '~/lib/launch-week-ticket/db-api'
 
@@ -30,7 +30,7 @@ export default async function githubOAuth(req: NextApiRequest, res: NextApiRespo
     return
   }
 
-  const q = qs.stringify({
+  const q = stringify({
     client_id: process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID,
     client_secret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
     code: req.query.code,
