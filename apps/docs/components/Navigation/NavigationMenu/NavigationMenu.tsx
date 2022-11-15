@@ -20,6 +20,12 @@ const SideNav = () => {
         case `/docs${tempBasePath}`:
           setLevel('home')
           break
+        case `/docs${tempBasePath}/getting-started`:
+          setLevel('gettingstarted')
+          break
+        case `/docs${tempBasePath}/tutorials`:
+          setLevel('tutorials')
+          break
         case `/docs${tempBasePath}/database`:
           setLevel('database')
           break
@@ -70,7 +76,7 @@ const SideNav = () => {
       },
       {
         label: 'Getting started',
-        icon: 'gettingstarted.svg',
+        icon: 'getting-started.svg',
         href: '/getting-started',
         level: 'gettingstarted',
       },

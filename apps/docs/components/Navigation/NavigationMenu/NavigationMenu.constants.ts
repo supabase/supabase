@@ -37,6 +37,8 @@ export const REFERENCES: References = {
 }
 
 export const gettingstarted = {
+  icon: '/img/icons/menu/getting-started.svg',
+  title: 'Getting started',
   label: 'Overview',
   items: [
     { name: 'Introduction', url: '/', items: [] },
@@ -46,6 +48,7 @@ export const gettingstarted = {
 }
 
 export const tutorials = {
+  icon: '/img/icons/menu/tutorials.svg',
   label: 'Quickstarts',
   items: [
     { name: 'Angular', url: '/guides/with-angular', items: [] },
@@ -332,6 +335,8 @@ export const integrations = {
 }
 
 export const reference = {
+  title: 'API Reference',
+  icon: '/img/icons/menu/reference.svg',
   items: [
     {
       name: 'Client libraries',
