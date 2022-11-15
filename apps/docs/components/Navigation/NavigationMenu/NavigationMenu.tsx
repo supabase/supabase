@@ -199,7 +199,7 @@ const SideNav = () => {
           // level !== 'home' && 'opacity-0 invisible'
         ].join(' ')}
       >
-        <ul className="relative w-full flex flex-col gap-4">
+        <ul className="relative w-full flex flex-col gap-5">
           {home.map((section, sectionIndex) => {
             return (
               <>
@@ -209,7 +209,7 @@ const SideNav = () => {
                     key={`section-${sectionIndex}-border`}
                   ></div>
                 )}
-                <div className="flex flex-col gap-2" key={`section-${sectionIndex}`}>
+                <div className="flex flex-col gap-3" key={`section-${sectionIndex}`}>
                   {section.map((link) => {
                     return (
                       <a
@@ -221,11 +221,14 @@ const SideNav = () => {
                       >
                         <li
                           className={[
-                            'flex items-center gap-3',
+                            'group flex items-center gap-3',
                             'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
                           ].join(' ')}
                         >
-                          <img src={`${router.basePath}/img/icons/menu/${link.icon}`} />
+                          <img
+                            src={`${router.basePath}/img/icons/menu/${link.icon}`}
+                            className="opacity-75 w-4.5 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
+                          />
                           {link.label}
                         </li>
                       </a>
