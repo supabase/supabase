@@ -71,19 +71,19 @@ hello world
     return (
       <Link
         href={`/new/${product.href}`}
-        passHref
         key={product.title}
+        passHref
       >
-      <a className={`
-        relative
-        group
-        overflow-hidden
-        bg-white dark:bg-scale-300 border rounded-md drop-shadow-sm
-        transition
-        border-scale-500
-        hover:border-scale-700
-        gap-6
-        p-8 flex flex-col ${
+        <a className={`
+          relative
+          group
+          overflow-hidden
+          bg-white dark:bg-scale-300 border rounded-md drop-shadow-sm
+          transition
+          border-scale-500
+          hover:border-scale-700
+          gap-6
+          p-8 flex flex-col ${
           product.span ?? 'col-span-4'
         }`}>
           <img

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import rehypeFilter from 'react-markdown/lib/rehype-filter'
 import { IconChevronLeft } from '~/../../packages/ui'
@@ -65,29 +66,23 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
                   {x.items.map((x) => {
                     return (
                       <li key={x.name}>
-                        <a
-                          onClick={() => {
-                            router.push(`/${tempBasePath}${x.href}`)
-                          }}
-                          className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900"
-                        >
-                          {x.name}
-                        </a>
+                        <Link href={`/${tempBasePath}${x.href}`} passHref>
+                          <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
+                            {x.name}
+                          </a>
+                        </Link>
                       </li>
                     )
                   })}
                 </>
               ) : (
                 <li>
-                  <a
-                    onClick={() => {
-                      router.push(`/${tempBasePath}${x.href}`)
-                    }}
-                    className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3"
-                  >
-                    {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
-                    {x.name}
-                  </a>
+                  <Link href={`/${tempBasePath}${x.href}`} passHref>
+                    <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
+                      {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
+                      {x.name}
+                    </a>
+                  </Link>
                 </li>
               )}
             </div>
@@ -105,15 +100,12 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
           return (
             <div key={x.name}>
               <li>
-                <a
-                  onClick={() => {
-                    router.push(`/${tempBasePath}${x.href}`)
-                  }}
-                  className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1"
-                >
-                  {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
-                  {x.name}
-                </a>
+                <Link href={`/${tempBasePath}${x.href}`} passHref>
+                  <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
+                    {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
+                    {x.name}
+                  </a>
+                </Link>
               </li>
             </div>
           )

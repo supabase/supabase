@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
@@ -60,6 +61,8 @@ const SideNav = () => {
   }
 
   useEffect(() => {
+    console.log(router)
+    handleRouteChange(router.basePath + router.asPath)
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
@@ -212,26 +215,22 @@ const SideNav = () => {
                 <div className="flex flex-col gap-3" key={`section-${sectionIndex}`}>
                   {section.map((link) => {
                     return (
-                      <a
-                        key={link.label}
-                        onClick={() => {
-                          // setLevel(link.level)
-                          router.push(tempBasePath + link.href)
-                        }}
-                      >
-                        <li
-                          className={[
-                            'group flex items-center gap-3',
-                            'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
-                          ].join(' ')}
-                        >
-                          <img
-                            src={`${router.basePath}/img/icons/menu/${link.icon}`}
-                            className="opacity-75 w-4.5 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
-                          />
-                          {link.label}
-                        </li>
-                      </a>
+                      <Link href={tempBasePath + link.href} passHref>
+                        <a key={link.label}>
+                          <li
+                            className={[
+                              'group flex items-center gap-3',
+                              'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
+                            ].join(' ')}
+                          >
+                            <img
+                              src={`${router.basePath}/img/icons/menu/${link.icon}`}
+                              className="opacity-75 w-4.5 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
+                            />
+                            {link.label}
+                          </li>
+                        </a>
+                      </Link>
                     )
                   })}
                 </div>
