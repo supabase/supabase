@@ -1,11 +1,17 @@
+import { useRouter } from 'next/router'
 import Footer from '~/components/Footer'
 import NavBar from '~/components/Navigation/NavBar'
-import NavigationMenu from '~/components/NavigationMenu'
+import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 const Layout = ({ children }) => {
+  const router = useRouter()
   return (
     <>
       <main>
+        <img
+          src={`${router.basePath}/img/gradient-bg.png`}
+          className="absolute left-0 w-[520px] top-0"
+        />
         <div className="max-w-[1400px] mx-auto">
           <NavBar />
         </div>
