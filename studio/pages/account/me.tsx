@@ -71,28 +71,6 @@ const ProfileCard = observer(() => {
     })()
   }, [])
 
-  // const updatePassword = async (model: { password: string }) => {
-  //   try {
-  //     const { password } = await passwordSchema.validate(model)
-
-  //     console.log('password:', password)
-
-  //     ui.setNotification({ category: 'success', message: 'Successfully updated password' })
-  //   } catch (error) {
-  //     if (error instanceof ValidationError) {
-  //       return ui.setNotification({
-  //         category: 'error',
-  //         message: error.message,
-  //       })
-  //     }
-
-  //     ui.setNotification({
-  //       category: 'error',
-  //       message: 'Something went wrong. Please try again later',
-  //     })
-  //   }
-  // }
-
   return (
     <article className="max-w-4xl p-4">
       <section>
