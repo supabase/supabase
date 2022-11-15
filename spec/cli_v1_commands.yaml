@@ -1,4 +1,4 @@
-clispec: '001'
+clispec: "001"
 info:
   id: cli
   version: 1.11.3
@@ -9,13 +9,6 @@ info:
   spec: https://github.com/supabase/supabase.tools/cli_spec/lib.yaml
   description: |
     Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
-  options: |-
-    ```sh
-          --debug            output debug logs to stderr
-          --experimental     enable experimental features
-      -h, --help             help for supabase
-          --workdir string   path to a Supabase project directory
-    ```
   tags:
     - id: local-dev
       title: Local Development
@@ -23,6 +16,19 @@ info:
       title: Management APIs
     - id: other-commands
       title: Additional Commands
+flags:
+  - id: debug
+    name: --debug
+    description: output debug logs to stderr (default false)
+  - id: experimental
+    name: --experimental
+    description: enable experimental features (default false)
+  - id: help
+    name: -h, --help
+    description: help for supabase (default false)
+  - id: workdir
+    name: --workdir `string`
+    description: path to a Supabase project directory (default "")
 commands:
   - id: supabase-test
     title: supabase test
@@ -32,10 +38,7 @@ commands:
     links: []
     subcommands:
       - supabase-test-db
-    options: |-
-      ```sh
-        -h, --help   help for test
-      ```
+    flags: []
   - id: supabase-test-db
     title: supabase test db
     summary: Tests local database with pgTAP
@@ -43,13 +46,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase test db [flags]
+      supabase test db
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for db
-      ```
+    flags: []
   - id: supabase-stop
     title: supabase stop
     summary: Stop all local Supabase containers
@@ -61,11 +61,11 @@ commands:
       supabase stop [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-            --backup   Backs up the current database before stopping.
-        -h, --help     help for stop
-      ```
+    flags:
+      - id: backup
+        name: --backup
+        description: |
+          Backs up the current database before stopping. (default false)
   - id: supabase-status
     title: supabase status
     summary: Show status of local Supabase containers
@@ -74,13 +74,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase status [flags]
+      supabase status
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for status
-      ```
+    flags: []
   - id: supabase-start
     title: supabase start
     summary: Start containers for Supabase local development
@@ -89,13 +86,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase start [flags]
+      supabase start
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for start
-      ```
+    flags: []
   - id: supabase-secrets
     title: supabase secrets
     summary: Manage Supabase secrets
@@ -106,10 +100,7 @@ commands:
       - supabase-secrets-list
       - supabase-secrets-set
       - supabase-secrets-unset
-    options: |-
-      ```sh
-        -h, --help   help for secrets
-      ```
+    flags: []
   - id: supabase-secrets-unset
     title: supabase secrets unset
     summary: Unset a secret(s) on Supabase
@@ -118,13 +109,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase secrets unset <NAME> ... [flags]
+      supabase secrets unset <NAME> ...
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for unset
-      ```
+    flags: []
   - id: supabase-secrets-set
     title: supabase secrets set
     summary: Set a secret(s) on Supabase
@@ -136,11 +124,10 @@ commands:
       supabase secrets set [flags] <NAME=VALUE> ...
       ```
     subcommands: []
-    options: |-
-      ```sh
-            --env-file string   Read secrets from a .env file.
-        -h, --help              help for set
-      ```
+    flags:
+      - id: env-file
+        name: --env-file `string`
+        description: Read secrets from a .env file. (default "")
   - id: supabase-secrets-list
     title: supabase secrets list
     summary: List all secrets on Supabase
@@ -149,13 +136,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase secrets list [flags]
+      supabase secrets list
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for list
-      ```
+    flags: []
   - id: supabase-projects
     title: supabase projects
     summary: Manage Supabase projects
@@ -165,10 +149,7 @@ commands:
     subcommands:
       - supabase-projects-create
       - supabase-projects-list
-    options: |-
-      ```sh
-        -h, --help   help for projects
-      ```
+    flags: []
   - id: supabase-projects-list
     title: supabase projects list
     summary: List all Supabase projects
@@ -177,13 +158,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase projects list [flags]
+      supabase projects list
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for list
-      ```
+    flags: []
   - id: supabase-projects-create
     title: supabase projects create
     summary: Create a project on Supabase
@@ -194,15 +172,53 @@ commands:
       supabase projects create <project name> [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-            --db-password string   Database password of the project.
-        -h, --help                 help for create
-        -i, --interactive          Enables interactive mode.
-            --org-id string        Organization ID to create the project in.
-            --plan string          Select a plan that suits your needs. (default "free")
-            --region string        Select a region close to you for the best performance.
-      ```
+    flags:
+      - id: db-password
+        name: --db-password `string`
+        description: Database password of the project. (default "")
+      - id: interactive
+        name: -i, --interactive
+        description: Enables interactive mode. (default false)
+      - id: org-id
+        name: --org-id `string`
+        description: Organization ID to create the project in. (default "")
+      - id: plan
+        name: --plan `string`
+        description: Select a plan that suits your needs. (default "free")
+        accepted_values:
+          - id: free
+            name: free `string`
+          - id: pro
+            name: pro `string`
+      - id: region
+        name: --region `string`
+        description: |
+          Select a region close to you for the best performance. (default "")
+        accepted_values:
+          - id: ap-northeast-1
+            name: ap-northeast-1 `string`
+          - id: ap-south-1
+            name: ap-south-1 `string`
+          - id: ca-central-1
+            name: ca-central-1 `string`
+          - id: eu-west-1
+            name: eu-west-1 `string`
+          - id: sa-east-1
+            name: sa-east-1 `string`
+          - id: ap-northeast-2
+            name: ap-northeast-2 `string`
+          - id: ap-southeast-1
+            name: ap-southeast-1 `string`
+          - id: ap-southeast-2
+            name: ap-southeast-2 `string`
+          - id: eu-central-1
+            name: eu-central-1 `string`
+          - id: eu-west-2
+            name: eu-west-2 `string`
+          - id: us-east-1
+            name: us-east-1 `string`
+          - id: us-west-1
+            name: us-west-1 `string`
   - id: supabase-orgs
     title: supabase orgs
     summary: Manage Supabase organizations
@@ -211,10 +227,7 @@ commands:
     links: []
     subcommands:
       - supabase-orgs-list
-    options: |-
-      ```sh
-        -h, --help   help for orgs
-      ```
+    flags: []
   - id: supabase-orgs-list
     title: supabase orgs list
     summary: List all organizations
@@ -223,13 +236,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase orgs list [flags]
+      supabase orgs list
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for list
-      ```
+    flags: []
   - id: supabase-migration
     title: supabase migration
     summary: Manage database migration scripts
@@ -239,10 +249,7 @@ commands:
     subcommands:
       - supabase-migration-list
       - supabase-migration-new
-    options: |-
-      ```sh
-        -h, --help   help for migration
-      ```
+    flags: []
   - id: supabase-migration-new
     title: supabase migration new
     summary: Create an empty migration script
@@ -250,13 +257,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase migration new <migration name> [flags]
+      supabase migration new <migration name>
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for new
-      ```
+    flags: []
   - id: supabase-migration-list
     title: supabase migration list
     summary: List local and remote migrations
@@ -267,11 +271,10 @@ commands:
       supabase migration list [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help              help for list
-        -p, --password string   Password to your remote Postgres database.
-      ```
+    flags:
+      - id: password
+        name: -p, --password `string`
+        description: Password to your remote Postgres database. (default "")
   - id: supabase-login
     title: supabase login
     summary: Authenticate using an access token
@@ -280,13 +283,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase login [flags]
+      supabase login
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for login
-      ```
+    flags: []
   - id: supabase-link
     title: supabase link
     summary: Link to a Supabase project
@@ -298,12 +298,14 @@ commands:
       supabase link [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help                 help for link
-        -p, --password string      Password to your remote Postgres database.
-            --project-ref string   Project ref of the Supabase project.
-      ```
+    flags:
+      - id: password
+        name: -p, --password `string`
+        description: Password to your remote Postgres database. (default "")
+      - id: project-ref
+        name: --project-ref `string`
+        description: Project ref of the Supabase project. (default "")
+        required: true
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
@@ -312,13 +314,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase init [flags]
+      supabase init
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for init
-      ```
+    flags: []
   - id: supabase-gen
     title: supabase gen
     summary: Run code generation tools
@@ -327,10 +326,7 @@ commands:
     links: []
     subcommands:
       - supabase-gen-types
-    options: |-
-      ```sh
-        -h, --help   help for gen
-      ```
+    flags: []
   - id: supabase-gen-types
     title: supabase gen types
     summary: Generate types from Postgres schema
@@ -338,10 +334,7 @@ commands:
     links: []
     subcommands:
       - supabase-gen-types-typescript
-    options: |-
-      ```sh
-        -h, --help   help for types
-      ```
+    flags: []
   - id: supabase-gen-types-typescript
     title: supabase gen types typescript
     summary: Generate types for TypeScript
@@ -354,15 +347,22 @@ commands:
       supabase gen types typescript [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-            --db-url string        Generate types from a database url.
-        -h, --help                 help for typescript
-            --linked               Generate types from the linked project.
-            --local                Generate types from the local dev database.
-            --project-id string    Generate types from a project ID.
-            --schema stringArray   Schemas to generate types for.
-      ```
+    flags:
+      - id: db-url
+        name: --db-url `string`
+        description: Generate types from a database url. (default "")
+      - id: linked
+        name: --linked
+        description: Generate types from the linked project. (default false)
+      - id: local
+        name: --local
+        description: Generate types from the local dev database. (default false)
+      - id: project-id
+        name: --project-id `string`
+        description: Generate types from a project ID. (default "")
+      - id: schema
+        name: --schema `stringArray`
+        description: Schemas to generate types for. (default [])
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions
@@ -374,10 +374,7 @@ commands:
       - supabase-functions-deploy
       - supabase-functions-new
       - supabase-functions-serve
-    options: |-
-      ```sh
-        -h, --help   help for functions
-      ```
+    flags: []
   - id: supabase-functions-serve
     title: supabase functions serve
     summary: Serve a Function locally
@@ -388,12 +385,14 @@ commands:
       supabase functions serve <Function name> [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-            --env-file string   Path to an env file to be populated to the Function environment.
-        -h, --help              help for serve
-            --no-verify-jwt     Disable JWT verification for the Function.
-      ```
+    flags:
+      - id: env-file
+        name: --env-file `string`
+        description: |
+          Path to an env file to be populated to the Function environment. (default "")
+      - id: no-verify-jwt
+        name: --no-verify-jwt
+        description: Disable JWT verification for the Function. (default false)
   - id: supabase-functions-new
     title: supabase functions new
     summary: Create a new Function locally
@@ -401,13 +400,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase functions new <Function name> [flags]
+      supabase functions new <Function name>
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for new
-      ```
+    flags: []
   - id: supabase-functions-deploy
     title: supabase functions deploy
     summary: Deploy a Function to Supabase
@@ -419,12 +415,13 @@ commands:
       supabase functions deploy <Function name> [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help                 help for deploy
-            --no-verify-jwt        Disable JWT verification for the Function.
-            --project-ref string   Project ref of the Supabase project.
-      ```
+    flags:
+      - id: no-verify-jwt
+        name: --no-verify-jwt
+        description: Disable JWT verification for the Function. (default false)
+      - id: project-ref
+        name: --project-ref `string`
+        description: Project ref of the Supabase project. (default "")
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase
@@ -437,11 +434,10 @@ commands:
       supabase functions delete <Function name> [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help                 help for delete
-            --project-ref string   Project ref of the Supabase project.
-      ```
+    flags:
+      - id: project-ref
+        name: --project-ref `string`
+        description: Project ref of the Supabase project. (default "")
   - id: supabase-domains
     title: supabase domains
     summary: Manage custom domain names for Supabase projects
@@ -454,12 +450,13 @@ commands:
       - supabase-domains-delete
       - supabase-domains-get
       - supabase-domains-reverify
-    options: |-
-      ```sh
-        -h, --help                 help for domains
-            --include-raw-output   Include raw output (useful for debugging).
-            --project-ref string   Project ref of the Supabase project.
-      ```
+    flags:
+      - id: include-raw-output
+        name: --include-raw-output
+        description: Include raw output (useful for debugging). (default false)
+      - id: project-ref
+        name: --project-ref `string`
+        description: Project ref of the Supabase project. (default "")
   - id: supabase-domains-reverify
     title: supabase domains reverify
     summary: Re-verify the custom hostname config for your project.
@@ -467,13 +464,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase domains reverify [flags]
+      supabase domains reverify
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for reverify
-      ```
+    flags: []
   - id: supabase-domains-get
     title: supabase domains get
     summary: Get the current custom hostname config.
@@ -483,13 +477,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase domains get [flags]
+      supabase domains get
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for get
-      ```
+    flags: []
   - id: supabase-domains-delete
     title: supabase domains delete
     summary: Deletes the custom hostname config for your project.
@@ -497,13 +488,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase domains delete [flags]
+      supabase domains delete
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for delete
-      ```
+    flags: []
   - id: supabase-domains-create
     title: supabase domains create
     summary: Create a custom hostname.
@@ -518,11 +506,11 @@ commands:
       supabase domains create [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-            --custom-hostname string   The custom hostname to use for your Supabase project.
-        -h, --help                     help for create
-      ```
+    flags:
+      - id: custom-hostname
+        name: --custom-hostname `string`
+        description: |
+          The custom hostname to use for your Supabase project. (default "")
   - id: supabase-domains-activate
     title: supabase domains activate
     summary: Activate the custom hostname for a project.
@@ -535,13 +523,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase domains activate [flags]
+      supabase domains activate
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for activate
-      ```
+    flags: []
   - id: supabase-db
     title: supabase db
     summary: Manage local Postgres databases
@@ -555,10 +540,7 @@ commands:
       - supabase-db-push
       - supabase-db-remote
       - supabase-db-reset
-    options: |-
-      ```sh
-        -h, --help   help for db
-      ```
+    flags: []
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets the local database to current migrations
@@ -566,13 +548,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase db reset [flags]
+      supabase db reset
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for reset
-      ```
+    flags: []
   - id: supabase-db-remote
     title: supabase db remote
     summary: Manage remote databases
@@ -581,11 +560,10 @@ commands:
     subcommands:
       - supabase-db-remote-changes
       - supabase-db-remote-commit
-    options: |-
-      ```sh
-        -h, --help              help for remote
-        -p, --password string   Password to your remote Postgres database.
-      ```
+    flags:
+      - id: password
+        name: -p, --password `string`
+        description: Password to your remote Postgres database. (default "")
   - id: supabase-db-remote-commit
     title: supabase db remote commit
     summary: Commit remote changes as a new migration
@@ -593,13 +571,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase db remote commit [flags]
+      supabase db remote commit
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for commit
-      ```
+    flags: []
   - id: supabase-db-remote-changes
     title: supabase db remote changes
     summary: Show changes on the remote database
@@ -608,13 +583,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase db remote changes [flags]
+      supabase db remote changes
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for changes
-      ```
+    flags: []
   - id: supabase-db-push
     title: supabase db push
     summary: Push new migrations to the remote database
@@ -625,12 +597,14 @@ commands:
       supabase db push [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-            --dry-run           Print the migrations that would be applied, but don't actually apply them.
-        -h, --help              help for push
-        -p, --password string   Password to your remote Postgres database.
-      ```
+    flags:
+      - id: dry-run
+        name: --dry-run
+        description: |
+          Print the migrations that would be applied, but don't actually apply them. (default false)
+      - id: password
+        name: -p, --password `string`
+        description: Password to your remote Postgres database. (default "")
   - id: supabase-db-lint
     title: supabase db lint
     summary: Checks local database for typing error
@@ -641,12 +615,18 @@ commands:
       supabase db lint [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help             help for lint
-            --level string     Error level to emit. (default "warning")
-        -s, --schema strings   List of schema to include. (default [public])
-      ```
+    flags:
+      - id: level
+        name: --level `string`
+        description: Error level to emit. (default "warning")
+        accepted_values:
+          - id: warning
+            name: warning `string`
+          - id: error
+            name: error `string`
+      - id: schema
+        name: -s, --schema `strings`
+        description: List of schema to include. (default [public])
   - id: supabase-db-diff
     title: supabase db diff
     summary: Diffs the local database for schema changes
@@ -657,14 +637,19 @@ commands:
       supabase db diff [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -f, --file string      Saves schema diff to a file.
-        -h, --help             help for diff
-            --linked           Diffs local schema against linked project.
-        -s, --schema strings   List of schema to include. (default [public])
-            --use-migra        Use migra to generate schema diff.
-      ```
+    flags:
+      - id: file
+        name: -f, --file `string`
+        description: Saves schema diff to a file. (default "")
+      - id: linked
+        name: --linked
+        description: Diffs local schema against linked project. (default false)
+      - id: schema
+        name: -s, --schema `strings`
+        description: List of schema to include. (default [public])
+      - id: use-migra
+        name: --use-migra
+        description: Use migra to generate schema diff. (default false)
   - id: supabase-db-branch
     title: supabase db branch
     summary: Manage local database branches
@@ -677,10 +662,7 @@ commands:
       - supabase-db-branch-delete
       - supabase-db-branch-list
       - supabase-db-branch-switch
-    options: |-
-      ```sh
-        -h, --help   help for branch
-      ```
+    flags: []
   - id: supabase-db-branch-switch
     title: supabase db branch switch
     summary: Switch the active branch
@@ -688,13 +670,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase db branch switch <branch name> [flags]
+      supabase db branch switch <branch name>
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for switch
-      ```
+    flags: []
   - id: supabase-db-branch-list
     title: supabase db branch list
     summary: List branches
@@ -702,13 +681,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase db branch list [flags]
+      supabase db branch list
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for list
-      ```
+    flags: []
   - id: supabase-db-branch-delete
     title: supabase db branch delete
     summary: Delete a branch
@@ -716,13 +692,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase db branch delete <branch name> [flags]
+      supabase db branch delete <branch name>
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for delete
-      ```
+    flags: []
   - id: supabase-db-branch-create
     title: supabase db branch create
     summary: Create a branch
@@ -730,13 +703,10 @@ commands:
     links: []
     usage: |-
       ```sh
-      supabase db branch create <branch name> [flags]
+      supabase db branch create <branch name>
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help   help for create
-      ```
+    flags: []
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
@@ -751,10 +721,7 @@ commands:
       - supabase-completion-fish
       - supabase-completion-powershell
       - supabase-completion-zsh
-    options: |-
-      ```sh
-        -h, --help   help for completion
-      ```
+    flags: []
   - id: supabase-completion-zsh
     title: supabase completion zsh
     summary: Generate the autocompletion script for zsh
@@ -788,11 +755,10 @@ commands:
       supabase completion zsh [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help              help for zsh
-            --no-descriptions   disable completion descriptions
-      ```
+    flags:
+      - id: no-descriptions
+        name: --no-descriptions
+        description: disable completion descriptions (default false)
   - id: supabase-completion-powershell
     title: supabase completion powershell
     summary: Generate the autocompletion script for powershell
@@ -812,11 +778,10 @@ commands:
       supabase completion powershell [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help              help for powershell
-            --no-descriptions   disable completion descriptions
-      ```
+    flags:
+      - id: no-descriptions
+        name: --no-descriptions
+        description: disable completion descriptions (default false)
   - id: supabase-completion-fish
     title: supabase completion fish
     summary: Generate the autocompletion script for fish
@@ -839,11 +804,10 @@ commands:
       supabase completion fish [flags]
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help              help for fish
-            --no-descriptions   disable completion descriptions
-      ```
+    flags:
+      - id: no-descriptions
+        name: --no-descriptions
+        description: disable completion descriptions (default false)
   - id: supabase-completion-bash
     title: supabase completion bash
     summary: Generate the autocompletion script for bash
@@ -875,8 +839,7 @@ commands:
       supabase completion bash
       ```
     subcommands: []
-    options: |-
-      ```sh
-        -h, --help              help for bash
-            --no-descriptions   disable completion descriptions
-      ```
+    flags:
+      - id: no-descriptions
+        name: --no-descriptions
+        description: disable completion descriptions (default false)
