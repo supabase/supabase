@@ -98,6 +98,10 @@ export function handler(req: Request) {
       {
         width: 2000,
         height: 1000,
+        headers: {
+          'content-type': 'image/png',
+          'cache-control': 'public, max-age=31536000, no-transform, immutable',
+        },
       }
     )
   } catch (error) {
