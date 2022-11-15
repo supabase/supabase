@@ -23,7 +23,7 @@ To get started:
 
 ## Configure a Custom Domain
 
-This example assumes your Supabase project is `foobar` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
+This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
 
 ### Configure a CNAME
 
@@ -34,7 +34,7 @@ Set up a CNAME record for `api.example.com`, resolving to `foobarbaz.supabase.co
 Use the `create` subcommand of the CLI to notify Supabase of your domain and retrieve TXT verification records:
 
 ```bash
-supabase domains create --project-ref foobar --custom-hostname api.example.com --experimental
+supabase domains create --project-ref foobarbaz --custom-hostname api.example.com --experimental
 ```
 
 The output of the `create` command includes two TXT records[^1] you will need to set up, in order to verify your control over the domain in question,
@@ -62,7 +62,7 @@ You might need to wait a few minutes before your updated DNS records are propaga
 ### Activate your domain
 
 The final activation step reconfigures your project to start serving traffic on your custom domain (`api.example.com`).
-The auth service, in particular, will no longer work with the original URL (`foobar.supabase.co`).
+The auth service, in particular, will no longer work with the original URL (`foobarbaz.supabase.co`).
 As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your custom domain:
 
 - any client code (e.g., frontends, mobile apps)
