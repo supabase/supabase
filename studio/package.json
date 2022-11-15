@@ -14,6 +14,7 @@
     "prettier:write": "prettier --write ."
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.4.4",
     "@headlessui/react": "^1.4.1",
     "@monaco-editor/react": "^4.3.1",
     "@next/bundle-analyzer": "^12.0.4",
@@ -77,6 +78,7 @@
     "sass": "^1.43.4",
     "scheduler": "^0.20.2",
     "semver": "^6.3.0",
+    "shared-data": "*",
     "sqlstring": "^2.3.2",
     "swr": "^1.2.1",
     "ui": "*",
@@ -84,6 +86,7 @@
     "uniforms-bridge-json-schema": "^3.6.2",
     "uuid": "^8.3.2",
     "yup": "^0.32.11",
+    "yup-password": "^0.2.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
