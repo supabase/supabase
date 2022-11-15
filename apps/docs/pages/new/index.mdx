@@ -4,6 +4,46 @@ export const meta = {
   title: 'Supabase Docs',
 }
 
+export const products = [
+  {
+    title: 'Database',
+    icon: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-6',
+  },
+  {
+    title: 'Auth',
+    icon: 'auth',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-6',
+  },
+  {
+    title: 'Storage',
+    icon: 'storage',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Realtime',
+    icon: 'realtime',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Edge Functions',
+    icon: 'functions',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+]
+
 Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text
 
 <div className="border rounded p-12">
@@ -19,6 +59,54 @@ As users add and move rectangles in a canvas, changes will be automatically sync
 Users will also be able to see other users selections, and undo and redo actions.
 
 hello world
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  {products.map((product) => {
+    return (
+      <div
+        className={`
+        relative
+        group
+        overflow-hidden
+
+        bg-white dark:bg-scale-300 border rounded-md drop-shadow-sm
+
+        transition
+
+        border-scale-500
+        hover:border-scale-700
+
+
+        gap-6
+        p-8 flex flex-col ${
+          product.span ?? 'col-span-4'
+        }`}
+      >
+        <img
+          src={`/docs/img/gradient-bg.png`}
+          className="transition-all absolute left-0 -top-64 w-[258px]
+          duration-700 ease-out
+          group-hover:w-[320px]
+          "
+        />
+        <div className="flex items-center gap-3">
+          <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
+            <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${product.icon}.svg`} />
+          </div>
+          <h5 className="text-base text-scale-1200">{product.title}</h5>
+        </div>
+
+        <p className="text-sm text-scale-1100">
+          Social Login allows the user to sign into a third party website instead of creating a new
+          account specifically for that website.
+        </p>
+        <span className="text-brand-900 justify-end text-sm">Learn more</span>
+      </div>
+    )
+
+})}
+
+</div>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
