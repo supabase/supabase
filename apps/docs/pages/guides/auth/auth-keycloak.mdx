@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-keycloak
-title: 'Login with Keycloak'
-description: Add Keycloak OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-keycloak',
+  title: 'Login with Keycloak',
+  description: 'Add Keycloak OAuth to your Supabase project',
+}
 
 To enable Keycloak Auth for your project, you need to set up an Keycloak OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -86,3 +83,7 @@ async function signout() {
 
 - You can find the keycloak openid endpoint configuration under the realm settings.
   ![Keycloak OpenID Endpoint Configuration](/docs/img/guides/auth-keycloak/keycloak-openid-endpoint-config.png)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

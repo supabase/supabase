@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: storage-cdn
-title: Storage CDN
-description: How Supabase Storage caches objects with a CDN
-sidebar_label: CDN
----
+  id: 'storage-cdn',
+  title: 'Storage CDN',
+  description: 'How Supabase Storage caches objects with a CDN',
+  sidebar_label: 'CDN',
+}
 
 ## CDN basics
 
@@ -34,3 +34,7 @@ The cache status of a particular request is sent in the `cf-cache-status` header
 ## Public vs Private Buckets
 
 Objects in public buckets do not require any Authorization to access objects. This leads to a better cache hit rate compared to private buckets. For private buckets, permissions for accessing each object is checked on a per user level. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both the users since they might have different security policies attached to them. On the other hand, if two different users access the same object in a public bucket from the same region, it results in a cache hit for the second user.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

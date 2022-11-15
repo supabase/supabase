@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: managing-environments
-title: Managing Environments
-description: How to deploy Supabase schema changes with a CI / CD pipeline.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'managing-environments',
+  title: 'Managing Environments',
+  description: 'How to deploy Supabase schema changes with a CI / CD pipeline.',
+}
 
 ## Overview
 
@@ -417,3 +414,7 @@ supabase db reset
 In case [`reset`](/docs/reference/cli/usage#supabase-db-reset) fails, you can manually resolve conflicts by editing `<t+2>_dev_A.sql` file.
 
 Once validated locally, commit your changes to Git and push to GitHub.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

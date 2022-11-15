@@ -1,14 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: with-vue-3
-title: 'Quickstart: Vue 3'
-description: Learn how to use Supabase in your Vue 3 App.
-sidebar_label: 'Vue 3'
----
+  id: 'with-vue-3',
+  title: 'Quickstart: Vue 3',
+  description: 'Learn how to use Supabase in your Vue 3 App.',
+  sidebar_label: 'Vue 3',
+}
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
 import QuickstartIntro from '/components/MDX/quickstart_intro.mdx'
 import ProjectSetup from '/components/MDX/project_setup.mdx'
 
@@ -390,3 +388,7 @@ At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Sign in: [app.supabase.com](https://app.supabase.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

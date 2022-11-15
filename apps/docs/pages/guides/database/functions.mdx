@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: functions
-title: Database Functions
-description: Creating and using Postgres functions.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'functions',
+  title: 'Database Functions',
+  description: 'Creating and using Postgres functions.',
+}
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
 These functions live inside your database, and they can be [used with the API](../../reference/javascript/rpc).
@@ -346,3 +343,7 @@ GRANT EXECUTE ON FUNCTION hello_world TO service_role;
     allowFullScreen
   ></iframe>
 </div>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

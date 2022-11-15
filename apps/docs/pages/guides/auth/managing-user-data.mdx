@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: managing-user-data
-title: Managing User Data
-description: Securing your user data with Row Level Security.
----
+  id: 'managing-user-data',
+  title: 'Managing User Data',
+  description: 'Securing your user data with Row Level Security.',
+}
 
 For security purposes, the `auth` schema is not exposed on the auto-generated API.
 
@@ -105,3 +105,7 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

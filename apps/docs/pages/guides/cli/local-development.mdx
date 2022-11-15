@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: local-development
-title: Local Development
-description: How to use Supabase on your local development machine.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'local-development',
+  title: 'Local Development',
+  description: 'How to use Supabase on your local development machine.',
+}
 
 Learn how to use the Supabase CLI to develop your project locally and deploy to the Supabase Platform.
 
@@ -240,3 +237,7 @@ The local development environment is not as feature-complete as the Supabase Pla
 ```
 
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

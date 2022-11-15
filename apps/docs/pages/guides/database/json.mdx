@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: json
-title: 'JSON'
-description: Using the JSON data type in PostgreSQL.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'json',
+  title: 'JSON',
+  description: 'Using the JSON data type in PostgreSQL.',
+}
 
 PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html) which gives flexibility when storing data inside a database column.
 
@@ -268,3 +265,7 @@ Note that the `->` operator returns JSONB data. If you want TEXT/STRING data ret
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [PostgreSQL: JSON Functions and Operators](https://www.postgresql.org/docs/12/functions-json.html)
 - [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

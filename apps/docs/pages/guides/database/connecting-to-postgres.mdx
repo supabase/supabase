@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: connecting-to-postgres
-title: 'Database Connections'
-description: There are various ways to connect to your Postgres database.
----
+  id: 'connecting-to-postgres',
+  title: 'Database Connections',
+  description: 'There are various ways to connect to your Postgres database.',
+}
 
 Supabase provides several options for programmatically connecting to your Postgres database:
 
@@ -135,3 +135,7 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-ca-2021.cer host=db.a
    file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin
    should now be able to connect to your Postgres via SSL.
    ![Add Connection Info.](/docs/img/guides/database/add-ssl-config.png)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

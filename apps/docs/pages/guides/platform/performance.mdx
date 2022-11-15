@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: performance
-title: Performance Tuning
-description: Getting the best results out of your Supabase project
----
+  id: 'performance',
+  title: 'Performance Tuning',
+  description: 'Getting the best results out of your Supabase project',
+}
 
 The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the tier your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
 
@@ -90,3 +90,7 @@ Using the query plan analyzer to optimize your queries is a large topic, with a 
 - [Enterprise DB.](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze)
 
 You can pair the information available from `pg_stat_statements` with the detailed system metrics available [via your metrics endpoint](../platform/metrics) to better understand the behavior of your DB and the queries you're executing against it.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

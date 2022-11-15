@@ -10,7 +10,7 @@ const withMDX = nextMdx({
     remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
-    providerImportSource: '@mdx-js/react',
+    // providerImportSource: '@mdx-js/react',
   },
 })
 

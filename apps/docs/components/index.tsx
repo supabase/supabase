@@ -11,11 +11,13 @@ import JwtGenerator from './JwtGenerator'
 import Frameworks from './Frameworks'
 import AuthProviders from './AuthProviders'
 import FunctionsExamples from './FunctionsExamples'
+import Extensions from './Extensions'
 
 // Other components
 import { Heading } from './CustomHTMLElements'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
+import { Mermaid } from 'mdx-mermaid/Mermaid'
 
 const components = {
   Admonition,
@@ -28,6 +30,8 @@ const components = {
   JwtGenerator,
   QuickstartIntro,
   ProjectSetup,
+  Mermaid,
+  Extensions,
   Alert: (props: any) => (
     <Alert {...props} className="not-prose">
       {props.children}

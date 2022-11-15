@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-twitter
-title: 'Login with Twitter'
-description: Add Twitter OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-twitter',
+  title: 'Login with Twitter',
+  description: 'Add Twitter OAuth to your Supabase project',
+}
 
 To enable Twitter Auth for your project, you need to set up a Twitter OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -97,3 +94,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

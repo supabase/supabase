@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: api
-title: Serverless APIs
-description: Auto-generating and Realtime APIs.
-sidebar_label: Overview
----
+  id: 'api',
+  title: 'Serverless APIs',
+  description: 'Auto-generating and Realtime APIs.',
+  sidebar_label: 'Overview',
+}
 
 Supabase auto-generates three types of API directly from your database schema.
 
@@ -375,3 +375,7 @@ The expected value for `useconfig` should be:
 ```sql
 ['session_preload_libraries=supautils, safeupdate']
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

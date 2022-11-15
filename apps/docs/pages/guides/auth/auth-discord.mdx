@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-discord
-title: 'Login with Discord'
-description: Add Discord OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-discord',
+  title: 'Login with Discord',
+  description: 'Add Discord OAuth to your Supabase project',
+}
 
 To enable Discord Auth for your project, you need to set up a Discord Application and add the Application OAuth credentials to your Supabase Dashboard.
 
@@ -94,3 +91,7 @@ async function signout() {
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Discord Account](https://discord.com)
 - [Discord Developer Portal](https://discord.com/developers)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

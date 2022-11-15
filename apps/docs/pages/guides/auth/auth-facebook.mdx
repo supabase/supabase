@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-facebook
-title: 'Login with Facebook'
-description: Add Facebook OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-facebook',
+  title: 'Login with Facebook',
+  description: 'Add Facebook OAuth to your Supabase project',
+}
 
 To enable Facebook Auth for your project, you need to set up a Facebook OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -109,3 +106,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Facebook Developers Dashboard](https://developers.facebook.com/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-slack
-title: 'Login with Slack'
-description: Add Slack OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-slack',
+  title: 'Login with Slack',
+  description: 'Add Slack OAuth to your Supabase project',
+}
 
 To enable Slack Auth for your project, you need to set up a Slack OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -101,3 +98,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Slack Developer Dashboard](https://api.slack.com/apps)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

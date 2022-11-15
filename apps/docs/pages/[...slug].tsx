@@ -38,7 +38,6 @@ export default function Doc({ meta, content, toc }: Props) {
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
   let slug
-
   if (params.slug.length > 1) {
     slug = `docs/${params.slug.join('/')}`
   } else {
@@ -48,6 +47,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   let doc = getDocsBySlug(slug)
   const content = await serialize(doc.content || '')
 
+  console.log(doc.content)
   return {
     props: {
       ...doc,

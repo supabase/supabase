@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: custom-domains
-title: Custom Domains
-description: Configuring a Custom Domain for your Supabase project.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'custom-domains',
+  title: 'Custom Domains',
+  description: 'Configuring a Custom Domain for your Supabase project.',
+}
 
 <Admonition type="note">
 
@@ -28,7 +25,7 @@ To get started:
 
 This example assumes your Supabase project is `foobar` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
 
-### <a id="cname-configure"></a>Configure a CNAME
+### Configure a CNAME
 
 Set up a CNAME record for `api.example.com`, resolving to `foobarbaz.supabase.co.`, with as low a TTL as possible.
 
@@ -91,3 +88,7 @@ As with the final activation stage of the process for setting up a custom domain
 ## Limitations
 
 Edge functions do not honor the custom domain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

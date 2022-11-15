@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: cicd-workflow
-title: CI / CD Workflow
-description: How to deploy Supabase Edge Functions with a CI / CD pipeline.
----
+  id: 'cicd-workflow',
+  title: 'CI / CD Workflow',
+  description: 'How to deploy Supabase Edge Functions with a CI / CD pipeline.',
+}
 
 As described in the Supabase CLI [Environments Guide](/docs/guides/cli/managing-environments), you can use the [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run Supabase CLI commands in your GitHub Actions, for example to deploy a Supabase Edge Function:
 
@@ -36,3 +36,7 @@ jobs:
 ```
 
 See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/.github/workflows/deploy.yaml).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: server-side-rendering
-title: Server-Side Rendering
-description: Render pages with user information on the server.
----
+  id: 'server-side-rendering',
+  title: 'Server-Side Rendering',
+  description: 'Render pages with user information on the server.',
+}
 
 Single-page apps with server-side rendering (SSR) is a popular way to optimize rendering
 performance and leverage advanced caching strategies.
@@ -207,3 +207,7 @@ data belonging to different users!
 
 Also be sure you set proper cache control headers. We recommend invalidating
 cache keys every hour or less.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: realtime
-title: Realtime
-description: Supabase Realtime with Broadcast, Presence, and Postgres CDC.
-sidebar_label: Overview
----
+  id: 'realtime',
+  title: 'Realtime',
+  description: 'Supabase Realtime with Broadcast, Presence, and Postgres CDC.',
+  sidebar_label: 'Overview',
+}
 
 Supabase provides a globally distributed cluster of [Realtime](https://github.com/supabase/realtime) servers that enable the following functionality:
 
@@ -51,3 +51,7 @@ We strongly encourage you to enable RLS on your database tables and have RLS pol
 
 - [Realtime quickstart](/docs/guides/realtime/quickstart)
 - [Realtime: Multiplayer Edition](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability) blog post
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

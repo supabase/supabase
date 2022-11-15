@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: with-flutter
-title: 'Quickstart: Flutter'
-description: Learn how to use Supabase in your Flutter App.
-sidebar_label: Flutter
----
+  id: 'with-flutter',
+  title: 'Quickstart: Flutter',
+  description: 'Learn how to use Supabase in your Flutter App.',
+  sidebar_label: 'Flutter',
+}
 
 <QuickstartIntro />
 
@@ -794,3 +794,7 @@ Congratulations, that is it! You have now built a fully functional user manageme
 ## See also
 
 - [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

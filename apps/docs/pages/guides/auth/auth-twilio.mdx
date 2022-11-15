@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-twilio
-title: Phone Auth with Twilio
-description: How to set up and use Mobile OTP with Twilio and Supabase.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-twilio',
+  title: 'Phone Auth with Twilio',
+  description: 'How to set up and use Mobile OTP with Twilio and Supabase.',
+}
 
 ## Overview
 
@@ -302,3 +299,7 @@ The user does not have a password therefore will need to sign in via this method
 - [Twilio Signup](https://www.twilio.com/try-twilio)
 - [Supabase Dashboard](https://app.supabase.com)
 - [Supabase Row Level Security](/docs/guides/auth#row-level-security)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

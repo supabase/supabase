@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: row-level-security
-title: Row Level Security
-description: Secure your data using Postgres Row Level Security.
----
+  id: 'row-level-security',
+  title: 'Row Level Security',
+  description: 'Secure your data using Postgres Row Level Security.',
+}
 
 When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
 
@@ -365,3 +365,7 @@ Deprecated. Use `auth.jwt() ->> 'email'` instead.
 </Admonition>
 
 Returns the email of the user making the request.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

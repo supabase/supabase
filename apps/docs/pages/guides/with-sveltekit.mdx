@@ -1,14 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: with-sveltekit
-title: 'Quickstart: SvelteKit'
-description: Learn how to use Supabase in your SvelteKit App.
-sidebar_label: SvelteKit
----
+  id: 'with-sveltekit',
+  title: 'Quickstart: SvelteKit',
+  description: 'Learn how to use Supabase in your SvelteKit App.',
+  sidebar_label: 'SvelteKit',
+}
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
 import QuickstartIntro from '/components/MDX/quickstart_intro.mdx'
 import ProjectSetup from '/components/MDX/project_setup.mdx'
 
@@ -445,3 +443,7 @@ At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Sign in: [app.supabase.com](https://app.supabase.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

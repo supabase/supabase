@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: with-ionic-angular
-title: 'Quickstart: Ionic Angular'
-description: Learn how to use Supabase in your Ionic Angular App.
-sidebar_label: Ionic Angular
----
+  id: 'with-ionic-angular',
+  title: 'Quickstart: Ionic Angular',
+  description: 'Learn how to use Supabase in your Ionic Angular App.',
+  sidebar_label: 'Ionic Angular',
+}
 
 <QuickstartIntro />
 
@@ -532,3 +532,7 @@ At this stage you have a fully functional application!
 ## Resources
 
 - [Authentication in Ionic Angular with Supabase](https://supabase.com/blog/authentication-in-ionic-angular)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

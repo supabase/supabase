@@ -1,14 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: extensions
-title: Overview
-description: Using Postgres extensions.
----
-
-import ExtensionsComponent from '@site/src/components/Extensions'
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'extensions',
+  title: 'Overview',
+  description: 'Using Postgres extensions.',
+}
 
 Extensions are exactly as they sound - they "extend" the database with functionality which isn't part of the Postgres core.
 Supabase has pre-installed some of the most useful open source extensions.
@@ -58,4 +54,8 @@ Enabling some extensions with `create extension <extension-name> with schema ext
 
 Supabase is pre-configured with over 50 extensions. You can also install your own SQL extensions directly in the database through our SQL editor.
 
-<ExtensionsComponent />
+<Extensions />
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

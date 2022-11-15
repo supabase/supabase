@@ -4,7 +4,7 @@ import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
-import TableOfContents from '~/components/TableOfContents'
+import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { useRouter } from 'next/router'
 import { getPageType } from '../lib/helpers'
 import components from '~/components'
@@ -17,7 +17,7 @@ interface Props {
   currentPage: string
 }
 
-const Layout: FC<Props> = ({ meta, children, toc: pageToc, currentPage }) => {
+const Layout: FC<Props> = ({ meta, children }) => {
   const { asPath } = useRouter()
   const page = getPageType(asPath)
 
@@ -32,25 +32,25 @@ const Layout: FC<Props> = ({ meta, children, toc: pageToc, currentPage }) => {
   }, [])
 
   const articleRef = useRef()
-  const [headingsArr, setHeadingsArr] = useState([])
+  const [tocList, setTocList] = useState([])
 
   useEffect(() => {
     const articleEl = articleRef.current as HTMLElement
 
     if (!articleRef.current) return
-    const headings = Array.from(articleEl.querySelectorAll('h2, h3, h4'))
-    setHeadingsArr(headings)
-    console.log(headings)
+    const headings = Array.from(articleEl.querySelectorAll('h2, h3'))
+    const newHeadings = headings
+      .filter((heading) => heading.id)
+      .map((heading) => {
+        const text = heading.textContent.replace('#', '')
+        const link = heading.querySelector('a').getAttribute('href')
+        const level = heading.tagName === 'H2' ? 2 : 3
+        return { text, link, level }
+      })
+    setTocList(newHeadings)
   }, [])
 
-  function generateTocItem(item) {
-    const id = item.id
-    console.log(id)
-  }
-
-  const hasTableOfContents = true
-  // pageToc !== undefined &&
-  // pageToc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
+  const hasTableOfContents = tocList.length > 0
 
   return (
     <>
@@ -83,6 +83,8 @@ const Layout: FC<Props> = ({ meta, children, toc: pageToc, currentPage }) => {
                   meta?.hide_table_of_contents || !hasTableOfContents ? 'xl:min-w-[880px]' : ''
                 } doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[880px]`}
               >
+                {meta?.title && <h1>{meta.title}</h1>}
+
                 <MDXProvider components={components}>{children}</MDXProvider>
               </article>
             </div>
@@ -93,9 +95,7 @@ const Layout: FC<Props> = ({ meta, children, toc: pageToc, currentPage }) => {
                   'thin-scrollbar overflow-y-auto sticky hidden xl:block md:col-span-3 px-2',
                 ].join(' ')}
               >
-                {headingsArr.length > 0 && headingsArr.map((item) => generateTocItem(item))}
-
-                {/* <TableOfContents toc={pageToc} /> */}
+                <GuidesTableOfContents list={tocList} />
               </div>
             )}
           </div>

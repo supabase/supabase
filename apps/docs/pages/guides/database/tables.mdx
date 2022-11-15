@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: tables
-title: Tables and Data
-description: Creating and using Postgres tables.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'tables',
+  title: 'Tables and Data',
+  description: 'Creating and using Postgres tables.',
+}
 
 Tables are where you store your data.
 
@@ -506,3 +503,7 @@ Creating a materialized view is not a solution to inefficient queries. You shoul
 - [PostgreSQL Tutorial: Create tables](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-create-table/)
 - [PostgreSQL Tutorial: Add column](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-add-column/)
 - [PostgreSQL Tutorial: Views](https://www.postgresqltutorial.com/postgresql-views/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

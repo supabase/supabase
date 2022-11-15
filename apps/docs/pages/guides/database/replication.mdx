@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: replication
-title: 'Replication'
-slug: replication
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'replication',
+  title: 'Replication',
+  slug: 'replication',
+}
 
 Replication is a technique for copying the data from one database to another. Supabase uses replication functionality to provide a real-time API. Replication is useful for:
 
@@ -93,3 +90,7 @@ begin;
   create publication publication_name;
 commit;
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

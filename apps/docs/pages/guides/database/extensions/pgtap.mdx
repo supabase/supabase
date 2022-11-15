@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: pgtap
-title: 'pgTAP: Unit Testing'
-description: Unit testing in PostgreSQL.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'pgtap',
+  title: 'pgTAP: Unit Testing',
+  description: 'Unit testing in PostgreSQL.',
+}
 
 `pgTAP` is a unit testing extension for PostgreSQL.
 
@@ -158,3 +155,7 @@ API:
 ## Resources
 
 - Official [`pgTAP` documentation](https://pgtap.org/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

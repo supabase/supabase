@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth
-title: Auth
-description: Supabase Edge Functions and Auth.
----
+  id: 'auth',
+  title: 'Auth',
+  description: 'Supabase Edge Functions and Auth.',
+}
 
 Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth), allowing you to identify which user called your function.
 
@@ -58,3 +58,7 @@ serve(async (req: Request) => {
 ```
 
 See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

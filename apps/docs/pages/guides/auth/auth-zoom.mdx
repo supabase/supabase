@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-zoom
-title: 'Login with Zoom'
-description: Add Zoom OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-zoom',
+  title: 'Login with Zoom',
+  description: 'Add Zoom OAuth to your Supabase project',
+}
 
 To enable Zoom Auth for your project, you need to set up a Zoom OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -97,3 +94,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Zoom App Marketplace](https://marketplace.zoom.us/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

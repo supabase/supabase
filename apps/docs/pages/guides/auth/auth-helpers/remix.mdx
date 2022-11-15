@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: remix
-title: Supabase Auth with Remix
-description: Authentication helpers for loaders and actions in Remix.
-sidebar_label: 'Remix'
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'remix',
+  title: 'Supabase Auth with Remix',
+  description: 'Authentication helpers for loaders and actions in Remix.',
+  sidebar_label: 'Remix',
+}
 
 This submodule provides convenience helpers for implementing user authentication in Remix applications.
 
@@ -879,3 +876,7 @@ export default function ProtectedPage() {
   return <pre>{JSON.stringify({ user, allRepos }, null, 2)}</pre>;
 }
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

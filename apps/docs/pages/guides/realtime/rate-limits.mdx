@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: rate-limits
-title: Realtime Rate Limits
-description: Understanding Realtime rate limiting
-sidebar_label: Rate Limits
----
+  id: 'rate-limits',
+  title: 'Realtime Rate Limits',
+  description: 'Understanding Realtime rate limiting',
+  sidebar_label: 'Rate Limits',
+}
 
 Supabase Realtime is a global cluster. We've implemented some rate limits to help ensure high availability for all customers.
 
@@ -78,3 +78,7 @@ The following limits apply to Presence messages:
 
 - 10 keys per object
 - Message rate limit is 10% of your Realtime message rate limit
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

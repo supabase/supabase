@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: plv8
-title: 'plv8: JavaScript Language'
-description: JavaScript language for PostgreSQL.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'plv8',
+  title: 'plv8: JavaScript Language',
+  description: 'JavaScript language for PostgreSQL.',
+}
 
 The `plv8` extension allows you use JavaScript within Postgres.
 
@@ -144,3 +141,7 @@ $$ language plv8;
 
 - Official [`plv8` documentation](https://plv8.github.io/)
 - [plv8 GitHub Repository](https://github.com/plv8/plv8)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

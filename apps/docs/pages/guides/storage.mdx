@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: storage
-title: Storage
-description: Use Supabase to store and serve files.
-sidebar_label: Overview
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'storage',
+  title: 'Storage',
+  description: 'Use Supabase to store and serve files.',
+  sidebar_label: 'Overview',
+}
 
 Supabase Storage makes it simple to store and serve large files.
 
@@ -371,3 +368,7 @@ using ( auth.uid() = owner );
 - [Swagger API documentation](https://supabase.github.io/storage-api)
 - Official [JavaScript](/docs/reference/javascript/storage-createbucket) and [Dart](/docs/reference/dart/storage-createbucket) documentation
 - [Community libraries](https://github.com/supabase-community)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

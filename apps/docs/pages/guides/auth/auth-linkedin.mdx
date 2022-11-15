@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-linkedin
-title: 'Login with LinkedIn'
-description: Add LinkedIn OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-linkedin',
+  title: 'Login with LinkedIn',
+  description: 'Add LinkedIn OAuth to your Supabase project',
+}
 
 To enable LinkedIn Auth for your project, you need to set up a LinkedIn OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -88,3 +85,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [LinkedIn Developer Dashboard](https://api.LinkedIn.com/apps)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

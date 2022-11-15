@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-messagebird
-title: Phone Auth with MessageBird
-description: How to set up and use Mobile OTP with MessageBird and Supabase.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-messagebird',
+  title: 'Phone Auth with MessageBird',
+  description: 'How to set up and use Mobile OTP with MessageBird and Supabase.',
+}
 
 ## Overview
 
@@ -283,3 +280,7 @@ The user does not have a password therefore will need to sign in via this method
 - [MessageBird Signup](https://dashboard.messagebird.com/en/sign-up)
 - [Supabase Dashboard](https://app.supabase.com)
 - [Supabase Row Level Security](/docs/guides/auth#row-level-security)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: index
-title: Auth Helpers
-description: A collection of framework-specific Auth utilities for working with Supabase.
-sidebar_label: Overview
----
+  id: 'index',
+  title: 'Auth Helpers',
+  description: 'A collection of framework-specific Auth utilities for working with Supabase.',
+  sidebar_label: 'Overview',
+}
 
 A collection of framework-specific Auth utilities for working with Supabase.
 
@@ -54,3 +54,7 @@ The Auth Helpers are in `beta`. They are usable in their current state, but it's
 
 - [Source code](https://github.com/supabase/auth-helpers)
 - [Known bugs and issues](https://github.com/supabase/auth-helpers/issues)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

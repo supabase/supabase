@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-twitch
-title: 'Login with Twitch'
-description: Add Twitch OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-twitch',
+  title: 'Login with Twitch',
+  description: 'Add Twitch OAuth to your Supabase project',
+}
 
 To enable Twitch Auth for your project, you need to set up a Twitch Application and add the Application OAuth credentials to your Supabase Dashboard.
 
@@ -108,3 +105,7 @@ async function signout() {
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Twitch Account](https://twitch.tv)
 - [Twitch Developer Console](https://dev.twitch.tv/console)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

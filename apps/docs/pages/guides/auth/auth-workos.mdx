@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-workos
-title: 'Login with WorkOS'
-description: Add WorkOS OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-workos',
+  title: 'Login with WorkOS',
+  description: 'Add WorkOS OAuth to your Supabase project',
+}
 
 To enable WorkOS Auth for your project, you need to set up WorkOS OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -90,3 +87,7 @@ async function signout() {
 ## Resources
 
 - [WorkOS Documentation](https://workos.com/docs/sso/guide)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

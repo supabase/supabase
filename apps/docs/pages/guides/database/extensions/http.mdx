@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: http
-title: 'http: RESTful Client'
-description: An HTTP Client for PostgreSQL Functions.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'http',
+  title: 'http: RESTful Client',
+  description: 'An HTTP Client for PostgreSQL Functions.',
+}
 
 The `http` extension allows you to call RESTful endpoints within Postgres.
 
@@ -116,3 +113,7 @@ from
 ## Resources
 
 - Official [`http` GitHub Repository](https://github.com/pramsey/pgsql-http)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
