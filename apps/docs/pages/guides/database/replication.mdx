@@ -1,4 +1,6 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: replication
 title: 'Replication'
 slug: replication
@@ -22,12 +24,7 @@ Replication is done through _publications_, a method of choosing which changes t
 4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
 <video width="99%" muted playsInline controls="true">
-  <source
-    src="/docs/videos/api/api-realtime.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+  <source src="/docs/videos/api/api-realtime.mp4" type="video/mp4" muted playsInline />
 </video>
 
 ## Create a publication

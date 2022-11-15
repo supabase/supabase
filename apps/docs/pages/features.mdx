@@ -1,8 +1,10 @@
----
-id: features
-title: Features
-description: 'Supabase features'
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'features',
+  title: 'Features',
+  description: 'Supabase features',
+}
 
 This is a non-exhaustive list of features that Supabase provides for every project.
 
@@ -170,3 +172,7 @@ Both Postgres and the Supabase Platform are production-ready. Some tools we offe
 | CLI                        |                        | `beta`  |
 | Client Library: JavaScript |                        | `GA`    |
 | Client Library: Dart       |                        | `beta`  |
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,11 +1,13 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: migrating-and-upgrading-projects
 title: 'Migrating and Upgrading Projects'
 description: Upgrade your project to the latest version of Supabase.
 sidebar_label: 'Migrating and upgrading'
 ---
 
-Supabase ships fast and we endeavor to add all new features to existing projects wherever possible. 
+Supabase ships fast and we endeavor to add all new features to existing projects wherever possible.
 In some cases, access to new features require upgrading or migrating your Supabase project.
 
 ## Upgrade your project
@@ -75,27 +77,15 @@ const NEW_PROJECT_URL = 'https://yyy.supabase.co'
 const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 
 ;(async () => {
-  const oldSupabaseRestClient = createClient(
-    OLD_PROJECT_URL,
-    OLD_PROJECT_SERVICE_KEY,
-    {
-      schema: 'storage',
-    }
-  )
-  const oldSupabaseClient = createClient(
-    OLD_PROJECT_URL,
-    OLD_PROJECT_SERVICE_KEY
-  )
-  const newSupabaseClient = createClient(
-    NEW_PROJECT_URL,
-    NEW_PROJECT_SERVICE_KEY
-  )
+  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
+    schema: 'storage',
+  })
+  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
+  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
 
   // make sure you update max_rows in postgrest settings if you have a lot of objects
   // or paginate here
-  const { data: oldObjects, error } = await oldSupabaseRestClient
-    .from('objects')
-    .select()
+  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
   if (error) {
     console.log('error getting objects from old bucket')
     throw error
@@ -104,10 +94,9 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
   for (const objectData of oldObjects) {
     console.log(`moving ${objectData.id}`)
     try {
-      const { data, error: downloadObjectError } =
-        await oldSupabaseClient.storage
-          .from(objectData.bucket_id)
-          .download(objectData.name)
+      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .download(objectData.name)
       if (downloadObjectError) {
         throw downloadObjectError
       }

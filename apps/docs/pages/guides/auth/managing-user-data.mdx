@@ -1,4 +1,6 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: managing-user-data
 title: Managing User Data
 description: Securing your user data with Row Level Security.
@@ -59,9 +61,7 @@ The nice thing about this pattern? We can now query this table via the API and w
 
 ```js
 // This will return nothing while the user is logged out
-const { data } = await supabase
-  .from('profiles')
-  .select('id, username, avatar_url, website')
+const { data } = await supabase.from('profiles').select('id, username, avatar_url, website')
 
 // After the user is logged in, this will only return
 // the logged-in user's data - in this case a single row

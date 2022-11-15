@@ -1,8 +1,10 @@
----
-id: architecture
-title: Architecture
-description: 'Supabase design and architecture'
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'architecture',
+  title: 'Architecture',
+  description: 'Supabase design and architecture',
+}
 
 Supabase is open source. We choose open source tools which are scalable and make them simple to use.
 
@@ -154,3 +156,7 @@ As the profile of a developer changes over time, Supabase will continue to evolv
 Supabase supports existing tools and communities wherever possible. Supabase is more like a "community of communities" - each tool typically has its own community
 which we work with.
 Open source is something we approach [collaboratively](https://supabase.com/blog/supabase-series-b#giving-back): we employ maintainers, sponsor projects, invest in businesses, and develop our own open source tools.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

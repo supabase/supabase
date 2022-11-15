@@ -1,4 +1,6 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: auth-mfa
 title: 'Multi-Factor Authentication'
 description: Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.
@@ -26,9 +28,9 @@ prone to malicious account takeovers. These can be prevented with
 MFA because they require the user to provide proof of
 both of these:
 
-- Something they know.  
+- Something they know.
   Password, or access to a social-login account.
-- Something they have.  
+- Something they have.
   Access to an authenticator app (a.k.a. TOTP), mobile phone or recovery code.
 
 ## Overview
@@ -39,9 +41,9 @@ authenticator app in the control of users.
 
 Applications using MFA require two important flows:
 
-1. **Enrollment flow.**  
+1. **Enrollment flow.**
    This lets users set up and control MFA in your app.
-2. **Authentication flow.**  
+2. **Authentication flow.**
    This lets users sign in using any factors after the conventional login step.
 
 Supabase Auth provides:
@@ -78,11 +80,11 @@ Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a
 standard measure about the assurance Supabase Auth has of the user's identity
 for that particular session. There are two levels recognized today:
 
-1. **Assurance Level 1: `aal1`**  
+1. **Assurance Level 1: `aal1`**
    Means that the user's identity was verified using a conventional login method
    such as email+password, magic link, one-time password, phone auth or social
    login.
-2. **Assurance Level 2: `aal2`**  
+2. **Assurance Level 2: `aal2`**
    Means that the user's identity was additionally verified using at least one
    second factor, such as a TOTP code.
 
@@ -95,15 +97,15 @@ for your application. JWTs without an `aal` claim are at the `aal1` level.
 
 Adding MFA to your app involves these three steps:
 
-1. **Add enrollment flow.**  
+1. **Add enrollment flow.**
    You need to provide a UI within your app that your users will be able to set-up
    MFA in. You can add this right after sign-up, or as part of a separate flow in
    the settings portion of your app.
-2. **Add challenge step to login.**  
+2. **Add challenge step to login.**
    If a user has set-up MFA, your app's login flow needs to present a challenge
    screen to the user asking them to prove they have access to the additional
    factor.
-3. **Enforce rules for MFA logins.**  
+3. **Enforce rules for MFA logins.**
    Once your users have a way to enroll and log in with MFA, you need to enforce
    authorization rules across your app: on the frontend, backend, API servers or
    Row-Level Security policies.
@@ -113,12 +115,12 @@ Adding MFA to your app involves these three steps:
 An enrollment flow provides a UI for users to set up additional authentication factors.
 Most applications add the enrollment flow in two places within their app:
 
-1. Right after login or sign up.  
+1. Right after login or sign up.
    This lets users quickly set up MFA immediately after they log in or create an
    account. We recommend encouraging all users to set up MFA if that makes sense
    for your application. Many applications offer this as an opt-in step in an
    effort to reduce onboarding friction.
-2. From within a settings page.  
+2. From within a settings page.
    Allows users to set up, disable or modify their MFA settings.
 
 We recommend building one generic flow that you can reuse in both cases with
@@ -126,15 +128,15 @@ minor modifications.
 
 Enrolling a factor for use with MFA takes three steps:
 
-1. Call `supabase.auth.mfa.enroll()`.  
+1. Call `supabase.auth.mfa.enroll()`.
    This method returns a QR code and a secret. Display the QR
    code to the user and ask them to scan it with their authenticator application.
    If they are unable to scan the QR code, show the secret in plain text which
    they can type or paste into their authenticator app.
-2. Calling the `supabase.auth.mfa.challenge()` API.  
+2. Calling the `supabase.auth.mfa.challenge()` API.
    This prepares Supabase Auth to accept a verification code from the user
    and returns a challenge ID.
-3. Calling the `supabase.auth.mfa.verify()` API.  
+3. Calling the `supabase.auth.mfa.verify()` API.
    This verifies that the user has indeed added the secret from step (1) into
    their app and is working correctly. If the verification succeeds, the factor
    immediately becomes active for the user account. If not, you should repeat
@@ -400,15 +402,15 @@ application's database, APIs and server-side rendering.
 Depending on your application's needs, there are three ways you can choose to
 enforce MFA.
 
-1. **Enforce for all users (new and existing).**  
-   Any user account will have to enroll MFA to continue using your app.  
+1. **Enforce for all users (new and existing).**
+   Any user account will have to enroll MFA to continue using your app.
    The application will not allow access without going through MFA first.
-2. **Enforce for new users only.**  
+2. **Enforce for new users only.**
    Only new users will be forced to enroll MFA, while old users will be encouraged
-   to do so.  
+   to do so.
    The application will not allow access for new users without going through MFA
    first.
-3. **Enforce only for users that have opted-in.**  
+3. **Enforce only for users that have opted-in.**
    Users that want MFA can enroll in it and the application will not allow access
    without going through MFA first.
 
@@ -547,14 +549,14 @@ using Row Level Security policies will give you sufficient protection. In the
 event that you have other APIs that you wish to protect, follow these general
 guidelines:
 
-1. **Use a good JWT verification and parsing library for your language.**  
+1. **Use a good JWT verification and parsing library for your language.**
    This will let you securely parse JWTs and extract their claims.
 2. **Retrieve the `aal` claim from the JWT and compare its value according to
-   your needs.**  
+   your needs.**
    If you've encountered an AAL level that can be increased, ask the user to
    continue the login process instead of logging them out.
 3. **Use the `https://<project-ref>.supabase.co/rest/v1/auth/factors` REST
-   endpoint to identify if the user has enrolled any MFA factors.**  
+   endpoint to identify if the user has enrolled any MFA factors.**
    Only `verified` factors should be acted upon.
 
 ## Frequently asked questions
