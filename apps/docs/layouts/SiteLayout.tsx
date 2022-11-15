@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Footer from '~/components/Footer'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
@@ -19,7 +20,12 @@ const Layout = ({ children }) => {
           <div className="col-span-3">
             <NavigationMenu />
           </div>
-          <div className="col-span-9">{children}</div>
+          <div className="col-span-9">
+            <Link href="/docs/new/database" passHref>
+              go to database
+            </Link>
+            {children}
+          </div>
         </div>
         <Footer />
       </main>

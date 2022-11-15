@@ -55,7 +55,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
 
         {menu.items.map((x, index) => {
           return (
-            <div>
+            <div key={x.name}>
               {x.items && x.items.length > 0 ? (
                 <>
                   {index !== 0 && <div className="h-px w-full bg-green-500 my-3"></div>}
@@ -64,7 +64,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
                   </span>
                   {x.items.map((x) => {
                     return (
-                      <li>
+                      <li key={x.name}>
                         <a
                           onClick={() => {
                             router.push(`/${tempBasePath}${x.href}`)
@@ -103,7 +103,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
         )}
         {menu.extras?.map((x) => {
           return (
-            <div>
+            <div key={x.name}>
               <li>
                 <a
                   onClick={() => {
