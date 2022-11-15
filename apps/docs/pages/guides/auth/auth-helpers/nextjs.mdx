@@ -1,11 +1,12 @@
-import Layout from '~/layouts/DefaultLayout'
+---
+id: nextjs
+title: Supabase Auth with Next.js
+description: Authentication helpers for Next.js API routes, middleware, and SSR.
+sidebar_label: 'Next.js'
+---
 
-export const meta = {
-  id: 'nextjs',
-  title: 'Supabase Auth with Next.js',
-  description: 'Authentication helpers for Next.js API routes, middleware, and SSR.',
-  sidebar_label: 'Next.js',
-}
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 This submodule provides convenience helpers for implementing user authentication in Next.js applications.
 
@@ -837,7 +838,3 @@ import { Database } from '../database.types'
 
 const supabaseClient = useSupabaseClient<Database>()
 ```
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
