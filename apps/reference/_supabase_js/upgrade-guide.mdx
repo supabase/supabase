@@ -30,7 +30,7 @@ npm install @supabase/supabase-js@2
 <TabItem value="1.x">
 
 ```ts title="src/supabaseClient.ts"
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   schema: 'custom',
   persistSession: false
 })
@@ -40,7 +40,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 <TabItem value="2.x">
 
 ```ts title="src/supabaseClient.ts"
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: {
     schema: 'custom'
   },
