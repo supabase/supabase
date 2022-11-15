@@ -45,6 +45,12 @@ const SignUpForm = () => {
     const error = response.error
 
     if (!error) {
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Signed up successfully!`,
+      })
+
       setIsSubmitted(true)
     } else {
       setCaptchaToken(null)
