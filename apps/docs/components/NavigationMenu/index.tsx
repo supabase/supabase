@@ -94,7 +94,7 @@ const SideNav = () => {
   ]
 
   return (
-    <div className="flex py-10 px-5">
+    <div className="flex relative">
       {/* // main menu */}
       <div
         className={[
