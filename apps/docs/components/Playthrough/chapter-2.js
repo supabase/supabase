@@ -1,4 +1,4 @@
-import { Code, Console, GoToFile } from './console'
+import { Code, Playground, GoToFile } from './Playground'
 
 const envContents = `NEXT_PUBLIC_SUPABASE_URL=https://fwobemhztvkziokpwsfc.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3b2JlbWh6dHZremlva3B3c2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY3MzUzNjUsImV4cCI6MTk4MjMxMTM2NX0.8OmPbKgfLNzrvZjpAf7SZRBH4tum5hHd1nOIPlTynlU`
@@ -15,7 +15,7 @@ export default {
       type: 'step',
       header: 'Initialize the app with create-next-app',
       solution: [{ command: 'npx create-next-app --use-npm --no-eslint --js .' }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           <p>Run:</p>
@@ -35,7 +35,7 @@ export default {
       type: 'step',
       header: 'Install the Supabase client library',
       solution: [{ command: 'npm install @supabase/supabase-js' }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           <p>Run:</p>
@@ -55,7 +55,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY`,
         },
       ],
       solution: [{ path: '.env.local', contents: envContents }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           <p>

@@ -1,4 +1,4 @@
-import { Code, Console, GoToFile } from './console'
+import { Code, Playground, GoToFile } from './Playground'
 
 const appContents = `import '../styles/globals.css'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -59,7 +59,7 @@ export default {
           command: 'npm install @supabase/auth-helpers-react @supabase/auth-helpers-nextjs',
         },
       ],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           <p>Run:</p>
@@ -78,7 +78,7 @@ export default {
       header: 'Add SessionContextProvider',
       intro: [{ currentPath: '/pages/_app.js' }],
       solution: [{ path: 'pages/_app.js', contents: appContents }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           Go to <GoToFile path="pages/_app.js" /> and add the context provider:
@@ -90,7 +90,7 @@ export default {
       type: 'step',
       header: 'Install Supabase Auth UI',
       solution: [{ command: 'npm install @supabase/auth-ui-react' }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           Install this:
@@ -102,7 +102,7 @@ export default {
       type: 'step',
       header: 'Add the Auth component',
       solution: [{ path: 'pages/index.js', contents: indexContents1 }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           Now put this into <GoToFile path="pages/index.js" />:<Code>{indexContents1}</Code>
@@ -114,7 +114,7 @@ export default {
       header: 'Run the app',
       intro: [{ path: 'components/Account.js', contents: '' }],
       solution: [{ command: 'npm run dev', onRunning: true }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           You can run the app with:

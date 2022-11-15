@@ -1,4 +1,4 @@
-import { Code, Console, GoToFile } from './console'
+import { Code, Playground, GoToFile } from './Playground'
 
 const accountContents = `import { useState, useEffect } from 'react'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -584,7 +584,7 @@ export default {
         },
       ],
       solution: [{ path: 'components/Account.js', contents: accountContents }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           <p>
@@ -599,7 +599,7 @@ export default {
       type: 'step',
       header: 'Update index.js',
       solution: [{ path: 'pages/index.js', contents: indexContents }],
-      show: () => <Console />,
+      show: () => <Playground />,
       children: (
         <>
           <p>
@@ -613,12 +613,12 @@ export default {
       type: 'step',
       header: 'Update styles',
       solution: [{ path: 'styles/globals.css', contents: stylesContents }],
-      show: () => <Console />,
+      show: () => <Playground />,
     },
     {
       type: 'step',
       header: 'Test',
-      show: () => <Console />,
+      show: () => <Playground />,
     },
   ],
 }

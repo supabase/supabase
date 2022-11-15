@@ -1,5 +1,5 @@
 import React from 'react'
-import { Chapters } from './chapter'
+import { Chapters } from './Chapter'
 import { useSubscription } from './watcher'
 import { allSteps, chapters } from './steps-data'
 import { stepWatcher } from './store'
