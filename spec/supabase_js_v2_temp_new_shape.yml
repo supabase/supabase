@@ -745,15 +745,19 @@ functions:
       - id: getting-your-data
         name: Getting your data
         code: |
+          ```js
           const { data, error } = await supabase
             .from('countries')
             .select()
+          ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
+          ```js
           const { data, error } = await supabase
             .from('countries')
             .select('name')
+          ```
       - id: query-foreign-tables
         name: Query foreign tables
         description: |
