@@ -9,7 +9,6 @@ import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { delete_, post } from 'lib/common/fetch'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
-import { generateFeedbackMessage } from 'components/interfaces/Billing/ExitSurvey/ExitSurvey.utils'
 
 interface Props {
   type?: 'danger' | 'default'
