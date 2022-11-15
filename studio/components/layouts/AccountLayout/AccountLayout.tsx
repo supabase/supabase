@@ -28,8 +28,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
   const onClickLogout = async () => {
     await auth.signOut()
     localStorage.removeItem(STORAGE_KEY)
-    await router.push('/sign-in')
-    router.reload()
+    window.location.href = '/sign-in'
   }
 
   const organizationsLinks = app.organizations
