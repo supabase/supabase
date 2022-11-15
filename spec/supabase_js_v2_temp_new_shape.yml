@@ -1954,6 +1954,7 @@ functions:
         hideCodeBlock: true
 
   - id: Using Filters
+    title: Using Filters
     description: |
       Filters allow you to only return rows that match certain conditions.
 
@@ -4074,6 +4075,7 @@ functions:
           ```
 
   - id: Using Modifiers
+    title: Using Modifiers
     description: |
       Filters work on the row level—they allows you to return rows that
       only match certain conditions without changing the shape of the rows.
