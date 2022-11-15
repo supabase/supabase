@@ -83,8 +83,9 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
                     onClick={() => {
                       router.push(`/${tempBasePath}${x.href}`)
                     }}
-                    className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900"
+                    className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3"
                   >
+                    {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
                     {x.name}
                   </a>
                 </li>
