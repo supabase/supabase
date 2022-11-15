@@ -65,7 +65,7 @@ const TopNavBar: FC = () => {
   }
 
   return (
-    <nav className="h-[60px] border-b px-4 backdrop-blur backdrop-filter dark:bg-blackA-1200 dark:bg-blackA-300">
+    <nav className="h-[60px] border-b px-4 backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300">
       <div className="max-w-[1400px] grid grid-cols-12 mx-auto gap-4 px-5 h-full">
         <div className="col-span-3 flex items-center">
           <button className="mr-4 block stroke-2 lg:hidden" onClick={toggleMobileMenu}>
