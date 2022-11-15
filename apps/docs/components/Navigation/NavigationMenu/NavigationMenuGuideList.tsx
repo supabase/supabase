@@ -93,20 +93,28 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
             </div>
           )
         })}
-        {menu.extras && <div className="h-px w-full bg-green-500 my-3"></div>}
+        {menu.extras && (
+          <>
+            <div className="h-px w-full bg-green-500 my-3"></div>
+            <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-2">
+              Resources
+            </span>
+          </>
+        )}
         {menu.extras?.map((x) => {
           return (
             <div>
-              <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
-                {x.name}
-              </span>
-              {x.items.map((x) => {
-                return (
-                  <li className="transition text-scale-1000 text-sm hover:text-brand-900">
-                    {x.name}
-                  </li>
-                )
-              })}
+              <li>
+                <a
+                  onClick={() => {
+                    router.push(`/${tempBasePath}${x.href}`)
+                  }}
+                  className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1"
+                >
+                  {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
+                  {x.name}
+                </a>
+              </li>
             </div>
           )
         })}
