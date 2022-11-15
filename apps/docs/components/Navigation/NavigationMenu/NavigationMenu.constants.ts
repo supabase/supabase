@@ -51,20 +51,100 @@ export const tutorials = {
   icon: '/img/icons/menu/tutorials.svg',
   label: 'Quickstarts',
   items: [
-    { name: 'Angular', url: '/guides/with-angular', items: [] },
-    { name: 'Expo', url: '/guides/with-expo', items: [] },
-    { name: 'Flutter', url: '/guides/with-flutter', items: [] },
-    { name: 'Ionic Angular', url: '/guides/with-ionic-angular', items: [] },
-    { name: 'Ionic React', url: '/guides/with-ionic-react', items: [] },
-    { name: 'Ionic Vue', url: '/guides/with-ionic-vue', items: [] },
-    { name: 'Next.js', url: '/guides/with-nextjs', items: [] },
-    { name: 'Nuxt 3', url: '/guides/with-nuxt-3', items: [] },
-    { name: 'React', url: '/guides/with-react', items: [] },
-    { name: 'RedwoodJS', url: '/guides/with-redwoodjs', items: [] },
-    { name: 'SolidJS', url: '/guides/with-solidjs', items: [] },
-    { name: 'Svelte', url: '/guides/with-svelte', items: [] },
-    { name: 'SvelteKit', url: '/guides/with-sveltekit', items: [] },
-    { name: 'Vue 3', url: '/guides/with-vue-3', items: [] },
+    {
+      name: 'Javascript',
+      items: [
+        { name: 'React', url: '/guides/with-react', items: [], icon: '/img/icons/react-icon.svg' },
+        {
+          name: 'Next.js',
+          url: '/guides/with-nextjs',
+          items: [],
+          icon: '/img/icons/Next-icon.svg',
+        },
+        {
+          name: 'Angular',
+          url: '/guides/with-angular',
+          items: [],
+          icon: '/img/icons/menu/functions.svg',
+        },
+        {
+          name: 'Nuxt 3',
+          url: '/guides/with-nuxt-3',
+          items: [],
+          icon: '/img/icons/Nuxt-icon.svg',
+        },
+        {
+          name: 'RedwoodJS',
+          url: '/guides/with-redwoodjs',
+          items: [],
+          icon: '/img/icons/menu/functions.svg',
+        },
+        {
+          name: 'SolidJS',
+          url: '/guides/with-solidjs',
+          items: [],
+          icon: '/img/icons/menu/functions.svg',
+        },
+        {
+          name: 'Svelte',
+          url: '/guides/with-svelte',
+          items: [],
+          icon: '/img/icons/menu/functions.svg',
+        },
+        {
+          name: 'SvelteKit',
+          url: '/guides/with-sveltekit',
+          items: [],
+          icon: '/img/icons/menu/functions.svg',
+        },
+        {
+          name: 'Vue 3',
+          url: '/guides/with-vue-3',
+          items: [],
+          icon: '/img/icons/menu/functions.svg',
+        },
+      ],
+    },
+    {
+      name: 'Mobile based',
+      items: [
+        {
+          name: 'Flutter',
+          url: '/guides/with-flutter',
+          items: [],
+          icon: '/img/icons/flutter-icon.svg',
+        },
+        {
+          name: 'Expo',
+          url: '/guides/with-expo',
+          items: [],
+          icon: '/img/icons/menu/functions.svg',
+        },
+      ],
+    },
+    {
+      name: 'Low code',
+      items: [
+        {
+          name: 'Ionic Angular',
+          url: '/guides/with-ionic-angular',
+          items: [],
+          icon: '/img/icons/angular-icon.svg',
+        },
+        {
+          name: 'Ionic React',
+          url: '/guides/with-ionic-react',
+          items: [],
+          icon: '/img/icons/react-icon.svg',
+        },
+        {
+          name: 'Ionic Vue',
+          url: '/guides/with-ionic-vue',
+          items: [],
+          icon: '/img/icons/Ionic-icon.svg',
+        },
+      ],
+    },
   ],
 }
 export const cli = {
