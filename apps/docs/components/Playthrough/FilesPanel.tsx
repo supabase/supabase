@@ -98,7 +98,7 @@ const entriesWatcher = mergeWatchers(fileTreeWatcher, currentFileWatcher, (fileT
   }
   return {
     currentPath: file?.path,
-    isCurrentDirty: false,
+    isCurrentDirty: true,
     entries: fileTree.map((entry) => {
       return mapEntry(entry)
     }),

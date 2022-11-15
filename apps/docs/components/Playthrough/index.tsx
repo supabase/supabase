@@ -4,7 +4,7 @@ import { useSubscription } from './watcher'
 import { allSteps, chapters } from './steps-data'
 import { stepWatcher } from './store'
 
-stepWatcher.notify(allSteps[7])
+stepWatcher.notify(allSteps[0])
 
 export function Playthrough() {
   const step = useSubscription(stepWatcher)
@@ -15,7 +15,7 @@ export function Playthrough() {
       <div className="absolute inset-0 flex">
         <div
           className="overflow-hidden rounded m-3"
-          style={{ width: '40%', background: '#232323', colorScheme: 'dark' }}
+          style={{ width: '40%', maxWidth: '65ch', background: '#232323', colorScheme: 'dark' }}
         >
           <section className="prose relative overflow-auto text-white h-full">
             <h1 className="px-4 mt-8">Quickstart: Next.js</h1>
