@@ -43,15 +43,15 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   return (
     <>
       <div className="flex flex-col items-start gap-6">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-2">
           <h4 className="text-scale-1200">
-            Setup complete! Press activate to enable {customDomain.hostname} for this project.
+            Setup complete! Press activate to enable the custom domain{' '}
+            <code className="text-sm">{customDomain.hostname}</code> for this project.
           </h4>
-
           <span className="text-sm text-scale-1100">
-            Supabase recommends that your schedule a downtime window of 20-30 minutes for your
-            application, as you will need to update any client code (e.g., frontends, mobile apps),
-            and any OAuth providers (e.g., google, github) that use the current supabase subdomain.
+            We recommend that you schedule a downtime window of 20 - 30 minutes for your
+            application, as you will need to update any services that need to know about your custom
+            domain (e.g client side code or OAuth providers)
           </span>
         </div>
 
@@ -80,9 +80,16 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       </div>
 
       <ConfirmModal
+        size="small"
         visible={isActivateConfirmModalVisible}
-        title={`Are you sure you want to activate ${customDomain.hostname}?`}
-        description="Your existing supabase subdomain will be deactivated."
+        // @ts-ignore
+        title={
+          <div>
+            Are you sure you want to activate the custom domain{' '}
+            <code className="text-sm">{customDomain.hostname}</code> for the project?
+          </div>
+        }
+        description="The existing Supabase subdomain will be deactivated."
         buttonLabel="Activate"
         buttonLoadingLabel="Activating"
         onSelectCancel={() => setIsActivateConfirmModalVisible(false)}

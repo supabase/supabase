@@ -5,30 +5,33 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import InformationBox from 'components/ui/InformationBox'
 import { ProjectSettingsResponse } from 'data/config/project-settings-query'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { ReactNode } from 'react'
-import { Alert, Form, Input } from 'ui'
+import { Form, IconAlertCircle, Input } from 'ui'
 import * as yup from 'yup'
 
 const FORM_ID = 'custom-domains-form'
 
 const schema = yup.object({
-  domain: yup.string().required('Custom domain is required'),
+  domain: yup.string().required('A value for your custom domain is required'),
 })
 
 export type CustomDomainsConfigureHostnameProps = {
   projectRef?: string
   title: ReactNode
   settings?: ProjectSettingsResponse
+  onSuccessfullyAdded: () => void
 }
 
 const CustomDomainsConfigureHostname = ({
   projectRef,
   title,
   settings,
+  onSuccessfullyAdded,
 }: CustomDomainsConfigureHostnameProps) => {
   const { ui } = useStore()
 
@@ -44,12 +47,7 @@ const CustomDomainsConfigureHostname = ({
         projectRef,
         customDomain: values.domain,
       })
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created custom domain. Please verify the domain by adding the listed records to your domain's DNS settings.`,
-        duration: 10000,
-      })
+      onSuccessfullyAdded()
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -100,17 +98,22 @@ const CustomDomainsConfigureHostname = ({
                     name="domain"
                     placeholder="subdomain.example.com"
                   />
-
-                  <Alert
-                    withIcon
-                    variant="info"
-                    title="Setup CNAME record before adding a custom domain"
-                  >
-                    Create a CNAME record in your DNS provider pointing to{' '}
-                    <code>{settings?.autoApiService.app_config.endpoint ?? 'Loading...'}</code>,
-                    then add your custom domain above.
-                  </Alert>
                 </FormSectionContent>
+                <div className="col-span-12">
+                  <InformationBox
+                    hideCollapse
+                    defaultVisibility
+                    icon={<IconAlertCircle strokeWidth={2} />}
+                    title="Setup a CNAME record first before adding a custom domain"
+                    description={
+                      <p>
+                        Create a CNAME record in your DNS provider pointing to{' '}
+                        <code>{settings?.autoApiService.app_config.endpoint ?? 'Loading...'}</code>{' '}
+                        with as low a TTL as possible before adding your custom domain above.
+                      </p>
+                    }
+                  />
+                </div>
               </FormSection>
             </FormPanel>
           </>

@@ -1,19 +1,38 @@
 import { ProjectSettingsResponse } from 'data/config/project-settings-query'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
+import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle, IconRefreshCw } from 'ui'
+import { Alert, Button, IconAlertCircle, IconRefreshCw } from 'ui'
 import DNSRecord from './DNSRecord'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
   customDomain: CustomDomainResponse
   settings?: ProjectSettingsResponse
+  isSuccessfullyAdded: boolean
 }
 
-const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
+const CustomDomainVerify = ({
+  projectRef,
+  customDomain,
+  settings,
+  isSuccessfullyAdded,
+}: CustomDomainVerifyProps) => {
+  const { ui } = useStore()
+
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
-    useCustomDomainReverifyMutation()
+    useCustomDomainReverifyMutation({
+      onSuccess: (res) => {
+        if (res.status === '2_initiated') {
+          // [Joshen TODO] - Is this what it means? Do we also need to cover for 3_challenge_verified?
+          ui.setNotification({
+            category: 'info',
+            message: 'Unable to verify records from DNS provider yet',
+          })
+        }
+      },
+    })
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) {
@@ -25,6 +44,11 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
   return (
     <>
+      {isSuccessfullyAdded && (
+        <Alert withIcon variant="success" title="Your custom domain has been successfully added">
+          Please verify the domain by adding the listed records below to your domain's DNS settings.
+        </Alert>
+      )}
       <div>
         <h4 className="text-scale-1200">Set the following record(s) in your DNS provider:</h4>
         <span className="text-sm text-scale-1100">
@@ -36,6 +60,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         'custom hostname does not CNAME to this zone.'
       ) && (
         <DNSRecord
+          showLabel
           type="CNAME"
           name={customDomain.hostname}
           value={settings?.autoApiService.app_config.endpoint ?? 'Loading...'}

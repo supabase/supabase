@@ -56,13 +56,20 @@ const ConfirmModal = ({
               <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center gap-2">
-                  <Button htmlType="button" type="default" onClick={onSelectCancel} block>
+                  <Button
+                    block
+                    htmlType="button"
+                    type="default"
+                    onClick={onSelectCancel}
+                    disabled={loading}
+                  >
                     Cancel
                   </Button>
                   <Button
                     htmlType="submit"
                     block
                     type={danger ? 'danger' : 'primary'}
+                    disabled={loading}
                     loading={loading}
                   >
                     {buttonLoadingLabel && loading
