@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import Footer from '~/components/Footer'
-import NavBar from '~/components/Navigation/NavBar'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 const Layout = ({ children }) => {
   const router = useRouter()
@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
           className="absolute left-0 w-[520px] top-0"
         />
         <div className="max-w-[1400px] mx-auto">
-          <NavBar />
+          <TopNavBar />
         </div>
         <div className="grid grid-cols-12 opacity-100 duration-100 max-w-[1400px] mx-auto py-16 gap-4 px-5">
           <div className="col-span-3">
