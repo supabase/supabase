@@ -1,13 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: pgcron
-title: 'pg_cron: Job Scheduling'
-description: 'pgnet: a simple cron-based job scheduler for PostgreSQL that runs inside the database.'
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'pgcron',
+  title: 'pg_cron: Job Scheduling',
+  description:
+    'pgnet: a simple cron-based job scheduler for PostgreSQL that runs inside the database.',
+}
 
 The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that runs inside the database.
 
@@ -98,3 +96,7 @@ SELECT cron.unschedule('nightly-vacuum');
 ## Resources
 
 - [pg_cron GitHub Repository](https://github.com/citusdata/pg_cron)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

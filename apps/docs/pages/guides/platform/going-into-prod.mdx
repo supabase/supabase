@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: going-into-prod
-title: 'Production Readiness'
-description: 'Things to do before making your app publicly available'
----
+  id: 'going-into-prod',
+  title: 'Production Readiness',
+  description: 'Things to do before making your app publicly available',
+}
 
 After developing your project and deciding it's Production Ready, you should run through this checklist to ensure that your project:
 
@@ -57,3 +57,7 @@ After developing your project and deciding it's Production Ready, you should run
 ## Next steps
 
 This checklist is always growing so be sure to check back frequently, and also feel free to suggest additions and amendments by making a PR on [GitHub](https://github.com/supabase/supabase).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: database
-title: Database
-description: Use Supabase to manage your data.
-sidebar_label: Overview
----
+  id: 'database',
+  title: 'Database',
+  description: 'Use Supabase to manage your data.',
+  sidebar_label: 'Overview',
+}
 
 Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database, a free and open source
 database which is considered one of the world's most stable and advanced databases.
@@ -87,3 +87,7 @@ Read about resetting your database password [here](/docs/guides/database/managin
 
 - Read more about [Postgres](/docs/postgres/server/about)
 - Sign in: [app.supabase.com](https://app.supabase.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: quickstart
-title: Realtime Quickstart
-description: Getting started with Realtime's Features
-sidebar_label: Quickstart
----
+  id: 'quickstart',
+  title: 'Realtime Quickstart',
+  description: "Getting started with Realtime's Features",
+  sidebar_label: 'Quickstart',
+}
 
 Learn how to build [multiplayer.dev](https://multiplayer.dev), a collaborative app that demonstrates Broadcast, Presence, and Postgres CDC using [Realtime](/docs/guides/realtime).
 
@@ -258,3 +258,7 @@ channel.subscribe(async (status) => {
   }
 })
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

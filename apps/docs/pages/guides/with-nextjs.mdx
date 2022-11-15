@@ -1,14 +1,13 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: with-nextjs
-title: 'Quickstart: Next.js'
-description: Learn how to use Supabase in your Next App.
-sidebar_label: 'Next.js'
----
+  id: 'with-nextjs',
+  title: 'Quickstart: Next.js',
+  description: 'Learn how to use Supabase in your Next App.',
+  sidebar_label: 'Next.js',
+}
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import QuickstartIntro from '/components/MDX/quickstart_intro.mdx'
 import ProjectSetup from '/components/MDX/project_setup.mdx'
 
 <QuickstartIntro />
@@ -736,3 +735,7 @@ At this stage you have a fully functional application!
 - See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub.
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Sign in: [app.supabase.com](https://app.supabase.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-notion
-title: 'Login with Notion'
-description: Add Notion OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-notion',
+  title: 'Login with Notion',
+  description: 'Add Notion OAuth to your Supabase project',
+}
 
 To enable Notion Auth for your project, you need to set up a Notion Application and add the Application OAuth credentials to your Supabase Dashboard.
 
@@ -92,3 +89,7 @@ async function signout() {
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Notion Account](https://notion.so)
 - [Notion Developer Portal](https://www.notion.so/my-integrations)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

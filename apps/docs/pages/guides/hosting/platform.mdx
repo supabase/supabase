@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: platform
-title: Supabase Platform
-description: Getting started with the Supabase Platform.
-sidebar_label: Overview
----
+  id: 'platform',
+  title: 'Supabase Platform',
+  description: 'Getting started with the Supabase Platform.',
+  sidebar_label: 'Overview',
+}
 
 Supabase is a hosted platform which makes it very simple to get started without needing to manage any infrastructure.
 
@@ -80,3 +80,7 @@ If Supabase experiences outages, we keep you as informed as possible, as early a
 - Slack Alerts: You can receive updates via the RSS feed, using Slack's [built-in RSS functionality](https://slack.com/help/articles/218688467-Add-RSS-feeds-to-Slack) <br />`/feed subscribe https://status.supabase.com/history.atom`
 
 Make sure to review our [SLA](/docs/company/sla) for details on our commitment to Platform Stability.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

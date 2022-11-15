@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth
-title: Auth
-description: Use Supabase to Authenticate and Authorize your users.
-sidebar_label: Overview
----
+  id: 'auth',
+  title: 'Auth',
+  description: 'Use Supabase to Authenticate and Authorize your users.',
+  sidebar_label: 'Overview',
+}
 
 ## Overview
 
@@ -122,3 +122,7 @@ When users sign up, Supabase assigns them a unique ID. You can reference this ID
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/auth-zoom2.mp4" type="video/mp4" muted playsInline />
 </video>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

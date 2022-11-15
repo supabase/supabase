@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: migrating-and-upgrading-projects
-title: 'Migrating and Upgrading Projects'
-description: Upgrade your project to the latest version of Supabase.
-sidebar_label: 'Migrating and upgrading'
----
+  id: 'migrating-and-upgrading-projects',
+  title: 'Migrating and Upgrading Projects',
+  description: 'Upgrade your project to the latest version of Supabase.',
+  sidebar_label: 'Migrating and upgrading',
+}
 
 Supabase ships fast and we endeavor to add all new features to existing projects wherever possible.
 In some cases, access to new features require upgrading or migrating your Supabase project.
@@ -118,3 +118,7 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
   }
 })()
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

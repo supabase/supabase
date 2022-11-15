@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-github
-title: 'Login with GitHub'
-description: Add GitHub OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-github',
+  title: 'Login with GitHub',
+  description: 'Add GitHub OAuth to your Supabase project',
+}
 
 To enable GitHub Auth for your project, you need to set up a GitHub OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -102,3 +99,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [GitHub Developer Settings](https://github.com/settings/developers)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

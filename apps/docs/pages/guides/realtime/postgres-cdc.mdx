@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: postgres-cdc
-title: Postgres CDC
-description: Getting started with Realtime's Postgres CDC feature
----
+  id: 'postgres-cdc',
+  title: 'Postgres CDC',
+  description: "Getting started with Realtime's Postgres CDC feature",
+}
 
 Realtime's Postgres Change Data Capture (CDC) feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
 
@@ -117,3 +117,7 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

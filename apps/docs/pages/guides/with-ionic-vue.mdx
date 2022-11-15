@@ -1,14 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: with-ionic-vue
-title: 'Quickstart: Ionic Vue'
-description: Learn how to use Supabase in your Ionic Vue App.
-sidebar_label: Ionic Vue
----
+  id: 'with-ionic-vue',
+  title: 'Quickstart: Ionic Vue',
+  description: 'Learn how to use Supabase in your Ionic Vue App.',
+  sidebar_label: 'Ionic Vue',
+}
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
 import QuickstartIntro from '/components/MDX/quickstart_intro.mdx'
 import ProjectSetup from '/components/MDX/project_setup.mdx'
 
@@ -566,3 +564,7 @@ At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Sign in: [app.supabase.com](https://app.supabase.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

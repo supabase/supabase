@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: full-text-search
-title: 'Full Text Search'
-description: How to use full text search in PostgreSQL.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'full-text-search',
+  title: 'Full Text Search',
+  description: 'How to use full text search in PostgreSQL.',
+}
 
 Postgres has built-in functions to handle `Full Text Search` queries. This is like a "search engine" within Postgres.
 
@@ -590,3 +587,7 @@ final result = await client
 ## Resources
 
 - [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

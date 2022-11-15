@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: testing
-title: Testing Your Database
-description: Test your database schema, tables, functions, and policies.
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'testing',
+  title: 'Testing Your Database',
+  description: 'Test your database schema, tables, functions, and policies.',
+}
 
 You can use the Supabase CLI to test your database. The minimum required version of the CLI is [v1.11.4](https://github.com/supabase/cli/releases). To get started:
 
@@ -70,3 +67,7 @@ Result: PASS
 
 - [pgTAP extension](/docs/guides/database/extensions/pgtap)
 - Official [pgTAP documentation](https://pgtap.org/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

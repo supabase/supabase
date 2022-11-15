@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: database-usage
-title: Database usage
-description: Understanding how database usage applies to your subscription.
----
+  id: 'database-usage',
+  title: 'Database usage',
+  description: 'Understanding how database usage applies to your subscription.',
+}
 
 Database storage refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily.
 
@@ -57,3 +57,7 @@ However, it can be necessary to either [fine-tune](https://www.percona.com/blog/
 the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips),
 or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
 For example, running a manual vacuum after deleting large amounts of data from your DB could help reduce the reported disk usage by Postgres.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

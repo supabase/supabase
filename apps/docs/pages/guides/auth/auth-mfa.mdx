@@ -1,12 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-mfa
-title: 'Multi-Factor Authentication'
-description: Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.
----
-
-import { Mermaid } from 'mdx-mermaid/Mermaid'
+  id: 'auth-mfa',
+  title: 'Multi-Factor Authentication',
+  description:
+    'Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.',
+}
 
 <Admonition type="note">
 
@@ -629,3 +628,7 @@ Currently recognized methods are:
 - `mfa/totp` - a TOTP additional factor.
 
 This list will expand in the future.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

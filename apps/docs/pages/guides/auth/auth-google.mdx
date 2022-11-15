@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-google
-title: 'Login with Google'
-description: Add Google OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-google',
+  title: 'Login with Google',
+  description: 'Add Google OAuth to your Supabase project',
+}
 
 To enable Google Auth for your project, you need to set up a Google OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -117,3 +114,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

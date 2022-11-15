@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: sveltekit
-title: Supabase Auth with SvelteKit
-description: Convenience helpers for implementing user authentication in SvelteKit.
-sidebar_label: SvelteKit
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'sveltekit',
+  title: 'Supabase Auth with SvelteKit',
+  description: 'Convenience helpers for implementing user authentication in SvelteKit.',
+  sidebar_label: 'SvelteKit',
+}
 
 This submodule provides convenience helpers for implementing user authentication in [SvelteKit](https://kit.svelte.dev/) applications.
 
@@ -1119,3 +1116,7 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
 - [SvelteKit example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit)
 - [SvelteKit Email/Password example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit-email-password)
 - [SvelteKit Magiclink example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit-magic-link)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

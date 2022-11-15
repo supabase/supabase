@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: metrics
-title: Metrics
-description: Observability for your Supabase project
----
+  id: 'metrics',
+  title: 'Metrics',
+  description: 'Observability for your Supabase project',
+}
 
 In addition to the reports and charts built in to the Supabase dashboard, each project hosted on the Supabase platform comes with a [Prometheus](https://prometheus.io/)-compatible metrics endpoint, which can be used to gather insight into the health and status of your project.
 
@@ -31,3 +31,7 @@ Your project's metrics endpoint is accessible at `https://<project-ref>.supabase
 ```
 
 Additionally, we [maintain a guide](https://github.com/supabase/grafana-agent-fly-example/) on quickly setting up a scraping agent to work with Grafana Cloud.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

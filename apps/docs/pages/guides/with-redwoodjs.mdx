@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: with-redwoodjs
-title: 'Quickstart: RedwoodJS'
-description: Learn how to use Supabase in your RedwoodJS App.
-sidebar_label: RedwoodJS
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'with-redwoodjs',
+  title: 'Quickstart: RedwoodJS',
+  description: 'Learn how to use Supabase in your RedwoodJS App.',
+  sidebar_label: 'RedwoodJS',
+}
 
 ## Intro
 
@@ -782,3 +779,7 @@ At this stage you have a fully functional application!
 - Sign in: [app.supabase.com](https://app.supabase.com)
 - Learn more about [RedwoodJS](https://redwoodjs.com)
 - Visit the [RedwoodJS Discourse Community](https://community.redwoodjs.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-spotify
-title: 'Login with Spotify'
-description: Add Spotify OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-spotify',
+  title: 'Login with Spotify',
+  description: 'Add Spotify OAuth to your Supabase project',
+}
 
 To enable Spotify Auth for your project, you need to set up a Spotify OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -96,3 +93,7 @@ async function signout() {
 - [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

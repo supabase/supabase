@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth-azure
-title: 'Login with Azure'
-description: Add Azure OAuth to your Supabase project
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'auth-azure',
+  title: 'Login with Azure',
+  description: 'Add Azure OAuth to your Supabase project',
+}
 
 To enable Azure Auth for your project, you need to set up an Azure OAuth application and add the application credentials to your Supabase Dashboard.
 
@@ -100,3 +97,7 @@ async function signout() {
 
 - [Azure Developer Account](https://portal.azure.com)
 - [GitHub Discussion](https://github.com/supabase/gotrue/pull/54#issuecomment-757043573)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

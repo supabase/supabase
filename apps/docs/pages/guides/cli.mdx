@@ -1,12 +1,13 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: cli
-title: Supabase CLI
-description: The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.
-sidebar_label: Overview
-toc_max_heading_level: 2
----
+  id: 'cli',
+  title: 'Supabase CLI',
+  description:
+    'The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.',
+  sidebar_label: 'Overview',
+  toc_max_heading_level: 2,
+}
 
 The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.
 You can also use the CLI to manage your Supabase projects, handle database migrations and CI/CD workflows, and generate types directly from your database schema.
@@ -115,3 +116,7 @@ brew upgrade supabase
 - [Supabase CLI Reference](/docs/reference/cli/usage)
 - [Local Development](/docs/guides/cli/local-development)
 - [Managing Environments](/docs/guides/cli/managing-environments)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,13 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: pgnet
-title: 'pg_net: Async Networking'
-description: 'pg_net: an async networking extension for PostgreSQL.'
----
-
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+  id: 'pgnet',
+  title: 'pg_net: Async Networking',
+  description: 'pg_net: an async networking extension for PostgreSQL.',
+}
 
 <Admonition type="caution">
 
@@ -253,3 +250,7 @@ Possible values for `net.http_response_result.status` are `('PENDING', 'SUCCESS'
 
 - Source code: [github.com/supabase/pg_net](https://github.com/supabase/pg_net/)
 - Official Docs: [supabase.github.io/pg_net](https://supabase.github.io/pg_net/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
