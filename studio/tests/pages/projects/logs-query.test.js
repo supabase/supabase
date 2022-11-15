@@ -1,20 +1,14 @@
-// mock the fetch function
-jest.mock('lib/common/fetch')
 import { get } from 'lib/common/fetch'
-
-// mock the settings layout
-jest.mock('components/layouts', () => ({
-  LogsExplorerLayout: jest.fn().mockImplementation(({ children }) => <div>{children}</div>),
-}))
-
-// mock mobx
-jest.mock('mobx-react-lite')
-import { observer } from 'mobx-react-lite'
-observer.mockImplementation((v) => v)
-
-// mock the router
-jest.mock('next/router')
 import { useRouter } from 'next/router'
+import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
+import { render } from 'tests/helpers'
+import { waitFor, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { logDataFixture } from '../../fixtures'
+import { clickDropdown } from 'tests/helpers'
+import dayjs from 'dayjs'
+import { useProjectSubscription } from 'hooks'
+
 const defaultRouterMock = () => {
   const router = jest.fn()
   router.query = { ref: '123' }
@@ -22,60 +16,7 @@ const defaultRouterMock = () => {
   router.pathname = 'logs/path'
   return router
 }
-useRouter.mockReturnValue(defaultRouterMock())
 
-// mock monaco editor
-jest.mock('@monaco-editor/react')
-import Editor, { useMonaco } from '@monaco-editor/react'
-Editor = jest.fn()
-Editor.mockImplementation((props) => {
-  return (
-    <textarea className="monaco-editor" onChange={(e) => props.onChange(e.target.value)}></textarea>
-  )
-})
-useMonaco.mockImplementation((v) => v)
-
-// mock usage flags
-jest.mock('components/ui/Flag/Flag')
-import Flag from 'components/ui/Flag/Flag'
-Flag.mockImplementation(({ children }) => <>{children}</>)
-jest.mock('hooks')
-import { useStore, useFlag } from 'hooks'
-useFlag.mockReturnValue(true)
-useStore.mockImplementation(() => ({
-  content: {
-    addRecentLogSqlSnippet: jest.fn(),
-  },
-}))
-
-jest.mock('hooks')
-import { useProjectSubscription } from 'hooks'
-useProjectSubscription = jest.fn((ref) => ({
-  subscription: {
-    tier: {
-      supabase_prod_id: 'tier_free',
-    },
-  },
-}))
-
-import { SWRConfig } from 'swr'
-import { LogsExplorerPage as Page } from 'pages/project/[ref]/logs-explorer/index'
-const LogsExplorerPage = (props) => (
-  <SWRConfig
-    value={{
-      provider: () => new Map(),
-      shouldRetryOnError: false,
-    }}
-  >
-    <Page {...props} />
-  </SWRConfig>
-)
-
-import { render, fireEvent, waitFor, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { logDataFixture } from '../../fixtures'
-import { clickDropdown } from 'tests/helpers'
-import dayjs from 'dayjs'
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
@@ -197,21 +138,6 @@ test('custom sql querying', async () => {
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
-test('datepicker interaction updates query params', async () => {
-  render(<LogsExplorerPage />)
-  clickDropdown(await screen.findByText(/Last day/))
-  userEvent.click(await screen.findByText(/Last 3 days/))
-
-  const router = useRouter()
-  expect(router.push).toBeCalledWith(
-    expect.objectContaining({
-      query: expect.objectContaining({
-        its: expect.any(String),
-      }),
-    })
-  )
-})
-
 test('query warnings', async () => {
   const router = defaultRouterMock()
   router.query = {
@@ -223,4 +149,43 @@ test('query warnings', async () => {
   useRouter.mockReturnValue(router)
   render(<LogsExplorerPage />)
   await screen.findByText('1 warning')
+})
+
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
+        },
+      },
+    })
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(5, 'month').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsExplorerPage />)
+    await screen.findByText(/Log retention/) // assert modal title is present
+  })
+
+  test('based on datepicker helpers', async () => {
+    render(<LogsExplorerPage />)
+    // click on the dropdown
+    clickDropdown(await screen.findByText('Last 24 hours'))
+    userEvent.click(await screen.findByText('Last 3 days'))
+
+    // only free tier will show modal
+    if (key === 'FREE') {
+      await screen.findByText('Log retention') // assert modal title is present
+    } else {
+      await expect(screen.findByText('Log retention')).rejects.toThrow()
+    }
+  })
 })

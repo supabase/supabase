@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { FC, useEffect } from 'react'
-import { IconChevronRight, IconLoader } from '@supabase/ui'
+import { IconChevronRight, IconLoader } from 'ui'
 
 import { useProjectSubscription, useStore } from 'hooks'
 import Panel from 'components/ui/Panel'
@@ -46,7 +46,7 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
             <p className="text-sm">{dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}</p>
           </div>
           <div className="flex w-[15%] items-center justify-end">
-            <Link href={`/project/${project.ref}/settings/billing`}>
+            <Link href={`/project/${project.ref}/settings/billing/subscription`}>
               <a className="group flex items-center space-x-2">
                 <p className="text-sm opacity-0 transition group-hover:opacity-100">View details</p>
                 <IconChevronRight />
@@ -88,7 +88,7 @@ const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
         ))}
         {projects.length === 0 && (
           <Panel.Content>
-            <p className="text-scale-1100 text-sm">No projects created yet</p>
+            <p className="text-sm text-scale-1100">No projects created yet</p>
           </Panel.Content>
         )}
       </Panel>

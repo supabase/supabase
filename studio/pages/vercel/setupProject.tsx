@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
-import { Button, Input, Listbox, Typography } from '@supabase/ui'
+import { Button, Input, Listbox } from 'ui'
 import { Dictionary } from 'components/grid'
 import generator from 'generate-password'
 
@@ -141,9 +141,7 @@ const Connecting = () => (
     <div className="flex w-32 items-center justify-center">
       <Loading />
     </div>
-    <Typography.Text>
-      <p>Connecting...</p>
-    </Typography.Text>
+    <p>Connecting...</p>
   </div>
 )
 
@@ -307,7 +305,7 @@ const CreateProject = observer(() => {
             type="select"
             value={dbRegion}
             onChange={onDbRegionChange}
-            descriptionText="Select a region close to you for the best performance."
+            descriptionText="Select a region close to your users for the best performance."
           >
             {Object.keys(REGIONS).map((option: string, i) => {
               const label = Object.values(REGIONS)[i]

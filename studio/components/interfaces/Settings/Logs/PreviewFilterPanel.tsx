@@ -1,14 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import {
-  Button,
-  Input,
-  Typography,
-  IconRefreshCw,
-  IconSearch,
-  IconExternalLink,
-  IconEye,
-  IconEyeOff,
-} from '@supabase/ui'
+import { Button, Input, IconRefreshCw, IconSearch, IconExternalLink, IconEye, IconEyeOff } from 'ui'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'
@@ -79,9 +70,9 @@ const PreviewFilterPanel: FC<Props> = ({
               ].join(' ')}
             >
               <div className="absolute z-20">
-                <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
+                <p style={{ fontSize: '0.6rem' }} className="text-white">
                   {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                </Typography.Text>
+                </p>
               </div>
               <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
               <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
@@ -134,7 +125,7 @@ const PreviewFilterPanel: FC<Props> = ({
               hasEdits && (
                 <button
                   onClick={() => handleInputSearch(search)}
-                  className="text-scale-1100 hover:text-scale-1200 mx-2"
+                  className="mx-2 text-scale-1100 hover:text-scale-1200"
                 >
                   {'↲'}
                 </button>

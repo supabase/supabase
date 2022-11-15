@@ -4,6 +4,7 @@
 const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
+const mdxMermaid = require('mdx-mermaid')
 
 const baseUrl = '/docs/'
 
@@ -14,7 +15,7 @@ const config = {
   url: 'https://supabase.com',
   baseUrl: baseUrl,
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenMarkdownLinks: 'throw',
   favicon: '/favicon.ico',
   themes: ['docusaurus-theme-search-typesense'],
 
@@ -83,6 +84,18 @@ const config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: '_realtime',
+        path: '_realtime',
+        routeBasePath: '/reference/realtime',
+        sidebarPath: require.resolve('./nav/realtime_sidebars.js'),
+        breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: '_supabase_dart',
         path: '_supabase_dart',
         routeBasePath: '/reference/dart',
@@ -90,6 +103,15 @@ const config = {
         breadcrumbs: false,
         editUrl:
           'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        lastVersion: 'current',
+        versions: {
+          current: {
+            label: 'v1',
+          },
+          v0: {
+            label: 'v0',
+          },
+        },
       },
     ],
     [
@@ -102,25 +124,15 @@ const config = {
         breadcrumbs: false,
         editUrl:
           'https://github.com/supabase/supabase/edit/master/apps/reference/',
-        // lastVersion: 'current',
-        // versions: {
-        //   current: {
-        //     label: 'v2',
-        //     // path: 'v2',
-        //   },
-        // },
-      },
-    ],
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: '_auth_helpers',
-        path: '_auth_helpers',
-        routeBasePath: '/reference/auth-helpers',
-        sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
-        breadcrumbs: false,
-        editUrl:
-          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        lastVersion: 'current',
+        versions: {
+          current: {
+            label: 'v2',
+          },
+          v1: {
+            label: 'v1',
+          },
+        },
       },
     ],
   ],
@@ -136,6 +148,7 @@ const config = {
           breadcrumbs: false,
           editUrl:
             'https://github.com/supabase/supabase/edit/master/apps/reference',
+          //remarkPlugins: [mdxMermaid.default],
         },
         blog: false,
         theme: {
@@ -178,6 +191,22 @@ const config = {
                 to: '/oss',
               },
               {
+                label: 'Terms of Service',
+                to: '/docs/company/terms',
+              },
+              {
+                label: 'Privacy Policy',
+                to: '/docs/company/privacy',
+              },
+              {
+                label: 'Acceptable Use Policy',
+                to: '/docs/company/aup',
+              },
+              {
+                label: 'Service Level Agreement',
+                to: '/docs/company/sla',
+              },
+              {
                 label: 'Humans.txt',
                 to: 'https://supabase.com/humans.txt',
               },
@@ -216,6 +245,14 @@ const config = {
             title: 'Community',
             items: [
               {
+                label: 'SupaSquad',
+                href: 'https://supabase.com/docs/handbook/supasquad',
+              },
+              {
+                label: 'Contributing',
+                href: 'https://supabase.com/docs/handbook/contributing',
+              },
+              {
                 label: 'GitHub',
                 href: 'https://github.com/supabase/supabase',
               },
@@ -234,15 +271,6 @@ const config = {
               {
                 label: 'Discord',
                 href: 'https://discord.supabase.com',
-              },
-            ],
-          },
-          {
-            title: 'Beta',
-            items: [
-              {
-                label: 'Join our beta',
-                href: 'https://app.supabase.com',
               },
             ],
           },
@@ -277,6 +305,7 @@ const config = {
         contextualSearch: true,
       },
     }),
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
 }
 
 module.exports = config

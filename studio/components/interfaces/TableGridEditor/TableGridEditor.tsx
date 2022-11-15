@@ -2,8 +2,8 @@ import { FC, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { find, isUndefined } from 'lodash'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
@@ -11,7 +11,6 @@ import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
 import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
 import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
-import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   /** Theme for the editor */
@@ -60,25 +59,9 @@ const TableGridEditor: FC<Props> = ({
   const gridRef = useRef<SupabaseGridRef>(null)
   const projectRef = ui.selectedProject?.ref
 
-  // Permissions scaffolding
-  const canRead = false
-  const canInsert = false
-  const canUpdate = false
-  const canDelete = false
-
-  // [Joshen] When we get to this, double check again what are the actions
-  // const canUpdate = checkPermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
-  // const canAdminWrite = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
-  // const canInsert = checkPermissions(PermissionAction.CREATE, String(tableId))
-  // const canEdit = canAdminWrite && canInsert && canUpdate
-
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(router.query.id)} />
   }
-
-  // if (!canRead) {
-  //   return <NoPermission isFullPage resourceText={`access the table "${selectedTable.name}"`} />
-  // }
 
   const tableId = selectedTable?.id
 
@@ -86,6 +69,7 @@ const TableGridEditor: FC<Props> = ({
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2
   const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
+  const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const gridTable = !isViewSelected
     ? parseSupaTable({
@@ -157,7 +141,7 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isViewSelected && !isLocked}
+        editable={canUpdateTables && !isViewSelected && !isLocked}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={

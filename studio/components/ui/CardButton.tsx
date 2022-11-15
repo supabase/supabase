@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { IconChevronRight } from '@supabase/ui'
+import { IconChevronRight } from 'ui'
 import Link from 'next/link'
 
 interface Props {
@@ -83,23 +83,25 @@ const CardButton: FC<Props> = ({
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
         <h5 className="text-scale-1200">{title}</h5>
-        <div className="flex w-full flex-1 flex-col">
-          <p className="text-scale-1100 text-sm">{description}</p>
-          <div className="w-full">{children && children}</div>
-        </div>
-        <div className="w-full">{footer && footer}</div>
+        {(children || description) && (
+          <div className="flex w-full flex-1 flex-col">
+            <p className="text-sm text-scale-1100">{description}</p>
+            <div className="w-full">{children && children}</div>
+          </div>
+        )}
+        {footer && <div className="w-full">{footer}</div>}
       </div>
       {isLink && (
         <div
           className="
-          text-scale-900
-          group-hover:text-scale-1200
           absolute
           right-4
           top-4
+          text-scale-900
           transition-all
           duration-200
           group-hover:right-3
+          group-hover:text-scale-1200
         "
         >
           <IconChevronRight />

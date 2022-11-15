@@ -69,7 +69,7 @@
         "security": [{ "bearer": [] }]
       },
       "post": {
-        "operationId": "createOrganization_",
+        "operationId": "createOrganization",
         "summary": "Create an organization",
         "parameters": [],
         "requestBody": {
@@ -96,6 +96,50 @@
       }
     },
     "/v1/projects/{ref}/functions": {
+      "post": {
+        "operationId": "createFunction",
+        "summary": "Create a function",
+        "description": "Creates a function and adds it to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to create project's function" }
+        },
+        "tags": ["projects"],
+        "security": [
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] },
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] }
+        ]
+      },
       "get": {
         "operationId": "getFunctions",
         "summary": "List all functions",
@@ -121,41 +165,16 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's functions" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
-      },
-      "post": {
-        "operationId": "createFunction",
-        "summary": "Create a function",
-        "description": "Creates a function and adds it to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreateFunctionBody" } }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
-            }
-          },
-          "500": { "description": "Failed to create project's function" }
-        },
-        "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] },
+          { "apiKeyHeader": [], "apiKeyParam": [] },
+          { "bearer": [] }
+        ]
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}": {
@@ -182,7 +201,7 @@
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": {}, "type": "string" }
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
           }
         ],
         "responses": {
@@ -194,13 +213,14 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve function with given slug" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "patch": {
-        "operationId": "UpdateFunction",
+        "operationId": "updateFunction",
         "summary": "Update a function",
         "description": "Updates a function with the specified slug and project.",
         "parameters": [
@@ -216,15 +236,22 @@
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": {}, "type": "string" }
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateFunctionBody" } }
-          }
-        },
         "responses": {
           "200": {
             "description": "",
@@ -232,10 +259,11 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to update function with given slug" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "delete": {
         "operationId": "deleteFunction",
@@ -254,22 +282,22 @@
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": {}, "type": "string" }
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
           }
         ],
         "responses": {
           "200": { "description": "" },
+          "403": { "description": "" },
           "500": { "description": "Failed to delete function with given slug" }
         },
         "tags": ["projects"],
-        "security": [{ "bearer": [] }]
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
-    "/v1/projects/{ref}/secrets": {
+    "/v1/projects/{ref}/custom-hostname": {
       "get": {
-        "operationId": "getSecrets",
-        "summary": "List all secrets",
-        "description": "Returns all secrets you've previously added to the specified project.",
+        "operationId": "getCustomHostnameConfig",
+        "summary": "Gets project's custom hostname config",
         "parameters": [
           {
             "name": "ref",
@@ -284,22 +312,41 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/SecretResponse" }
-                }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
               }
             }
           },
-          "500": { "description": "Failed to retrieve project's secrets" }
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's custom hostname config" }
         },
-        "tags": ["projects"],
+        "tags": ["custom hostname (beta)"],
         "security": [{ "bearer": [] }]
       },
+      "delete": {
+        "operationId": "removeCustomHostnameConfig",
+        "summary": "Deletes a project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/initialize": {
       "post": {
-        "operationId": "createSecrets",
-        "summary": "Bulk create secrets",
-        "description": "Creates multiple secrets and adds them to the specified project.",
+        "operationId": "createCustomHostnameConfig",
+        "summary": "Updates project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -313,24 +360,30 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "array",
-                "items": { "$ref": "#/components/schemas/CreateSecretBody" }
-              }
+              "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameBody" }
             }
           }
         },
         "responses": {
-          "201": { "description": "" },
-          "500": { "description": "Failed to create project's secrets" }
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project custom hostname configuration" }
         },
-        "tags": ["projects"],
+        "tags": ["custom hostname (beta)"],
         "security": [{ "bearer": [] }]
-      },
-      "delete": {
-        "operationId": "deleteSecrets",
-        "summary": "Bulk delete secrets",
-        "description": "Deletes all secrets with the given names from the specified project",
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/reverify": {
+      "post": {
+        "operationId": "reverify",
+        "summary": "Attempts to verify the DNS configuration for project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -340,20 +393,48 @@
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "type": "array", "items": { "type": "string" } } }
-          }
-        },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
-            "content": { "application/json": { "schema": { "type": "object" } } }
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
           },
-          "500": { "description": "Failed to delete secrets with given names" }
+          "403": { "description": "" },
+          "500": { "description": "Failed to verify project custom hostname configuration" }
         },
-        "tags": ["projects"],
+        "tags": ["custom hostname (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/activate": {
+      "post": {
+        "operationId": "activate",
+        "summary": "Activates a custom hostname for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to activate project custom hostname configuration" }
+        },
+        "tags": ["custom hostname (beta)"],
         "security": [{ "bearer": [] }]
       }
     },
@@ -412,6 +493,196 @@
         "tags": ["pgsodium (beta)"],
         "security": [{ "bearer": [] }]
       }
+    },
+    "/v1/projects/{ref}/secrets": {
+      "get": {
+        "operationId": "getSecrets",
+        "summary": "List all secrets",
+        "description": "Returns all secrets you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SecretResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's secrets" }
+        },
+        "tags": ["projects"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "post": {
+        "operationId": "createSecrets",
+        "summary": "Bulk create secrets",
+        "description": "Creates multiple secrets and adds them to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/CreateSecretBody" }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to create project's secrets" }
+        },
+        "tags": ["projects"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "deleteSecrets",
+        "summary": "Bulk delete secrets",
+        "description": "Deletes all secrets with the given names from the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "type": "array", "items": { "type": "string" } } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete secrets with given names" }
+        },
+        "tags": ["projects"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/types/typescript": {
+      "get": {
+        "operationId": "getTypescriptTypes",
+        "summary": "Generate TypeScript types",
+        "description": "Returns the TypeScript types of your schema for use with supabase-js.",
+        "parameters": [
+          {
+            "name": "included_schemas",
+            "required": false,
+            "in": "query",
+            "schema": { "default": "public", "type": "string" }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TypescriptResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to generate TypeScript types" }
+        },
+        "tags": ["projects"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-bans/retrieve": {
+      "post": {
+        "operationId": "getNetworkBans",
+        "summary": "Gets project's network bans",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkBanResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's network bans" }
+        },
+        "tags": ["network bans (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-bans": {
+      "delete": {
+        "operationId": "removeNetworkBan",
+        "summary": "Remove network bans.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RemoveNetworkBanRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to remove network bans." }
+        },
+        "tags": ["network bans (beta)"],
+        "security": [{ "bearer": [] }]
+      }
     }
   },
   "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
@@ -457,7 +728,8 @@
               "ap-south-1",
               "sa-east-1"
             ]
-          }
+          },
+          "kps_enabled": { "type": "boolean" }
         },
         "required": ["db_pass", "name", "organization_id", "plan", "region"]
       },
@@ -485,16 +757,6 @@
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
-      "CreateFunctionBody": {
-        "type": "object",
-        "properties": {
-          "slug": { "type": "string", "pattern": {} },
-          "name": { "type": "string" },
-          "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
-        },
-        "required": ["slug", "name", "body"]
-      },
       "FunctionSlugResponse": {
         "type": "object",
         "properties": {
@@ -510,13 +772,33 @@
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
-      "UpdateFunctionBody": {
+      "UpdateCustomHostnameResponse": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
-        }
+          "status": {
+            "enum": [
+              "1_not_started",
+              "2_initiated",
+              "3_challenge_verified",
+              "4_origin_setup_completed",
+              "5_services_reconfigured"
+            ],
+            "type": "string"
+          },
+          "custom_hostname": { "type": "string" },
+          "data": { "type": "object" }
+        },
+        "required": ["status", "custom_hostname", "data"]
+      },
+      "UpdateCustomHostnameBody": {
+        "type": "object",
+        "properties": { "custom_hostname": { "type": "string" } },
+        "required": ["custom_hostname"]
+      },
+      "UpdatePgsodiumConfigBody": {
+        "type": "object",
+        "properties": { "root_key": { "type": "string" } },
+        "required": ["root_key"]
       },
       "SecretResponse": {
         "type": "object",
@@ -527,14 +809,26 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "value": { "type": "string", "pattern": {} }
+          "value": { "type": "string", "pattern": "/^(?!SUPABASE_).*/" }
         },
         "required": ["name", "value"]
       },
-      "UpdatePgsodiumConfigBody": {
+      "TypescriptResponse": {
         "type": "object",
-        "properties": { "root_key": { "type": "string" } },
-        "required": ["root_key"]
+        "properties": { "types": { "type": "string" } },
+        "required": ["types"]
+      },
+      "NetworkBanResponse": {
+        "type": "object",
+        "properties": {
+          "banned_ipv4_addresses": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["banned_ipv4_addresses"]
+      },
+      "RemoveNetworkBanRequest": {
+        "type": "object",
+        "properties": { "ipv4_addresses": { "type": "array", "items": { "type": "string" } } },
+        "required": ["ipv4_addresses"]
       }
     }
   }

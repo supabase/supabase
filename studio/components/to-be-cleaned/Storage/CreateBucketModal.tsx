@@ -1,16 +1,16 @@
 import { FC, useEffect, useState } from 'react'
-import { Modal, Alert, Button, Input, Space, Typography, Toggle } from '@supabase/ui'
+import { Modal, Alert, Button, Input, Toggle } from 'ui'
 
 interface Props {
-  visible : boolean
+  visible: boolean
   onSelectCancel: () => {}
-  onSelectSave: () => {}
+  onSelectSave: (bucketName: string, isPublic: boolean) => {}
 }
 
 const CreateBucketModal: FC<Props> = ({
   visible = false,
   onSelectCancel = () => {},
-  onSelectSave = (bucketName: string, isPublic: boolean) => {},
+  onSelectSave = () => {},
 }) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -67,15 +67,15 @@ const CreateBucketModal: FC<Props> = ({
     >
       <form className="space-y-6 py-4">
         <Modal.Content>
-          <div className="flex items-center relative">
+          <div className="relative flex items-center">
             <Input
               autoFocus
               label="Name of bucket"
               labelOptional="Buckets cannot be renamed once created."
               descriptionText={
-                <Typography.Text type="secondary">
+                <p className="text-scale-1000">
                   Only lowercase letters, numbers, dots, and hyphens
-                </Typography.Text>
+                </p>
               }
               layout="vertical"
               error={error}
@@ -87,7 +87,7 @@ const CreateBucketModal: FC<Props> = ({
             />
           </div>
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <div className="space-y-4">
             <Toggle

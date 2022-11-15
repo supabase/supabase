@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Button, Modal, Menu, IconExternalLink, IconTrash } from '@supabase/ui'
+import { Button, Modal, Menu, IconExternalLink, IconTrash } from 'ui'
 
 import { RowItem } from './RowItem'
 import { FilterHeader } from './FilterHeader'
@@ -146,7 +146,7 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
             onChange={onFilterChange}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <div className="foreign-table-modal__content-container">
             <div

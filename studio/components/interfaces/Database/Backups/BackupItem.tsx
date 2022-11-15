@@ -2,9 +2,10 @@ import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, IconDownload } from '@supabase/ui'
+import { Badge, Button, IconDownload } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -23,6 +24,10 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   const [isRestoring, setRestoring] = useState<boolean>(false)
 
   const projectId = ui.selectedProject?.id ?? -1
+  const canTriggerScheduledBackups = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_job.restore.prepare'
+  )
 
   async function restore(backup: any) {
     setRestoring(true)
@@ -90,14 +95,18 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
       return (
         <div className="flex space-x-4">
           {backup.data.canRestore && (
-            <Button type="default" disabled={isRestoring || isDownloading} onClick={onRestoreClick}>
+            <Button
+              type="default"
+              disabled={!canTriggerScheduledBackups || isRestoring || isDownloading}
+              onClick={onRestoreClick}
+            >
               Restore
             </Button>
           )}
 
           <Button
             type="default"
-            disabled={isRestoring || isDownloading}
+            disabled={!canTriggerScheduledBackups || isRestoring || isDownloading}
             onClick={() => download(backup)}
             loading={isDownloading}
             icon={<IconDownload />}
@@ -112,10 +121,10 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   return (
     <div
       className={`flex h-12 items-center justify-between px-6 ${
-        index ? 'dark:border-dark border-t' : ''
+        index ? 'border-t dark:border-dark' : ''
       }`}
     >
-      <p className="text-scale-1200 text-sm ">
+      <p className="text-sm text-scale-1200 ">
         {dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')}
       </p>
       <div className="">{generateSideButtons(backup)}</div>

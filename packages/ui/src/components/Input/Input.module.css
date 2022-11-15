@@ -1,0 +1,68 @@
+/* .sbui-input-container {
+  @apply relative;
+} */
+
+/* .sbui-input {
+  @apply block box-border pl-3 pr-3 py-2 w-full rounded-md shadow-sm text-sm border border-solid transition-all;
+  @apply bg-white text-input-value-light border-input-border-light;
+  @apply focus:ring-input-border-focus-light focus:border-input-border-focus-light focus:outline-none;
+
+  @apply dark:bg-transparent dark:text-input-value-dark dark:border-input-border-dark;
+  @apply dark:focus:border-input-border-focus-dark dark:focus:ring-input-border-focus-dark;
+
+  
+  font-family: inherit;
+  transition: box-shadow 0.3s ease-in-out;
+} */
+
+/* .sbui-input:focus {
+  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
+} */
+
+/* .sbui-input--error {
+  @apply border-red-500 dark:border-red-500;
+}
+
+.sbui-input--borderless {
+  @apply border-transparent shadow-none;
+}
+
+.sbui-input-actions-container {
+  @apply absolute inset-y-0 right-0 pl-3 pr-1 flex items-center;
+} */
+
+.sbui-textarea-actions-container {
+  @apply absolute inset-y-1 right-0 pl-3 pr-1 flex items-start;
+}
+
+.sbui-textarea-actions-container__items {
+  @apply flex items-center;
+}
+
+/*
+  Input sizes
+*/
+
+/* .sbui-input--tiny {
+  @apply px-2.5 py-1.5 text-xs;
+}
+.sbui-input--small {
+  @apply px-3 py-2 text-sm leading-4;
+}
+.sbui-input--medium {
+  @apply px-4 py-2 text-sm;
+}
+.sbui-input--large {
+  @apply px-4 py-2 text-base;
+}
+.sbui-input--xlarge {
+  @apply px-6 py-3 text-base;
+} */
+
+/*
+  Input icon
+*/
+
+/* .sbui-input--with-icon {
+  @apply pl-10;
+} */

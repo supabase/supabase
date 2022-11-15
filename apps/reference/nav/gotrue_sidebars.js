@@ -18,6 +18,7 @@ const sidebars = {
 
   sidebar: [
     'intro',
+    // 'usage', // Hide until the OpenAPI spec is updated to v3
     'config',
     'release-notes',
     // {

@@ -1,12 +1,10 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
-import { observer } from 'mobx-react-lite'
-import { IconClipboard, IconGlobe } from '@supabase/ui'
-import Table from 'components/to-be-cleaned/Table'
-
 import { useRouter } from 'next/router'
+import { observer } from 'mobx-react-lite'
+
 import { useStore } from 'hooks'
-// import _functionDropdown from './_functionDropdown'
+import Table from 'components/to-be-cleaned/Table'
 
 interface Props {
   function: any
@@ -18,6 +16,10 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
 
   const router = useRouter()
   const ref = ui?.selectedProject?.ref
+
+  // get the .co or .net TLD from the restUrl
+  const restUrl = ui.selectedProject?.restUrl
+  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   return (
     <Table.tr
@@ -32,12 +34,8 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
         </div>
       </Table.td>
       <Table.td className="">
-        {/* <span className="text-sm text-scale-1100 flex items-center gap-1">
-          <IconGlobe size={14} />
-          HTTP Request
-        </span> */}
         <div className="text-xs text-scale-900 flex gap-2 items-center truncate">
-          <span className="font-mono truncate hidden md:inline">{`https://${ref}.functions.supabase.co/${item.slug}`}</span>
+          <span className="font-mono truncate hidden md:inline">{`https://${ref}.functions.supabase.${restUrlTld}/${item.slug}`}</span>
           <span className="font-mono truncate md:hidden">{`/${item.name}`}</span>
         </div>
       </Table.td>

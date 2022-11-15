@@ -1,8 +1,7 @@
-import { SupabaseClient } from '@supabase/supabase-js'
-import { Button, Form, Input, InputNumber, Select } from '@supabase/ui'
+import { Button, Form, Input, InputNumber, Select } from 'ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
-import { PartnerContact } from '~/types/partners'
+import { SupabaseClient } from '~/lib/supabase'
 
 const INITIAL_VALUES = {
   type: 'expert',
@@ -41,24 +40,21 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
 
   const handleFormSubmit = async (values: any) => {
-    const { error } = await supabase.from<PartnerContact>('partner_contacts').insert(
-      [
-        {
-          type: values.type,
-          first: values.first,
-          last: values.last,
-          company: values.company,
-          size: Number(values.size),
-          title: values.title,
-          email: values.email,
-          website: values.email.split('@')[1],
-          phone: values.phone,
-          country: values.country,
-          details: values.details,
-        },
-      ],
-      { returning: 'minimal' }
-    )
+    const { error } = await supabase.from('partner_contacts').insert([
+      {
+        type: values.type,
+        first: values.first,
+        last: values.last,
+        company: values.company,
+        size: Number(values.size),
+        title: values.title,
+        email: values.email,
+        website: values.email.split('@')[1],
+        phone: values.phone,
+        country: values.country,
+        details: values.details,
+      },
+    ])
 
     // TODO: handle error
     console.log('error:', error)
@@ -172,8 +168,10 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                   name="country"
                   layout="vertical"
                 >
-                  {countries.map(({ code, name }) => (
-                    <Select.Option value={code}>{name}</Select.Option>
+                  {countries.map(({ code, name }: any, i: number) => (
+                    <Select.Option key={i} value={code}>
+                      {name}
+                    </Select.Option>
                   ))}
                 </Select>
               </div>
