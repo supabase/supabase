@@ -10,17 +10,17 @@ import TabItem from '@theme/TabItem'
 
 Supabase Storage makes it simple to store and serve large files.
 
-### Files
+## Files
 
 Files can be any sort of media file. This includes images, GIFs, and videos. It is best practice to store files outside of your database because of their sizes. For security, HTML files are returned as plain text.
 
-### Folders
+## Folders
 
 Folders are a way to organize your files (just like on your computer).
 There is no right or wrong way to
 organize your files. You can store them in whichever folder structure suits your project.
 
-### Buckets
+## Buckets
 
 Buckets are distinct containers for files and folders. You can think of them like "super folders".
 Generally you would create distinct buckets for different Security and Access Rules. For example, you might
@@ -93,9 +93,9 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 
 ```dart
 void main() async {
-  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+  final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  final storageResponse = await client
+  final storageResponse = await supabase
       .storage
       .createBucket('avatars');
 }
@@ -140,12 +140,12 @@ const { data, error } = await supabase.storage
 
 ```dart
 void main() async {
-  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+  final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Create file `example.txt` and upload it in `public` bucket
   final file = File('example.txt');
   file.writeAsStringSync('File content');
-  final storageResponse = await client
+  final storageResponse = await supabase
       .storage
       .from('public')
       .upload('example.txt', file);
@@ -190,9 +190,9 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 
 ```dart
 void main() async {
-  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+  final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  final storageResponse = await client
+  final storageResponse = await supabase
       .storage
       .from('public')
       .download('example.txt');

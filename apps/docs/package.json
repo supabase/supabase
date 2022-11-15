@@ -7,7 +7,8 @@
     "build": "npm run generate:all && next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "node ./scripts/build-search.js",
+    "build:sitemap": "node ./internals/generate-sitemap.mjs",
+    "postbuild": "node ./scripts/build-search.js && node ./internals/generate-sitemap.mjs",
     "generate:all": "npm-run-all --parallel gen:api gen:cli gen:gotrue gen:storage gen:supabase-dart:v0 gen:supabase-dart:v1 gen:supabase-js:v1 gen:supabase-js:v2",
     "gen:api": "npm-run-all gen:api:usage",
     "gen:api:usage": "ts-node ./generator/index.ts gen --type api --url https://api.supabase.com --input ../../spec/transforms/api_v0_openapi_deparsed.json --output  ./docs/reference/api/generated/usage.mdx",
@@ -81,6 +82,8 @@
     "sass": "^1.55.0",
     "ts-node": "^10.9.1",
     "tsconfig": "*",
-    "typescript": "^4.5.3"
+    "typescript": "^4.5.3",
+    "globby": "^12.0.2",
+    "prettier": "^2.2.1"
   }
 }
