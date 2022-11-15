@@ -1,6 +1,5 @@
 import { MDXProvider } from '@mdx-js/react'
-
-import { useEffect, FC } from 'react'
+import { useEffect, FC, useRef, useState } from 'react'
 import Head from 'next/head'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
@@ -18,7 +17,7 @@ interface Props {
   currentPage: string
 }
 
-const Layout: FC<Props> = ({ meta, children, toc, currentPage }) => {
+const Layout: FC<Props> = ({ meta, children, toc: pageToc, currentPage }) => {
   const { asPath } = useRouter()
   const page = getPageType(asPath)
 
@@ -32,9 +31,27 @@ const Layout: FC<Props> = ({ meta, children, toc, currentPage }) => {
     }
   }, [])
 
-  const hasTableOfContents =
-    toc !== undefined && toc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
-  console.log({ children })
+  const articleRef = useRef()
+  const [headingsArr, setHeadingsArr] = useState([])
+
+  useEffect(() => {
+    const articleEl = articleRef.current as HTMLElement
+
+    if (!articleRef.current) return
+    const headings = Array.from(articleEl.querySelectorAll('h2, h3, h4'))
+    setHeadingsArr(headings)
+    console.log(headings)
+  }, [])
+
+  function generateTocItem(item) {
+    const id = item.id
+    console.log(id)
+  }
+
+  const hasTableOfContents = true
+  // pageToc !== undefined &&
+  // pageToc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
+
   return (
     <>
       <Head>
@@ -61,6 +78,7 @@ const Layout: FC<Props> = ({ meta, children, toc, currentPage }) => {
               } py-2 lg:py-4 px-2 lg:px-8 mx-auto`}
             >
               <article
+                ref={articleRef}
                 className={`${
                   meta?.hide_table_of_contents || !hasTableOfContents ? 'xl:min-w-[880px]' : ''
                 } doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[880px]`}
@@ -75,7 +93,9 @@ const Layout: FC<Props> = ({ meta, children, toc, currentPage }) => {
                   'thin-scrollbar overflow-y-auto sticky hidden xl:block md:col-span-3 px-2',
                 ].join(' ')}
               >
-                <TableOfContents toc={toc} />
+                {headingsArr.length > 0 && headingsArr.map((item) => generateTocItem(item))}
+
+                {/* <TableOfContents toc={pageToc} /> */}
               </div>
             )}
           </div>
