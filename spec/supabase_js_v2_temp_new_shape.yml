@@ -857,6 +857,56 @@ functions:
         hideCodeBlock: true
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
+        code: |
+          const { data, error } = await supabase
+             .from('messages')
+             .select(`
+               content,
+               from:sender_id(name),
+               to:receiver_id(name)
+             `)
+        data:
+          sql: |
+            ```sql
+             create table
+             users (id int8 primary key, name text);
+
+             create table
+               messages (
+                 sender_id int8 not null references users,
+                 receiver_id int8 not null references users,
+                 content text
+               );
+
+             insert into
+               users (id, name)
+             values
+               (1, 'Kiran'),
+               (2, 'Evan');
+
+             insert into
+               messages (sender_id, receiver_id, content)
+             values
+               (1, 2, '👋');
+             ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "content": "👋",
+                "from": {
+                  "name": "Kiran"
+                },
+                "to": {
+                  "name": "Evan"
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           If you need to query the same foreign table twice, use the name of the
           joined column to identify which join to use. You can also give each
