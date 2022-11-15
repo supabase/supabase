@@ -1,19 +1,7 @@
 import { FC, useEffect, useContext, createContext, FormEvent, useState } from 'react'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import {
-  Button,
-  Input,
-  Select,
-  SidePanel,
-  Typography,
-  IconTrash,
-  Divider,
-  Radio,
-  IconPlus,
-  Toggle,
-  Modal,
-} from '@supabase/ui'
+import { Button, Input, Select, SidePanel, IconTrash, Radio, IconPlus, Toggle, Modal } from 'ui'
 import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
 
@@ -370,12 +358,12 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
         visible={visible}
         onCancel={isClosingSidePanel}
         header={_localState.title}
-        className="hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0"
+        className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
         loading={_localState.loading}
         onConfirm={handleSubmit}
       >
         <CreateFunctionContext.Provider value={_localState}>
-          <div className="space-y-10 mt-4">
+          <div className="mt-4 space-y-10">
             {_localState.isEditing ? (
               <>
                 <SidePanel.Content>
@@ -384,11 +372,11 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                     <SelectSchema />
                   </div>
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputMultiArguments readonly={true} />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputDefinition />
                 </SidePanel.Content>
@@ -398,25 +386,25 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                 <SidePanel.Content>
                   <InputName />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <div className="space-y-4">
                     <SelectSchema />
                     <SelectReturnType />
                   </div>
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputMultiArguments />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <InputDefinition />
                 </SidePanel.Content>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 py-4 bg-bg-alt-light dark:bg-bg-alt-dark rounded`}>
+                    <div className={`space-y-8 rounded bg-bg-alt-light py-4 dark:bg-bg-alt-dark`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}
@@ -437,11 +425,11 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                         <SelectBehavior />
                       </div>
                     </SidePanel.Content>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <SidePanel.Content>
                       <InputMultiConfigParams />
                     </SidePanel.Content>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <SidePanel.Content>
                       <RadioSecurity />
                     </SidePanel.Content>
@@ -462,7 +450,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
           }}
           children={
             <Modal.Content>
-              <p className="text-scale-1100 py-4 text-sm">
+              <p className="py-4 text-sm text-scale-1100">
                 There are unsaved changes. Are you sure you want to close the panel? Your changes
                 will be lost.
               </p>
@@ -521,7 +509,7 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
-      <div className="pt-4 space-y-2">
+      <div className="space-y-2 pt-4">
         {readonly && isEmpty(_localState!.formState.args.value) && (
           <span className="text-scale-900">No argument for this function</span>
         )}
@@ -642,10 +630,10 @@ const InputMultiConfigParams: FC = observer(({}) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h5 className="text-base text-scale-1200">Config Params</h5>
       </div>
-      <div className="pt-4 space-y-2">
+      <div className="space-y-2 pt-4">
         {_localState!.formState.configParams.value.map(
           (
             x: { name: string; value: string; error?: { name?: string; value?: string } },

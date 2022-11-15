@@ -1,13 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import {
-  Button,
-  Loading,
-  Typography,
-  IconFileText,
-  IconDownload,
-  IconChevronLeft,
-  IconChevronRight,
-} from '@supabase/ui'
+import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
@@ -85,7 +77,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
   }
 
   return (
-    <div className="my-4 container max-w-4xl space-y-1">
+    <div className="container my-4 max-w-4xl space-y-1">
       <Loading active={loading}>
         <Table
           head={[
@@ -99,9 +91,9 @@ const Invoices: FC<Props> = ({ projectRef }) => {
             invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={5} className="p-3 py-12 text-center">
-                  <Typography.Text type="secondary">
+                  <p className="text-scale-1000">
                     {loading ? 'Checking for invoices' : 'No invoices for this project yet'}
-                  </Typography.Text>
+                  </p>
                 </Table.td>
               </Table.tr>
             ) : (
@@ -113,22 +105,20 @@ const Invoices: FC<Props> = ({ projectRef }) => {
                         <IconFileText size="xxl" />
                       </Table.td>
                       <Table.td>
-                        <Typography.Text>
-                          {new Date(x.period_end * 1000).toLocaleString()}
-                        </Typography.Text>
+                        <p>{new Date(x.period_end * 1000).toLocaleString()}</p>
                       </Table.td>
                       <Table.td>
-                        <Typography.Text>
+                        <p>
                           {x.subtotal >= 0
                             ? `$${x.subtotal / 100}`
                             : `-$${Math.abs(x.subtotal / 100)}`}
-                        </Typography.Text>
+                        </p>
                       </Table.td>
                       <Table.td>
-                        <Typography.Text>{x.number}</Typography.Text>
+                        <p>{x.number}</p>
                       </Table.td>
                       <Table.td className="align-right">
-                        <div className="flex items-center space-x-2 justify-end">
+                        <div className="flex items-center justify-end space-x-2">
                           <Button
                             type="outline"
                             icon={<IconDownload />}

@@ -27,7 +27,11 @@ export function withAuth<T>(
     const returning =
       app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
     const { profile, isLoading } = useProfile(returning)
-    const { permissions, isLoading: isPermissionLoading } = usePermissions(returning)
+    const {
+      permissions,
+      isLoading: isPermissionLoading,
+      mutate: mutatePermissions,
+    } = usePermissions(profile, returning)
 
     const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
     const isRedirecting =
@@ -42,12 +46,9 @@ export function withAuth<T>(
         } else if (returning !== 'minimal') {
           ui.setProfile(profile)
 
-          if (!app.organizations.isInitialized) {
-            app.organizations.load()
-          }
-          if (!app.projects.isInitialized) {
-            app.projects.load()
-          }
+          if (!app.organizations.isInitialized) app.organizations.load()
+          if (!app.projects.isInitialized) app.projects.load()
+          mutatePermissions()
         }
       }
 
@@ -63,7 +64,9 @@ export function withAuth<T>(
 
     useEffect(() => {
       if (!isLoading && router.isReady) {
-        rootStore.setProjectRef(ref ? String(ref) : undefined)
+        if (ref) {
+          rootStore.setProjectRef(Array.isArray(ref) ? ref[0] : ref)
+        }
         rootStore.setOrganizationSlug(slug ? String(slug) : undefined)
       }
     }, [isLoading, router.isReady, ref, slug])

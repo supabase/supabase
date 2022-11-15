@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Form, Modal, Input } from '@supabase/ui'
+import { Button, Form, Modal, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -27,7 +27,7 @@ const DeleteOrganizationButton = observer(() => {
       errors.orgName = 'Enter the name of the organization.'
     }
     if (values.orgName !== orgSlug) {
-      errors.orgName = 'Value entered does not match name of the organization.'
+      errors.orgName = 'Value entered does not match the value above.'
     }
     return errors
   }
@@ -74,8 +74,8 @@ const DeleteOrganizationButton = observer(() => {
         onCancel={() => setIsOpen(false)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-scale-1200 text-sm">Delete organisation</h5>
-            <span className="text-scale-900 text-xs">Are you sure?</span>
+            <h5 className="text-sm text-scale-1200">Delete organisation</h5>
+            <span className="text-xs text-scale-900">Are you sure?</span>
           </div>
         }
       >
@@ -88,13 +88,13 @@ const DeleteOrganizationButton = observer(() => {
           {({ isSubmitting }: { isSubmitting: boolean }) => (
             <div className="space-y-4 py-3">
               <Modal.Content>
-                <p className="text-scale-900 text-sm">
+                <p className="text-sm text-scale-900">
                   This action <span className="text-scale-1200">cannot</span> be undone. This will
                   permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
                   organization and remove all of its projects.
                 </p>
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Input
                   id="orgName"
@@ -105,11 +105,11 @@ const DeleteOrganizationButton = observer(() => {
                   }
                   onChange={(e) => setValue(e.target.value)}
                   value={value}
-                  placeholder="Type in the orgnaization name"
+                  placeholder="Enter the string above"
                   className="w-full"
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Button
                   block

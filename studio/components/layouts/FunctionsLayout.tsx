@@ -1,24 +1,40 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
+import { FC, useEffect, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconCode } from '@supabase/ui'
+import { IconCode } from 'ui'
 
-import { useStore, withAuth } from 'hooks'
+import { checkPermissions, useStore, withAuth } from 'hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import BaseLayout from 'components/layouts'
+import NoPermission from 'components/ui/NoPermission'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
+interface Props {
+  title?: string
+  children?: ReactNode
+}
+
+const FunctionsLayout: FC<Props> = ({ title, children }) => {
   const { functions, ui } = useStore()
   const router = useRouter()
 
   const { id, ref } = router.query
 
   useEffect(() => {
-    if (ui.selectedProjectRef) {
-      functions.load()
-    }
+    if (ui.selectedProjectRef) functions.load()
   }, [ui.selectedProjectRef])
+
+  const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
+  if (!canReadFunctions) {
+    return (
+      <BaseLayout title={title || 'Edge Functions'} product="Edge Functions">
+        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+          <NoPermission isFullPage resourceText="access your project's edge functions" />
+        </main>
+      </BaseLayout>
+    )
+  }
 
   const item = id ? functions.byId(id) : null
   const name = item?.name || ''
@@ -27,30 +43,34 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const centered = !hasFunctions
 
   return (
-    <BaseLayout isLoading={!functions.isLoaded}>
+    <BaseLayout
+      isLoading={!functions.isLoaded}
+      title={title || 'Edge Functions'}
+      product="Edge Functions"
+    >
       {centered ? (
         <>
           <div className="mx-auto max-w-5xl py-24 px-5">
             <div
-              className="flex 
-            flex-col 
-            gap-y-4
-            xl:flex-row 
-            item-center 
-            justify-between"
+              className="item-center 
+            flex 
+            flex-col
+            justify-between 
+            gap-y-4 
+            xl:flex-row"
             >
               <div className="flex items-center gap-3">
                 <div
                   className={[
-                    'w-6 h-6 bg-brand-300 border border-brand-600 rounded',
-                    'text-brand-900 flex items-center justify-center',
+                    'h-6 w-6 rounded border border-brand-600 bg-brand-300',
+                    'flex items-center justify-center text-brand-900',
                   ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
                 </div>
                 <div className="flex items-center space-x-4">
                   <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
-                  <p className="text-scale-1000 mt-1">Beta</p>
+                  <p className="mt-1 text-scale-1000">Beta</p>
                 </div>
               </div>
             </div>
@@ -59,19 +79,19 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
           </div>
         </>
       ) : (
-        <div className="h-full flex flex-col flex-grow py-6">
+        <div className="flex h-full flex-grow flex-col py-6">
           <div
             className={[
-              'w-full mx-auto transition-all flex flex-col',
-              'px-5 lg:px-16 xl:px-24 1xl:px-28 2xl:px-32 gap-4',
+              'mx-auto flex w-full flex-col transition-all',
+              '1xl:px-28 gap-4 px-5 lg:px-16 xl:px-24 2xl:px-32',
             ].join(' ')}
           >
-            <div className="flex flex-col gap-y-4 xl:flex-row item-center justify-between">
+            <div className="item-center flex flex-col justify-between gap-y-4 xl:flex-row">
               <div className="flex items-center gap-3">
                 <div
                   className={[
-                    'w-6 h-6 bg-brand-300 border border-brand-600 rounded',
-                    'text-brand-900 flex items-center justify-center',
+                    'h-6 w-6 rounded border border-brand-600 bg-brand-300',
+                    'flex items-center justify-center text-brand-900',
                   ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
@@ -79,11 +99,11 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
 
                 <div className="flex items-center space-x-4">
                   <Link href={`/project/${ref}/functions`}>
-                    <h1 className="transition-colors text-2xl text-scale-1200 cursor-pointer hover:text-scale-1100">
+                    <h1 className="cursor-pointer text-2xl text-scale-1200 transition-colors hover:text-scale-1100">
                       Edge Functions
                     </h1>
                   </Link>
-                  <p className="text-scale-1000 mt-1">Beta</p>
+                  <p className="mt-1 text-scale-1000">Beta</p>
                 </div>
 
                 {name && (
@@ -112,8 +132,8 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
           </div>
           <div
             className={[
-              'h-full flex flex-col flex-grow w-full mx-auto transition-all',
-              'px-5 lg:px-16 xl:px-24 1xl:px-28 2xl:px-32 gap-4',
+              'mx-auto flex h-full w-full flex-grow flex-col transition-all',
+              '1xl:px-28 gap-4 px-5 lg:px-16 xl:px-24 2xl:px-32',
             ].join(' ')}
           >
             {children}

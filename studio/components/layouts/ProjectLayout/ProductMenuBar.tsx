@@ -1,5 +1,4 @@
 import { FC, ReactNode } from 'react'
-import { Typography } from '@supabase/ui'
 import { useFlag } from 'hooks'
 
 interface Props {
@@ -24,7 +23,7 @@ const ProductMenuBar: FC<Props> = ({ title, children }) => {
         className="dark:border-dark flex max-h-12 items-center border-b px-6"
         style={{ minHeight: '3rem' }}
       >
-        <Typography.Title level={4}>{title}</Typography.Title>
+        <h4 className="text-lg">{title}</h4>
       </div>
       <div className="flex-grow overflow-y-auto">{children}</div>
     </div>

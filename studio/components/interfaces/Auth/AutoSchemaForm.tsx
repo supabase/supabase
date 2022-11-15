@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from '@supabase/ui'
+import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'ui'
 
 import { useStore, checkPermissions } from 'hooks'
 import {
@@ -87,7 +87,7 @@ const AutoSchemaForm = observer(() => {
         return (
           <>
             <FormHeader
-              title="General settings"
+              title="Auth settings"
               description="Configure authentication sessions for your users"
             />
             <FormPanel
@@ -126,19 +126,12 @@ const AutoSchemaForm = observer(() => {
                 <FormSectionContent loading={!isLoaded}>
                   {/* Permitted redirects for anything on that domain */}
                   {/* Check with @kangming about this */}
-                  <Input
-                    id="SITE_URL"
-                    size="small"
-                    label="Site URL"
-                    descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
-                    disabled={!canUpdateConfig}
-                  />
                   <InputNumber
                     id="JWT_EXP"
                     size="small"
                     label="JWT expiry limit"
                     descriptionText="How long tokens are valid for. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
-                    actions={<span className="text-scale-900 mr-3">seconds</span>}
+                    actions={<span className="mr-3 text-scale-900">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
@@ -184,7 +177,7 @@ const AutoSchemaForm = observer(() => {
                       min={0}
                       label="Reuse Interval"
                       descriptionText="Time interval where the same refresh token can be used to request for an access token."
-                      actions={<span className="text-scale-900 mr-3">seconds</span>}
+                      actions={<span className="mr-3 text-scale-900">seconds</span>}
                       disabled={!canUpdateConfig}
                     />
                   )}

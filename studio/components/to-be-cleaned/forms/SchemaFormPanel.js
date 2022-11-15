@@ -1,6 +1,6 @@
 import SchemaForm from './SchemaForm'
 import React, { useState } from 'react'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from 'ui'
 
 export default function SchemaFormPanel({
   schema,
@@ -12,6 +12,7 @@ export default function SchemaFormPanel({
   onSubmit,
   submitLabel = 'Save',
   cancelLabel = 'Cancel',
+  message = '',
 }) {
   let formRef
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false)
@@ -39,17 +40,17 @@ export default function SchemaFormPanel({
     <section className="section-block mb-8">
       <div
         className="
-          px-6 h-12
-          bg-panel-header-light dark:bg-panel-header-dark
-          border-b border-panel-border-light dark:border-panel-border-dark
-          flex overflow-hidden items-center"
+          flex h-12
+          items-center overflow-hidden
+          border-b border-panel-border-light bg-panel-header-light
+          px-6 dark:border-panel-border-dark dark:bg-panel-header-dark"
       >
         <div className="flex-1 text-left">
-          <Typography.Title level={6}>{title || ''}</Typography.Title>
+          <h6>{title || ''}</h6>
         </div>
         <div
           className={`flex transition duration-150 ${
-            hasChanged ? 'opacity-100' : 'opacity-0 cursor-default'
+            hasChanged ? 'opacity-100' : 'cursor-default opacity-0'
           }`}
         >
           <Button onClick={onClickCancel} type="default" disabled={!hasChanged}>
@@ -65,6 +66,7 @@ export default function SchemaFormPanel({
             {submitLabel || 'Save'}
           </Button>
         </div>
+        <span className="text-sm text-scale-900">{message}</span>
       </div>
 
       <div className="Form section-block--body px-6 py-3">

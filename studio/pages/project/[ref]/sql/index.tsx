@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useMonaco } from '@monaco-editor/react'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
@@ -15,7 +15,6 @@ const SqlEditor: NextPageWithLayout = () => {
   const { isDarkTheme } = ui
   const sqlEditorStore: any = useSqlStore()
   const monaco = useMonaco()
-  const [theme, setTheme] = useState(localStorage.getItem('theme'))
 
   useEffect(() => {
     if (monaco) {

@@ -1,7 +1,6 @@
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'

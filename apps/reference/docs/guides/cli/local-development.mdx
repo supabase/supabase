@@ -107,6 +107,10 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 </TabItem>
 </Tabs>
 
+:::note
+To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
+:::
+
 ## Database migrations
 
 Database changes are managed through "migrations." Database migrations are a common way of tracking changes to your database over time.

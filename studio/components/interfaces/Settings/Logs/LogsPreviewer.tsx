@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Typography, IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
+import { IconRewind, Button } from 'ui'
 
 import {
   LogTable,
@@ -12,6 +12,7 @@ import {
   LogEventChart,
   Filters,
   ensureNoTimestampConflict,
+  maybeShowUpgradePrompt,
 } from 'components/interfaces/Settings/Logs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
@@ -19,6 +20,9 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 import { LOGS_TABLES } from './Logs.constants'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
+import { useProjectSubscription } from 'hooks'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { StripeProduct } from 'components/interfaces/Billing'
 import UpgradePrompt from './UpgradePrompt'
 
 /**
@@ -46,8 +50,10 @@ export const LogsPreviewer: React.FC<Props> = ({
   tableName,
 }) => {
   const router = useRouter()
-  const { s, ite, its } = router.query
+  const { s, ite, its, ref } = router.query
   const [showChart, setShowChart] = useState(true)
+  const { subscription } = useProjectSubscription(ref as string)
+  const tier = subscription?.tier
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
@@ -55,6 +61,10 @@ export const LogsPreviewer: React.FC<Props> = ({
     { error, logData, params, newCount, filters, isLoading, eventChartData },
     { loadOlder, setFilters, refresh, setParams },
   ] = useLogsPreview(projectRef as string, table, filterOverride)
+
+  const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
+    params.iso_timestamp_start as string
+  )
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, search_query: s as string }))
@@ -66,6 +76,16 @@ export const LogsPreviewer: React.FC<Props> = ({
       }))
     }
   }, [s, ite, its])
+
+  // Show the prompt on page load based on query params
+  useEffect(() => {
+    if (its) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier?.key)
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      }
+    }
+  }, [its, tier])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -109,24 +129,30 @@ export const LogsPreviewer: React.FC<Props> = ({
         },
       })
     } else if (event === 'datepicker-change') {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: from || '',
-        iso_timestamp_end: to || '',
-      }))
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          its: from || '',
-          ite: to || '',
-        },
-      })
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
+
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      } else {
+        setParams((prev) => ({
+          ...prev,
+          iso_timestamp_start: from || '',
+          iso_timestamp_end: to || '',
+        }))
+        router.push({
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            its: from || '',
+            ite: to || '',
+          },
+        })
+      }
     }
   }
 
   return (
-    <div className="h-full flex flex-col flex-grow">
+    <div className="flex h-full flex-grow flex-col">
       <PreviewFilterPanel
         csvData={logData}
         isLoading={isLoading}
@@ -141,7 +167,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         defaultFromValue={params.iso_timestamp_start}
         onExploreClick={() => {
           router.push(
-            `/project/${projectRef}/logs-explorer?q=${encodeURIComponent(
+            `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
               params.sql || ''
             )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
               params.iso_timestamp_end || ''
@@ -160,8 +186,8 @@ export const LogsPreviewer: React.FC<Props> = ({
         className={
           'transition-all duration-500 ' +
           (showChart && !isLoading && logData.length > 0
-            ? 'opacity-100 h-24 pt-4 mb-4'
-            : 'opacity-0 h-0')
+            ? 'mb-4 h-24 pt-4 opacity-100'
+            : 'h-0 opacity-0')
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
@@ -179,7 +205,7 @@ export const LogsPreviewer: React.FC<Props> = ({
           )}
         </div>
       </div>
-      <div className="flex flex-col flex-grow relative pt-4">
+      <div className="relative flex flex-grow flex-col pt-4">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
@@ -190,32 +216,17 @@ export const LogsPreviewer: React.FC<Props> = ({
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
             params={params}
+            error={error}
           />
         </LoadingOpacity>
         {!error && (
-          <div className="p-2 flex flex-row justify-between">
+          <div className="flex flex-row justify-between p-2">
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
               Load older
             </Button>
-            <UpgradePrompt projectRef={projectRef} from={params.iso_timestamp_start || ''} />
-          </div>
-        )}
-        {error && (
-          <div className="flex w-full h-full justify-center items-center mx-auto">
-            <Card className="flex flex-col gap-y-2  w-2/5 bg-scale-400">
-              <div className="flex flex-row gap-x-2 py-2">
-                <IconAlertCircle size={16} />
-                <Typography.Text type="secondary">
-                  Sorry! An error occured when fetching data.
-                </Typography.Text>
-              </div>
-              <Input.TextArea
-                label="Error Messages"
-                value={JSON.stringify(error, null, 2)}
-                borderless
-                className=" border-t-2 border-scale-800 pt-2 font-mono"
-              />
-            </Card>
+            <div className="mt-2 flex flex-row justify-end">
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+            </div>
           </div>
         )}
       </div>

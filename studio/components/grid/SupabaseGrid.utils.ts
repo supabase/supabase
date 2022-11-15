@@ -67,22 +67,32 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
   ) as Filter[]
 }
 
-export function initTable(
+export async function initTable(
   props: SupabaseGridProps,
   state: InitialStateType,
   dispatch: (value: any) => void,
   sort?: string[], // Come directly from URL param
   filter?: string[] // Come directly from URL param
-): { savedState: { sorts?: string[]; filters?: string[] } } {
+): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
   function onInitTable(table: SupaTable, props: SupabaseGridProps) {
     const savedState = props.storageRef
       ? onLoadStorage(props.storageRef, table.name, table.schema)
       : undefined
 
-    // Load sort and filters via URL param only if given
+    // Check for saved state on initial load and also, load sort and filters via URL param only if given
     // Otherwise load from local storage to resume user session
-    if (sort === undefined && filter === undefined && (savedState?.sorts || savedState?.filters)) {
-      return { savedState: { sorts: savedState.sorts, filters: savedState.filters } }
+    if (
+      !state.isInitialComplete &&
+      sort === undefined &&
+      filter === undefined &&
+      (savedState?.sorts || savedState?.filters)
+    ) {
+      return {
+        savedState: {
+          sorts: savedState.sorts,
+          filters: savedState.filters,
+        },
+      }
     }
 
     const gridColumns = getGridColumns(table, {
@@ -108,19 +118,15 @@ export function initTable(
   }
 
   if (typeof props.table === 'string') {
-    const fetchMethod = props.editable
-      ? fetchEditableInfo(state.metaService!, props.table, props.schema)
-      : fetchReadOnlyInfo(state.metaService!, props.table, props.schema)
+    const viewData = props.editable
+      ? await fetchEditableInfo(state.metaService!, props.table, props.schema)
+      : await fetchReadOnlyInfo(state.metaService!, props.table, props.schema)
 
-    fetchMethod.then((res) => {
-      if (res) {
-        return onInitTable(res, props)
-      } else {
-        if (props.onError) {
-          props.onError({ message: 'fetch table info failed' })
-        }
-      }
-    })
+    if (viewData) {
+      return onInitTable(viewData, props)
+    } else {
+      if (props.onError) props.onError({ message: 'Failed to fetch data from view' })
+    }
   } else {
     return onInitTable(props.table, props)
   }

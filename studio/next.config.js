@@ -4,6 +4,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
+// this is required to use shared packages in the packages directory
+const withTM = require('next-transpile-modules')(['ui', 'common'])
+
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
@@ -30,6 +33,51 @@ const nextConfig = {
       {
         source: '/project/:ref/settings',
         destination: '/project/:ref/settings/general',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/auth/settings',
+        destination: '/project/:ref/auth/users',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/postgres-logs',
+        destination: '/project/:ref/logs/postgres-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/postgrest-logs',
+        destination: '/project/:ref/logs/postgrest-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/pgbouncer-logs',
+        destination: '/project/:ref/logs/pgbouncer-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/realtime-logs',
+        destination: '/project/:ref/logs/realtime-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/logs',
+        destination: '/project/:ref/logs/storage-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/auth/logs',
+        destination: '/project/:ref/logs/auth-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/logs-explorer',
+        destination: '/project/:ref/logs/explorer',
         permanent: true,
       },
     ]
@@ -65,7 +113,9 @@ const nextConfig = {
 }
 
 // Export all config
-const moduleExports = withPlugins([[withBundleAnalyzer({})]], nextConfig)
+const plugins = [[withBundleAnalyzer({})], withTM()]
+
+const moduleExports = withPlugins(plugins, nextConfig)
 
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
@@ -85,4 +135,4 @@ const sentryWebpackPluginOptions = {
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-    : nextConfig
+    : withPlugins([withTM()], nextConfig)

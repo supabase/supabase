@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, SidePanel } from '@supabase/ui'
+import { SidePanel } from 'ui'
 
 import { CreateHookContext } from '../'
 import SelectServiceMethod from './SelectServiceMethod'
@@ -15,19 +15,18 @@ const ServiceConfigForm: FC = observer(({}) => {
     <>
       {_localState.formState.hookService.value === 'http_request' ? (
         <>
-          <SidePanel.Seperator />
+          <SidePanel.Separator />
           <div className="space-y-10">
             <div className="space-y-6 px-6">
-              <Typography.Title level={5}>HTTP Request</Typography.Title>
+              <h5>HTTP Request</h5>
               <SelectServiceMethod />
               <InputServiceUrl />
-              {/* <InputServiceTimeout /> */}
             </div>
-            <SidePanel.Seperator />
+            <SidePanel.Separator />
             <div className="px-6">
               <InputMultiServiceHeaders />
             </div>
-            <SidePanel.Seperator />
+            <SidePanel.Separator />
             <div className="px-6">
               <InputMultiServiceParams />
             </div>

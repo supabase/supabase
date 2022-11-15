@@ -1,6 +1,6 @@
 import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
-import { Project, Notification, User, Organization, ProjectBase } from 'types'
+import { Project, Notification, User, Organization, ProjectBase, Permission } from 'types'
 import { IRootStore } from './RootStore'
 import Telemetry from 'lib/telemetry'
 
@@ -16,7 +16,7 @@ export interface IUiStore {
   selectedOrganization?: Organization
   notification?: Notification
   profile?: User
-  permissions?: any // [Joshen TODO]: type this
+  permissions?: Permission[]
 
   load: () => void
   setTheme: (theme: 'dark' | 'light') => void
@@ -25,7 +25,7 @@ export interface IUiStore {
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
   setProfile: (value?: User) => void
-  setPermissions: (permissions?: any) => void // [Joshen TODO]: type this
+  setPermissions: (permissions?: Permission[]) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -37,7 +37,7 @@ export default class UiStore implements IUiStore {
   selectedOrganizationSlug?: string
   notification?: Notification
   profile?: User
-  permissions?: any = [] // [Joshen TODO]: define this
+  permissions?: Permission[] = []
 
   constructor(rootStore: IRootStore) {
     this.rootStore = rootStore
@@ -57,7 +57,7 @@ export default class UiStore implements IUiStore {
   get selectedProject() {
     if (this.selectedProjectRef) {
       const found = this.rootStore.app.projects.find(
-        (x: Project) => x.ref == this.selectedProjectRef
+        (x: Project) => x.ref === this.selectedProjectRef
       )
       return !!found?.connectionString ? found : undefined
     }

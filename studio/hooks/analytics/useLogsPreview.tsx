@@ -14,7 +14,7 @@ import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
 import { API_URL } from 'lib/constants'
@@ -47,18 +47,21 @@ function useLogsPreview(
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
   const [filters, setFilters] = useState<Filters>({ ...filterOverride })
+  const isFirstRender = useRef<boolean>(true)
 
   const [params, setParams] = useState<LogsEndpointParams>({
     project: projectRef,
-    sql: '',
+    sql: genDefaultQuery(table, filters),
     iso_timestamp_start: defaultHelper.calcFrom(),
     iso_timestamp_end: defaultHelper.calcTo(),
   })
 
   useEffect(() => {
-    if (filters !== {}) {
-      refresh()
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
     }
+    refresh()
   }, [JSON.stringify(filters)])
 
   // handle url generation for log pagination
@@ -175,7 +178,7 @@ function useLogsPreview(
         return { ...resolved, ...filterOverride }
       })
     } else {
-      setFilters((prev) => ({ ...prev, ...newFilters, ...filterOverride }))
+      setFilters({ ...newFilters, ...filterOverride })
     }
   }
   return [

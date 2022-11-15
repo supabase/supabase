@@ -22,6 +22,9 @@ export interface IPostgresMetaInterface<T> {
   find: (filter?: any) => T | undefined
   byId: (id: number | string) => T | undefined
   initialDataArray: (value: T[]) => void
+
+  setUrl: (url: string) => void
+  setHeaders: (headers: { [prop: string]: any }) => void
 }
 
 // [TODO] Need to refactor the logic for 'isInitialized'
@@ -161,8 +164,8 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       if (response.error) throw response.error
 
       const data = response as T
-      const indentity = response[this.identifier]
-      this.data[indentity] = data
+      const identity = response[this.identifier]
+      this.data[identity] = data
       return data
     } catch (error: any) {
       return { data: null, error }
@@ -196,5 +199,18 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     } catch (error: any) {
       return { error }
     }
+  }
+
+  setUrl(url: string) {
+    this.url = url
+
+    // if the url changes, we need to reset the state
+    this.state = this.STATES.INITIAL
+    this.data = {}
+    this.error = null
+  }
+
+  setHeaders(headers: { [prop: string]: any }) {
+    this.headers = headers
   }
 }
