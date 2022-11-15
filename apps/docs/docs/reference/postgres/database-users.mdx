@@ -1,4 +1,6 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: database-users
 title: "Database Users"
 slug: database-users
@@ -10,30 +12,9 @@ import TabsPanel from '@theme/TabsPanel';
 
 Users and Roles are almost interchangeable.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Create New User
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -46,7 +27,6 @@ Users and Roles are almost interchangeable.
 create user new_user
 with password 'hello';
 ```
-
 
 </TabsPanel>
 

@@ -1,4 +1,6 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: connecting-to-postgres
 title: 'Database Connections'
 description: There are various ways to connect to your Postgres database.
@@ -121,7 +123,7 @@ SSL enabled as illustrated below:
 psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-ca-2021.cer host=db.abcdefghijklm.supabase.co dbname=postgres user=postgres"
 ```
 
-2. With `pgAdmin`  
+2. With `pgAdmin`
    a. Register a new Postgres server
    ![Register a new postgres server.](/docs/img/guides/database/register-server-pgAdmin.png)
 

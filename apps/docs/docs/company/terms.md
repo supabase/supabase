@@ -1,6 +1,9 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: terms
 title: Terms of Service
+
 ---
 
 `Last Modified: 20 November 2020`

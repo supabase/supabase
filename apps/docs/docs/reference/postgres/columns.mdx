@@ -1,4 +1,6 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: columns
 title: "Columns"
 slug: columns
@@ -10,7 +12,6 @@ import TabsPanel from '@theme/TabsPanel';
 
 Creating columns.
 
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
@@ -25,33 +26,14 @@ create table table_name (
   name text
 );
 ```
-
 
 </TabsPanel>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### During table creation
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -67,15 +49,12 @@ create table table_name (
   name text
 );
 ```
-
 
 </TabsPanel>
 
 </Tabs>
 
 ### Create column
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -88,7 +67,6 @@ create table table_name (
 alter table new_table
 add new_column text;
 ```
-
 
 </TabsPanel>
 

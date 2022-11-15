@@ -1,6 +1,9 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: privacy
 title: Privacy Policy
+
 ---
 
 `Last modified: 27 March 2021`

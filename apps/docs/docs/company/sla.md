@@ -1,6 +1,9 @@
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: sla
 title: Service Level Agreement
+
 ---
 
 The following Service Level Agreement, which is incorporated into and forms part of the Subscription Agreement between Supabase, Inc. ("Supabase") and Customer (the "Agreement"), will apply to the Services for Enterprise Customers specified in an Order Form during the applicable Subscription Term:

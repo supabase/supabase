@@ -1,5 +1,7 @@
 const template = `
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
 id: usage
 slug: /usage
 title: Usage
