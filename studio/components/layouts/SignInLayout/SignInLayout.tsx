@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { useSWRConfig } from 'swr'
+import { Button, IconFile, IconFileText } from 'ui'
 
 type SignInLayoutProps = {
   heading: string
@@ -103,12 +104,13 @@ const SignInLayout = ({
             </div>
 
             <div className="hidden items-center space-x-3 md:ml-10 md:flex md:pr-4">
-              <a
-                href="https://supabase.com/docs"
-                className="text-sm text-scale-1100 transition-colors hover:text-scale-1200"
-              >
-                Documentation
-              </a>
+              <Link href="https://supabase.com/docs">
+                <a target="_blank">
+                  <Button type="default" icon={<IconFileText />}>
+                    Documentation
+                  </Button>
+                </a>
+              </Link>
             </div>
           </nav>
         </div>
