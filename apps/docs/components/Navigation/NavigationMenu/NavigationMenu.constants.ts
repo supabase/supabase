@@ -77,6 +77,7 @@ export const cli = {
 }
 
 export const auth = {
+  icon: '/img/icons/menu/auth.svg',
   label: 'Auth',
   extras: [
     { name: 'API Reference', level: 'integrations', items: [] },
@@ -163,6 +164,7 @@ export const auth = {
 }
 
 export const database = {
+  icon: '/img/icons/menu/database.svg',
   label: 'Database',
   items: [
     { name: 'Overview', url: '/guides/database', items: [] },
@@ -223,6 +225,7 @@ export const database = {
 }
 
 export const functions = {
+  icon: '/img/icons/menu/functions.svg',
   label: 'Edge Functions',
   items: [
     { name: 'Overview', url: '/guides/functions', items: [] },
@@ -233,6 +236,7 @@ export const functions = {
 }
 
 export const realtime = {
+  icon: '/img/icons/menu/realtime.svg',
   label: 'Realtime',
   items: [
     { name: 'Overview', url: '/guides/realtime', items: [] },
@@ -243,6 +247,7 @@ export const realtime = {
 }
 
 export const storage = {
+  icon: '/img/icons/menu/storage.svg',
   label: 'Storage',
   items: [
     { name: 'Overview', url: '/guides/storage', items: [] },
@@ -251,6 +256,7 @@ export const storage = {
 }
 
 export const platform = {
+  icon: '/img/icons/menu/platform.svg',
   label: 'Platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
@@ -288,6 +294,7 @@ export const migrate = {
 }
 
 export const integrations = {
+  icon: '/img/icons/menu/integrations.svg',
   label: 'Integrations',
   items: [
     { name: 'Supabase Marketplace', url: '/guides/integrations/integrations', items: [] },
