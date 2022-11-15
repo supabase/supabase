@@ -40,15 +40,6 @@ const ForgotPasswordLayout = ({
               </Link>
             </div>
           </div>
-
-          <div className="hidden items-center space-x-3 md:ml-10 md:flex md:pr-4">
-            <a
-              href="https://supabase.com/docs"
-              className="text-sm text-scale-1100 transition-colors hover:text-scale-1200"
-            >
-              Documentation
-            </a>
-          </div>
         </nav>
       </div>
 
