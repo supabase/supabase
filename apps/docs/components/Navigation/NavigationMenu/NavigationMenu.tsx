@@ -12,59 +12,62 @@ const SideNav = () => {
 
   const tempBasePath = '/new'
 
-  useEffect(() => {
-    function handleRouteChange(url: string) {
-      console.log('path changed')
-      console.log(url)
-      switch (url) {
-        case `/docs${tempBasePath}`:
-          setLevel('home')
-          break
-        case `/docs${tempBasePath}/getting-started`:
-          setLevel('gettingstarted')
-          break
-        case `/docs${tempBasePath}/tutorials`:
-          setLevel('tutorials')
-          break
-        case `/docs${tempBasePath}/database`:
-          setLevel('database')
-          break
-        case `/docs${tempBasePath}/auth`:
-          setLevel('auth')
-          break
-        case `/docs${tempBasePath}/storage`:
-          setLevel('storage')
-          break
-        case `/docs${tempBasePath}/realtime`:
-          setLevel('realtime')
-          break
-        case `/docs${tempBasePath}/edge-functions`:
-          setLevel('functions')
-          break
-        case `/docs${tempBasePath}/reference`:
-          setLevel('reference')
-          break
-        case `/docs${tempBasePath}/integrations`:
-          setLevel('integrations')
-          break
-        case `/docs${tempBasePath}/platform`:
-          setLevel('platform')
-          break
-        case url.includes(`/docs${tempBasePath}/reference/javascript/`) && url:
-          setLevel('reference_javascript')
-          break
+  function handleRouteChange(url: string) {
+    console.log('path changed')
+    console.log(url)
+    console.log('LISTEN')
+    switch (url) {
+      case `/docs${tempBasePath}`:
+        setLevel('home')
+        break
+      case `/docs${tempBasePath}/getting-started`:
+        setLevel('gettingstarted')
+        break
+      case `/docs${tempBasePath}/tutorials`:
+        setLevel('tutorials')
+        break
+      case `/docs${tempBasePath}/database`:
+        setLevel('database')
+        break
+      case `/docs${tempBasePath}/auth`:
+        setLevel('auth')
+        break
+      case `/docs${tempBasePath}/storage`:
+        setLevel('storage')
+        break
+      case `/docs${tempBasePath}/realtime`:
+        setLevel('realtime')
+        break
+      case `/docs${tempBasePath}/edge-functions`:
+        setLevel('functions')
+        break
+      case `/docs${tempBasePath}/reference`:
+        setLevel('reference')
+        break
+      case `/docs${tempBasePath}/integrations`:
+        setLevel('integrations')
+        break
+      case `/docs${tempBasePath}/platform`:
+        setLevel('platform')
+        break
+      case url.includes(`/docs${tempBasePath}/reference/javascript/`) && url:
+        setLevel('reference_javascript')
+        break
 
-        default:
-          break
-      }
+      default:
+        break
     }
+  }
 
+  useEffect(() => {
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
   }, [router.events])
+
+  // handleRouteChange(router.asPath)
 
   const home = [
     [
@@ -200,11 +203,17 @@ const SideNav = () => {
           {home.map((section, sectionIndex) => {
             return (
               <>
-                {sectionIndex !== 0 && <div className="h-px w-full bg-green-500"></div>}
-                <div className="flex flex-col gap-2">
+                {sectionIndex !== 0 && (
+                  <div
+                    className="h-px w-full bg-green-500"
+                    key={`section-${sectionIndex}-border`}
+                  ></div>
+                )}
+                <div className="flex flex-col gap-2" key={`section-${sectionIndex}`}>
                   {section.map((link) => {
                     return (
                       <a
+                        key={link.label}
                         onClick={() => {
                           // setLevel(link.level)
                           router.push(tempBasePath + link.href)

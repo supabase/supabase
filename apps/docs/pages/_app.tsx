@@ -16,17 +16,17 @@ import SiteLayout from '~/layouts/SiteLayout'
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
 
-  function telemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
-      referrer: document.referrer,
-      title: document.title,
-      route,
-    })
-  }
+  // function telemetry(route: string) {
+  //   return post(`https://api.supabase.io/platform/telemetry/page`, {
+  //     referrer: document.referrer,
+  //     title: document.title,
+  //     route,
+  //   })
+  // }
 
   useEffect(() => {
     function handleRouteChange(url: string) {
-      telemetry(url)
+      // telemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
