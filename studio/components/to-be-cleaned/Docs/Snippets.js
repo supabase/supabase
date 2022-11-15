@@ -660,7 +660,7 @@ curl -X GET '${endpoint}/auth/v1/user' \\
     js: {
       language: 'js',
       code: `
-const user = supabase.auth.user()
+const { data: { user } } = await supabase.auth.getUser()
 `,
     },
   }),
