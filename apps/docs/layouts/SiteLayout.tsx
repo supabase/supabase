@@ -20,12 +20,7 @@ const Layout = ({ children }) => {
           <div className="col-span-3">
             <NavigationMenu />
           </div>
-          <div className="col-span-9">
-            <Link href="/docs/new/database" passHref>
-              go to database
-            </Link>
-            {children}
-          </div>
+          <div className="col-span-9">{children}</div>
         </div>
         <Footer />
       </main>
