@@ -5,51 +5,6 @@ export const meta = {
   title: 'Supabase Docs',
 }
 
-export const products = [
-  {
-    title: 'Database',
-    icon: 'database',
-    href: 'database',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
-    span: 'col-span-6',
-  },
-  {
-    title: 'Auth',
-    icon: 'auth',
-    href: 'auth',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
-    span: 'col-span-6',
-  },
-  {
-    title: 'Storage',
-    icon: 'storage',
-    href: 'storage',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
-  },
-  {
-    title: 'Realtime',
-    icon: 'realtime',
-    href: 'realtime',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
-  },
-  {
-    title: 'Edge Functions',
-    icon: 'functions',
-    href: 'functions',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
-  },
-]
-
 Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text
 
 <div className="border rounded p-12">
@@ -112,6 +67,214 @@ hello world
 })}
 
 </div>
+
+### Supabase APIs
+
+<div className="grid grid-cols-12 gap-6 not-prose my-16">
+  {apis.map((product) => {
+    return (
+      <Link
+        href={`/new/${product.href}`}
+        key={product.title}
+        passHref
+      >
+        <a className={`
+          relative
+          group
+          overflow-hidden
+         border rounded-md 
+          transition
+          border-scale-400
+          hover:border-scale-500
+          gap-6
+          p-8 flex flex-col ${
+          product.span ?? 'col-span-4'
+        }`}>
+          <img
+            src={`/docs/img/gradient-bg.png`}
+            className="transition-all absolute left-0 -top-64 w-[258px]
+            duration-700 ease-out
+            group-hover:w-[320px]
+            "
+          />
+          <div className="flex items-center gap-3">
+            <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
+              <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${product.icon}.svg`} />
+            </div>
+            <h5 className="text-base text-scale-1200">{product.title}</h5>
+          </div>
+
+          <p className="text-sm text-scale-1100">
+            Social Login allows the user to sign into a third party website instead of creating a new
+            account specifically for that website.
+          </p>
+          <span className="text-brand-900 justify-end text-sm">Learn more</span>
+        </a>
+      </Link>
+    )
+
+})}
+
+</div>
+
+### Platform Resources
+
+<div className="grid grid-cols-12 gap-6 not-prose my-16">
+  {platform.map((product) => {
+    return (
+      <Link
+        href={`/new/${product.href}`}
+        key={product.title}
+        passHref
+      >
+        <a className={`
+          relative
+          group
+          overflow-hidden
+          border rounded-md 
+          transition
+          border-scale-400
+          hover:border-scale-500
+          ${
+          product.span ?? 'col-span-4'
+        }`}>
+          <img
+            src={`/docs/img/cards/${product.header}.svg`}
+            className="transition-all left-0 -top-64 w-full
+            duration-700 ease-out
+            "
+          />
+          <img
+            src={`/docs/img/gradient-bg.png`}
+            className="transition-all absolute left-0 -top-64 w-[258px]
+            duration-700 ease-out
+            group-hover:w-[320px]
+            "
+          />
+          <div className="px-8 pb-8 flex flex-col gap-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
+                <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${product.icon}.svg`} />
+              </div>
+              <h5 className="text-base text-scale-1200">{product.title}</h5>
+            </div>
+
+            <p className="text-sm text-scale-1100">
+              Social Login allows the user to sign into a third party website instead of creating a new
+              account specifically for that website.
+            </p>
+            <span className="text-brand-900 justify-end text-sm">Learn more</span>
+          </div>
+        </a>
+      </Link>
+    )
+
+})}
+
+</div>
+
+export const products = [
+  {
+    title: 'Database',
+    icon: 'database',
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-6',
+  },
+  {
+    title: 'Auth',
+    icon: 'auth',
+    href: 'auth',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-6',
+  },
+  {
+    title: 'Storage',
+    icon: 'storage',
+    href: 'storage',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Realtime',
+    icon: 'realtime',
+    href: 'realtime',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Edge Functions',
+    icon: 'functions',
+    href: 'functions',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+]
+
+export const apis = [
+  {
+    title: 'Severless APIs',
+    icon: 'reference',
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Managment API',
+    icon: 'reference',
+    href: 'auth',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Client libraries',
+    icon: 'reference',
+    href: 'storage',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+]
+
+export const platform = [
+  {
+    header: 'sample-card-header',
+    title: 'Dashboard guides',
+    icon: 'reference',
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-6',
+  },
+  {
+    header: 'sample-card-header-2',
+    title: 'Integrations',
+    icon: 'integrations',
+    href: 'auth',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-6',
+  },
+  //   {
+  //     title: 'Glossary',
+  //     icon: 'reference',
+  //     href: 'storage',
+  //     description: `
+  // Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  //   `,
+  //   },
+]
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
