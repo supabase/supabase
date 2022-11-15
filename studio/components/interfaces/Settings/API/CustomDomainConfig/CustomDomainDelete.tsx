@@ -43,24 +43,40 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
   return (
     <>
       <div className="flex items-center justify-between">
-        <div>
-          <code className="text-sm bg-green-400">{customDomain.hostname}</code> is activate and
-          serving traffic.
+        <div className="w-full space-y-2">
+          <p className="text-xs text-scale-1100">Active custom domain:</p>
+          <div className="flex items-center space-x-2">
+            <code className="text-lg mx-0 flex items-center space-x-2">
+              <div className="h-2 w-2 rounded-full bg-brand-900" />
+              <span>{customDomain.hostname}</span>
+            </code>
+          </div>
+          <p className="text-sm !mt-4">
+            Your custom domain is currently active and is serving traffic
+          </p>
         </div>
 
-        <Button
-          type="danger"
-          icon={<IconTrash />}
-          onClick={() => setIsDeleteConfirmModalVisible(true)}
-        >
-          Delete Custom Domain
-        </Button>
+        <div>
+          <Button
+            type="danger"
+            icon={<IconTrash />}
+            onClick={() => setIsDeleteConfirmModalVisible(true)}
+          >
+            Delete Custom Domain
+          </Button>
+        </div>
       </div>
 
       <ConfirmModal
         danger
         visible={isDeleteConfirmModalVisible}
-        title={`Are you sure you want to delete ${customDomain.hostname}?`}
+        // @ts-ignore
+        title={
+          <div>
+            Are you sure you want to delete the custom domain{' '}
+            <code className="text-sm">{customDomain.hostname}</code> for the project?
+          </div>
+        }
         description="Your custom domain will be deactivated. You will need to re-verify your domain if you want to use it again."
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"

@@ -11,7 +11,7 @@ import BackupsError from './BackupsError'
 import BackupsEmpty from './BackupsEmpty'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import InformationBox from 'components/ui/InformationBox'
-import { IconAlertCircle } from 'ui'
+import { IconAlertCircle, IconClock } from 'ui'
 
 interface Props {}
 
@@ -32,6 +32,7 @@ const BackupsList: FC<Props> = ({}) => {
   if (tierKey === 'FREE') {
     return (
       <UpgradeToPro
+        icon={<IconClock size="large" />}
         primaryText="Free Plan does not include project backups."
         projectRef={projectRef}
         secondaryText="Please upgrade to Pro plan for up to 7 days of backups."

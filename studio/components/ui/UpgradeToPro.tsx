@@ -1,14 +1,15 @@
 import { Button, IconClock } from 'ui'
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 
 interface Props {
+  icon?: ReactNode
   primaryText: string
   projectRef: string
   secondaryText: string
 }
 
-const UpgradeToPro: FC<Props> = ({ primaryText, projectRef, secondaryText }) => (
+const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText }) => (
   <div
     className={[
       'block w-full rounded border border-opacity-20 py-4 px-6',
@@ -17,9 +18,7 @@ const UpgradeToPro: FC<Props> = ({ primaryText, projectRef, secondaryText }) => 
     ].join(' ')}
   >
     <div className="flex space-x-3">
-      <div className="mt-1">
-        <IconClock size="large" />
-      </div>
+      {icon && <div className="mt-1">{icon}</div>}
       <div className="flex w-full items-center justify-between">
         <div className="space-y-1">
           <p className="text-sm">{primaryText}</p>
