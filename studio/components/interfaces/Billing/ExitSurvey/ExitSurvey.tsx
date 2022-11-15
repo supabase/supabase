@@ -139,17 +139,20 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         }
       }
 
-      // Submit feedback to Freshdesk
+      // Submit exit survey to Hubspot
       const feedbackRes = await post(`${API_URL}/feedback/send`, {
         projectRef,
-        subject: 'Subscription cancellation - Exit survey',
+        subject: 'Subscription cancellation - Exit survey [Downgrade]',
         tags: ['dashboard-exitsurvey'],
         category: 'Billing',
         message: generateFeedbackMessage(selectedReasons, downgradeMessage),
       })
       if (feedbackRes.error) throw feedbackRes.error
     } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to cancel subscription: ${error}` })
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to cancel subscription: ${error.message}`,
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -275,7 +278,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           <Modal.Content>
             <p className="text-sm text-scale-1200">Would you like to update your project now?</p>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
               <Button block type="default" onClick={() => setShowConfirmModal(false)}>

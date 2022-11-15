@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { TabsContext } from './TabsContext'
 
 import * as TabsPrimitive from '@radix-ui/react-tabs'
+import { useRouter } from 'next/router'
 
 // @ts-ignore
 // import TabsStyles from './Tabs.module.css'
@@ -48,11 +49,14 @@ function Tabs({
       : ''
   )
 
+  const router = useRouter()
+  const hash = router.asPath?.split('#')[1]?.toUpperCase()
+
   let __styles = styleHandler('tabs')
 
   // activeId state can be overriden externally with `active`
-  // defaults to use activeTab
-  const active = activeId ? activeId : activeTab
+  // defaults to the first panelif we have one or url hash if not
+  const active = activeId ? activeId : activeTab ? activeTab : hash
 
   function onTabClick(id: string) {
     const newTabSelected = id !== active
@@ -76,11 +80,7 @@ function Tabs({
   }
 
   return (
-    <TabsPrimitive.Root
-      defaultValue={defaultActiveId}
-      value={active}
-      className={__styles.base}
-    >
+    <TabsPrimitive.Root defaultValue={defaultActiveId} value={active} className={__styles.base}>
       <TabsPrimitive.List className={listClasses.join(' ')}>
         {addOnBefore}
         {children.map((tab: any) => {
@@ -117,9 +117,7 @@ function Tabs({
         {/* </Space> */}
         {addOnAfter}
       </TabsPrimitive.List>
-      <TabsContext.Provider value={{ activeId: active }}>
-        {children}
-      </TabsContext.Provider>
+      <TabsContext.Provider value={{ activeId: active }}>{children}</TabsContext.Provider>
     </TabsPrimitive.Root>
   )
 }

@@ -190,7 +190,7 @@ const ColumnEditor: FC<Props> = ({
         </div>
       </SidePanel.Content>
 
-      <SidePanel.Seperator />
+      <SidePanel.Separator />
 
       <SidePanel.Content>
         <div className="space-y-10 py-6">
@@ -202,7 +202,7 @@ const ColumnEditor: FC<Props> = ({
           />
         </div>
       </SidePanel.Content>
-      <SidePanel.Seperator />
+      <SidePanel.Separator />
       <SidePanel.Content>
         <div className="space-y-10 py-6">
           <ColumnType
@@ -212,7 +212,7 @@ const ColumnEditor: FC<Props> = ({
             disabled={!isUndefined(columnFields?.foreignKey)}
             description={
               <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-                <a>
+                <a target="_blank" rel="noreferrer">
                   <Button
                     as="span"
                     type="text"

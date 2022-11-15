@@ -16,6 +16,7 @@ import {
   IconEdit2,
   IconLoader,
   IconChevronsUp,
+  IconList,
 } from 'ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
@@ -284,11 +285,18 @@ const FileExplorerHeader = ({
           >
             <Button
               as="span"
-              icon={<IconColumns size={16} strokeWidth={2} />}
+              icon={
+                view === 'LIST' ? (
+                  <IconList size={16} strokeWidth={2} />
+                ) : (
+                  <IconColumns size={16} strokeWidth={2} />
+                )
+              }
               type="text"
               disabled={breadcrumbs.length === 0}
+              onChange={onChangeView}
             >
-              Views
+              View as
             </Button>
           </Dropdown>
           <Dropdown

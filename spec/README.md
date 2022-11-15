@@ -10,7 +10,6 @@ To get started, run `make init`. This installs all dependencies.
 
 ```bash
 
-make                # download latest specs and add enrichments
-make.generate       # transform the specs into docs
+make                # download and transform specs into docs
 
 ```

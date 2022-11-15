@@ -303,7 +303,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // ...
 
-const supabaseClient = createClient(
+const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 )
@@ -311,7 +311,7 @@ const supabaseClient = createClient(
 const App = () => (
   <FatalErrorBoundary page={FatalErrorPage}>
     <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
-      <AuthProvider client={supabaseClient} type="supabase">
+      <AuthProvider client={supabase} type="supabase">
         <RedwoodApolloProvider>
           <Routes />
         </RedwoodApolloProvider>
@@ -324,7 +324,7 @@ export default App
 ```
 
 And one optional step is to update the CSS file `web/src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/examples/main/supabase-js-v2/user-management/react-user-management/src/index.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Start RedwoodJS and your first Page
 

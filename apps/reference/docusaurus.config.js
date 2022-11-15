@@ -4,6 +4,7 @@
 const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
+const mdxMermaid = require('mdx-mermaid')
 
 const baseUrl = '/docs/'
 
@@ -14,7 +15,7 @@ const config = {
   url: 'https://supabase.com',
   baseUrl: baseUrl,
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenMarkdownLinks: 'throw',
   favicon: '/favicon.ico',
   themes: ['docusaurus-theme-search-typesense'],
 
@@ -83,6 +84,18 @@ const config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: '_realtime',
+        path: '_realtime',
+        routeBasePath: '/reference/realtime',
+        sidebarPath: require.resolve('./nav/realtime_sidebars.js'),
+        breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: '_supabase_dart',
         path: '_supabase_dart',
         routeBasePath: '/reference/dart',
@@ -90,11 +103,10 @@ const config = {
         breadcrumbs: false,
         editUrl:
           'https://github.com/supabase/supabase/edit/master/apps/reference/',
-        lastVersion: 'v0',
+        lastVersion: 'current',
         versions: {
           current: {
-            label: 'v1-dev',
-            path: '/next',
+            label: 'v1',
           },
           v0: {
             label: 'v0',
@@ -136,6 +148,7 @@ const config = {
           breadcrumbs: false,
           editUrl:
             'https://github.com/supabase/supabase/edit/master/apps/reference',
+          //remarkPlugins: [mdxMermaid.default],
         },
         blog: false,
         theme: {

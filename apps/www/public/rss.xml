@@ -5,14 +5,42 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 11 Oct 2022 16:04:00 +0000</lastBuildDate>
+      <lastBuildDate>Tue, 01 Nov 2022 16:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-beta-update-october-2022</guid>
+  <title>Supabase Beta October 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-update-october-2022</link>
+  <description>New SDKs, quickstarts, Functions tricks, and more. But, more importantly, Launch Week 6️ has a date!</description>
+  <pubDate>Tue, 01 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-commitfest</guid>
+  <title>What is PostgreSQL commitfest and how to contribute</title>
+  <link>https://supabase.com/blog/postgresql-commitfest</link>
+  <description>A time-tested method for contributing to the core Postgres code</description>
+  <pubDate>Wed, 26 Oct 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-flutter-sdk-v1-released</guid>
+  <title>supabase-flutter v1 Released</title>
+  <link>https://supabase.com/blog/supabase-flutter-sdk-v1-released</link>
+  <description>We've released supabase-flutter v1. More intuitive way of accessing Supabase from your Flutter application.</description>
+  <pubDate>Thu, 20 Oct 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-js-v2-released</guid>
+  <title>supabase-js v2 Released</title>
+  <link>https://supabase.com/blog/supabase-js-v2-released</link>
+  <description>We've released supabase-js v2. Updated examples, quickstarts, and an improved experience.</description>
+  <pubDate>Wed, 19 Oct 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</guid>
-  <title>Postgres FTS vs the rest</title>
+  <title>Postgres Full Text Search vs the rest</title>
   <link>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</link>
   <description>Comparing one of the most popular Postgres features against alternatives</description>
-  <pubDate>Tue, 11 Oct 2022 16:04:00 +0000</pubDate>
+  <pubDate>Thu, 13 Oct 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-september-2022</guid>
@@ -107,16 +135,16 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-js-v2</guid>
-  <title>supabase-js v2 Release Candidate</title>
+  <title>supabase-js v2</title>
   <link>https://supabase.com/blog/supabase-js-v2</link>
-  <description>First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.</description>
+  <description>A look at supabase-js v2, which brings type support and focuses on quality-of-life improvements for developers.</description>
   <pubDate>Mon, 15 Aug 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta</guid>
-  <title>Supabase CLI v1 and Admin API Beta</title>
+  <title>Supabase CLI v1 and Management API Beta</title>
   <link>https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta</link>
-  <description>We are moving Supabase CLI v1 out of beta, and releasing Admin API beta.</description>
+  <description>We are moving Supabase CLI v1 out of beta, and releasing Management API beta.</description>
   <pubDate>Sun, 14 Aug 2022 16:04:00 +0000</pubDate>
 </item>
 <item>

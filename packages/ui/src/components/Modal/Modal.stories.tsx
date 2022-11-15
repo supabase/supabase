@@ -588,7 +588,7 @@ customFooterOneButton.args = {
   icon: <IconCheck background="brand" size="xxxlarge" />,
   onCancel: action('onCancel'),
   onConfirm: action('onConfirm'),
-  title: 'Payment succesful',
+  title: 'Payment successful',
   description:
     'Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.',
   layout: 'vertical',

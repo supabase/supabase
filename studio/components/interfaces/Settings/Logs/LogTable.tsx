@@ -14,7 +14,7 @@ import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceed
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
-import Divider from 'components/ui/Divider'
+import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -113,6 +113,10 @@ const LogTable = ({
         columns = FunctionsLogsColumnRender
         break
 
+      case 'auth':
+        columns = AuthColumnRenderer
+        break
+
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
           columns = DefaultPreviewColumnRenderer
@@ -202,7 +206,7 @@ const LogTable = ({
 
     return (
       <div className="flex w-1/2 justify-center px-5">
-        <Alert variant="danger" title="Sorry! An error occured when fetching data." withIcon>
+        <Alert variant="danger" title="Sorry! An error occurred when fetching data." withIcon>
           <Renderer {...childProps} />
         </Alert>
       </div>

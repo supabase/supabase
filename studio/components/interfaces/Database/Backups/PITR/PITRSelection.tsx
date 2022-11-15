@@ -347,7 +347,7 @@ const PITRSelection = ({}) => {
           <Modal.Content>
             <p>Point in time recovery review</p>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="py-2 space-y-1">
               <p className="text-sm text-scale-1100"> Your database will be restored to</p>
@@ -355,7 +355,7 @@ const PITRSelection = ({}) => {
               <p className="text-lg">{selectedTimezone?.text}</p>
             </div>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <Alert withIcon variant="warning" title="Warning: This action cannot be undone">
               <div className="space-y-3">
@@ -366,7 +366,7 @@ const PITRSelection = ({}) => {
               </div>
             </Alert>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <p className="text-sm">
               Restores may take from a few minutes up to several hours depending on the size of your

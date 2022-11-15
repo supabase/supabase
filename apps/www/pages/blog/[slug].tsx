@@ -1,4 +1,4 @@
-import { Badge, Divider, IconChevronLeft, IconFile } from '@supabase/ui'
+import { Badge, Divider, IconChevronLeft, IconFile } from 'ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import { MDXRemote } from 'next-mdx-remote'
@@ -128,6 +128,7 @@ function BlogPostPage(props: any) {
     <>
       <NextSeo
         title={props.blog.title}
+        description={props.blog.description}
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,

@@ -206,7 +206,7 @@ We'll focus on the end-user-centric meaning of performance here (query speed).
 
 Postgres is capable of loading CSVs, but since we'll be using other search engines as well, let's convert to format that's much easier to use and process - [Newline Delimited JSON](https://dataprotocols.org/ndjson/).
 
-After a few lines of code and one `[csv2ndjson.mjs` script](https://github.com/VADOSWARE/fts-benchmark/blob/main/src/util/csv2ndjson.mjs) later, we have a `movies.ndjson.json` full of JSON documents that we can easily ingest into any search engine (or other database for that matter!).
+After a few lines of code and one [`csv2ndjson.mjs` script](https://github.com/VADOSWARE/fts-benchmark/blob/main/src/util/csv2ndjson.mjs) later, we have a `movies.ndjson.json` full of JSON documents that we can easily ingest into any search engine (or other database for that matter!).
 
 ### Inserting the data
 
@@ -332,7 +332,7 @@ There's a _lot_ of tuning left undone here, but a few points stand out right awa
 - Postgres FTS is quite close performance-wise to many other solutions, at least in their default configuration.
 - Only Typesense and MeiliSearch properly handled mis-spellings (the "suprman" query).
 - Typesense was relatively strict with matches compared to other engines.
-- OpenSearch was _very_ fast with ingest, but also failed with the misspelling out of the box.
+- OpenSearch was _very_ fast with ingest, but the default configuration doesn't index misspellings.
 - In-memory SQLite is by far the fastest, and PG isn't too far behind for this small data set.
 
 ## Feedback from the other products
@@ -348,7 +348,7 @@ _Quentin de Quelen, Meilisearch CEO_
 
 ### Typesense
 
-> Some more context around Typesense's behavior: how loose or exact matches are done are configurable in Typesense. For eg, you can configure the number of typos that are accounted for (num_typos), and when typo tolerance should kick-in, only if a configurable amount of results are not found (typo_tokens_treshold). For multi keyword searches, you can configure Typesense to expand the search by dropping some of the keywords, until at least a configurable number of search results are found (drop_tokens_threshold).
+> Some more context around Typesense's behavior: how loose or exact matches are done are configurable in Typesense. For eg, you can configure the number of typos that are accounted for (num_typos), and when typo tolerance should kick-in, only if a configurable amount of results are not found (typo_tokens_threshold). For multi keyword searches, you can configure Typesense to expand the search by dropping some of the keywords, until at least a configurable number of search results are found (drop_tokens_threshold).
 > We've chosen specifically to keep the search tight because we received feedback from users that some results were confusing if we let the defaults be too loose.
 
 _Jason Bosco, Typesense CEO_

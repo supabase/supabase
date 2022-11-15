@@ -266,7 +266,7 @@ const MembersView = () => {
               By changing the role of this member their permissions will change.
             </p>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex gap-3">
               <Button

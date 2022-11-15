@@ -5,12 +5,14 @@ import { useProjectSubscription, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
-import { usageBasedItems } from './ProjectUsageBars.constants'
+import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 
 interface ProjectUsageMinimalProps {
   projectRef?: string
   filter: string
 }
+
+// [Joshen] This is currently not being used anywhere as of 011122
 
 const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter }) => {
   const { usage, error: usageError, isLoading } = useProjectUsage(projectRef)
@@ -23,7 +25,7 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
     return <></>
   }
 
-  const product = usageBasedItems.find((item) => item.title === filter)
+  const product = USAGE_BASED_PRODUCTS.find((item) => item.title === filter)
   if (!product) return <></>
 
   if (usageError || subscriptionError) {
