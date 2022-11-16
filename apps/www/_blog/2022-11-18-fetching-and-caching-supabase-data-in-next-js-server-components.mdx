@@ -66,14 +66,13 @@ create table if not exists posts (
   id uuid default uuid_generate_v4() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   title text,
-  content text,
-  is_published boolean default false
+  content text
 );
 
-insert into posts(title, content, is_published)
+insert into posts(title, content)
 values
-  ('My first post', 'Wow! What a great post.', true),
-  ('My second post', 'This one needs a little work!', false);
+  ('My first post', 'Wow! What a great post.'),
+  ('My second post', 'This one needs a little work!');
 ```
 
 This will create a table called `posts`, and populate it with some example data.
