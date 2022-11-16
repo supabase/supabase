@@ -1,11 +1,16 @@
 import Layout from '~/layouts/DefaultLayout'
 import Link from 'next/link'
+import { GlassPanel } from 'ui'
 
 export const meta = {
   title: 'Supabase Docs',
+  description: 'All the information to integrate supabase',
 }
 
 Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text
+
+adsdasd
+Hello danny
 
 <div className="border rounded p-12">
 
@@ -29,37 +34,10 @@ hello world
         key={product.title}
         passHref
       >
-        <a className={`
-          relative
-          group
-          overflow-hidden
-          bg-white dark:bg-scale-300 border rounded-md drop-shadow-sm
-          transition
-          border-scale-500
-          hover:border-scale-700
-          gap-6
-          p-8 flex flex-col ${
-          product.span ?? 'col-span-4'
-        }`}>
-          <img
-            src={`/docs/img/gradient-bg.png`}
-            className="transition-all absolute left-0 -top-64 w-[258px]
-            duration-700 ease-out
-            group-hover:w-[320px]
-            "
-          />
-          <div className="flex items-center gap-3">
-            <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
-              <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${product.icon}.svg`} />
-            </div>
-            <h5 className="text-base text-scale-1200">{product.title}</h5>
-          </div>
-
-          <p className="text-sm text-scale-1100">
-            Social Login allows the user to sign into a third party website instead of creating a new
-            account specifically for that website.
-          </p>
-          <span className="text-brand-900 justify-end text-sm">Learn more</span>
+        <a className={product.span ?? 'col-span-4'}>
+          <GlassPanel {...product} background={true}>
+            {product.description}
+          </GlassPanel>
         </a>
       </Link>
     )
@@ -78,37 +56,10 @@ hello world
         key={product.title}
         passHref
       >
-        <a className={`
-          relative
-          group
-          overflow-hidden
-         border rounded-md 
-          transition
-          border-scale-400
-          hover:border-scale-500
-          gap-6
-          p-8 flex flex-col ${
-          product.span ?? 'col-span-4'
-        }`}>
-          <img
-            src={`/docs/img/gradient-bg.png`}
-            className="transition-all absolute left-0 -top-64 w-[258px]
-            duration-700 ease-out
-            group-hover:w-[320px]
-            "
-          />
-          <div className="flex items-center gap-3">
-            <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
-              <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${product.icon}.svg`} />
-            </div>
-            <h5 className="text-base text-scale-1200">{product.title}</h5>
-          </div>
-
-          <p className="text-sm text-scale-1100">
-            Social Login allows the user to sign into a third party website instead of creating a new
-            account specifically for that website.
-          </p>
-          <span className="text-brand-900 justify-end text-sm">Learn more</span>
+        <a className={product.span ?? 'col-span-4'}>
+          <GlassPanel {...product} background={false}>
+            {product.description}
+          </GlassPanel> 
         </a>
       </Link>
     )
@@ -127,44 +78,10 @@ hello world
         key={product.title}
         passHref
       >
-        <a className={`
-          relative
-          group
-          overflow-hidden
-          border rounded-md 
-          transition
-          border-scale-400
-          hover:border-scale-500
-          ${
-          product.span ?? 'col-span-4'
-        }`}>
-          <img
-            src={`/docs/img/cards/${product.header}.svg`}
-            className="transition-all left-0 -top-64 w-full
-            duration-700 ease-out
-            "
-          />
-          <img
-            src={`/docs/img/gradient-bg.png`}
-            className="transition-all absolute left-0 -top-64 w-[258px]
-            duration-700 ease-out
-            group-hover:w-[320px]
-            "
-          />
-          <div className="px-8 pb-8 flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
-                <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${product.icon}.svg`} />
-              </div>
-              <h5 className="text-base text-scale-1200">{product.title}</h5>
-            </div>
-
-            <p className="text-sm text-scale-1100">
-              Social Login allows the user to sign into a third party website instead of creating a new
-              account specifically for that website.
-            </p>
-            <span className="text-brand-900 justify-end text-sm">Learn more</span>
-          </div>
+        <a className={product.span ?? 'col-span-4'}>
+          <GlassPanel {...product} background={false}>
+            {product.description}
+          </GlassPanel> 
         </a>
       </Link>
     )
@@ -178,9 +95,7 @@ export const products = [
     title: 'Database',
     icon: 'database',
     href: 'database',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
+    description: 'Social Login allows the user to sign into a third party website instead of.',
     span: 'col-span-6',
   },
   {
@@ -247,7 +162,7 @@ Social Login allows the user to sign into a third party website instead of creat
 
 export const platform = [
   {
-    header: 'sample-card-header-3',
+    header: '/docs/img/cards/sample-card-header-3.svg',
     title: 'Dashboard guides',
     icon: 'reference',
     href: 'database',
@@ -257,7 +172,7 @@ Social Login allows the user to sign into a third party website instead of creat
     span: 'col-span-6',
   },
   {
-    header: 'sample-card-header-2',
+    header: '/docs/img/cards/sample-card-header-2.svg',
     title: 'Integrations',
     icon: 'integrations',
     href: 'auth',
@@ -267,7 +182,7 @@ Social Login allows the user to sign into a third party website instead of creat
     span: 'col-span-6',
   },
   {
-    header: 'sample-card-header-4',
+    header: '/docs/img/cards/sample-card-header-4.svg',
     title: 'Glossary',
     icon: 'reference',
     href: 'storage',

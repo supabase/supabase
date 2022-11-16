@@ -5,6 +5,7 @@ import * as React from 'react'
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
+export * from './src/components/GlassPanel'
 // export * from './src/components/Image'
 
 // DISPLAYS

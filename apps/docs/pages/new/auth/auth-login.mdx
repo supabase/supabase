@@ -1,0 +1,25 @@
+import Layout from '~/layouts/tutorials/TutorialLayout'
+import Link from 'next/link'
+import { GlassPanel } from 'ui'
+
+export const meta = {
+  title: 'Auth login',
+}
+
+## Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text
+
+Auth0 Universal Login defines your login flow, which is the key feature of an Authorization Server.
+Each time a user needs to prove their identity, your applications redirect to Universal Login and Auth0 will do what is needed to guarantee the user's identity.
+
+By choosing Universal Login, you don't have to do any integration work to handle the various flavors of authentication. You can start off using a simple username and password.
+You can also add other features such as social login and multi-factor authentication (MFA). All of this is dynamic and adjustable in real-time without requiring application-level changes because all functionality is driven by the web pages served by the centralized Authentication Server.
+Your application will benefit from any improvements Auth0 makes in the login flow without the need for you to change your code.
+
+Create a consistent, branded login experience by customizing the login page appearance and behavior from the Auth0 Dashboard including the logo and colors.
+For more advanced use cases, you can change the code of each page.
+
+To learn more about the differences between Universal Login and embedded login, read Centralized Universal Login vs. Embedded Login.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

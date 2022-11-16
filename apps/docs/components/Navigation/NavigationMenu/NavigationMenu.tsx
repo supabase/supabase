@@ -30,7 +30,7 @@ const SideNav = () => {
       case `/docs${tempBasePath}/database`:
         setLevel('database')
         break
-      case `/docs${tempBasePath}/auth`:
+      case url.includes(`/docs${tempBasePath}/auth`) && url:
         setLevel('auth')
         break
       case `/docs${tempBasePath}/storage`:

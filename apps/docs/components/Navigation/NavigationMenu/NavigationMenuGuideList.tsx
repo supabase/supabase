@@ -31,15 +31,15 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
           }}
           className={[
             'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
+            'text-base transition-all duration-200 text-brand-900 hover:text-brand-1200 hover:cursor-pointer ',
           ].join(' ')}
         >
           <div className="relative w-2">
-            <div>
-              <IconChevronLeft size={10} />
+            <div className="transition-all ease-out ml-0 group-hover:-ml-1">
+              <IconChevronLeft size={10} strokeWidth={3} />
             </div>
           </div>
-          <span>back</span>
+          <span>Main Menu</span>
         </li>
 
         <div className="flex items-center gap-3 my-3">
