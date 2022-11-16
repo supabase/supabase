@@ -50,6 +50,27 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     domains: ['avatars.githubusercontent.com', 'github.com', 'user-images.githubusercontent.com'],
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: '',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+        ],
+      },
+    ]
+  },
 }
 
 // next.config.js
