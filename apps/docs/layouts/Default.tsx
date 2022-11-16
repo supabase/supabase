@@ -59,7 +59,11 @@ const Layout: FC<Props> = ({ meta, children, toc }) => {
                   : 'col-span-12 lg:col-span-9'
               } py-2 lg:py-4 px-2 lg:px-8 mx-auto`}
             >
-              <article className="doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[880px] ">
+              <article
+                className={`${
+                  meta?.hide_table_of_contents || !hasTableOfContents ? 'xl:min-w-[880px]' : ''
+                } doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[880px]`}
+              >
                 {children}
               </article>
             </div>

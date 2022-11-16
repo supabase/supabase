@@ -24,7 +24,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.0.0-rc.12'
 serve(async (req: Request) => {
   try {
     // Create a Supabase client with the Auth context of the logged in user.
-    const supabaseClient = createClient(
+    const supabase = createClient(
       // Supabase API URL - env var exported by default.
       Deno.env.get('SUPABASE_URL') ?? '',
       // Supabase API ANON KEY - env var exported by default.
@@ -38,12 +38,12 @@ serve(async (req: Request) => {
     // highlight-start
     const {
       data: { user },
-    } = await supabaseClient.auth.getUser()
+    } = await supabase.auth.getUser()
     // highlight-end
 
     // And we can run queries in the context of our authenticated user
     // highlight-start
-    const { data, error } = await supabaseClient.from('users').select('*')
+    const { data, error } = await supabase.from('users').select('*')
     if (error) throw error
     // highlight-end
 

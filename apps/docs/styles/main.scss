@@ -106,10 +106,6 @@ pre[class*='language-'] {
   }
 }
 
-.method-list-group li:last-child {
-  border-bottom: 1px solid var(--colors-scale3);
-}
-
 .method-list-title-isChild {
   font-family: var(--custom-font-size-xs);
   & h5 {
@@ -125,7 +121,7 @@ pre[class*='language-'] {
 }
 
 .method-list-group {
-  @apply p-0 m-0 list-none;
+  @apply p-0 m-0 list-none border-b;
 }
 
 .method-list-group .method-list-group {
@@ -224,4 +220,10 @@ a:has(code) {
 
 .doc-content-container ul li a {
   box-shadow: none !important;
+}
+
+// fix ToC links when they have <code> inside
+.toc-menu li a code {
+  background: none;
+  border: none;
 }

@@ -123,14 +123,14 @@ const { data } = await supabase.auth.signIn({
 There is a new `channel()` method in the Realtime library, which will be used for our Multiplayer updates.
 
 ```ts
-supabaseClient
+supabase
   .channel('any_string_you_want')
   .on('presence', { event: 'track' }, (payload) => {
     console.log(payload)
   })
   .subscribe()
 
-supabaseClient
+supabase
   .channel('any_string_you_want')
   .on(
     'postgres_changes',
