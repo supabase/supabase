@@ -28,12 +28,15 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
+import { ComesFrom } from '~/components/ComesFrom'
+import Link from 'next/link'
 
 const marginTop = 256
 export default function Ref(props) {
   // const myRef = useRef(null)
 
-  console.log('props', props)
+  //console.log('props', props)
+  // console.log({ jsSpec })
 
   const [offsetY, setOffsetY] = useState(0)
   const [sections, setSections] = useState([])
@@ -132,19 +135,21 @@ export default function Ref(props) {
         <div className="px-10 fixed">
           {sections.map((x, i) => {
             return (
-              <a
-                className={[
-                  'block text-sm hover:text-scale-1200 text-scale-1100 cursor-pointer',
-                  sections && sections[i].isActive ? 'text-brand-900 text-scale-900' : '',
-                ].join(' ')}
-                key={i}
-                onClick={() => {
-                  window.scrollTo(0, x.boundingTop - marginTop)
-                  setOffsetY(x.boundingTop - marginTop)
-                }}
-              >
-                {x.topic}
-              </a>
+              <Link href={`#${x.topic}`} key={i}>
+                <a
+                  className={[
+                    'block text-sm hover:text-scale-1200 text-scale-1100 cursor-pointer',
+                    sections && sections[i].isActive ? 'text-brand-900' : 'text-scale-1100',
+                  ].join(' ')}
+                  // key={i}
+                  // onClick={() => {
+                  //   window.scrollTo(0, x.boundingTop - marginTop)
+                  //   setOffsetY(x.boundingTop - marginTop)
+                  // }}
+                >
+                  {x.topic}
+                </a>
+              </Link>
             )
           })}
         </div>
@@ -155,6 +160,7 @@ export default function Ref(props) {
             // ref={myRef}
           >
             {jsSpec.functions.map((item, itemIndex) => {
+              if (item['$ref']) console.log('$ref', item['$ref'])
               // if (item.id !== 'select()') return <div>hidden section</div>
               // const sectionRef = useRef(null)
 
@@ -163,7 +169,7 @@ export default function Ref(props) {
               // console.log('hasTsRef', hasTsRef)
               // console.log('jsTypeSpec', jsTypeSpec)
               const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
-              // console.log('tsDefinition', tsDefinition)
+              console.log('tsDefinition', tsDefinition)
               // console.log(`tsDefinition for ${item.title ?? item.id}`, tsDefinition)
 
               // useEffect(() => {
@@ -207,9 +213,11 @@ export default function Ref(props) {
 
               // console.log('serialFunctionMarkdownContent', serialFunctionMarkdownContent)
 
+              const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
+
               return (
                 <>
-                  <header className="sticky top-0 bg-gray-600 z-10 p-4">
+                  <header className="sticky top-14 bg-gray-600 z-10 p-4">
                     <h1 className="text-3xl not-prose" onClick={() => updateUrl(item.id)}>
                       {examples.functions[itemIndex].title ??
                         examples.functions[itemIndex].id ??
@@ -223,126 +231,177 @@ export default function Ref(props) {
                     // ref={sectionRef}
                   >
                     <div className="prose" key={item.id}>
-                      <p className="text-lg not-prose">
-                        {examples.functions[itemIndex].description}
-                      </p>
-
-                      <hr />
-                      {functionMarkdownContent && (
-                        <MDXRemote {...functionMarkdownContent} components={components} />
+                      {shortText && (
+                        <>
+                          <ComesFrom
+                            link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
+                            text="combined.json"
+                          />
+                          <p
+                            className="text-lg not-prose"
+                            dangerouslySetInnerHTML={{ __html: shortText }}
+                          ></p>
+                        </>
                       )}
 
+                      {examples.functions[itemIndex].description && (
+                        <>
+                          <ComesFrom
+                            link="https://github.com/supabase/supabase/pull/10095/files#diff-c514c66b77772b9e3d9a5403c136ee52dfeaaeacb1d8138ea85ce35ee64e5006"
+                            text="examples.yml"
+                          />
+                          <p className="text-lg not-prose">
+                            {examples.functions[itemIndex].description}
+                          </p>
+                        </>
+                      )}
+                      <hr />
+                      {functionMarkdownContent && (
+                        <>
+                          <ComesFrom
+                            link="https://github.com/supabase/supabase/pull/10095/files#diff-bf42aab7d324c5330e4ae65d94803cd6da686d2241015536b0263e7f76aeca35"
+                            text="auth.signUp().mdx"
+                          />
+                          <MDXRemote {...functionMarkdownContent} components={components} />
+                        </>
+                      )}
                       {item.notes && (
                         <div>
+                          <ComesFrom
+                            link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml#L105"
+                            text="supabase_js_v2"
+                          />
                           <ReactMarkdown>{item.notes}</ReactMarkdown>
                         </div>
                       )}
-
                       {/* // parameters */}
-                      {parameters && <div dangerouslySetInnerHTML={{ __html: parameters }}></div>}
+                      {parameters && (
+                        <>
+                          <ComesFrom
+                            link="https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/combined.json"
+                            text="combined.json"
+                          />
+                          <div dangerouslySetInnerHTML={{ __html: parameters }}></div>
+                        </>
+                      )}
                     </div>
                     <div className="w-full">
                       <div className="sticky top-24">
                         {item.examples && (
-                          <Tabs
-                            defaultActiveId={item.examples[0].id}
-                            size="small"
-                            type="underlined"
-                            scrollable
-                          >
-                            {item.examples &&
-                              item.examples.map((example, exampleIndex) => {
-                                const exampleString = `
+                          <>
+                            {' '}
+                            <ComesFrom
+                              className="mb-5"
+                              link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml"
+                              text="supabase_js_v2"
+                            />
+                            <Tabs
+                              defaultActiveId={item.examples[0].id}
+                              size="small"
+                              type="underlined"
+                              scrollable
+                            >
+                              {item.examples &&
+                                item.examples.map((example, exampleIndex) => {
+                                  const exampleString = `
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 `
-                                const currentExampleId = example.id
-                                const staticExample =
-                                  examples.functions[itemIndex].examples[exampleIndex]
+                                  const currentExampleId = example.id
+                                  const staticExample =
+                                    examples.functions[itemIndex].examples[exampleIndex]
 
-                                const response = staticExample.response
-                                const sql = staticExample?.data?.sql
-                                const tables = staticExample?.data?.tables
+                                  const response = staticExample.response
+                                  const sql = staticExample?.data?.sql
+                                  const tables = staticExample?.data?.tables
 
-                                return (
-                                  <Tabs.Panel id={example.id} label={example.name}>
-                                    {tables &&
-                                      tables.length > 0 &&
-                                      tables.map((table) => {
-                                        console.log(table)
+                                  return (
+                                    <Tabs.Panel id={example.id} label={example.name}>
+                                      {tables &&
+                                        tables.length > 0 &&
+                                        tables.map((table) => {
+                                          console.log(table)
 
-                                        // @ts-ignore
-                                        // const [content, setContent] = useState(null)
+                                          // @ts-ignore
+                                          // const [content, setContent] = useState(null)
 
-                                        // // @ts-ignore
-                                        // useEffect(() => {
-                                        //   async function makeContent() {
-                                        //     setContent(
-                                        //       await serialize(table.content, {
-                                        //         mdxOptions: {
-                                        //           remarkPlugins: [remarkGfm],
-                                        //           format: 'mdx',
-                                        //         },
-                                        //       })
-                                        //     )
-                                        //   }
-                                        //   makeContent()
-                                        // }, [])
+                                          // // @ts-ignore
+                                          // useEffect(() => {
+                                          //   async function makeContent() {
+                                          //     setContent(
+                                          //       await serialize(table.content, {
+                                          //         mdxOptions: {
+                                          //           remarkPlugins: [remarkGfm],
+                                          //           format: 'mdx',
+                                          //         },
+                                          //       })
+                                          //     )
+                                          //   }
+                                          //   makeContent()
+                                          // }, [])
 
-                                        return (
-                                          <div className="bg-scale-300 border rounded prose max-w-none">
-                                            <div className="bg-scale-200 px-5 py-2">
-                                              <div className="flex gap-2 items-center">
-                                                <div className="text-brand-900">
-                                                  <IconDatabase size={16} />
+                                          return (
+                                            <div className="bg-scale-300 border rounded prose max-w-none">
+                                              <div className="bg-scale-200 px-5 py-2">
+                                                <div className="flex gap-2 items-center">
+                                                  <div className="text-brand-900">
+                                                    <IconDatabase size={16} />
+                                                  </div>
+                                                  <h5 className="text-xs text-scale-1200">
+                                                    {table.name}
+                                                  </h5>
                                                 </div>
-                                                <h5 className="text-xs text-scale-1200">
-                                                  {table.name}
-                                                </h5>
                                               </div>
-                                            </div>
 
-                                            {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
-                                            {/* {content && <MDXRemote {...content} />} */}
-                                          </div>
-                                        )
-                                      })}
-                                    {sql && (
+                                              {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
+                                              {/* {content && <MDXRemote {...content} />} */}
+                                            </div>
+                                          )
+                                        })}
+                                      {sql && (
+                                        <CodeBlock
+                                          className="useless-code-block-class"
+                                          language="sql"
+                                          hideLineNumbers={true}
+                                        >
+                                          {sql}
+                                        </CodeBlock>
+                                      )}
                                       <CodeBlock
                                         className="useless-code-block-class"
-                                        language="sql"
+                                        language="js"
                                         hideLineNumbers={true}
                                       >
-                                        {sql}
+                                        {exampleString +
+                                          (example.code &&
+                                            example.code
+                                              .replace('```', '')
+                                              .replace('js', '')
+                                              .replace('```', ''))}
                                       </CodeBlock>
-                                    )}
-                                    <CodeBlock
-                                      className="useless-code-block-class"
-                                      language="js"
-                                      hideLineNumbers={true}
-                                    >
-                                      {exampleString +
-                                        (example.code &&
-                                          example.code
-                                            .replace('```', '')
-                                            .replace('js', '')
-                                            .replace('```', ''))}
-                                    </CodeBlock>
-                                    {response && (
-                                      <CodeBlock
-                                        className="useless-code-block-class"
-                                        language="json"
-                                        hideLineNumbers={true}
-                                      >
-                                        {response}
-                                      </CodeBlock>
-                                    )}
-                                  </Tabs.Panel>
-                                )
-                              })}
-                          </Tabs>
+                                      {response && (
+                                        <>
+                                          <ComesFrom
+                                            className="mb-5 mt-5"
+                                            link="https://github.com/supabase/supabase/pull/10095/files#diff-c514c66b77772b9e3d9a5403c136ee52dfeaaeacb1d8138ea85ce35ee64e5006"
+                                            text="examples.yml"
+                                          />
+                                          <CodeBlock
+                                            className="useless-code-block-class"
+                                            language="json"
+                                            hideLineNumbers={true}
+                                          >
+                                            {response}
+                                          </CodeBlock>
+                                        </>
+                                      )}
+                                    </Tabs.Panel>
+                                  )
+                                })}
+                            </Tabs>
+                          </>
                         )}
                       </div>
                     </div>
