@@ -47,7 +47,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.25.1
+    image: supabase/gotrue:v2.31.0
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -87,6 +87,7 @@ services:
 
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
+      MFA_ENABLED: ${MFA_ENABLED}
 
   rest:
     container_name: supabase-rest
