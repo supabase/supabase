@@ -16,7 +16,7 @@ interface Props {
 // [Area of improvement] Input field loses focus after the debounce (because of useUrlState?)
 const FilterRow: FC<Props> = ({ filter, filterIdx }) => {
   const state = useTrackedState()
-  const [_, setParams] = useUrlState({ arrayKeys: ['filter'] })
+  const [{ filter: filters }, setParams] = useUrlState({ arrayKeys: ['filter'] })
 
   const column = state.table?.columns.find((x) => x.name === filter.column)
   const columnOptions =
@@ -107,7 +107,7 @@ const FilterRow: FC<Props> = ({ filter, filterIdx }) => {
       }
     })
   }
-  const debounceHandler = useCallback(debounce(updateFilterValue, 600), [])
+  const debounceHandler = useCallback(debounce(updateFilterValue, 600), [filters])
 
   const placeholder =
     column?.format === 'timestamptz'
