@@ -1,6 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import Head from 'next/head'
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import components from '~/components'
 import Footer from '~/components/Footer'
 import SideBar from '~/components/Navigation/SideBar'
@@ -17,6 +17,8 @@ interface Props {
 const Layout: FC<Props> = (props: Props) => {
   // const contentString = renderToString(props.children)
 
+  const [active, setActive] = useState(false)
+
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -25,6 +27,12 @@ const Layout: FC<Props> = (props: Props) => {
     } else {
       document.documentElement.className = key === 'true' ? 'dark' : ''
     }
+  }, [])
+
+  useEffect(() => {
+    setTimeout(function () {
+      setActive(true)
+    }, 150)
   }, [])
 
   // const contentString = renderToString(props.children)
@@ -52,7 +60,13 @@ const Layout: FC<Props> = (props: Props) => {
         <meta property="og:title" content={props.meta?.title} />
       </Head>
 
-      <div className="">
+      <div
+        className={[
+          'relative transition-all ease-out',
+          'duration-150 ',
+          active ? 'opacity-100 left-0' : 'opacity-0 left-5',
+        ].join(' ')}
+      >
         {/* <p className="text-brand-900 tracking-wider">Tutorials</p> */}
         <article className="prose dark:prose-dar max-w-none">
           <h1>{props.meta.title}</h1>

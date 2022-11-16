@@ -20,9 +20,20 @@ const Layout = ({ children }) => {
           <div className="col-span-3">
             <NavigationMenu />
           </div>
-          <div className="col-span-9">{children}</div>
+          <div className="col-span-9">
+            {children}
+            <hr className="border-scale-400  mt-32"></hr>
+            <div className="flex flex-row gap-3 mt-6">
+              <span className="text-xs text-scale-900">Supabase 2022</span>
+              <span className="text-xs text-scale-900">—</span>
+              <a className="text-xs text-scale-800">Contributing</a>
+              <a className="text-xs text-scale-800">Author Styleguide</a>
+              <a className="text-xs text-scale-800">Changelog</a>
+              <a className="text-xs text-scale-800">Opensource</a>
+              <a className="text-xs text-scale-800">Supasquad</a>
+            </div>
+          </div>
         </div>
-        <Footer />
       </main>
     </>
   )

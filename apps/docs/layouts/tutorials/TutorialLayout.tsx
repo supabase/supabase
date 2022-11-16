@@ -1,6 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import Head from 'next/head'
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import components from '~/components'
 import Footer from '~/components/Footer'
 import SideBar from '~/components/Navigation/SideBar'
@@ -16,6 +16,7 @@ interface Props {
 
 const Layout: FC<Props> = (props: Props) => {
   // const contentString = renderToString(props.children)
+  const [active, setActive] = useState(false)
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
@@ -25,6 +26,12 @@ const Layout: FC<Props> = (props: Props) => {
     } else {
       document.documentElement.className = key === 'true' ? 'dark' : ''
     }
+  }, [])
+
+  useEffect(() => {
+    setTimeout(function () {
+      setActive(true)
+    }, 150)
   }, [])
 
   // const contentString = renderToString(props.children)
@@ -52,40 +59,33 @@ const Layout: FC<Props> = (props: Props) => {
         <meta property="og:title" content={props.meta?.title} />
       </Head>
 
-      <main>
-        {/* <NavBar currentPage={currentPage} /> */}
-        <div className="flex w-full flex-row">
-          <SideBar menuItems={props.menuItems} />
-          <div className="main-content-pane docs-width grid md:grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
-            <div
-              className={`${
-                props.meta?.hide_table_of_contents || !hasTableOfContents
-                  ? 'col-span-12 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8'
-                  : 'col-span-12 md:col-span-9'
-              } py-2 md:py-4 px-2 md:px-8`}
-            >
-              <p className="text-brand-900 tracking-wider">Tutorials</p>
-              <article className="prose dark:prose-dark dark:bg-scale-200 max-w-4xl mt-8">
-                <h1>{props.meta.title}</h1>
-                <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
+      <div
+        className={[
+          'relative transition-all ease-out',
+          'duration-150',
+          active ? 'opacity-100 left-0' : 'opacity-0 left-10',
+        ].join(' ')}
+      >
+        <div>
+          <p className="text-brand-900 tracking-wider">Tutorials</p>
+          <article className={['prose dark:prose-dark ', 'max-w-none'].join(' ')}>
+            <h1>{props.meta.title}</h1>
+            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
 
-                <MDXProvider components={components} children={props.children} />
-              </article>
-            </div>
-            {hasTableOfContents && !props.meta?.hide_table_of_contents && (
-              <div
-                className={[
-                  'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
-                  'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
-                ].join(' ')}
-              >
-                <TableOfContents toc={props.toc} video={props.meta.video} />
-              </div>
-            )}
-          </div>
+            <MDXProvider components={components} children={props.children} />
+          </article>
         </div>
-        <Footer />
-      </main>
+        {hasTableOfContents && !props.meta?.hide_table_of_contents && (
+          <div
+            className={[
+              'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
+              'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+            ].join(' ')}
+          >
+            <TableOfContents toc={props.toc} video={props.meta.video} />
+          </div>
+        )}
+      </div>
     </>
   )
 }
