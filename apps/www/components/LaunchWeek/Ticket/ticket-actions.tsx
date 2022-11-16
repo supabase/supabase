@@ -23,6 +23,7 @@ import IconDownload from '~/components/LaunchWeek/Ticket/icons/icon-download'
 import LoadingDots from './loading-dots'
 import styleUtils from './utils.module.css'
 import styles from './ticket-actions.module.css'
+import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
 
 type Props = {
   username: string
@@ -35,9 +36,14 @@ export default function TicketActions({ username, golden = false }: Props) {
   const downloadLink = useRef<HTMLAnchorElement>()
   const permalink = encodeURIComponent(`${SITE_URL}/tickets/${username}`)
   const text = encodeURIComponent(golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT)
+  const { userData } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${text}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
-  const downloadUrl = `/launch-week-register/api/ticket-images/${username}`
+  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?ticketNumber=${encodeURIComponent(
+    userData.ticketNumber ?? ''
+  )}&username=${encodeURIComponent(userData.username ?? '')}&name=${encodeURIComponent(
+    userData.name ?? ''
+  )}${userData.golden ? '&golden=true' : ''}`
 
   useEffect(() => {
     setImgReady(false)

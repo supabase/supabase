@@ -7,14 +7,19 @@ import {
 import Ticket from './ticket'
 import ConfContainer from './conf-container'
 import Form from './form'
+import { SupabaseClient, Session } from '@supabase/supabase-js'
 
 type Props = {
+  supabase: SupabaseClient
+  session: Session | null
   defaultUserData: UserData
   sharePage?: boolean
   defaultPageState?: PageState
 }
 
 export default function Conf({
+  supabase,
+  session,
   defaultUserData,
   sharePage,
   defaultPageState = 'registration',
@@ -25,6 +30,8 @@ export default function Conf({
   return (
     <ConfDataContext.Provider
       value={{
+        supabase,
+        session,
         userData,
         setUserData,
         setPageState,

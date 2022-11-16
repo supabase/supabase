@@ -4,8 +4,14 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
+import { createClient, Session } from '@supabase/supabase-js'
+import { useState, useEffect } from 'react'
 
 export default function TicketHome() {
+  const [supabase] = useState(() =>
+    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+  )
+  const [session, setSession] = useState<Session | null>(null)
   const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
@@ -15,6 +21,12 @@ export default function TicketHome() {
     name: query.name?.toString(),
     username: query.username?.toString(),
   }
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session)
+    })
+  }, [])
 
   return (
     <>
@@ -43,6 +55,8 @@ export default function TicketHome() {
             className="md:40 hidden w-28 dark:block lg:w-48"
           />
           <TicketContainer
+            supabase={supabase}
+            session={session}
             defaultUserData={defaultUserData}
             defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
           />

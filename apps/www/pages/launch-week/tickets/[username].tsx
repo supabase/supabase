@@ -5,7 +5,8 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
-import { getUserByUsername } from '~/lib/launch-week-ticket/db-api'
+import { createClient } from '@supabase/supabase-js'
+import { useState } from 'react'
 
 type Props = {
   username: string | null
@@ -14,7 +15,15 @@ type Props = {
   golden: boolean
 }
 
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_SECRET!
+)
+
 export default function TicketShare({ username, ticketNumber, name, golden }: Props) {
+  const [supabase] = useState(() =>
+    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+  )
   const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
 
   if (!ticketNumber) {
@@ -22,8 +31,10 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
   }
 
   const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?ticketNumber=${encodeURIComponent(
-    ticketNumber
-  )}&username=${encodeURIComponent(username ?? '')}&name=${encodeURIComponent(name ?? '')}`
+    ticketNumber ?? ''
+  )}&username=${encodeURIComponent(username ?? '')}&name=${encodeURIComponent(name ?? '')}${
+    golden ? '&golden=true' : ''
+  }`
 
   return (
     <>
@@ -52,6 +63,8 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
             className="md:40 hidden w-28 dark:block lg:w-48"
           />
           <TicketContainer
+            supabase={supabase}
+            session={null}
             defaultUserData={{
               username: username || undefined,
               name: name || '',
@@ -72,10 +85,14 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   let ticketNumber: number | null | undefined
   const GOLDEN_TICKETS = (process.env.GOLDEN_TICKETS?.split(',') ?? []).map((n) => Number(n))
 
-  if (username && username !== 'register') {
-    const user = await getUserByUsername(username)
-    name = user.name ?? user.username
-    ticketNumber = user.ticketNumber
+  if (username) {
+    const { data: user } = await supabaseAdmin!
+      .from('lw6_tickets')
+      .select('name, ticketNumber')
+      .eq('username', username)
+      .single()
+    name = user?.name
+    ticketNumber = user?.ticketNumber
   }
   return {
     props: {

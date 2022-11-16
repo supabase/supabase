@@ -24,18 +24,7 @@ import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
 import LoadingDots from './loading-dots'
 import formStyles from './form.module.css'
 import ticketFormStyles from './ticket-form.module.css'
-import { saveGithubToken } from '~/lib/launch-week-ticket/user-api'
 
-type GitHubOAuthData =
-  | {
-      type: 'token'
-      token: string
-    }
-  | {
-      type: 'user'
-      name: string
-      login: string
-    }
 type FormState = 'default' | 'loading' | 'error'
 type TicketGenerationState = 'default' | 'loading'
 
@@ -48,7 +37,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
   const [username, setUsername] = useState(defaultUsername)
   const [formState, setFormState] = useState<FormState>('default')
   const [errorMsg, setErrorMsg] = useState('')
-  const { userData, setUserData } = useConfData()
+  const { userData, setUserData, supabase } = useConfData()
   const formRef = useRef<HTMLFormElement>(null)
 
   return formState === 'error' ? (
@@ -72,7 +61,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
   ) : (
     <form
       ref={formRef}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
 
         if (formState !== 'default') {
@@ -84,93 +73,10 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
         setFormState('loading')
         setTicketGenerationState('loading')
 
-        if (!process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID) {
-          setFormState('error')
-          setErrorMsg('GitHub OAuth App must be set up.')
-          return
-        }
-
-        const windowWidth = 600
-        const windowHeight = 700
-        // https://stackoverflow.com/a/32261263/114157
-        const windowTop = window?.top
-          ? window.top.outerHeight / 2 + window.top.screenY - 700 / 2
-          : 0
-        const windowLeft = window?.top
-          ? window.top.outerWidth / 2 + window.top.screenX - 600 / 2
-          : 0
-
-        const openedWindow = window.open(
-          `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(
-            process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID
-          )}`,
-          'githubOAuth',
-          `resizable,scrollbars,status,width=${windowWidth},height=${windowHeight},top=${windowTop},left=${windowLeft}`
-        )
-
-        new Promise<GitHubOAuthData | undefined>((resolve) => {
-          const interval = setInterval(() => {
-            if (!openedWindow || openedWindow.closed) {
-              clearInterval(interval)
-              resolve(undefined)
-            }
-          }, 250)
-
-          window.addEventListener('message', function onMessage(msgEvent) {
-            // When devtools is opened the message may be received multiple times
-            if (SITE_ORIGIN !== msgEvent.origin || !msgEvent.data.type) {
-              return
-            }
-            clearInterval(interval)
-            if (openedWindow) {
-              openedWindow.close()
-            }
-            resolve(msgEvent.data)
-          })
+        await supabase.auth.signInWithOAuth({
+          provider: 'github',
+          options: { redirectTo: `${SITE_ORIGIN}/launch-week/tickets` },
         })
-          .then(async (data) => {
-            if (!data) {
-              setFormState('default')
-              setTicketGenerationState('default')
-              return
-            }
-
-            let usernameFromResponse: string
-            let name: string
-            if (data.type === 'token') {
-              const res = await saveGithubToken({ id: userData.id, token: data.token })
-
-              if (!res.ok) {
-                throw new Error('Failed to store oauth result')
-              }
-
-              const responseJson = await res.json()
-              usernameFromResponse = responseJson.username
-              name = responseJson.name
-            } else {
-              usernameFromResponse = data.login
-              name = data.name
-            }
-
-            document.body.classList.add('ticket-generated')
-            setUserData({ ...userData, username: usernameFromResponse, name })
-            setUsername(usernameFromResponse)
-            setFormState('default')
-            setTicketGenerationState('default')
-
-            // Prefetch GitHub avatar
-            new Image().src = `https://github.com/${usernameFromResponse}.png`
-
-            // Prefetch the twitter share URL to eagerly generate the page
-            fetch(`/tickets/${usernameFromResponse}`).catch((_) => {})
-          })
-          .catch((err) => {
-            // eslint-disable-next-line no-console
-            console.error(err)
-            setFormState('error')
-            setErrorMsg('Error! Please try again.')
-            setTicketGenerationState('default')
-          })
       }}
     >
       <div className={cn(formStyles['form-row'], ticketFormStyles['form-row'])}>

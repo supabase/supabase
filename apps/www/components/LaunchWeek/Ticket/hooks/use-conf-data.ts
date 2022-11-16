@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, useContext } from 'react'
 
 export type PageState = 'registration' | 'ticket'
@@ -27,6 +28,8 @@ export type UserData = {
 }
 
 type ConfDataContextType = {
+  supabase: SupabaseClient
+  session: Session | null
   userData: UserData
   setUserData: React.Dispatch<React.SetStateAction<UserData>>
   setPageState: React.Dispatch<React.SetStateAction<PageState>>

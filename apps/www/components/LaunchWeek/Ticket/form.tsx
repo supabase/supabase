@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import cn from 'classnames'
 import useConfData from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import { useRouter } from 'next/router'
@@ -22,20 +22,23 @@ import LoadingDots from './loading-dots'
 import styleUtils from './utils.module.css'
 import styles from './form.module.css'
 import useEmailQueryParam from '~/components/LaunchWeek/Ticket/hooks/use-email-query-param'
-import { register } from '~/lib/launch-week-ticket/user-api'
 // import Captcha, { useCaptcha } from './captcha'
 
 type FormState = 'default' | 'loading' | 'error'
 
+export type ConfUser = {
+  id?: string
+  email?: string
+  ticketNumber?: number
+  name?: string
+  username?: string
+  createdAt?: number
+  golden?: boolean
+}
+
 type Props = {
   sharePage?: boolean
   align?: 'Left' | 'Center'
-}
-
-class FormError extends Error {
-  constructor(public res: Response) {
-    super()
-  }
 }
 
 export default function Form({ sharePage, align = 'Center' }: Props) {
@@ -44,31 +47,55 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   const [errorTryAgain, setErrorTryAgain] = useState(false)
   const [focused, setFocused] = useState(false)
   const [formState, setFormState] = useState<FormState>('default')
-  const { setPageState, setUserData } = useConfData()
+  const { setPageState, setUserData, session, userData, supabase } = useConfData()
   const router = useRouter()
   const isCaptchaEnabled = false
-  // const {
-  //   ref: captchaRef,
-  //   execute: executeCaptcha,
-  //   reset: resetCaptcha,
-  //   isEnabled: isCaptchaEnabled,
-  // } = useCaptcha()
+
+  useEffect(() => {
+    if (session?.user) {
+      document.body.classList.add('ticket-generated')
+      const username = session.user.user_metadata.user_name
+      const name = session.user.user_metadata.full_name
+      const email = session.user.email
+      supabase
+        .from('lw6_tickets')
+        .upsert({ email, name, username }, { onConflict: 'email', ignoreDuplicates: false })
+        .eq('email', email)
+        .select()
+        .single()
+        .then(({ data, error }) => {
+          if (error) return supabase.auth.signOut()
+          setUserData(data)
+          setFormState('default')
+
+          // Prefetch GitHub avatar
+          new Image().src = `https://github.com/${username}.png`
+
+          // Prefetch the twitter share URL to eagerly generate the page
+          fetch(`/launch-week/tickets/${username}`).catch((_) => {})
+
+          setPageState('ticket')
+        })
+    }
+  }, [session])
+
+  async function register(email: string, token?: string): Promise<ConfUser> {
+    const { data, error } = await supabase!.from('lw6_tickets').insert({ email })
+    return {
+      id: 'new',
+      ticketNumber: 1234,
+      name: '',
+      username: '',
+      golden: false,
+    }
+  }
 
   const handleRegister = useCallback(
     (token?: string) => {
       register(email, token)
-        .then(async (res) => {
-          if (!res.ok) {
-            throw new FormError(res)
-          }
-
-          const data = await res.json()
-          const params = {
-            id: data.id,
-            ticketNumber: data.ticketNumber,
-            name: data.name,
-            username: data.username,
-            golden: data.golden ?? false,
+        .then(async (params) => {
+          if (!params) {
+            throw new Error()
           }
 
           if (sharePage) {
@@ -88,17 +115,6 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
         })
         .catch(async (err) => {
           let message = 'Error! Please try again.'
-
-          if (err instanceof FormError) {
-            const { res } = err
-            const data = res.headers.get('Content-Type')?.includes('application/json')
-              ? await res.json()
-              : null
-
-            if (data?.error?.code === 'bad_email') {
-              message = 'Please enter a valid email'
-            }
-          }
 
           setErrorMsg(message)
           setFormState('error')
