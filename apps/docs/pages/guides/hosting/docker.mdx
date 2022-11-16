@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: docker
-title: Self-hosting with Docker
-description: How to configure and deploy Supabase.
-sidebar_label: Docker
----
+  id: 'docker',
+  title: 'Self-hosting with Docker',
+  description: 'How to configure and deploy Supabase.',
+  sidebar_label: 'Docker',
+}
 
 Docker is the easiest way to get started with self-hosted Supabase.
 
@@ -114,3 +114,7 @@ See the following guides to deploy Docker Compose setup using your preferred too
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Sign in: [app.supabase.com](https://app.supabase.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

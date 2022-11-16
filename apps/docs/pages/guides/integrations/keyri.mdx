@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: keyri
-title: 'Keyri'
-description: 'QR authentication for an easy and flexible biometric solution across all platforms.'
----
+  id: 'keyri',
+  title: 'Keyri',
+  description:
+    'QR authentication for an easy and flexible biometric solution across all platforms.',
+}
 
 Keyri can be used to incorporate sign-in-with-QR functionality into your Supabase app, allowing users to scan a QR code on your web app with your mobile app and be instantly logged into the web app without having to input any credentials.
 
@@ -140,3 +141,7 @@ if (response.error != null) {
         .catchError((error, stackTrace) => _onError(error));
 }
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

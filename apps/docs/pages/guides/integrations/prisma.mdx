@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: prisma
-title: 'Prisma'
-description: 'Connect your Supabase postgres database to your Prisma project.'
----
+  id: 'prisma',
+  title: 'Prisma',
+  description: 'Connect your Supabase postgres database to your Prisma project.',
+}
 
 This guide explains how to quickly connect the Postgres database provided by Supabase to a Prisma project.
 
@@ -162,3 +162,7 @@ alter default privileges in schema public grant all on sequences to postgres, an
 - [Prisma](https://prisma.io) official website.
 - [Prisma GitHub](https://github.com/prisma/prisma).
 - [Prisma](https://www.prisma.io/docs/) documentation.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

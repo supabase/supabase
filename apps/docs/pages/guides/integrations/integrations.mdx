@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: integrations
-title: 'Supabase Marketplace'
-description: 'Integrations and Partners'
----
+  id: 'integrations',
+  title: 'Supabase Marketplace',
+  description: 'Integrations and Partners',
+}
 
 The Supabase Marketplace brings together all the tools you need to extend your Supabase project. This includes:
 
@@ -34,3 +34,7 @@ Integrations are assessed on the following criteria:
   All listings are required to have their own Terms and Conditions, Privacy Policy, and Acceptable Use Policy, and the company must have resources to meet their SLAs.
 - **Maintainability**
   All integrations are required to be maintained and functional with Supabase, and the company may be assessed on your ability to remain functional over a long time horizon.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

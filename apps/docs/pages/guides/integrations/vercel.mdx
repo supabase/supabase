@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: vercel
-title: 'Vercel'
-description: The fastest way to get up and running with an application that uses Supabase is with Vercel's Next.js starter and Supabase integration.
----
+  id: 'vercel',
+  title: 'Vercel',
+  description:
+    "The fastest way to get up and running with an application that uses Supabase is with Vercel's Next.js starter and Supabase integration.",
+}
 
 This guide steps through using Vercel's dashboard to create a Next.js project integrated with Supabase. To further streamline the process, we will be using the Next.js starter template, which can be automatically forked to a new GitHub repo, without leaving the dashboard!
 
@@ -241,3 +242,7 @@ export default function Home() {
 - [Vercel blog](https://vercel.com/blog).
 - [Vercel docs](https://vercel.com/docs).
 - [Vercel Integration docs](https://vercel.com/docs/integrations)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

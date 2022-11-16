@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: draftbit
-title: 'Draftbit'
-description: 'Connect your Supabase postgres database to your Low-code mobile app.'
----
+  id: 'draftbit',
+  title: 'Draftbit',
+  description: 'Connect your Supabase postgres database to your Low-code mobile app.',
+}
 
 This guide explains how to connect a Supabase back-end to a Draftbit front-end and then configure all CRUD operations necessary to build a simple mobile app.
 
@@ -231,3 +231,7 @@ In the API Request action:
 - [Draftbit](https://draftb.it/3Fkbask) official website.
 - [Draftbit Community](https://community.draftbit.com/home).
 - [Draftbit](https://docs.draftbit.com/) documentation.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

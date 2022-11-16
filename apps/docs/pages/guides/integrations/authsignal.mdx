@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: authsignal
-title: 'Authsignal'
-description: 'Add an MFA step after sign-in. Use Supabase Auth to sign in with email and password and Authsignal to initiate an Authenticator App challenge.'
----
+  id: 'authsignal',
+  title: 'Authsignal',
+  description:
+    'Add an MFA step after sign-in. Use Supabase Auth to sign in with email and password and Authsignal to initiate an Authenticator App challenge.',
+}
 
 This guide shows how to integrate [Authsignal](https://www.authsignal.com/) with [Next.js](https://nextjs.org/) and [Supabase](https://supabase.com/) in order to add an MFA step after sign-in.
 
@@ -582,3 +583,7 @@ Then if you sign out, you'll be prompted to complete an MFA challenge when signi
 
 - To learn more about Authsignal take a look at the [API Documentation](https://docs.authsignal.com/).
 - You can customize the look and feel of the Authsignal Prebuilt MFA page [here](https://portal.authsignal.com/organisations/tenants/customizations).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

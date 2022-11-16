@@ -1,13 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: dhiwise
-title: 'DhiWise'
-description: 'Get started with Supabase and DhiWise. Convert your Figma designs into Flutter apps, store data, and authenticate your users'
----
-
-import select from '/docs/img/guides/integrations/dhiwise/select.png'
-import create from '/docs/img/guides/integrations/dhiwise/create.png'
+  id: 'dhiwise',
+  title: 'DhiWise',
+  description:
+    'Get started with Supabase and DhiWise. Convert your Figma designs into Flutter apps, store data, and authenticate your users',
+}
 
 This guide explains how to connect Supabase backend to DhiWise Flutter application quickly.
 
@@ -66,7 +64,9 @@ After downloading the application source code,
 
 When you first integrate Supabase in your DhiWise Flutter application, You will be asked to add [Supabase auth key and URL](##step-3-find-the-api-key-and-url). When you add them, all the tables available in your Supabase project will be synced in DhiWise. You can integrate Select and Create queries on your Flutter screen for a particular table in DhiWise.
 
-<h3> Select records </h3>
+### Select records
+
+![Create](/docs/img/guides/integrations/dhiwise/select.png)
 
 #### **Step 1:**
 
@@ -197,3 +197,7 @@ Finally, you have added Supabase to your application to create records from your
 
 - [DhiWise Official Website](https://dhiwise.com)
 - [DhiWise Documentation](https://docs.dhiwise.com)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

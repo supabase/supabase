@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: overview
-title: Self Hosting
-sidebar_label: Overview
-description: Getting started with Self Hosting.
----
+  id: 'overview',
+  title: 'Self Hosting',
+  sidebar_label: 'Overview',
+  description: 'Getting started with Self Hosting.',
+}
 
 There are several ways to use Supabase:
 
@@ -155,3 +155,7 @@ While Supabase officially supports Docker, we have several other deployment stra
 - [supabase-kubernetes](https://github.com/supabase-community/supabase-kubernetes) (Unofficial)
 - [supabase-terraform](https://github.com/supabase-community/supabase-terraform) (Unofficial)
 - [supabase-traefik](https://github.com/supabase-community/supabase-traefik) (Unofficial)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

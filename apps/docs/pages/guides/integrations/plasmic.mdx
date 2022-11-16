@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: plasmic
-title: 'Plasmic'
-description: 'Get started with Supabase and Plasmic, an open-source framework for building internal tools.'
----
+  id: 'plasmic',
+  title: 'Plasmic',
+  description:
+    'Get started with Supabase and Plasmic, an open-source framework for building internal tools.',
+}
 
 In this guide, we will show you how to build a crowd-sourced Pokemon Pokedex, by connecting **Supabase**, an open source Firebase backend alternative, with **Plasmic**, a visual builder for the web. While many users leverage Plasmic to quickly launch and iterate on landing pages, in this tutorial we’ll show just how powerful Plasmic can be as a general-purpose visual builder for React, which can be used to design and implement fully featured read-write applications.
 
@@ -312,3 +313,7 @@ export function SupabaseTextField({ name, className }: { name?: string; classNam
 ```
 
 In summary, by populating state into React contexts, we can store and retrieve data for use in other code components, which can be used for arbitrarily powerful interactions in Plasmic Studio.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

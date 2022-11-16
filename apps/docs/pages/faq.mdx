@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: faq
-title: FAQs
-description: 'Most frequently asked questions regarding Supabase'
----
+  id: 'faq',
+  title: 'FAQs',
+  description: 'Most frequently asked questions regarding Supabase',
+}
 
 ### Where do I find support?
 
@@ -38,3 +38,7 @@ We only support PostgreSQL. It's unlikely we'll ever move away from Postgres; ho
 We officially support [JavaScript](/docs/reference/javascript/installing) and [Flutter](/docs/reference/dart/installing).
 
 You can find community-supported libraries in our [GitHub Community](https://github.com/supabase-community), and you can also help us to identify the most popular languages by [voting for a new client library](https://github.com/supabase/supabase/discussions/5).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

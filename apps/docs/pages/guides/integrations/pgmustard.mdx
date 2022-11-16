@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: pgmustard
-title: 'pgMustard'
-description: 'Troubleshoot slow queries on Supabase with pgMustard, a visualization tool that also gives advice.'
----
+  id: 'pgmustard',
+  title: 'pgMustard',
+  description:
+    'Troubleshoot slow queries on Supabase with pgMustard, a visualization tool that also gives advice.',
+}
 
 This guide explains how to troubleshoot slow queries on Supabase using `explain` and pgMustard.
 
@@ -66,3 +67,7 @@ We could look into why Postgres isn’t choosing to do an index-only scan here, 
 
 - [pgMustard](https://www.pgmustard.com) official website.
 - [pgMustard explain glossary](https://www.pgmustard.com/docs/explain).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

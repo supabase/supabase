@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: dashibase
-title: 'Dashibase'
-description: 'Create an internal CRUD dashboard with Supabase and Dashibase in 15 mins.'
----
+  id: 'dashibase',
+  title: 'Dashibase',
+  description: 'Create an internal CRUD dashboard with Supabase and Dashibase in 15 mins.',
+}
 
 Are you tired of building admin panels? [Dashibase](https://dashibase.com/) is a super fast way to build internal CRUD dashboards with a Notion-like UI.
 
@@ -99,3 +99,7 @@ P.S. How long did we take? :)
 - [Dashibase open-source repo](https://github.com/dashibase)
 - [Dashibase Twitter](https://twitter.com/dashibase)
 - [Dashibase Discord](https://discord.gg/crhDFYvbbq)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
