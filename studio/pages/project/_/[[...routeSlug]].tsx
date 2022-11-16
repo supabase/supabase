@@ -13,7 +13,7 @@ const Header: FC<Props> = () => {
   return (
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
-        <Link href="/">
+        <Link href="/projects">
           <a>
             <img
               src="/img/supabase-logo.svg"

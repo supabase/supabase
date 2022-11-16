@@ -1,5 +1,5 @@
 import Router, { useRouter } from 'next/router'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, PropsWithChildren } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -220,7 +220,7 @@ const Wizard: NextPageWithLayout = () => {
       }
       footer={
         <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => Router.push('/')}>
+          <Button type="default" onClick={() => Router.push('/projects')}>
             Cancel
           </Button>
           <div className="items-center space-x-3">
@@ -415,7 +415,7 @@ const Wizard: NextPageWithLayout = () => {
 }
 
 const PageLayout = withAuth(
-  observer(({ children }) => {
+  observer<PropsWithChildren<{}>>(({ children }) => {
     const router = useRouter()
     const { slug } = router.query
 
