@@ -25,12 +25,13 @@ const AutoSchemaForm = observer(() => {
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
-    JWT_EXP: authConfig.config.JWT_EXP,
     SITE_URL: authConfig.config.SITE_URL,
+    JWT_EXP: authConfig.config.JWT_EXP,
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig.config.REFRESH_TOKEN_ROTATION_ENABLED || false,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
+    MAX_ENROLLED_FACTORS: authConfig.config.MAX_ENROLLED_FACTORS,
   }
 
   const schema = object({
@@ -48,6 +49,9 @@ const AutoSchemaForm = observer(() => {
       is: true,
       then: string().required('Must have a hCaptcha secret'),
     }),
+    MAX_ENROLLED_FACTORS: number()
+      .min(0, 'Must be be a value more than 0')
+      .max(30, 'Must be a value less than 30'),
   })
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
@@ -175,12 +179,24 @@ const AutoSchemaForm = observer(() => {
                       id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                       size="small"
                       min={0}
-                      label="Reuse Interval"
+                      label="Reuse interval"
                       descriptionText="Time interval where the same refresh token can be used to request for an access token."
                       actions={<span className="mr-3 text-scale-900">seconds</span>}
                       disabled={!canUpdateConfig}
                     />
                   )}
+                </FormSectionContent>
+              </FormSection>
+              <FormSection
+                header={<FormSectionLabel>Multi Factor Authentication (MFA)</FormSectionLabel>}
+              >
+                <FormSectionContent loading={!isLoaded}>
+                  <InputNumber
+                    id="MAX_ENROLLED_FACTORS"
+                    size="small"
+                    label="Maximum number of enrolled factors"
+                    disabled={!canUpdateConfig}
+                  />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>
