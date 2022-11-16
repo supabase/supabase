@@ -118,17 +118,19 @@ authSubscription.data?.unsubscribe();
 ```
 
 </TabPanel>
+
 <TabPanel id="1.0x" label="After">
 
 ```dart
 final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-      final AuthChangeEvent event = data.event;
-      final Session? session = data.session;
-      // handle auth state change
-    });
+  final AuthChangeEvent event = data.event;
+  final Session? session = data.session;
+  // handle auth state change
+});
 
 // Unsubscribe when no longer needed
 authSubscription.cancel();
+
 ```
 
 </TabPanel>
