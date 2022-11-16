@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: installing
-title: 'Installing'
-slug: installing
----
+  id: 'installing',
+  title: 'Installing',
+  slug: 'installing',
+}
 
 ## Flutter
 
@@ -21,3 +21,7 @@ For non-Flutter projects using Dart, such as server-side Dart or Angular-Dart, y
 ```bash
 dart pub add supabase
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

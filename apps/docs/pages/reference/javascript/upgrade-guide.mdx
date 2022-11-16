@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: upgrade-guide
-title: Upgrade to supabase-js v2
-description: 'Learn how to upgrade to supabase-js v2.'
----
+  id: 'upgrade-guide',
+  title: 'Upgrade to supabase-js v2',
+  description: 'Learn how to upgrade to supabase-js v2.',
+}
 
 supabase-js v2 focuses on "quality-of-life" improvements for developers and addresses some of the largest pain points in v1. v2 includes type support, a rebuilt Auth library with async methods, improved errors, and more.
 
@@ -436,3 +436,7 @@ supabase.removeChannel(userListener)
 
 </TabPanel>
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

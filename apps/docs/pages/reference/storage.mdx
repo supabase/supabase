@@ -1,10 +1,12 @@
----
-slug: /
-sidebar_position: 1
-id: storage-server
-title: Supabase Storage Server
-sidebar_label: Supabase Storage Server
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  slug: '/',
+  sidebar_position: 1,
+  id: 'storage-server',
+  title: 'Supabase Storage Server',
+  sidebar_label: 'Supabase Storage Server',
+}
 
 An S3 compatible object storage service that integrates with Postgres.
 
@@ -26,3 +28,7 @@ Read [this post](https://supabase.com/blog/supabase-storage) on why we decided t
 - [Known bugs and issues](https://github.com/supabase/storage-js/issues)
 - [Storage Guides](/guides/storage)
 - [OpenAPI Docs](https://supabase.github.io/storage-api/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

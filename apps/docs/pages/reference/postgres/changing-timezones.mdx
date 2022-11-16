@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: changing-timezones
-title: "Changing Timezones"
-slug: changing-timezones
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
----
+  id: 'changing-timezones',
+  title: 'Changing Timezones',
+  slug: 'changing-timezones',
+  custom_edit_url: 'https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml',
+}
 
 ;
 import TabsPanel from '@theme/TabsPanel';
@@ -98,3 +98,7 @@ where name ilike '%york%';
 </TabsPanel>
 
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: upgrade-guide
-title: Upgrade to supabase-flutter v1
-description: 'Learn how to upgrade to supabase-flutter v1.'
----
+  id: 'upgrade-guide',
+  title: 'Upgrade to supabase-flutter v1',
+  description: 'Learn how to upgrade to supabase-flutter v1.',
+}
 
 supabase-flutter focuses on improving the developer experience and making it easier to use. This guide will help you upgrade from supabase-flutter v0 to v1.
 
@@ -544,3 +544,7 @@ await supabase.removeChannel(channel);
 
 </TabPanel>
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

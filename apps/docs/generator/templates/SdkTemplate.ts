@@ -1,7 +1,5 @@
 const template = `
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
+---
 id: usage
 title: Usage
 toc_max_heading_level: 2

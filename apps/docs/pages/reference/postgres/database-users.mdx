@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: database-users
-title: "Database Users"
-slug: database-users
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
----
-
-;
-import TabsPanel from '@theme/TabsPanel';
+  id: 'database-users',
+  title: 'Database Users',
+  slug: 'database-users',
+  custom_edit_url: 'https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml',
+}
 
 Users and Roles are almost interchangeable.
 
@@ -31,3 +28,7 @@ with password 'hello';
 </TabsPanel>
 
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

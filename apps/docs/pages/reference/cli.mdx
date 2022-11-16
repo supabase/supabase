@@ -1,13 +1,13 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: intro
-slug: /
-sidebar_position: 1
-sidebar_label: Supabase CLI
-title: Supabase CLI
-hide_table_of_contents: true
----
+  id: 'intro',
+  slug: '/',
+  sidebar_position: 1,
+  sidebar_label: 'Supabase CLI',
+  title: 'Supabase CLI',
+  hide_table_of_contents: true,
+}
 
 The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.
 The CLI is still under development, but it contains all the functionality for working with your Supabase projects and the Supabase Platform.
@@ -28,3 +28,7 @@ The CLI is still under development, but it contains all the functionality for wo
 - [Known bugs and issues](https://github.com/supabase/cli/issues)
 - [Supabase CLI v1 and Management API Beta](https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta)
 - [The CLI team announcing CLI V1 and Management API Beta - Video](https://www.youtube.com/watch?v=OpPOaJI_Z28)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

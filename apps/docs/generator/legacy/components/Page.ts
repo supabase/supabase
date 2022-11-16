@@ -26,9 +26,7 @@ const Page = ({
   errors = '',
 }: PageParmas) =>
   `
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
+---
 id: ${id}
 title: "${title}"
 slug: ${slug}

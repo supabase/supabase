@@ -1,9 +1,9 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: typescript-support
-title: Typescript Support
----
+  id: 'typescript-support',
+  title: 'Typescript Support',
+}
 
 `supabase-js` supports Typescript.
 
@@ -80,3 +80,7 @@ type MoviesResponseSuccess = MoviesResponse['data'] & {
   actors: Actors[]
 }
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

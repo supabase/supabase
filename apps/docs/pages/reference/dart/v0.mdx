@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: intro
-slug: /
-sidebar_label: Supabase Dart Library
-title: Supabase Dart Library
----
+  id: 'intro',
+  slug: '/',
+  sidebar_label: 'Supabase Dart Library',
+  title: 'Supabase Dart Library',
+}
 
 <Admonition type="caution">
 
@@ -27,3 +27,7 @@ You can use the `supabase-dart` library to:
 
 - Source Code: [github.com/supabase/supabase-dart](https://github.com/supabase/supabase-dart)
 - [Known bugs and issues](https://github.com/supabase/supabase-dart/issues)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

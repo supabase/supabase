@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: installing
-title: 'Installing'
-slug: installing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
----
+  id: 'installing',
+  title: 'Installing',
+  slug: 'installing',
+  custom_edit_url: 'https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml',
+}
 
 All JavaScript libraries are built directly by the Supabase team. this is in reference/js/installing
 
@@ -34,3 +34,7 @@ Or via CDN
 //or
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

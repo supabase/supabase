@@ -1,10 +1,12 @@
----
-slug: /
-sidebar_position: 1
-id: auth-server
-title: Supabase Auth Server
-sidebar_label: Supabase Auth Server
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  slug: '/',
+  sidebar_position: 1,
+  id: 'auth-server',
+  title: 'Supabase Auth Server',
+  sidebar_label: 'Supabase Auth Server',
+}
 
 The Supabase Auth Server (GoTrue) is a JSON Web Token (JWT)-based API for managing users and issuing access tokens.
 
@@ -20,3 +22,7 @@ GoTrue is an open-source API written in Golang, that acts as a self-standing API
 - [Source Code](https://github.com/supabase/gotrue)
 - [Known bugs and issues](https://github.com/supabase/gotrue/issues)
 - [Auth Guides](/docs/guides/auth)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: connection-strings
-title: "Connection Strings"
-slug: connection-strings
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
----
-
-;
-import TabsPanel from '@theme/TabsPanel';
+  id: 'connection-strings',
+  title: 'Connection Strings',
+  slug: 'connection-strings',
+  custom_edit_url: 'https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml',
+}
 
 There are various ways to connect to your database, depending on the configuration of your Postgres instance and the tool which you are connecting with.
 
@@ -115,3 +112,7 @@ host=hostname port=5432 dbname=databasename user=username password=secret
 </TabsPanel>
 
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

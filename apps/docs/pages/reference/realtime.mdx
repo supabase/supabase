@@ -1,10 +1,12 @@
----
-slug: /
-sidebar_position: 1
-id: realtime
-title: Supabase Realtime Server
-sidebar_label: Supabase Realtime Server
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  slug: '/',
+  sidebar_position: 1,
+  id: 'realtime',
+  title: 'Supabase Realtime Server',
+  sidebar_label: 'Supabase Realtime Server',
+}
 
 Supabase Realtime is a server built with Elixir using the [Phoenix Framework](https://www.phoenixframework.org) that allows you to listen to changes in your PostgreSQL database via logical replication and then broadcast those changes via WebSockets.
 
@@ -55,3 +57,7 @@ Not yet! Due to the following limitations:
 - [Source Code](https://github.com/supabase/realtime)
 - [Known bugs and issues](https://github.com/supabase/realtime/issues)
 - [Realtime Guides](https://supabase.com/docs/guides/realtime)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

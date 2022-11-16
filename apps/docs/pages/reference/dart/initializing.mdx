@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: initializing
-title: 'Initializing'
-slug: initializing
----
+  id: 'initializing',
+  title: 'Initializing',
+  slug: 'initializing',
+}
 
 ## Flutter
 
@@ -39,3 +39,7 @@ and is the easiest way to interact with everything we offer within the Supabase 
 ```dart
 final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
