@@ -6,8 +6,8 @@ export default {
   content: [
     <>
       <p>
-        Before we start building we're going to set up our Database and API. This is as simple as
-        starting a new Project in Supabase and then creating a "schema" inside the database.
+        Before we start building we&apos;re going to set up our Database and API. This is as simple
+        as starting a new Project in Supabase and then creating a schema inside the database.
       </p>
       <h3>Create a project</h3>
     </>,
@@ -46,7 +46,7 @@ export default {
     <>
       <h3>Set up the database schema </h3>
       <p>
-        Now we are going to set up the database schema. We can use the "User Management Starter"
+        Now we are going to set up the database schema. We can use the User Management Starter
         quickstart in the SQL Editor, or you can just copy/paste the SQL from below and run it
         yourself.
       </p>

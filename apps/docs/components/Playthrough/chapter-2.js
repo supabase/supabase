@@ -7,7 +7,7 @@ export default {
   title: 'Step 2: Building the App',
   content: [
     <>
-      <p>Let's start building the Next.js app from scratch.</p>
+      <p>Lets start building the Next.js app from scratch.</p>
       <h3>Initialize a Next.js app</h3>
       <p>We can use create-next-app to initialize an app called supabase-nextjs</p>
     </>,

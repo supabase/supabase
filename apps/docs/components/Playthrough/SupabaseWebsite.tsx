@@ -10,8 +10,8 @@ export function Login({ onEvent }) {
         Sign In with GitHub
       </button>
       <p className="mt-6" style={{ color: '#a0a0a0', fontSize: 12 }}>
-        By continuing, you agree to Supabase's Terms of Service and Privacy Policy, and to receive
-        periodic emails with updates.
+        By continuing, you agree to Supabase&apos;s Terms of Service and Privacy Policy, and to
+        receive periodic emails with updates.
       </p>
     </div>
   )
@@ -20,7 +20,7 @@ export function Login({ onEvent }) {
 export function NewProject({ onEvent }) {
   return (
     <div style={{ width: 400 }}>
-      <div style={{ textAlign: 'left', marginBottom: 12 }}>Lorem Ipsum's Org</div>
+      <div style={{ textAlign: 'left', marginBottom: 12 }}>Lorem Ipsums Org</div>
       <div className="p-4 border border-gray-900 border-dashed rounded">
         <h2 style={{ fontSize: 18 }}>No projects</h2>
         <p style={{ fontSize: 14, color: '#999' }}>Get started by creating a new project.</p>
@@ -88,7 +88,6 @@ export function ProjectDetails({ onEvent }) {
             onClick={() => {
               onEvent('create')
               setTimeout(() => {
-                console.log('timeout')
                 onEvent('launch database')
               }, 2000)
             }}
