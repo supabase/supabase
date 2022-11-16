@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: supasquad
-title: SupaSquad
-description: Supabase Advocate program
----
+  id: 'supasquad',
+  title: 'SupaSquad',
+  description: 'Supabase Advocate program',
+}
 
 The SupaSquad is an official Supabase advocate program where community members help build and manage the Supabase community.
 
@@ -88,3 +88,7 @@ Apply to join the program using [this form](https://airtable.com/shr0FtLqLfhpuEy
   No worries! The program isn't a job. It's just an opportunity to build your skillset and audience within
   the Supabase ecosystem.
 </details>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: introduction
-title: Supabase Handbook
-description: 'The Supabase public handbook and manifesto'
----
+  id: 'introduction',
+  title: 'Supabase Handbook',
+  description: 'The Supabase public handbook and manifesto',
+}
 
 Supabase is thinking in public. Everything is online, no matter how raw the current state of things.
 
@@ -15,3 +15,7 @@ This is our public handbook and manifesto. We are completely opensource and this
 ## Opensource
 
 Wherever we can we will support existing opensource tools and libraries.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: contributing
-title: Contributing
-description: Want to help?
----
+  id: 'contributing',
+  title: 'Contributing',
+  description: 'Want to help?',
+}
 
 ## How to contribute
 
@@ -26,3 +26,7 @@ Want to contribute? Why not jump into our GitHub repo and:
 - [Translate our Readme](https://github.com/supabase/supabase/issues/1341).
 - Try our products and give feedback.
 - Spread the word if you like what we are doing.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
