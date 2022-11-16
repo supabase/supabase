@@ -23,6 +23,7 @@ export function getDocsBySlug(slug: string) {
     (realSlug.includes('reference/cli/') && !nonGeneratedReferencePages.includes(realSlug)) ||
     (realSlug.includes('reference/api/') && !nonGeneratedReferencePages.includes(realSlug)) ||
     (realSlug.includes('reference/auth/') && !nonGeneratedReferencePages.includes(realSlug)) ||
+    (realSlug.includes('reference/realtime/') && !nonGeneratedReferencePages.includes(realSlug)) ||
     (realSlug.includes('reference/storage/') && !nonGeneratedReferencePages.includes(realSlug))
       ? getPathToGeneratedDoc(realSlug)
       : realSlug
