@@ -28,7 +28,9 @@ const CustomDomainVerify = ({
           // [Joshen TODO] - Is this what it means? Do we also need to cover for 3_challenge_verified?
           ui.setNotification({
             category: 'info',
-            message: 'Unable to verify records from DNS provider yet',
+            message:
+              'Unable to verify records from DNS provider yet. Do check again in a bit as it may take up to 24 hours for changes in DNS records to propagate',
+            duration: 6000,
           })
         }
       },
@@ -45,15 +47,23 @@ const CustomDomainVerify = ({
   return (
     <>
       {isSuccessfullyAdded && (
-        <Alert withIcon variant="success" title="Your custom domain has been successfully added">
+        <Alert
+          withIcon
+          closable
+          variant="success"
+          title="Your custom domain has been successfully added"
+        >
           Please verify the domain by adding the listed records below to your domain's DNS settings.
         </Alert>
       )}
       <div>
         <h4 className="text-scale-1200">Set the following record(s) in your DNS provider:</h4>
-        <span className="text-sm text-scale-1100">
+        <p className="text-sm text-scale-1100">
           Please note that it may take up to 24 hours for the DNS records to propagate.
-        </span>
+        </p>
+        <p className="text-sm text-scale-1100">
+          Records which have been successfully verified will be removed from this list below.
+        </p>
       </div>
 
       {customDomain.verification_errors?.includes(
