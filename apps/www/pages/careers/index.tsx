@@ -455,12 +455,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
                               <div className="flex items-center space-x-4">
                                 <Badge className="rounded-full flex items-center lg:text-sm">
-                                  <div className="relative w-3 h-3 mx-auto">
-                                    <Image
+                                  <div className="w-3 h-3">
+                                    <img
                                       src="/images/career/icons/globe-dark.svg"
                                       alt="globe icon"
-                                      layout="fill"
-                                      objectFit="cover"
+                                      width="100%"
+                                      height="100%"
                                     />
                                   </div>
                                   <span className="ml-1">{job.location.name}</span>
