@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
+import { PROJECT_ENDPOINT, PROJECT_REST_URL } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -39,11 +40,11 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
           app: { id: 1, name: 'Auto API' },
           app_config: {
             db_schema: 'public',
-            endpoint: process.env.SUPABASE_URL,
+            endpoint: PROJECT_ENDPOINT,
             realtime_enabled: true,
           },
-          endpoint: process.env.SUPABASE_URL || 'http://localhost:8000',
-          restUrl: `${process.env.SUPABASE_REST_URL}/rest/v1/` || 'http://localhost:8000/rest/v1/',
+          endpoint: PROJECT_ENDPOINT,
+          restUrl: PROJECT_REST_URL,
           defaultApiKey: process.env.SUPABASE_ANON_KEY,
           serviceApiKey: process.env.SUPABASE_SERVICE_KEY,
           service_api_keys: [
@@ -68,11 +69,11 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       app: { id: 1, name: 'Auto API' },
       app_config: {
         db_schema: 'public',
-        endpoint: process.env.SUPABASE_URL,
+        endpoint: PROJECT_ENDPOINT,
         realtime_enabled: true,
       },
-      endpoint: process.env.SUPABASE_URL,
-      restUrl: `${process.env.SUPABASE_REST_URL}/rest/v1/`,
+      endpoint: PROJECT_ENDPOINT,
+      restUrl: PROJECT_REST_URL,
       defaultApiKey: process.env.SUPABASE_ANON_KEY,
       serviceApiKey: process.env.SUPABASE_SERVICE_KEY,
       service_api_keys: [
