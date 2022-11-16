@@ -29,7 +29,7 @@ const examples = [
   },
   {
     name: 'Working with Supabase Storage',
-    description: 'An example on reading a file from Supbase Storage.',
+    description: 'An example on reading a file from Supabase Storage.',
     href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
   },
   {
