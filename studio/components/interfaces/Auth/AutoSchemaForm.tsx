@@ -31,7 +31,7 @@ const AutoSchemaForm = observer(() => {
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
-    MAX_ENROLLED_FACTORS: authConfig.config.MAX_ENROLLED_FACTORS || 10, // [TODO remove the 10]
+    MAX_ENROLLED_FACTORS: authConfig.config.MAX_ENROLLED_FACTORS,
   }
 
   const schema = object({
