@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
+import { PROJECT_REST_URL } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -35,7 +36,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
       db_ssl: false,
     }),
     kpsVersion: 'kps-v1.0.0',
-    restUrl: `${process.env.SUPABASE_REST_URL}/rest/v1/` || 'http://localhost:8000/rest/v1/',
+    restUrl: PROJECT_REST_URL,
   }
 
   return res.status(200).json(response)

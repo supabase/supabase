@@ -18,7 +18,6 @@ import {
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { IS_PLATFORM } from 'lib/constants'
 
 interface Props {}
 
