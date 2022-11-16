@@ -88,11 +88,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
               formStyles['generate-with-github'],
               formStyles[formState]
             )}
-            disabled={
-              !process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID ||
-              formState === 'loading' ||
-              Boolean(username)
-            }
+            disabled={formState === 'loading' || Boolean(username)}
             onClick={() => {
               // if (formRef && formRef.current && isMobileOrTablet()) {
               //   scrollTo(formRef.current, formRef.current.offsetHeight);
