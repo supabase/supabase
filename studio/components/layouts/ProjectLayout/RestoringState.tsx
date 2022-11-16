@@ -8,7 +8,7 @@ import { getWithTimeout } from 'lib/common/fetch'
 interface Props {}
 
 const RestoringState: FC<Props> = ({}) => {
-  const { app, ui } = useStore()
+  const { app, ui, meta } = useStore()
   const project = ui.selectedProject
   const checkServerInterval = useRef<number>()
 
@@ -37,7 +37,7 @@ const RestoringState: FC<Props> = ({}) => {
 
   const onConfirm = async () => {
     setLoading(true)
-    await app.projects.fetchDetail(project?.ref ?? '')
+    await app.projects.fetchDetail(project?.ref ?? '', (project) => meta.setProjectDetails(project))
   }
 
   return (

@@ -165,7 +165,7 @@ export const menuItems: NavMenu = {
         { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
         { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
         { name: 'Database Functions', url: '/guides/database/functions', items: [] },
-        { name: 'Database Webhooks', url: '/guides/database/database-webhooks', items: [] },
+        { name: 'Database Webhooks', url: '/guides/database/webhooks', items: [] },
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
         { name: 'Database Testing', url: '/guides/database/testing', items: [] },
         {
@@ -318,6 +318,7 @@ export const menuItems: NavMenu = {
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
+            { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
           ],
         },
       ],

@@ -8,6 +8,7 @@ export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dash
 export const auth = new GoTrueClient({
   url: GOTRUE_URL,
   storageKey: STORAGE_KEY,
+  detectSessionInUrl: true,
 })
 
 export const getAuthUser = async (token: String): Promise<any> => {
