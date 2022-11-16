@@ -17,6 +17,7 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
     }
     i++
   }
+
   return currentNode
 }
 
