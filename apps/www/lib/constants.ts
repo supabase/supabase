@@ -3,8 +3,10 @@ export const DESCRIPTION = 'The Open Source Alternative to Firebase.'
 
 // Launch Weeek
 export const SAMPLE_TICKET_NUMBER = 1234
-export const SITE_URL = 'http://localhost:3000/launch-week'
-export const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_ORIGIN || new URL(SITE_URL).origin
+export const SITE_URL = `${
+  process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000'
+}/launch-week`
+export const SITE_ORIGIN = new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
 export const COOKIE = 'supa-launch-week-ticke-user-id'
 export const DATE = 'December 12 8:00 PT | 11:00 ET'
