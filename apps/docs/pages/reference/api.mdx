@@ -1,10 +1,12 @@
----
-slug: /
-sidebar_position: 1
-id: management-api
-title: Management API
-sidebar_label: Management API
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  slug: '/',
+  sidebar_position: 1,
+  id: 'management-api',
+  title: 'Management API',
+  sidebar_label: 'Management API',
+}
 
 The Management API allows you to manage your projects programmatically.
 
@@ -35,3 +37,7 @@ All resources created via the API are subject to the pricing detailed on our [Pr
 - [OpenAPI Docs](https://api.supabase.com/api/v1)
 - [OpenAPI Spec](https://api.supabase.com/api/v1-json)
 - Reporting bugs and issues: [github.com/supabase/supabase](https://github.com/supabase/supabase)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

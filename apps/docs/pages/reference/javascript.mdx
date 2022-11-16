@@ -1,11 +1,12 @@
----
-slug: /
-sidebar_position: 1
-id: supabase-js
-title: Supabase JavaScript Library
-sidebar_label: Supabase JavaScript Library
-hide_table_of_contents: true
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  slug: '/',
+  id: 'supabase-js',
+  title: 'Supabase JavaScript Library',
+  sidebar_label: 'Supabase JavaScript Library',
+  hide_table_of_contents: true,
+}
 
 This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`.
 
@@ -23,3 +24,7 @@ You can use the `supabase-js` library to:
 - TypeDoc: [supabase.github.io/supabase-js](https://supabase.github.io/supabase-js/v2/)
 - NPM: [npmjs.com/package/@supabase/supabase-js](https://www.npmjs.com/package/@supabase/supabase-js)
 - [Known bugs and issues](https://github.com/supabase/supabase-js/issues)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

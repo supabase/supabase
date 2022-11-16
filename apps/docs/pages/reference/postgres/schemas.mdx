@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: schemas
-title: "Schemas"
-slug: schemas
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
----
-
-;
-import TabsPanel from '@theme/TabsPanel';
+  id: 'schemas',
+  title: 'Schemas',
+  slug: 'schemas',
+  custom_edit_url: 'https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml',
+}
 
 Schemas are like "folders". They help to keep your database organized.
 
@@ -91,3 +88,7 @@ create schema "Schema Name";
 </TabsPanel>
 
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

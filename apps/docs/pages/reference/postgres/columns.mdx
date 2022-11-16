@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: columns
-title: "Columns"
-slug: columns
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
----
-
-;
-import TabsPanel from '@theme/TabsPanel';
+  id: 'columns',
+  title: 'Columns',
+  slug: 'columns',
+  custom_edit_url: 'https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml',
+}
 
 Creating columns.
 
@@ -71,3 +68,7 @@ add new_column text;
 </TabsPanel>
 
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

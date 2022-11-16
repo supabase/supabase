@@ -1,9 +1,9 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: release-notes
-title: Release Notes
----
+  id: 'release-notes',
+  title: 'Release Notes',
+}
 
 Supabase.js v2 release notes.
 
@@ -210,3 +210,7 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
   - We have introduced new error types to distinguish between different kinds of errors. A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
   - The correct content-type headers are automatically attached when sending the request if you don’t pass in a `Content-Type` header and pass in an argument to your function. We automatically attach the content type for `Blob`, `ArrayBuffer`, `File`, `FormData` ,`String` . If it doesn’t match any of these we assume the payload is `json` , we serialise the payload as JSON and attach the content type as `application/json`.
   - `responseType` does not need to be explicitly passed in. We parse the response based on the `Content-Type` response header sent by the function. We support parsing the responses as `text`, `json`, `blob`, `form-data` and are parsed as `text` by default.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

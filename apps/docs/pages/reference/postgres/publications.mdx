@@ -1,14 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: publications
-title: "Publications"
-slug: publications
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
----
-
-;
-import TabsPanel from '@theme/TabsPanel';
+  id: 'publications',
+  title: 'Publications',
+  slug: 'publications',
+  custom_edit_url: 'https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml',
+}
 
 Publications are a way of grouping changes generated from a table or a group of tables.
 These changes can then be sent to other systems (usually another Postgres database).
@@ -169,3 +166,7 @@ commit;
 </TabsPanel>
 
 </Tabs>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
