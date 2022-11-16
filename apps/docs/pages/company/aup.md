@@ -1,9 +1,6 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
+---
 id: aup
 title: Acceptable Use Policy
-
 ---
 
 `Last Modified: 15 April 2021`

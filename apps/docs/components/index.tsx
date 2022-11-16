@@ -17,7 +17,7 @@ import Extensions from './Extensions'
 import { Heading } from './CustomHTMLElements'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
-import { Mermaid } from 'mdx-mermaid/Mermaid'
+import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 
 const components = {
   Admonition,
