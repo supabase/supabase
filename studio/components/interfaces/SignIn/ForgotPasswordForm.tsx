@@ -37,7 +37,7 @@ const ForgotPasswordForm = () => {
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
           ? process.env.NEXT_PUBLIC_VERCEL_URL
           : process.env.NEXT_PUBLIC_SITE_URL
-      }/forgot-password`,
+      }/reset-password`,
     })
     const error = response.error
 
