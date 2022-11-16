@@ -26,10 +26,7 @@ export function Playthrough() {
             />
           </section>
         </div>
-        <section
-          className="m-3 ml-0 rounded overflow-hidden"
-          style={{ width: '60%', background: '#232323' }}
-        >
+        <section className="m-3 ml-0 rounded overflow-hidden" style={{ width: '60%' }}>
           {show}
         </section>
       </div>

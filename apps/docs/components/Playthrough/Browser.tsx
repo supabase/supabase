@@ -11,6 +11,7 @@ export function Browser({ screen, onEvent, url }) {
           height: '100%',
           color: 'white',
           textAlign: 'center',
+          background: '#232323',
         }}
       >
         {screen === 'login' && <Login onEvent={onEvent} />}
