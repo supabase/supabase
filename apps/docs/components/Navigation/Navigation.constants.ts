@@ -318,6 +318,7 @@ export const menuItems: NavMenu = {
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
+            { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
           ],
         },
       ],
