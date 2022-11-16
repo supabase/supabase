@@ -1,28 +1,21 @@
-import { FC, Fragment, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { FC, Fragment, useEffect, useState } from 'react'
 import { Input, IconSearch, Listbox, Button, Divider, Modal, Form, IconHelpCircle } from 'ui'
-import SecretRow from './SecretRow'
 import EncryptionKeySelector from './EncryptionKeySelector'
 import InformationBox from 'components/ui/InformationBox'
+import { useStore } from 'hooks'
 
 interface Props {}
 
 const EncryptionKeysManagement: FC<Props> = ({}) => {
+  const { vault } = useStore()
+
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<string>('name')
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
 
-  const mockEncryptionKeys = [
-    {
-      created_at: Number(new Date()),
-    },
-    {
-      created_at: Number(new Date()),
-    },
-    {
-      created_at: Number(new Date()),
-    },
-  ]
+  console.log('keys', vault.listKeys())
 
   return (
     <>
@@ -189,4 +182,4 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   )
 }
 
-export default EncryptionKeysManagement
+export default observer(EncryptionKeysManagement)
