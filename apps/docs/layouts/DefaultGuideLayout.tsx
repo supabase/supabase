@@ -84,7 +84,6 @@ const Layout: FC<Props> = ({ meta, children }) => {
                 } doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[880px]`}
               >
                 {meta?.title && <h1>{meta.title}</h1>}
-
                 <MDXProvider components={components}>{children}</MDXProvider>
               </article>
             </div>
