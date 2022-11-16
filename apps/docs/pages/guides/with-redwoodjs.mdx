@@ -304,12 +304,12 @@ import { createClient } from '@supabase/supabase-js'
 
 // ...
 
-const supabaseClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
 
 const App = () => (
   <FatalErrorBoundary page={FatalErrorPage}>
     <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
-      <AuthProvider client={supabaseClient} type="supabase">
+      <AuthProvider client={supabase} type="supabase">
         <RedwoodApolloProvider>
           <Routes />
         </RedwoodApolloProvider>

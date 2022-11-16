@@ -53,7 +53,7 @@ on the browser, and that's completely fine since we have [Row Level Security](/d
 import { createClient } from '@supabase/auth-helpers-sveltekit'
 import { env } from '$env/dynamic/public'
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
+export const supabase = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
 ```
 
 And one optional step is to update the CSS file `public/global.css` to make the app look nice.
@@ -75,7 +75,7 @@ Update your `src/routes/+layout.svelte`:
 
 ```html title=src/routes/+layout.svelte
 <script lang="ts">
-  import { supabaseClient } from '$lib/supabaseClient'
+  import { supabase } from '$lib/supabaseClient'
   import { invalidate } from '$app/navigation'
   import { onMount } from 'svelte'
   import './styles.css'
@@ -83,7 +83,7 @@ Update your `src/routes/+layout.svelte`:
   onMount(() => {
     const {
       data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange(() => {
+    } = supabase.auth.onAuthStateChange(() => {
       invalidate('supabase:auth')
     })
 
@@ -139,7 +139,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 ```html title=src/routes/Auth.svelte
 <script lang="ts">
-  import { supabaseClient } from '$lib/supabaseClient'
+  import { supabase } from '$lib/supabaseClient'
 
   let loading = false
   let email: string
@@ -147,7 +147,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
   const handleLogin = async () => {
     try {
       loading = true
-      const { error } = await supabaseClient.auth.signInWithOtp({ email })
+      const { error } = await supabase.auth.signInWithOtp({ email })
       if (error) throw error
       alert('Check your email for the login link!')
     } catch (error) {
@@ -184,7 +184,7 @@ Create a new `Account.svelte` component to handle this functionality.
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { AuthSession } from '@supabase/supabase-js'
-  import { supabaseClient } from '$lib/supabaseClient'
+  import { supabase } from '$lib/supabaseClient'
 
   export let session: AuthSession
 
@@ -202,7 +202,7 @@ Create a new `Account.svelte` component to handle this functionality.
       loading = true
       const { user } = session
 
-      const { data, error, status } = await supabaseClient
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user.id)
@@ -237,7 +237,7 @@ Create a new `Account.svelte` component to handle this functionality.
         updated_at: new Date(),
       }
 
-      let { error } = await supabaseClient.from('profiles').upsert(updates)
+      let { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) throw error
     } catch (error) {
@@ -252,7 +252,7 @@ Create a new `Account.svelte` component to handle this functionality.
   async function signOut() {
     try {
       loading = true
-      let { error } = await supabaseClient.auth.signOut()
+      let { error } = await supabase.auth.signOut()
       if (error) throw error
     } catch (error) {
       if (error instanceof Error) {
@@ -333,7 +333,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 ```html title=src/routes/Avatar.svelte
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { supabaseClient } from '$lib/supabaseClient'
+  import { supabase } from '$lib/supabaseClient'
 
   export let size = 10
   export let url: string
@@ -346,7 +346,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
   const downloadImage = async (path: string) => {
     try {
-      const { data, error } = await supabaseClient.storage.from('avatars').download(path)
+      const { data, error } = await supabase.storage.from('avatars').download(path)
 
       if (error) {
         throw error
@@ -373,7 +373,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
 
-      let { error } = await supabaseClient.storage.from('avatars').upload(filePath, file)
+      let { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (error) {
         throw error

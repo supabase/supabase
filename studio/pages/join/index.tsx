@@ -236,7 +236,7 @@ const JoinOrganizationPage = () => {
         'items-center justify-center gap-8 px-5',
       ].join(' ')}
     >
-      <Link href="/">
+      <Link href="/projects">
         <a className="flex items-center justify-center gap-4">
           <img
             src="/img/supabase-logo.svg"
