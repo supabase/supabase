@@ -11,4 +11,4 @@ console.log(`Function "launchweek-ticket-og" up and running!`)
 // @ts-ignore
 serve(handler)
 
-// To deploy: supabase functions deploy opengraph --no-verify-jwt
+// To deploy: supabase functions deploy launchweek-ticket-og --no-verify-jwt
