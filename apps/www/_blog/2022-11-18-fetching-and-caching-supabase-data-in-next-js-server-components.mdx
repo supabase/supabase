@@ -103,6 +103,8 @@ export default createClient(
 )
 ```
 
+> For automatically adding types to the Supabase client, check out [how to generate types](https://supabase.com/docs/reference/javascript/typescript-support).
+
 Okay, let’s look at some different data fetching and caching strategies.
 
 # Static
@@ -378,6 +380,8 @@ export default function ClientPosts() {
   return isLoading ? <p>Loading</p> : <pre>{JSON.stringify(posts, null, 2)}</pre>
 }
 ```
+
+> Again, check out [how to generate types](https://supabase.com/docs/reference/javascript/typescript-support) to add proper typing for Post.
 
 But now we have loading spinners! Yuck!
 
