@@ -1,65 +1,33 @@
 import { FC, Fragment, useState } from 'react'
-import Divider from 'components/ui/Divider'
-import { IconSearch, Input, Button, Listbox, Modal, Form, IconHelpCircle } from 'ui'
+import { Input, IconSearch, Listbox, Button, Divider, Modal, Form, IconHelpCircle } from 'ui'
 import SecretRow from './SecretRow'
+import EncryptionKeySelector from './EncryptionKeySelector'
 import InformationBox from 'components/ui/InformationBox'
-import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
 
 interface Props {}
 
-const SecretsManagement: FC<Props> = ({}) => {
+const EncryptionKeysManagement: FC<Props> = ({}) => {
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<string>('name')
-  const [showAddSecretModal, setShowAddSecretModal] = useState(false)
-  const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
+  const [showAddKeyModal, setShowAddKeyModal] = useState(false)
+  const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
 
-  const mockSecrets = [
+  const mockEncryptionKeys = [
     {
-      key_id: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
-      description: 'NEXT_PUBLIC_CLIENT_ACCESS_KEY',
       created_at: Number(new Date()),
-      secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
     },
     {
-      key_id: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
-      description: 'SUPABASE_SUPA_SECRET_SERVER_SIDE_KEY',
       created_at: Number(new Date()),
-      secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
     },
     {
-      key_id: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
-      description: 'This is a bit more of a secret key',
       created_at: Number(new Date()),
-      secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
     },
   ]
-
-  const secrets =
-    searchValue.length > 0
-      ? mockSecrets.filter(
-          (secret) =>
-            secret.key_id.toLowerCase().includes(searchValue.toLowerCase()) ||
-            secret.description.toLowerCase().includes(searchValue.toLowerCase())
-        )
-      : mockSecrets
-
-  const validate = (values: any) => {
-    const errors: any = {}
-
-    if (values.secret.length === 0) errors.secret = 'Please enter your secret value'
-    if (values.keyId.length > 0 && false) errors.keyId = ''
-
-    return errors
-  }
-
-  const onAddNewSecret = async (values: any, { setSubmitting }: any) => {
-    console.log('onAddNewSecret', values)
-  }
 
   return (
     <>
       <div className="space-y-4">
-        <h3 className="text-scale-1200 mb-2 text-xl">Secrets Management</h3>
+        <h3 className="text-scale-1200 mb-2 text-xl">Encryption Keys</h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
@@ -81,13 +49,13 @@ const SecretsManagement: FC<Props> = ({}) => {
               </Listbox>
             </div>
           </div>
-          <Button type="primary" onClick={() => setShowAddSecretModal(true)}>
-            Add new secret
+          <Button type="primary" onClick={() => setShowAddKeyModal(true)}>
+            Add new key
           </Button>
         </div>
 
         {/* Table of secrets */}
-        <div className="border border-scale-500 rounded">
+        {/* <div className="border border-scale-500 rounded">
           {secrets.map((secret, idx) => {
             return (
               <Fragment key={secret.key_id}>
@@ -115,16 +83,16 @@ const SecretsManagement: FC<Props> = ({}) => {
               )}
             </>
           )}
-        </div>
+        </div> */}
       </div>
 
       <Modal
         closable
         size="small"
         alignFooter="right"
-        visible={selectedSecretToRemove !== undefined}
-        onCancel={() => setSelectedSecretToRemove(undefined)}
-        onConfirm={() => setSelectedSecretToRemove(undefined)}
+        visible={selectedKeyToRemove !== undefined}
+        onCancel={() => setSelectedKeyToRemove(undefined)}
+        onConfirm={() => setSelectedKeyToRemove(undefined)}
         header={<h5 className="text-sm text-scale-1200">Confirm to delete secret</h5>}
       >
         <div className="py-4">
@@ -135,9 +103,9 @@ const SecretsManagement: FC<Props> = ({}) => {
                 sure?
               </p>
               <div className="space-y-1">
-                <p className="text-sm">{selectedSecretToRemove?.description}</p>
+                <p className="text-sm">{selectedKeyToRemove?.description}</p>
                 <p className="text-sm text-scale-1100">
-                  ID: <span className="font-mono">{selectedSecretToRemove?.key_id}</span>
+                  ID: <span className="font-mono">{selectedKeyToRemove?.key_id}</span>
                 </p>
               </div>
             </div>
@@ -149,15 +117,15 @@ const SecretsManagement: FC<Props> = ({}) => {
         closable
         hideFooter
         size="medium"
-        visible={showAddSecretModal}
-        onCancel={() => setShowAddSecretModal(false)}
+        visible={showAddKeyModal}
+        onCancel={() => setShowAddKeyModal(false)}
         header={<h5 className="text-sm text-scale-1200">Add new secret</h5>}
       >
         <Form
           id="add-new-secret-form"
           initialValues={{ secret: '', description: '', keyId: '', newKeyName: '' }}
-          validate={validate}
-          onSubmit={onAddNewSecret}
+          validate={() => {}}
+          onSubmit={() => {}}
         >
           {({ isSubmitting }: any) => {
             return (
@@ -203,7 +171,7 @@ const SecretsManagement: FC<Props> = ({}) => {
                     <Button
                       type="default"
                       disabled={isSubmitting}
-                      onClick={() => setShowAddSecretModal(false)}
+                      onClick={() => setShowAddKeyModal(false)}
                     >
                       Cancel
                     </Button>
@@ -221,4 +189,4 @@ const SecretsManagement: FC<Props> = ({}) => {
   )
 }
 
-export default SecretsManagement
+export default EncryptionKeysManagement

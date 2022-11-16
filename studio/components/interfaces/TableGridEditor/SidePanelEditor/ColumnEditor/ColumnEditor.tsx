@@ -27,7 +27,7 @@ import {
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import EncryptionKeySelector from 'components/interfaces/Vault/EncryptionKeySelector'
+import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
 
 interface Props {
   column?: PostgresColumn
