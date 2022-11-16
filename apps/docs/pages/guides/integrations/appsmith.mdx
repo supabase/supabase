@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: appsmith
-title: 'Appsmith'
-description: 'Get started with Supabase and Appsmith, an open-source framework for building internal tools.'
----
+  id: 'appsmith',
+  title: 'Appsmith',
+  description:
+    'Get started with Supabase and Appsmith, an open-source framework for building internal tools.',
+}
 
 This guide explains how to quickly build a Support Dashboard by connecting a Supabase back-end to an Appsmith front-end.
 
@@ -166,3 +167,7 @@ SELECT * FROM public."tickets";
 - [Appsmith](https://www.appsmith.com/) official website.
 - [Appsmith GitHub](https://github.com/appsmithorg).
 - [Appsmith](https://docs.appsmith.com/) documentation.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: firestore-data
-title: 'Firestore Data Migration'
-description: 'Migrate your Firebase Firestore database to a Supabase Postgres database.'
-sidebar_label: Firestore Data
----
+  id: 'firestore-data',
+  title: 'Firestore Data Migration',
+  description: 'Migrate your Firebase Firestore database to a Supabase Postgres database.',
+  sidebar_label: 'Firestore Data',
+}
 
 Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore) to convert data from a Firebase Firestore database to a Supabase PostgreSQL database. The process copies the entire contents of a single Firestore `collection` to a single PostgreSQL `table`.
 
@@ -210,3 +210,7 @@ The result is two separate JSON files:
 - [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
 - [Firestore Storage Migration](/docs/guides/migrations/firebase-storage)
 - [Firebase Auth Migration](/docs/guides/migrations/firebase-auth)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: stytch
-title: 'Stytch'
-description: "Build a Next.js application powered by password-less authentication from Stytch, and Supabase's Row Level Security (RLS)."
----
+  id: 'stytch',
+  title: 'Stytch',
+  description:
+    "Build a Next.js application powered by password-less authentication from Stytch, and Supabase's Row Level Security (RLS).",
+}
 
 In this guide we will build a simple expense tracker web application using Stytch, Supabase, and Next.js.
 
@@ -656,3 +657,7 @@ With these two changes you will now have a working Google One Tap authentication
 
 - [Stytch blog](https://stytch.com/blog?utm_source=supabase&utm_medium=guide)
 - [Stytch documentation](https://stytch.com/docs?utm_source=supabase&utm_medium=guide)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

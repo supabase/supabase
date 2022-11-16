@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: firebase-auth
-title: 'Firebase Auth Migration'
-description: 'Migrate Firebase auth users to a Supabase project.'
-sidebar_label: Firebase Auth
----
+  id: 'firebase-auth',
+  title: 'Firebase Auth Migration',
+  description: 'Migrate Firebase auth users to a Supabase project.',
+  sidebar_label: 'Firebase Auth',
+}
 
 Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth) to help migrate auth users from a Firebase project to a Supabase project. There are two parts to the migration process:
 
@@ -87,3 +87,7 @@ For more advanced migrations, including the use of a middleware server component
 - [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
 - [Firestore Data Migration](/docs/guides/migrations/firestore-data)
 - [Firestore Storage Migration](/docs/guides/migrations/firebase-storage)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

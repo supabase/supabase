@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: clerk
-title: 'Clerk'
-description: 'This guide explains how to connect your Supabase database with Clerk, a powerful authentication provider built for the modern web.'
----
+  id: 'clerk',
+  title: 'Clerk',
+  description:
+    'This guide explains how to connect your Supabase database with Clerk, a powerful authentication provider built for the modern web.',
+}
 
 This guide explains how to connect your Supabase database with [Clerk](https://clerk.dev), an authentication provider built for the modern web.
 
@@ -184,3 +185,7 @@ If you would like the requesting user ID from the JWT to automatically populate 
 - [Next.js + Supabase + Clerk tutorial](https://clerk.dev/blog/nextjs-supabase-todos-with-multifactor-authentication)
 - [Clerk guide for Next.js Authentication](https://docs.clerk.dev/get-started/nextjs)
 - [Clerk Community Discord channel](https://discord.com/invite/b5rXHjAg7A)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: polyscale
-title: 'PolyScale'
-description: 'The easiest way to get low-latency reads from your Supabase database for multi-region applications is by using PolyScale, a code-free global caching service.'
----
+  id: 'polyscale',
+  title: 'PolyScale',
+  description:
+    'The easiest way to get low-latency reads from your Supabase database for multi-region applications is by using PolyScale, a code-free global caching service.',
+}
 
 [PolyScale](https://polyscale.ai) is an intelligent, serverless database caching engine which allows low-latency reads from Supabase globally, no coding required. Supabase can be connected to PolyScale in minutes, providing you fast access to your Supabase data around the globe.
 
@@ -63,3 +64,7 @@ That's it.
 ## All done!
 
 You can read more about PolyScale [here](https://www.polyscale.ai/) or check out our [documentation](https://docs.polyscale.ai/).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

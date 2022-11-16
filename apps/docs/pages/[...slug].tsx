@@ -47,7 +47,6 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   let doc = getDocsBySlug(slug)
   const content = await serialize(doc.content || '')
 
-  console.log(doc.content)
   return {
     props: {
       ...doc,

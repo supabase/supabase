@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: directus
-title: 'Directus'
-description: 'In this guide, we will show you how to create a Supabase project, install the Directus platform locally and configure the two to connect.'
----
+  id: 'directus',
+  title: 'Directus',
+  description:
+    'In this guide, we will show you how to create a Supabase project, install the Directus platform locally and configure the two to connect.',
+}
 
 In this guide, we will demonstrate how to create a new Supabase project, install a fresh instance of the Directus platform, then configure the two to work together seamlessly. If you're unfamiliar with either of these systems, don't worry! We'll start off with an overview of each platform and explain how they complement each other, noting any overlap in capabilities.
 
@@ -18,8 +19,7 @@ In this guide, we will demonstrate how to create a new Supabase project, install
 
 [Directus](https://directus.io/) is an open-source data platform that layers on top of any SQL database, providing a powerful suite of tools. The Directus Engine provides dynamic REST and GraphQL APIs based on your schema, hooks and automation, authentication and access control, and file transformations. Directus Studio enables engineers and non-technical users alike to browse, manage, and visualize database content through a no-code app.
 
----
-
+}
 Supabase is a suite of open-source tools making Postgres databases, file storage, authentication, and edge functions more accessible to developers of all skill levels. Directus is also developer tooling and additionally provides a Data Studio that is safe and intuitive enough for anyone, including non-technical users, to use. This is the crucial bit that gives the two platforms such a strong “network effect.”
 
 When these two systems are brought together, you get a scalable datastore, limitless connectivity options, and a no-code app that allows your technical and business teams to collaborate together efficiently.
@@ -131,3 +131,7 @@ Below are some additional resources to dive in and start exploring these two pla
 
 - Explore the [Supabase documentation](https://supabase.com/docs)
 - Join the Supabase community on [Discord](https://discord.supabase.com/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

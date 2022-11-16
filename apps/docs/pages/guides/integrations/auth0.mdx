@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: auth0
-title: 'Auth0'
-description: 'Swap out Supabase authentication with Auth0. Let Auth0 handle tokens and signing users in and out, while Supabase enforces authorization policies with Row Level Security (RLS).'
----
+  id: 'auth0',
+  title: 'Auth0',
+  description:
+    'Swap out Supabase authentication with Auth0. Let Auth0 handle tokens and signing users in and out, while Supabase enforces authorization policies with Row Level Security (RLS).',
+}
 
 This guide steps through building a Next.js application with Auth0 and Supabase. We configure Auth0 to handle authenticating users and managing tokens, while writing our authorization logic in Supabase - using Row Level Security policies.
 
@@ -463,3 +464,7 @@ Now when we refresh our application, we should finally see our list of `todos`!
 - [Using Next.js and Auth0 with Supabase article](https://auth0.com/blog/using-nextjs-and-auth0-with-supabase/).
 - [Auth0 community](https://community.auth0.com/).
 - [Auth0 documentation](https://auth0.com/docs/).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

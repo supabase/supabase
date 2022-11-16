@@ -22,7 +22,7 @@ export default function Home({
   )
 }
 export async function getStaticProps() {
-  const doc = getDocsBySlug('docs/introduction')
+  const doc = getDocsBySlug('pages/introduction')
   const content = await serialize(doc.content || '')
   return {
     props: {

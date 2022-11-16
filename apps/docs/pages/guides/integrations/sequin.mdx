@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: sequin
-title: 'Sequin'
-description: 'Sync platforms like Stripe and Salesforce with your Supabase database in real-time using Sequin.'
----
+  id: 'sequin',
+  title: 'Sequin',
+  description:
+    'Sync platforms like Stripe and Salesforce with your Supabase database in real-time using Sequin.',
+}
 
 This guide explains how to quickly setup a sync between Sequin and a Supabase Postgres database.
 
@@ -84,3 +85,7 @@ You'll use this client to query for data in your synced schema.
 - [Sequin Console](https://app.sequin.io*).
 - [Sequin](https://docs.sequin.io/welcome) documentation.
 - [Sequin + Supabase + Stripe Tutorial](https://github.com/sequin-io/build-a-saas-with-next-js-supabase-stripe-and-sequin)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

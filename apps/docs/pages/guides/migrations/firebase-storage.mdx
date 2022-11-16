@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: firebase-storage
-title: 'Firebase Storage Migration'
-description: 'Migrate Firebase Storage files to Supabase Storage.'
-sidebar_label: Firebase Storage
----
+  id: 'firebase-storage',
+  title: 'Firebase Storage Migration',
+  description: 'Migrate Firebase Storage files to Supabase Storage.',
+  sidebar_label: 'Firebase Storage',
+}
 
 Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/storage) to convert storage files from Firebase Storage to Supabase Storage. Conversion is a two-step process:
 
@@ -66,3 +66,7 @@ If the bucket doesn't exist, it's created as a `non-public` bucket. You must set
 - [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
 - [Firestore Data Migration](/docs/guides/migrations/firestore-data)
 - [Firebase Auth Migration](/docs/guides/migrations/firebase-auth)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

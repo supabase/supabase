@@ -1,10 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-id: snaplet
-title: 'Snaplet'
-description: 'Get started with Supabase and Snaplet, a developer tool for working with safe, versioned, up-to-date production-like data'
----
+  id: 'snaplet',
+  title: 'Snaplet',
+  description:
+    'Get started with Supabase and Snaplet, a developer tool for working with safe, versioned, up-to-date production-like data',
+}
 
 This step-by-step guide explains how to use Snaplet to clone your production Supabase project into another development database.
 
@@ -116,3 +117,7 @@ Once completed, you will be presented with a list of databases that are connecte
 As a Supabase user, you can see how this solves an issue developers all typically experience when attempting to create multiple development environments and populating each of those environments with data that can be worked with. Snaplet simplifies this process down to creating the respective Supabase projects, connecting the data source (The production database) to Snaplet and telling Snaplet where to restore that data (staging and development databases).
 
 If you want to learn more about Snaplet, you can explore the Snaplet [docs](https://docs.snaplet.dev/). If you have any questions, feel free to [reach out on Discord](https://discord.com/invite/6HUuajc866).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
