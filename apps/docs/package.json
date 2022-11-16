@@ -54,6 +54,7 @@
     "next": "12.1.0",
     "next-compose-plugins": "^2.2.1",
     "next-mdx-remote": "^3.0.8",
+    "next-seo": "^5.14.1",
     "next-themes": "0.0.15",
     "next-transpile-modules": "^9.0.0",
     "octokit": "^2.0.10",
