@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconHelpCircle, Toggle, Modal } from 'ui'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
@@ -43,6 +43,7 @@ const ProUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
+  const showPitrAddons = useFlag('pitrSelfServe')
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
@@ -219,7 +220,7 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
-                    {pitrDurationOptions.length > 0 && (
+                    {showPitrAddons && pitrDurationOptions.length > 0 && (
                       <>
                         <Divider light />
                         <PITRDurationSelection
