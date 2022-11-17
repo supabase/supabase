@@ -39,7 +39,7 @@ export default {
       children: (
         <>
           <p>Run:</p>
-          <Code>npm install @supabase/supabase-js</Code>
+          <Code language="bash">npm install @supabase/supabase-js</Code>
           <p>supabase-js is an isomorphic JavaScript client for Supabase</p>
         </>
       ),
