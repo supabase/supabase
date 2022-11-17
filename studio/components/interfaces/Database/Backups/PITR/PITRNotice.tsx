@@ -1,15 +1,12 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Button, IconCalendar } from 'ui'
 import { FormPanel } from 'components/ui/Forms'
-import { useProjectSubscription } from 'hooks'
+import { useParams, useProjectSubscription } from 'hooks'
 import { getPITRRetentionDuration } from './PITR.utils'
 
 const PITRNotice = ({}) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const { subscription } = useProjectSubscription(ref as string)
+  const { ref } = useParams()
+  const { subscription } = useProjectSubscription(ref)
   const retentionPeriod = getPITRRetentionDuration(subscription?.addons ?? [])
 
   return (
