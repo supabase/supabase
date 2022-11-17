@@ -68,9 +68,10 @@ export function handler(req: Request) {
           <div
             style={{
               display: 'flex',
+              justifyContent: 'center',
               flexDirection: 'column',
               position: 'absolute',
-              top: '380',
+              top: '360',
               left: '800',
               width: '600',
               height: '270',
@@ -110,7 +111,7 @@ export function handler(req: Request) {
               position: 'absolute',
               top: '750',
               left: '800',
-              fontSize: '20',
+              fontSize: '25',
             }}
           >
             December 12th, 2022
@@ -120,8 +121,8 @@ export function handler(req: Request) {
             style={{
               position: 'absolute',
               top: '750',
-              left: '1150',
-              fontSize: '20',
+              left: '1120',
+              fontSize: '25',
             }}
           >
             supabase.com/launch-week
