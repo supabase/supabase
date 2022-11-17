@@ -61,7 +61,7 @@ const SignInForm = () => {
         return ui.setNotification({
           id: toastId,
           category: 'error',
-          message: 'Please click the link sent to your email to confirm your account',
+          message: 'Account has not been verified, please check the link sent to your email',
         })
       }
 
