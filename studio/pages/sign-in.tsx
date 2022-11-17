@@ -1,42 +1,11 @@
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
 import { SignInLayout } from 'components/layouts'
-import Connecting from 'components/ui/Loading'
-import { auth } from 'lib/gotrue'
 import Link from 'next/link'
-import { NextRouter, useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
-// detect for redirect from 3rd party service like vercel, aws...
-const isRedirectFromThirdPartyService = (router: NextRouter) => router.query.next !== undefined
-
 const SignInPage: NextPageWithLayout = () => {
-  const router = useRouter()
-  const autoSignIn = isRedirectFromThirdPartyService(router)
-
-  useEffect(() => {
-    if (autoSignIn) {
-      const queryParams = (router.query as any) || {}
-      const params = new URLSearchParams(queryParams)
-
-      // trigger github signIn
-      auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${
-            process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-              ? process.env.NEXT_PUBLIC_VERCEL_URL
-              : process.env.NEXT_PUBLIC_SITE_URL
-          }?${params.toString()}`,
-        },
-      })
-    }
-  }, [])
-
-  return autoSignIn ? (
-    <Connecting />
-  ) : (
+  return (
     <>
       <div className="flex flex-col gap-5">
         <SignInWithGitHub />
