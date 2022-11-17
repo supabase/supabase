@@ -91,25 +91,6 @@ export default class VaultStore implements IVaultStore {
     }
   }
 
-  // Always return the default key as the first result
-  // listKeys(filter?: any) {
-  //   const arr = this.data.keys.slice()
-
-  //   if (!!filter) {
-  //     const filteredResults = arr.filter(filter).sort((a: any, b: any) => a.key_id - b.key_id)
-  //     const defaultKey = filteredResults.find((key) => key.status === 'default') as EncryptionKey
-
-  //     if (defaultKey === undefined) return filteredResults
-  //     else return [defaultKey].concat(filteredResults.filter((key) => key.status !== 'default'))
-  //   } else {
-  //     const results = arr.sort((a: any, b: any) => a.key_id - b.key_id)
-  //     const defaultKey = results.find((key) => key.status === 'default') as EncryptionKey
-
-  //     if (defaultKey === undefined) return results
-  //     return [defaultKey].concat(results.filter((key) => key.status !== 'default'))
-  //   }
-  // }
-
   listKeys(filter?: any) {
     const arr = this.data.keys.slice()
 

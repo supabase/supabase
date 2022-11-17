@@ -2,9 +2,21 @@ import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, Fragment, useState } from 'react'
-import { Input, IconSearch, Listbox, Button, Modal, Form, IconTrash, Badge } from 'ui'
+import {
+  Input,
+  IconSearch,
+  Listbox,
+  Button,
+  Modal,
+  Form,
+  IconTrash,
+  Badge,
+  IconHelpCircle,
+} from 'ui'
 import { useStore } from 'hooks'
 import Divider from 'components/ui/Divider'
+
+const DEFAULT_KEY_NAME = 'No description provided'
 
 interface Props {}
 
@@ -36,7 +48,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
 
   const addKey = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    const res = await vault.addKey(values.name)
+    const res = await vault.addKey(values.description)
     if (!res.error) {
       vault.load()
       ui.setNotification({ category: 'success', message: 'Successfully added new key' })
@@ -73,7 +85,25 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   return (
     <>
       <div className="space-y-4">
-        <h3 className="text-scale-1200 mb-2 text-xl">Encryption Keys</h3>
+        <h3 className="text-scale-1200 mb-2 text-xl flex items-center space-x-2">
+          <span>Encryption Keys</span>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <IconHelpCircle size={18} strokeWidth={2} className="text-scale-1100" />
+            </Tooltip.Trigger>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">What are encryption keys?</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
@@ -86,7 +116,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
             />
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
-                <Listbox.Option id="comment" value="comment" label="Sort by name">
+                <Listbox.Option id="comment" value="comment" label="Sort by description">
                   Name
                 </Listbox.Option>
                 <Listbox.Option id="created" value="created" label="Sort by created at">
@@ -107,14 +137,17 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
               <Fragment key={key.key_id}>
                 <div className="px-6 py-4 flex items-center space-x-4">
                   <div className="space-y-1 min-w-[37%] max-w-[37%]">
-                    <p className="text-sm truncate" title={key.comment || 'Unnamed'}>
-                      {key.comment || 'Unnamed'}
-                    </p>
                     <p
                       title={key.id}
-                      className="text-sm text-scale-1000 font-mono font-bold truncate"
+                      className="text-sm text-scale-1200 font-mono font-bold truncate"
                     >
                       {key.id}
+                    </p>
+                    <p
+                      className="text-sm truncate text-scale-1100"
+                      title={key.comment || DEFAULT_KEY_NAME}
+                    >
+                      {key.comment || DEFAULT_KEY_NAME}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2 w-[38%]">
@@ -197,9 +230,11 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                 Are you sure?
               </p>
               <div className="space-y-1">
-                <p className="text-sm">{selectedKeyToRemove?.comment ?? 'Unnamed'}</p>
+                <p className="text-sm">
+                  <code className="!mx-0">{selectedKeyToRemove?.id}</code>
+                </p>
                 <p className="text-sm text-scale-1100">
-                  ID: <span className="font-mono">{selectedKeyToRemove?.id}</span>
+                  {selectedKeyToRemove?.comment ?? DEFAULT_KEY_NAME}
                 </p>
               </div>
             </div>
@@ -215,13 +250,17 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
         onCancel={() => setShowAddKeyModal(false)}
         header={<h5 className="text-sm text-scale-1200">Add new encryption key</h5>}
       >
-        <Form id="add-new-key-form" initialValues={{ name: '' }} onSubmit={addKey}>
+        <Form id="add-new-key-form" initialValues={{ description: '' }} onSubmit={addKey}>
           {({ isSubmitting }: any) => {
             return (
               <div className="py-4">
                 <Modal.Content>
+                  <p className="text-sm mb-4">
+                    Keys are of standard UUID types - you can provide an optional description to
+                    your key for better identification.
+                  </p>
                   <div className="space-y-4 pb-4">
-                    <Input id="name" label="Name" labelOptional="Optional" />
+                    <Input id="description" label="Description" labelOptional="Optional" />
                   </div>
                 </Modal.Content>
                 <Modal.Separator />

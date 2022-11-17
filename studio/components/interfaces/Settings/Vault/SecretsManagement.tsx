@@ -1,7 +1,9 @@
 import { FC, Fragment, useState } from 'react'
-import Divider from 'components/ui/Divider'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { IconSearch, Input, Button, Listbox, Modal, Form, IconHelpCircle } from 'ui'
+
 import SecretRow from './SecretRow'
+import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
 import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
 
@@ -59,7 +61,25 @@ const SecretsManagement: FC<Props> = ({}) => {
   return (
     <>
       <div className="space-y-4">
-        <h3 className="text-scale-1200 mb-2 text-xl">Secrets Management</h3>
+        <h3 className="text-scale-1200 mb-2 text-xl flex items-center space-x-2">
+          <span>Secrets Management</span>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <IconHelpCircle size={18} strokeWidth={2} className="text-scale-1100" />
+            </Tooltip.Trigger>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">What are secrets?</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
@@ -180,17 +200,16 @@ const SecretsManagement: FC<Props> = ({}) => {
                       icon={<IconHelpCircle size={18} strokeWidth={2} />}
                       url="asd"
                       urlLabel="Vault documentation"
-                      title="What is a Key ID?"
+                      title="What is a encryption key?"
                       description={
                         <div className="space-y-2">
                           <p>
-                            Every secret in the Vault is encrypted with a Key ID. The Vault comes
-                            with a default value for this Key ID which is sufficient for simple
-                            purposes.
+                            Every secret in the Vault is encrypted with a key. The Vault comes with
+                            a default value for this key which is sufficient for simple purposes.
                           </p>
                           <p>
-                            However, you may also use a custom Key ID for more advanced use cases,
-                            such as having different secrets visible to different users
+                            However, you may also use a custom key for more advanced use cases, such
+                            as having different secrets visible to different users
                           </p>
                         </div>
                       }
