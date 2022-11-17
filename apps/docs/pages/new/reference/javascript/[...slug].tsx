@@ -31,6 +31,7 @@ import { ComesFrom } from '~/components/ComesFrom'
 
 import LibraryNavigationMenu from '~/components/Navigation/NavigationMenu/LibraryNavigationMenu'
 import Layout from '~/layouts/ReferenceDocsLayout'
+import StickySectionHeader from '~/components/StickySectionHeader'
 
 export default function Ref(props) {
   const menuItems = jsSpec.functions.map((item) => {
@@ -72,17 +73,17 @@ export default function Ref(props) {
             const functionMarkdownContent = props?.docs[itemIndex]?.content
 
             const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
+            const itemId = examples.functions[itemIndex].id
+              ? examples.functions[itemIndex].id
+              : null
+            const itemTitle = examples.functions[itemIndex].title
+              ? examples.functions[itemIndex].title
+              : null
 
             return (
               <>
-                <header className="sticky top-14 bg-white dark:bg-blackA-300 z-10 p-4">
-                  <h1 className="text-3xl not-prose" onClick={() => updateUrl(item.id)}>
-                    {examples.functions[itemIndex].title ??
-                      examples.functions[itemIndex].id ??
-                      item.name ??
-                      item.id}
-                  </h1>
-                </header>
+                {itemId && itemTitle && <StickySectionHeader title={item.title} />}
+
                 <div
                   className="grid grid-cols-2 pb-32 ref-container gap-10"
                   id={item.id}
