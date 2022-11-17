@@ -21,7 +21,7 @@ const AutoSchemaForm = observer(() => {
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
 
-  const showMfaSso = false
+  const showMfaSso = useFlag('mfaSso')
   const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
