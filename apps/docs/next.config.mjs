@@ -1,10 +1,8 @@
 import nextMdx from '@next/mdx'
-import bundleAnalyzer from '@next/bundle-analyzer'
-
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 
-import theme from 'shiki/themes/nord.json' assert { type: 'json' }
+//import theme from 'shiki/themes/nord.json' assert { type: 'json' }
 import { remarkCodeHike } from '@code-hike/mdx'
 
 import withTM from 'next-transpile-modules'
@@ -35,13 +33,9 @@ const withMDX = nextMdx({
     ],
     rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
-    providerImportSource: '@mdx-js/react',
+    // providerImportSource: '@mdx-js/react',
   },
 })
-
-// const withBundleAnalyzer = bundleAnalyzer({
-//   enabled: process.env.ANALYZE === 'true',
-// })
 
 // /** @type {NextConfig} */
 const nextConfig = {
@@ -53,6 +47,27 @@ const nextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     domains: ['avatars.githubusercontent.com', 'github.com', 'user-images.githubusercontent.com'],
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: '',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+        ],
+      },
+    ]
   },
 }
 

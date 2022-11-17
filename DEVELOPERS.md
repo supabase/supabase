@@ -79,7 +79,7 @@ Then visit, and edit, any of the following sites:
 
 #### Running sites individually
 
-You can run any of the sites indiviudally by using the scope name. For example:
+You can run any of the sites individually by using the scope name. For example:
 
 ```sh
 npm run dev:www

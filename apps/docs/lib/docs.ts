@@ -45,7 +45,7 @@ export function getDocsBySlug(slug: string) {
   // if no match, 404
   if (!fs.existsSync(fullPath)) {
     console.log(`\nfile ${fullPath} not found, redirect to 404\n`)
-    fullPath = join(docsDirectory, 'docs/404.mdx')
+    fullPath = join(docsDirectory, 'pages/404.mdx')
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8')
