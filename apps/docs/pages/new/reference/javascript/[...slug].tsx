@@ -82,7 +82,7 @@ export default function Ref(props) {
 
             return (
               <>
-                {itemId && itemTitle && <StickySectionHeader title={item.title} />}
+                {itemId && itemTitle && <StickySectionHeader id={item.id} title={item.title} />}
 
                 <div
                   className="grid grid-cols-2 pb-32 ref-container gap-10"
