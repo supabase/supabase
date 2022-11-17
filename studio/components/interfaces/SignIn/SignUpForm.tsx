@@ -16,6 +16,7 @@ const signUpSchema = passwordSchema.shape({
 const SignUpForm = () => {
   const { ui } = useStore()
   const captchaRef = useRef<HCaptcha>(null)
+  const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -107,17 +108,24 @@ const SignUpForm = () => {
                 placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
                 disabled={isSubmitting}
                 autoComplete="new-password"
+                onFocus={() => setShowConditions(true)}
                 actions={
                   <Button
                     icon={passwordHidden ? <IconEye /> : <IconEyeOff />}
                     type="default"
-                    className="mr-1"
+                    className="!mr-1"
                     onClick={() => setPasswordHidden((prev) => !prev)}
                   />
                 }
               />
 
-              <PasswordConditionsHelper password={values.password} />
+              <div
+                className={`${
+                  showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
+                } transition-all duration-400 overflow-y-hidden`}
+              >
+                <PasswordConditionsHelper password={values.password} />
+              </div>
 
               <div className="self-center">
                 <HCaptcha
@@ -138,7 +146,7 @@ const SignUpForm = () => {
                 form="signUp-form"
                 htmlType="submit"
                 size="large"
-                disabled={isSubmitting}
+                disabled={values.password.length === 0 || isSubmitting}
                 loading={isSubmitting}
               >
                 Sign Up
