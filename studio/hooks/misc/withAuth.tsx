@@ -8,7 +8,7 @@ import { useProfile, useStore, usePermissions } from 'hooks'
 import Error500 from '../../pages/500'
 import { NextPageWithLayout } from 'types'
 
-const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
+const PLATFORM_ONLY_PAGES = ['reports', 'settings']
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
