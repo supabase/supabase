@@ -2,11 +2,11 @@
 title: 'Fetching and caching Supabase data in Next.js 13 Server Components'
 description: 'Next.js 13 introduces new data fetching and caching methods to enable React Server Components and Suspense.'
 author: jonmeyers_io
-image: TODO
-thumb: TODO
+image: 2022-11-17-supabase-nextjs-13/nextjs-supabase.jpg
+thumb: 2022-11-17-supabase-nextjs-13/nextjs-supabase.jpg
 tags:
   - Next.js
-date: '2022-11-16'
+date: '2022-11-17'
 toc_depth: 3
 ---
 
@@ -381,7 +381,7 @@ But now we have loading spinners! Yuck!
 
 # Realtime
 
-Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://app.supabase.com/project/lzdftaiyqrgmgqunxlwf/database/replication) on the posts table.
+Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://app.supabase.com/project/_/database/replication) on the posts table.
 
 Let’s merge the two previous concepts and fetch the initial state of our posts in a Server Component, and then render a Client Component to do client-y things — like subscribe to changes in the DB and update the UI dynamically:
 
