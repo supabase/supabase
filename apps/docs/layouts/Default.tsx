@@ -1,5 +1,5 @@
 import { useEffect, FC } from 'react'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
@@ -36,16 +36,20 @@ const Layout: FC<Props> = ({ meta, children, toc }) => {
 
   return (
     <>
-      <Head>
-        <title>{meta?.title} | Supabase</title>
-        <meta name="description" content={meta?.description} />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <link rel="icon" href="/docs/favicon.ico" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content={meta?.title} />
-        <meta property="og:description" content={meta?.description} />
-        <meta property="og:title" content={meta?.title} />
-      </Head>
+      <NextSeo
+        title={`${meta?.title} | Supabase`}
+        description={meta?.description ? meta?.description : meta?.title}
+        openGraph={{
+          title: meta?.title,
+          description: meta?.description,
+          url: `https://supabase.com/docs/${currentPage}`,
+          images: [
+            {
+              url: `https://supabase.com/docs/img/supabase-og-image.png`,
+            },
+          ],
+        }}
+      />
 
       <main>
         <NavBar />
