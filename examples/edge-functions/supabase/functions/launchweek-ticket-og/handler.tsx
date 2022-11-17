@@ -3,9 +3,9 @@ import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.2/mod.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const BACKGROUND_IMAGE_STD =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/lw6_og_bg.png'
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/lw6_ticket_regular.jpg'
 const BACKGROUND_IMAGE_GOLDEN =
-  'https://pbs.twimg.com/profile_banners/1219566488325017602/1662536044/1500x500' // TODO
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/lw6_ticket_gold.jpg'
 const SUPA_CHECKMARK =
   'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/supaverified.png'
 
@@ -72,7 +72,7 @@ export function handler(req: Request) {
               flexDirection: 'column',
               position: 'absolute',
               top: '360',
-              left: '800',
+              left: '815',
               width: '600',
               height: '270',
               overflow: 'hidden',
@@ -110,7 +110,7 @@ export function handler(req: Request) {
             style={{
               position: 'absolute',
               top: '750',
-              left: '800',
+              left: '815',
               fontSize: '25',
             }}
           >
