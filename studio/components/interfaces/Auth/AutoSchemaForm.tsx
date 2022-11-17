@@ -4,7 +4,7 @@ import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useFlag } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -21,6 +21,7 @@ const AutoSchemaForm = observer(() => {
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
 
+  const showMfaSso = false
   const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
@@ -187,18 +188,20 @@ const AutoSchemaForm = observer(() => {
                   )}
                 </FormSectionContent>
               </FormSection>
-              <FormSection
-                header={<FormSectionLabel>Multi Factor Authentication (MFA)</FormSectionLabel>}
-              >
-                <FormSectionContent loading={!isLoaded}>
-                  <InputNumber
-                    id="MAX_ENROLLED_FACTORS"
-                    size="small"
-                    label="Maximum number of enrolled factors"
-                    disabled={!canUpdateConfig}
-                  />
-                </FormSectionContent>
-              </FormSection>
+              {showMfaSso && (
+                <FormSection
+                  header={<FormSectionLabel>Multi Factor Authentication (MFA)</FormSectionLabel>}
+                >
+                  <FormSectionContent loading={!isLoaded}>
+                    <InputNumber
+                      id="MAX_ENROLLED_FACTORS"
+                      size="small"
+                      label="Maximum number of enrolled factors"
+                      disabled={!canUpdateConfig}
+                    />
+                  </FormSectionContent>
+                </FormSection>
+              )}
             </FormPanel>
           </>
         )
