@@ -20,17 +20,17 @@ const nonPlatformRedirects = [
   {
     source: '/project/:ref/auth/providers',
     destination: '/project/:ref/auth/users',
-    permanent: true,
+    permanent: false,
   },
   {
     source: '/project/:ref/auth/templates',
     destination: '/project/:ref/auth/users',
-    permanent: true,
+    permanent: false,
   },
   {
     source: '/project/:ref/auth/url-configuration',
     destination: '/project/:ref/auth/users',
-    permanent: true,
+    permanent: false,
   },
 ]
 
