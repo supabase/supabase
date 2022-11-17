@@ -30,7 +30,9 @@ const Layout = ({ children }) => {
         </div>
         <div className="grid grid-cols-12 opacity-100 duration-100 max-w-[1400px] mx-auto py-16 gap-4 px-5">
           <div className="col-span-3">
-            <NavigationMenu />
+            <div className="sticky top-8">
+              <NavigationMenu />
+            </div>
           </div>
           <div className="col-span-9">
             {children}

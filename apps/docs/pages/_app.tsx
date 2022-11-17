@@ -41,7 +41,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <ThemeProvider>
       <SearchProvider>
-        <SiteLayout>{getLayout(<Component {...pageProps}></Component>)}</SiteLayout>
+        {/* <SiteLayout>{getLayout(<Component {...pageProps}></Component>)}</SiteLayout> */}
+        {getLayout(<Component {...pageProps} />)}
       </SearchProvider>
     </ThemeProvider>
   )

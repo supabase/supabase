@@ -12,7 +12,7 @@ interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
   children: any
   toc?: any
-  menuItems: any
+  menuItems?: any
   currentPage: string
 }
 
@@ -42,7 +42,7 @@ const Layout: FC<Props> = ({ meta, children, toc }) => {
         openGraph={{
           title: meta?.title,
           description: meta?.description,
-          url: `https://supabase.com/docs/${currentPage}`,
+          // url: `https://supabase.com/docs/${currentPage}`,
           images: [
             {
               url: `https://supabase.com/docs/img/supabase-og-image.png`,

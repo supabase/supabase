@@ -104,19 +104,7 @@ const TopNavBar: FC = () => {
         <div className="col-span-5 flex items-center">
           <div className="max-w-xl grow">
             <SearchButton className="w-full">
-              <div
-                className="
-              flex 
-              group
-              items-center 
-              justify-between 
-              bg-scaleA-200 
-              border 
-              transition
-              hover:border-scale-600
-              hover:bg-scaleA-300 
-              border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded"
-              >
+              <div className="flex group items-center justify-between bg-scaleA-200 border transition hover:border-scale-600 hover:bg-scaleA-300 border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded">
                 <div className="flex items-center space-x-2">
                   <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
                   <p className="text-scale-1100 text-sm group-hover:text-scale-1200 transition">

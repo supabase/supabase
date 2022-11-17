@@ -6,7 +6,8 @@ import Footer from '~/components/Footer'
 import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
 import NavBar from '~/components/Navigation/NavBar'
-
+import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean; video?: string }
   children: any
@@ -60,6 +61,9 @@ const Layout: FC<Props> = (props: Props) => {
         <meta property="og:title" content={props.meta?.title} />
       </Head>
 
+      <div className="mx-auto sticky top-0 z-10">
+        <TopNavBar />
+      </div>
       <div
         className={[
           'relative transition-all ease-out',
@@ -67,23 +71,34 @@ const Layout: FC<Props> = (props: Props) => {
           active ? 'opacity-100 left-0' : 'opacity-0 left-5',
         ].join(' ')}
       >
-        {/* <p className="text-brand-900 tracking-wider">Tutorials</p> */}
-        <article className="prose dark:prose-dar max-w-none">
-          <h1>{props.meta.title}</h1>
-          {/* <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div> */}
-          <MDXProvider components={components} children={props.children} />
-        </article>
-      </div>
-      {hasTableOfContents && !props.meta?.hide_table_of_contents && (
-        <div
-          className={[
-            'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
-            'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
-          ].join(' ')}
-        >
-          <TableOfContents toc={props.toc} video={props.meta.video} />
+        <div className="grid grid-cols-12 opacity-100 duration-100 max-w-[1400px] mx-auto py-16 gap-4 px-5">
+          <div className="col-span-3">
+            <div className="px-10 sticky top-24">
+              <NavigationMenu />
+            </div>
+          </div>
+          <div className="col-span-9">
+            {/* <p className="text-brand-900 tracking-wider">Tutorials</p> */}
+            <article className="prose dark:prose-dar max-w-none">
+              <h1>{props.meta.title}</h1>
+              (default layout)
+              {/* <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div> */}
+              <MDXProvider components={components}>{props.children}</MDXProvider>
+            </article>
+          </div>
+
+          {hasTableOfContents && !props.meta?.hide_table_of_contents && (
+            <div
+              className={[
+                'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
+                'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+              ].join(' ')}
+            >
+              <TableOfContents toc={props.toc} video={props.meta.video} />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </>
   )
 }

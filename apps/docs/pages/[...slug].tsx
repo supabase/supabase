@@ -22,8 +22,14 @@ interface Props {
 export default function Doc({ meta, content, toc }: Props) {
   return (
     // @ts-ignore
+    <MDXRemote {...content} components={components} />
+  )
+}
+
+Doc.getLayout = function getLayout(page) {
+  return (
     <Layout meta={meta} toc={toc}>
-      <MDXRemote {...content} components={components} />
+      {page}
     </Layout>
   )
 }
@@ -35,7 +41,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   } else {
     slug = `docs/${params.slug[0]}`
   }
-
+  console.log({ slug })
   let doc = getDocsBySlug(slug)
   const content = await serialize(doc.content || '')
 
@@ -44,6 +50,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
       ...doc,
       content,
       toc: toc(doc.content, { maxdepth: 1, firsth1: false }),
+      slug: 'currentPage',
     },
   }
 }
