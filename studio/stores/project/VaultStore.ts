@@ -9,9 +9,19 @@ export interface IVaultStore {
   error: any
 
   load: () => void
-  listKeys: () => any[]
-  listSecrets: () => any[]
+  listKeys: (filter?: any) => EncryptionKey[]
+  listSecrets: () => Secret[]
 }
+
+interface EncryptionKey {
+  id: string
+  key_id: number
+  comment: string
+  created: string
+  status: string
+}
+
+interface Secret {}
 
 export default class VaultStore implements IVaultStore {
   rootStore: IRootStore
@@ -23,7 +33,7 @@ export default class VaultStore implements IVaultStore {
     LOADED: 'loaded',
   }
 
-  data: any = { keys: [], secrets: [] }
+  data: { keys: EncryptionKey[]; secrets: Secret[] } = { keys: [], secrets: [] }
   state = this.STATES.INITIAL
   error = null
 
@@ -76,12 +86,22 @@ export default class VaultStore implements IVaultStore {
     }
   }
 
+  // Always return the default key as the first result
   listKeys(filter?: any) {
     const arr = this.data.keys.slice()
+
     if (!!filter) {
-      return arr.filter(filter).sort((a: any, b: any) => b.key_id - a.key_id)
+      const filteredResults = arr.filter(filter).sort((a: any, b: any) => a.key_id - b.key_id)
+      const defaultKey = filteredResults.find((key) => key.status === 'default') as EncryptionKey
+
+      if (defaultKey === undefined) return filteredResults
+      else return [defaultKey].concat(filteredResults.filter((key) => key.status !== 'default'))
     } else {
-      return arr.sort((a: any, b: any) => b.key_id - a.key_id)
+      const results = arr.sort((a: any, b: any) => a.key_id - b.key_id)
+      const defaultKey = results.find((key) => key.status === 'default') as EncryptionKey
+
+      if (defaultKey === undefined) return results
+      return [defaultKey].concat(results.filter((key) => key.status !== 'default'))
     }
   }
 

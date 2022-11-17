@@ -21,7 +21,7 @@ const VaultSettings: NextPageWithLayout = () => {
       <VaultToggle />
 
       {/* Show encryption keys table if vault extension is enabled */}
-      <EncryptionKeysManagement />
+      <EncryptionKeysManagement onSelectRemove={() => {}} />
 
       {/* Show secrets table if vault extension is enabled */}
       <SecretsManagement />
