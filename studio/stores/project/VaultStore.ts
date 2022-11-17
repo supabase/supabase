@@ -10,7 +10,12 @@ export interface IVaultStore {
 
   load: () => void
   listKeys: (filter?: any) => EncryptionKey[]
+  addKey: (name?: string) => any
+  deleteKey: (id: string) => any
+
   listSecrets: () => Secret[]
+  addSecret: (name?: string) => any
+  deleteSecret: (id: string) => any
 }
 
 interface EncryptionKey {
@@ -87,22 +92,44 @@ export default class VaultStore implements IVaultStore {
   }
 
   // Always return the default key as the first result
+  // listKeys(filter?: any) {
+  //   const arr = this.data.keys.slice()
+
+  //   if (!!filter) {
+  //     const filteredResults = arr.filter(filter).sort((a: any, b: any) => a.key_id - b.key_id)
+  //     const defaultKey = filteredResults.find((key) => key.status === 'default') as EncryptionKey
+
+  //     if (defaultKey === undefined) return filteredResults
+  //     else return [defaultKey].concat(filteredResults.filter((key) => key.status !== 'default'))
+  //   } else {
+  //     const results = arr.sort((a: any, b: any) => a.key_id - b.key_id)
+  //     const defaultKey = results.find((key) => key.status === 'default') as EncryptionKey
+
+  //     if (defaultKey === undefined) return results
+  //     return [defaultKey].concat(results.filter((key) => key.status !== 'default'))
+  //   }
+  // }
+
   listKeys(filter?: any) {
     const arr = this.data.keys.slice()
 
     if (!!filter) {
-      const filteredResults = arr.filter(filter).sort((a: any, b: any) => a.key_id - b.key_id)
-      const defaultKey = filteredResults.find((key) => key.status === 'default') as EncryptionKey
-
-      if (defaultKey === undefined) return filteredResults
-      else return [defaultKey].concat(filteredResults.filter((key) => key.status !== 'default'))
+      return arr
+        .filter(filter)
+        .sort((a: any, b: any) => Number(new Date(a.created)) - Number(new Date(b.created)))
     } else {
-      const results = arr.sort((a: any, b: any) => a.key_id - b.key_id)
-      const defaultKey = results.find((key) => key.status === 'default') as EncryptionKey
-
-      if (defaultKey === undefined) return results
-      return [defaultKey].concat(results.filter((key) => key.status !== 'default'))
+      return arr.sort((a: any, b: any) => Number(new Date(a.created)) - Number(new Date(b.created)))
     }
+  }
+
+  async addKey(name?: string) {
+    if (name) return await this.rootStore.meta.query(`select * from pgsodium.create_key('${name}')`)
+    else return await this.rootStore.meta.query(`select * from pgsodium.create_key()`)
+  }
+
+  async deleteKey(id: string) {
+    const query = new Query().from('key', 'pgsodium').delete().match({ id }).toSql()
+    return await this.rootStore.meta.query(query)
   }
 
   listSecrets(filter?: any) {
@@ -113,4 +140,8 @@ export default class VaultStore implements IVaultStore {
       return arr
     }
   }
+
+  async addSecret(name?: string) {}
+
+  async deleteSecret(id: string) {}
 }

@@ -1,41 +1,74 @@
-import { observer } from 'mobx-react-lite'
-import { FC, Fragment, useState } from 'react'
-import {
-  Input,
-  IconSearch,
-  Listbox,
-  Button,
-  Divider,
-  Modal,
-  Form,
-  IconHelpCircle,
-  IconTrash,
-  Badge,
-} from 'ui'
-import EncryptionKeySelector from './EncryptionKeySelector'
-import InformationBox from 'components/ui/InformationBox'
-import { useStore } from 'hooks'
 import dayjs from 'dayjs'
+import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { FC, Fragment, useState } from 'react'
+import { Input, IconSearch, Listbox, Button, Modal, Form, IconTrash, Badge } from 'ui'
+import { useStore } from 'hooks'
+import Divider from 'components/ui/Divider'
 
-interface Props {
-  onSelectRemove: (key: any) => void
-}
+interface Props {}
 
-const EncryptionKeysManagement: FC<Props> = ({ onSelectRemove }) => {
-  const { vault } = useStore()
+const EncryptionKeysManagement: FC<Props> = ({}) => {
+  const { vault, ui } = useStore()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [selectedSort, setSelectedSort] = useState<string>('name')
+  const [selectedSort, setSelectedSort] = useState<'comment' | 'created'>('created')
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
 
-  const keys = searchValue
-    ? vault.listKeys(
-        (key: any) =>
-          (key?.comment ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
-          key.id.toLowerCase().includes(searchValue.toLowerCase())
-      )
-    : vault.listKeys()
+  const [isDeletingKey, setIsDeletingKey] = useState(false)
+
+  const keys = (
+    searchValue
+      ? vault.listKeys(
+          (key: any) =>
+            (key?.comment ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
+            key.id.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      : vault.listKeys()
+  ).sort((a: any, b: any) => {
+    if (selectedSort === 'created') {
+      return Number(new Date(a.created)) - Number(new Date(b.created))
+    } else {
+      return a[selectedSort] > b[selectedSort] ? 1 : -1
+    }
+  })
+
+  const addKey = async (values: any, { setSubmitting }: any) => {
+    setSubmitting(true)
+    const res = await vault.addKey(values.name)
+    if (!res.error) {
+      vault.load()
+      ui.setNotification({ category: 'success', message: 'Successfully added new key' })
+      setShowAddKeyModal(false)
+    } else {
+      ui.setNotification({
+        error: res.error,
+        category: 'error',
+        message: `Failed to add new key: ${res.error.message}`,
+      })
+    }
+    setSubmitting(false)
+  }
+
+  const confirmDeleteKey = async () => {
+    if (!selectedKeyToRemove) return
+
+    setIsDeletingKey(true)
+    const res = await vault.deleteKey(selectedKeyToRemove.id)
+    if (!res.error) {
+      vault.load()
+      ui.setNotification({ category: 'success', message: `Successfully deleted encryption key` })
+      setSelectedKeyToRemove(undefined)
+    } else {
+      ui.setNotification({
+        error: res.error,
+        category: 'error',
+        message: `Failed to delete encryption key: ${res.error.message}`,
+      })
+    }
+    setIsDeletingKey(false)
+  }
 
   return (
     <>
@@ -53,10 +86,10 @@ const EncryptionKeysManagement: FC<Props> = ({ onSelectRemove }) => {
             />
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
-                <Listbox.Option id="name" value="name" label="Sort by name">
+                <Listbox.Option id="comment" value="comment" label="Sort by name">
                   Name
                 </Listbox.Option>
-                <Listbox.Option id="createdAt" value="createdAt" label="Sort by created at">
+                <Listbox.Option id="created" value="created" label="Sort by created at">
                   Created at
                 </Listbox.Option>
               </Listbox>
@@ -91,12 +124,32 @@ const EncryptionKeysManagement: FC<Props> = ({ onSelectRemove }) => {
                     <p className="text-sm text-scale-1100">
                       Added on {dayjs(key.created).format('MMM D, YYYY')}
                     </p>
-                    <Button
-                      type="default"
-                      className="py-2"
-                      icon={<IconTrash />}
-                      onClick={() => onSelectRemove(key)}
-                    />
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Button
+                          type="default"
+                          className="py-2"
+                          icon={<IconTrash />}
+                          disabled={key.status === 'default'}
+                          onClick={() => setSelectedKeyToRemove(key)}
+                        />
+                      </Tooltip.Trigger>
+                      {key.status === 'default' && (
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              The default key cannot be deleted
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      )}
+                    </Tooltip.Root>
                   </div>
                 </div>
                 {idx !== keys.length - 1 && <Divider light />}
@@ -132,20 +185,21 @@ const EncryptionKeysManagement: FC<Props> = ({ onSelectRemove }) => {
         alignFooter="right"
         visible={selectedKeyToRemove !== undefined}
         onCancel={() => setSelectedKeyToRemove(undefined)}
-        onConfirm={() => setSelectedKeyToRemove(undefined)}
-        header={<h5 className="text-sm text-scale-1200">Confirm to delete secret</h5>}
+        onConfirm={confirmDeleteKey}
+        loading={isDeletingKey}
+        header={<h5 className="text-sm text-scale-1200">Confirm to delete encryption key</h5>}
       >
         <div className="py-4">
           <Modal.Content>
             <div className="space-y-4">
               <p className="text-sm">
-                The following secret will be permanently removed and cannot be recovered. Are you
-                sure?
+                The following encryption key will be permanently removed and cannot be recovered.
+                Are you sure?
               </p>
               <div className="space-y-1">
-                <p className="text-sm">{selectedKeyToRemove?.description}</p>
+                <p className="text-sm">{selectedKeyToRemove?.comment ?? 'Unnamed'}</p>
                 <p className="text-sm text-scale-1100">
-                  ID: <span className="font-mono">{selectedKeyToRemove?.key_id}</span>
+                  ID: <span className="font-mono">{selectedKeyToRemove?.id}</span>
                 </p>
               </div>
             </div>
@@ -159,50 +213,15 @@ const EncryptionKeysManagement: FC<Props> = ({ onSelectRemove }) => {
         size="medium"
         visible={showAddKeyModal}
         onCancel={() => setShowAddKeyModal(false)}
-        header={<h5 className="text-sm text-scale-1200">Add new secret</h5>}
+        header={<h5 className="text-sm text-scale-1200">Add new encryption key</h5>}
       >
-        <Form
-          id="add-new-secret-form"
-          initialValues={{ secret: '', description: '', keyId: '', newKeyName: '' }}
-          validate={() => {}}
-          onSubmit={() => {}}
-        >
+        <Form id="add-new-key-form" initialValues={{ name: '' }} onSubmit={addKey}>
           {({ isSubmitting }: any) => {
             return (
               <div className="py-4">
                 <Modal.Content>
                   <div className="space-y-4 pb-4">
-                    <Input id="secret" label="Secret value" />
-                    <Input id="description" label="Description" labelOptional="Optional" />
-                  </div>
-                </Modal.Content>
-                <Modal.Separator />
-                <Modal.Content>
-                  <div className="py-4 space-y-4">
-                    <EncryptionKeySelector
-                      id="keyId"
-                      labelOptional="Optional"
-                      onSelectKey={(key) => console.log(key)}
-                    />
-                    <InformationBox
-                      icon={<IconHelpCircle size={18} strokeWidth={2} />}
-                      url="asd"
-                      urlLabel="Vault documentation"
-                      title="What is a Key ID?"
-                      description={
-                        <div className="space-y-2">
-                          <p>
-                            Every secret in the Vault is encrypted with a Key ID. The Vault comes
-                            with a default value for this Key ID which is sufficient for simple
-                            purposes.
-                          </p>
-                          <p>
-                            However, you may also use a custom Key ID for more advanced use cases,
-                            such as having different secrets visible to different users
-                          </p>
-                        </div>
-                      }
-                    />
+                    <Input id="name" label="Name" labelOptional="Optional" />
                   </div>
                 </Modal.Content>
                 <Modal.Separator />
@@ -216,7 +235,7 @@ const EncryptionKeysManagement: FC<Props> = ({ onSelectRemove }) => {
                       Cancel
                     </Button>
                     <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                      Add secret
+                      Add key
                     </Button>
                   </div>
                 </Modal.Content>
