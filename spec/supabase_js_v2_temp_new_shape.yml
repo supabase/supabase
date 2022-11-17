@@ -102,7 +102,7 @@ functions:
           ```
 
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
-  - id: auth.signUp()
+  - id: auth-sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
@@ -144,7 +144,7 @@ functions:
             }
           )
           ```
-  - id: auth.signInWithPassword()
+  - id: auth-sign-in-with-password
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
@@ -176,7 +176,7 @@ functions:
             token: '123456',
           })
           ```
-  - id: auth.signInWithOtp()
+  - id: auth-sign-in-with-otp
     title: 'signInWithOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
@@ -206,7 +206,7 @@ functions:
             phone: '+13334445555',
           })
           ```
-  - id: auth.signInWithOAuth()
+  - id: auth-sign-in-with-oauth
     title: 'signInWithOAuth()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
@@ -215,7 +215,6 @@ functions:
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
-
         isSpotlight: true
         code: |
           ```js
@@ -254,7 +253,7 @@ functions:
           })
           const oAuthToken = data.session.provider_token // use to access provider API
           ```
-  - id: auth.signOut()
+  - id: auth-sign-out
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
@@ -267,7 +266,7 @@ functions:
           ```js
           const { error } = await supabase.auth.signOut()
           ```
-  - id: auth.verifyOtp()
+  - id: auth-verify-otp
     title: 'verifyOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
@@ -288,7 +287,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
           ```
-  - id: auth.getSession()
+  - id: auth-get-session
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
@@ -299,7 +298,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.getSession()
           ```
-  - id: auth.getUser()
+  - id: auth-get-user
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
@@ -320,7 +319,7 @@ functions:
           ```js
           const { data: { user } } = await supabase.auth.getUser(jwt)
           ```
-  - id: auth.updateUser()
+  - id: auth-update-user
     title: 'updateUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
@@ -352,7 +351,7 @@ functions:
             data: { hello: 'world' }
           })
           ```
-  - id: auth.setSession()
+  - id: auth-set-session
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
@@ -369,7 +368,7 @@ functions:
           ```js
             const { data, error } = supabase.auth.setSession(refresh_token)
           ```
-  - id: auth.refreshSession()
+  - id: auth-refresh-session
     title: 'refreshSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
@@ -390,7 +389,7 @@ functions:
           ```js
           const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
           ```
-  - id: auth.onAuthStateChange()
+  - id: auth-on-auth-state-change
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
@@ -453,13 +452,13 @@ functions:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  - id: Supabase Auth Admin Api
+  - id: supabase-auth-admin-api
     title: 'Overview'
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
 
-  - id: auth.admin.getUserById()
+  - id: auth-admin-get-user-by-id
     title: 'getUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
@@ -474,7 +473,7 @@ functions:
           const { data, error } = await supabase.auth.admin.getUserById(1)
           ```
 
-  - id: auth.admin.listUsers()
+  - id: auth-admin-list-users
     title: 'listUsers()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     examples:
@@ -485,7 +484,7 @@ functions:
           ```js
           const { data: { users }, error } = await supabase.auth.admin.listUsers()
           ```
-  - id: auth.admin.createUser()
+  - id: auth-admin-createUser
     title: 'createUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
@@ -520,7 +519,7 @@ functions:
             phone_confirm: true
           })
           ```
-  - id: auth.admin.deleteUser()
+  - id: auth-admin-deleteUser
     title: 'deleteUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
@@ -536,7 +535,7 @@ functions:
           )
           ```
 
-  - id: auth.admin.inviteUserByEmail()
+  - id: auth-admin-invite-user-by-email
     title: 'inviteUserByEmail()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
@@ -550,7 +549,7 @@ functions:
           const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
           ```
 
-  - id: auth.resetPasswordForEmail()
+  - id: auth-reset-password-for-email
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
@@ -601,7 +600,7 @@ functions:
            }, [])
           ```
 
-  - id: auth.admin.generateLink()
+  - id: auth-admin-generate-link
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     examples:
@@ -668,7 +667,7 @@ functions:
           })
           ```
 
-  - id: auth.admin.updateUserById()
+  - id: auth-admin-update-user-by-id
     title: 'updateUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     examples:
@@ -733,7 +732,7 @@ functions:
           )
           ```
 
-  - id: select()
+  - id: select
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
@@ -764,6 +763,84 @@ functions:
           If your database has foreign key relationships, you can query related tables too.
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('users')
+              .select(`
+                name,
+                teams (
+                  name
+                )
+              `)
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+                -- both foreign keys must be part of a composite primary key
+                primary key (user_id, team_id)
+              );
+
+            insert into
+              users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "name": "Kiran",
+                  "teams": [
+                    {
+                      "name": "Green"
+                    },
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                },
+                {
+                  "name": "Evan",
+                  "teams": [
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           If you're in a situation where your tables are **NOT** directly
           related, but instead are joined by a _join table_, you can still use
@@ -862,13 +939,15 @@ functions:
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
         code: |
+          ```ts
           const { data, error } = await supabase
-             .from('messages')
-             .select(`
-               content,
-               from:sender_id(name),
-               to:receiver_id(name)
-             `)
+            .from('messages')
+            .select(`
+              content,
+              from:sender_id(name),
+              to:receiver_id(name)
+            `)
+          ```
         data:
           sql: |
             ```sql
@@ -981,6 +1060,38 @@ functions:
         hideCodeBlock: true
       - id: filtering-through-foreign-tables
         name: Filtering through foreign tables
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries(*)')
+            .eq('countries.name', 'Estonia')
+          ```
+        data:
+          sql: |
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries(*)')
+            .eq('countries.name', 'Estonia')
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": null
+              },
+              {
+                "name": "Munich",
+                "countries": null
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
           table returns `[]` or `null` but the parent table is not filtered out.
