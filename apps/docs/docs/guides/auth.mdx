@@ -51,11 +51,9 @@ You can enable third-party providers with the click of a button by navigating to
 
 ### Redirect URLs and wildcards
 
-When using third-party providers the [Supabase client library](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect) will redirect the user to the provider. When the third-party provider successfully authenticates the user, the provider will redirect the user to the Supabase Auth callback URL, from where they will be further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
+When using third-party providers, the [Supabase client library](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect) redirects the user to the provider. When the third-party provider successfully authenticates the user, the provider redirects the user to the Supabase Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or [add additional redirect URLs](https://app.supabase.com/project/_/auth/settings).
 
-You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
-
-A full list of supported pattern syntax can be found [here](https://pkg.go.dev/github.com/gobwas/glob#Compile).
+You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel. See the [full list of supported patterns](https://pkg.go.dev/github.com/gobwas/glob#Compile).
 
 #### Netlify preview URLs
 
