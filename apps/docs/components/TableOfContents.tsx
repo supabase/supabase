@@ -1,3 +1,7 @@
+// [Terry]
+// Delete this after we've implemented GuidesTableofContents and moved all guides
+// and rename GuidesTableofContents to TableOfContents
+
 import { FC } from 'react'
 import { getAnchor, removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
 
