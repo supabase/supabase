@@ -1,13 +1,27 @@
 import { observer } from 'mobx-react-lite'
-import { FC, Fragment, useEffect, useState } from 'react'
-import { Input, IconSearch, Listbox, Button, Divider, Modal, Form, IconHelpCircle } from 'ui'
+import { FC, Fragment, useState } from 'react'
+import {
+  Input,
+  IconSearch,
+  Listbox,
+  Button,
+  Divider,
+  Modal,
+  Form,
+  IconHelpCircle,
+  IconTrash,
+  Badge,
+} from 'ui'
 import EncryptionKeySelector from './EncryptionKeySelector'
 import InformationBox from 'components/ui/InformationBox'
 import { useStore } from 'hooks'
+import dayjs from 'dayjs'
 
-interface Props {}
+interface Props {
+  onSelectRemove: (key: any) => void
+}
 
-const EncryptionKeysManagement: FC<Props> = ({}) => {
+const EncryptionKeysManagement: FC<Props> = ({ onSelectRemove }) => {
   const { vault } = useStore()
 
   const [searchValue, setSearchValue] = useState<string>('')
@@ -15,7 +29,13 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
 
-  console.log('keys', vault.listKeys())
+  const keys = searchValue
+    ? vault.listKeys(
+        (key: any) =>
+          (key?.comment ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
+          key.id.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    : vault.listKeys()
 
   return (
     <>
@@ -48,22 +68,49 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
         </div>
 
         {/* Table of secrets */}
-        {/* <div className="border border-scale-500 rounded">
-          {secrets.map((secret, idx) => {
+        <div className="border border-scale-500 rounded">
+          {keys.map((key, idx) => {
             return (
-              <Fragment key={secret.key_id}>
-                <SecretRow secret={secret} onSelectRemove={setSelectedSecretToRemove} />
-                {idx !== mockSecrets.length - 1 && <Divider light />}
+              <Fragment key={key.key_id}>
+                <div className="px-6 py-4 flex items-center space-x-4">
+                  <div className="space-y-1 min-w-[37%] max-w-[37%]">
+                    <p className="text-sm truncate" title={key.comment || 'Unnamed'}>
+                      {key.comment || 'Unnamed'}
+                    </p>
+                    <p
+                      title={key.id}
+                      className="text-sm text-scale-1000 font-mono font-bold truncate"
+                    >
+                      {key.id}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2 w-[38%]">
+                    {key.status === 'default' && <Badge color="green">Default</Badge>}
+                  </div>
+                  <div className="flex items-center justify-end w-[25%] space-x-4">
+                    <p className="text-sm text-scale-1100">
+                      Added on {dayjs(key.created).format('MMM D, YYYY')}
+                    </p>
+                    <Button
+                      type="default"
+                      className="py-2"
+                      icon={<IconTrash />}
+                      onClick={() => onSelectRemove(key)}
+                    />
+                  </div>
+                </div>
+                {idx !== keys.length - 1 && <Divider light />}
               </Fragment>
             )
           })}
-          {secrets.length === 0 && (
+          {keys.length === 0 && (
             <>
               {searchValue.length === 0 ? (
                 <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                  <p className="text-sm text-scale-1200">No secrets added yet</p>
+                  <p className="text-sm text-scale-1200">No encryption keys added yet</p>
                   <p className="text-sm text-scale-1100">
-                    The Vault allows you to store sensitive information like API keys
+                    Encryption keys are created by the pgsodium extension and can be used to encrypt
+                    your columns and secrets
                   </p>
                 </div>
               ) : (
@@ -76,7 +123,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
               )}
             </>
           )}
-        </div> */}
+        </div>
       </div>
 
       <Modal
