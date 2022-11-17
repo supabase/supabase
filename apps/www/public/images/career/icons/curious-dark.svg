@@ -1,7 +1,8 @@
-<svg width="40" height="44" viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="19.6822" cy="25.1517" r="4.87601" transform="rotate(30 19.6822 25.1517)" fill="#1B543A"/>
-<circle cx="18.9118" cy="22.3428" r="1.82954" transform="rotate(30 18.9118 22.3428)" fill="#1B543A" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M11.2444 31.0037C11.6363 31.6078 12.097 32.1802 12.6267 32.7098C16.6993 36.7825 23.3024 36.7825 27.3751 32.7098C31.4478 28.6372 31.4478 22.0341 27.3751 17.9614C23.3024 13.8887 16.6993 13.8887 12.6267 17.9614C11.1115 19.4765 10.1601 21.3418 9.77228 23.2968M9.756 27.2906C9.66577 26.8154 9.60876 26.3352 9.58495 25.8536" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M1.41895 25.3353L6.57852 20.1757C13.9909 12.7633 26.0088 12.7633 33.4213 20.1757L38.5808 25.3353L33.4213 30.4949C26.0089 37.9073 13.9909 37.9073 6.57853 30.4949L1.41895 25.3353Z" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M1.41895 19.0978L4.44354 16.0732C13.0351 7.48165 26.9647 7.48165 35.5562 16.0732L38.5808 19.0978" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.615234" y="0.583008" width="48" height="48" rx="8" fill="#164430"/>
+<circle cx="24.2974" cy="25.7347" r="4.87601" transform="rotate(30 24.2974 25.7347)" fill="#133929"/>
+<circle cx="23.2931" cy="24.1459" r="2" transform="rotate(30 23.2931 24.1459)" fill="#4CC38A"/>
+<path d="M15.8596 31.5868C16.2515 32.1909 16.7123 32.7633 17.2419 33.2929C21.3146 37.3656 27.9177 37.3656 31.9903 33.2929C36.063 29.2203 36.063 22.6171 31.9903 18.5445C27.9177 14.4718 21.3146 14.4718 17.2419 18.5445C15.7268 20.0596 14.7753 21.9249 14.3875 23.8799M14.3712 27.8737C14.281 27.3985 14.224 26.9183 14.2002 26.4367" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M6.03418 25.9185L11.1938 20.7589C18.6062 13.3465 30.6241 13.3465 38.0365 20.7589L43.1961 25.9185L38.0365 31.078C30.6241 38.4904 18.6062 38.4905 11.1938 31.078L6.03418 25.9185Z" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M6.03418 19.6809L9.05877 16.6563C17.6503 8.06478 31.5799 8.06478 40.1715 16.6563L43.1961 19.6809" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
 </svg>

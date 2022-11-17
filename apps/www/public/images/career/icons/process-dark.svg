@@ -1,12 +1,10 @@
-<svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.28884 28.532L13.0151 24.8057L9.28884 21.0794" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M16.3311 10.5266H6.00928V24.8057H12.9588" stroke="#4CC38A" stroke-width="2" stroke-linejoin="bevel"/>
-<path d="M39.1731 42.186L35.4468 38.4597L39.1731 34.7334" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M9.44993 41.8455L5.72363 38.1192L9.44993 34.3929" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M32.6704 10.5266L43.4658 10.5266" stroke="#133929" stroke-width="2" stroke-linejoin="bevel"/>
-<path d="M6.62305 38.1946L15.6724 38.1946" stroke="#133929" stroke-width="2" stroke-linejoin="bevel"/>
-<path d="M31.8643 24.1064H42.186V38.3389H35.2365" stroke="#4CC38A" stroke-width="2" stroke-linejoin="bevel"/>
-<rect x="16" y="6.02661" width="16" height="9" fill="#1B543A" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<rect x="16" y="19.6064" width="16" height="9" fill="#1B543A" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<rect x="16" y="33.186" width="16" height="9" fill="#1B543A" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.0107422" width="48" height="48" rx="8" fill="#164430"/>
+<path d="M9.36452 27.8327L13.0908 24.1064L9.36453 20.3802" stroke="#4CC38A" stroke-width="2" stroke-linejoin="bevel"/>
+<path d="M16.3418 10.5266H6.02002V24.1064H12.9696" stroke="#4CC38A" stroke-width="2" stroke-linejoin="bevel"/>
+<path d="M38.4704 41.9209L34.7441 38.1946L38.4704 34.4683" stroke="#4CC38A" stroke-width="2" stroke-linejoin="bevel"/>
+<path d="M31.875 24.1064H42.1968V38.1946H35.2472" stroke="#4CC38A" stroke-width="2" stroke-linejoin="bevel"/>
+<rect x="16.0107" y="6.02661" width="16" height="9" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<rect x="16.0107" y="19.6064" width="16" height="9" fill="#1B543A" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<rect x="16.0107" y="33.186" width="16" height="9" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
 </svg>

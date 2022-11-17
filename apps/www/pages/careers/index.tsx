@@ -242,8 +242,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           key={i}
                           className="flex sm:block items-center space-x-6 sm:space-x-0 sm:space-y-4 md:w-full"
                         >
-                          <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-brand-500 dark:bg-brand-600 rounded-lg flex items-center">
-                            <div className="relative w-[80%] h-[80%] mx-auto">
+                          <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg flex items-center">
+                            <div className="relative w-full h-full mx-auto">
                               <Image
                                 src={`/images/career/icons/${human.icon}${
                                   isDarkMode ? '-dark' : '-light'
@@ -268,8 +268,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               </SectionContainer>
 
               <SectionContainer className="!pb-0">
-                <div className="w-14 h-14 bg-brand-500 dark:bg-brand-600 rounded-lg flex items-center mx-auto mb-6">
-                  <div className="relative w-[80%] h-[80%] mx-auto">
+                <div className="w-14 h-14 rounded-lg flex items-center mx-auto mb-6">
+                  <div className="relative w-full h-full mx-auto">
                     <Image
                       src={`/images/career/icons/open_source${isDarkMode ? '-dark' : '-light'}.svg`}
                       alt="open source icon"
@@ -354,8 +354,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         className="h-full bg-scale-300 border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
-                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square bg-brand-500 dark:bg-brand-600 rounded-lg flex items-center">
-                          <div className="relative w-[80%] h-[80%] mx-auto">
+                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square rounded-lg flex items-center">
+                          <div className="relative w-full h-full mx-auto">
                             <Image
                               src={`/images/career/icons/${benefits.icon}${
                                 isDarkMode ? '-dark' : '-light'
@@ -381,8 +381,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
           </SectionContainer>
 
           <SectionContainer>
-            <div className="w-14 h-14 bg-brand-500 dark:bg-brand-600 rounded-lg flex items-center mx-auto mb-6">
-              <div className="relative w-[80%] h-[80%] mx-auto">
+            <div className="w-14 h-14 rounded-lg flex items-center mx-auto mb-6">
+              <div className="relative w-full h-full mx-auto">
                 <Image
                   src={`/images/career/icons/jobs${isDarkMode ? '-dark' : '-light'}.svg`}
                   alt="jobs icon"
