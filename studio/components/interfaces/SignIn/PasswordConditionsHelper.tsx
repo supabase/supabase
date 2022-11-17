@@ -11,11 +11,11 @@ const PasswordConditionsHelper = ({ password }: PasswordConditionsHelperProps) =
 
   return (
     <div className="text-sm">
-      <PasswordCondition title="One or more uppercase letters" isMet={hasUppercase} />
-      <PasswordCondition title="One or more lowercase letters" isMet={hasLowercase} />
-      <PasswordCondition title="One or more numbers" isMet={hasNumber} />
-      <PasswordCondition title="One or more special characters" isMet={hasSpecialCharacter} />
-      <PasswordCondition title="At least 8 characters long" isMet={isEightCharactersLong} />
+      <PasswordCondition title="Uppercase letter" isMet={hasUppercase} />
+      <PasswordCondition title="Lowercase letter" isMet={hasLowercase} />
+      <PasswordCondition title="Number" isMet={hasNumber} />
+      <PasswordCondition title="Special character (e.g. !?<>@#$%)" isMet={hasSpecialCharacter} />
+      <PasswordCondition title="> 7 characters" isMet={isEightCharactersLong} />
     </div>
   )
 }
@@ -31,7 +31,7 @@ const PasswordCondition = ({ title, isMet }: PasswordConditionProps) => {
   return (
     <div
       className={
-        'flex items-center gap-1 transition duration-200 ' +
+        'flex items-center gap-1 space-x-1.5 transition duration-200 ' +
         (isMet ? 'text-scale-1100' : 'text-scale-900')
       }
     >
