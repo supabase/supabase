@@ -333,17 +333,18 @@ pages:
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
-      - `setSession()` takes in a refresh token and uses it to get a new session.
+      - `setSession()` takes in a refresh token and access token to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - If you are using React Native, you will need to install a Buffer polyfill via a library such as [rn-nodeify](https://github.com/tradle/rn-nodeify) to properly use the library.
     examples:
-      - name: Refresh the session
-        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+      - name: Set the session
+        description: Sets the session data from a `refresh_token` and `access_token` and returns the current session or an error if the tokens are invalid.
         isSpotlight: true
         js: |
           ```js
-            const { data, error } = supabase.auth.setSession(refresh_token)
+            const { data, error } = supabase.auth.setSession({refresh_token, access_token})
           ```
   auth.refreshSession():
     title: 'refreshSession()'

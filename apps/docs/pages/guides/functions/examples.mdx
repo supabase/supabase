@@ -1,0 +1,17 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'examples',
+  title: 'Examples',
+  description: 'Useful Supabase Edge Functions Examples',
+}
+
+You can find a list of useful [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
+
+<div className="container" style={{ padding: 0 }}>
+  <FunctionsExamples />
+</div>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
