@@ -214,8 +214,8 @@ pages:
       - name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          When the third-party provider successfully authenticates the user, the provider will redirect the user to the Supabase Auth callback URL from where they will be further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url).
-          You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings). You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) to support preview URLs from providers like Netlify and Vercel.
+          When the third-party provider successfully authenticates the user, the provider redirects the user to the Supabase Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url).
+          You can modify the `SITE_URL` or [add additional redirect URLs](https://app.supabase.com/project/_/auth/settings). You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) to support preview URLs from providers like Netlify and Vercel.
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
