@@ -50,7 +50,7 @@ const DatabaseUsage: FC<any> = () => {
     let cancel = false
     const getDatabaseSize = async () => {
       const res = await meta.query(
-        'select sum(pg_database_size(pg_database.datname))::integer as db_size from pg_database;'
+        'select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_database;'
       )
       if (!res.error && !cancel) {
         setDatabaseSize(res[0].db_size)
