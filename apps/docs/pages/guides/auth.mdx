@@ -77,14 +77,16 @@ Vercel provides an environment variable for the URL of the deployment called `NE
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'
   options: {
-    redirectTo: `${
-      process.env.NEXT_PUBLIC_VERCEL_URL
-        ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL
-        : 'http://localhost:3000'
-    }`
+    redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : "http://localhost:3000"
   }
 }
 ```
+
+#### Mobile deep linking URIs
+
+For mobile applications you can use deep linking URIs. For example for your `SITE_URL` you can specify something like `com.supabase://login-callback/` and for additional redirect URLs something like `com.supabase.staging://login-callback/` if needed.
 
 ## Authorization
 
