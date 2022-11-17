@@ -28,7 +28,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: ':path*',
+        source: '/:path*',
         headers: [
           {
             key: 'Strict-Transport-Security',
@@ -43,6 +43,7 @@ const nextConfig = {
             value: 'DENY',
           },
         ],
+        basePath: false,
       },
     ]
   },
