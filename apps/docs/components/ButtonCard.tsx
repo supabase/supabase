@@ -6,8 +6,8 @@ interface Props {
   title: string
   description?: string
   to: string
-  icon?: string | ReactNode
-  children?: ReactNode
+  icon?: string | any
+  children?: any
   layout?: 'vertical' | 'horizontal'
 }
 
