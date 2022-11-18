@@ -129,6 +129,11 @@ export const menuItems: NavMenu = {
             { name: 'Overview', url: '/guides/auth/auth-helpers', items: [] },
             { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
             { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
+            {
+              name: 'Next.js Server Components',
+              url: '/guides/auth/auth-helpers/nextjs-server-components',
+              items: [],
+            },
             { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
             { name: 'Remix', url: '/guides/auth/auth-helpers/remix', items: [] },
           ],

@@ -92,6 +92,7 @@ const sidebars = {
             'guides/auth/auth-helpers/index',
             'guides/auth/auth-helpers/auth-ui',
             'guides/auth/auth-helpers/nextjs',
+            'guides/auth/auth-helpers/nextjs-server-components',
             'guides/auth/auth-helpers/sveltekit',
             'guides/auth/auth-helpers/remix',
           ],
