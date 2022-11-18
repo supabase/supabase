@@ -8,7 +8,8 @@ interface Props {
   label?: string
   labelOptional?: string
   selectedKeyId?: any
-  onSelectKey?: (keyId: string) => void
+  onSelectKey: (keyId: string) => void
+  onUpdateDescription?: (desc: string) => void
 }
 
 const EncryptionKeySelector: FC<Props> = ({
@@ -18,6 +19,7 @@ const EncryptionKeySelector: FC<Props> = ({
   labelOptional,
   selectedKeyId,
   onSelectKey = () => {},
+  onUpdateDescription = () => {},
 }) => {
   const { vault } = useStore()
   const keys = vault.listKeys()
@@ -49,7 +51,7 @@ const EncryptionKeySelector: FC<Props> = ({
             value={key.id}
           >
             <div className="space-y-1">
-              <p>{key.comment ?? 'No description provided'}</p>
+              <p>{key.comment || 'No description provided'}</p>
               <p className="text-xs">
                 ID: <span className="font-mono">{key.id}</span>
               </p>
@@ -58,7 +60,12 @@ const EncryptionKeySelector: FC<Props> = ({
         ))}
       </Listbox>
       {selectedKeyId === 'create-new' && (
-        <Input id={descriptionId} label="Description" labelOptional="Optional" />
+        <Input
+          id={descriptionId}
+          label="Description"
+          labelOptional="Optional"
+          onChange={(event) => onUpdateDescription(event.target.value)}
+        />
       )}
     </>
   )

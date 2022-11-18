@@ -10,6 +10,7 @@ import {
   PostgresType,
 } from '@supabase/postgres-meta'
 
+import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnType from './ColumnType'
@@ -33,7 +34,6 @@ interface Props {
   column?: PostgresColumn
   selectedTable: PostgresTable
   tables: PostgresTable[]
-  enumTypes: PostgresType[]
   visible: boolean
   closePanel: () => void
   saveChanges: (
@@ -50,14 +50,21 @@ const ColumnEditor: FC<Props> = ({
   column,
   selectedTable,
   tables = [],
-  enumTypes = [],
   visible = false,
   closePanel = () => {},
   saveChanges = () => {},
   updateEditorDirty = () => {},
 }) => {
+  const { meta, vault } = useStore()
+
   const isNewRecord = isUndefined(column)
   const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
+
+  const enumTypes = meta.types.list(
+    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
+  )
+  const keys = vault.listKeys()
+  const defaultKey = keys.find((key) => key.status === 'default')
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -67,7 +74,7 @@ const ColumnEditor: FC<Props> = ({
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? generateColumnField()
+        ? { ...generateColumnField(), keyId: defaultKey?.id }
         : generateColumnFieldFromPostgresColumn(column!, selectedTable)
       setColumnFields(columnFields)
     }
@@ -128,8 +135,19 @@ const ColumnEditor: FC<Props> = ({
         const foreignKey = columnFields.foreignKey
           ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
           : undefined
-        const configuration = { columnId: column?.id }
-        saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
+        const configuration = {
+          columnId: column?.id,
+          isEncrypted: columnFields.isEncrypted,
+          keyId: columnFields.keyId,
+          keyDescription: columnFields.keyDescription,
+        }
+        console.log('onSaveChangses', {
+          payload,
+          foreignKey,
+          configuration,
+        })
+        resolve()
+        // saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -288,22 +306,31 @@ const ColumnEditor: FC<Props> = ({
           />
         </FormSectionContent>
       </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <Toggle
-            label="Encrypt Column"
-            descriptionText="Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE)"
-            checked={columnFields.isEncrypted}
-            onChange={() => onUpdateField({ isEncrypted: !columnFields.isEncrypted })}
-          />
-          {columnFields.isEncrypted && (
-            <EncryptionKeySelector label="Select a key to encrypt your column with" />
-          )}
-        </FormSectionContent>
-      </FormSection>
+      {isNewRecord && (
+        <>
+          <SidePanel.Separator />
+          <FormSection
+            header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <Toggle
+                label="Encrypt Column"
+                descriptionText="Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE)"
+                checked={columnFields.isEncrypted}
+                onChange={() => onUpdateField({ isEncrypted: !columnFields.isEncrypted })}
+              />
+              {columnFields.isEncrypted && (
+                <EncryptionKeySelector
+                  label="Select a key to encrypt your column with"
+                  selectedKeyId={columnFields.keyId}
+                  onSelectKey={(id) => onUpdateField({ keyId: id })}
+                  onUpdateDescription={(desc) => onUpdateField({ keyDescription: desc })}
+                />
+              )}
+            </FormSectionContent>
+          </FormSection>
+        </>
+      )}
 
       <ForeignKeySelector
         tables={tables}

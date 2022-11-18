@@ -53,9 +53,6 @@ const SidePanelEditor: FC<Props> = ({
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
 
   const saveRow = async (
     payload: any,
@@ -271,7 +268,6 @@ const SidePanelEditor: FC<Props> = ({
       )}
       {!isUndefined(selectedTable) && (
         <ColumnEditor
-          enumTypes={enumTypes}
           tables={tables}
           column={selectedColumnToEdit}
           selectedTable={selectedTable}
@@ -280,13 +276,6 @@ const SidePanelEditor: FC<Props> = ({
           saveChanges={saveColumn}
           updateEditorDirty={() => setIsEdited(true)}
         />
-        // <ColumnEditorV2
-        //   visible={sidePanelKey === 'column'}
-        //   column={selectedColumnToEdit}
-        //   selectedTable={selectedTable}
-        //   enumTypes={enumTypes}
-        //   closePanel={onClosePanel}
-        // />
       )}
       <TableEditor
         table={selectedTableToEdit}

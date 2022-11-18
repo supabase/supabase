@@ -69,24 +69,17 @@ export interface ColumnField {
   isIdentity: boolean
   isPrimaryKey: boolean
   isNewColumn: boolean
-  isEncrypted: boolean
-}
 
-// export interface ForeignKey {
-//   table: PostgresTable
-//   column: PostgresColumn
-// }
+  isEncrypted?: boolean
+  keyId?: string
+  keyDescription?: string
+}
 
 export interface PostgresDataTypeOption {
   name: string
   description: string
   type: 'number' | 'text' | 'time' | 'json' | 'bool' | 'others'
 }
-
-// export interface FormattedPostgresColumn extends PostgresColumn {
-//   isPrimaryKey: boolean
-//   foreignKey: ForeignKey
-// }
 
 // Probably belongs to a higher level
 export interface Dictionary<T> {
