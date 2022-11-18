@@ -83,10 +83,11 @@ export async function saveFile(path: string, contents: string) {
   return result
 }
 
-export async function saveDraft(path: string) {
+export function saveDraft(path: string) {
   const contents = dirtyFiles[path]
   if (contents != null) {
     saveFile(path, contents)
   }
   delete dirtyFiles[path]
+  return true
 }
