@@ -35,6 +35,19 @@ export const getServerSideProps: GetServerSideProps = async () => {
     career.contributors.includes(contributor.login)
   )
 
+  contributors.push(
+    {
+      login: 'marijanasimag',
+      avatar_url: 'https://avatars.githubusercontent.com/u/46031252?v=4',
+      html_url: 'https://github.com/marijanasimag',
+    },
+    {
+      login: 'estee_tey',
+      avatar_url: 'https://pbs.twimg.com/profile_images/1589662526941253632/s1cu3vuD_400x400.jpg',
+      html_url: 'https://twitter.com/estee_tey',
+    }
+  )
+
   if (!job_data && !contributors) {
     return {
       props: {
