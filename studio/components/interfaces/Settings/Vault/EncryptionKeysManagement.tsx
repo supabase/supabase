@@ -11,7 +11,8 @@ import {
   Form,
   IconTrash,
   Badge,
-  IconHelpCircle,
+  IconKey,
+  IconLoader,
 } from 'ui'
 import { useStore } from 'hooks'
 import Divider from 'components/ui/Divider'
@@ -50,7 +51,6 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
     setSubmitting(true)
     const res = await vault.addKey(values.description)
     if (!res.error) {
-      vault.load()
       ui.setNotification({ category: 'success', message: 'Successfully added new key' })
       setShowAddKeyModal(false)
     } else {
@@ -69,7 +69,6 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
     setIsDeletingKey(true)
     const res = await vault.deleteKey(selectedKeyToRemove.id)
     if (!res.error) {
-      vault.load()
       ui.setNotification({ category: 'success', message: `Successfully deleted encryption key` })
       setSelectedKeyToRemove(undefined)
     } else {
@@ -85,42 +84,23 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   return (
     <>
       <div className="space-y-4">
-        <h3 className="text-scale-1200 mb-2 text-xl flex items-center space-x-2">
-          <span>Encryption Keys</span>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconHelpCircle size={18} strokeWidth={2} className="text-scale-1100" />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
-                ].join(' ')}
-              >
-                <span className="text-xs text-scale-1200">What are encryption keys?</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
-        </h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
               className="w-64"
               size="small"
-              placeholder="Search"
+              placeholder="Search by description or ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
               icon={<IconSearch strokeWidth={2} size={16} />}
             />
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
-                <Listbox.Option id="comment" value="comment" label="Sort by description">
-                  Name
-                </Listbox.Option>
                 <Listbox.Option id="created" value="created" label="Sort by created at">
                   Created at
+                </Listbox.Option>
+                <Listbox.Option id="comment" value="comment" label="Sort by description">
+                  Description
                 </Listbox.Option>
               </Listbox>
             </div>
@@ -130,82 +110,89 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
           </Button>
         </div>
 
-        {/* Table of secrets */}
+        {/* Table of keys */}
         <div className="border border-scale-500 rounded">
-          {keys.map((key, idx) => {
-            return (
-              <Fragment key={key.key_id}>
-                <div className="px-6 py-4 flex items-center space-x-4">
-                  <div className="space-y-1 min-w-[37%] max-w-[37%]">
-                    <p
-                      title={key.id}
-                      className="text-sm text-scale-1200 font-mono font-bold truncate"
-                    >
-                      {key.id}
-                    </p>
-                    <p
-                      className="text-sm truncate text-scale-1100"
-                      title={key.comment || DEFAULT_KEY_NAME}
-                    >
-                      {key.comment || DEFAULT_KEY_NAME}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2 w-[38%]">
-                    {key.status === 'default' && <Badge color="green">Default</Badge>}
-                  </div>
-                  <div className="flex items-center justify-end w-[25%] space-x-4">
-                    <p className="text-sm text-scale-1100">
-                      Added on {dayjs(key.created).format('MMM D, YYYY')}
-                    </p>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger>
-                        <Button
-                          type="default"
-                          className="py-2"
-                          icon={<IconTrash />}
-                          disabled={key.status === 'default'}
-                          onClick={() => setSelectedKeyToRemove(key)}
-                        />
-                      </Tooltip.Trigger>
-                      {key.status === 'default' && (
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                              'border border-scale-200',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-scale-1200">
-                              The default key cannot be deleted
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      )}
-                    </Tooltip.Root>
-                  </div>
-                </div>
-                {idx !== keys.length - 1 && <Divider light />}
-              </Fragment>
-            )
-          })}
-          {keys.length === 0 && (
+          {vault.isLoading ? (
+            <div className="px-6 py-6 space-x-2 flex items-center justify-center">
+              <IconLoader className="animate-spin text-scale-1100" size={16} strokeWidth={1.5} />
+              <p className="text-sm text-scale-1200">Loading keys from the Vault</p>
+            </div>
+          ) : (
             <>
-              {searchValue.length === 0 ? (
-                <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                  <p className="text-sm text-scale-1200">No encryption keys added yet</p>
-                  <p className="text-sm text-scale-1100">
-                    Encryption keys are created by the pgsodium extension and can be used to encrypt
-                    your columns and secrets
-                  </p>
-                </div>
-              ) : (
-                <div className="px-6 py-4 space-y-1">
-                  <p className="text-sm text-scale-1200">No results found</p>
-                  <p className="text-sm text-scale-1100">
-                    Your search for "{searchValue}" did not return any results
-                  </p>
-                </div>
+              {keys.map((key, idx) => {
+                return (
+                  <Fragment key={key.key_id}>
+                    <div className="px-6 py-4 flex items-center space-x-4">
+                      <IconKey className="text-scale-1100" strokeWidth={2} />
+                      <div className="space-y-1 min-w-[37%] max-w-[37%]">
+                        <p
+                          className="text-sm truncate text-scale-1200"
+                          title={key.comment || DEFAULT_KEY_NAME}
+                        >
+                          {key.comment || DEFAULT_KEY_NAME}
+                        </p>
+                        <p title={key.id} className="text-xs text-scale-1100 font-bold truncate">
+                          ID: <span className="font-mono">{key.id}</span>
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2 w-[38%]">
+                        {key.status === 'default' && <Badge color="green">Default</Badge>}
+                      </div>
+                      <div className="flex items-center justify-end w-[25%] space-x-4">
+                        <p className="text-sm text-scale-1100">
+                          Added on {dayjs(key.created).format('MMM D, YYYY')}
+                        </p>
+                        <Tooltip.Root delayDuration={0}>
+                          <Tooltip.Trigger>
+                            <Button
+                              type="default"
+                              className="py-2"
+                              icon={<IconTrash />}
+                              disabled={key.status === 'default'}
+                              onClick={() => setSelectedKeyToRemove(key)}
+                            />
+                          </Tooltip.Trigger>
+                          {key.status === 'default' && (
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-scale-1200">
+                                  The default key cannot be deleted
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          )}
+                        </Tooltip.Root>
+                      </div>
+                    </div>
+                    {idx !== keys.length - 1 && <Divider light />}
+                  </Fragment>
+                )
+              })}
+              {keys.length === 0 && (
+                <>
+                  {searchValue.length === 0 ? (
+                    <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
+                      <p className="text-sm text-scale-1200">No encryption keys added yet</p>
+                      <p className="text-sm text-scale-1100">
+                        Encryption keys are created by the pgsodium extension and can be used to
+                        encrypt your columns and secrets
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="px-6 py-4 space-y-1">
+                      <p className="text-sm text-scale-1200">No results found</p>
+                      <p className="text-sm text-scale-1100">
+                        Your search for "{searchValue}" did not return any results
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
@@ -229,12 +216,12 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                 The following encryption key will be permanently removed and cannot be recovered.
                 Are you sure?
               </p>
-              <div className="space-y-1">
-                <p className="text-sm">
-                  <code className="!mx-0">{selectedKeyToRemove?.id}</code>
-                </p>
-                <p className="text-sm text-scale-1100">
+              <div className="space-y-2">
+                <p className="text-sm text-scale-1200">
                   {selectedKeyToRemove?.comment ?? DEFAULT_KEY_NAME}
+                </p>
+                <p className="text-xs text-scale-1100">
+                  <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
                 </p>
               </div>
             </div>
