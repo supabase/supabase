@@ -21,7 +21,9 @@ services:
       DEFAULT_PROJECT: ${STUDIO_DEFAULT_PROJECT}
 
       SUPABASE_URL: http://kong:8000
-      SUPABASE_REST_URL: ${PUBLIC_REST_URL}
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      # Kept for backwards compatibility with studio:0.22.08
+      SUPABASE_REST_URL: ${API_EXTERNAL_URL}/rest/v1/
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
@@ -45,7 +47,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.19.4
+    image: supabase/gotrue:v2.31.0
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -85,6 +87,7 @@ services:
 
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
+      MFA_ENABLED: ${MFA_ENABLED}
 
   rest:
     container_name: supabase-rest
@@ -168,7 +171,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.82
+    image: supabase/postgres:14.1.0.89
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
