@@ -34,10 +34,10 @@ type Props = {
 }
 
 export default function Form({ defaultUsername = '', setTicketGenerationState }: Props) {
-  const [username, setUsername] = useState(defaultUsername)
+  const [username] = useState(defaultUsername)
   const [formState, setFormState] = useState<FormState>('default')
-  const [errorMsg, setErrorMsg] = useState('')
-  const { userData, setUserData, supabase } = useConfData()
+  const [errorMsg] = useState('')
+  const { supabase } = useConfData()
   const formRef = useRef<HTMLFormElement>(null)
 
   return formState === 'error' ? (

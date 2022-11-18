@@ -27,7 +27,6 @@
     "dayjs": "^1.11.4",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
-    "htmlescape": "^1.1.1",
     "markdown-toc": "^1.2.0",
     "marked": "^4.0.12",
     "next": "12.1.0",
@@ -62,7 +61,6 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.7",
     "@types/classnames": "^2.3.1",
-    "@types/htmlescape": "^1.1.1",
     "@types/jest": "^25.2.2",
     "@types/marked": "^4.0.3",
     "@types/mdx-js__react": "^1.5.5",
