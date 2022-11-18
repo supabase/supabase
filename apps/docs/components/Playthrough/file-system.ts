@@ -1,4 +1,4 @@
-import * as x from './container'
+import * as container from './container'
 import { currentFileWatcher, fileTreeWatcher } from './store'
 
 type FileTree = FileTreeEntry[]
@@ -21,31 +21,32 @@ export async function setCurrentPath(path: string) {
 }
 
 export async function refreshFileTree() {
-  const tree = await getFileTreeFrom('')
+  const files = await container.readDir('')
+  const tree = await getFileTreeFrom('', files)
   fileTreeWatcher.notify(tree)
 }
 
-async function getFileTreeFrom(path: string): Promise<FileTree> {
+async function getFileTreeFrom(path: string, files: string[]): Promise<FileTree> {
   const dirs = ['pages', 'components', 'styles']
   const ignore = ['node_modules', '.next', '.gitignore', 'package-lock.json', 'README.md', 'api']
   let treeFiles: FileEntry[] = []
   let treeDirs: DirEntry[] = []
-  const files = await x.readDir(path)
   const promises = files.map(async (file) => {
     if (ignore.includes(file)) {
       return
     }
-    if (dirs.includes(file)) {
+    const children = await container.readDir(path + file)
+    if (children && children.length > 0) {
       treeDirs.push({
         name: file,
-        path: path + '/' + file,
+        path: path + file,
         type: 'directory',
-        children: await getFileTreeFrom(file),
+        children: await getFileTreeFrom(file + '/', children),
       })
     } else {
       treeFiles.push({
         name: file,
-        path: path + '/' + file,
+        path: path + file,
         type: 'file',
       })
     }
@@ -55,7 +56,7 @@ async function getFileTreeFrom(path: string): Promise<FileTree> {
 }
 export async function readFile(path: string) {
   try {
-    return await x.readFile(path)
+    return await container.readFile(path)
   } catch (e) {
     return undefined
   }
@@ -70,7 +71,7 @@ export async function saveFile(path: string, contents: string) {
   console.log('saving file', path, currentFileWatcher.get())
   const safePath = path.startsWith('/') ? path.slice(1) : path
 
-  const result = await x.saveFile(safePath, contents)
+  const result = await container.saveFile(safePath, contents)
 
   const currentPath = currentFileWatcher.get()?.path
   const currentSafePath = currentPath?.startsWith('/') ? currentPath.slice(1) : currentPath

@@ -27,11 +27,11 @@ stepWatcher.subscribe(async (step, prev) => {
   }
   const { intro } = getCurrentStep()
   if (intro) {
-    await runCommands(intro)
+    await runCommands(intro, true)
   }
 })
 
-async function runCommands(commands: any[]) {
+async function runCommands(commands: any[], intro: boolean = false) {
   let i = 0
   while (i < commands.length) {
     const { command, path, contents, currentPath, onRunning } = commands[i]
@@ -43,6 +43,7 @@ async function runCommands(commands: any[]) {
         await writeAndRun(command)
       }
     } else if (path) {
+      if (!intro) setCurrentPath(path)
       await saveFile(path, contents)
     } else if (currentPath) {
       setCurrentPath(currentPath)

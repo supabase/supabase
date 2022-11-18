@@ -23,7 +23,12 @@ const containerPromise = new Promise((resolve) => {
 
 export async function readDir(path: string) {
   await containerPromise
-  return container.fs.readdir(path)
+  try {
+    const result = await container.fs.readdir(path)
+    return result
+  } catch (e) {
+    return undefined
+  }
 }
 
 export async function readFile(path: string) {

@@ -76,7 +76,6 @@ export default {
     {
       type: 'step',
       header: 'Add SessionContextProvider',
-      intro: [{ currentPath: '/pages/_app.js' }],
       solution: [{ path: 'pages/_app.js', contents: appContents }],
       show: () => <Playground />,
       children: (
