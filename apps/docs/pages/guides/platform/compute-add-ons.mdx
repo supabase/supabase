@@ -1,8 +1,10 @@
----
-id: compute-add-ons
-title: Compute Add-ons
-description: Learn about your project's instance and additional add-ons.
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'compute-add-ons',
+  title: 'Compute Add-ons',
+  description: 'Learn about your project\'s instance and additional add-ons.',
+}
 
 Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
 
@@ -32,3 +34,7 @@ When considering compute upgrades, assess whether your bottlenecks are hardware-
 ## Disk IO bandwidth
 
 Disk IO bandwidth can be measured in IOPS, a unit of measurement representing the number of input/output operations per second. These operations are calculated in Megabits per second. Depending on the read/write load of your application, you may need to upgrade to a larger instance capable of a higher number of IOPS. If you're unsure of how many IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://app.supabase.com/project/_/reports). Alternatively, you can start on a smaller instance size and upgrade later as needed.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
