@@ -231,10 +231,6 @@ article p code {
   display: inline-block;
 }
 
-// .doc-content-container ul li a {
-//   box-shadow: none !important;
-// }
-
 // fix ToC links when they have <code> inside
 .toc-menu li a code {
   background: none;
