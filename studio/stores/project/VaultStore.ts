@@ -2,6 +2,39 @@ import { Query } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
 import { IRootStore } from '../RootStore'
 
+const MOCK_SECRETS = [
+  {
+    key_id: 'e8bcc97c-6caf-4ae4-bd75-ef61928ca66d',
+    description: 'Client access key for dashboard',
+    created_at: '2022-11-01 06:43:48.492465',
+    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686', // encrypted secret value
+  },
+  {
+    key_id: 'e8bcc97c-6caf-4ae4-bd75-ef61928ca66d',
+    description: 'Secret key for server',
+    created_at: '2022-11-20 06:43:48.492465',
+    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
+  },
+  {
+    key_id: 'a968f3ab-de05-42d3-aa64-43838b9e56b5',
+    description: 'This is a bit more of a secret key',
+    created_at: '2022-11-18 06:43:48.492465',
+    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
+  },
+  {
+    key_id: 'a968f3ab-de05-42d3-aa64-43838b9e56b5',
+    description: undefined,
+    created_at: '2022-11-05 06:43:48.492465',
+    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
+  },
+  {
+    key_id: 'a968f3ab-de05-42d3-aa64-43838b9e56b5',
+    description: 'This is a pretty long description that Im testing if it should wrap or not',
+    created_at: '2022-11-3 06:43:48.492465',
+    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
+  },
+]
+
 export interface IVaultStore {
   isLoading: boolean
   isInitialized: boolean
@@ -13,8 +46,9 @@ export interface IVaultStore {
   addKey: (name?: string) => any
   deleteKey: (id: string) => any
 
-  listSecrets: () => Secret[]
+  listSecrets: (filter?: any) => Secret[]
   addSecret: (name?: string) => any
+  updateSecret: (payload: any) => any
   deleteSecret: (id: string) => any
 }
 
@@ -26,7 +60,12 @@ interface EncryptionKey {
   status: string
 }
 
-interface Secret {}
+interface Secret {
+  key_id: string
+  description: string
+  created_at: string
+  secret: string
+}
 
 export default class VaultStore implements IVaultStore {
   rootStore: IRootStore
@@ -69,7 +108,7 @@ export default class VaultStore implements IVaultStore {
     const keys = await this.rootStore.meta.query(query)
     if (!keys.error) vault.keys = keys
 
-    const secrets: any = []
+    const secrets: any = MOCK_SECRETS
     if (!secrets.error) vault.secrets = secrets
 
     this.data = vault
@@ -104,25 +143,42 @@ export default class VaultStore implements IVaultStore {
   }
 
   async addKey(name?: string) {
-    if (name) return await this.rootStore.meta.query(`select * from pgsodium.create_key('${name}')`)
-    else return await this.rootStore.meta.query(`select * from pgsodium.create_key()`)
+    const res =
+      name !== undefined
+        ? await this.rootStore.meta.query(`select * from pgsodium.create_key('${name}')`)
+        : await this.rootStore.meta.query(`select * from pgsodium.create_key()`)
+    if (!res.error) {
+      this.data.keys = this.data.keys.concat(res)
+    }
+    return res
   }
 
   async deleteKey(id: string) {
     const query = new Query().from('key', 'pgsodium').delete().match({ id }).toSql()
-    return await this.rootStore.meta.query(query)
+    const res = await this.rootStore.meta.query(query)
+    if (!res.error) {
+      this.data.keys = this.data.keys.filter((key) => key.id !== id)
+    }
+    return res
   }
 
   listSecrets(filter?: any) {
     const arr = this.data.secrets.slice()
+
     if (!!filter) {
-      return arr.filter(filter)
-    } else {
       return arr
+        .filter(filter)
+        .sort((a: any, b: any) => Number(new Date(a.created_at)) - Number(new Date(b.created_at)))
+    } else {
+      return arr.sort(
+        (a: any, b: any) => Number(new Date(a.created_at)) - Number(new Date(b.created_at))
+      )
     }
   }
 
   async addSecret(name?: string) {}
+
+  async updateSecret(payload: any) {}
 
   async deleteSecret(id: string) {}
 }

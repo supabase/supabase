@@ -1,48 +1,36 @@
-import { useStore } from 'hooks'
-import { FC, useState, useEffect } from 'react'
+import { FC } from 'react'
 import { Input, Listbox, Modal, IconPlus } from 'ui'
+import { useStore } from 'hooks'
 
 interface Props {
   id?: string
+  descriptionId?: string
+  label?: string
   labelOptional?: string
-  onSelectKey?: (key: any) => void
-  onChangeKeyName?: (key: string) => void
+  selectedKeyId?: any
+  onSelectKey?: (keyId: string) => void
 }
 
 const EncryptionKeySelector: FC<Props> = ({
-  id,
+  id = 'keyId',
+  descriptionId = 'keyDescription',
+  label = 'Encryption key',
   labelOptional,
+  selectedKeyId,
   onSelectKey = () => {},
-  onChangeKeyName = () => {},
 }) => {
   const { vault } = useStore()
-  const [showNewKeyField, setShowNewKeyField] = useState(false)
-
   const keys = vault.listKeys()
-
-  useEffect(() => {
-    console.log('Fetch all avaiable encryption keys from vault')
-  }, [])
-
-  const onChange = (id: any) => {
-    if (id === 'create-new') {
-      setShowNewKeyField(true)
-    } else {
-      setShowNewKeyField(false)
-      const key = keys.find((key) => key.id === id)
-      onSelectKey(key)
-    }
-  }
 
   return (
     <>
       <Listbox
         id={id}
-        label="Encryption Key"
+        label={label}
         size="small"
-        defaultValue={keys[0].id}
+        value={selectedKeyId}
         labelOptional={labelOptional}
-        onChange={onChange}
+        onChange={onSelectKey}
       >
         <Listbox.Option
           key="create-new"
@@ -55,23 +43,22 @@ const EncryptionKeySelector: FC<Props> = ({
         </Listbox.Option>
         <Modal.Separator />
         {keys.map((key) => (
-          <Listbox.Option key={key.id} label={key.id} value={key.id}>
+          <Listbox.Option
+            key={key.id}
+            label={key.status === 'default' ? `${key.id} (Default)` : key.id}
+            value={key.id}
+          >
             <div className="space-y-1">
-              <p>
-                <span className="font-mono">{key.id}</span>
+              <p>{key.comment ?? 'No description provided'}</p>
+              <p className="text-xs">
+                ID: <span className="font-mono">{key.id}</span>
               </p>
-              <p>{key.comment ?? 'Unnamed key'}</p>
             </div>
           </Listbox.Option>
         ))}
       </Listbox>
-      {showNewKeyField && (
-        <Input
-          id="newKeyDescription"
-          label="Description"
-          labelOptional="Optional"
-          onChange={(e) => onChangeKeyName(e.target.value)}
-        />
+      {selectedKeyId === 'create-new' && (
+        <Input id={descriptionId} label="Description" labelOptional="Optional" />
       )}
     </>
   )

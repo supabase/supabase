@@ -161,8 +161,8 @@ const ColumnEditor: FC<Props> = ({
         }
       }}
     >
-      <FormSection header={<FormSectionLabel>General</FormSectionLabel>}>
-        <FormSectionContent loading={false}>
+      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:!col-span-8">
           <Input
             label="Name"
             type="text"
@@ -180,8 +180,12 @@ const ColumnEditor: FC<Props> = ({
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
-      <FormSection header={<FormSectionLabel>Foreign Key Relation</FormSectionLabel>}>
-        <FormSectionContent loading={false}>
+      <FormSection
+        header={
+          <FormSectionLabel className="lg:!col-span-4">Foreign Key Relation</FormSectionLabel>
+        }
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
           <div>
             <ColumnForeignKey
               column={columnFields}
@@ -193,8 +197,10 @@ const ColumnEditor: FC<Props> = ({
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
-      <FormSection header={<FormSectionLabel>Data Type</FormSectionLabel>}>
-        <FormSectionContent loading={false}>
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Data Type</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
           <ColumnType
             value={columnFields?.format ?? ''}
             layout="vertical"
@@ -258,8 +264,10 @@ const ColumnEditor: FC<Props> = ({
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
-      <FormSection header={<FormSectionLabel>Configuration</FormSectionLabel>}>
-        <FormSectionContent loading={false}>
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Configuration</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
           <Toggle
             label="Is Primary Key"
             descriptionText="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table"
@@ -281,15 +289,19 @@ const ColumnEditor: FC<Props> = ({
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
-      <FormSection header={<FormSectionLabel>Security</FormSectionLabel>}>
-        <FormSectionContent loading={false}>
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
           <Toggle
             label="Encrypt Column"
             descriptionText="Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE)"
             checked={columnFields.isEncrypted}
             onChange={() => onUpdateField({ isEncrypted: !columnFields.isEncrypted })}
           />
-          {columnFields.isEncrypted && <EncryptionKeySelector />}
+          {columnFields.isEncrypted && (
+            <EncryptionKeySelector label="Select a key to encrypt your column with" />
+          )}
         </FormSectionContent>
       </FormSection>
 

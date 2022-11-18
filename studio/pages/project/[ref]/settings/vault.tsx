@@ -6,11 +6,15 @@ import {
   SecretsManagement,
   EncryptionKeysManagement,
 } from 'components/interfaces/Settings/Vault'
-import { useStore } from 'hooks'
+import { useStore, useParams } from 'hooks'
 import { useEffect } from 'react'
+import { Tabs } from 'ui'
+import { useRouter } from 'next/router'
 
 const VaultSettings: NextPageWithLayout = () => {
+  const router = useRouter()
   const { vault } = useStore()
+  const { ref } = useParams()
 
   useEffect(() => {
     vault.load()
@@ -20,11 +24,15 @@ const VaultSettings: NextPageWithLayout = () => {
     <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
       <VaultToggle />
 
-      {/* Show encryption keys table if vault extension is enabled */}
-      <EncryptionKeysManagement />
-
-      {/* Show secrets table if vault extension is enabled */}
-      <SecretsManagement />
+      {/* [Joshen] Consider splitting into separate pages */}
+      <Tabs size="medium" type="underlined">
+        <Tabs.Panel id="secrets" label="Secrets Management">
+          <SecretsManagement />
+        </Tabs.Panel>
+        <Tabs.Panel id="keys" label="Encryption Keys">
+          <EncryptionKeysManagement />
+        </Tabs.Panel>
+      </Tabs>
     </div>
   )
 }
