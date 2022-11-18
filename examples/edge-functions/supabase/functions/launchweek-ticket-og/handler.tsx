@@ -9,7 +9,12 @@ const BACKGROUND_IMAGE_GOLDEN =
 const SUPA_CHECKMARK =
   'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/supaverified.png'
 
-export function handler(req: Request) {
+// Load custom font
+const FONT_URL =
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/CircularStd-Bold.otf'
+const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
+
+export async function handler(req: Request) {
   const url = new URL(req.url)
   const ticketNumber = url.searchParams.get('ticketNumber')
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
@@ -21,6 +26,8 @@ export function handler(req: Request) {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     })
+
+  const fontData = await font
 
   const numDigits = `${Number(ticketNumber)}`.length
   const prefix = `00000000`.slice(numDigits)
@@ -34,6 +41,7 @@ export function handler(req: Request) {
             height: '1000px',
             backgroundColor: '#000',
             color: '#fff',
+            fontFamily: '"Circular"',
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
@@ -154,6 +162,13 @@ export function handler(req: Request) {
       {
         width: 2000,
         height: 1000,
+        fonts: [
+          {
+            name: 'Circular',
+            data: fontData,
+            style: 'normal',
+          },
+        ],
         headers: {
           'content-type': 'image/png',
           'cache-control': 'public, max-age=31536000, no-transform, immutable',
