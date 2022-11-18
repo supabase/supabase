@@ -1,0 +1,696 @@
+---
+id: nextjs-server-components
+title: Supabase Auth with Next.js Server Components
+description: Authentication helpers for creating an authenticated Supabase client in Next.js 13 app directory Server Components.
+sidebar_label: 'Next.js Server Components'
+---
+
+import Tabs from '@theme/Tabs'
+
+This submodule provides experimental convenience helpers for implementing user authentication in Next.js Server Components - the `app` directory. For examples using the `pages` directory check out [Auth Helpers in Next.js](/docs/guides/auth/auth-helpers/nextjs).
+
+> To learn more about fetching and caching Supabase data with Next.js 13 Server Components, check out our [blog](/blog/fetching-and-caching-supabase-data-in-next-js-server-components) or [live stream](https://www.youtube.com/watch?v=QH0P5xZt5wY).
+
+## Install the Next.js helper library
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+>
+
+<TabPanel id="npm" label="npm">
+
+```sh
+npm install @supabase/auth-helpers-nextjs
+```
+
+> [Next.js Server Components](https://beta.nextjs.org/docs) and the `app` directory are experimental and likely to change.
+
+</TabPanel>
+<TabPanel id="yarn" label="Yarn">
+
+```sh
+yarn add @supabase/auth-helpers-nextjs
+```
+
+> [Next.js Server Components](https://beta.nextjs.org/docs) and the `app` directory are experimental and likely to change.
+
+</TabPanel>
+</Tabs>
+
+## Set up environment variables
+
+Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api) in the dashboard, and create a `.env.local` file with the following environment variables:
+
+```bash title=".env.local"
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+## Creating a Supabase Client
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+Create a new file at `/utils/supabase-browser.js` and populate with the following:
+
+```js title="/utils/supabase-browser.js"
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+
+export default createBrowserSupabaseClient()
+```
+
+This will be used any time we need to create a Supabase client _client-side_ - in `useEffect`, for example.
+
+Create a new file at `/utils/supabase-server.js` and populate with the following:
+
+```js title="/utils/supabase-server.js"
+import { headers, cookies } from 'next/headers'
+import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
+
+export default () =>
+  createServerComponentSupabaseClient({
+    headers,
+    cookies,
+  })
+```
+
+> This needs to export a function, as the headers and cookies are not populated with values until the Server Component is requesting data.
+
+This will be used any time we need to create a Supabase client _server-side_ - in a Server Component, for example.
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+Create a new file at `/utils/supabase-browser.ts` and populate with the following:
+
+```ts
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { Database } from '../db_types'
+
+export default createBrowserSupabaseClient<Database>()
+```
+
+> TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createBrowserSupabaseClient` to add type support to the Supabase client.
+
+This will be used any time we need to create a Supabase client _client-side_ - in `useEffect`, for example.
+
+Create a new file at `/utils/supabase-server.ts` and populate with the following:
+
+```ts title="/utils/supabase-server.ts"
+import { headers, cookies } from 'next/headers'
+import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { Database } from '../db_types'
+
+export default () =>
+  createServerComponentSupabaseClient<Database>({
+    headers,
+    cookies,
+  })
+```
+
+> TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createServerSupabaseClient` to add type support to the Supabase client.
+
+> This needs to export a function, as the headers and cookies are not populated with values until the Server Component is requesting data.
+
+This will be used any time we need to create a Supabase client _server-side_ - in a Server Component, for example.
+
+</TabPanel>
+</Tabs>
+
+## Middleware
+
+Middleware runs before every route declared in the `matcher` array. Since we don't have access to set cookies or headers from Server Components, we need to create a Middleware Supabase client and refresh the user's session by calling `getSession()`.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx title="middleware.js"
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+
+export async function middleware(req) {
+  const res = NextResponse.next()
+
+  const supabase = createMiddlewareSupabaseClient({ req, res })
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return res
+}
+
+export const config = {
+  matcher: ['/optional-session', '/required-session', '/realtime'],
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title="middleware.ts"
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+
+  const supabase = createMiddlewareSupabaseClient({ req, res })
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return res
+}
+
+export const config = {
+  matcher: ['/optional-session', '/required-session', '/realtime'],
+}
+```
+
+</TabPanel>
+</Tabs>
+
+> Any Server Component route that uses a Supabase client must be added to this middleware's `matcher` array. Without this, the Server Component may try to make a request to Supabase with an expired `access_token`.
+
+## Supabase Listener
+
+We need to set up a listener to fetch fresh data whenever our user logs in or out.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+Create a `/components/supabase-listener.jsx` file and add the following:
+
+```jsx title="/components/supabase-listener.jsx"
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import supabase from '../utils/supabase'
+
+export default function SupabaseListener({ accessToken }) {
+  const router = useRouter()
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.access_token !== accessToken) {
+        router.refresh()
+      }
+    })
+  }, [accessToken])
+
+  return null
+}
+```
+
+> `use client` tells Next.js that this is a [Client Component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components). Only Client Components can use hooks like `useEffect` and `useRouter`.
+
+The function we pass to `onAuthStateChange` is automatically called by Supabase whenever a user's session changes. This component takes an `accessToken` prop, which will be the server's state for our user (we'll set this up next). If the `accessToken` from the server and the new `access_token` do not match then the client and server are out of sync, therefore, we want to reload the active route.
+
+Lastly, fetch the server-side session in the `RootLayout` and pass it to our new `<SupabaseListener />` component.
+
+```jsx title="/app/layout.jsx"
+import SupabaseListener from '../components/supabase-listener'
+import createClient from '../utils/supabase-server'
+
+export default async function RootLayout({ children }) {
+  const supabase = createClient()
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return (
+    // html and head section omitted
+    <body>
+      <SupabaseListener accessToken={session?.access_token} />
+      {children}
+    </body>
+  )
+}
+```
+
+We don't want Next.js to cache this `session` value, so we need to export a `revalidate` value of `0`.
+
+```jsx
+export const revalidate = 0
+```
+
+We also want to tell Next.js to explicitly exclude this component's code from the client bundle by installing the `server-only` package:
+
+```bash
+npm install server-only
+```
+
+And importing it at the top of our component.
+
+```jsx
+import 'server-only'
+```
+
+The entire Layout component should look something like this:
+
+```jsx title="/app/layout.jsx"
+import 'server-only'
+
+import SupabaseListener from '../components/supabase-listener'
+import './globals.css'
+import createClient from '../utils/supabase-server'
+
+// do not cache this layout
+export const revalidate = 0
+
+export default async function RootLayout({ children }) {
+  const supabase = createClient()
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return (
+    <html lang="en">
+      {/*
+        <head /> will contain the components returned by the nearest parent
+        head.jsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
+      */}
+      <head />
+      <body>
+        <SupabaseListener accessToken={session?.access_token} />
+        {children}
+      </body>
+    </html>
+  )
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+Create a `/components/supabase-listener.tsx` file and add the following:
+
+```tsx title="/components/supabase-listener.tsx"
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import supabase from '../utils/supabase'
+
+export default function SupabaseListener({ accessToken }: { accessToken?: string }) {
+  const router = useRouter()
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.access_token !== accessToken) {
+        router.refresh()
+      }
+    })
+  }, [accessToken])
+
+  return null
+}
+```
+
+> `use client` tells Next.js that this is a [Client Component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components). Only Client Components can use hooks like `useEffect` and `useRouter`.
+
+The function we pass to `onAuthStateChange` is automatically called by Supabase whenever a user's session changes. This component takes an `accessToken` prop, which will be the server's state for our user (we'll set this up next). If the `accessToken` from the server and the new `access_token` do not match then the client and server are out of sync, therefore, we want to reload the active route.
+
+Lastly, fetch the server-side session in the `RootLayout` and pass it to our new `<SupabaseListener />` component.
+
+```tsx title="/app/layout.tsx"
+import SupabaseListener from '../components/supabase-listener'
+import createClient from '../utils/supabase-server'
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const supabase = createClient()
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return (
+    // html and head section omitted
+    <body>
+      <SupabaseListener accessToken={session?.access_token} />
+      {children}
+    </body>
+  )
+}
+```
+
+> Again, TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createServerComponentSupabaseClient` to add type support to the Supabase client.
+
+We don't want Next.js to cache this `session` value, so we need to export a `revalidate` value of `0`.
+
+```tsx
+export const revalidate = 0
+```
+
+We also want to tell Next.js to explicitly exclude this component's code from the client bundle by installing the `server-only` package:
+
+```bash
+npm install server-only
+```
+
+And importing it at the top of our component.
+
+```tsx
+import 'server-only'
+```
+
+The entire Layout component should look something like this:
+
+```tsx title="/app/layout.tsx"
+import 'server-only'
+
+import SupabaseListener from '../components/supabase-listener'
+import './globals.css'
+import createClient from '../utils/supabase-server'
+
+// do not cache this layout
+export const revalidate = 0
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const supabase = createClient()
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return (
+    <html lang="en">
+      {/*
+        <head /> will contain the components returned by the nearest parent
+        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
+      */}
+      <head />
+      <body>
+        <SupabaseListener accessToken={session?.access_token} />
+        {children}
+      </body>
+    </html>
+  )
+}
+```
+
+</TabPanel>
+</Tabs>
+
+Supabase can now be used in any Client or Server component.
+
+## Server Components
+
+Next.js recommends fetching data in Server Components whenever possible.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx
+import 'server-only'
+
+import createClient from '../../utils/supabase-server'
+
+// do not cache this page
+export const revalidate = 0
+
+export default async function ServerComponent() {
+  const supabase = createClient()
+  const { data } = await supabase.from('posts').select('*')
+
+  return <pre>{JSON.stringify({ data }, null, 2)}</pre>
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx
+import 'server-only'
+
+import createClient from '../../utils/supabase-server'
+
+// do not cache this page
+export const revalidate = 0
+
+export default async function ServerComponent() {
+  const supabase = createClient()
+  const { data } = await supabase.from('posts').select('*')
+
+  return <pre>{JSON.stringify({ data }, null, 2)}</pre>
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Client Components
+
+While Next.js recommend doing all data fetching in Server Components, we still need Supabase client-side for things like authentication and subscribing to realtime updates.
+
+### Authentication
+
+We can call any of [Supabase's authentication methods](https://supabase.com/docs/reference/javascript/v1/auth-signin) - such as `supabase.auth.signInWithOAuth` - from a client component.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx title="/components/login.jsx"
+'use client'
+
+import supabase from '../utils/supabase-browser'
+
+export default function Login() {
+  const handleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+    })
+
+    if (error) {
+      console.log({ error })
+    }
+  }
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      console.log({ error })
+    }
+  }
+
+  return (
+    <>
+      <button onClick={handleLogin}>Login</button>
+      <button onClick={handleLogout}>Logout</button>
+    </>
+  )
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title="/components/login.tsx"
+'use client'
+
+import supabase from '../utils/supabase-browser'
+
+export default function Login() {
+  const handleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+    })
+
+    if (error) {
+      console.log({ error })
+    }
+  }
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      console.log({ error })
+    }
+  }
+
+  return (
+    <>
+      <button onClick={handleLogin}>Login</button>
+      <button onClick={handleLogout}>Logout</button>
+    </>
+  )
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Realtime
+
+A nice pattern for fetching data server-side and subscribing to changes client-side can be done by combining Server and Client components.
+
+> To receive realtime events, you must [enable replication on your "posts" table in Supabase](https://app.supabase.com/project/_/database/replication).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+Create a new file at `/app/realtime/posts.jsx` and populate with the following:
+
+```jsx title="/app/realtime/posts.jsx"
+'use client'
+
+import { useEffect, useState } from 'react'
+import supabase from '../../utils/supabase-browser'
+
+export default function Posts({ serverPosts }) {
+  const [posts, setPosts] = useState(serverPosts)
+
+  useEffect(() => {
+    setPosts(serverPosts)
+  }, [serverPosts])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('*')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) =>
+        setPosts((posts) => [...posts, payload.new])
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [serverPosts])
+
+  return <pre>{JSON.stringify(posts, null, 2)}</pre>
+}
+```
+
+> The first `useEffect` is required to overwrite posts if the `serverPosts` prop changes.
+
+This can now be used in a Server Component to subscribe to realtime updates.
+
+Create a new file at `/app/realtime/page.jsx` and populate with the following:
+
+```jsx title="/app/realtime/page.jsx"
+import 'server-only'
+
+import createClient from '../../utils/supabase-server'
+import Posts from './posts'
+
+// do not cache this page
+export const revalidate = 0
+
+export default async function Realtime() {
+  const supabase = createClient()
+  const { data } = await supabase.from('posts').select('*')
+
+  return <Posts serverPosts={data || []} />
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+Create a new file at `/app/realtime/posts.tsx` and populate with the following:
+
+```tsx title="/app/realtime/posts.tsx"
+'use client'
+
+import { useEffect, useState } from 'react'
+import { Database } from '../../db_types'
+import supabase from '../../utils/supabase-browser'
+
+type Post = Database['public']['Tables']['posts']['Row']
+
+export default function Posts({ serverPosts }: { serverPosts: Post[] }) {
+  const [posts, setPosts] = useState(serverPosts)
+
+  useEffect(() => {
+    setPosts(serverPosts)
+  }, [serverPosts])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('*')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) =>
+        setPosts((posts) => [...posts, payload.new as Post])
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [serverPosts])
+
+  return <pre>{JSON.stringify(posts, null, 2)}</pre>
+}
+```
+
+> The first `useEffect` is required to overwrite posts if the `serverPosts` prop changes.
+
+This can now be used in a Server Component to subscribe to realtime updates.
+
+Create a new file at `/app/realtime/page.tsx` and populate with the following:
+
+```tsx title="/app/realtime/page.tsx"
+import 'server-only'
+
+import createClient from '../../utils/supabase-server'
+import Posts from './posts'
+
+// do not cache this page
+export const revalidate = 0
+
+export default async function Realtime() {
+  const supabase = createClient()
+  const { data } = await supabase.from('posts').select('*')
+
+  return <Posts serverPosts={data || []} />
+}
+```
+
+</TabPanel>
+</Tabs>
