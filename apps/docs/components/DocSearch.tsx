@@ -74,10 +74,13 @@ export function SearchProvider({ children }: any) {
             appId={APP_ID}
             // @ts-ignore
             navigator={{
-              navigate({ suggestionUrl }) {
+              navigate({ itemUrl }) {
                 setIsOpen(false)
-                router.push(suggestionUrl)
+                router.push(itemUrl)
               },
+            }}
+            getMissingResultsUrl={({ query }) => {
+              return `https://github.com/supabase/supabase/issues/new?title=Unable+to+search+docs+with+query:+${query}`
             }}
             hitComponent={Hit}
             transformItems={(items) => {
