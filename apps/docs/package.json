@@ -54,6 +54,7 @@
     "codemirror": "^6.0.1",
     "common": "*",
     "config": "*",
+    "diff": "^5.1.0",
     "dotenv": "^16.0.3",
     "graphql": "^16.5.0",
     "gray-matter": "^4.0.3",
@@ -84,6 +85,7 @@
     "xterm-addon-fit": "^0.6.0"
   },
   "devDependencies": {
+    "@types/diff": "^5.0.2",
     "@types/node": "^17.0.12",
     "@types/react": "17.0.39",
     "config": "*",

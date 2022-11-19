@@ -10,11 +10,29 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import React from 'react'
 import { saveDraft, updateDraft } from './file-system'
 import { currentFileWatcher } from './store'
+import { diffWords } from 'diff'
 
 export function Editor({ className }) {
   const ref = React.useRef<HTMLDivElement>(null)
   React.useEffect(() => attach(ref.current), [])
-  return <div ref={ref} className={className} />
+  return (
+    <>
+      <style jsx global>{`
+        @keyframes new-code {
+          0% {
+            background-color: rgb(208 255 98 / 0%);
+          }
+          20% {
+            background-color: rgb(208 255 98 / 35%);
+          }
+          100% {
+            background-color: rgb(208 255 98 / 0%);
+          }
+        }
+      `}</style>
+      <div ref={ref} className={className} />
+    </>
+  )
 }
 
 const customizeTheme = EditorView.theme({
@@ -22,7 +40,10 @@ const customizeTheme = EditorView.theme({
   '.cm-scroller': { overflow: 'auto', minHeight: '100%' },
   '.cm-content': { minHeight: '100%' },
   '.cm-gutter': { minHeight: '100%' },
-  '.cm-new-code': { background: 'rgba(30, 200, 10, 0.2)' },
+  '.cm-new-code': {
+    borderRadius: '2px',
+    animation: 'new-code 0.6s linear',
+  },
 })
 
 const newCodeMark = Decoration.mark({ class: 'cm-new-code' })
@@ -87,10 +108,26 @@ function onFileChanged(oldPath: string, newPath: string, contents: string, view:
   const pathChanged = oldPath !== newPath
 
   if (!pathChanged) {
-    const sameContent = view.state.doc.toString() === contents
+    const oldContent = view.state.doc.toString()
+    if (oldContent === contents) return
+    // const sameContent = oldContent === contents
+    let cursor = 0
+    const marks = diffWords(oldContent, contents)
+      .map((part) => {
+        if (part.added) {
+          const start = cursor
+          const end = cursor + part.value.length
+          cursor = end
+          return newCodeMark.range(start, end)
+        } else if (!part.removed) {
+          cursor += part.value.length
+        }
+      })
+      .filter(Boolean)
+
     const update = view.state.update({
       changes: { from: 0, to: view.state.doc.length, insert: contents },
-      effects: newCodeEffect.of([newCodeMark.range(0, 5)]),
+      effects: newCodeEffect.of(marks),
     })
     view.dispatch(update)
   } else {

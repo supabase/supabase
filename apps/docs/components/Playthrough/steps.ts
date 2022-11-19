@@ -43,7 +43,7 @@ async function runCommands(commands: any[], intro: boolean = false) {
         await writeAndRun(command)
       }
     } else if (path) {
-      if (!intro) setCurrentPath(path)
+      if (!intro) await setCurrentPath(path)
       await saveFile(path, contents)
     } else if (currentPath) {
       setCurrentPath(currentPath)
