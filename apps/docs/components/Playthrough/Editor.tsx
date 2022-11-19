@@ -1,11 +1,11 @@
 import { basicSetup, EditorView } from 'codemirror'
-import { keymap, Decoration, DecorationSet } from '@codemirror/view'
+import { keymap, Decoration } from '@codemirror/view'
 import { javascript } from '@codemirror/lang-javascript'
 import { css } from '@codemirror/lang-css'
 import { html } from '@codemirror/lang-html'
 import { json } from '@codemirror/lang-json'
 import type { LanguageSupport } from '@codemirror/language'
-import { Compartment, EditorState, StateField, StateEffect, Range } from '@codemirror/state'
+import { EditorState, StateField, StateEffect, Range } from '@codemirror/state'
 import { oneDark } from '@codemirror/theme-one-dark'
 import React from 'react'
 import { saveDraft, updateDraft } from './file-system'
@@ -21,12 +21,15 @@ export function Editor({ className }) {
         @keyframes new-code {
           0% {
             background-color: rgb(208 255 98 / 0%);
+            filter: brightness(0.9);
           }
           20% {
             background-color: rgb(208 255 98 / 35%);
+            filter: brightness(1.4);
           }
           100% {
             background-color: rgb(208 255 98 / 0%);
+            filter: brightness(1);
           }
         }
       `}</style>
@@ -46,7 +49,6 @@ const customizeTheme = EditorView.theme({
   },
 })
 
-const newCodeMark = Decoration.mark({ class: 'cm-new-code' })
 const newCodeEffect = StateEffect.define<Range<Decoration>[]>()
 const newCodeExtension = StateField.define({
   create() {
@@ -111,14 +113,20 @@ function onFileChanged(oldPath: string, newPath: string, contents: string, view:
     const oldContent = view.state.doc.toString()
     if (oldContent === contents) return
     // const sameContent = oldContent === contents
+    const changes = diffWords(oldContent, contents)
     let cursor = 0
-    const marks = diffWords(oldContent, contents)
+    let staggerIndex = 0
+    const newCodeCount = changes.filter((c) => c.added).length
+    const marks = changes
       .map((part) => {
         if (part.added) {
           const start = cursor
           const end = cursor + part.value.length
           cursor = end
-          return newCodeMark.range(start, end)
+          return Decoration.mark({
+            class: 'cm-new-code',
+            attributes: { style: `animation-delay: ${(500 * staggerIndex++) / newCodeCount}ms` },
+          }).range(start, end)
         } else if (!part.removed) {
           cursor += part.value.length
         }
