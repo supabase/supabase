@@ -67,6 +67,9 @@ When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/aut
 async function signInWithKeycloak() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'keycloak',
+    options: {
+      scopes: 'openid',
+    },
   })
 }
 ```
