@@ -384,8 +384,19 @@
   @apply text-slate-1200 dark:text-scale-1200 font-normal;
 }
 
-.DocSearch-StartScreen .DocSearch-Help {
-  @apply py-16 px-6 text-center text-slate-400;
+.DocSearch-NoResults-Prefill-List {
+  .DocSearch-Help {
+    color: var(--colors-scale11) !important;
+  }
+}
+
+.DocSearch-Help {
+  @apply text-scale-1100;
+  font-size: 0.875rem !important;
+  a {
+    color: var(--colors-brand9) !important;
+    font-weight: 400 !important;
+  }
 }
 
 .DocSearch-NoResults {
