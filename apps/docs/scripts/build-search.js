@@ -17,12 +17,20 @@ const algoliasearch = require('algoliasearch/lite')
 // A lot of them are not even linked to within the docs site, so just need to
 // double check if they can be removed or if we want them in the side bars.
 const ignoredFiles = [
-  'docs/404.mdx',
-  'docs/support.mdx',
-  'docs/faqs.mdx',
-  'docs/guides.mdx',
-  'docs/guides/database/arrays.mdx',
-  'docs/guides/database/json.mdx',
+  'pages/404.mdx',
+  'pages/faq.mdx',
+  'pages/support.mdx',
+  'pages/oss.tsx',
+  'pages/_app.tsx',
+  'pages/_document.tsx',
+  'pages/[...slug].tsx',
+  'pages/company/aup.md',
+  'pages/company/privacy.md',
+  'pages/company/sla.md',
+  'pages/company/terms.md',
+  'pages/handbook/contributing.mdx',
+  'pages/handbook/introduction.mdx',
+  'pages/handbook/supasquad.mdx',
 ]
 
 const nameMap = {
@@ -69,9 +77,11 @@ async function walk(dir) {
     )
     const index = client.initIndex(indexName)
 
-    const slugs = (await walk('docs')).filter((slug) => !ignoredFiles.includes(slug))
+    const referencePages = await walk('docs')
+    const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
+    const allPages = guidePages.concat(referencePages)
 
-    const searchObjects = slugs
+    const searchObjects = allPages
       .map((slug) => {
         const fileContents = fs.readFileSync(slug, 'utf8')
         const { data, content } = matter(fileContents)
@@ -79,6 +89,7 @@ async function walk(dir) {
         const { id, title, description } = data
         const url = (slug.includes('/generated') ? slug.replace('/generated', '') : slug)
           .replace('docs', '')
+          .replace('pages', '')
           .replace(/\.mdx$/, '')
         const source = slug.includes('/reference') ? 'reference' : 'guide'
         const object = {
