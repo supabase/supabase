@@ -11,7 +11,7 @@ export function Playthrough() {
 
   const show = step.show()
   return (
-    <div className="w-full h-screen flex relative overflow-hidden">
+    <div className="w-full h-full flex relative overflow-hidden">
       <div className="absolute inset-0 flex">
         <div
           className="overflow-hidden rounded m-3"

@@ -1,0 +1,14 @@
+import { Playthrough } from '~/components/Playthrough'
+import Layout from '~/layouts/PlaythroughLayout'
+
+export const meta = {
+  id: 'play-with-nextjs',
+  title: 'Playthrough: Next.js',
+  description: 'Learn how to use Supabase in your Next App.',
+}
+
+<Playthrough />
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
