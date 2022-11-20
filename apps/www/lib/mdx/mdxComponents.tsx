@@ -29,20 +29,13 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     img: (props: any) => {
       if (props.className !== ignoreClass) {
         return (
-          <div
-            className={[
-              'next-image--dynamic-fill',
-              type === 'blog' && 'to-scale-400 from-scale-500 rounded-lg border bg-gradient-to-r',
-            ].join(' ')}
-          >
+          <span className={['next-image--dynamic-fill'].join(' ')}>
             <Image
               {...props}
-              className={['next-image--dynamic-fill', type === 'blog' && 'rounded-md border'].join(
-                ' '
-              )}
+              className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
               layout="fill"
             />
-          </div>
+          </span>
         )
       }
       return <img {...props} />
