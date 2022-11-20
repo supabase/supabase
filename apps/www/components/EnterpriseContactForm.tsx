@@ -119,14 +119,30 @@ const EnterpriseContactForm = () => {
 
               <div>
                 <Listbox label="Company Size" id="companySize" name="companySize" layout="vertical">
-                  <Listbox.Option label='---' value="">{'---'}</Listbox.Option>
-                  <Listbox.Option label="1-10" value="1-10">1-10 Employees</Listbox.Option>
-                  <Listbox.Option label="11-50" value="11-50">11-50 Employees</Listbox.Option>
-                  <Listbox.Option label="51-200" value="51-200">51-200 Employees</Listbox.Option>
-                  <Listbox.Option label="201-500" value="201-500">201-500 Employees</Listbox.Option>
-                  <Listbox.Option label="501-1000" value="501-1000">501-1000 Employees</Listbox.Option>
-                  <Listbox.Option label="1001-5000" value="1001-5000">1001-5000 Employees</Listbox.Option>
-                  <Listbox.Option label="5001+" value="5001+">5001+ Employees</Listbox.Option>
+                  <Listbox.Option label="---" value="">
+                    {'---'}
+                  </Listbox.Option>
+                  <Listbox.Option label="1-10" value="1-10">
+                    1-10 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="11-50" value="11-50">
+                    11-50 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="51-200" value="51-200">
+                    51-200 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="201-500" value="201-500">
+                    201-500 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="501-1000" value="501-1000">
+                    501-1000 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="1001-5000" value="1001-5000">
+                    1001-5000 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="5001+" value="5001+">
+                    5001+ Employees
+                  </Listbox.Option>
                 </Listbox>
               </div>
 
