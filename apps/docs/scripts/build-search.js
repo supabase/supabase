@@ -4,6 +4,7 @@ const path = require('path')
 const matter = require('gray-matter')
 const dotenv = require('dotenv')
 const algoliasearch = require('algoliasearch/lite')
+const { isEmpty } = require('lodash')
 
 // [Joshen] We initially thought of building out our search using Algolia directly,
 // but eventually decided to just use DocSearch since it provides us a UI and some
@@ -83,10 +84,30 @@ async function walk(dir) {
 
     const searchObjects = allPages
       .map((slug) => {
+        let id, title, description
         const fileContents = fs.readFileSync(slug, 'utf8')
         const { data, content } = matter(fileContents)
 
-        const { id, title, description } = data
+        if (isEmpty(data)) {
+          // Guide pages do not have front-matter meta, unlike reference pages, have to manually extract
+          const metaIndex = fileContents.indexOf('export const meta = {')
+          if (metaIndex !== -1) {
+            const metaString =
+              fileContents
+                .slice(metaIndex + 20, fileContents.indexOf('}') + 1)
+                .replace(/\n/g, '')
+                .slice(0, -2) + '}'
+            const meta = eval(`(${metaString})`)
+            id = meta.id
+            title = meta.title
+            description = meta.description
+          }
+        } else {
+          id = data.id
+          title = data.title
+          description = data.description
+        }
+
         const url = (slug.includes('/generated') ? slug.replace('/generated', '') : slug)
           .replace('docs', '')
           .replace('pages', '')
