@@ -390,6 +390,12 @@
   }
 }
 
+.DocSearch-StartScreen {
+  .DocSearch-Help {
+    @apply text-center py-16; 
+  }
+}
+
 .DocSearch-Help {
   @apply text-scale-1100;
   font-size: 0.875rem !important;
