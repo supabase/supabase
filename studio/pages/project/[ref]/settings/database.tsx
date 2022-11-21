@@ -351,7 +351,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
             }
           >
             <Panel.Content>
-              <Tabs type="underlined">
+              <Tabs type="underlined" size="small">
                 {/* @ts-ignore */}
                 <Tabs.Panel id="psql" label="PSQL">
                   <Input copy readOnly disabled value={psqlConnString} />
