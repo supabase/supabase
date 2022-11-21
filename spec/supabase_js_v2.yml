@@ -143,7 +143,7 @@ functions:
             }
           )
           ```
-  - id: auth-sign-in-with-password
+  - id: sign-in-with-password
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
@@ -175,7 +175,7 @@ functions:
             token: '123456',
           })
           ```
-  - id: auth-sign-in-with-otp
+  - id: sign-in-with-otp
     title: 'signInWithOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
@@ -205,7 +205,7 @@ functions:
             phone: '+13334445555',
           })
           ```
-  - id: auth-sign-in-with-oauth
+  - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
@@ -252,7 +252,7 @@ functions:
           })
           const oAuthToken = data.session.provider_token // use to access provider API
           ```
-  - id: auth-sign-out
+  - id: sign-out
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
@@ -265,7 +265,7 @@ functions:
           ```js
           const { error } = await supabase.auth.signOut()
           ```
-  - id: auth-verify-otp
+  - id: verify-otp
     title: 'verifyOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
@@ -286,7 +286,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
           ```
-  - id: auth-get-session
+  - id: get-session
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
@@ -297,7 +297,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.getSession()
           ```
-  - id: auth-get-user
+  - id: get-user
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
@@ -318,7 +318,7 @@ functions:
           ```js
           const { data: { user } } = await supabase.auth.getUser(jwt)
           ```
-  - id: auth-update-user
+  - id: update-user
     title: 'updateUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
@@ -350,7 +350,7 @@ functions:
             data: { hello: 'world' }
           })
           ```
-  - id: auth-set-session
+  - id: set-session
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
@@ -367,7 +367,7 @@ functions:
           ```js
             const { data, error } = supabase.auth.setSession(refresh_token)
           ```
-  - id: auth-refresh-session
+  - id: refresh-session
     title: 'refreshSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
@@ -388,7 +388,7 @@ functions:
           ```js
           const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
           ```
-  - id: auth-on-auth-state-change
+  - id: on-auth-state-change
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
@@ -451,13 +451,13 @@ functions:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  - id: supabase-auth-admin-api
+  - id: admin-api
     title: 'Overview'
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
 
-  - id: auth-admin-get-user-by-id
+  - id: get-user-by-id
     title: 'getUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
@@ -472,7 +472,7 @@ functions:
           const { data, error } = await supabase.auth.admin.getUserById(1)
           ```
 
-  - id: auth-admin-list-users
+  - id: list-users
     title: 'listUsers()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     examples:
@@ -483,7 +483,7 @@ functions:
           ```js
           const { data: { users }, error } = await supabase.auth.admin.listUsers()
           ```
-  - id: auth-admin-createUser
+  - id: create-user
     title: 'createUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
@@ -518,7 +518,7 @@ functions:
             phone_confirm: true
           })
           ```
-  - id: auth-admin-deleteUser
+  - id: delete-user
     title: 'deleteUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
@@ -534,7 +534,7 @@ functions:
           )
           ```
 
-  - id: auth-admin-invite-user-by-email
+  - id: invite-user-by-email
     title: 'inviteUserByEmail()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
@@ -599,7 +599,7 @@ functions:
            }, [])
           ```
 
-  - id: auth-admin-generate-link
+  - id: generate-link
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     examples:
@@ -666,7 +666,7 @@ functions:
           })
           ```
 
-  - id: auth-admin-update-user-by-id
+  - id: update-user-by-id
     title: 'updateUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     examples:
@@ -4029,7 +4029,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: containedBy
+  - id: contained-by
     title: containedBy()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
     examples:
@@ -4296,7 +4296,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: rangeGt
+  - id: range-gt
     title: rangeGt()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
     examples:
@@ -4395,7 +4395,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
-  - id: rangeGte
+  - id: range-gte
     title: rangeGte()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
     examples:
@@ -4494,7 +4494,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
-  - id: rangeLt
+  - id: range-lt
     title: rangeLt()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
     examples:
@@ -4592,7 +4592,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-  - id: rangeLte
+  - id: range-lte
     title: rangeLte()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
@@ -4691,7 +4691,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
-  - id: rangeAdjacent
+  - id: range-adjacent
     title: rangeAdjacent()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
     examples:
@@ -4973,7 +4973,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
   # TODO: schema & result
-  - id: textSearch
+  - id: text-search
     title: textSearch()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
     notes:
@@ -6356,7 +6356,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-  - id: db-abortSignal
+  - id: abort-signal
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
     title: abortSignal()
     examples:
@@ -6585,7 +6585,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-  - id: db.csv
+  - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
     examples:
@@ -6745,7 +6745,7 @@ functions:
   #           .eq('id', 1)
   #         ```
 
-  - id: invoke()
+  - id: invoke
     title: invoke()
     description: |
       Invoke a Supabase Function.
@@ -6805,7 +6805,7 @@ functions:
           })
           ```
 
-  - id: subscribe()
+  - id: subscribe
     title: on().subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
@@ -6949,7 +6949,7 @@ functions:
           supabase.removeAllChannels()
           ```
 
-  - id: storage-listBuckets
+  - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
@@ -6968,7 +6968,7 @@ functions:
             .listBuckets()
           ```
 
-  - id: storage-getBucket
+  - id: get-bucket
     title: getBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
@@ -6987,7 +6987,7 @@ functions:
             .getBucket('avatars')
           ```
 
-  - id: storage-createBucket
+  - id: create-bucket
     title: createBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
@@ -7006,7 +7006,7 @@ functions:
             .createBucket('avatars', { public: false })
           ```
 
-  - id: storage-emptyBucket
+  - id: empty-bucket
     title: emptyBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
@@ -7024,7 +7024,7 @@ functions:
             .storage
             .emptyBucket('avatars')
           ```
-  - id: storage-updateBucket
+  - id: update-bucket
     title: updateBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
@@ -7043,7 +7043,7 @@ functions:
             .updateBucket('avatars', { public: false })
           ```
 
-  - id: storage-deleteBucket
+  - id: delete-bucket
     title: deleteBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
@@ -7062,7 +7062,7 @@ functions:
             .deleteBucket('avatars')
           ```
 
-  - id: storage-from-upload
+  - id: from-upload
     title: from.upload()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
@@ -7100,7 +7100,7 @@ functions:
             })
           ```
 
-  - id: storage-from-update
+  - id: from-update
     title: from.update()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
@@ -7138,7 +7138,7 @@ functions:
             })
           ```
 
-  - id: storage-from-move
+  - id: from-move
     title: from.move()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
@@ -7158,7 +7158,7 @@ functions:
             .move('public/avatar1.png', 'private/avatar2.png')
           ```
 
-  - id: storage-from-copy
+  - id: from-copy
     title: from.copy()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
@@ -7178,7 +7178,7 @@ functions:
             .copy('public/avatar1.png', 'private/avatar2.png')
           ```
 
-  - id: storage-from-createSignedUrl
+  - id: from-create-signed-url
     title: from.createSignedUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
@@ -7198,7 +7198,7 @@ functions:
             .createSignedUrl('folder/avatar1.png', 60)
           ```
 
-  - id: storage-from-createSignedUrls
+  - id: from-create-signed-urls
     title: from.createSignedUrls()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
@@ -7218,7 +7218,7 @@ functions:
             .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
           ```
 
-  - id: storage-from-getPublicUrl
+  - id: from-get-public-url
     title: from.getPublicUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
@@ -7239,7 +7239,7 @@ functions:
             .getPublicUrl('folder/avatar1.png')
           ```
 
-  - id: storage-from-download
+  - id: from-download
     title: from.download()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
@@ -7259,7 +7259,7 @@ functions:
             .download('folder/avatar1.png')
           ```
 
-  - id: storage-from-remove
+  - id: from-remove
     title: from.remove()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
@@ -7279,7 +7279,7 @@ functions:
             .remove(['folder/avatar1.png'])
           ```
 
-  - id: storage-from-list
+  - id: from-list
     title: from.list()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
