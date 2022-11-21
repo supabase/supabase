@@ -32,26 +32,28 @@ const ConfirmPaymentModal: FC<Props> = ({
     >
       <div className="space-y-4 py-4">
         <Modal.Content>
-          {isChangingInstanceSize && (
-            <Alert
-              withIcon
-              variant="warning"
-              title="Your project will need to be restarted for size changes to take place"
-            >
-              Upon confirmation, your project will be restarted to change your instance size. This
-              will take up to 2 minutes in which your project will be unavailable during the time.
-            </Alert>
-          )}
-          {isDisablingPITR && (
-            <Alert
-              withIcon
-              variant="warning"
-              title="All available PITR back ups for your project will be removed and are non-recoverable"
-            >
-              As such, your project will not have past PITR backups if you were to re-enable PITR
-              for your project.
-            </Alert>
-          )}
+          <div className="space-y-2">
+            {isChangingInstanceSize && (
+              <Alert
+                withIcon
+                variant="warning"
+                title="Your project will need to be restarted for size changes to take place"
+              >
+                Upon confirmation, your project will be restarted to change your instance size. This
+                will take up to 2 minutes in which your project will be unavailable during the time.
+              </Alert>
+            )}
+            {isDisablingPITR && (
+              <Alert
+                withIcon
+                variant="warning"
+                title="All available PITR back ups for your project will be removed and are non-recoverable"
+              >
+                As such, your project will not have past PITR backups if you were to re-enable PITR
+                for your project.
+              </Alert>
+            )}
+          </div>
         </Modal.Content>
         <Modal.Content>
           <p className="text-sm text-scale-1200">
