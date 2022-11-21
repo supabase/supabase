@@ -115,7 +115,7 @@ functions:
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
-      - id: sign-up.
+      - id: sign-up
         name: Sign up.
         isSpotlight: true
         code: |
@@ -185,7 +185,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
     examples:
-      - id: sign-in-with-email.
+      - id: sign-in-with-email
         name: Sign in with email.
         isSpotlight: true
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
@@ -195,7 +195,7 @@ functions:
             email: 'example@email.com',
           })
           ```
-      - id: sign-in-with-sms-otp.
+      - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP.
         isSpotlight: false
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
@@ -341,7 +341,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
-      - id: update-the-user's-metadata
+      - id: update-the-users-metadata
         name: Update the user's metadata
         isSpotlight: true
         code: |
@@ -476,7 +476,7 @@ functions:
     title: 'listUsers()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     examples:
-      - id: get-a-full-list-of-users.
+      - id: get-a-full-list-of-users
         name: Get a full list of users.
         isSpotlight: true
         code: |
@@ -500,7 +500,7 @@ functions:
             user_metadata: { name: 'Yoda' }
           })
           ```
-      - id: auto-confirm-the-user's-email
+      - id: auto-confirm-the-users-email
         name: Auto-confirm the user's email
         code: |
           ```js
@@ -509,7 +509,7 @@ functions:
             email_confirm: true
           })
           ```
-      - id: auto-confirm-the-user's-phone-number
+      - id: auto-confirm-the-users-phone-number
         name: Auto-confirm the user's phone number
         code: |
           ```js
@@ -569,7 +569,7 @@ functions:
             redirectTo: 'https://example.com/update-password',
           })
           ```
-      - id: reset-password(react)
+      - id: reset-password-react
         name: Reset password (React)
         isSpotlight: true
         code: |
@@ -670,7 +670,7 @@ functions:
     title: 'updateUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     examples:
-      - id: updates-a-users-email.
+      - id: updates-a-users-email
         name: Updates a user's email.
         isSpotlight: false
         code: |
@@ -680,7 +680,7 @@ functions:
             { email: 'new@email.com' }
           )
           ```
-      - id: updates-a-users-password.
+      - id: updates-a-users-password
         name: Updates a user's password.
         isSpotlight: false
         code: |
@@ -690,7 +690,7 @@ functions:
             { password: 'new_password' }
           )
           ```
-      - id: updates-a-users-metadata.
+      - id: updates-a-users-metadata
         name: Updates a user's metadata.
         isSpotlight: true
         code: |
@@ -700,7 +700,7 @@ functions:
             { user_metadata: { hello: 'world' } }
           )
           ```
-      - id: updates-a-users-app-metadata.
+      - id: updates-a-users-app-metadata
         name: Updates a user's app_metadata.
         isSpotlight: false
         code: |
@@ -710,7 +710,7 @@ functions:
             { app_metadata: { plan: 'trial' } }
           )
           ```
-      - id: confirms-a-users-email-address.
+      - id: confirms-a-users-email-address
         name: Confirms a user's email address.
         isSpotlight: false
         code: |
@@ -720,7 +720,7 @@ functions:
             { email_confirm: true }
           )
           ```
-      - id: confirms-a-users-phone-number.
+      - id: confirms-a-users-phone-number
         name: Confirms a user's phone number.
         isSpotlight: false
         code: |
@@ -5016,7 +5016,7 @@ functions:
               config: 'english'
             })
           ```
-      - id: websearch
+      - id: web-search
         name: Websearch
         description: |
           Uses PostgreSQL's `websearch_to_tsquery` function.
