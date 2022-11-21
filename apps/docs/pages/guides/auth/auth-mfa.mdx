@@ -94,20 +94,24 @@ for your application. JWTs without an `aal` claim are at the `aal1` level.
 
 ## Adding to your app
 
-Adding MFA to your app involves these three steps:
+Adding MFA to your app involves these four steps:
 
 1. **Add enrollment flow.**
    You need to provide a UI within your app that your users will be able to set-up
    MFA in. You can add this right after sign-up, or as part of a separate flow in
    the settings portion of your app.
-2. **Add challenge step to login.**
+2. **Add unenrollment flow.**
+   You need to support a UI through which users can see existing devices and unenroll
+   devices which are no longer relevant.
+3. **Add challenge step to login.**
    If a user has set-up MFA, your app's login flow needs to present a challenge
    screen to the user asking them to prove they have access to the additional
    factor.
-3. **Enforce rules for MFA logins.**
+4. **Enforce rules for MFA logins.**
    Once your users have a way to enroll and log in with MFA, you need to enforce
    authorization rules across your app: on the frontend, backend, API servers or
    Row-Level Security policies.
+
 
 ### Add enrollment flow
 
@@ -140,6 +144,8 @@ Enrolling a factor for use with MFA takes three steps:
    their app and is working correctly. If the verification succeeds, the factor
    immediately becomes active for the user account. If not, you should repeat
    steps 2 and 3.
+
+
 
 #### Example: React
 
@@ -236,6 +242,126 @@ export function EnrollMFA({
       />
       <input type="button" value="Enable" onClick={onEnableClicked} />
       <input type="button" value="Cancel" onClick={onCancelled} />
+    </>
+  )
+}
+```
+
+### Add unenrollment flow
+
+An Unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts.
+Most applications do so via a factor management page where users can view and unlink selected factors.
+
+To unenroll a factor, a user simply needs to call `supabase.auth.mfa.unenroll()` with the id of the factor they wish to unenroll.
+For example, to unenroll the nil UUID we would call: `supabase.auth.mfa.unenroll({factorId: "00000000-0000-0000-0000-000000000000"})`.
+
+
+#### Example: React
+
+Below is an example that creates a new `UnenrollMFA` component that illustrates
+the important pieces of the MFA enrollment flow.
+
+- When the component appears on screen, the `supabase.auth.mfa.listFactors()` API is
+  called once to fetch all existing factors together with their details.
+- The existing factors for a user are displayed together with the option to unenroll
+- Once the user has selected a factor to unenroll they can hit the `Unenroll` button
+  which creates a confirmation modal. We use `react-modal` for this modal.
+- `onUnenrolled` is a callback that notifies the other components that Unenrollment
+  has completed.
+- `onCancelled` is a callback that notifies the other components that the user
+  has clicked the `Cancel` button.
+
+```tsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Modal from 'react-modal';
+
+...
+
+/**
+ * UnenrollMFA shows a simple table with the list of factors together with a button to unenroll.
+ * When a user selects a factor and clicks the unenroll button it displays a
+ * confirmation popup with the option to unenroll or to cancel. If the user opts
+ * to continue, it calls `onUnenroll`. Otherwise, if the user clicks cancel the
+ * `onCancelled` callback is called.
+ */
+export function UnenrollMFA({
+  onEnrolled,
+  onCancelled,
+}: {
+  onUnenrolled: () => void
+  onCancelled: () => void
+}) {
+  const [factorIds, setFactorIds] = useState('')
+  // TODO(Joel) - write the corresponding example
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+  function closeModal() {
+    setIsOpen(false);
+    onCancelled();
+  }
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  const [error, setError] = useState('') // holds an error message
+
+  const onEnableClicked = () => {
+    setError('')
+    ;(async () => {
+      const challenge = await supabase.auth.mfa.challenge({ factorId })
+      if (challenge.error) {
+        setError(challenge.error.message)
+        throw challenge.error
+      }
+
+      const challengeId = challenge.data.id
+
+      const verify = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId,
+        code: verifyCode,
+      })
+      if (verify.error) {
+        setError(verify.error.message)
+        throw verify.error
+      }
+
+      onEnrolled()
+    })()
+  }
+
+  useEffect(() => {
+    ;(async () => {
+      const { data, error } = await supabase.auth.mfa.listFactors({
+        userId: <to-be-filled>
+      })
+      if (error) {
+        throw error
+      }
+
+      setFactorIds(data.id)
+    })()
+  }, [])
+
+  return (
+    <>
+      {error && <div className="error">{error}</div>}
+      <button onClick={openModal}>Open Modal</button>
+      <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        contentLabel="Unenrollment confirmation modal"
+      >
+        <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Confirm Unenrollment</h2>
+        <div>Do you wish to proceed to unenroll: (todo: fetch-factor-name-here)?</div>
+        <form>
+          <button onClick={()=> supabase.auth.mfa.unenroll()}>Unenroll</button>
+          <button onClick={closeModal}>Cancel</button>
+        </form>
+      </Modal>
+    </div>
     </>
   )
 }
@@ -589,7 +715,7 @@ seconds later. The entries are ordered most recent method first!
 {
   "amr": [
     {
-      "method": "mfa/totp",
+      "method": "totp",
       "timestamp": 1666086056
     },
     {
@@ -625,7 +751,7 @@ Currently recognized methods are:
 - `otp` - any one-time password based sign in (email code, SMS code, magic
   link).
 - `oauth` - any OAuth based sign in (social login).
-- `mfa/totp` - a TOTP additional factor.
+- `totp` - a TOTP additional factor.
 
 This list will expand in the future.
 
