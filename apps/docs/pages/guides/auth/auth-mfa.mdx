@@ -152,6 +152,10 @@ Enrolling a factor for use with MFA takes three steps:
 Below is an example that creates a new `EnrollMFA` component that illustrates
 the important pieces of the MFA enrollment flow.
 
+<Admonition type="note">
+A user can only unenroll a factor after completing the enrollment flow and obtaining
+an `aal2` JWT claim.
+</Admonition>
 - When the component appears on screen, the `supabase.auth.mfa.enroll()` API is
   called once to start the process of enrolling a new factor for the current
   user.
@@ -259,7 +263,8 @@ For example, to unenroll the nil UUID we would call: `supabase.auth.mfa.unenroll
 #### Example: React
 
 Below is an example that creates a new `UnenrollMFA` component that illustrates
-the important pieces of the MFA enrollment flow.
+the important pieces of the MFA enrollment flow. Note that a user can only unenroll a
+
 
 - When the component appears on screen, the `supabase.auth.mfa.listFactors()` API is
   called once to fetch all existing factors together with their details.
