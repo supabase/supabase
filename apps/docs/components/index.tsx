@@ -50,7 +50,7 @@ const components = {
       {props.children}
     </Heading>
   ),
-  code: (props: any) => {
+  pre: (props: any) => {
     const linesToHighlight = parseNumericRange(props.lines ?? '')
     return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
   },

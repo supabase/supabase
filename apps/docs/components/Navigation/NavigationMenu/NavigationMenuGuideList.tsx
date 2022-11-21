@@ -7,6 +7,8 @@ import * as NavItems from './NavigationMenu.constants'
 const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) => {
   const router = useRouter()
 
+  tempBasePath = ''
+
   const menu = NavItems[id]
 
   return (
@@ -66,7 +68,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
                   {x.items.map((x) => {
                     return (
                       <li key={x.name}>
-                        <Link href={`/${tempBasePath}${x.href}`} passHref>
+                        <Link href={`/${tempBasePath}${x.url}`} passHref>
                           <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
                             {x.name}
                           </a>
@@ -77,7 +79,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
                 </>
               ) : (
                 <li>
-                  <Link href={`/${tempBasePath}${x.href}`} passHref>
+                  <Link href={`/${tempBasePath}${x.url}`} passHref>
                     <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
                       {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
                       {x.name}

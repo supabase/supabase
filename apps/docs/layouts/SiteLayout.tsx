@@ -6,6 +6,10 @@ import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMen
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 const Layout = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS !== 'true') {
+    return <>{children}</>
+  }
+
   const router = useRouter()
 
   useEffect(() => {
