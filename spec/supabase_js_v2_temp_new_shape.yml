@@ -16,7 +16,6 @@ info:
 
 functions:
   - id: initializing
-    title: initializing
     $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `createClient()` method.
@@ -103,8 +102,7 @@ functions:
           ```
 
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
-  - id: auth.signUp()
-    title: 'signUp()'
+  - id: sign-up
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/settings).
@@ -145,7 +143,7 @@ functions:
             }
           )
           ```
-  - id: auth.signInWithPassword()
+  - id: sign-in-with-password
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
@@ -177,7 +175,7 @@ functions:
             token: '123456',
           })
           ```
-  - id: auth.signInWithOtp()
+  - id: sign-in-with-otp
     title: 'signInWithOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
@@ -207,7 +205,7 @@ functions:
             phone: '+13334445555',
           })
           ```
-  - id: auth.signInWithOAuth()
+  - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
@@ -216,7 +214,6 @@ functions:
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
-
         isSpotlight: true
         code: |
           ```js
@@ -255,7 +252,7 @@ functions:
           })
           const oAuthToken = data.session.provider_token // use to access provider API
           ```
-  - id: auth.signOut()
+  - id: sign-out
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
@@ -268,7 +265,7 @@ functions:
           ```js
           const { error } = await supabase.auth.signOut()
           ```
-  - id: auth.verifyOtp()
+  - id: verify-otp
     title: 'verifyOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
@@ -289,7 +286,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
           ```
-  - id: auth.getSession()
+  - id: get-session
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
@@ -300,7 +297,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.getSession()
           ```
-  - id: auth.getUser()
+  - id: get-user
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
@@ -321,7 +318,7 @@ functions:
           ```js
           const { data: { user } } = await supabase.auth.getUser(jwt)
           ```
-  - id: auth.updateUser()
+  - id: update-user
     title: 'updateUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
@@ -353,7 +350,7 @@ functions:
             data: { hello: 'world' }
           })
           ```
-  - id: auth.setSession()
+  - id: set-session
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
@@ -370,7 +367,7 @@ functions:
           ```js
             const { data, error } = supabase.auth.setSession(refresh_token)
           ```
-  - id: auth.refreshSession()
+  - id: refresh-session
     title: 'refreshSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
@@ -391,7 +388,7 @@ functions:
           ```js
           const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
           ```
-  - id: auth.onAuthStateChange()
+  - id: on-auth-state-change
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
@@ -454,13 +451,13 @@ functions:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  - id: Supabase Auth Admin Api
+  - id: admin-api
     title: 'Overview'
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
 
-  - id: auth.admin.getUserById()
+  - id: get-user-by-id
     title: 'getUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
@@ -475,7 +472,7 @@ functions:
           const { data, error } = await supabase.auth.admin.getUserById(1)
           ```
 
-  - id: auth.admin.listUsers()
+  - id: list-users
     title: 'listUsers()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     examples:
@@ -486,7 +483,7 @@ functions:
           ```js
           const { data: { users }, error } = await supabase.auth.admin.listUsers()
           ```
-  - id: auth.admin.createUser()
+  - id: create-user
     title: 'createUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
@@ -521,7 +518,7 @@ functions:
             phone_confirm: true
           })
           ```
-  - id: auth.admin.deleteUser()
+  - id: delete-user
     title: 'deleteUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
@@ -537,7 +534,7 @@ functions:
           )
           ```
 
-  - id: auth.admin.inviteUserByEmail()
+  - id: invite-user-by-email
     title: 'inviteUserByEmail()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
@@ -551,7 +548,7 @@ functions:
           const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
           ```
 
-  - id: auth.resetPasswordForEmail()
+  - id: auth-reset-password-for-email
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
@@ -578,31 +575,31 @@ functions:
         code: |
           ```js
           /**
-          * Step 1: Send the user an email to get a password reset token.
-          * This email contains a link which sends the user back to your application.
-          */
+           * Step 1: Send the user an email to get a password reset token.
+           * This email contains a link which sends the user back to your application.
+           */
           const { data, error } = await supabase.auth
             .resetPasswordForEmail('user@email.com')
 
           /**
-          * Step 2: Once the user is redirected back to your application,
-          * ask the user to reset their password.
-          */
-          useEffect(() => {
-            supabase.auth.onAuthStateChange(async (event, session) => {
-              if (event == "PASSWORD_RECOVERY") {
-                const newPassword = prompt("What would you like your new password to be?");
-                const { data, error } = await supabase.auth
-                  .updateUser({ password: newPassword })
+           * Step 2: Once the user is redirected back to your application,
+           * ask the user to reset their password.
+           */
+           useEffect(() => {
+             supabase.auth.onAuthStateChange(async (event, session) => {
+               if (event == "PASSWORD_RECOVERY") {
+                 const newPassword = prompt("What would you like your new password to be?");
+                 const { data, error } = await supabase.auth
+                   .updateUser({ password: newPassword })
 
-                if (data) alert("Password updated successfully!")
-                if (error) alert("There was an error updating your password.")
-              }
-            })
-          }, [])
+                 if (data) alert("Password updated successfully!")
+                 if (error) alert("There was an error updating your password.")
+               }
+             })
+           }, [])
           ```
 
-  - id: auth.admin.generateLink()
+  - id: generate-link
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     examples:
@@ -669,7 +666,7 @@ functions:
           })
           ```
 
-  - id: auth.admin.updateUserById()
+  - id: update-user-by-id
     title: 'updateUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     examples:
@@ -734,7 +731,7 @@ functions:
           )
           ```
 
-  - id: select()
+  - id: select
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
@@ -765,6 +762,84 @@ functions:
           If your database has foreign key relationships, you can query related tables too.
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('users')
+              .select(`
+                name,
+                teams (
+                  name
+                )
+              `)
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+                -- both foreign keys must be part of a composite primary key
+                primary key (user_id, team_id)
+              );
+
+            insert into
+              users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "name": "Kiran",
+                  "teams": [
+                    {
+                      "name": "Green"
+                    },
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                },
+                {
+                  "name": "Evan",
+                  "teams": [
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           If you're in a situation where your tables are **NOT** directly
           related, but instead are joined by a _join table_, you can still use
@@ -863,6 +938,7 @@ functions:
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
         code: |
+          ```ts
           const { data, error } = await supabase
             .from('messages')
             .select(`
@@ -870,30 +946,31 @@ functions:
               from:sender_id(name),
               to:receiver_id(name)
             `)
+          ```
         data:
           sql: |
             ```sql
-            create table
-            users (id int8 primary key, name text);
+             create table
+             users (id int8 primary key, name text);
 
-            create table
-              messages (
-                sender_id int8 not null references users,
-                receiver_id int8 not null references users,
-                content text
-              );
+             create table
+               messages (
+                 sender_id int8 not null references users,
+                 receiver_id int8 not null references users,
+                 content text
+               );
 
-            insert into
-              users (id, name)
-            values
-              (1, 'Kiran'),
-              (2, 'Evan');
+             insert into
+               users (id, name)
+             values
+               (1, 'Kiran'),
+               (2, 'Evan');
 
-            insert into
-              messages (sender_id, receiver_id, content)
-            values
-              (1, 2, '👋');
-            ```
+             insert into
+               messages (sender_id, receiver_id, content)
+             values
+               (1, 2, '👋');
+             ```
         response: |
           ```json
           {
@@ -982,6 +1059,53 @@ functions:
         hideCodeBlock: true
       - id: filtering-through-foreign-tables
         name: Filtering through foreign tables
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries(*)')
+            .eq('countries.name', 'Estonia')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": null
+              },
+              {
+                "name": "Munich",
+                "countries": null
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
           table returns `[]` or `null` but the parent table is not filtered out.
@@ -1072,6 +1196,33 @@ functions:
         hideCodeBlock: true
       - id: querying-with-count-option
         name: Querying with count option
+        code: |
+          ```ts
+          const { count, error } = await supabase
+            .from('countries')
+            .select('*', { count: 'exact', head: true })
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "count": 3,
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           You can get the number of rows by using the
           [count](/docs/reference/javascript/select#parameters) option. For
@@ -1117,6 +1268,44 @@ functions:
         hideCodeBlock: true
       - id: querying-json-data
         name: Querying JSON data
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select(`
+              id, name,
+              address->city
+            `)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Avdotya",
+                "city": "Saint Petersburg"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           You can select and filter data inside of
           [JSON](/docs/guides/database/json) columns. Postgres offers some
@@ -1173,12 +1362,31 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: insert()
+  - id: insert
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
     examples:
       - id: create-a-record
         name: Create a record
+        code: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .insert({ id: 1, name: 'Denmark' })
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1238,14 +1446,34 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { error } = await supabase
-            .from('countries')
-            .insert({ id: 1, name: 'Denmark' })
-          ```
       - id: create-a-record-and-return-it
         name: Create a record and return it
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .insert({ id: 1, name: 'Denmark' })
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Denmark"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1286,6 +1514,34 @@ functions:
         hideCodeBlock: true
       - id: bulk-create
         name: Bulk create
+        code: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .insert([
+              { id: 1, name: 'Nepal' },
+              { id: 1, name: 'Vietnam' },
+            ])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (id)=(1) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
         description: |
           A bulk create operation is handled in a single transaction.
           If any of the inserts fail, none of the rows are inserted.
@@ -1353,7 +1609,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: update()
+  - id: update
     title: 'Modify data: update()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.update'
     notes: |
@@ -1361,6 +1617,31 @@ functions:
     examples:
       - id: updating-your-data
         name: Updating your data
+        code: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .update({ name: 'Australia' })
+            .eq('id', 1)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Taiwan');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1427,15 +1708,40 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: update-a-record-and-return-it
+        name: Update a record and return it
         code: |
           ```ts
-          const { error } = await supabase
+          const { data, error } = await supabase
             .from('countries')
             .update({ name: 'Australia' })
             .eq('id', 1)
+            .select()
           ```
-      - id: update-a-record-and-return-it
-        name: Update a record and return it
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Taiwan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Australia"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1482,6 +1788,51 @@ functions:
         hideCodeBlock: true
       - id: updating-json-data
         name: Updating JSON data
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .update({
+              address: {
+                street: 'Melrose Place',
+                postcode: 90210
+              }
+            })
+            .eq('address->postcode', 90210)
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "street": "Melrose Place",
+                  "postcode": 90210
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Postgres offers some
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
@@ -1545,8 +1896,7 @@ functions:
 
           Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
-
-  - id: upsert()
+  - id: upsert
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
@@ -1554,6 +1904,37 @@ functions:
     examples:
       - id: upsert-your-data
         name: Upsert your data
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Albania' })
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1598,15 +1979,46 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: bulk-upsert-your-data
+        name: Bulk Upsert your data
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
-            .upsert({ id: 1, name: 'Albania' })
+            .upsert([
+              { id: 1, name: 'Albania' },
+              { id: 2, name: 'Algeria' },
+            ])
             .select()
           ```
-      - id: bulk-upsert-your-data
-        name: Bulk Upsert your data
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              },
+              {
+                "id": 2,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1659,6 +2071,41 @@ functions:
         hideCodeBlock: true
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' })
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 generated by default as identity primary key,
+                handle text not null unique,
+                display_name text
+              );
+
+            insert into
+              users (id, handle, display_name)
+            values
+              (1, 'saoirse', null);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (handle)=(saoirse) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"users_handle_key\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
         description: |
           In the following query, `upsert()` implicitly uses the `id`
           (primary key) column to determine conflicts. If there is no existing
@@ -1750,7 +2197,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: delete()
+  - id: delete
     title: 'Delete data: delete()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.delete'
     notes: |
@@ -1763,6 +2210,31 @@ functions:
     examples:
       - id: delete-records
         name: Delete records
+        code: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .delete()
+            .eq('id', 1)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1824,15 +2296,8 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { error } = await supabase
-            .from('countries')
-            .delete()
-            .eq('id', 1)
-          ```
 
-  - id: rpc()
+  - id: rpc
     title: 'Postgres functions: rpc()'
     description: |
       You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
@@ -1847,6 +2312,25 @@ functions:
     examples:
       - id: call-a-postgres-function-without-arguments
         name: Call a Postgres function without arguments
+        code: |
+          ```ts
+          const { data, error } = await supabase.rpc('hello_world')
+          ```
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1879,12 +2363,27 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase.rpc('hello_world')
-          ```
       - id: call-a-postgres-function-with-arguments
         name: Call a Postgres function with arguments
+        code: |
+          ```ts
+          const { data, error } = await supabase.rpc('echo', { say: '👋' })
+          ```
+        data:
+          sql: |
+            ```sql
+            create function echo(say text) returns text as $$
+              select say;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+            {
+              "data": "👋",
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -1918,6 +2417,29 @@ functions:
         hideCodeBlock: true
       - id: bulk-processing
         name: Bulk processing
+        code: |
+          ```ts
+          const { data, error } = await supabase.rpc('add_one_each', { arr: [1, 2, 3] })
+          ```
+        data:
+          sql: |
+            ```sql
+            create function add_one_each(arr int[]) returns int[] as $$
+              select array_agg(n + 1) from unnest(arr) as n;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              2,
+              3,
+              4
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           You can process large payloads by passing in an array as an argument:
 
@@ -1957,6 +2479,40 @@ functions:
         hideCodeBlock: true
       - id: call-a-postgres-function-with-filters
         name: Call a Postgres function with filters
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .rpc('list_stored_countries')
+            .eq('id', 1)
+            .single()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'France'),
+              (2, 'United Kingdom');
+
+            create function list_stored_countries() returns setof countries as $$
+              select * from countries;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 1,
+              "name": "France"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Postgres functions that return tables can also be combined with
           [Filters](/docs/reference/javascript/using-filters) and
@@ -2008,191 +2564,341 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: Using Filters
-    title: Using Filters
-    description: |
-      Filters allow you to only return rows that match certain conditions.
+  # - id: using-filters
+  #   title: Using Filters
+  #   description: |
+  #     Filters allow you to only return rows that match certain conditions.
 
-      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
+  #     Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
 
-      If a Postgres function returns a table response, you can also apply filters.
+  #     If a Postgres function returns a table response, you can also apply filters.
+  #   examples:
+  #     - id: applying-filters
+  #       name: Applying Filters
+  #       description: |
+  #         Filters must be applied after any of `select()`, `update()`, `upsert()`,
+  #         `delete()`, and `rpc()` and before
+  #         [modifiers](/docs/reference/javascript/using-modifiers).
+  #       code: |
+  #         ```ts
+  #         const { data, error } = await supabase
+  #           .from('cities')
+  #           .select('name, country_id')
+  #           .eq('name', 'The Shire')    // Correct
 
-      ### Applying Filters
+  #         const { data, error } = await supabase
+  #           .from('cities')
+  #           .eq('name', 'The Shire')    // Incorrect
+  #           .select('name, country_id')
+  #         ```
+  #       - id: chaining-filters
+  #         name: Chaining
+  #         description: |
+  #           Filters can be chained together to produce advanced queries. For example,
+  #           to query cities with population between 1,000 and 10,000:
 
-      Filters must be applied after any of `select()`, `update()`, `upsert()`,
-      `delete()`, and `rpc()` and before
-      [modifiers](/docs/reference/javascript/using-modifiers).
+  #           ```ts
+  #           const { data, error } = await supabase
+  #             .from('cities')
+  #             .select('name, country_id')
+  #             .gte('population', 1000)
+  #             .lt('population', 10000)
+  #           ```
+  #         code: |
+  #           ```ts
+  #           const { data, error } = await supabase
+  #             .from('cities')
+  #             .select('name, country_id')
+  #             .gte('population', 1000)
+  #             .lt('population', 10000)
+  #           ```
+  #       - id: conditional-chaining
+  #         name: Conditional Chaining
+  #         description: |
+  #             Filters can be built up one step at a time and then executed. For example:
 
-      ```ts
-      const { data, error } = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .eq('name', 'The Shire')    // Correct
+  #             ```ts
+  #             const filterByName = null
+  #             const filterPopLow = 1000
+  #             const filterPopHigh = 10000
 
-      const { data, error } = await supabase
-        .from('cities')
-        .eq('name', 'The Shire')    // Incorrect
-        .select('name, country_id')
-      ```
+  #             let query = supabase
+  #               .from('cities')
+  #               .select('name, country_id')
 
-      ### Chaining
+  #             if (filterByName)  { query = query.eq('name', filterByName) }
+  #             if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+  #             if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
 
-      Filters can be chained together to produce advanced queries. For example,
-      to query cities with population between 1,000 and 10,000:
+  #             const { data, error } = await query
+  #             ```
+  #         code: |
+  #           ```ts
+  #           const filterByName = null
+  #           const filterPopLow = 1000
+  #           const filterPopHigh = 10000
 
-      ```ts
-      const { data, error } = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .gte('population', 1000)
-        .lt('population', 10000)
-      ```
+  #           let query = supabase
+  #             .from('cities')
+  #             .select('name, country_id')
 
-      ### Conditional Chaining
+  #           if (filterByName)  { query = query.eq('name', filterByName) }
+  #           if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+  #           if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
 
-      Filters can be built up one step at a time and then executed. For example:
+  #           const { data, error } = await query
+  #           ```
+  #       - id: filter-by-value-within-json-column
+  #         name: Filter by values within a JSON column
+  #         code: |
+  #           ```ts
+  #           const { data, error } = await supabase
+  #             .from('users')
+  #             .select()
+  #             .eq('address->postcode', 90210)
+  #           ```
+  #         data:
+  #           sql: |
+  #             ```sql
+  #             create table
+  #               users (
+  #                 id int8 primary key,
+  #                 name text,
+  #                 address jsonb
+  #               );
 
-      ```ts
-      const filterByName = null
-      const filterPopLow = 1000
-      const filterPopHigh = 10000
+  #             insert into
+  #               users (id, name, address)
+  #             values
+  #               (1, 'Michael', '{ "postcode": 90210 }'),
+  #               (2, 'Jane', null);
+  #             ```
+  #         response: |
+  #           ```json
+  #           {
+  #             "data": [
+  #               {
+  #                 "id": 1,
+  #                 "name": "Michael",
+  #                 "address": {
+  #                   "postcode": 90210
+  #                 }
+  #               }
+  #             ],
+  #             "status": 200,
+  #             "statusText": "OK"
+  #           }
+  #           ```
+  #         description: |
+  #             <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+  #               <TabPanel id="schema" label="Schema">
 
-      let query = supabase
-        .from('cities')
-        .select('name, country_id')
+  #                 ```sql
+  #                 create table
+  #                   users (
+  #                     id int8 primary key,
+  #                     name text,
+  #                     address jsonb
+  #                   );
 
-      if (filterByName)  { query = query.eq('name', filterByName) }
-      if (filterPopLow)  { query = query.gte('population', filterPopLow) }
-      if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+  #                 insert into
+  #                   users (id, name, address)
+  #                 values
+  #                   (1, 'Michael', '{ "postcode": 90210 }'),
+  #                   (2, 'Jane', null);
+  #                 ```
 
-      const { data, error } = await query
-      ```
+  #               </TabPanel>
+  #               <TabPanel id="js" label="JavaScript">
 
-      ### Filter by values within a JSON column
+  #                 ```ts
+  #                 const { data, error } = await supabase
+  #                   .from('users')
+  #                   .select()
+  #                   .eq('address->postcode', 90210)
+  #                 ```
 
-      <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-      <TabPanel id="schema" label="Schema">
+  #               </TabPanel>
+  #               <TabPanel id="result" label="Result">
 
-        ```sql
-        create table
-          users (
-            id int8 primary key,
-            name text,
-            address jsonb
-          );
+  #                 ```json
+  #                 {
+  #                   "data": [
+  #                     {
+  #                       "id": 1,
+  #                       "name": "Michael",
+  #                       "address": {
+  #                         "postcode": 90210
+  #                       }
+  #                     }
+  #                   ],
+  #                   "status": 200,
+  #                   "statusText": "OK"
+  #                 }
+  #                 ```
 
-        insert into
-          users (id, name, address)
-        values
-          (1, 'Michael', '{ "postcode": 90210 }'),
-          (2, 'Jane', null);
-        ```
+  #               </TabPanel>
+  #             </Tabs>
+  #       - id: filter-foreign-tables
+  #         name: Filter Foreign Tables
+  #         code: |
+  #           ```ts
+  #           const { data, error } = await supabase
+  #             .from('countries')
+  #             .select(`
+  #               name,
+  #               cities!inner (
+  #                 name
+  #               )
+  #             `)
+  #             .eq('cities.name', 'Bali')
+  #           ```
+  #         data:
+  #           sql: |
+  #             ```sql
+  #             create table
+  #               countries (id int8 primary key, name text);
+  #             create table
+  #               cities (
+  #                 id int8 primary key,
+  #                 country_id int8 not null references countries,
+  #                 name text
+  #               );
 
-      </TabPanel>
-      <TabPanel id="js" label="JavaScript">
+  #             insert into
+  #               countries (id, name)
+  #             values
+  #               (1, 'Germany'),
+  #               (2, 'Indonesia');
+  #             insert into
+  #               cities (id, country_id, name)
+  #             values
+  #               (1, 2, 'Bali'),
+  #               (2, 1, 'Munich');
+  #             ```
+  #           response: |
+  #             ```json
+  #             {
+  #               "data": [
+  #                 {
+  #                   "name": "Indonesia",
+  #                   "cities": [
+  #                     {
+  #                       "name": "Bali"
+  #                     }
+  #                   ]
+  #                 }
+  #               ],
+  #               "status": 200,
+  #               "statusText": "OK"
+  #             }
+  #             ```
+  #         description: |
+  #           You can filter on foreign tables in your `select()` query using dot
+  #           notation:
 
-        ```ts
-        const { data, error } = await supabase
-          .from('users')
-          .select()
-          .eq('address->postcode', 90210)
-        ```
+  #           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+  #             <TabPanel id="schema" label="Schema">
 
-      </TabPanel>
-      <TabPanel id="result" label="Result">
+  #               ```sql
+  #               create table
+  #                 countries (id int8 primary key, name text);
+  #               create table
+  #                 cities (
+  #                   id int8 primary key,
+  #                   country_id int8 not null references countries,
+  #                   name text
+  #                 );
 
-        ```json
-        {
-          "data": [
-            {
-              "id": 1,
-              "name": "Michael",
-              "address": {
-                "postcode": 90210
-              }
-            }
-          ],
-          "status": 200,
-          "statusText": "OK"
-        }
-        ```
+  #               insert into
+  #                 countries (id, name)
+  #               values
+  #                 (1, 'Germany'),
+  #                 (2, 'Indonesia');
+  #               insert into
+  #                 cities (id, country_id, name)
+  #               values
+  #                 (1, 2, 'Bali'),
+  #                 (2, 1, 'Munich');
+  #               ```
 
-      </TabPanel>
-      </Tabs>
+  #             </TabPanel>
+  #             <TabPanel id="js" label="JavaScript">
 
-      ### Filter Foreign Tables
+  #               ```ts
+  #               const { data, error } = await supabase
+  #                 .from('countries')
+  #                 .select(`
+  #                   name,
+  #                   cities!inner (
+  #                     name
+  #                   )
+  #                 `)
+  #                 .eq('cities.name', 'Bali')
+  #               ```
 
-      You can filter on foreign tables in your `select()` query using dot
-      notation:
+  #             </TabPanel>
+  #             <TabPanel id="result" label="Result">
 
-      <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-      <TabPanel id="schema" label="Schema">
+  #               ```json
+  #               {
+  #                 "data": [
+  #                   {
+  #                     "name": "Indonesia",
+  #                     "cities": [
+  #                       {
+  #                         "name": "Bali"
+  #                       }
+  #                     ]
+  #                   }
+  #                 ],
+  #                 "status": 200,
+  #                 "statusText": "OK"
+  #               }
+  #               ```
 
-        ```sql
-        create table
-          countries (id int8 primary key, name text);
-        create table
-          cities (
-            id int8 primary key,
-            country_id int8 not null references countries,
-            name text
-          );
-
-        insert into
-          countries (id, name)
-        values
-          (1, 'Germany'),
-          (2, 'Indonesia');
-        insert into
-          cities (id, country_id, name)
-        values
-          (1, 2, 'Bali'),
-          (2, 1, 'Munich');
-        ```
-
-      </TabPanel>
-      <TabPanel id="js" label="JavaScript">
-
-        ```ts
-        const { data, error } = await supabase
-          .from('countries')
-          .select(`
-            name,
-            cities!inner (
-              name
-            )
-          `)
-          .eq('cities.name', 'Bali')
-        ```
-
-      </TabPanel>
-      <TabPanel id="result" label="Result">
-
-        ```json
-        {
-          "data": [
-            {
-              "name": "Indonesia",
-              "cities": [
-                {
-                  "name": "Bali"
-                }
-              ]
-            }
-          ],
-          "status": 200,
-          "statusText": "OK"
-        }
-        ```
-
-      </TabPanel>
-      </Tabs>
-
-  - id: eq()
+  #             </TabPanel>
+  #           </Tabs>
+  ######## TODO CHECK FILTER YAML ERRORS ########
+  - id: eq
+    title: eq()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Albania')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2239,19 +2945,49 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: neq
+    title: neq()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .eq('name', 'Albania')
+            .neq('name', 'Albania')
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: neq()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2302,19 +3038,45 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: gt
+    title: gt()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .neq('name', 'Albania')
+            .gt('id', 2)
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: gt()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2361,19 +3123,49 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: gte
+    title: gte()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .gt('id', 2)
+            .gte('id', 2)
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: gte()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2424,19 +3216,45 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: lt
+    title: lt()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .gte('id', 2)
+            .lt('id', 2)
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: lt()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2483,19 +3301,49 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: lte
+    title: lte()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .lt('id', 2)
+            .lte('id', 2)
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: lte()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2546,19 +3394,34 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: like
+    title: like()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .lte('id', 2)
+            .like('name', '%Alba%')
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: like()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2605,19 +3468,45 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: ilike
+    title: ilike()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .like('name', '%Alba%')
+            .like('name', '%alba%')
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: ilike()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          response: |
+            ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "name": "Albania"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2664,19 +3553,44 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: is
+    title: is()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
+    examples:
+      - id: checking-nullness
+        name: Checking nullness
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .like('name', '%alba%')
+            .eq('name', null)
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: is()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
-    examples:
-      - id: checking-nullness
-        name: Checking nullness
+            insert into
+              countries (id, name)
+            values
+              (1, 'null'),
+              (2, null);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "null"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Using the `eq()` filter doesn't work when filtering for `null`:
 
@@ -2755,19 +3669,49 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: in
+    title: in()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .is('name', null)
+            .in('name', ['Albania', 'Algeria'])
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: in()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2818,19 +3762,47 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .in('name', ['Albania', 'Algeria'])
-          ```
-
-  - id: contains()
+  - id: contains
+    title: contains()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
     examples:
       - id: on-array-columns
         name: On array columns
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select()
+            .contains('name', ['is:online', 'faction:red'])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              issues (
+                id int8 primary key,
+                title text,
+                tags text[]
+              );
+
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "title": "Cache invalidation is not working"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2879,15 +3851,45 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: on-range-columns
+        name: On range columns
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('users')
+            .from('reservations')
             .select()
-            .contains('name', ['is:online', 'faction:red'])
+            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
           ```
-      - id: on-range-columns
-        name: On range columns
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -2942,8 +3944,43 @@ functions:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
-      - id: on`jsonb`columns
+      - id: on-jsonb-columns
         name: On `jsonb` columns
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select('name')
+            .contains('address', { postcode: 90210 })
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{}');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Michael"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -2992,11 +4029,47 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: containedBy()
+  - id: contained-by
+    title: containedBy()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
     examples:
       - id: on-array-columns
         name: On array columns
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('classes')
+            .select('name')
+            .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              classes (
+                id int8 primary key,
+                name text,
+                days text[]
+              );
+
+            insert into
+              classes (id, name, days)
+            values
+              (1, 'Chemistry', array['monday', 'friday']),
+              (2, 'History', array['monday', 'wednesday', 'thursday']);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Chemistry"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3045,15 +4118,45 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: on-range-columns
+        name: On range columns
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('classes')
-            .select('name')
-            .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
+            .from('reservations')
+            .select()
+            .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
           ```
-      - id: on-range-columns
-        name: On range columns
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -3108,8 +4211,43 @@ functions:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
-      - id: on`jsonb`columns
+      - id: on-jsonb-columns
         name: On `jsonb` columns
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select('name')
+            .containedBy('address', {})
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{}');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "name": "Jane"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3158,11 +4296,49 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: rangeGt()
+  - id: range-gt
+    title: rangeGt()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('reservations')
+            .select()
+            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -3218,19 +4394,50 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: range-gte
+    title: rangeGte()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
+            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
 
-  - id: rangeGte()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -3286,19 +4493,50 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: range-lt
+    title: rangeLt()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
+            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
 
-  - id: rangeLt()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -3354,19 +4592,49 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: range-lte
+    title: rangeLte()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
+            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
 
-  - id: rangeLte()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -3422,19 +4690,50 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: range-adjacent
+    title: rangeAdjacent()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
+            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
 
-  - id: rangeAdjacent()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -3490,19 +4789,48 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('reservations')
-            .select()
-            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
-          ```
 
-  - id: overlaps()
+  - id: overlaps
+    title: overlaps()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
     examples:
       - id: on-array-columns
         name: On array columns
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('issues')
+            .select('title')
+            .overlaps('tags', ['is:closed', 'severity:high'])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              issues (
+                id int8 primary key,
+                title text,
+                tags text[]
+              );
+
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "title": "Cache invalidation is not working"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3551,15 +4879,45 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: on-range-columns
+        name: On range columns
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('issues')
-            .select('title')
-            .overlaps('tags', ['is:closed', 'severity:high'])
+            .from('reservations')
+            .select()
+            .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
           ```
-      - id: on-range-columns
-        name: On range columns
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -3614,9 +4972,9 @@ functions:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
-
   # TODO: schema & result
-  - id: textSearch()
+  - id: text-search
+    title: textSearch()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
     notes:
       - For more information, see [Postgres full text search](/docs/guides/database/full-text-search).
@@ -3681,11 +5039,44 @@ functions:
             })
           ```
 
-  - id: match()
+  - id: match
+    title: match()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .match({ id: 2, name: 'Albania' })
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3731,15 +5122,8 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .match({ id: 2, name: 'Albania' })
-          ```
-
-  - id: not()
+  - id: not
+    title: not()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
     notes: |
       not() expects you to use the raw PostgREST syntax for the filter values.
@@ -3749,8 +5133,40 @@ functions:
       .not('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
       ```
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .not('name', 'is', null)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'null'),
+              (2, null);
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "name": "null"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3796,15 +5212,8 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .not('name', 'is', null)
-          ```
-
-  - id: or()
+  - id: or
+    title: or()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
     notes: |
       or() expects you to use the raw PostgREST syntax for the filter names and values.
@@ -3814,8 +5223,43 @@ functions:
       .or('id.in.(5,6,7), arraycol.cd.{"a","b"}')  // Use `cd` for `containedBy()`
       ```
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .or('id.eq.2,name.eq.Algeria')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3864,15 +5308,40 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: use-or-with-and
+        name: Use `or` with `and`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select('name')
-            .or('id.eq.2,name.eq.Algeria')
+            .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
           ```
-      - id: use`or`with`and`
-        name: Use `or` with `and`
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        reponse: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3918,8 +5387,60 @@ functions:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
-      - id: use`or`on-foreign-tables
+      - id: use-or-on-foreign-tables
         name: Use `or` on foreign tables
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities!inner (
+                name
+              )
+            `)
+            .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -3985,7 +5506,8 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: filter()
+  - id: filter
+    title: filter()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
     notes: |
       filter() expects you to use the raw PostgREST syntax for the filter values.
@@ -3995,8 +5517,41 @@ functions:
       .filter('arraycol', 'cs', '{"a","b"}')  // Use `cs` for `contains()`, `{}` for array values
       ```
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .filter('name', 'in', '("Algeria","Japan")')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4043,15 +5598,60 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
-            .select()
-            .filter('name', 'in', '("Algeria","Japan")')
+            .select(`
+              name,
+              cities!inner (
+                name
+              )
+            `)
+            .filter('cities.name', 'eq', 'Bali')
           ```
-      - id: on-a-foreign-table
-        name: On a foreign table
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4116,20 +5716,7 @@ functions:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select(`
-              name,
-              cities!inner (
-                name
-              )
-            `)
-            .filter('cities.name', 'eq', 'Bali')
-          ```
-
-  - id: Using Modifiers
+  - id: using-modifiers
     title: Using Modifiers
     description: |
       Filters work on the row level—they allows you to return rows that
@@ -4141,12 +5728,43 @@ functions:
       queries that return rows (e.g., `select()` or `rpc()` on a function that
       returns a table response).
 
-  - id: db.modifiers.select()
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+  - id: db-modifiers-select
     title: select()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
     examples:
-      - id: with`upsert()`
+      - id: with-upsert
         name: With `upsert()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .upsert({ id: 1, name: 'Algeria' })
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4213,19 +5831,53 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: order
+    title: order()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .upsert({ id: 1, name: 'Algeria' })
-            .select()
+            .from('cities')
+            .select('name', 'country_id')
+            .order('id', { ascending: false })
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: order()
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4280,15 +5932,67 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('cities')
-            .select('name', 'country_id')
-            .order('id', { ascending: false })
-          ```
       - id: on-a-foreign-table
         name: On a foreign table
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('countries')
+              .select(`
+                name,
+                cities (
+                  name
+                )
+              `)
+              .order('name', { foreignTable: 'cities', ascending: false })
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States'),
+              (2, 'Vanuatu');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "New York City"
+                  },
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              },
+              {
+                "name": "Vanuatu",
+                "cities": []
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
@@ -4364,11 +6068,44 @@ functions:
           </Tabs>
         hideCodeBlock: true
 
-  - id: limit()
+  - id: limit
+    title: limit()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .limit(1)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4414,15 +6151,59 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
-            .select('name')
-            .limit(1)
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+            .limit(1, { foreignTable: 'cities' })
           ```
-      - id: on-a-foreign-table
-        name: On a foreign table
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4486,12 +6267,47 @@ functions:
           </TabPanel>
           </Tabs>
         hideCodeBlock: true
-
-  - id: range()
+  - id: range
+    title: range()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.range'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .range(0, 1)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4540,20 +6356,44 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select('name')
-            .range(0, 1)
-          ```
-
-  - id: db.abortSignal()
+  - id: abort-signal
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
     title: abortSignal()
     examples:
       - id: aborting-requests-in-flight
         name: Aborting requests in-flight
+        code: |
+          ```ts
+          const ac = new AbortController()
+          ac.abort()
+          const { data, error } = await supabase
+            .from('very_big_table')
+            .select()
+            .abortSignal(ac.signal)
+          ```
+        data:
+          sql: |
+            ```ts
+            const ac = new AbortController()
+            ac.abort()
+            const { data, error } = await supabase
+              .from('very_big_table')
+              .select()
+              .abortSignal(ac.signal)
+            ```
+        response: |
+          ```json
+            {
+              "error": {
+                "message": "FetchError: The user aborted a request.",
+                "details": "",
+                "hint": "",
+                "code": ""
+              },
+              "status": 400,
+              "statusText": "Bad Request"
+            }
+            ```
         description: |
           You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
 
@@ -4589,21 +6429,43 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const ac = new AbortController()
-          ac.abort()
-          const { data, error } = await supabase
-            .from('very_big_table')
-            .select()
-            .abortSignal(ac.signal)
-          ```
-
-  - id: single()
+  - id: single
+    title: single()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .limit(1)
+            .single()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Afghanistan"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4648,20 +6510,40 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
+  - id: maybeSingle
+    title: maybeSingle()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
+    examples:
+      - id: with-select
+        name: With `select()`
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
-            .select('name')
-            .limit(1)
-            .single()
+            .select()
+            .eq('name', 'Singapore')
+            .maybeSingle()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-  - id: maybeSingle()
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
-    examples:
-      - id: with`select()`
-        name: With `select()`
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4703,21 +6585,40 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .eq('name', 'Singapore')
-            .maybeSingle()
-          ```
-
-  - id: db.csv()
+  - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
     examples:
       - id: return-data-as-csv
         name: Return data as CSV
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .csv()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         description: |
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
 
@@ -4761,13 +6662,6 @@ functions:
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .from('countries')
-            .select()
-            .csv()
-          ```
 
   # NOTE: Not available on currently deployed PostgREST
   # db.geojson():
@@ -4851,8 +6745,8 @@ functions:
   #           .eq('id', 1)
   #         ```
 
-  - id: invoke()
-    title: 'invoke()'
+  - id: invoke
+    title: invoke()
     description: |
       Invoke a Supabase Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
@@ -4862,7 +6756,7 @@ functions:
       - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
       - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
     examples:
-      - id: basic-invocation.
+      - id: basic-invocation
         name: Basic invocation.
         description:
         isSpotlight: true
@@ -4872,7 +6766,7 @@ functions:
             body: { foo: 'bar' }
           })
           ```
-      - id: error-handling.
+      - id: error-handling
         name: Error handling.
         description: |
           A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
@@ -4896,7 +6790,7 @@ functions:
             console.log('Fetch error:', error.message)
           }
           ```
-      - id: passing-custom-headers.
+      - id: passing-custom-headers
         name: Passing custom headers.
         description: |
           You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
@@ -4911,8 +6805,8 @@ functions:
           })
           ```
 
-  - id: subscribe()
-    title: 'on().subscribe()'
+  - id: subscribe
+    title: on().subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
@@ -5015,8 +6909,8 @@ functions:
             .subscribe()
           ```
 
-  - id: getChannels()
-    title: 'getChannels()'
+  - id: get-channels
+    title: getChannels()
     $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
       - id: get-all-channels
@@ -5027,8 +6921,8 @@ functions:
           const channels = supabase.getChannels()
           ```
 
-  - id: removeChannel()
-    title: 'removeChannel()'
+  - id: remove-channel
+    title: removeChannel()
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
@@ -5041,8 +6935,8 @@ functions:
           supabase.removeChannel(myChannel)
           ```
 
-  - id: removeAllChannels()
-    title: 'removeAllChannels()'
+  - id: remove-all-channels
+    title: removeAllChannels()
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
@@ -5055,8 +6949,8 @@ functions:
           supabase.removeAllChannels()
           ```
 
-  - id: storage.listBuckets()
-    title: 'listBuckets()'
+  - id: list-buckets
+    title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - RLS policy permissions required:
@@ -5074,8 +6968,8 @@ functions:
             .listBuckets()
           ```
 
-  - id: storage.getBucket()
-    title: 'getBucket()'
+  - id: get-bucket
+    title: getBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - RLS policy permissions required:
@@ -5093,8 +6987,8 @@ functions:
             .getBucket('avatars')
           ```
 
-  - id: storage.createBucket()
-    title: 'createBucket()'
+  - id: create-bucket
+    title: createBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
       - RLS policy permissions required:
@@ -5112,8 +7006,8 @@ functions:
             .createBucket('avatars', { public: false })
           ```
 
-  - id: storage.emptyBucket()
-    title: 'emptyBucket()'
+  - id: empty-bucket
+    title: emptyBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
       - RLS policy permissions required:
@@ -5130,8 +7024,8 @@ functions:
             .storage
             .emptyBucket('avatars')
           ```
-  - id: storage.updateBucket()
-    title: 'updateBucket()'
+  - id: update-bucket
+    title: updateBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
       - RLS policy permissions required:
@@ -5149,8 +7043,8 @@ functions:
             .updateBucket('avatars', { public: false })
           ```
 
-  - id: storage.deleteBucket()
-    title: 'deleteBucket()'
+  - id: delete-bucket
+    title: deleteBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
       - RLS policy permissions required:
@@ -5168,8 +7062,8 @@ functions:
             .deleteBucket('avatars')
           ```
 
-  - id: storage.from.upload()
-    title: 'from.upload()'
+  - id: from-upload
+    title: from.upload()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - RLS policy permissions required:
@@ -5206,8 +7100,8 @@ functions:
             })
           ```
 
-  - id: storage.from.update()
-    title: 'from.update()'
+  - id: from-update
+    title: from.update()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
       - RLS policy permissions required:
@@ -5230,7 +7124,7 @@ functions:
               upsert: false
             })
           ```
-      - id: update-file-using`arraybuffer`from-base64-file-data
+      - id: update-file-using-arraybuffer-from-base64-file-data
         name: Update file using `ArrayBuffer` from base64 file data
         code: |
           ```js
@@ -5244,8 +7138,8 @@ functions:
             })
           ```
 
-  - id: storage.from.move()
-    title: 'from.move()'
+  - id: from-move
+    title: from.move()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
       - RLS policy permissions required:
@@ -5264,8 +7158,8 @@ functions:
             .move('public/avatar1.png', 'private/avatar2.png')
           ```
 
-  - id: storage.from.copy()
-    title: 'from.copy()'
+  - id: from-copy
+    title: from.copy()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
       - RLS policy permissions required:
@@ -5284,8 +7178,8 @@ functions:
             .copy('public/avatar1.png', 'private/avatar2.png')
           ```
 
-  - id: storage.from.createSignedUrl()
-    title: 'from.createSignedUrl()'
+  - id: from-create-signed-url
+    title: from.createSignedUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
       - RLS policy permissions required:
@@ -5304,8 +7198,8 @@ functions:
             .createSignedUrl('folder/avatar1.png', 60)
           ```
 
-  - id: storage.from.createSignedUrls()
-    title: 'from.createSignedUrls()'
+  - id: from-create-signed-urls
+    title: from.createSignedUrls()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
       - RLS policy permissions required:
@@ -5324,8 +7218,8 @@ functions:
             .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
           ```
 
-  - id: storage.from.getPublicUrl()
-    title: 'from.getPublicUrl()'
+  - id: from-get-public-url
+    title: from.getPublicUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
@@ -5345,8 +7239,8 @@ functions:
             .getPublicUrl('folder/avatar1.png')
           ```
 
-  - id: storage.from.download()
-    title: 'from.download()'
+  - id: from-download
+    title: from.download()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
       - RLS policy permissions required:
@@ -5365,8 +7259,8 @@ functions:
             .download('folder/avatar1.png')
           ```
 
-  - id: storage.from.remove()
-    title: 'from.remove()'
+  - id: from-remove
+    title: from.remove()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
       - RLS policy permissions required:
@@ -5385,8 +7279,8 @@ functions:
             .remove(['folder/avatar1.png'])
           ```
 
-  - id: storage.from.list()
-    title: 'from.list()'
+  - id: from-list
+    title: from.list()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
       - RLS policy permissions required:

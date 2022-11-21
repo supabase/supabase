@@ -191,6 +191,8 @@ export default function Ref(props) {
 
               const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
+              console.log('parameters', parameters)
+
               // @ts-ignore
               // const [serialFunctionMarkdownContent, setSerialFunctionMarkdownContent] =
               //   useState(null)
@@ -216,43 +218,48 @@ export default function Ref(props) {
               const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
 
               return (
-                <>
-                  <header className="sticky top-14 bg-gray-600 z-10 p-4">
-                    <h1 className="text-3xl not-prose" onClick={() => updateUrl(item.id)}>
+                <div>
+                  <header
+                    className={[
+                      // 'border-b sticky top-16 z-10',
+                      ' mb-16',
+                    ].join(' ')}
+                  >
+                    <h1
+                      className="text-xl not-prose text-scale-1200 capitalize mb-3 "
+                      onClick={() => updateUrl(item.id)}
+                    >
                       {examples.functions[itemIndex].title ??
                         examples.functions[itemIndex].id ??
                         item.name ??
                         item.id}
                     </h1>
+                    {shortText && (
+                      <>
+                        <p
+                          className="text-base text-scale-1100 not-prose"
+                          dangerouslySetInnerHTML={{ __html: shortText }}
+                        ></p>
+                        <ComesFrom
+                          link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
+                          text="combined.json"
+                        />
+                      </>
+                    )}
                   </header>
                   <div
-                    className="grid grid-cols-2 pb-32 ref-container gap-10"
+                    className="grid grid-cols-2 ref-container gap-10"
                     id={item.id}
                     // ref={sectionRef}
                   >
                     <div className="prose" key={item.id}>
-                      {shortText && (
+                      {item.description && (
                         <>
                           <ComesFrom
                             link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
                           />
-                          <p
-                            className="text-lg not-prose"
-                            dangerouslySetInnerHTML={{ __html: shortText }}
-                          ></p>
-                        </>
-                      )}
-
-                      {examples.functions[itemIndex].description && (
-                        <>
-                          <ComesFrom
-                            link="https://github.com/supabase/supabase/pull/10095/files#diff-c514c66b77772b9e3d9a5403c136ee52dfeaaeacb1d8138ea85ce35ee64e5006"
-                            text="examples.yml"
-                          />
-                          <p className="text-lg not-prose">
-                            {examples.functions[itemIndex].description}
-                          </p>
+                          <p className="text-lg not-prose">{item.description}</p>
                         </>
                       )}
                       <hr />
@@ -281,7 +288,76 @@ export default function Ref(props) {
                             link="https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
                           />
-                          <div dangerouslySetInnerHTML={{ __html: parameters }}></div>
+                          <h5 className="mb-3 text-base">Parameters</h5>
+                          <div className="">
+                            {parameters.map((param) => {
+                              return (
+                                <div className="border-t border-b py-5">
+                                  <div className="flex gap-3 items-center">
+                                    <span className="text-sm text-scale-1200 font-mono font-medium">
+                                      {param.name ?? 'no-name'}
+                                    </span>
+                                    <span>
+                                      {param.isOptional ? (
+                                        <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">
+                                          Optional
+                                        </div>
+                                      ) : (
+                                        <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
+                                          REQUIRED
+                                        </div>
+                                      )}
+                                    </span>
+                                    <span className="text-scale-900 text-xs">
+                                      {param.type ?? 'no type'}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-scale-1000 mb-0">
+                                    {param.description ?? 'nodescription'}
+                                  </p>
+                                  {param.subContent && (
+                                    <div className="mt-8">
+                                      {param.subContent.map((param) => {
+                                        return (
+                                          <div
+                                            className="px-5 py-3 first:border-t border-b border-l border-r
+                                          
+                                            first:rounded-tl-lg first:rounded-tr-lg
+                                            last:rounded-bl-lg last:rounded-br-lg
+                                          "
+                                          >
+                                            <div className="flex gap-3 items-center">
+                                              <span className="text-sm text-scale-1200 font-mono font-medium">
+                                                {param.name ?? 'no-name'}
+                                              </span>
+                                              <span>
+                                                {param.isOptional ? (
+                                                  <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">
+                                                    Optional
+                                                  </div>
+                                                ) : (
+                                                  <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
+                                                    REQUIRED
+                                                  </div>
+                                                )}
+                                              </span>
+                                              <span className="text-scale-900 text-xs">
+                                                {param.type ?? 'no type'}
+                                              </span>
+                                            </div>
+                                            <p className="text-sm text-scale-1000 mb-0">
+                                              {param.description ?? 'nodescription'}
+                                            </p>
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                          {/* <div dangerouslySetInnerHTML={{ __html: parameters }}></div> */}
                         </>
                       )}
                     </div>
@@ -310,8 +386,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 `
                                   const currentExampleId = example.id
-                                  const staticExample =
-                                    examples.functions[itemIndex].examples[exampleIndex]
+                                  const staticExample = item.examples[exampleIndex]
 
                                   const response = staticExample.response
                                   const sql = staticExample?.data?.sql
@@ -406,7 +481,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
               )
             })}
           </div>
