@@ -429,3 +429,42 @@ launch week
     white-space: pre !important;
   }
 }
+
+.testGradient {
+  margin: 0 auto;
+  width: 100%;
+  height: 200px;
+  border-bottom: 0;
+  background: radial-gradient(
+    circle at 50% -200%,
+    rgba(0, 155, 112, 1) 0%,
+    rgba(28, 28, 28, 1) 70%,
+    rgba(28, 28, 28, 1) 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.testGradient:after {
+  content: '';
+  position: absolute;
+  height: 140px;
+  left: -10%;
+  right: -10%;
+  border-radius: 50%;
+  bottom: 156px;
+  background: #1c1c1c;
+  z-index: 2;
+}
+
+.testGradient:before {
+  content: '';
+  position: absolute;
+  height: 138px;
+  left: -10%;
+  right: -10%;
+  border-radius: 50%;
+  bottom: 154px;
+  background: var(--colors-brand6);
+  z-index: 1;
+}
