@@ -57,30 +57,33 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
             <div key={x.name}>
               {x.items && x.items.length > 0 ? (
                 <>
-                  {/* {<div className="h-px w-full bg-green-500 my-3"></div>} */}
-                  <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
-                    {x.name}
-                  </span>
-                  {x.items.map((x, subItemIndex) => {
+                  {x.items.map((subItem, subItemIndex) => {
                     return (
                       <>
-                        <li key={x.name}>
-                          <Link href={`/${x.url}`} passHref>
-                            <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
+                        {subItemIndex === 0 && (
+                          <>
+                            <div className="h-px w-full bg-green-500 my-3"></div>
+                            <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
                               {x.name}
+                            </span>
+                          </>
+                        )}
+                        <li key={subItem.name}>
+                          <Link href={`/${subItem.url}`} passHref>
+                            <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
+                              {subItem.name}
                             </a>
                           </Link>
                         </li>
-                        {subItemIndex == x.items.length && (
+                        {/* {subItemIndex === x.items.length - 1 && (
                           <div className="h-px w-full bg-green-500 my-3"></div>
-                        )}
+                        )} */}
                       </>
                     )
                   })}
                 </>
               ) : (
                 <>
-                  {/* {index === 0 && <div className="h-px w-full bg-green-500 my-3"></div>} */}
                   <li>
                     <Link href={`/${x.url}`} passHref>
                       <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
