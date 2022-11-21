@@ -4,31 +4,31 @@ import { IRootStore } from '../RootStore'
 
 const MOCK_SECRETS = [
   {
-    key_id: 'e8bcc97c-6caf-4ae4-bd75-ef61928ca66d',
+    key_id: '095f4bfe-f63c-420b-8849-f1e455ee3a02',
     description: 'Client access key for dashboard',
     created_at: '2022-11-01 06:43:48.492465',
     secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686', // encrypted secret value
   },
   {
-    key_id: 'e8bcc97c-6caf-4ae4-bd75-ef61928ca66d',
+    key_id: '095f4bfe-f63c-420b-8849-f1e455ee3a02',
     description: 'Secret key for server',
     created_at: '2022-11-20 06:43:48.492465',
     secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
   },
   {
-    key_id: 'a968f3ab-de05-42d3-aa64-43838b9e56b5',
+    key_id: '57bfa919-e81b-4afc-a3b4-372981b2a39a',
     description: 'This is a bit more of a secret key',
     created_at: '2022-11-18 06:43:48.492465',
     secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
   },
   {
-    key_id: 'a968f3ab-de05-42d3-aa64-43838b9e56b5',
+    key_id: '57bfa919-e81b-4afc-a3b4-372981b2a39a',
     description: undefined,
     created_at: '2022-11-05 06:43:48.492465',
     secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
   },
   {
-    key_id: 'a968f3ab-de05-42d3-aa64-43838b9e56b5',
+    key_id: '57bfa919-e81b-4afc-a3b4-372981b2a39a',
     description: 'This is a pretty long description that Im testing if it should wrap or not',
     created_at: '2022-11-3 06:43:48.492465',
     secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',

@@ -22,7 +22,7 @@ const VaultSettings: NextPageWithLayout = () => {
       <VaultToggle />
 
       {/* [Joshen] Consider splitting into separate pages */}
-      <Tabs size="medium" type="underlined">
+      <Tabs size="small" type="underlined">
         <Tabs.Panel id="secrets" label="Secrets Management">
           <SecretsManagement />
         </Tabs.Panel>

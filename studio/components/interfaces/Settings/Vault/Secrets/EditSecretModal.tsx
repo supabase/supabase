@@ -1,7 +1,8 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { Modal, Form, Input, Button, IconEyeOff, IconEye } from 'ui'
 
 import { useStore } from 'hooks'
+import EncryptionKeySelector from '../EncryptionKeySelector'
 
 interface Props {
   selectedSecret: any
@@ -9,8 +10,12 @@ interface Props {
 }
 
 const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
-  const { ui } = useStore()
   const [showSecretValue, setShowSecretValue] = useState(false)
+  const [selectedKeyId, setSelectedKeyId] = useState<string>()
+
+  useEffect(() => {
+    setSelectedKeyId(selectedSecret?.key_id)
+  }, [selectedSecret])
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -65,6 +70,19 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
                     }
                   />
                   <Input id="description" label="Description" labelOptional="Optional" />
+                </div>
+              </Modal.Content>
+              <Modal.Separator />
+              <Modal.Content>
+                <div className="py-4">
+                  <EncryptionKeySelector
+                    id="keyId"
+                    descriptionId="keyDescription"
+                    label="Select a key to encrypt your secret with"
+                    labelOptional="Optional"
+                    selectedKeyId={selectedKeyId}
+                    onSelectKey={setSelectedKeyId}
+                  />
                 </div>
               </Modal.Content>
               <Modal.Separator />
