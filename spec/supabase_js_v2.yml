@@ -7087,7 +7087,7 @@ functions:
               upsert: false
             })
           ```
-      - id: upload-file-using`arraybuffer`from-base64-file-data
+      - id: upload-file-using-arraybuffer-from-base64-file-data
         name: Upload file using `ArrayBuffer` from base64 file data
         code: |
           ```js
