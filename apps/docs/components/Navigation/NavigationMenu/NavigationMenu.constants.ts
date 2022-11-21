@@ -442,21 +442,21 @@ export const reference = {
       items: [
         {
           name: 'supabase-js',
-          href: '/reference/javascript/start',
+          url: '/new/reference/javascript/start',
           level: 'reference_javascript',
           items: [],
           icon: '/img/icons/javascript.svg',
         },
         {
           name: 'supabase-dart',
-          href: '/reference/dart/start',
+          url: '/new/reference/dart/start',
           level: 'reference_dart',
           items: [],
           icon: '/img/icons/javascript.svg',
         },
         {
           name: 'supbase-python',
-          href: '/reference/python/start',
+          url: '/new/reference/python/start',
           level: 'reference_python',
           items: [],
           icon: '/img/icons/javascript.svg',
@@ -468,13 +468,13 @@ export const reference = {
       items: [
         {
           name: 'Supabase CLI',
-          href: '/reference/cli',
+          url: '/new/reference/cli',
           items: [],
           icon: '/img/icons/javascript.svg',
         },
         {
           name: 'Management API',
-          href: '/reference/javascript',
+          url: '/new/reference/javascript',
           items: [],
           icon: '/img/icons/javascript.svg',
         },

@@ -16,6 +16,7 @@ info:
 
 functions:
   - id: initializing
+    title: initializing
     $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `createClient()` method.
@@ -577,28 +578,28 @@ functions:
         code: |
           ```js
           /**
-           * Step 1: Send the user an email to get a password reset token.
-           * This email contains a link which sends the user back to your application.
-           */
+          * Step 1: Send the user an email to get a password reset token.
+          * This email contains a link which sends the user back to your application.
+          */
           const { data, error } = await supabase.auth
             .resetPasswordForEmail('user@email.com')
 
           /**
-           * Step 2: Once the user is redirected back to your application,
-           * ask the user to reset their password.
-           */
-           useEffect(() => {
-             supabase.auth.onAuthStateChange(async (event, session) => {
-               if (event == "PASSWORD_RECOVERY") {
-                 const newPassword = prompt("What would you like your new password to be?");
-                 const { data, error } = await supabase.auth
-                   .updateUser({ password: newPassword })
+          * Step 2: Once the user is redirected back to your application,
+          * ask the user to reset their password.
+          */
+          useEffect(() => {
+            supabase.auth.onAuthStateChange(async (event, session) => {
+              if (event == "PASSWORD_RECOVERY") {
+                const newPassword = prompt("What would you like your new password to be?");
+                const { data, error } = await supabase.auth
+                  .updateUser({ password: newPassword })
 
-                 if (data) alert("Password updated successfully!")
-                 if (error) alert("There was an error updating your password.")
-               }
-             })
-           }, [])
+                if (data) alert("Password updated successfully!")
+                if (error) alert("There was an error updating your password.")
+              }
+            })
+          }, [])
           ```
 
   - id: auth.admin.generateLink()
@@ -863,36 +864,36 @@ functions:
         name: Query the same foreign table multiple times
         code: |
           const { data, error } = await supabase
-             .from('messages')
-             .select(`
-               content,
-               from:sender_id(name),
-               to:receiver_id(name)
-             `)
+            .from('messages')
+            .select(`
+              content,
+              from:sender_id(name),
+              to:receiver_id(name)
+            `)
         data:
           sql: |
             ```sql
-             create table
-             users (id int8 primary key, name text);
+            create table
+            users (id int8 primary key, name text);
 
-             create table
-               messages (
-                 sender_id int8 not null references users,
-                 receiver_id int8 not null references users,
-                 content text
-               );
+            create table
+              messages (
+                sender_id int8 not null references users,
+                receiver_id int8 not null references users,
+                content text
+              );
 
-             insert into
-               users (id, name)
-             values
-               (1, 'Kiran'),
-               (2, 'Evan');
+            insert into
+              users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
 
-             insert into
-               messages (sender_id, receiver_id, content)
-             values
-               (1, 2, '👋');
-             ```
+            insert into
+              messages (sender_id, receiver_id, content)
+            values
+              (1, 2, '👋');
+            ```
         response: |
           ```json
           {
