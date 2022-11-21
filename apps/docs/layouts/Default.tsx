@@ -19,6 +19,8 @@ interface Props {
 const Layout: FC<Props> = ({ meta, children, toc }) => {
   const { asPath } = useRouter()
 
+  console.log('asPath', asPath)
+
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -34,6 +36,8 @@ const Layout: FC<Props> = ({ meta, children, toc }) => {
 
   const pageType = getPageType(asPath)
 
+  console.log('Default, pageType', pageType)
+
   return (
     <>
       <NextSeo
@@ -42,7 +46,7 @@ const Layout: FC<Props> = ({ meta, children, toc }) => {
         openGraph={{
           title: meta?.title,
           description: meta?.description,
-          url: `https://supabase.com/docs/${currentPage}`,
+          url: `https://supabase.com/docs/${asPath}`,
           images: [
             {
               url: `https://supabase.com/docs/img/supabase-og-image.png`,

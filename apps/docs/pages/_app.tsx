@@ -5,6 +5,7 @@ import { AppPropsWithLayout } from 'types'
 import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
 import { ThemeProvider } from '../components/Providers'
+import SiteLayout from '~/layouts/SiteLayout'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
@@ -66,7 +67,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       />
       <ThemeProvider>
         <SearchProvider>
-          <Component {...pageProps} />
+          <SiteLayout>
+            <Component {...pageProps} />
+          </SiteLayout>
         </SearchProvider>
       </ThemeProvider>
     </>
