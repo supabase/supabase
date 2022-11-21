@@ -1,9 +1,10 @@
----
-id: aup
-title: Acceptable Use Policy
----
+import Layout from '~/layouts/DefaultGuideLayout'
 
-`Last Modified: 15 April 2021`
+export const meta = {
+  title: 'Acceptable Use Policy',
+}
+
+_Last Modified: 15 April 2021_
 
 This Acceptable Use Policy (this “Policy”) describes prohibited uses of the web services offered by Supabase, Inc. and its affiliates (the “Services”) and the website located at https://supabase.com (the “Supabase Site”). The examples described in this Policy are not exhaustive. We may modify this Policy at any time by posting a revised version on the Supabase Site. By using the Services or accessing the Supabase Site, you agree to the latest version of this Policy. If you violate the Policy or authorize or help others to do so, we may suspend or terminate your use of the Services.
 
@@ -50,3 +51,7 @@ We may report any activity that we suspect violates any law or regulation to app
 Reporting of Violations of this Policy
 
 If you become aware of any violation of this Policy, you will immediately notify us and provide us with assistance, as requested, to stop or remedy the violation. To report any violation of this Policy, please contact us at support@supabase.io.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
