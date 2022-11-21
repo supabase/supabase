@@ -132,7 +132,7 @@ export default function Ref(props) {
   return (
     <div>
       <div className="flex my-16">
-        <div className="px-10 fixed">
+        {/* <div className="px-10 fixed">
           {sections.map((x, i) => {
             return (
               <Link href={`#${x.topic}`} key={i}>
@@ -152,9 +152,9 @@ export default function Ref(props) {
               </Link>
             )
           })}
-        </div>
+        </div> */}
 
-        <div className="ml-64 w-full">
+        <div className="w-full">
           <div
             className="flex flex-col gap-32 mx-auto max-w-5xl"
             // ref={myRef}

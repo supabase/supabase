@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
+import NavigationMenuRefList from './NavigationMenuRefList'
 
 const SideNav = () => {
   console.log('sidebar rerendered')
@@ -49,7 +50,7 @@ const SideNav = () => {
       case url.includes(`/docs/platform`) && url:
         setLevel('platform')
         break
-      case url.includes(`/docs/reference/javascript/`) && url:
+      case url.includes(`/docs/new/reference/javascript/`) && url:
         setLevel('reference_javascript')
         break
 
@@ -250,11 +251,7 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
 
       {/* reference level */}
-      <NavigationMenuGuideList
-        id={'reference_javascript'}
-        currentLevel={level}
-        setLevel={setLevel}
-      />
+      <NavigationMenuRefList id={'reference_javascript'} currentLevel={level} setLevel={setLevel} />
 
       {/* // ref menu */}
       {/* <div
