@@ -1,4 +1,8 @@
 module.exports = [
+  // {
+  //   source: '/:path*',
+  //   destination: `/:path*`,
+  // },
   {
     source: '/docs',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/docs`,
