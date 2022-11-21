@@ -1081,6 +1081,61 @@ class _LoginPageState extends State<LoginPage> {
 
 Notice that I have not used bloc anywhere on the register or login page. I try to only use state management libraries for pages that have some complexity. Since both register and login pages are relatively simple, I am going with the good old `setState`.
 
+We should also modify the splash page to redirect signed-in users to the RoomsPage by default.
+
+```dart title=lib/pages/splash_page.dart
+import 'package:flutter/material.dart';
+import 'package:my_chat_app/pages/register_page.dart';
+import 'package:my_chat_app/pages/rooms_page.dart';
+import 'package:my_chat_app/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+/// Page to redirect users to the appropreate page depending on the initial auth state
+class SplashPage extends StatefulWidget {
+  const SplashPage({Key? key}) : super(key: key);
+
+  @override
+  SplashPageState createState() => SplashPageState();
+}
+
+class SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    getInitialSession();
+    super.initState();
+  }
+
+  Future<void> getInitialSession() async {
+    // quick and dirty way to wait for the widget to mount
+    await Future.delayed(Duration.zero);
+
+    try {
+      final session = await SupabaseAuth.instance.initialSession;
+      if (session == null) {
+        Navigator.of(context)
+            .pushAndRemoveUntil(RegisterPage.route(), (_) => false);
+      } else {
+        Navigator.of(context)
+            .pushAndRemoveUntil(RoomsPage.route(), (_) => false);
+      }
+    } catch (_) {
+      context.showErrorSnackBar(
+        message: 'Error occured during session refresh',
+      );
+      Navigator.of(context)
+          .pushAndRemoveUntil(RegisterPage.route(), (_) => false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+```
+
 ### Step 4: Authorization with Row Level Security (RLS)
 
 At this point, we seemingly have a complete app, except if we open the app right now, we will see every user’s room with all the messages that have ever been sent within the app by any user. This is because we have not set up Row Level Security yet. [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) is a mechanism in PostgreSQL that allows developers to define who can perform what operation on a row-by-row basis. There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today. Let’s run the following SQL to set the security policy.
