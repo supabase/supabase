@@ -1,0 +1,22 @@
+//overrides
+#__docusaurus {
+  [class*='docMainContainer_'] {
+    // max-width: initial;
+    padding-top: var(--doc-page-vertical-spacing);
+
+    > .container {
+      max-width: initial;
+
+      > .row {
+        flex-wrap: nowrap;
+      }
+    }
+  }
+
+  [class*='docPage_'] {
+    > div {
+      flex-grow: 1;
+      min-width: 0;
+    }
+  }
+}

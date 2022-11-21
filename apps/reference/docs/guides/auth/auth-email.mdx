@@ -1,0 +1,106 @@
+---
+id: auth-email
+title: 'Login With Email'
+description: Use Supabase to Authenticate and Authorize your users using email.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+## Overview
+
+Setting up Email logins for your Supabase application.
+
+- Add Email authenticator to your [Supabase Project](https://app.supabase.com)
+- Add the login code to your application - [JavaScript](https://github.com/supabase/supabase-js) | [Flutter](https://github.com/supabase/supabase-flutter)
+
+## Configure email settings
+
+1. Go to the [Authentication Settings](https://app.supabase.com/project/_/auth/settings) page in the Dashboard.
+1. For **Site URL**, enter the final (hosted) URL of your app.
+1. Under Auth Providers, **enable email provider**.
+
+:::note Self hosting
+
+For self-hosting, you can update your project configuration using the files and environment variables provided.
+See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for details.
+
+:::
+
+## Add login code to your client app
+
+<Tabs
+  defaultValue="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
+
+When your user signs in, call [signInWithPassword()](/docs/reference/javascript/auth-signinwithpassword) with their email address and password:
+
+```js
+async function signInWithEmail() {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: 'example@email.com',
+    password: 'example-password',
+  })
+}
+```
+
+</TabItem>
+
+<TabItem value="dart">
+
+When your user signs in, call [signInWithPassword()](/docs/reference/dart/auth-signinwithpassword) with their email address and password:
+
+```dart
+Future<void> signInWithEmail() async {
+  final AuthResponse res = await supabase.auth.signInWithPassword(
+    email: 'example@email.com',
+    password: 'example-password'
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+<Tabs
+  defaultValue="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabItem>
+
+<TabItem value="dart">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+   await supabase.auth.signOut();
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)

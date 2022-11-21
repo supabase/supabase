@@ -1,0 +1,69 @@
+---
+id: examples
+title: Examples
+description: Useful Supabase Edge Functions Examples.
+---
+
+import ButtonCard from '@site/src/components/ButtonCard'
+const examples = [
+  {
+    name: 'With supabase-js',
+    description: 'Use the Supabase client inside your Edge Function.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts',
+  },
+  {
+    name: 'With CORS headers',
+    description: 'Send CORS headers for invoking from the browser.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts',
+  },
+  {
+    name: 'React Native with Stripe',
+    description: 'Full example for using Supabase and Stripe, with Expo.',
+    href: 'https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions',
+  },
+  {
+    name: 'Flutter with Stripe',
+    description: 'Full example for using Supabase and Stripe, with Flutter.',
+    href: 'https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions',
+  },
+  {
+    name: 'Building a RESTful Service API',
+    description:
+      'Learn how to use HTTP methods and paths to build a RESTful service for managing tasks.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/restful-tasks/index.ts',
+  },
+  {
+    name: 'Working with Supabase Storage',
+    description: 'An example on reading a file from Supabase Storage.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
+  },
+  {
+    name: 'OpenGraph Image Generation',
+    description:
+      'Generate Open Graph images with Deno and Supabase Edge Functions, no framework needed.',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/opengraph',
+  },
+  {
+    name: 'Get User Location',
+    description: `Get user location data from user's IP address.`,
+    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/location',
+  },
+]
+
+You can find a list of useful [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {examples.map((x) => (
+      <div class="col col--6">
+        <ButtonCard
+          class="card"
+          to={x.href}
+          title={x.name}
+          description={x.description}
+          style={{ height: '100%' }}
+        />
+      </div>
+    ))}
+  </div>
+</div>
