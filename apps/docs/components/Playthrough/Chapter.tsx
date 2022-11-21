@@ -8,7 +8,7 @@ const headerHeight = 96
 
 export function Chapters({ stepIndex, chapterIndex, chapters }) {
   return (
-    <div className="px-4" style={{ color: '#bbb' }}>
+    <div className="px-4 relative" style={{ marginBottom: 'calc(50vh)' }}>
       {chapters.map((chapter, i) => (
         <Chapter
           chapter={chapter}
@@ -31,20 +31,19 @@ export function Chapter({ index, current, stepIndex, chapter }) {
   return (
     <>
       <div
+        className="bg-white dark:bg-scale-200"
         style={{
-          background: '#232323',
           margin: '0 -8px',
           padding: '2px 8px',
           height: headerHeight,
-          color: '#ddd',
-          ...(isCurrentChapter ? { position: 'sticky', top: 0 } : {}),
+          ...(isCurrentChapter ? { position: 'sticky', top: 60, zIndex: 10 } : {}),
         }}
       >
         <h2 className="text-2xl my-4">{chapter.title}</h2>
         <Progress.Root
           value={progress}
           max={100}
-          className="bg-brand-900"
+          className="bg-brand-800 dark:bg-brand-900"
           style={{
             borderRadius: 999,
             width: '100%',
@@ -54,7 +53,7 @@ export function Chapter({ index, current, stepIndex, chapter }) {
           }}
         >
           <Progress.Indicator
-            className="bg-neutral-700"
+            className="bg-neutral-300 dark:bg-neutral-700"
             style={{
               width: '100%',
               height: '100%',
@@ -82,12 +81,14 @@ function Step({ currentIndex, step }) {
   return (
     <Collapsible.Root
       className={`border rounded-lg p-4 my-4 ${
-        current ? 'bg-neutral-800 border-brand-900 text-white z-10' : 'border-neutral-600'
+        current
+          ? 'border-brand-900 text-black dark:text-white z-10 bg-white dark:bg-scale-200'
+          : 'border-neutral-600'
       }`}
       style={{
         padding: 6,
         margin: '6px -6px',
-        ...(current ? { position: 'sticky', bottom: 4, top: headerHeight } : {}),
+        ...(current ? { position: 'sticky', bottom: 4, top: headerHeight + 60 } : {}),
       }}
       open={current || open}
       onOpenChange={(open) => setOpen(open)}

@@ -6,7 +6,7 @@ import { mergeWatchers, useSubscription } from './watcher'
 export function FilesPanel() {
   const { entries, currentPath, isCurrentDirty } = useSubscription(entriesWatcher)
   return (
-    <div className="bg-gray-900 w-56" style={{ background: '#232323' }}>
+    <div className="bg-gray-900 w-56 dark" style={{ background: '#232323' }}>
       <div className="text-gray-900 px-2 py-1 border-b text-sm border-gray-500 flex justify-between">
         <span className="">Files</span>
         <button

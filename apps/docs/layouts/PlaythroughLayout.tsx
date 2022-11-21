@@ -69,17 +69,17 @@ const Layout: FC<Props> = ({ meta, children }) => {
         }}
       />
 
-      <main className="h-screen flex flex-col">
+      <main>
         <NavBar currentPage={page} />
-        <div className="flex w-full flex-row flex-1">
+        <div className="flex w-full flex-row ">
           <SideBar menuItems={menuItems[page]} />
           <div className="main-content-pane docs-width w-full">
-            <article ref={articleRef} className="h-full">
+            <article ref={articleRef}>
               <MDXProvider components={components}>{children}</MDXProvider>
             </article>
           </div>
         </div>
-        {/* <Footer /> */}
+        <Footer />
       </main>
     </>
   )
