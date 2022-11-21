@@ -327,8 +327,14 @@ export const realtime = {
   items: [
     { name: 'Overview', url: '/guides/realtime', items: [] },
     { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-    { name: 'Postgres CDC', url: '/guides/realtime/postgres-cdc', items: [] },
-    { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+    {
+      name: 'Channels',
+      url: undefined,
+      items: [
+        { name: 'Postgres CDC', url: '/guides/realtime/postgres-cdc', items: [] },
+        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+      ],
+    },
   ],
 }
 
@@ -383,7 +389,6 @@ export const integrations = {
   icon: '/img/icons/menu/integrations.svg',
   label: 'Integrations',
   items: [
-    { name: 'Supabase Marketplace', url: '/guides/integrations/integrations', items: [] },
     {
       name: 'Auth',
       url: undefined,
@@ -424,6 +429,7 @@ export const integrations = {
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
       ],
     },
+    { name: 'Supabase Marketplace', url: '/guides/integrations/integrations', items: [] },
   ],
 }
 

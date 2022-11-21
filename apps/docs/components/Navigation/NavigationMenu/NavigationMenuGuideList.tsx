@@ -57,31 +57,39 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
             <div key={x.name}>
               {x.items && x.items.length > 0 ? (
                 <>
-                  {index !== 0 && <div className="h-px w-full bg-green-500 my-3"></div>}
+                  {/* {<div className="h-px w-full bg-green-500 my-3"></div>} */}
                   <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
                     {x.name}
                   </span>
-                  {x.items.map((x) => {
+                  {x.items.map((x, subItemIndex) => {
                     return (
-                      <li key={x.name}>
-                        <Link href={`/${x.url}`} passHref>
-                          <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
-                            {x.name}
-                          </a>
-                        </Link>
-                      </li>
+                      <>
+                        <li key={x.name}>
+                          <Link href={`/${x.url}`} passHref>
+                            <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
+                              {x.name}
+                            </a>
+                          </Link>
+                        </li>
+                        {subItemIndex == x.items.length && (
+                          <div className="h-px w-full bg-green-500 my-3"></div>
+                        )}
+                      </>
                     )
                   })}
                 </>
               ) : (
-                <li>
-                  <Link href={`/${x.url}`} passHref>
-                    <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
-                      {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
-                      {x.name}
-                    </a>
-                  </Link>
-                </li>
+                <>
+                  {/* {index === 0 && <div className="h-px w-full bg-green-500 my-3"></div>} */}
+                  <li>
+                    <Link href={`/${x.url}`} passHref>
+                      <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
+                        {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
+                        {x.name}
+                      </a>
+                    </Link>
+                  </li>
+                </>
               )}
             </div>
           )
