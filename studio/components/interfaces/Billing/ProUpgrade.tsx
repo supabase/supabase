@@ -43,7 +43,7 @@ const ProUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
-  const showPitrAddons = useFlag('pitrSelfServe')
+  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
@@ -220,7 +220,7 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
-                    {showPitrAddons && pitrDurationOptions.length > 0 && (
+                    {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
                       <>
                         <Divider light />
                         <PITRDurationSelection
