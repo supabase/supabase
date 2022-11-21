@@ -1,9 +1,10 @@
----
-id: terms
-title: Terms of Service
----
+import Layout from '~/layouts/DefaultGuideLayout'
 
-`Last Modified: 20 November 2020`
+export const meta = {
+  title: 'Terms of service',
+}
+
+_Last Modified: 20 November 2020_
 
 These Customer Terms and Conditions (this "**Agreement**"), effective as of the date on which you click a button or check a box (or something similar) acknowledging your acceptance of this Agreement (the "**Effective Date**"), is by and between Supabase, Inc., a Delaware corporation with offices located at 970 Toa Payoh North #07-04, Singapore 318992 ("**Supabase**") and the entity on whose behalf the individual accepting this Agreement accepts this Agreement ("**Customer**"). The individual accepting this Agreement hereby represents and warrants that it is duly authorized by the entity on whose behalf it accepts this Agreement to so accept this Agreement. Supabase and Customer may be referred to herein collectively as the "**Parties**" or individually as a "**Party**." The Parties agree as follows:
 
@@ -233,3 +234,7 @@ Each Party acknowledges and agrees that a breach or threatened breach by such Pa
 ### 12. Publicity.
 
 Supabase may identify Customer as a user of the Services and may use Customer's name, logo, and other trademarks in Supabase's customer list, press releases, blog posts, advertisements, and website (and all use thereof and goodwill arising therefrom shall inure to the sole and exclusive benefit of Customer). Otherwise, neither Party may use the name, logo, or other trademarks of the other Party for any purpose without the other Party's prior written approval.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
