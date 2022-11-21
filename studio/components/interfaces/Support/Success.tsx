@@ -75,7 +75,7 @@ const Success: FC<Props> = ({ sentCategory = 'Best_practices' }) => {
         <Divider light />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
-        <Link href="/">
+        <Link href="/projects">
           <Button>Go back to dashboard</Button>
         </Link>
       </div>

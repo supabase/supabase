@@ -1,0 +1,94 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'custom-domains',
+  title: 'Custom Domains',
+  description: 'Configuring a Custom Domain for your Supabase project.',
+}
+
+<Admonition type="note">
+
+Custom Domains are currently in beta, and are being slowly made available to projects.
+
+</Admonition>
+
+Custom domains allow you to present a branded experience to your users. You can also use a subdomain for the purposes of this guide.
+
+To get started:
+
+1. [Install](/docs/guides/cli) the Supabase CLI 1.11.3+.
+1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/hosting/platform#manage-team-members) for the project you'd like to set up a custom domain for.
+1. Enable the Custom Domains add-on in the Billing page of the Dashboard.
+
+## Configure a Custom Domain
+
+This example assumes your Supabase project is `foobar` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
+
+### Configure a CNAME
+
+Set up a CNAME record for `api.example.com`, resolving to `foobarbaz.supabase.co.`, with as low a TTL as possible.
+
+### Configure TXT Verification
+
+Use the `create` subcommand of the CLI to notify Supabase of your domain and retrieve TXT verification records:
+
+```bash
+supabase domains create --project-ref foobar --custom-hostname api.example.com --experimental
+```
+
+The output of the `create` command includes two TXT records[^1] you will need to set up, in order to verify your control over the domain in question,
+and for us to issue SSL certificates for it. For example:
+
+```bash
+[...]
+Required outstanding validation records:
+        _cf-custom-hostname.api.example.com TXT -> 46BBC14D-D50A-409C-8DB5-F862CF5BA660
+        api.example.com TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
+```
+
+[^1] One of the records requires you to _replace_ the CNAME record set up in [the first step](#cname-configure) with a TXT record. You'll be able to restore it back to the CNAME after the verification process has been completed.
+
+### Verify your domain
+
+Set up both records as instructed, and then use the `reverify` command for the Supabase Platform to verify the records:
+
+```bash
+supabase domains reverify --project-ref foobarbaz --experimental
+```
+
+You might need to wait a few minutes before your updated DNS records are propagated, especially if the older records were using a high TTL.
+
+### Activate your domain
+
+The final activation step reconfigures your project to start serving traffic on your custom domain (`api.example.com`).
+The auth service, in particular, will no longer work with the original URL (`foobar.supabase.co`).
+As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your custom domain:
+
+- any client code (e.g., frontends, mobile apps)
+- any OAuth providers (e.g., google, github)
+
+Additionally, update the DNS configuration for `api.example.com` to once more use a CNAME record that resolves to `foobarbaz.supabase.co`.
+Finally, you can use the `activate` subcommand to reconfigure your project:
+
+```bash
+supabase domains activate --project-ref foobarbaz --experimental
+```
+
+## Remove a Custom Domain
+
+If you have a custom domain (`api.example.com`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
+
+```bash
+supabase domains delete --project-ref foobarbaz --experimental
+```
+
+As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.
+
+## Limitations
+
+Edge functions do not honor the custom domain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
