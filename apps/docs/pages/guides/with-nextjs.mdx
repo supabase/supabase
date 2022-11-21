@@ -111,10 +111,7 @@ function MyApp({ Component, pageProps }) {
   const [supabase] = useState(() => createBrowserSupabaseClient())
 
   return (
-    <SessionContextProvider
-      supabaseClient={supabase}
-      initialSession={pageProps.initialSession}
-    >
+    <SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
       <Component {...pageProps} />
     </SessionContextProvider>
   )
@@ -140,10 +137,7 @@ function MyApp({
   const [supabase] = useState(() => createBrowserSupabaseClient())
 
   return (
-    <SessionContextProvider
-      supabaseClient={supabase}
-      initialSession={pageProps.initialSession}
-    >
+    <SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
       <Component {...pageProps} />
     </SessionContextProvider>
   )
@@ -735,4 +729,6 @@ At this stage you have a fully functional application!
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
-export default Page
+export default Pag
+
+e
