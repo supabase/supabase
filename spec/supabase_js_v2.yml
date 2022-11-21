@@ -103,6 +103,7 @@ functions:
 
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
   - id: sign-up
+    title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/settings).
