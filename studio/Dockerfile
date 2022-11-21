@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 FROM base as builder
 WORKDIR /usr/src/app
-COPY package*.json .
+COPY package*.json ./
 COPY turbo.json .
 COPY packages packages
 COPY studio studio
