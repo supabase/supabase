@@ -1,31 +1,29 @@
 import { FC, useState } from 'react'
-import {
-  Listbox,
-  IconLoader,
-  Button,
-  IconPlus,
-  IconAlertCircle,
-  IconCreditCard,
-  Modal,
-  Alert,
-} from 'ui'
+import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
-import { getProductPrice } from '../Billing.utils'
+import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
+import { DatabaseAddon } from '../AddOns/AddOns.types'
+import { getPITRDays } from './PaymentSummaryPanel.utils'
+import ConfirmPaymentModal from './ConfirmPaymentModal'
+
+// [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
 interface Props {
   isRefreshingPreview: boolean
   subscriptionPreview?: SubscriptionPreview
   currentPlan: any
-  currentComputeSize: any
+  currentComputeSize: DatabaseAddon
+  currentPITRDuration: DatabaseAddon | undefined
   selectedPlan?: any
-  selectedComputeSize: any
+  selectedComputeSize: DatabaseAddon
+  selectedPITRDuration: DatabaseAddon | undefined
   isSpendCapEnabled: boolean
   paymentMethods?: any
   selectedPaymentMethod: any
@@ -45,12 +43,14 @@ interface Props {
 
 const PaymentSummaryPanel: FC<Props> = ({
   isRefreshingPreview,
+  isSpendCapEnabled,
   subscriptionPreview,
   currentPlan,
-  selectedPlan,
-  isSpendCapEnabled,
   currentComputeSize,
+  currentPITRDuration,
+  selectedPlan,
   selectedComputeSize,
+  selectedPITRDuration,
   paymentMethods,
   selectedPaymentMethod,
   isLoadingPaymentMethods,
@@ -70,6 +70,10 @@ const PaymentSummaryPanel: FC<Props> = ({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
+  const currentPITRDays = currentPITRDuration !== undefined ? getPITRDays(currentPITRDuration) : 0
+  const selectedPITRDays =
+    selectedPITRDuration !== undefined ? getPITRDays(selectedPITRDuration) : 0
+
   const isEnterprise = currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   const isChangingPlan =
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG &&
@@ -78,10 +82,11 @@ const PaymentSummaryPanel: FC<Props> = ({
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
+  const isChangingPITRDuration = currentPITRDuration?.id !== selectedPITRDuration?.id
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
-    ? isChangingComputeSize
+    ? isChangingComputeSize || isChangingPITRDuration
     : subscriptionPreview?.has_changes ?? false
 
   const getPlanName = (plan: any) => {
@@ -90,10 +95,25 @@ const PaymentSummaryPanel: FC<Props> = ({
     } else return plan.name
   }
 
+  const validateOrder = () => {
+    const error = validateSubscriptionUpdatePayload(selectedComputeSize, selectedPITRDuration)
+    if (error) {
+      return ui.setNotification({
+        duration: 4000,
+        category: 'error',
+        message: error,
+      })
+    } else {
+      isChangingComputeSize || (isChangingPITRDuration && selectedPITRDays === 0)
+        ? setShowConfirmModal(true)
+        : onConfirmPayment()
+    }
+  }
+
   return (
     <>
       <div
-        className="w-full space-y-8 border-l bg-panel-body-light px-6 py-10 dark:bg-panel-body-dark lg:px-12"
+        className="w-full space-y-8 border-l bg-panel-body-light px-6 py-10 dark:bg-panel-body-dark lg:px-12 overflow-y-auto"
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
@@ -123,27 +143,18 @@ const PaymentSummaryPanel: FC<Props> = ({
         {projectRegion !== 'af-south-1' && (
           <div className="space-y-1">
             <p className="text-sm">Selected add-ons</p>
-            {currentComputeSize === undefined && selectedComputeSize === undefined && (
-              <p className="text-sm text-scale-1100">No add-ons selected</p>
-            )}
-            {currentComputeSize !== undefined && (
-              <div className="flex items-center justify-between">
-                <p
-                  className={`${
-                    isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                  } text-sm`}
-                >
-                  {currentComputeSize.name}
-                </p>
-                <p
-                  className={`${
-                    isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                  } text-sm`}
-                >
-                  ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
-                </p>
-              </div>
-            )}
+            <div className="flex items-center justify-between">
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                {currentComputeSize.name}
+              </p>
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
+              </p>
+            </div>
             {isChangingComputeSize && (
               <div className="flex items-center justify-between">
                 <p className="text-sm">{selectedComputeSize.name}</p>
@@ -152,8 +163,59 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
-            {isChangingComputeSize && (
-              <div className="!mt-4">
+            {currentPITRDuration?.id !== undefined && (
+              <div className="flex items-center justify-between">
+                <p
+                  className={`${
+                    isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  {currentPITRDuration?.name}
+                </p>
+                <p
+                  className={`${
+                    isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  ${(getProductPrice(currentPITRDuration).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+            {isChangingPITRDuration && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{selectedPITRDuration?.name}</p>
+                <p className="text-sm">
+                  ${(getProductPrice(selectedPITRDuration).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+
+            {/* Show information boxes with regards to change in subscriptions */}
+            <div className="!mt-4 space-y-4">
+              {isChangingPITRDuration && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title={
+                    currentPITRDuration?.id === undefined
+                      ? 'Enabling PITR'
+                      : selectedPITRDuration?.id === undefined
+                      ? 'Disabling PITR'
+                      : 'Updating PITR duration'
+                  }
+                  description={
+                    selectedPITRDays >= currentPITRDays
+                      ? `The days for which PITR is available for will only start at the time of enabling the add-on (e.g You will have access to the full ${selectedPITRDays} days of PITR after ${
+                          selectedPITRDays - currentPITRDays
+                        } days from today)`
+                      : selectedPITRDays === 0
+                      ? 'All available PITR back ups for your project will be removed and are non-recoverable'
+                      : `Only the latest ${selectedPITRDays} days of PITR from today will be retained (all backups that are later than ${selectedPITRDays} days will be removed and are non-recoverable)`
+                  }
+                />
+              )}
+              {isChangingComputeSize && (
                 <InformationBox
                   hideCollapse
                   defaultVisibility
@@ -161,8 +223,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                   title="Changing your compute size"
                   description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
                 />
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
@@ -263,53 +325,21 @@ const PaymentSummaryPanel: FC<Props> = ({
             size="medium"
             loading={isSubmitting}
             disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
-            onClick={() => (isChangingComputeSize ? setShowConfirmModal(true) : onConfirmPayment())}
+            onClick={() => validateOrder()}
           >
             Confirm payment
           </Button>
         </div>
       </div>
 
-      <Modal
-        hideFooter
+      <ConfirmPaymentModal
         visible={showConfirmModal}
-        size="large"
-        header="Updating project database instance size"
+        isChangingInstanceSize={isChangingComputeSize}
+        isDisablingPITR={isChangingPITRDuration && selectedPITRDays === 0}
+        isSubmitting={isSubmitting}
         onCancel={() => setShowConfirmModal(false)}
-      >
-        <div className="space-y-4 py-4">
-          <Modal.Content>
-            <Alert
-              withIcon
-              variant="warning"
-              title="Your project will need to be restarted for changes to take place"
-            >
-              Upon confirmation, your project will be restarted to change your instance size. This
-              will take up to 2 minutes in which your project will be unavailable during the time.
-            </Alert>
-          </Modal.Content>
-          <Modal.Content>
-            <p className="text-sm text-scale-1200">Would you like to update your project now?</p>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <div className="flex items-center gap-2">
-              <Button block type="default" onClick={() => setShowConfirmModal(false)}>
-                Cancel
-              </Button>
-              <Button
-                block
-                type="primary"
-                loading={isSubmitting}
-                disabled={isSubmitting}
-                onClick={() => onConfirmPayment()}
-              >
-                Confirm
-              </Button>
-            </div>
-          </Modal.Content>
-        </div>
-      </Modal>
+        onConfirm={() => onConfirmPayment()}
+      />
     </>
   )
 }
