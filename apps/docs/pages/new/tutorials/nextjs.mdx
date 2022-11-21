@@ -1,18 +1,11 @@
-<<<<<<< Updated upstream:apps/docs/pages/guides/with-nextjs.mdx
-import Layout from '~/layouts/DefaultGuideLayout'
-=======
----
-title: 'Build a user management app with Next.js'
-description: Learn how to use Supabase in your Next App.
-sidebar_label: 'Next.js'
----
->>>>>>> Stashed changes:apps/docs/docs/guides/with-nextjs.mdx
+import Layout from '~/layouts/tutorials/TutorialLayout'
+
+import StepHike from '~/components/StepHike'
+import { Tabs } from 'ui'
 
 export const meta = {
-  id: 'with-nextjs',
-  title: 'Quickstart: Next.js',
-  description: 'Learn how to use Supabase in your Next App.',
-  sidebar_label: 'Next.js',
+  title: 'Build a user management app with Next.js',
+  description: 'Learn how to use Supabase in your Next App',
 }
 
 This tutorial demonstrates how to build a basic user management app with Next.js and Supabase. The app authenticates and identifies the user, stores their profile information in the database, and allows the user to log in, update their profile details, and upload a profile photo. The app uses:
@@ -36,9 +29,16 @@ This tutorial demonstrates how to build a basic user management app with Next.js
   size="medium"
   defaultActiveId="js"
 >
-<TabPanel id="js" label="JavaScript">
 
-## 1. Project setup {#project-setup}
+<Tabs.Panel id="js" label="JavaScript">
+
+<StepHike title={"Implementation guide"}>
+
+<StepHike.Step step={'A'} title="hello world">
+  adsdsds sadds asds
+</StepHike.Step>
+
+<StepHike.Step step={1} title="Project setup">
 
 ### Initialize a Next.js app
 
@@ -73,7 +73,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLIC_API_KEY
 
 Optionally, style the app using [styles/globals.css](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-ts-user-management/styles/globals.css) from the GitHub example.
 
-## 2. Set up a login page {#set-up-login-page}
+</StepHike.Step>
+
+<StepHike.Step step={2} title="Set up a login page">
 
 Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge functions. It can be challenging to authenticate your users in all these different environments so we created [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
 
@@ -139,7 +141,9 @@ const Home = () => {
 export default Home
 ```
 
-## 3. Add an account management page {#add-account-management-page}
+</StepHike.Step>
+
+<StepHike.Step step={3} title="Add an account management page">
 
 After a user is signed in, they need a way to update their profile details and manage their account.
 Create a new component called `Account.js` within a `components` folder with a function to retreive the user's profile:
@@ -194,9 +198,8 @@ Add a form to collect the user's updated username and website:
 ```js title=components/Account.js
 // ...
 
-  async function getProfile() {
+async function getProfile() {
   //  ...
-  }
 
   return (
     <div className="form-widget">
@@ -248,42 +251,39 @@ Add a function to update the user's profile with the new username and website:
 ```js title=components/Account.js
 // ...
 
-  async function getProfile() {
+async function getProfile() {
   //  ...
-  }
-
-  async function updateProfile({ username, website, avatar_url }) {
-    try {
-      setLoading(true)
-
-      const updates = {
-        id: user.id,
-        username,
-        website,
-        avatar_url,
-        updated_at: new Date().toISOString(),
-      }
-
-      let { error } = await supabase.from('profiles').upsert(updates)
-      if (error) throw error
-      alert('Profile updated!')
-    } catch (error) {
-      alert('Error updating the data!')
-      console.log(error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="form-widget">
-      ...
-    </div>
-  )
 }
+
+async function updateProfile({ username, website, avatar_url }) {
+  try {
+    setLoading(true)
+
+    const updates = {
+      id: user.id,
+      username,
+      website,
+      avatar_url,
+      updated_at: new Date().toISOString(),
+    }
+
+    let { error } = await supabase.from('profiles').upsert(updates)
+    if (error) throw error
+    alert('Profile updated!')
+  } catch (error) {
+    alert('Error updating the data!')
+    console.log(error)
+  } finally {
+    setLoading(false)
+  }
+}
+
+return <div className="form-widget">...</div>
 ```
 
-## 4. Add profile photos {#add-profile-photos}
+</StepHike.Step>
+
+<StepHike.Step step={4} title="Add profile photos">
 
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos. Create an `Avatar.js` component to allow the user to upload a profile photo:
 
@@ -401,11 +401,13 @@ return (
 )
 ```
 
-## 5. Run the app {#run-the-app}
+</StepHike.Step>
+
+<StepHike.Step step={5} title="Run the app">
 
 Update `pages/index.js` with the `Account` component:
 
-```jsx lines=3,14 title=pages/index.js
+```js lines=3,14 pages/index.js
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Account from '../components/Account'
@@ -432,29 +434,21 @@ Run `npm run dev` and open your browser to [localhost:3000](http://localhost:300
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
+</StepHike.Step>
+
+</StepHike>
+
+</Tabs.Panel>
+<Tabs.Panel id="ts" label="TypeScript">
 
 TS guide content
 
-</TabPanel>
+</Tabs.Panel>
 </Tabs>
 
 ## See also
 
-<<<<<<< Updated upstream:apps/docs/pages/guides/with-nextjs.mdx
-- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management) and deploy it to Vercel.
-- Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui).
-- Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs).
-- Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers).
-- See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub.
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
-=======
 - See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management) and deploy it to Vercel
 - Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers)
->>>>>>> Stashed changes:apps/docs/docs/guides/with-nextjs.mdx
+
+export default ({ children }) => <Layout meta={meta} children={children} />
