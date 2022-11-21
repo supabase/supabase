@@ -1,3 +1,5 @@
+// [Terry] Also need to look at getPageType() in ./lib/helpers
+// to set a menu to a page
 import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
 import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
 import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
@@ -5,6 +7,7 @@ import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
 import SupabaseCLINav from 'data/nav/supabase-cli'
 import SupabaseAPINav from 'data/nav/supabase-api'
 import AuthServerNav from 'data/nav/auth-server'
+import RealtimeServerNav from 'data/nav/realtime-server'
 import StorageServerNav from 'data/nav/storage-server'
 
 import { NavMenu, References } from './Navigation.types'
@@ -134,17 +137,21 @@ export const menuItems: NavMenu = {
           name: 'Deep Dive',
           url: undefined,
           items: [
-            { name: 'Part One: JWTs', url: '/learn/auth-deep-dive/jwts', items: [] },
             {
-              name: 'Part Two: Row Level Security',
-              url: '/learn/auth-deep-dive/row-level-security',
+              name: 'Part One: JWTs',
+              url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
               items: [],
             },
-            { name: 'Part Three: Policies', url: '/learn/auth-deep-dive/policies', items: [] },
-            { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/gotrue', items: [] },
+            {
+              name: 'Part Two: Row Level Security',
+              url: '/learn/auth-deep-dive/auth-row-level-security',
+              items: [],
+            },
+            { name: 'Part Three: Policies', url: '/learn/auth-deep-dive/auth-policies', items: [] },
+            { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/auth-gotrue', items: [] },
             {
               name: 'Part Five: Google OAuth',
-              url: '/learn/auth-deep-dive/google-oauth',
+              url: '/learn/auth-deep-dive/auth-google-oauth',
               items: [],
             },
           ],
@@ -158,7 +165,7 @@ export const menuItems: NavMenu = {
         { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
         { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
         { name: 'Database Functions', url: '/guides/database/functions', items: [] },
-        { name: 'Database Webhooks', url: '/guides/database/database-webhooks', items: [] },
+        { name: 'Database Webhooks', url: '/guides/database/webhooks', items: [] },
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
         { name: 'Database Testing', url: '/guides/database/testing', items: [] },
         {
@@ -174,11 +181,6 @@ export const menuItems: NavMenu = {
           url: undefined,
           items: [
             { name: 'Overview', url: '/guides/database/extensions', items: [] },
-            {
-              name: 'plv8: Javascript Language',
-              url: '/guides/database/extensions/plv8',
-              items: [],
-            },
             { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
             {
               name: 'pg_cron: Job Scheduling',
@@ -191,6 +193,11 @@ export const menuItems: NavMenu = {
               items: [],
             },
             { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
+            {
+              name: 'plv8: Javascript Language',
+              url: '/guides/database/extensions/plv8',
+              items: [],
+            },
             {
               name: 'uuid-ossp: Unique Identifiers',
               url: '/guides/database/extensions/uuid-ossp',
@@ -239,6 +246,7 @@ export const menuItems: NavMenu = {
       label: 'Platform',
       items: [
         { name: 'Overview', url: '/guides/hosting/platform', items: [] },
+        { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
@@ -311,6 +319,7 @@ export const menuItems: NavMenu = {
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
+            { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
           ],
         },
       ],
@@ -331,6 +340,7 @@ export const menuItems: NavMenu = {
       label: 'Self-hosting',
       items: [
         { name: 'Auth Server', url: '/reference/auth', items: [] },
+        { name: 'Realtime Server', url: '/reference/realtime', items: [] },
         { name: 'Storage Server', url: '/reference/storage', items: [] },
       ],
     },
@@ -342,5 +352,6 @@ export const menuItems: NavMenu = {
   'reference/cli': SupabaseCLINav,
   'reference/api': SupabaseAPINav,
   'reference/auth': AuthServerNav,
+  'reference/realtime': RealtimeServerNav,
   'reference/storage': StorageServerNav,
 }

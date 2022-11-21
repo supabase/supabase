@@ -214,8 +214,8 @@ pages:
       - name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
+          When the third-party provider successfully authenticates the user, the provider redirects the user to the Supabase Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url).
+          You can modify the `SITE_URL` or [add additional redirect URLs](https://app.supabase.com/project/_/auth/settings). You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) to support preview URLs from providers like Netlify and Vercel.
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -333,17 +333,18 @@ pages:
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
-      - `setSession()` takes in a refresh token and uses it to get a new session.
+      - `setSession()` takes in a refresh token and access token to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - If you are using React Native, you will need to install a Buffer polyfill via a library such as [rn-nodeify](https://github.com/tradle/rn-nodeify) to properly use the library.
     examples:
-      - name: Refresh the session
-        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+      - name: Set the session
+        description: Sets the session data from a `refresh_token` and `access_token` and returns the current session or an error if the tokens are invalid.
         isSpotlight: true
         js: |
           ```js
-            const { data, error } = supabase.auth.setSession(refresh_token)
+            const { data, error } = supabase.auth.setSession({refresh_token, access_token})
           ```
   auth.refreshSession():
     title: 'refreshSession()'
@@ -691,8 +692,8 @@ pages:
     examples:
       - name: Getting your data
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -706,8 +707,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -715,8 +716,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -739,7 +740,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -753,8 +754,8 @@ pages:
         description: |
           You can select specific fields from your tables.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -768,8 +769,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -777,8 +778,8 @@ pages:
               .select('name')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -798,15 +799,15 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Query foreign tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -830,8 +831,8 @@ pages:
               (2, 1, 'Munich');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -844,8 +845,8 @@ pages:
               `)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -872,7 +873,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Query foreign tables through a join table
@@ -882,8 +883,8 @@ pages:
           the `select()` method to query the related data. The join table needs
           to have the foreign keys as part of its composite primary key.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -923,8 +924,8 @@ pages:
               (2, 2);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -937,8 +938,8 @@ pages:
               `)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -968,7 +969,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Query the same foreign table multiple times
@@ -977,8 +978,8 @@ pages:
           joined column to identify which join to use. You can also give each
           column an alias.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1003,8 +1004,8 @@ pages:
               (1, 2, '👋');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1016,8 +1017,8 @@ pages:
               `)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1037,7 +1038,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Filtering through foreign tables
@@ -1045,8 +1046,8 @@ pages:
           If the filter on a foreign table's column is not satisfied, the foreign
           table returns `[]` or `null` but the parent table is not filtered out.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1070,8 +1071,8 @@ pages:
               (2, 1, 'Munich');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1080,8 +1081,8 @@ pages:
               .eq('countries.name', 'Estonia')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1100,13 +1101,13 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
           If you want to filter out the parent table rows, use the `!inner` hint:
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1115,8 +1116,8 @@ pages:
               .eq('countries.name', 'Estonia')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1126,7 +1127,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Querying with count option
@@ -1135,8 +1136,8 @@ pages:
           [count](/docs/reference/javascript/select#parameters) option. For
           example, to get the table count without returning all rows:
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1150,8 +1151,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { count, error } = await supabase
@@ -1159,8 +1160,8 @@ pages:
               .select('*', { count: 'exact', head: true })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1170,7 +1171,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Querying JSON data
@@ -1180,8 +1181,8 @@ pages:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           querying JSON data.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1197,8 +1198,8 @@ pages:
               (1, 'Avdotya', '{"city":"Saint Petersburg"}');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
           ```ts
           const { data, error } = await supabase
@@ -1209,8 +1210,8 @@ pages:
             `)
           ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1226,7 +1227,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -1236,16 +1237,16 @@ pages:
     examples:
       - name: Create a record
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
               countries (id int8 primary key, name text);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { error } = await supabase
@@ -1253,8 +1254,8 @@ pages:
               .insert({ id: 1, name: 'Denmark' })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1262,11 +1263,11 @@ pages:
               "statusText": "Created"
             }
             ```
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1274,8 +1275,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1290,7 +1291,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -1302,16 +1303,16 @@ pages:
           ```
       - name: Create a record and return it
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
               countries (id int8 primary key, name text);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1320,8 +1321,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1336,7 +1337,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Bulk create
@@ -1344,16 +1345,16 @@ pages:
           A bulk create operation is handled in a single transaction.
           If any of the inserts fail, none of the rows are inserted.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
               countries (id int8 primary key, name text);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { error } = await supabase
@@ -1364,8 +1365,8 @@ pages:
               ])
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1380,11 +1381,11 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1392,8 +1393,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1403,7 +1404,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -1415,8 +1416,8 @@ pages:
     examples:
       - name: Updating your data
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1428,8 +1429,8 @@ pages:
               (1, 'Taiwan');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { error } = await supabase
@@ -1438,8 +1439,8 @@ pages:
               .eq('id', 1)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1448,11 +1449,11 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1460,8 +1461,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1476,7 +1477,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -1489,8 +1490,8 @@ pages:
           ```
       - name: Update a record and return it
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1502,8 +1503,8 @@ pages:
               (1, 'Taiwan');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1513,8 +1514,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1529,7 +1530,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Updating JSON data
@@ -1538,8 +1539,8 @@ pages:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           working with JSON data.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1555,8 +1556,8 @@ pages:
               (1, 'Michael', '{ "postcode": 90210 }');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1571,8 +1572,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1591,7 +1592,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
           Currently, it is only possible to update the entire JSON document.
@@ -1605,8 +1606,8 @@ pages:
     examples:
       - name: Upsert your data
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1618,8 +1619,8 @@ pages:
               (1, 'Afghanistan');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1628,8 +1629,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1644,7 +1645,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -1657,8 +1658,8 @@ pages:
           ```
       - name: Bulk Upsert your data
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1670,8 +1671,8 @@ pages:
               (1, 'Afghanistan');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1683,8 +1684,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1703,7 +1704,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Upserting into tables with constraints
@@ -1713,8 +1714,8 @@ pages:
           row with the same `id`, `upsert()` inserts a new row, which
           will fail in this case as there is already a row with `handle` `"saoirse"`.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1730,8 +1731,8 @@ pages:
               (1, 'saoirse', null);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1740,8 +1741,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1756,14 +1757,14 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
           Using the `onConflict` option, you can instruct `upsert()` to use
           another column with a unique constraint to determine conflicts:
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             await supabase
@@ -1777,8 +1778,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1794,7 +1795,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -1811,8 +1812,8 @@ pages:
     examples:
       - name: Delete records
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -1824,8 +1825,8 @@ pages:
               (1, 'Spain');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { error } = await supabase
@@ -1834,8 +1835,8 @@ pages:
               .eq('id', 1)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1844,11 +1845,11 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -1856,8 +1857,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1867,7 +1868,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -1894,8 +1895,8 @@ pages:
     examples:
       - name: Call a Postgres function without arguments
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create function hello_world() returns text as $$
@@ -1903,15 +1904,15 @@ pages:
             $$ language sql;
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase.rpc('hello_world')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1921,7 +1922,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -1931,8 +1932,8 @@ pages:
           ```
       - name: Call a Postgres function with arguments
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create function echo(say text) returns text as $$
@@ -1940,15 +1941,15 @@ pages:
             $$ language sql;
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase.rpc('echo', { say: '👋' })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1958,15 +1959,15 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Bulk processing
         description: |
           You can process large payloads by passing in an array as an argument:
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create function add_one_each(arr int[]) returns int[] as $$
@@ -1974,15 +1975,15 @@ pages:
             $$ language sql;
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase.rpc('add_one_each', { arr: [1, 2, 3] })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -1996,7 +1997,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Call a Postgres function with filters
@@ -2005,8 +2006,8 @@ pages:
           [Filters](/docs/reference/javascript/using-filters) and
           [Modifiers](/docs/reference/javascript/using-modifiers).
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2023,8 +2024,8 @@ pages:
             $$ language sql;
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2033,8 +2034,8 @@ pages:
               .single()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2047,7 +2048,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -2112,8 +2113,8 @@ pages:
 
       ### Filter by values within a JSON column
 
-      <Tabs>
-      <TabItem value="schema" label="Schema">
+      <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+      <TabPanel id="schema" label="Schema">
 
         ```sql
         create table
@@ -2130,8 +2131,8 @@ pages:
           (2, 'Jane', null);
         ```
 
-      </TabItem>
-      <TabItem default value="js" label="JavaScript">
+      </TabPanel>
+      <TabPanel id="js" label="JavaScript">
 
         ```ts
         const { data, error } = await supabase
@@ -2140,8 +2141,8 @@ pages:
           .eq('address->postcode', 90210)
         ```
 
-      </TabItem>
-      <TabItem value="result" label="Result">
+      </TabPanel>
+      <TabPanel id="result" label="Result">
 
         ```json
         {
@@ -2159,7 +2160,7 @@ pages:
         }
         ```
 
-      </TabItem>
+      </TabPanel>
       </Tabs>
 
       ### Filter Foreign Tables
@@ -2167,8 +2168,8 @@ pages:
       You can filter on foreign tables in your `select()` query using dot
       notation:
 
-      <Tabs>
-      <TabItem value="schema" label="Schema">
+      <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+      <TabPanel id="schema" label="Schema">
 
         ```sql
         create table
@@ -2192,8 +2193,8 @@ pages:
           (2, 1, 'Munich');
         ```
 
-      </TabItem>
-      <TabItem default value="js" label="JavaScript">
+      </TabPanel>
+      <TabPanel id="js" label="JavaScript">
 
         ```ts
         const { data, error } = await supabase
@@ -2207,8 +2208,8 @@ pages:
           .eq('cities.name', 'Bali')
         ```
 
-      </TabItem>
-      <TabItem value="result" label="Result">
+      </TabPanel>
+      <TabPanel id="result" label="Result">
 
         ```json
         {
@@ -2227,7 +2228,7 @@ pages:
         }
         ```
 
-      </TabItem>
+      </TabPanel>
       </Tabs>
 
   eq():
@@ -2235,8 +2236,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2250,8 +2251,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2260,8 +2261,8 @@ pages:
               .eq('name', 'Albania')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2276,7 +2277,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2293,8 +2294,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2308,8 +2309,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2318,8 +2319,8 @@ pages:
               .neq('name', 'Albania')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2338,7 +2339,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2355,8 +2356,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2370,8 +2371,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2380,8 +2381,8 @@ pages:
               .gt('id', 2)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2396,7 +2397,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2413,8 +2414,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2428,8 +2429,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2438,8 +2439,8 @@ pages:
               .gte('id', 2)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2458,7 +2459,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2475,8 +2476,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2490,8 +2491,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2500,8 +2501,8 @@ pages:
               .lt('id', 2)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2516,7 +2517,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2533,8 +2534,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2548,8 +2549,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2558,8 +2559,8 @@ pages:
               .lte('id', 2)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2578,7 +2579,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2595,8 +2596,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2610,8 +2611,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2620,8 +2621,8 @@ pages:
               .like('name', '%Alba%')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2636,7 +2637,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2653,8 +2654,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2668,8 +2669,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2678,8 +2679,8 @@ pages:
               .like('name', '%alba%')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2694,7 +2695,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2713,8 +2714,8 @@ pages:
         description: |
           Using the `eq()` filter doesn't work when filtering for `null`:
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2727,8 +2728,8 @@ pages:
               (2, null);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2737,8 +2738,8 @@ pages:
               .eq('name', null)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2753,13 +2754,13 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
           Instead, you need to use `is()`:
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2768,8 +2769,8 @@ pages:
               .is('name', null)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2784,7 +2785,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2801,8 +2802,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2816,8 +2817,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2826,8 +2827,8 @@ pages:
               .in('name', ['Albania', 'Algeria'])
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2846,7 +2847,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2863,8 +2864,8 @@ pages:
     examples:
       - name: On array columns
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2881,8 +2882,8 @@ pages:
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2891,8 +2892,8 @@ pages:
               .contains('tags', ['is:open', 'severity:high'])
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2906,7 +2907,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -2924,8 +2925,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2942,8 +2943,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -2952,8 +2953,8 @@ pages:
               .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -2969,13 +2970,13 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: On `jsonb` columns
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -2992,8 +2993,8 @@ pages:
               (2, 'Jane', '{}');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3002,8 +3003,8 @@ pages:
               .contains('address', { postcode: 90210 })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3017,7 +3018,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -3026,8 +3027,8 @@ pages:
     examples:
       - name: On array columns
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3044,8 +3045,8 @@ pages:
               (2, 'History', array['monday', 'wednesday', 'thursday']);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3054,8 +3055,8 @@ pages:
               .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3069,7 +3070,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3087,8 +3088,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3105,8 +3106,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3115,8 +3116,8 @@ pages:
               .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3132,13 +3133,13 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: On `jsonb` columns
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3155,8 +3156,8 @@ pages:
               (2, 'Jane', '{}');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3165,8 +3166,8 @@ pages:
               .containedBy('address', {})
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3180,7 +3181,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -3194,8 +3195,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3212,8 +3213,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3222,8 +3223,8 @@ pages:
               .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3239,7 +3240,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3261,8 +3262,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3279,8 +3280,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3289,8 +3290,8 @@ pages:
               .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3306,7 +3307,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3328,8 +3329,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3346,8 +3347,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3356,8 +3357,8 @@ pages:
               .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3373,7 +3374,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3395,8 +3396,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3413,8 +3414,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3423,8 +3424,8 @@ pages:
               .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3440,7 +3441,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3462,8 +3463,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3480,8 +3481,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3490,8 +3491,8 @@ pages:
               .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3507,7 +3508,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3524,8 +3525,8 @@ pages:
     examples:
       - name: On array columns
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3542,8 +3543,8 @@ pages:
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3552,8 +3553,8 @@ pages:
               .overlaps('tags', ['is:closed', 'severity:high'])
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3567,7 +3568,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3585,8 +3586,8 @@ pages:
           can filter on range columns using the string representation of range
           values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3603,8 +3604,8 @@ pages:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3613,8 +3614,8 @@ pages:
               .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3630,7 +3631,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -3701,8 +3702,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3716,8 +3717,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3726,8 +3727,8 @@ pages:
               .match({ id: 2, name: 'Albania' })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3741,7 +3742,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3765,8 +3766,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3779,8 +3780,8 @@ pages:
               (2, null);
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3789,8 +3790,8 @@ pages:
               .not('name', 'is', null)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3805,7 +3806,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3829,8 +3830,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3844,8 +3845,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3854,8 +3855,8 @@ pages:
               .or('id.eq.2,name.eq.Algeria')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3872,7 +3873,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -3885,8 +3886,8 @@ pages:
           ```
       - name: Use `or` with `and`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3900,8 +3901,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3910,8 +3911,8 @@ pages:
               .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
 
             ```json
@@ -3926,13 +3927,13 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
       - name: Use `or` on foreign tables
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -3956,8 +3957,8 @@ pages:
               (2, 1, 'Munich');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -3971,8 +3972,8 @@ pages:
               .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -3991,7 +3992,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -4007,8 +4008,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4022,8 +4023,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4032,8 +4033,8 @@ pages:
               .filter('name', 'in', '("Algeria","Japan")')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4048,7 +4049,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4061,8 +4062,8 @@ pages:
           ```
       - name: On a foreign table
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4086,8 +4087,8 @@ pages:
               (2, 1, 'Munich');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4101,8 +4102,8 @@ pages:
               .filter('cities.name', 'eq', 'Bali')
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4121,7 +4122,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         js: |
@@ -4154,8 +4155,8 @@ pages:
     examples:
       - name: With `upsert()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4167,8 +4168,8 @@ pages:
               (1, 'Afghanistan');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4176,8 +4177,8 @@ pages:
               .upsert({ id: 1, name: 'Albania' })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4186,11 +4187,11 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
 
-          <Tabs>
-          <TabItem default value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4199,8 +4200,8 @@ pages:
               .select()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4215,7 +4216,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4232,8 +4233,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4247,8 +4248,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4257,8 +4258,8 @@ pages:
               .order('name', { ascending: false })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4281,7 +4282,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4297,8 +4298,8 @@ pages:
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4322,8 +4323,8 @@ pages:
               (2, 1, 'New York City');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4337,8 +4338,8 @@ pages:
               .order('name', { foreignTable: 'cities', ascending: false })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4364,7 +4365,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -4373,8 +4374,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4388,8 +4389,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4398,8 +4399,8 @@ pages:
               .limit(1)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4413,7 +4414,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4426,8 +4427,8 @@ pages:
           ```
       - name: On a foreign table
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4450,8 +4451,8 @@ pages:
               (2, 1, 'New York City');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4465,8 +4466,8 @@ pages:
               .limit(1, { foreignTable: 'cities' })
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4485,7 +4486,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
 
@@ -4494,8 +4495,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4509,8 +4510,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4519,8 +4520,8 @@ pages:
               .range(0, 1)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4537,7 +4538,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4557,8 +4558,8 @@ pages:
         description: |
           You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
 
-          <Tabs>
-          <TabItem value="js" label="JavaScript">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const ac = new AbortController()
@@ -4569,8 +4570,8 @@ pages:
               .abortSignal(ac.signal)
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4585,7 +4586,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4604,8 +4605,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4619,8 +4620,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4630,8 +4631,8 @@ pages:
               .single()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4643,7 +4644,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4661,8 +4662,8 @@ pages:
     examples:
       - name: With `select()`
         description: |
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4676,8 +4677,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4687,8 +4688,8 @@ pages:
               .maybeSingle()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4697,7 +4698,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true
@@ -4718,8 +4719,8 @@ pages:
         description: |
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
 
-          <Tabs>
-          <TabItem value="schema" label="Schema">
+          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
+          <TabPanel id="schema" label="Schema">
 
             ```sql
             create table
@@ -4733,8 +4734,8 @@ pages:
               (3, 'Algeria');
             ```
 
-          </TabItem>
-          <TabItem default value="js" label="JavaScript">
+          </TabPanel>
+          <TabPanel id="js" label="JavaScript">
 
             ```ts
             const { data, error } = await supabase
@@ -4743,8 +4744,8 @@ pages:
               .csv()
             ```
 
-          </TabItem>
-          <TabItem value="result" label="Result">
+          </TabPanel>
+          <TabPanel id="result" label="Result">
 
             ```json
             {
@@ -4754,7 +4755,7 @@ pages:
             }
             ```
 
-          </TabItem>
+          </TabPanel>
           </Tabs>
         hideCodeBlock: true
         isSpotlight: true

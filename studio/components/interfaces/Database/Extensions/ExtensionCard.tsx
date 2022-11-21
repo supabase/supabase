@@ -96,9 +96,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           ].join(' ')}
         >
           <div className="p-4 px-6">
-            <p className="text-sm text-scale-1100">
-              <span className="flex-grow capitalize">{extension.comment}</span>
-            </p>
+            <p className="text-sm text-scale-1100 capitalize-sentence">{extension.comment}</p>
           </div>
           {isOn && extension.schema && (
             <div className="p-4 px-6">

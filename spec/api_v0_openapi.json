@@ -107,14 +107,21 @@
             "in": "path",
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreateFunctionBody" } }
-          }
-        },
         "responses": {
           "201": {
             "description": "",
@@ -230,14 +237,21 @@
             "in": "path",
             "description": "Function slug",
             "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateFunctionBody" } }
-          }
-        },
         "responses": {
           "200": {
             "description": "",
@@ -302,13 +316,14 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's custom hostname config" }
         },
         "tags": ["custom hostname (beta)"],
         "security": [{ "bearer": [] }]
       },
       "delete": {
-        "operationId": "remove",
+        "operationId": "removeCustomHostnameConfig",
         "summary": "Deletes a project's custom hostname configuration",
         "parameters": [
           {
@@ -321,6 +336,7 @@
         ],
         "responses": {
           "200": { "description": "" },
+          "403": { "description": "" },
           "500": { "description": "Failed to delete project custom hostname configuration" }
         },
         "tags": ["custom hostname (beta)"],
@@ -357,6 +373,7 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to update project custom hostname configuration" }
         },
         "tags": ["custom hostname (beta)"],
@@ -385,6 +402,7 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to verify project custom hostname configuration" }
         },
         "tags": ["custom hostname (beta)"],
@@ -413,6 +431,7 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to activate project custom hostname configuration" }
         },
         "tags": ["custom hostname (beta)"],
@@ -605,6 +624,65 @@
         "tags": ["projects"],
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
+    },
+    "/v1/projects/{ref}/network-bans/retrieve": {
+      "post": {
+        "operationId": "getNetworkBans",
+        "summary": "Gets project's network bans",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkBanResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's network bans" }
+        },
+        "tags": ["network bans (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-bans": {
+      "delete": {
+        "operationId": "removeNetworkBan",
+        "summary": "Remove network bans.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RemoveNetworkBanRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to remove network bans." }
+        },
+        "tags": ["network bans (beta)"],
+        "security": [{ "bearer": [] }]
+      }
     }
   },
   "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
@@ -665,16 +743,6 @@
         "properties": { "name": { "type": "string" } },
         "required": ["name"]
       },
-      "CreateFunctionBody": {
-        "type": "object",
-        "properties": {
-          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
-          "name": { "type": "string" },
-          "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
-        },
-        "required": ["slug", "name", "body"]
-      },
       "FunctionResponse": {
         "type": "object",
         "properties": {
@@ -703,14 +771,6 @@
           "body": { "type": "string" }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
-      },
-      "UpdateFunctionBody": {
-        "type": "object",
-        "properties": {
-          "name": { "type": "string" },
-          "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
-        }
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -757,6 +817,18 @@
         "type": "object",
         "properties": { "types": { "type": "string" } },
         "required": ["types"]
+      },
+      "NetworkBanResponse": {
+        "type": "object",
+        "properties": {
+          "banned_ipv4_addresses": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["banned_ipv4_addresses"]
+      },
+      "RemoveNetworkBanRequest": {
+        "type": "object",
+        "properties": { "ipv4_addresses": { "type": "array", "items": { "type": "string" } } },
+        "required": ["ipv4_addresses"]
       }
     }
   }

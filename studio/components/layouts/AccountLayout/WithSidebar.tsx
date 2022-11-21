@@ -19,7 +19,7 @@ interface Props {
 }
 
 /*
-The information heirarchy for WithSidebar is:
+The information hierarchy for WithSidebar is:
   WithSidebar
     SectionsWithHeaders
       SidebarItem
@@ -56,7 +56,9 @@ const WithSidebar: FC<Props> = ({
           {title && (
             <div className="mb-2">
               <div className="flex h-12 max-h-12 items-center border-b px-6 dark:border-dark">
-                <h4 className="mb-0 text-lg">{title}</h4>
+                <h4 className="mb-0 text-lg truncate" title={title}>
+                  {title}
+                </h4>
               </div>
             </div>
           )}

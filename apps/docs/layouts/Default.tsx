@@ -1,5 +1,5 @@
 import { useEffect, FC } from 'react'
-import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
@@ -29,16 +29,20 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
 
   return (
     <>
-      <Head>
-        <title>{meta?.title} | Supabase</title>
-        <meta name="description" content={meta?.description} />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <link rel="icon" href="/docs/favicon.ico" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content={meta?.title} />
-        <meta property="og:description" content={meta?.description} />
-        <meta property="og:title" content={meta?.title} />
-      </Head>
+      <NextSeo
+        title={`${meta?.title} | Supabase`}
+        description={meta?.description ? meta?.description : meta?.title}
+        openGraph={{
+          title: meta?.title,
+          description: meta?.description,
+          url: `https://supabase.com/docs/${currentPage}`,
+          images: [
+            {
+              url: `https://supabase.com/docs/img/supabase-og-image.png`,
+            },
+          ],
+        }}
+      />
 
       <main>
         <NavBar currentPage={currentPage} />
@@ -49,10 +53,14 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               className={`${
                 meta?.hide_table_of_contents || !hasTableOfContents
                   ? 'col-span-12 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8'
-                  : 'col-span-12 md:col-span-9'
-              } py-2 md:py-4 px-2 md:px-8`}
+                  : 'col-span-12 lg:col-span-9'
+              } py-2 lg:py-4 px-2 lg:px-8 mx-auto`}
             >
-              <article className="prose dark:prose-dark dark:bg-scale-200 width-full mt-8">
+              <article
+                className={`${
+                  meta?.hide_table_of_contents || !hasTableOfContents ? 'xl:min-w-[880px]' : ''
+                } doc-content-container prose dark:prose-dark dark:bg-scale-200 width-full mt-8 2xl:max-w-[880px]`}
+              >
                 {children}
               </article>
             </div>
@@ -60,7 +68,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
               <div
                 className={[
                   'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
-                  'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+                  'thin-scrollbar overflow-y-auto sticky hidden xl:block md:col-span-3 px-2',
                 ].join(' ')}
               >
                 <TableOfContents toc={toc} />

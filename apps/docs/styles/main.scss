@@ -55,7 +55,7 @@ article h1 {
 .docs-width {
   max-width: calc(100% - var(--sidebar-width));
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     max-width: none;
   }
 }
@@ -67,7 +67,6 @@ article h1 {
 
 .width-full {
   width: 100% !important;
-  max-width: max-content !important;
 }
 
 .p:not(.prose *):not(.overwrite) {
@@ -107,10 +106,6 @@ pre[class*='language-'] {
   }
 }
 
-.method-list-group li:last-child {
-  border-bottom: 1px solid var(--colors-scale3);
-}
-
 .method-list-title-isChild {
   font-family: var(--custom-font-size-xs);
   & h5 {
@@ -126,7 +121,7 @@ pre[class*='language-'] {
 }
 
 .method-list-group {
-  @apply p-0 m-0 list-none;
+  @apply p-0 m-0 list-none border-b;
 }
 
 .method-list-group .method-list-group {
@@ -189,9 +184,7 @@ pre[class*='language-'] {
 // format <code> inside <p>
 h2 code,
 h3 code,
-h4 code,
-li code,
-p code {
+h4 code {
   word-break: keep-all !important;
   white-space: nowrap !important;
   padding: 0.1rem 0.35rem !important;
@@ -220,8 +213,17 @@ a:has(code) {
   box-shadow: none !important;
 }
 
-pre code {
-  @media screen and (max-width: 768px) {
-    white-space: normal !important;
-  }
+// fix firefox issue with li wrapping
+.doc-content-container ul li div.relative {
+  display: inline-block;
+}
+
+.doc-content-container ul li a {
+  box-shadow: none !important;
+}
+
+// fix ToC links when they have <code> inside
+.toc-menu li a code {
+  background: none;
+  border: none;
 }

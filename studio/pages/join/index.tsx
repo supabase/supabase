@@ -32,7 +32,7 @@ const JoinOrganizationPage = () => {
   const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
     tokenValidationInfo || {}
 
-  const loginRedirectLink = `/?next=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   useEffect(() => {
     const fetchTokenInfo = async () => {
@@ -236,7 +236,7 @@ const JoinOrganizationPage = () => {
         'items-center justify-center gap-8 px-5',
       ].join(' ')}
     >
-      <Link href="/">
+      <Link href="/projects">
         <a className="flex items-center justify-center gap-4">
           <img
             src="/img/supabase-logo.svg"

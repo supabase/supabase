@@ -79,7 +79,7 @@ It has a lot of potential though. Some ideas we'll be playing with over the next
 - **Documentation:** for tutorials and demos.
 - **Offline data:** running it in the browser for an offline cache, similar to [sql.js](https://sql.js.org/#/) or [absurd-sql](https://github.com/jlongster/absurd-sql).
 - **Offline data analysis:** using it in a dashboard for offline data analysis and charts.
-- **Testing:** testing PostgresSQL functions, triggers, data modeling, logical replication, etc.
+- **Testing:** testing PostgreSQL functions, triggers, data modeling, logical replication, etc.
 - **Dev environments:** use it as a development environment — pull data from production or push new data, functions, triggers, views up to production.
 - **Snapshots:** create a test version of your database with sample data, then take a snapshot to send to other developers.
 - **Support:** send snapshots of your database to support personnel to demonstrate an issue you're having.
@@ -97,10 +97,10 @@ See [source code](https://github.com/snaplet/postgres-browser/tree/main/packages
 
 ### Web application
 
-Next, we need to run the the VM inside our browser. How? [WASM](https://en.wikipedia.org/wiki/WebAssembly).
+Next, we need to run the VM inside our browser. How? [WASM](https://en.wikipedia.org/wiki/WebAssembly).
 We use [v86](https://github.com/copy/v86) to run our VM inside the browser. Our demo application is very simple - plain HTML and some basic styling.
 
-See [source code](https://github.com/snaplet/postgres-browser/tree/main/packages/pg-browser).
+See [source code](https://github.com/snaplet/postgres-wasm/tree/main/packages/runtime). 
 
 ### Network proxy
 
@@ -109,7 +109,7 @@ To circumvent this, we proxy the traffic through websockets. We run a fork of [W
 which allows the emulator to talk to the internet by converting data sent over a websocket port into TCP packets.
 Our fork of Websockproxy adds the ability to tunnel into the Postgres server.
 
-See [source code](https://github.com/snaplet/postgres-browser/tree/main/packages/websockproxy).
+See [source code](https://github.com/snaplet/postgres-wasm/tree/main/packages/websockproxy).
 
 ## Technical deep-dive
 
@@ -147,7 +147,7 @@ We achieve this by mounting a compressed [9P filesystem](<https://en.wikipedia.o
 renames every file an 8-character name and produces a `filesystem.json` file representing a nested structure with files, original file names, sizes, etc.
 We then [copy this compressed output](https://github.com/supabase-community/postgres-wasm/blob/main/packages/buildroot/config/board/pg-browser/post-image.sh) to the VM.
 We modified the kernel command line and v86 boot parameters to boot directly from the 9P filesystem, and even put our kernel file into the p9 filesystem.
-All non-essential files are loaded asyncrhonously over HTTPS in the browser as needed.
+All non-essential files are loaded asynchronously over HTTPS in the browser as needed.
 
 The initial state was smaller, but still 15-20mb in size. We discussed this with Fabian who pointed us towards the `page_poison=on` kernel parameter.
 This parameter allowed us to clear caches before creating the snapshots, by forcing Linux to write arbitrary bytes on freed memory instead of random bytes,
