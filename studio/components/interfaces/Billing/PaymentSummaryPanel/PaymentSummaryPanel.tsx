@@ -11,8 +11,7 @@ import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
 import { DatabaseAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
-import ConfirmUpdateInstanceModal from './ConfirmUpdateInstanceModal'
-import ConfirmDisablePITRModal from './ConfirmDisablePITRModal'
+import ConfirmPaymentModal from './ConfirmPaymentModal'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
@@ -105,7 +104,7 @@ const PaymentSummaryPanel: FC<Props> = ({
         message: error,
       })
     } else {
-      isChangingComputeSize || isChangingPITRDuration
+      isChangingComputeSize || (isChangingPITRDuration && selectedPITRDays === 0)
         ? setShowConfirmModal(true)
         : onConfirmPayment()
     }
@@ -333,15 +332,10 @@ const PaymentSummaryPanel: FC<Props> = ({
         </div>
       </div>
 
-      <ConfirmUpdateInstanceModal
-        visible={showConfirmModal && isChangingComputeSize}
-        isSubmitting={isSubmitting}
-        onCancel={() => setShowConfirmModal(false)}
-        onConfirm={() => onConfirmPayment()}
-      />
-
-      <ConfirmDisablePITRModal
-        visible={showConfirmModal && isChangingComputeSize}
+      <ConfirmPaymentModal
+        visible={showConfirmModal}
+        isChangingInstanceSize={isChangingComputeSize}
+        isDisablingPITR={isChangingPITRDuration && selectedPITRDays === 0}
         isSubmitting={isSubmitting}
         onCancel={() => setShowConfirmModal(false)}
         onConfirm={() => onConfirmPayment()}
