@@ -1,14 +1,5 @@
 import { FC, useState } from 'react'
-import {
-  Listbox,
-  IconLoader,
-  Button,
-  IconPlus,
-  IconAlertCircle,
-  IconCreditCard,
-  Modal,
-  Alert,
-} from 'ui'
+import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -20,6 +11,8 @@ import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
 import { DatabaseAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
+import ConfirmUpdateInstanceModal from './ConfirmUpdateInstanceModal'
+import ConfirmDisablePITRModal from './ConfirmDisablePITRModal'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
@@ -112,7 +105,9 @@ const PaymentSummaryPanel: FC<Props> = ({
         message: error,
       })
     } else {
-      isChangingComputeSize ? setShowConfirmModal(true) : onConfirmPayment()
+      isChangingComputeSize || isChangingPITRDuration
+        ? setShowConfirmModal(true)
+        : onConfirmPayment()
     }
   }
 
@@ -338,46 +333,19 @@ const PaymentSummaryPanel: FC<Props> = ({
         </div>
       </div>
 
-      <Modal
-        hideFooter
-        visible={showConfirmModal}
-        size="large"
-        header="Updating project database instance size"
+      <ConfirmUpdateInstanceModal
+        visible={showConfirmModal && isChangingComputeSize}
+        isSubmitting={isSubmitting}
         onCancel={() => setShowConfirmModal(false)}
-      >
-        <div className="space-y-4 py-4">
-          <Modal.Content>
-            <Alert
-              withIcon
-              variant="warning"
-              title="Your project will need to be restarted for changes to take place"
-            >
-              Upon confirmation, your project will be restarted to change your instance size. This
-              will take up to 2 minutes in which your project will be unavailable during the time.
-            </Alert>
-          </Modal.Content>
-          <Modal.Content>
-            <p className="text-sm text-scale-1200">Would you like to update your project now?</p>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <div className="flex items-center gap-2">
-              <Button block type="default" onClick={() => setShowConfirmModal(false)}>
-                Cancel
-              </Button>
-              <Button
-                block
-                type="primary"
-                loading={isSubmitting}
-                disabled={isSubmitting}
-                onClick={() => onConfirmPayment()}
-              >
-                Confirm
-              </Button>
-            </div>
-          </Modal.Content>
-        </div>
-      </Modal>
+        onConfirm={() => onConfirmPayment()}
+      />
+
+      <ConfirmDisablePITRModal
+        visible={showConfirmModal && isChangingComputeSize}
+        isSubmitting={isSubmitting}
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={() => onConfirmPayment()}
+      />
     </>
   )
 }
