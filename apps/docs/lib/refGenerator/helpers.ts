@@ -34,7 +34,7 @@ export function generateParameters(tsDefinition: any) {
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
-  let parameters = paramDefinitions.map((x) => recurseThroughParams(x)).join(`\n`)
+  let parameters = paramDefinitions.map((x) => recurseThroughParams(x)) // old join // .join(`\n`)
   return methodListGroup(parameters)
 }
 
@@ -67,8 +67,8 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
 
-    let heading = `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
-    subContent = methodListGroup([heading].concat(properties).join('\n'))
+    let heading = 'Properties' // old `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
+    subContent = methodListGroup([heading].concat(properties)) // old join // .join('\n'))
     return methodListItemLabel(labelParams, subContent)
   }
   return methodListItemLabel(labelParams, subContent)
@@ -93,33 +93,46 @@ const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
   return uniqBy(joined, 'name')
 }
 
-const methodListGroup = (items) => `
-<ul className="method-list-group">
-  ${items}
-</ul>
-`
+const methodListGroup = (items) => {
+  return items
+  // old
+  // `
+  // <ul className="method-list-group">
+  //   ${items}
+  // </ul>
+  // `
+}
 
-const methodListItemLabel = ({ name, isOptional, type, description }, subContent) => `
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      ${name}
-    </span>
-    <span className="method-list-item-label-badge ${!isOptional && 'required'}">
-      ${isOptional ? 'optional' : 'required'}
-    </span>
-    <span className="method-list-item-validation">
-      ${type}
-    </span>
-  </h4>
-  <div class="method-list-item-description">
+const methodListItemLabel = ({ name, isOptional, type, description }, subContent) => {
+  return {
+    name,
+    isOptional,
+    type,
+    description,
+    subContent,
+  }
+  // `
+  // <li className="method-list-item">
+  //   <h4 className="method-list-item-label">
+  //     <span className="method-list-item-label-name">
+  //       ${name}
+  //     </span>
+  //     <span className="method-list-item-label-badge ${!isOptional && 'required'}">
+  //       ${isOptional ? 'optional' : 'required'}
+  //     </span>
+  //     <span className="method-list-item-validation">
+  //       ${type}
+  //     </span>
+  //   </h4>
+  //   <div class="method-list-item-description">
 
-${description ? description : 'No description provided. '}
+  // ${description ? description : 'No description provided. '}
 
-  </div>
-  ${subContent}
-</li>
-`
+  //   </div>
+  //   ${subContent}
+  // </li>
+  // `
+}
 
 function generateLabelParam(param: any) {
   let labelParams: any = {}
@@ -143,22 +156,22 @@ function generateLabelParam(param: any) {
 
 function extractParamTypeAsString(paramDefinition) {
   if (paramDefinition.type?.name) {
-    return `<code>${paramDefinition.type.name}</code>`
+    // return `<code>${paramDefinition.type.name}</code>` // old
+    return paramDefinition.type.name
   } else if (paramDefinition.type?.type == 'union') {
-    return paramDefinition.type.types
-      .map((x) =>
-        x.value
-          ? `<code>${x.value}</code>`
-          : x.name
-          ? `<code>${x.name}</code>`
-          : x.type
-          ? `<code>${x.type}</code>`
-          : ''
-      )
-      .join(' | ')
+    return paramDefinition.type.types.map((x) =>
+      x.value
+        ? x.value // old `<code>${x.value}</code>`
+        : x.name
+        ? x.name // `<code>${x.name}</code>`
+        : x.type
+        ? x.type // `<code>${x.type}</code>`
+        : ''
+    )
+    // .join(' | ') // dont need to join now
   }
 
-  return '<code>object</code>'
+  return 'object' // old '<code>object</code>'
 }
 
 const tsDocCommentToMdComment = (commentObject: TsDoc.DocComment) =>
