@@ -421,3 +421,10 @@ launch week
 .recharts-surface {
   overflow: visible;
 }
+
+/* Fix inline code block wrapping */
+@media screen and (min-width: 769px) {
+  .short-inline-codeblock {
+    white-space: pre !important;
+  }
+}
