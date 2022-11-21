@@ -18,12 +18,21 @@ import ConfirmPaymentModal from './ConfirmPaymentModal'
 interface Props {
   isRefreshingPreview: boolean
   subscriptionPreview?: SubscriptionPreview
+
   currentPlan: any
-  currentComputeSize: DatabaseAddon
-  currentPITRDuration: DatabaseAddon | undefined
+  currentAddons: {
+    computeSize: DatabaseAddon
+    pitrDuration: DatabaseAddon
+    customDomains: DatabaseAddon
+  }
+
   selectedPlan?: any
-  selectedComputeSize: DatabaseAddon
-  selectedPITRDuration: DatabaseAddon | undefined
+  selectedAddons: {
+    computeSize: DatabaseAddon
+    pitrDuration: DatabaseAddon
+    customDomains: DatabaseAddon
+  }
+
   isSpendCapEnabled: boolean
   paymentMethods?: any
   selectedPaymentMethod: any
@@ -45,12 +54,13 @@ const PaymentSummaryPanel: FC<Props> = ({
   isRefreshingPreview,
   isSpendCapEnabled,
   subscriptionPreview,
+
   currentPlan,
-  currentComputeSize,
-  currentPITRDuration,
+  currentAddons,
+
   selectedPlan,
-  selectedComputeSize,
-  selectedPITRDuration,
+  selectedAddons,
+
   paymentMethods,
   selectedPaymentMethod,
   isLoadingPaymentMethods,
@@ -70,9 +80,10 @@ const PaymentSummaryPanel: FC<Props> = ({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  const currentPITRDays = currentPITRDuration !== undefined ? getPITRDays(currentPITRDuration) : 0
+  const currentPITRDays =
+    currentAddons.pitrDuration !== undefined ? getPITRDays(currentAddons.pitrDuration) : 0
   const selectedPITRDays =
-    selectedPITRDuration !== undefined ? getPITRDays(selectedPITRDuration) : 0
+    selectedAddons.pitrDuration !== undefined ? getPITRDays(selectedAddons.pitrDuration) : 0
 
   const isEnterprise = currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   const isChangingPlan =
@@ -81,8 +92,10 @@ const PaymentSummaryPanel: FC<Props> = ({
       currentPlan.prod_id !== selectedPlan.id) ||
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
-  const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
-  const isChangingPITRDuration = currentPITRDuration?.id !== selectedPITRDuration?.id
+  const isChangingComputeSize = currentAddons.computeSize.id !== selectedAddons.computeSize.id
+  const isChangingPITRDuration = currentAddons.pitrDuration?.id !== selectedAddons.pitrDuration?.id
+  const isChangingCustomDomains =
+    currentAddons.customDomains?.id !== selectedAddons.customDomains?.id
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
@@ -96,7 +109,7 @@ const PaymentSummaryPanel: FC<Props> = ({
   }
 
   const validateOrder = () => {
-    const error = validateSubscriptionUpdatePayload(selectedComputeSize, selectedPITRDuration)
+    const error = validateSubscriptionUpdatePayload(selectedAddons)
     if (error) {
       return ui.setNotification({
         duration: 4000,
@@ -147,45 +160,71 @@ const PaymentSummaryPanel: FC<Props> = ({
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
               >
-                {currentComputeSize.name}
+                {currentAddons.computeSize.name}
               </p>
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
               >
-                ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
+                ${(getProductPrice(currentAddons.computeSize).unit_amount / 100).toFixed(2)}
               </p>
             </div>
             {isChangingComputeSize && (
               <div className="flex items-center justify-between">
-                <p className="text-sm">{selectedComputeSize.name}</p>
+                <p className="text-sm">{selectedAddons.computeSize.name}</p>
                 <p className="text-sm">
-                  ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
+                  ${(getProductPrice(selectedAddons.computeSize).unit_amount / 100).toFixed(2)}
                 </p>
               </div>
             )}
-            {currentPITRDuration?.id !== undefined && (
+            {currentAddons.pitrDuration?.id !== undefined && (
               <div className="flex items-center justify-between">
                 <p
                   className={`${
                     isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  {currentPITRDuration?.name}
+                  {currentAddons.pitrDuration?.name}
                 </p>
                 <p
                   className={`${
                     isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  ${(getProductPrice(currentPITRDuration).unit_amount / 100).toFixed(2)}
+                  ${(getProductPrice(currentAddons.pitrDuration).unit_amount / 100).toFixed(2)}
                 </p>
               </div>
             )}
             {isChangingPITRDuration && (
               <div className="flex items-center justify-between">
-                <p className="text-sm">{selectedPITRDuration?.name}</p>
+                <p className="text-sm">{selectedAddons.pitrDuration?.name}</p>
                 <p className="text-sm">
-                  ${(getProductPrice(selectedPITRDuration).unit_amount / 100).toFixed(2)}
+                  ${(getProductPrice(selectedAddons.pitrDuration).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+            {currentAddons.customDomains?.id !== undefined && (
+              <div className="flex items-center justify-between">
+                <p
+                  className={`${
+                    isChangingCustomDomains ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  {currentAddons.customDomains?.name}
+                </p>
+                <p
+                  className={`${
+                    isChangingCustomDomains ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  ${(getProductPrice(currentAddons.customDomains).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+            {isChangingCustomDomains && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{selectedAddons.customDomains?.name}</p>
+                <p className="text-sm">
+                  ${(getProductPrice(selectedAddons.customDomains).unit_amount / 100).toFixed(2)}
                 </p>
               </div>
             )}
@@ -198,9 +237,9 @@ const PaymentSummaryPanel: FC<Props> = ({
                   defaultVisibility
                   icon={<IconAlertCircle strokeWidth={2} />}
                   title={
-                    currentPITRDuration?.id === undefined
+                    currentAddons.pitrDuration?.id === undefined
                       ? 'Enabling PITR'
-                      : selectedPITRDuration?.id === undefined
+                      : selectedAddons.pitrDuration?.id === undefined
                       ? 'Disabling PITR'
                       : 'Updating PITR duration'
                   }
