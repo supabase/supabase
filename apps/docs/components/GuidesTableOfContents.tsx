@@ -41,7 +41,7 @@ interface Props {
 
 const GuidesTableOfContents: FC<Props> = ({ list }) => {
   return (
-    <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-12">
+    <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
       {list.map((item, i) => (
         <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
           <a

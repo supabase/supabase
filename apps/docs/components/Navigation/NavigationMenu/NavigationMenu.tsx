@@ -11,47 +11,45 @@ const SideNav = () => {
 
   const [level, setLevel] = useState('home')
 
-  const tempBasePath = '/new'
-
   function handleRouteChange(url: string) {
     console.log('path changed')
     console.log(url)
     console.log('LISTEN')
     switch (url) {
-      case `/docs${tempBasePath}`:
+      case `/docs`:
         setLevel('home')
         break
-      case `/docs${tempBasePath}/getting-started`:
+      case url.includes(`/docs/getting-started`) && url:
         setLevel('gettingstarted')
         break
-      case `/docs${tempBasePath}/tutorials`:
+      case url.includes(`/docs/guides/tutorials`) && url:
         setLevel('tutorials')
         break
-      case `/docs${tempBasePath}/database`:
+      case url.includes(`/docs/guides/database`) && url:
         setLevel('database')
         break
-      case url.includes(`/docs${tempBasePath}/auth`) && url:
+      case url.includes(`/docs/guides/auth`) && url:
         setLevel('auth')
         break
-      case `/docs${tempBasePath}/storage`:
+      case url.includes(`/docs/guides/storage`) && url:
         setLevel('storage')
         break
-      case `/docs${tempBasePath}/realtime`:
+      case url.includes(`/doc/guides/realtime`) && url:
         setLevel('realtime')
         break
-      case `/docs${tempBasePath}/edge-functions`:
+      case url.includes(`/docs/edge-functions`) && url:
         setLevel('functions')
         break
-      case `/docs${tempBasePath}/reference`:
+      case url.includes(`/docs/reference`) && url:
         setLevel('reference')
         break
-      case `/docs${tempBasePath}/integrations`:
+      case url.includes(`/docs/integrations`) && url:
         setLevel('integrations')
         break
-      case `/docs${tempBasePath}/platform`:
+      case url.includes(`/docs/platform`) && url:
         setLevel('platform')
         break
-      case url.includes(`/docs${tempBasePath}/reference/javascript/`) && url:
+      case url.includes(`/docs/reference/javascript/`) && url:
         setLevel('reference_javascript')
         break
 
@@ -89,7 +87,7 @@ const SideNav = () => {
       {
         label: 'Tutorials',
         icon: 'tutorials.svg',
-        href: '/tutorials',
+        href: '/guides/tutorials',
         level: 'tutorials',
       },
     ],
@@ -97,31 +95,31 @@ const SideNav = () => {
       {
         label: 'Database',
         icon: 'database.svg',
-        href: '/database',
+        href: '/guides/database',
         level: 'database',
       },
       {
         label: 'Auth',
         icon: 'auth.svg',
-        href: '/auth',
+        href: '/guides/auth',
         level: 'auth',
       },
       {
         label: 'Storage',
         icon: 'storage.svg',
-        href: '/storage',
+        href: '/guides/storage',
         level: 'storage',
       },
       {
         label: 'Realtime',
         icon: 'realtime.svg',
-        href: '/realtime',
+        href: '/guides/realtime',
         level: 'realtime',
       },
       {
         label: 'Edge Functions',
         icon: 'functions.svg',
-        href: '/edge-functions',
+        href: '/guides/edge-functions',
         level: 'functions',
       },
     ],
@@ -135,13 +133,13 @@ const SideNav = () => {
       {
         label: 'Integrations',
         icon: 'integrations.svg',
-        href: '/integrations',
+        href: '/guides/integrations',
         level: 'integrations',
       },
       {
         label: 'Platform',
         icon: 'platform.svg',
-        href: '/platform',
+        href: '/guides/platform',
         level: 'platform',
       },
     ],
@@ -215,7 +213,7 @@ const SideNav = () => {
                 <div className="flex flex-col gap-3" key={`section-${sectionIndex}`}>
                   {section.map((link) => {
                     return (
-                      <Link href={tempBasePath + link.href} passHref>
+                      <Link href={link.href} passHref>
                         <a key={link.label}>
                           <li
                             className={[
@@ -240,73 +238,22 @@ const SideNav = () => {
         </ul>
       </div>
 
-      <NavigationMenuGuideList
-        id={'gettingstarted'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'tutorials'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'database'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'auth'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'storage'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'realtime'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'functions'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'reference'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'integrations'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
-      <NavigationMenuGuideList
-        id={'platform'}
-        currentLevel={level}
-        setLevel={setLevel}
-        tempBasePath={tempBasePath}
-      />
+      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'database'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'auth'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'storage'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'realtime'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'functions'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
 
       {/* reference level */}
       <NavigationMenuGuideList
         id={'reference_javascript'}
         currentLevel={level}
         setLevel={setLevel}
-        tempBasePath={tempBasePath}
       />
 
       {/* // ref menu */}
