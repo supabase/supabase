@@ -278,7 +278,7 @@ export default function Ref(props) {
                             link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml#L105"
                             text="supabase_js_v2"
                           />
-                          <ReactMarkdown>{item.notes}</ReactMarkdown>
+                          <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
                         </div>
                       )}
                       {/* // parameters */}
