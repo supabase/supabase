@@ -1,17 +1,21 @@
 module.exports = [
   {
+    source: '/:path*',
+    destination: `/:path*`,
+  },
+  {
     source: '/docs',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/docs`,
+    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
   },
   {
     // redirect /docs/
     // trailing slash caused by docusaurus issue with multizone
     source: '/docs/',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/docs/`,
+    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
   },
   {
     source: '/docs/:path*',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/docs/:path*`,
+    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
   },
   // rewrite to keep existing ticket urls working
   {
