@@ -5,6 +5,7 @@ import { IconAlertCircle, Input } from 'ui'
 
 import {
   useStore,
+  useFlag,
   useProjectSettings,
   useProjectPostgrestConfig,
   useJwtSecretUpdateStatus,
@@ -25,6 +26,8 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
+
+  const isCustomDomainsEnabled = useFlag('customDomains')
 
   const { services, isError, mutateSettings } = useProjectSettings(ref as string | undefined)
   const { mutateConfig } = useProjectPostgrestConfig(ref as string | undefined)
@@ -100,9 +103,11 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
           <PostgrestConfig />
         </section>
 
-        <section className="mt-8">
-          <CustomDomainConfig />
-        </section>
+        {isCustomDomainsEnabled && (
+          <section className="mt-8">
+            <CustomDomainConfig />
+          </section>
+        )}
       </div>
     </>
   )
