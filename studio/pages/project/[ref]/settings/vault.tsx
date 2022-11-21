@@ -6,15 +6,12 @@ import {
   SecretsManagement,
   EncryptionKeysManagement,
 } from 'components/interfaces/Settings/Vault'
-import { useStore, useParams } from 'hooks'
+import { useStore } from 'hooks'
 import { useEffect } from 'react'
 import { Tabs } from 'ui'
-import { useRouter } from 'next/router'
 
 const VaultSettings: NextPageWithLayout = () => {
-  const router = useRouter()
   const { vault } = useStore()
-  const { ref } = useParams()
 
   useEffect(() => {
     vault.load()
