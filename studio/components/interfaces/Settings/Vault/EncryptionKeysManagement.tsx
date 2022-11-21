@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, Fragment, useState } from 'react'
 import {
+  Alert,
   Input,
   IconSearch,
   Listbox,
@@ -135,10 +136,10 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                           ID: <span className="font-mono">{key.id}</span>
                         </p>
                       </div>
-                      <div className="flex items-center space-x-2 w-[38%]">
+                      <div className="flex items-center space-x-2 w-[33%]">
                         {key.status === 'default' && <Badge color="green">Default</Badge>}
                       </div>
-                      <div className="flex items-center justify-end w-[25%] space-x-4">
+                      <div className="flex items-center justify-end w-[30%] space-x-4">
                         <p className="text-sm text-scale-1100">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
@@ -201,20 +202,26 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
 
       <Modal
         closable
-        size="small"
+        size="medium"
         alignFooter="right"
         visible={selectedKeyToRemove !== undefined}
         onCancel={() => setSelectedKeyToRemove(undefined)}
         onConfirm={confirmDeleteKey}
         loading={isDeletingKey}
-        header={<h5 className="text-sm text-scale-1200">Confirm to delete encryption key</h5>}
+        header={<h5 className="text-sm text-scale-1200">Confirm to delete key</h5>}
       >
         <div className="py-4">
           <Modal.Content>
             <div className="space-y-4">
+              <Alert
+                withIcon
+                variant="warning"
+                title="Deleting a key that's in use will cause any secret or column which depends on it to be unusable."
+              >
+                Do ensure that the key is not currently in use to prevent any issues.
+              </Alert>
               <p className="text-sm">
-                The following encryption key will be permanently removed and cannot be recovered.
-                Are you sure?
+                The following key will be permanently removed and cannot be recovered.
               </p>
               <div className="space-y-2">
                 <p className="text-sm text-scale-1200">
@@ -235,19 +242,29 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
         size="medium"
         visible={showAddKeyModal}
         onCancel={() => setShowAddKeyModal(false)}
-        header={<h5 className="text-sm text-scale-1200">Add new encryption key</h5>}
+        header={<h5 className="text-sm text-scale-1200">Add a new key</h5>}
       >
-        <Form id="add-new-key-form" initialValues={{ description: '' }} onSubmit={addKey}>
+        <Form
+          id="add-new-key-form"
+          validateOnBlur={false}
+          initialValues={{ name: '' }}
+          validate={(values: any) => {
+            const errors: any = {}
+            if (values.name.length === 0) errors.name = 'Please provide a name for your key'
+            return errors
+          }}
+          onSubmit={addKey}
+        >
           {({ isSubmitting }: any) => {
             return (
               <div className="py-4">
                 <Modal.Content>
                   <p className="text-sm mb-4">
-                    Keys are of standard UUID types - you can provide an optional description to
-                    your key for better identification.
+                    Keys are of standard UUID types - you can provide a description to your key for
+                    better identification.
                   </p>
                   <div className="space-y-4 pb-4">
-                    <Input id="description" label="Description" labelOptional="Optional" />
+                    <Input id="name" label="Key Name" />
                   </div>
                 </Modal.Content>
                 <Modal.Separator />
