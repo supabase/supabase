@@ -24,7 +24,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
         currentLevel !== id ? 'opacity-0 invisible absolute' : '',
       ].join(' ')}
     >
-      <ul className={'relative w-full flex flex-col gap-0'}>
+      <div className={'relative w-full flex flex-col gap-0 sticky top-8'}>
         <Link href={`${menu.parent ?? '/'}`} passHref>
           <a
             className={[
@@ -52,52 +52,50 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
             {menu.title ?? currentLevel}
           </h2>
         </div>
+        <ul>
+          {jsSpec.functions.map((x, index) => {
+            return (
+              <li key={x.name}>
+                {x.items && x.items.length > 0 ? (
+                  <>
+                    {x.items.map((subItem, subItemIndex) => {
+                      return (
+                        <>
+                          {subItemIndex === 0 && (
+                            <>
+                              <div className="h-px w-full bg-green-500 my-3"></div>
+                              <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
+                                {x.name}
+                              </span>
+                            </>
+                          )}
 
-        {jsSpec.functions.map((x, index) => {
-          return (
-            <div key={x.name}>
-              {x.items && x.items.length > 0 ? (
-                <>
-                  {x.items.map((subItem, subItemIndex) => {
-                    return (
-                      <>
-                        {subItemIndex === 0 && (
-                          <>
-                            <div className="h-px w-full bg-green-500 my-3"></div>
-                            <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
-                              {x.name}
-                            </span>
-                          </>
-                        )}
-                        <li key={subItem.name}>
-                          <Link href={`/${subItem.url}`} passHref>
+                          <Link href={`/${subItem.url}`} passHref key={subItem.name}>
                             <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
                               {subItem.name}
                             </a>
                           </Link>
-                        </li>
-                        {/* {subItemIndex === x.items.length - 1 && (
+                          {/* {subItemIndex === x.items.length - 1 && (
                           <div className="h-px w-full bg-green-500 my-3"></div>
                         )} */}
-                      </>
-                    )
-                  })}
-                </>
-              ) : (
-                <>
-                  <li>
+                        </>
+                      )
+                    })}
+                  </>
+                ) : (
+                  <>
                     <Link href={`#${x.id}`} passHref>
                       <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
                         {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
                         {x.title}
                       </a>
                     </Link>
-                  </li>
-                </>
-              )}
-            </div>
-          )
-        })}
+                  </>
+                )}
+              </li>
+            )
+          })}
+        </ul>
         {menu.extras && (
           <>
             <div className="h-px w-full bg-green-500 my-3"></div>
@@ -120,7 +118,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
             </div>
           )
         })}
-      </ul>
+      </div>
     </div>
   )
 }

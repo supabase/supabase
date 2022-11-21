@@ -231,15 +231,15 @@ export default function Ref(props) {
                           ' mb-16',
                         ].join(' ')}
                       >
-                        <h1
-                          className="text-2xl not-prose text-scale-1200 capitalize mb-4"
+                        <h2
+                          className="text-2xl not-prose text-scale-1200 capitalize mb-4 scroll-mt-16"
                           onClick={() => updateUrl(item.id)}
                         >
                           {examples.functions[itemIndex].title ??
                             examples.functions[itemIndex].id ??
                             item.name ??
                             item.id}
-                        </h1>
+                        </h2>
                         {shortText && (
                           <>
                             <p
@@ -323,7 +323,7 @@ export default function Ref(props) {
                                           <div
                                             className="px-5 py-3 first:border-t border-b border-l border-r
                                             border-scale-500
-                                          
+
                                             first:rounded-tl-lg first:rounded-tr-lg
                                             last:rounded-bl-lg last:rounded-br-lg
 
