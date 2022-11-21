@@ -1,0 +1,16 @@
+openref: 0.1
+
+info:
+  id: reference/supabase-client-libs
+  title: Supabase Shared Clients
+  description: |
+
+    Client libraries shared info.
+
+  specUrl: https://github.com/supabase/supabase/edit/master/spec/client-libs-common.yml
+  slugPrefix: '/'
+
+functions:
+  - id: sign-up
+    product: auth
+    title: 'signUp()'
