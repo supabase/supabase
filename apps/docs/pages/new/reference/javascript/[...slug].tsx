@@ -219,40 +219,41 @@ export default function Ref(props) {
 
               return (
                 <div>
-                  <header
-                    className={[
-                      // 'border-b sticky top-16 z-10',
-                      ' mb-16',
-                    ].join(' ')}
-                  >
-                    <h1
-                      className="text-xl not-prose text-scale-1200 capitalize mb-3 "
-                      onClick={() => updateUrl(item.id)}
-                    >
-                      {examples.functions[itemIndex].title ??
-                        examples.functions[itemIndex].id ??
-                        item.name ??
-                        item.id}
-                    </h1>
-                    {shortText && (
-                      <>
-                        <p
-                          className="text-base text-scale-1100 not-prose"
-                          dangerouslySetInnerHTML={{ __html: shortText }}
-                        ></p>
-                        <ComesFrom
-                          link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
-                          text="combined.json"
-                        />
-                      </>
-                    )}
-                  </header>
                   <div
                     className="grid grid-cols-2 ref-container gap-10"
                     id={item.id}
                     // ref={sectionRef}
                   >
                     <div className="prose" key={item.id}>
+                      <header
+                        className={[
+                          // 'border-b sticky top-16 z-10',
+                          ' mb-16',
+                        ].join(' ')}
+                      >
+                        <h1
+                          className="text-2xl not-prose text-scale-1200 capitalize mb-4"
+                          onClick={() => updateUrl(item.id)}
+                        >
+                          {examples.functions[itemIndex].title ??
+                            examples.functions[itemIndex].id ??
+                            item.name ??
+                            item.id}
+                        </h1>
+                        {shortText && (
+                          <>
+                            <p
+                              className="text-base text-scale-1100 not-prose"
+                              dangerouslySetInnerHTML={{ __html: shortText }}
+                            ></p>
+                            <ComesFrom
+                              link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
+                              text="combined.json"
+                            />
+                          </>
+                        )}
+                      </header>
+
                       {item.description && (
                         <>
                           <ComesFrom
@@ -292,7 +293,7 @@ export default function Ref(props) {
                           <div className="">
                             {parameters.map((param) => {
                               return (
-                                <div className="border-t border-b py-5">
+                                <div className="border-t border-b py-5 flex flex-col gap-3">
                                   <div className="flex gap-3 items-center">
                                     <span className="text-sm text-scale-1200 font-mono font-medium">
                                       {param.name ?? 'no-name'}
@@ -312,18 +313,21 @@ export default function Ref(props) {
                                       {param.type ?? 'no type'}
                                     </span>
                                   </div>
-                                  <p className="text-sm text-scale-1000 mb-0">
+                                  <p className="text-sm text-scale-1000 m-0">
                                     {param.description ?? 'nodescription'}
                                   </p>
                                   {param.subContent && (
-                                    <div className="mt-8">
+                                    <div className="mt-3">
                                       {param.subContent.map((param) => {
                                         return (
                                           <div
                                             className="px-5 py-3 first:border-t border-b border-l border-r
+                                            border-scale-500
                                           
                                             first:rounded-tl-lg first:rounded-tr-lg
                                             last:rounded-bl-lg last:rounded-br-lg
+
+                                            flex flex-col gap-3
                                           "
                                           >
                                             <div className="flex gap-3 items-center">
@@ -345,7 +349,7 @@ export default function Ref(props) {
                                                 {param.type ?? 'no type'}
                                               </span>
                                             </div>
-                                            <p className="text-sm text-scale-1000 mb-0">
+                                            <p className="text-sm text-scale-1000 m-0">
                                               {param.description ?? 'nodescription'}
                                             </p>
                                           </div>
