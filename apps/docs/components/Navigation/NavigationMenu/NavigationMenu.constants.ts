@@ -54,45 +54,50 @@ export const tutorials = {
     {
       name: 'Javascript',
       items: [
-        { name: 'React', url: '/guides/with-react', items: [], icon: '/img/icons/react-icon.svg' },
+        {
+          name: 'React',
+          url: '/guides/tutorials/with-react',
+          items: [],
+          icon: '/img/icons/react-icon.svg',
+        },
         {
           name: 'Next.js',
-          url: '/guides/with-nextjs',
+          url: '/guides/tutorials/with-nextjs',
           items: [],
         },
         {
           name: 'Angular',
-          url: '/guides/with-angular',
+          url: '/guides/tutorials/with-angular',
           items: [],
         },
         {
           name: 'Nuxt 3',
-          url: '/guides/with-nuxt-3',
+          url: '/guides/tutorials/with-nuxt-3',
           items: [],
         },
         {
           name: 'RedwoodJS',
-          url: '/guides/with-redwoodjs',
+          url: '/guides/tutorials/with-redwoodjs',
           items: [],
         },
         {
           name: 'SolidJS',
-          url: '/guides/with-solidjs',
+          url: '/guides/tutorials/with-solidjs',
           items: [],
         },
         {
           name: 'Svelte',
-          url: '/guides/with-svelte',
+          url: '/guides/tutorials/with-svelte',
           items: [],
         },
         {
           name: 'SvelteKit',
-          url: '/guides/with-sveltekit',
+          url: '/guides/tutorials/with-sveltekit',
           items: [],
         },
         {
           name: 'Vue 3',
-          url: '/guides/with-vue-3',
+          url: '/guides/tutorials/with-vue-3',
           items: [],
         },
       ],
@@ -102,12 +107,12 @@ export const tutorials = {
       items: [
         {
           name: 'Flutter',
-          url: '/guides/with-flutter',
+          url: '/guides/tutorials/with-flutter',
           items: [],
         },
         {
           name: 'Expo',
-          url: '/guides/with-expo',
+          url: '/guides/tutorials/with-expo',
           items: [],
         },
       ],
@@ -117,17 +122,17 @@ export const tutorials = {
       items: [
         {
           name: 'Ionic Angular',
-          url: '/guides/with-ionic-angular',
+          url: '/guides/tutorials/with-ionic-angular',
           items: [],
         },
         {
           name: 'Ionic React',
-          url: '/guides/with-ionic-react',
+          url: '/guides/tutorials/with-ionic-react',
           items: [],
         },
         {
           name: 'Ionic Vue',
-          url: '/guides/with-ionic-vue',
+          url: '/guides/tutorials/with-ionic-vue',
           items: [],
         },
       ],
@@ -146,21 +151,11 @@ export const cli = {
 export const auth = {
   icon: '/img/icons/menu/auth.svg',
   label: 'Auth',
-  extras: [
-    {
-      name: 'API Reference',
-      level: 'integrations',
-      items: [],
-      icon: '/img/icons/menu/reference.svg',
-    },
-    {
-      name: 'Integrations',
-      level: 'reference',
-      items: [],
-      icon: '/img/icons/menu/integrations.svg',
-    },
-  ],
   items: [
+    {
+      name: 'Overview',
+      url: '/guides/auth/overview',
+    },
     {
       name: 'Authentication',
       url: undefined,
@@ -236,6 +231,20 @@ export const auth = {
           items: [],
         },
       ],
+    },
+  ],
+  extras: [
+    {
+      name: 'API Reference',
+      level: 'integrations',
+      items: [],
+      icon: '/img/icons/menu/reference.svg',
+    },
+    {
+      name: 'Integrations',
+      level: 'reference',
+      items: [],
+      icon: '/img/icons/menu/integrations.svg',
     },
   ],
 }

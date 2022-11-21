@@ -4,10 +4,8 @@ import rehypeFilter from 'react-markdown/lib/rehype-filter'
 import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
 
-const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) => {
+const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
   const router = useRouter()
-
-  tempBasePath = ''
 
   const menu = NavItems[id]
 
@@ -26,23 +24,21 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
       ].join(' ')}
     >
       <ul className={'relative w-full flex flex-col gap-0'}>
-        <li
-          onClick={() => {
-            router.push(`${tempBasePath}${menu.parent ?? ''}`)
-            // setLevel(menu.parent && 'home')
-          }}
-          className={[
-            'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-brand-900 hover:text-brand-1200 hover:cursor-pointer ',
-          ].join(' ')}
-        >
-          <div className="relative w-2">
-            <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-              <IconChevronLeft size={10} strokeWidth={3} />
+        <Link href={`${menu.parent ?? '/'}`} passHref>
+          <a
+            className={[
+              'flex items-center gap-1 text-xs group mb-3',
+              'text-base transition-all duration-200 text-brand-900 hover:text-brand-1200 hover:cursor-pointer ',
+            ].join(' ')}
+          >
+            <div className="relative w-2">
+              <div className="transition-all ease-out ml-0 group-hover:-ml-1">
+                <IconChevronLeft size={10} strokeWidth={3} />
+              </div>
             </div>
-          </div>
-          <span>Main Menu</span>
-        </li>
+            <span>Main Menu</span>
+          </a>
+        </Link>
 
         <div className="flex items-center gap-3 my-3">
           {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
@@ -68,7 +64,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
                   {x.items.map((x) => {
                     return (
                       <li key={x.name}>
-                        <Link href={`/${tempBasePath}${x.url}`} passHref>
+                        <Link href={`/${x.url}`} passHref>
                           <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
                             {x.name}
                           </a>
@@ -79,7 +75,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
                 </>
               ) : (
                 <li>
-                  <Link href={`/${tempBasePath}${x.url}`} passHref>
+                  <Link href={`/${x.url}`} passHref>
                     <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
                       {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
                       {x.name}
@@ -102,7 +98,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, tempBasePath, id }) =
           return (
             <div key={x.name}>
               <li>
-                <Link href={`/${tempBasePath}${x.href}`} passHref>
+                <Link href={`/${x.href}`} passHref>
                   <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
                     {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
                     {x.name}

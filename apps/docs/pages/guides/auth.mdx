@@ -1,4 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import NewContent from '~/pages/new/auth.mdx'
+import { useRouter } from 'next/router'
 
 export const meta = {
   id: 'auth',
@@ -160,6 +162,12 @@ When users sign up, Supabase assigns them a unique ID. You can reference this ID
   <source src="/docs/videos/auth-zoom2.mp4" type="video/mp4" muted playsInline />
 </video>
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => {
+  const router = useRouter()
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true' && !router.asPath.includes('overview')) {
+    return NewContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
 
 export default Page
