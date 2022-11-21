@@ -1,17 +1,18 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle, Tabs } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useFlag } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import InformationBox from 'components/ui/InformationBox'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
-import InformationBox from 'components/ui/InformationBox'
-import Link from 'next/link'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -24,6 +25,7 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
 
       <Tabs
         type="underlined"
+        size="small"
         activeId="pitr"
         onChange={(id: any) => {
           if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
@@ -51,13 +53,20 @@ const PITR = () => {
   const ref = ui.selectedProject?.ref ?? 'default'
   const isEnabled = configuration.walg_enabled
 
+  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
   const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
   if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
 
   if (isLoading) return <Loading />
   if (error) return <BackupsError />
   if (!isEnabled)
-    return (
+    return isPITRSelfServeEnabled ? (
+      <UpgradeToPro
+        projectRef={ref}
+        primaryText="Free Plan does not include point in time recovery."
+        secondaryText="Please upgrade to the Pro plan to enable point in time recovery for your project."
+      />
+    ) : (
       <InformationBox
         hideCollapse
         defaultVisibility
@@ -76,12 +85,6 @@ const PITR = () => {
         }
         icon={<IconAlertCircle size={18} strokeWidth={2} />}
       />
-      // [Joshen] Once PITR is ready for self-serve
-      // <UpgradeToPro
-      //   projectRef={ref}
-      //   primaryText="Free Plan does not include point in time recovery."
-      //   secondaryText="Please upgrade to the Pro plan to enable point in time recovery for your project."
-      // />
     )
 
   return (
