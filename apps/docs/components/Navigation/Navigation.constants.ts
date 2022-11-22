@@ -282,6 +282,11 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Supabase Marketplace', url: '/guides/integrations/integrations', items: [] },
         {
+          name: 'API',
+          url: undefined, 
+          items: [ {name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] }]
+        },
+        {
           name: 'Auth',
           url: undefined,
           items: [
