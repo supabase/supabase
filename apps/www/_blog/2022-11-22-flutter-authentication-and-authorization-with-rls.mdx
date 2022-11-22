@@ -1194,7 +1194,12 @@ With the Row Level Security policies set up, our application is complete. We now
 
 ## Conclusions/ Future Improvements
 
-Continuing from our [previous article](https://supabase.com/blog/flutter-tutorial-building-a-chat-app), we added proper authorization to our chat application using Row Level Security, which enabled us to add 1 on 1 chat feature. One thing we could update is at the top of the rooms page, we are loading the newest created users to start a conversation. This is fine, but it only allows users to start a conversation with new users. We can for example update this to a list of users that are online at the same time. We can implement this using the [presence](https://supabase.com/docs/guides/realtime#presence) feature of Supabase. 
+Continuing from our [previous article](https://supabase.com/blog/flutter-tutorial-building-a-chat-app), we added proper authorization to our chat application using Row Level Security, which enabled us to add 1 on 1 chat feature.
+We used bloc for our state management solution. One thing we could have done differently if we were to write test codes was to pass the supabase instance as a parameter of the cubit so that we could [write tests using the bloc_test package](https://bloclibrary.dev/#/testing).
+
+We could also explore some cool feature improvement.
+At the top of the rooms page, we are loading the newest created users to start a conversation. This is fine, but it only allows users to start a conversation with new users.
+We can for example update this to a list of users that are online at the same time. We can implement this using the [presence feature](https://supabase.com/docs/guides/realtime#presence) of Supabase. 
 
 ## More Flutter Resources
 
