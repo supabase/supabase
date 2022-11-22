@@ -183,7 +183,10 @@ And that is it for deep link configuration.
 
 The rooms page will load two types of data, recently added users and a list of rooms that the user belongs to. We will be using bloc to load these two types of data and display them on the rooms page. 
 
-Let’s start out by creating states for the rooms page. The rooms page would have four different states, loading, loaded, empty, and error. We will display different UI on the rooms page depending on what state it is.
+Let’s start out by creating states for the rooms page.
+The rooms page would have four different states, loading, loaded, empty, and error. We will display different UI on the rooms page depending on what state it is.
+Create a `lib/cubit/rooms/rooms_state.dart` file and paste the following code.
+You may see some errors, but we will take care of them in the next step.
 
 ```dart title=lib/cubit/rooms/rooms_state.dart
 part of 'rooms_cubit.dart';
@@ -218,7 +221,7 @@ class RoomsError extends RoomState {
 
 Now that we have the states defined, we will create rooms_cubit.
 A [cubit](https://bloclibrary.dev/#/coreconcepts?id=cubit) is a class within the flutter_bloc library where we will make requests to Supabase to get the data and transform them into states and emit them to the UI widgets. 
-
+Let's create a `lib/cubit/rooms/rooms_cubit.dart` file and complete the cubit. 
 
 ```dart title=lib/cubit/rooms/rooms_cubit.dart
 import 'dart:async';
@@ -357,6 +360,7 @@ class RoomCubit extends Cubit<RoomState> {
 Now that we have the states and cubit to power our rooms page, it’s time to create the `RoomsPage`. 
 
 We have two list views, one horizontal list view to display other users, and one vertical list views with list tiles representing each room that the user is a part of. 
+We will create a `lib/pages/rooms_page.dart` file with the following content.
 
 ```dart title=lib/pages/rooms_page.dart
 import 'package:flutter/material.dart';
@@ -534,6 +538,7 @@ You may see some errors, but they will go away once we edit the chat page!
 ### Step 2: Modify the chat page to load messages in the room
 
 Our `ChatPage` will have a similar layout as the previous one, but will only display messages sent to a single room. We will start by creating `MessagesState`. The messages page will also have four different states, loading, loaded, empty, and error.
+Create a `lib/cubits/messages/messages_state.dart` file with the following code.
 
 ```dart title=lib/cubits/messages/messages_state.dart
 part of 'messages_cubit.dart';
@@ -557,6 +562,7 @@ class MessagesError extends MessagesState {
 ```
 
 Now let's create messages cubit to retrieve the data from our database and emit it as states.
+Create a `lib/cubits/messages/messages_cubit.dart` file and paste the following.
 
 ```dart title=lib/cubits/messages/messages_cubit.dart
 import 'dart:async';
@@ -636,6 +642,7 @@ class MessagesCubit extends Cubit<MessagesState> {
 Messages cubit is pretty simple. It sets a real-time listener to the database using the stream method and emits an empty state if there are no messages in the room, or emits a loaded state if there are messages. 
 
 Because we are using cubit, we need to modify the MessagesPage widget as well.
+Open `lib/pages/chat_page.dart` and let's update it.
 
 ```dart title=lib/pages/chat_page.dart
 import 'package:flutter/material.dart';
@@ -836,7 +843,11 @@ class _ChatBubble extends StatelessWidget {
 
 Because we have modified the setting of our Supabase to send a confirmation email, we need to make some modifications to the register page and login page as well. 
 
-The main change is how we handle navigation. Previously, we were able to navigate the user to `ChatPage` right after sign-in was complete. This would no longer work, as we now have to wait for the user to confirm their email address. In this case, we would want to listen to auth state of the user and navigate when the user is signed in with a session. This allows us to react when the user confirmed their email addresses.
+The main change is how we handle navigation.
+Previously, we were able to navigate the user to `ChatPage` right after sign-in was complete.
+This would no longer work, as we now have to wait for the user to confirm their email address.
+In this case, we would want to listen to auth state of the user and navigate when the user is signed in with a session.
+This allows us to react when the user confirmed their email addresses.
 
 ```dart title=lib/pages/register_page.dart
 import 'dart:async';
@@ -998,7 +1009,10 @@ class _RegisterPageState extends State<RegisterPage> {
 }
 ```
 
-Login page becomes more simple. All it is doing is taking a user’s email and password and logging them in. It is not doing any navigation whatsoever. This is because `LoginPage` is navigated on top of `RegisterPage`, the auth state listener on `RegisterPage` is still active, and therefore can take care of the navigation. 
+Login page becomes more simple.
+All it is doing is taking a user’s email and password and logging them in.
+It is not doing any navigation whatsoever.
+This is because `LoginPage` is navigated on top of `RegisterPage`, the auth state listener on `RegisterPage` is still active, and therefore can take care of the navigation. 
 
 ```dart title=lib/pages/login_page.dart
 import 'package:flutter/material.dart';
@@ -1079,7 +1093,9 @@ class _LoginPageState extends State<LoginPage> {
 }
 ```
 
-Notice that I have not used bloc anywhere on the register or login page. I try to only use state management libraries for pages that have some complexity. Since both register and login pages are relatively simple, I am going with the good old `setState`.
+Notice that I have not used bloc anywhere on the register or login page.
+I try to only use state management libraries for pages that have some complexity.
+Since both register and login pages are relatively simple, I am going with the good old `setState`.
 
 We should also modify the splash page to redirect signed-in users to the RoomsPage by default.
 
