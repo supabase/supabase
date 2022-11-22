@@ -2,7 +2,7 @@ import { ComponentType, useEffect } from 'react'
 import Head from 'next/head'
 import { NextRouter, useRouter } from 'next/router'
 
-import { STORAGE_KEY } from 'lib/gotrue'
+import { getNextPath, STORAGE_KEY } from 'lib/gotrue'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile, useStore, usePermissions } from 'hooks'
 import Error500 from '../../pages/500'
@@ -86,7 +86,7 @@ export function withAuth<T>(
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
           <script
             dangerouslySetInnerHTML={{
-              __html: `if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {location.replace('/sign-in?next=' + (new URLSearchParams(location.search).get('next') || encodeURIComponent(location.pathname + location.search + location.hash)))}`,
+              __html: `window._getNextPath = ${getNextPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {location.replace('/sign-in?next=' + window._getNextPath(location.pathname))}`,
             }}
           />
         </Head>
