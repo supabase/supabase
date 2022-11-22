@@ -12,7 +12,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 - `firestoreusers2json` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.js)) exports users from an existing Firebase project to a `.json` file on your local system.
 - `import_users` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.js)) imports users from a saved `.json` file into your Supabase project (inserting those users into the `auth.users` table of your `PostgreSQL` database instance).
 
-## Set up the migration tool {`#set-up-migration-tool`}
+## Set up the migration tool [#set-up-migration-tool]
 
 1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
 
@@ -36,7 +36,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
 1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
 
-## Generate a Firebase private key {`#generate-firebase-private-key`}
+## Generate a Firebase private key [#generate-firebase-private-key]
 
 1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
 1. Click the gear icon next to **Project Overview** in the sidebar and select **Project Settings**.
@@ -44,7 +44,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 1. Click **Generate new private key**.
 1. Rename the downloaded file to `firebase-service.json`.
 
-## Save your Firebase password hash parameters {`#save-firebase-hash-parameters`}
+## Save your Firebase password hash parameters [#save-firebase-hash-parameters]
 
 1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
 1. Select **Authentication** (Build section) in the sidebar.
@@ -64,14 +64,14 @@ hash_config {
 
 ## Command line options
 
-### Dump Firestore users to a JSON file {`#dump-firestore-users`}
+### Dump Firestore users to a JSON file [#dump-firestore-users]
 
 `node firestoreusers2json.js [<filename.json>] [<batch_size>]`
 
 - `filename.json`: (optional) output filename (defaults to `./users.json`)
 - `batchSize`: (optional) number of users to fetch in each batch (defaults to 100)
 
-### Import JSON users file to Supabase Auth (PostgreSQL: auth.users) {`#import-json-users-file`}
+### Import JSON users file to Supabase Auth (PostgreSQL: auth.users) [#import-json-users-file]
 
 `node import_users.js <path_to_json_file> [<batch_size>]`
 
