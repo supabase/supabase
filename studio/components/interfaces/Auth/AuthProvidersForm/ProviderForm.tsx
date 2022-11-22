@@ -32,6 +32,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
 
   const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
   const INITIAL_VALUES = generateInitialValues()
+  if (provider.title === 'Email') console.log('initial', INITIAL_VALUES)
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
@@ -46,7 +47,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
     const { error } = await authConfig.update(payload)
 
     if (!error) {
-      resetForm({ values: payload, initialValues: payload })
+      resetForm({ values: { ...values }, initialValues: { ...values } })
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
     } else {
