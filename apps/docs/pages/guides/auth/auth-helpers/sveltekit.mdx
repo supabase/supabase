@@ -371,9 +371,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 }
 ```
 
-## Migrate from 0.7.x to 0.8 {#migration}
+## Migrate from 0.7.x to 0.8 {`#migration`}
 
-### Set up the Supabase client {#migration-set-up-supabase-client}
+### Set up the Supabase client {`#migration-set-up-supabase-client`}
 
 <Tabs
   scrollable
@@ -421,7 +421,7 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
 </TabPanel>
 </Tabs>
 
-### Initialize the client {#migration-initialize-client}
+### Initialize the client {`#migration-initialize-client`}
 
 <Tabs
   scrollable
@@ -477,7 +477,7 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
 </TabPanel>
 </Tabs>
 
-### Set up hooks {#migration-set-up-hooks}
+### Set up hooks {`#migration-set-up-hooks`}
 
 <Tabs
   scrollable
@@ -524,7 +524,7 @@ import '$lib/db'
 </TabPanel>
 </Tabs>
 
-### Typings {#migration-typings}
+### Typings {`#migration-typings`}
 
 <Tabs
   scrollable
@@ -581,7 +581,7 @@ declare namespace App {
 </TabPanel>
 </Tabs>
 
-### withPageAuth {#migration-with-page-auth}
+### withPageAuth {`#migration-with-page-auth`}
 
 <Tabs
   scrollable
@@ -659,7 +659,7 @@ export const load: PageLoad = async (event) => {
 </TabPanel>
 </Tabs>
 
-### withApiAuth {#migration-with-api-auth}
+### withApiAuth {`#migration-with-api-auth`}
 
 <Tabs
   scrollable
@@ -712,7 +712,7 @@ export const GET: RequestHandler = async (event) => {
 </TabPanel>
 </Tabs>
 
-## Migrate from 0.6.11 and below to 0.7.0 {#migration-0-7}
+## Migrate from 0.6.11 and below to 0.7.0 {`#migration-0-7`}
 
 There are numerous breaking changes in the latest 0.7.0 version of this library.
 
@@ -720,7 +720,7 @@ There are numerous breaking changes in the latest 0.7.0 version of this library.
 
 The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE_SUPABASE_URL` is now `PUBLIC_SUPABASE_URL`).
 
-### Set up the Supabase client {#migration-set-up-supabase-client-0-7}
+### Set up the Supabase client {`#migration-set-up-supabase-client-0-7`}
 
 <Tabs
   scrollable
@@ -769,7 +769,7 @@ setupSupabaseHelpers({
 </TabPanel>
 </Tabs>
 
-### Initialize the client {#migration-initialize-client-0-7}
+### Initialize the client {`#migration-initialize-client-0-7`}
 
 <Tabs
   scrollable
@@ -817,7 +817,7 @@ The `@supabase/auth-helpers-svelte` library is no longer required as the `@supab
 </TabPanel>
 </Tabs>
 
-### Set up hooks {#migration-set-up-hooks-0-7}
+### Set up hooks {`#migration-set-up-hooks-0-7`}
 
 <Tabs
   scrollable
@@ -871,7 +871,7 @@ export const handle = sequence(auth(), yourHandler)
 </TabPanel>
 </Tabs>
 
-### Typings {#migration-typings-0-7}
+### Typings {`#migration-typings-0-7`}
 
 <Tabs
   scrollable

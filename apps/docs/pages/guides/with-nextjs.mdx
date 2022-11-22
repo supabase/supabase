@@ -30,7 +30,7 @@ This tutorial demonstrates how to build a basic user management app with Next.js
 >
 <TabPanel id="js" label="JavaScript">
 
-## 1. Project setup {#project-setup}
+## 1. Project setup {`#project-setup`}
 
 ### Initialize a Next.js app
 
@@ -65,7 +65,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLIC_API_KEY
 
 Optionally, style the app using [styles/globals.css](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-ts-user-management/styles/globals.css) from the GitHub example.
 
-## 2. Set up a login page {#set-up-login-page}
+## 2. Set up a login page {`#set-up-login-page`}
 
 Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge functions. It can be challenging to authenticate your users in all these different environments so we created [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
 
@@ -131,7 +131,7 @@ const Home = () => {
 export default Home
 ```
 
-## 3. Add an account management page {#add-account-management-page}
+## 3. Add an account management page {`#add-account-management-page`}
 
 After a user is signed in, they need a way to update their profile details and manage their account.
 Create a new component called `Account.js` within a `components` folder with a function to retreive the user's profile:
@@ -275,7 +275,7 @@ Add a function to update the user's profile with the new username and website:
 }
 ```
 
-## 4. Add profile photos {#add-profile-photos}
+## 4. Add profile photos {`#add-profile-photos`}
 
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos. Create an `Avatar.js` component to allow the user to upload a profile photo:
 
@@ -393,7 +393,7 @@ return (
 )
 ```
 
-## 5. Run the app {#run-the-app}
+## 5. Run the app {`#run-the-app`}
 
 Update `pages/index.js` with the `Account` component:
 
@@ -444,4 +444,4 @@ TS guide content
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
-# export default Page
+export default Page
