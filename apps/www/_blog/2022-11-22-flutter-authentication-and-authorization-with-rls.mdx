@@ -1201,6 +1201,104 @@ class SplashPageState extends State<SplashPage> {
 }
 ```
 
+Finally we implement those `ProfilesCubit` that you saw here and there throughout the code.
+This cubit will act as in memory cache of all the profiles data so that the app does not have to go fetch the same profiles every single time it needs it. 
+Create `profiles_state.dart` and `profiles_cubit.dart` under `lib/cubits/` and add the following code.
+
+```dart title=lib/cubits/profiles_state.dart
+part of 'profiles_cubit.dart';
+
+@immutable
+abstract class ProfilesState {}
+
+class ProfilesInitial extends ProfilesState {}
+
+class ProfilesLoaded extends ProfilesState {
+  ProfilesLoaded({
+    required this.profiles,
+  });
+
+  final Map<String, Profile?> profiles;
+}
+```
+
+```dart title=lib/cubits/profiles_cubit.dart
+import 'dart:async';
+
+import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
+import 'package:my_chat_app/models/profile.dart';
+import 'package:my_chat_app/utils/constants.dart';
+
+part 'profiles_state.dart';
+
+class ProfilesCubit extends Cubit<ProfilesState> {
+  ProfilesCubit() : super(ProfilesInitial());
+
+  /// Map of app users cache in memory with profile_id as the key
+  final Map<String, Profile?> _profiles = {};
+
+  Future<void> getProfile(String userId) async {
+    if (_profiles[userId] != null) {
+      return;
+    }
+
+    final data = await supabase
+        .from('profiles')
+        .select()
+        .match({'id': userId}).single();
+
+    if (data == null) {
+      return;
+    }
+    _profiles[userId] = Profile.fromMap(data);
+
+    emit(ProfilesLoaded(profiles: _profiles));
+  }
+}
+```
+
+We will make the `ProfilesCubit` accessible from anywhere in the app with the following code in `main.dart` file.
+
+```dart title=lib/main.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_chat_app/cubits/profiles/profiles_cubit.dart';
+import 'package:my_chat_app/utils/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:my_chat_app/pages/splash_page.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    // TODO: Replace credentials with your own
+    url: 'supabase_url',
+    anonKey: 'supabase_anon_key',
+    authCallbackUrlHostname: 'login',
+  );
+
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<ProfilesCubit>(
+      create: (context) => ProfilesCubit(),
+      child: MaterialApp(
+        title: 'SupaChat',
+        debugShowCheckedModeBanner: false,
+        theme: appTheme,
+        home: const SplashPage(),
+      ),
+    );
+  }
+}
+```
+
 ### Step 4: Authorization with Row Level Security (RLS)
 
 At this point, we seemingly have a complete app, except if we open the app right now, we will see every user’s room with all the messages that have ever been sent within the app by any user. This is because we have not set up Row Level Security yet. [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) is a mechanism in PostgreSQL that allows developers to define who can perform what operation on a row-by-row basis. There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today. Let’s run the following SQL to set the security policy.
