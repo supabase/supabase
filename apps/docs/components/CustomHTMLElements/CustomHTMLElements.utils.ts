@@ -3,9 +3,9 @@ export const getAnchor = (text: any): string | undefined => {
   if (typeof text === 'object') {
     if (Array.isArray(text)) {
       const customAnchor = text.find(
-        (x) => typeof x === 'string' && x.includes('{#') && x.endsWith('}')
+        (x) => typeof x === 'string' && x.includes('[#') && x.endsWith(']')
       )
-      if (customAnchor !== undefined) return customAnchor.slice(3, customAnchor.indexOf('}'))
+      if (customAnchor !== undefined) return customAnchor.slice(2, customAnchor.indexOf(']'))
 
       const formattedText = text
         .map((x) => {
@@ -33,8 +33,8 @@ export const getAnchor = (text: any): string | undefined => {
       return anchor
     }
   } else if (typeof text === 'string') {
-    if (text.includes('{#') && text.endsWith('}')) {
-      return text.slice(text.indexOf('{#') + 2, text.indexOf('}'))
+    if (text.includes('[#') && text.endsWith(']')) {
+      return text.slice(text.indexOf('[#') + 2, text.indexOf(']'))
     } else {
       return text
         .toLowerCase()
@@ -48,9 +48,9 @@ export const getAnchor = (text: any): string | undefined => {
 
 export const removeAnchor = (text: any) => {
   if (typeof text === 'object' && Array.isArray(text)) {
-    return text.filter((x) => !(typeof x === 'string' && x.includes('{#') && x.endsWith('}')))
+    return text.filter((x) => !(typeof x === 'string' && x.includes('[#') && x.endsWith(']')))
   } else if (typeof text === 'string') {
-    if (text.indexOf('{#') > 0) return text.slice(0, text.indexOf('{#'))
+    if (text.indexOf('[#') > 0) return text.slice(0, text.indexOf('[#'))
     else return text
   }
   return text
