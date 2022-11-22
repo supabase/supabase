@@ -8,7 +8,7 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
 
   return [
     {
-      title: 'Reports',
+      title: '',
       items: [
         {
           name: 'Custom reports',
@@ -16,14 +16,23 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/reports`,
           items: [],
         },
+      ],
+    },
+    {
+      items: [
         ...(productReports
           ? [
               {
-                name: 'API',
+                name: 'API Overview',
                 key: 'api-overview',
                 url: `/project/${ref}/reports/api-overview`,
-                items: []
+                items: [],
               },
+              {
+                name: 'API Bots',
+                key: 'api-bots',
+                url: `/project/${ref}/reports/api-bots`,
+                items: [],
               },
             ]
           : []),

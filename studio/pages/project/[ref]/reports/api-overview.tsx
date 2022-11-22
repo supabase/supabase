@@ -16,7 +16,7 @@ import {
 export const ApiOverviewPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
-  const config = PRESET_CONFIG[Presets.OVERVIEW]
+  const config = PRESET_CONFIG[Presets.API_OVERVIEW]
   const hooks = hooksFactory(ref as string, config)
   const [statusCodes, statusCodesHandlers] = hooks.statusCodes()
   const [errorRate, errorRateHandlers] = hooks.errorRate()
