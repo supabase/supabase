@@ -160,7 +160,7 @@ export default function Ref(props) {
             // ref={myRef}
           >
             {jsSpec.functions.map((item, itemIndex) => {
-              if (item['$ref']) console.log('$ref', item['$ref'])
+              // if (item['$ref']) console.log('$ref', item['$ref'])
               // if (item.id !== 'select()') return <div>hidden section</div>
               // const sectionRef = useRef(null)
 
@@ -169,7 +169,7 @@ export default function Ref(props) {
               // console.log('hasTsRef', hasTsRef)
               // console.log('jsTypeSpec', jsTypeSpec)
               const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
-              console.log('tsDefinition', tsDefinition)
+              // console.log('tsDefinition', tsDefinition)
               // console.log(`tsDefinition for ${item.title ?? item.id}`, tsDefinition)
 
               // useEffect(() => {
@@ -191,7 +191,7 @@ export default function Ref(props) {
 
               const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
-              console.log('parameters', parameters)
+              console.log(`parameters ${item.title}`, parameters)
 
               // @ts-ignore
               // const [serialFunctionMarkdownContent, setSerialFunctionMarkdownContent] =
@@ -292,14 +292,30 @@ export default function Ref(props) {
                           <h5 className="mb-3 text-base">Parameters</h5>
                           <div className="">
                             {parameters.map((param) => {
+                              const overrides = item.params
+
+                              if (overrides) console.log(`overrides ${item.title}`, overrides)
+
+                              const overide = overrides?.filter((x) => {
+                                return param.name === x.name
+                              })
+
+                              // console.log('overide', overide)
+
+                              if (overide) {
+                                console.log('overrides has override', overide)
+                              }
+
+                              const paramItem = overide?.length > 0 ? overide[0] : param
+
                               return (
                                 <div className="border-t border-b py-5 flex flex-col gap-3">
                                   <div className="flex gap-3 items-center">
                                     <span className="text-sm text-scale-1200 font-mono font-medium">
-                                      {param.name ?? 'no-name'}
+                                      {paramItem.name ?? 'no-name'}
                                     </span>
                                     <span>
-                                      {param.isOptional ? (
+                                      {paramItem.isOptional ? (
                                         <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">
                                           Optional
                                         </div>
@@ -310,13 +326,13 @@ export default function Ref(props) {
                                       )}
                                     </span>
                                     <span className="text-scale-900 text-xs">
-                                      {param.type ?? 'no type'}
+                                      {paramItem.type ?? 'no type'}
                                     </span>
                                   </div>
                                   <p className="text-sm text-scale-1000 m-0">
-                                    {param.description ?? 'nodescription'}
+                                    {paramItem.description ?? 'nodescription'}
                                   </p>
-                                  {param.subContent && (
+                                  {paramItem.subContent && (
                                     <div className="mt-3">
                                       {param.subContent.map((param) => {
                                         return (
@@ -401,7 +417,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                       {tables &&
                                         tables.length > 0 &&
                                         tables.map((table) => {
-                                          console.log(table)
+                                          // console.log(table)
 
                                           // @ts-ignore
                                           // const [content, setContent] = useState(null)
@@ -508,7 +524,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   ]
 
   const pages = jsSpec.functions.map((x) => x.id)
-  console.log('pages', pages)
+  // console.log('pages', pages)
 
   /**
    * Read all the markdown files that might have
@@ -542,7 +558,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
       // console.log('docBySlug', content)
       // console.log()
 
-      if (content) console.log(content)
+      // if (content) console.log(content)
       return {
         id: x,
         title: x,
