@@ -6,11 +6,13 @@ import { useStore, useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
+import { NextPageWithLayout } from 'types'
 import { BillingLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import { ProUpgrade } from 'components/interfaces/Billing'
-import { NextPageWithLayout } from 'types'
+import { PaymentMethod } from 'components/interfaces/Billing/Billing.types'
+import { DatabaseAddon } from 'components/interfaces/Billing/AddOns/AddOns.types'
 
 const BillingUpdatePro: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -22,8 +24,8 @@ const BillingUpdatePro: NextPageWithLayout = () => {
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const [subscription, setSubscription] = useState<StripeSubscription>()
-  const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
-  const [paymentMethods, setPaymentMethods] = useState<any>()
+  const [products, setProducts] = useState<{ tiers: any[]; addons: DatabaseAddon[] }>()
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>()
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
 
   const isEnterprise =

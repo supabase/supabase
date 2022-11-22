@@ -84,7 +84,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
       <div
         className={[
           'flex items-center justify-between transition',
-          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[350px]',
+          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[200px]',
           `${
             isFocused
               ? 'border-scale-900'
@@ -96,7 +96,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
       >
         <IconClock className="text-scale-1100" size={18} strokeWidth={1.5} />
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4">
+          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -124,7 +124,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
         </Tooltip.Root>
         <span>:</span>
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4">
+          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -152,7 +152,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
         </Tooltip.Root>
         <span>:</span>
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4">
+          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
