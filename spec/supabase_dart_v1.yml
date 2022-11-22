@@ -42,19 +42,20 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-      - name: Sign up with third-party providers.
+      - id: sign-up-with-third-party-providers
+        name: Sign up with third-party providers.
         hideCodeBlock: true
         description: |
           If you are using Flutter, you can sign up with OAuth providers using the [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) method available on `supabase_flutter`.
 
-  - id: sign-in-with-assword
+  - id: sign-in-with-password
     title: 'signInWithPassword()'
     description: |
       Log in an existing user using email or phone number with password.
     notes: |
       - Requires either an email and password or a phone number and password.
     examples:
-      - id: id: sign-in-with-email-and-password
+      - id: sign-in-with-email-and-password
         name: Sign in with email and password
         isSpotlight: true
         code: |
@@ -159,7 +160,8 @@ functions:
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
-      - name: Sign out
+      - id: sign-out
+        name: Sign out
         isSpotlight: true
         code: |
           ```dart
@@ -372,7 +374,7 @@ functions:
             },
           );
           ```
-  -id: select
+  - id: select
     description: |
       Performs vertical filtering with SELECT.
     title: 'Fetch data: select()'
@@ -497,7 +499,7 @@ functions:
       Performs an INSERT into the table.
     title: 'Create data: insert()'
     examples:
-      - id: create-a-record 
+      - id: create-a-record
         name: Create a record
         isSpotlight: true
         code: |
@@ -633,14 +635,15 @@ functions:
           final data = await supabase
             .rpc('hello_world');
           ```
-      - name: With Parameters
+      - id: with-parameters
+        name: With Parameters
         code: |
           ```dart
           final data = await supabase
             .rpc('echo_city', params: { 'name': 'The Shire' });
           ```
 
-  -id: subscribe
+  - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
@@ -755,14 +758,14 @@ functions:
           }).subscribe();
           ```
 
-  id: remove-channnel
+  - id: remove-channnel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
     title: 'removeChannel()'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - id: removes-a-channel 
+      - id: removes-a-channel
         name: Remove a channel
         isSpotlight: true
         code: |
@@ -990,7 +993,7 @@ functions:
         - `buckets` permissions: `select` and `delete`
         - `objects` permissions: none
     examples:
-      - id: delete-bucket 
+      - id: delete-bucket
         name: Delete bucket
         isSpotlight: true
         code: |
@@ -1261,7 +1264,8 @@ functions:
             .single();
           ```
 
-  Using Filters:
+  - id: using-filters
+    title: Using Filters
     description: |
       Filters allow you to only return rows that match certain conditions.
 
@@ -1785,7 +1789,7 @@ functions:
           ```
 
   - id: lte
-    title: lte()  
+    title: lte()
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
@@ -1916,7 +1920,7 @@ functions:
           ```
 
   - id: is
-    title is_()
+    title: is_()
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
 
@@ -2339,7 +2343,8 @@ functions:
     description: |
       Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
     examples:
-      - name: Text search
+      - id: text-search
+        name: Text search
         code: |
           ```dart
           final data = await supabase
