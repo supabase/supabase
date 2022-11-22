@@ -32,7 +32,7 @@ function useAutoAuthRedirect() {
         // @ts-ignore
         cache.clear()
 
-        await router.push(getNextPath(returnTo))
+        await router.push(getNextPath())
       }
     })()
   }, [])

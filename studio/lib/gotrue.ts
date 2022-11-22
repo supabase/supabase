@@ -38,12 +38,20 @@ export const getIdentity = (gotrueUser: User) => {
   }
 }
 
-export const getNextPath = (path?: string | null) => {
-  let next = path ?? '/projects'
+// NOTE: do not use any imports in this function,
+// as it is use standalone in the documents head
+export const getNextPath = () => {
+  const searchParams = new URLSearchParams(location.search)
+  const returnTo = searchParams.get('next')
+
+  searchParams.delete('next')
+
+  const next = returnTo ?? '/projects'
+  const remainingSearchParams = searchParams.toString()
 
   if (next === 'new-project') {
-    return '/new/new-project'
+    return '/new/new-project' + (remainingSearchParams ? `?${remainingSearchParams}` : '')
   }
 
-  return next
+  return next + (remainingSearchParams ? `?${remainingSearchParams}` : '')
 }

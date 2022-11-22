@@ -1,5 +1,5 @@
 import { useStore } from 'hooks'
-import { STORAGE_KEY } from 'lib/gotrue'
+import { getNextPath, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -43,15 +43,7 @@ const SignInLayout = ({
       <Head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if (localStorage.getItem('${STORAGE_KEY}')) {
-              let returnTo = new URLSearchParams(location.search).get('next') ?? '/projects'
-
-              if (returnTo === 'new-project') {
-                returnTo = '/new/new-project'
-              }
-
-              location.replace(returnTo)
-            }`,
+            __html: `window._getNextPath = ${getNextPath.toString()};if (localStorage.getItem('${STORAGE_KEY}')) {location.replace(window._getNextPath())}`,
           }}
         />
       </Head>

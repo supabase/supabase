@@ -1,10 +1,7 @@
-import { useParams } from 'hooks'
 import { auth, getNextPath } from 'lib/gotrue'
 import { Button, IconGitHub } from 'ui'
 
 const SignInWithGitHub = () => {
-  const { next: returnTo } = useParams()
-
   async function handleGithubSignIn() {
     try {
       const { error } = await auth.signInWithOAuth({
@@ -14,7 +11,7 @@ const SignInWithGitHub = () => {
             process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
               ? process.env.NEXT_PUBLIC_VERCEL_URL
               : process.env.NEXT_PUBLIC_SITE_URL
-          }${getNextPath(returnTo)}`,
+          }${getNextPath()}`,
         },
       })
       if (error) throw error
