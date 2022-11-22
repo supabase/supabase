@@ -1,6 +1,5 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useStore } from 'hooks'
-import { useParams } from 'hooks/misc/useParams'
 import { auth, getNextPath } from 'lib/gotrue'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -17,7 +16,6 @@ const signInSchema = object({
 const SignInForm = () => {
   const { ui } = useStore()
   const router = useRouter()
-  const { next: returnTo } = useParams()
   const { cache } = useSWRConfig()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -52,7 +50,7 @@ const SignInForm = () => {
       // @ts-ignore
       cache.clear()
 
-      await router.push(getNextPath(returnTo))
+      await router.push(getNextPath())
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
