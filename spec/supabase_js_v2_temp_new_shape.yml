@@ -1366,6 +1366,12 @@ functions:
   - id: insert
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
+    params:
+      - name: values
+        type: object | object []
+        isOptional: false
+        description: |
+          Bobby Bobby Bobby Bobby Bobby Bobby
     examples:
       - id: create-a-record
         name: Create a record
