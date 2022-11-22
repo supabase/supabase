@@ -43,7 +43,7 @@ const ComputeSizeSelection: FC<Props> = ({
             return (
               <Radio
                 hidden
-                key={option.id}
+                key={option.id || 'micro-add-on'}
                 align="vertical"
                 // @ts-ignore
                 label={
