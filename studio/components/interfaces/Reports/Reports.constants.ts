@@ -33,9 +33,7 @@ export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
 }
 
-
-export const PRESET_CONFIG : Record<Presets, PresetConfig> ={
-  
+export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API_OVERVIEW]: {
     title: '',
     sql: {
@@ -97,7 +95,7 @@ ORDER BY
     },
   },
   [Presets.API_BOTS]: {
-    title: "API Bots",
+    title: 'API Bots',
     sql: {
       userAgents: `
 select
@@ -117,7 +115,7 @@ order by
   count desc
 limit 12
 `,
-      botScores:`
+      botScores: `
 select
   h.cf_connecting_ip as ip,
   h.cf_ipcountry as country,
@@ -143,10 +141,41 @@ group by
 order by
   bot_score desc
 limit 20
-
-      `
-    }
-  }
+      `,
+    },
+  },
+  [Presets.AUTH]: {
+    title: 'Auth',
+    sql: {
+      dailyActiveUsers: `
+select 
+  timestamp_trunc(timestamp, day) as timestamp,
+  count(distinct json_extract(f.event_message, "$.user_id")) as count
+from gotrue_logs f
+cross join unnest(f.metadata) as m
+where json_extract(f.event_message, "$.user_id") is not null
+group by 
+  timestamp
+order by
+  timestamp
+`,
+newUsers: `
+select 
+  TIMESTAMP_TRUNC(f.timestamp, DAY) as timestamp,
+  count(id) as count
+from 
+gotrue_logs f
+  cross join unnest(f.metadata) as m
+where  f.timestamp > "2022-11-20" 
+and m.project = "tzljvicuuxegpzwuwife"
+and JSON_VALUE(f.event_message, "$.path") = "/signup"
+and JSON_VALUE(f.event_message, "$.auth_event.actor_id") is not null
+and JSON_VALUE(f.event_message, "$.auth_event.action") != "user_repeated_signup"
+group by 
+  timestamp
+`
+    },
+  },
 }
 
 export const DATETIME_FORMAT = 'MMM D, ha'

@@ -1,6 +1,7 @@
 export enum Presets {
   API_OVERVIEW = 'overview',
-  API_BOTS="api_bots"
+  API_BOTS = 'api_bots',
+  AUTH = 'auth',
 }
 
 export interface PresetConfig {
