@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { DatetimeHelper } from '../Settings/Logs'
-import { Presets } from './Reports.types'
+import { PresetConfig, Presets } from './Reports.types'
 
 export const LAYOUT_COLUMN_COUNT = 24
 
@@ -28,7 +28,13 @@ export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   },
 ]
 
-export const PRESET_CONFIG = {
+export const DEFAULT_QUERY_PARAMS = {
+  iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),
+  iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
+}
+
+
+export const PRESET_CONFIG : Record<Presets, PresetConfig> ={
   [Presets.OVERVIEW]: {
     title: '',
     sql: {

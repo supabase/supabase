@@ -1,6 +1,11 @@
 export enum Presets {
   OVERVIEW = 'overview',
 }
+
+export interface PresetConfig {
+  title: string
+  sql: Record<string, string>
+}
 export interface StatusCodesDatum {
   timestamp: number
   status_code: number
