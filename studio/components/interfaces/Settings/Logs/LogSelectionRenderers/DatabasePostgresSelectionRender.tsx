@@ -2,7 +2,12 @@ import { Alert } from 'ui'
 import React from 'react'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import LogsDivider from '../Logs.Divider'
-import { jsonSyntaxHighlight, SelectionDetailedRow, SeverityFormatter } from '../LogsFormatters'
+import {
+  jsonSyntaxHighlight,
+  SelectionDetailedRow,
+  SelectionDetailedTimestampRow,
+  SeverityFormatter,
+} from '../LogsFormatters'
 
 const DatabasePostgresSelectionRender = ({ log }: any) => {
   const postgresUsername = log?.metadata[0]?.parsed[0]?.user_name
@@ -26,6 +31,7 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
           value={errorSeverity}
           valueRender={<SeverityFormatter value={errorSeverity} />}
         />
+        <SelectionDetailedTimestampRow value={log.timestamp} />
         <SelectionDetailedRow label="Postgres Username" value={postgresUsername} />
         <SelectionDetailedRow label="Session ID" value={sessionId} />
       </div>

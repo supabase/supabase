@@ -53,7 +53,7 @@ Procedural languages are automatically installed within `pg_catalog`, so you don
 </TabPanel>
 </Tabs>
 
-## `http_get` {#http_get}
+## `http_get` [#http_get]
 
 Creates an HTTP GET request returning the request's ID. HTTP requests are not started until the transaction is committed.
 
@@ -98,7 +98,7 @@ request_id
 
 After triggering `http_get`, use [`http_get_result`](#http_get_result) to get the result of the request.
 
-## `http_post` {#http_post}
+## `http_post` [#http_post]
 
 Creates an HTTP POST request with a JSON body, returning the request's ID. HTTP requests are not started until the transaction is committed.
 
@@ -150,7 +150,7 @@ request_id
 
 After triggering `http_post`, use [`http_get_result`](#http_get_result) to get the result of the request.
 
-## `http_collect_response` {#http_collect_response}
+## `http_collect_response` [#http_collect_response]
 
 Given a `request_id` reference, retrieves the response.
 

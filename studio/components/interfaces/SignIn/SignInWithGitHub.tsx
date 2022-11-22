@@ -1,4 +1,4 @@
-import { auth } from 'lib/gotrue'
+import { auth, getReturnToPath } from 'lib/gotrue'
 import { Button, IconGitHub } from 'ui'
 
 const SignInWithGitHub = () => {
@@ -11,7 +11,7 @@ const SignInWithGitHub = () => {
             process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
               ? process.env.NEXT_PUBLIC_VERCEL_URL
               : process.env.NEXT_PUBLIC_SITE_URL
-          }/projects`,
+          }${getReturnToPath()}`,
         },
       })
       if (error) throw error

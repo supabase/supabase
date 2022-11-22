@@ -8,13 +8,19 @@ import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "get-tshirt-competition" up and running!`)
 
-function positionInAlphabet(myChar: string): number {
-  const DIFFERENCE_CHARCODE_AND_LETTERS = 96
-  // Convert the character into lowercase
-  const myCharLowercase = myChar.toLowerCase()
-  // Find the position of the char in the alphabet
-  const position = myCharLowercase.charCodeAt(0) - DIFFERENCE_CHARCODE_AND_LETTERS
-  return position
+function countEmailSegments(email: string): string {
+  const [localPart, domain] = email.split('@')
+  const [hostname, ...countryCodes] = domain.split('.')
+  return `${localPart.length}${hostname.length}${countryCodes.reduce((a, cc) => a + cc.length, '')}`
+}
+
+function turnEmailToCount(email: string): string {
+  const [localPart, domain] = email.split('@')
+  const [hostname, ...countryCodes] = domain.split('.')
+  return `${localPart.length}@${hostname.length}${countryCodes.reduce(
+    (a, cc) => a + '.' + cc.length,
+    ''
+  )}`
 }
 
 serve(async (req) => {
@@ -40,7 +46,7 @@ serve(async (req) => {
         `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
 
-    if (Number(answer) !== positionInAlphabet(email!))
+    if (answer !== countEmailSegments(email!))
       throw new Error(
         `Sorry, that's wrong, please try again! HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
@@ -52,7 +58,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
     // Submit email to draw
-    const { error } = await supabaseAdminClient.from('get-tshirt-competition').upsert(
+    const { error } = await supabaseAdminClient.from('get-tshirt-competition-2').upsert(
       {
         email,
         twitter,
@@ -65,10 +71,13 @@ serve(async (req) => {
       throw new Error(error.details)
     }
 
-    return new Response(`Thanks for playing! ${email} has been added to the draw \\o/`, {
-      headers: { ...corsHeaders, 'Content-Type': 'text/plain' },
-      status: 200,
-    })
+    return new Response(
+      `Thanks for playing! ${turnEmailToCount(email!)} has been added to the draw \\o/`,
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'text/plain' },
+        status: 200,
+      }
+    )
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
