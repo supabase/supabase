@@ -22,7 +22,7 @@ Alternatively, use the [Heroku to Supabase migration tool](https://migrate.supab
   ></iframe>
 </div>
 
-## Retrieve your Heroku database credentials {`#retrieve-heroku-credentials`}
+## Retrieve your Heroku database credentials [#retrieve-heroku-credentials]
 
 1. Log in to your [Heroku account](https://heroku.com) and select the project you want to migrate.
 1. Click **Resources** in the menu and select your **Heroku Postgres** database.
@@ -33,13 +33,13 @@ Alternatively, use the [Heroku to Supabase migration tool](https://migrate.supab
    - User (`$HEROKU_USER`)
    - Password (`$HEROKU_PASSWORD`)
 
-## Retrieve your Supabase Host {`#retrieve-supabase-host`}
+## Retrieve your Supabase Host [#retrieve-supabase-host]
 
 1. If you're new to Supabase, [create a project](https://app.supabase.com).
 1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under **Connection Info**, note your Host (`$SUPABASE_HOST`).
 
-## Export your Heroku database to a file {`#export-heroku-database`}
+## Export your Heroku database to a file [#export-heroku-database]
 
 Use `pg_dump` with your Heroku credentials to export your Heroku database to a file (e.g., `heroku_dump.sql`).
 
@@ -49,7 +49,7 @@ pg_dump --clean --if-exists --quote-all-identifiers \
  --no-owner --no-privileges > heroku_dump.sql
 ```
 
-## Import the database to your Supabase project {`#import-database-to-supabase`}
+## Import the database to your Supabase project [#import-database-to-supabase]
 
 Use `psql` to import the Heroku database file to your Supabase project.
 

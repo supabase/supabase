@@ -2,34 +2,45 @@
 export const getAnchor = (text: any): string | undefined => {
   if (typeof text === 'object') {
     if (Array.isArray(text)) {
-      const customAnchor = text
-        .find((x) => typeof x === 'object' && x.props.children.startsWith('#'))
-        .props.children.slice(1)
+      const customAnchor = text.find(
+        (x) => typeof x === 'string' && x.includes('[#') && x.endsWith(']')
+      )
+      if (customAnchor !== undefined) return customAnchor.slice(2, customAnchor.indexOf(']'))
 
-      return customAnchor
-        .toLowerCase()
-        .replace(/[^a-z0-9- ]/g, '')
-        .replace(/[ ]/g, '-')
+      const formattedText = text
+        .map((x) => {
+          if (typeof x !== 'string') return x.props.children
+          else return x.trim()
+        })
+        .map((x) => {
+          if (typeof x !== 'string') return x
+          else
+            return x
+              .toLowerCase()
+              .replace(/[^a-z0-9- ]/g, '')
+              .replace(/[ ]/g, '-')
+        })
+
+      return formattedText.join('-').toLowerCase()
     } else {
       const anchor = text.props.children
-
       if (typeof anchor === 'string') {
-        console.log('anywhere')
         return anchor
           .toLowerCase()
           .replace(/[^a-z0-9- ]/g, '')
           .replace(/[ ]/g, '-')
       }
-
-      if (anchor.endsWith('{')) return anchor.slice(0, -1)
-
       return anchor
     }
   } else if (typeof text === 'string') {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9- ]/g, '')
-      .replace(/[ ]/g, '-')
+    if (text.includes('[#') && text.endsWith(']')) {
+      return text.slice(text.indexOf('[#') + 2, text.indexOf(']'))
+    } else {
+      return text
+        .toLowerCase()
+        .replace(/[^a-z0-9- ]/g, '')
+        .replace(/[ ]/g, '-')
+    }
   } else {
     return undefined
   }
@@ -37,27 +48,9 @@ export const getAnchor = (text: any): string | undefined => {
 
 export const removeAnchor = (text: any) => {
   if (typeof text === 'object' && Array.isArray(text)) {
-    return text.filter((x) => {
-      console.log('its an object first')
-      if (x.props) {
-        if (!x.props.children.startsWith('#')) {
-          return x
-        }
-      } else {
-        console.log('so what is this then', x)
-        if (x.endsWith('}')) return
-        if (x.endsWith('{')) {
-          console.log('watttt', x)
-          return x.slice(0, -1).trim()
-        } else {
-          console.log('huhhhhhhhh', x)
-          return x
-        }
-      }
-    })
+    return text.filter((x) => !(typeof x === 'string' && x.includes('[#') && x.endsWith(']')))
   } else if (typeof text === 'string') {
-    console.log('but then its a string')
-    if (text.endsWith('{')) return text.slice(0, -1)
+    if (text.indexOf('[#') > 0) return text.slice(0, text.indexOf('[#'))
     else return text
   }
   return text
