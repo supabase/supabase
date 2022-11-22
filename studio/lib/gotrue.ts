@@ -40,18 +40,13 @@ export const getIdentity = (gotrueUser: User) => {
 
 // NOTE: do not use any imports in this function,
 // as it is use standalone in the documents head
-export const getNextPath = (fallback = '/projects') => {
+export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
-  const returnTo = searchParams.get('next')
+  let returnTo = searchParams.get('returnTo') ?? fallback
 
-  searchParams.delete('next')
+  searchParams.delete('returnTo')
 
-  const next = returnTo ?? fallback
   const remainingSearchParams = searchParams.toString()
 
-  if (next === 'new-project') {
-    return '/new/new-project' + (remainingSearchParams ? `?${remainingSearchParams}` : '')
-  }
-
-  return next + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  return returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
 }
