@@ -2,13 +2,13 @@ import { ComponentType, useEffect } from 'react'
 import Head from 'next/head'
 import { NextRouter, useRouter } from 'next/router'
 
-import { STORAGE_KEY } from 'lib/gotrue'
+import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile, useStore, usePermissions } from 'hooks'
 import Error500 from '../../pages/500'
 import { NextPageWithLayout } from 'types'
 
-const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
+const PLATFORM_ONLY_PAGES = ['reports', 'settings']
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
@@ -86,7 +86,7 @@ export function withAuth<T>(
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
           <script
             dangerouslySetInnerHTML={{
-              __html: `if (!window.localStorage.getItem('${STORAGE_KEY}') && !window.location.hash) {window.location.replace('/?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash))}`,
+              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
             }}
           />
         </Head>
