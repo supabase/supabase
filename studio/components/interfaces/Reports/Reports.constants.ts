@@ -35,7 +35,8 @@ export const DEFAULT_QUERY_PARAMS = {
 
 
 export const PRESET_CONFIG : Record<Presets, PresetConfig> ={
-  [Presets.OVERVIEW]: {
+  
+  [Presets.API_OVERVIEW]: {
     title: '',
     sql: {
       statusCodes: `
@@ -95,6 +96,57 @@ ORDER BY
 `,
     },
   },
+  [Presets.API_BOTS]: {
+    title: "API Bots",
+    sql: {
+      userAgents: `
+select
+  h.user_agent as user_agent,
+  cf.asOrganization as request_source,
+  count(f.id) as count
+from
+  edge_logs as f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(r.cf) as cf
+  cross join unnest(r.headers) as h
+group by
+  user_agent,
+  request_source
+order by
+  count desc
+limit 12
+`,
+      botScores:`
+select
+  h.cf_connecting_ip as ip,
+  h.cf_ipcountry as country,
+  h.user_agent as user_agent,
+  r.path as path,
+  b.score as bot_score,
+  b.verifiedBot as bot_verified,
+  count(f.id) as count
+from
+  edge_logs as f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(r.cf) as cf
+  cross join unnest(r.headers) as h
+  cross join unnest(cf.botManagement) as b
+group by
+  ip,
+  country,
+  path,
+  user_agent,
+  bot_score,
+  bot_verified
+order by
+  bot_score desc
+limit 20
+
+      `
+    }
+  }
 }
 
 export const DATETIME_FORMAT = 'MMM D, ha'
