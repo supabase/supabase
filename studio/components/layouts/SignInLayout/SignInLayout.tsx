@@ -1,11 +1,13 @@
 import { useStore } from 'hooks'
-import { getNextPath, STORAGE_KEY } from 'lib/gotrue'
+import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
+import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
+import { useSWRConfig } from 'swr'
 import { Button, IconFileText } from 'ui'
 
 type SignInLayoutProps = {
@@ -22,8 +24,43 @@ const SignInLayout = ({
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
+  const pushNext = usePushNext()
   const { ui } = useStore()
+  const { cache } = useSWRConfig()
   const { theme } = ui
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const hasReturnTo = searchParams.has('returnTo')
+    const hasNext = searchParams.has('next')
+    const shouldRedirect = !hasReturnTo && !hasNext
+
+    if (!shouldRedirect) {
+      // If there's a returnTo or next, then this redirect will be handled by useAutoAuthRedirect() in _app.tsx
+      return
+    }
+
+    ;(async () => {
+      const { error } = await auth.initialize()
+
+      if (error) {
+        // if there was a problem signing in via the url, don't redirect
+        return
+      }
+
+      const {
+        data: { session },
+      } = await auth.getSession()
+
+      if (session) {
+        // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
+        // @ts-ignore
+        cache.clear()
+
+        await pushNext()
+      }
+    })()
+  }, [])
 
   const [quote, setQuote] = useState<{
     text: string
@@ -43,7 +80,7 @@ const SignInLayout = ({
       <Head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `window._getNextPath = ${getNextPath.toString()};if (localStorage.getItem('${STORAGE_KEY}')) {location.replace(window._getNextPath())}`,
+            __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace(window._getReturnToPath())}`,
           }}
         />
       </Head>
