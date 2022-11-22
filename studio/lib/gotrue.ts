@@ -37,3 +37,13 @@ export const getIdentity = (gotrueUser: User) => {
     return { identity: null, error: err }
   }
 }
+
+export const getNextPath = (path?: string | null) => {
+  let next = path ?? '/projects'
+
+  if (next === 'new-project') {
+    return '/new/new-project'
+  }
+
+  return next
+}
