@@ -1,10 +1,6 @@
 import SignInSSOForm from 'components/interfaces/SignIn/SignInSSOForm'
 import { SignInLayout } from 'components/layouts'
-import Connecting from 'components/ui/Loading'
-import { auth } from 'lib/gotrue'
 import Link from 'next/link'
-import { NextRouter, useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const SignInSSOPage: NextPageWithLayout = () => {
@@ -22,7 +18,7 @@ const SignInSSOPage: NextPageWithLayout = () => {
               Sign Up Now
             </a>
           </Link>
-        </div> 
+        </div>
       </div>
     </>
   )
