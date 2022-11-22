@@ -37,7 +37,9 @@ const ColumnType: FC<Props> = ({
         readOnly
         disabled
         label={showLabel ? 'Type' : ''}
-        layout="horizontal"
+        layout={showLabel ? 'horizontal' : undefined}
+        className="md:gap-x-0"
+        size="small"
         value={value}
         descriptionText={
           showLabel
