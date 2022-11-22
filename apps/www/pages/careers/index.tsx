@@ -152,7 +152,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 </div>
               </SectionContainer>
 
-              <SectionContainer className="!pt-0">
+              <SectionContainer className="-mt-16 md:mt-0">
                 <div className="md:flex md:gap-6">
                   <div className="md:w-1/2">
                     <div>
