@@ -21,7 +21,7 @@ The APIs are:
 - **Fast.** <br />Our benchmarks for basic reads are more than 300% faster than Firebase. The API is a very thin layer on top of Postgres, which does most of the heavy lifting.
 - **Scalable.** <br />The API can serve thousands of simultaneous requests, and works well for Serverless workloads.
 
-## REST API {`#rest-api-overview`}
+## REST API {#rest-api-overview}
 
 Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres.
 It provides everything you need from a CRUD API:
@@ -41,7 +41,7 @@ It provides everything you need from a CRUD API:
   ></iframe>
 </div>
 
-## GraphQL API {`#graphql-api-overview`}
+## GraphQL API {#graphql-api-overview}
 
 <Admonition type='note'>
 
@@ -51,7 +51,7 @@ GraphQL is in Beta, and may have breaking changes. It is only available on self-
 
 GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-graphql), an open source PostgreSQL extension for GraphQL.
 
-## Realtime API {`#realtime-api-overview`}
+## Realtime API {#realtime-api-overview}
 
 Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
@@ -130,7 +130,7 @@ You are provided with two keys:
 
 ### Accessing the docs in the Dashboard
 
-#### REST API {`#rest-api-dashboard-docs`}
+#### REST API {#rest-api-dashboard-docs}
 
 Supabase generates documentation in the [Dashboard](https://app.supabase.com) which updates as you make database changes.
 Let's view the documentation for a `countries` table which we created in our database.
