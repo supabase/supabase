@@ -171,7 +171,8 @@ export async function handler(req: Request) {
         ],
         headers: {
           'content-type': 'image/png',
-          'cache-control': 'public, max-age=31536000, no-transform, immutable',
+          'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
+          'cdn-cache-control': 'max-age=31536000',
         },
       }
     )
