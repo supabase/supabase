@@ -242,7 +242,8 @@ part 'rooms_state.dart';
 class RoomCubit extends Cubit<RoomState> {
   RoomCubit() : super(RoomsLoading());
 
-  final Map<String, StreamSubscription<Message?>> _messageSubscriptions = {};
+  final Map<String, StreamSubscription<Message?>>
+      _messageSubscriptions = {};
 
   late final String _myUserId;
 
@@ -251,7 +252,8 @@ class RoomCubit extends Cubit<RoomState> {
 
   /// List of rooms
   List<Room> _rooms = [];
-  StreamSubscription<List<Map<String, dynamic>>>? _rawRoomsSubscription;
+  StreamSubscription<List<Map<String, dynamic>>>?
+      _rawRoomsSubscription;
   bool _haveCalledGetRooms = false;
 
   Future<void> initializeRooms(BuildContext context) async {
@@ -279,7 +281,8 @@ class RoomCubit extends Cubit<RoomState> {
     _newUsers = rows.map(Profile.fromMap).toList();
 
     /// Get realtime updates on rooms that the user is in
-    _rawRoomsSubscription = supabase.from('room_participants').stream(
+    _rawRoomsSubscription =
+        supabase.from('room_participants').stream(
       primaryKey: ['room_id', 'profile_id'],
     ).listen((participantMaps) async {
       if (participantMaps.isEmpty) {
@@ -292,8 +295,10 @@ class RoomCubit extends Cubit<RoomState> {
           .where((room) => room.otherUserId != _myUserId)
           .toList();
       for (final room in _rooms) {
-        _getNewestMessage(context: context, roomId: room.id);
-        BlocProvider.of<ProfilesCubit>(context).getProfile(room.otherUserId);
+        _getNewestMessage(
+            context: context, roomId: room.id);
+        BlocProvider.of<ProfilesCubit>(context)
+            .getProfile(room.otherUserId);
       }
       emit(RoomsLoaded(
         newUsers: _newUsers,
@@ -324,15 +329,19 @@ class RoomCubit extends Cubit<RoomState> {
                 ),
         )
         .listen((message) {
-          final index = _rooms.indexWhere((room) => room.id == roomId);
-          _rooms[index] = _rooms[index].copyWith(lastMessage: message);
+          final index = _rooms
+              .indexWhere((room) => room.id == roomId);
+          _rooms[index] =
+              _rooms[index].copyWith(lastMessage: message);
           _rooms.sort((a, b) {
             /// Sort according to the last message
             /// Use the room createdAt when last message is not available
-            final aTimeStamp =
-                a.lastMessage != null ? a.lastMessage!.createdAt : a.createdAt;
-            final bTimeStamp =
-                b.lastMessage != null ? b.lastMessage!.createdAt : b.createdAt;
+            final aTimeStamp = a.lastMessage != null
+                ? a.lastMessage!.createdAt
+                : a.createdAt;
+            final bTimeStamp = b.lastMessage != null
+                ? b.lastMessage!.createdAt
+                : b.createdAt;
             return bTimeStamp.compareTo(aTimeStamp);
           });
           if (!isClosed) {
@@ -346,8 +355,8 @@ class RoomCubit extends Cubit<RoomState> {
 
   /// Creates or returns an existing roomID of both participants
   Future<String> createRoom(String otherUserId) async {
-    final data = await supabase
-        .rpc('create_new_room', params: {'other_user_id': otherUserId});
+    final data = await supabase.rpc('create_new_room',
+        params: {'other_user_id': otherUserId});
     emit(RoomsLoaded(rooms: _rooms, newUsers: _newUsers));
     return data as String;
   }
@@ -384,7 +393,8 @@ class RoomsPage extends StatelessWidget {
   static Route<void> route() {
     return MaterialPageRoute(
       builder: (context) => BlocProvider<RoomCubit>(
-        create: (context) => RoomCubit()..initializeRooms(context),
+        create: (context) =>
+            RoomCubit()..initializeRooms(context),
         child: const RoomsPage(),
       ),
     );
@@ -415,7 +425,8 @@ class RoomsPage extends StatelessWidget {
           } else if (state is RoomsLoaded) {
             final newUsers = state.newUsers;
             final rooms = state.rooms;
-            return BlocBuilder<ProfilesCubit, ProfilesState>(
+            return BlocBuilder<ProfilesCubit,
+                ProfilesState>(
               builder: (context, state) {
                 if (state is ProfilesLoaded) {
                   final profiles = state.profiles;
@@ -427,28 +438,39 @@ class RoomsPage extends StatelessWidget {
                           itemCount: rooms.length,
                           itemBuilder: (context, index) {
                             final room = rooms[index];
-                            final otherUser = profiles[room.otherUserId];
+                            final otherUser =
+                                profiles[room.otherUserId];
 
                             return ListTile(
-                              onTap: () => Navigator.of(context)
-                                  .push(ChatPage.route(room.id)),
+                              onTap: () =>
+                                  Navigator.of(context)
+                                      .push(ChatPage.route(
+                                          room.id)),
                               leading: CircleAvatar(
                                 child: otherUser == null
                                     ? preloader
-                                    : Text(otherUser.username.substring(0, 2)),
+                                    : Text(otherUser
+                                        .username
+                                        .substring(0, 2)),
                               ),
                               title: Text(otherUser == null
                                   ? 'Loading...'
                                   : otherUser.username),
-                              subtitle: room.lastMessage != null
+                              subtitle: room.lastMessage !=
+                                      null
                                   ? Text(
-                                      room.lastMessage!.content,
+                                      room.lastMessage!
+                                          .content,
                                       maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                      overflow: TextOverflow
+                                          .ellipsis,
                                     )
-                                  : const Text('Room created'),
+                                  : const Text(
+                                      'Room created'),
                               trailing: Text(format(
-                                  room.lastMessage?.createdAt ?? room.createdAt,
+                                  room.lastMessage
+                                          ?.createdAt ??
+                                      room.createdAt,
                                   locale: 'en_short')),
                             );
                           },
@@ -468,7 +490,8 @@ class RoomsPage extends StatelessWidget {
                 _NewUsers(newUsers: newUsers),
                 const Expanded(
                   child: Center(
-                    child: Text('Start a chat by tapping on available users'),
+                    child: Text(
+                        'Start a chat by tapping on available users'),
                   ),
                 ),
               ],
@@ -501,12 +524,16 @@ class _NewUsers extends StatelessWidget {
             .map<Widget>((user) => InkWell(
                   onTap: () async {
                     try {
-                      final roomId = await BlocProvider.of<RoomCubit>(context)
-                          .createRoom(user.id);
-                      Navigator.of(context).push(ChatPage.route(roomId));
+                      final roomId =
+                          await BlocProvider.of<RoomCubit>(
+                                  context)
+                              .createRoom(user.id);
+                      Navigator.of(context)
+                          .push(ChatPage.route(roomId));
                     } catch (_) {
                       context.showErrorSnackBar(
-                          message: 'Failed creating a new room');
+                          message:
+                              'Failed creating a new room');
                     }
                   },
                   child: Padding(
@@ -516,7 +543,8 @@ class _NewUsers extends StatelessWidget {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            child: Text(user.username.substring(0, 2)),
+                            child: Text(user.username
+                                .substring(0, 2)),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -541,33 +569,33 @@ You may see some errors, but they will go away once we edit the chat page!
 ### Step 2: Modify the chat page to load messages in the room
 
 Our `ChatPage` will have a similar layout as the previous one, but will only display messages sent to a single room. We will start by creating `MessagesState`. The messages page will also have four different states, loading, loaded, empty, and error.
-Create a `lib/cubits/messages/messages_state.dart` file with the following code.
+Create a `lib/cubits/chat/chat_state.dart` file with the following code.
 
-```dart title=lib/cubits/messages/messages_state.dart
-part of 'messages_cubit.dart';
+```dart title=lib/cubits/chat/chat_state.dart
+part of 'chat_cubit.dart';
 
 @immutable
-abstract class MessagesState {}
+abstract class ChatState {}
 
-class MessagesInitial extends MessagesState {}
+class ChatInitial extends ChatState {}
 
-class MessagesLoaded extends MessagesState {
-  MessagesLoaded(this.messages);
+class ChatLoaded extends ChatState {
+  ChatLoaded(this.messages);
   final List<Message> messages;
 }
 
-class MessagesEmpty extends MessagesState {}
+class ChatEmpty extends ChatState {}
 
-class MessagesError extends MessagesState {
-  MessagesError(this.message);
+class ChatError extends ChatState {
+  ChatError(this.message);
   final String message;
 }
 ```
 
-Now let's create messages cubit to retrieve the data from our database and emit it as states.
-Create a `lib/cubits/messages/messages_cubit.dart` file and paste the following.
+Now let's create chat cubit to retrieve the data from our database and emit it as states.
+Create a `lib/cubits/chat/chat_cubit.dart` file and paste the following.
 
-```dart title=lib/cubits/messages/messages_cubit.dart
+```dart title=lib/cubits/chat/chat_cubit.dart
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
@@ -575,10 +603,10 @@ import 'package:meta/meta.dart';
 import 'package:my_chat_app/models/message.dart';
 import 'package:my_chat_app/utils/constants.dart';
 
-part 'messages_state.dart';
+part 'chat_state.dart';
 
-class MessagesCubit extends Cubit<MessagesState> {
-  MessagesCubit() : super(MessagesInitial());
+class ChatCubit extends Cubit<ChatState> {
+  ChatCubit() : super(ChatInitial());
 
   StreamSubscription<List<Message>>? _messagesSubscription;
   List<Message> _messages = [];
@@ -605,9 +633,9 @@ class MessagesCubit extends Cubit<MessagesState> {
         .listen((messages) {
           _messages = messages;
           if (_messages.isEmpty) {
-            emit(MessagesEmpty());
+            emit(ChatEmpty());
           } else {
-            emit(MessagesLoaded(_messages));
+            emit(ChatLoaded(_messages));
           }
         });
   }
@@ -623,14 +651,14 @@ class MessagesCubit extends Cubit<MessagesState> {
       isMine: true,
     );
     _messages.insert(0, message);
-    emit(MessagesLoaded(_messages));
+    emit(ChatLoaded(_messages));
 
     try {
       await supabase.from('messages').insert(message.toMap());
     } catch (_) {
-      emit(MessagesError('Error submitting message.'));
+      emit(ChatError('Error submitting message.'));
       _messages.removeWhere((message) => message.id == 'new');
-      emit(MessagesLoaded(_messages));
+      emit(ChatLoaded(_messages));
     }
   }
 
@@ -642,7 +670,7 @@ class MessagesCubit extends Cubit<MessagesState> {
 }
 ```
 
-Messages cubit is pretty simple. It sets a real-time listener to the database using the stream method and emits an empty state if there are no messages in the room, or emits a loaded state if there are messages. 
+Chat cubit is pretty simple. It sets a real-time listener to the database using the stream method and emits an empty state if there are no messages in the room, or emits a loaded state if there are messages. 
 
 Because we are using cubit, we need to modify the MessagesPage widget as well.
 Open `lib/pages/chat_page.dart` and let's update it.
@@ -651,7 +679,8 @@ Open `lib/pages/chat_page.dart` and let's update it.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_chat_app/components/user_avatar.dart';
-import 'package:my_chat_app/cubits/messages/messages_cubit.dart';
+import 'package:my_chat_app/cubits/chat/chat_cubit.dart';
+
 import 'package:my_chat_app/models/message.dart';
 import 'package:my_chat_app/utils/constants.dart';
 import 'package:timeago/timeago.dart';
@@ -664,8 +693,8 @@ class ChatPage extends StatelessWidget {
 
   static Route<void> route(String roomId) {
     return MaterialPageRoute(
-      builder: (context) => BlocProvider<MessagesCubit>(
-        create: (context) => MessagesCubit()..setMessagesListener(roomId),
+      builder: (context) => BlocProvider<ChatCubit>(
+        create: (context) => ChatCubit()..setMessagesListener(roomId),
         child: const ChatPage(),
       ),
     );
@@ -675,16 +704,16 @@ class ChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Chat')),
-      body: BlocConsumer<MessagesCubit, MessagesState>(
+      body: BlocConsumer<ChatCubit, ChatState>(
         listener: (context, state) {
-          if (state is MessagesError) {
+          if (state is ChatError) {
             context.showErrorSnackBar(message: state.message);
           }
         },
         builder: (context, state) {
-          if (state is MessagesInitial) {
+          if (state is ChatInitial) {
             return preloader;
-          } else if (state is MessagesLoaded) {
+          } else if (state is ChatLoaded) {
             final messages = state.messages;
             return Column(
               children: [
@@ -702,7 +731,7 @@ class ChatPage extends StatelessWidget {
                 const _MessageBar(),
               ],
             );
-          } else if (state is MessagesEmpty) {
+          } else if (state is ChatEmpty) {
             return Column(
               children: const [
                 Expanded(
@@ -713,7 +742,7 @@ class ChatPage extends StatelessWidget {
                 _MessageBar(),
               ],
             );
-          } else if (state is MessagesError) {
+          } else if (state is ChatError) {
             return Center(child: Text(state.message));
           }
           throw UnimplementedError();
@@ -790,7 +819,7 @@ class _MessageBarState extends State<_MessageBar> {
     if (text.isEmpty) {
       return;
     }
-    BlocProvider.of<MessagesCubit>(context).sendMessage(text);
+    BlocProvider.of<ChatCubit>(context).sendMessage(text);
     _textController.clear();
   }
 }
@@ -862,11 +891,14 @@ import 'package:my_chat_app/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key, required this.isRegistering}) : super(key: key);
+  const RegisterPage(
+      {Key? key, required this.isRegistering})
+      : super(key: key);
 
   static Route<void> route({bool isRegistering = false}) {
     return MaterialPageRoute(
-      builder: (context) => RegisterPage(isRegistering: isRegistering),
+      builder: (context) =>
+          RegisterPage(isRegistering: isRegistering),
     );
   }
 
@@ -885,7 +917,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   final _usernameController = TextEditingController();
 
-  late final StreamSubscription<AuthState> _authSubscription;
+  late final StreamSubscription<AuthState>
+      _authSubscription;
 
   @override
   void initState() {
@@ -893,11 +926,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
     bool haveNavigated = false;
     // Listen to auth state to redirect user when the user clicks on confirmation link
-    _authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+    _authSubscription =
+        supabase.auth.onAuthStateChange.listen((data) {
       final session = data.session;
       if (session != null && !haveNavigated) {
         haveNavigated = true;
-        Navigator.of(context).pushReplacement(RoomsPage.route());
+        Navigator.of(context)
+            .pushReplacement(RoomsPage.route());
       }
     });
   }
@@ -926,12 +961,14 @@ class _RegisterPageState extends State<RegisterPage> {
         emailRedirectTo: 'io.supabase.chat://login',
       );
       context.showSnackBar(
-          message: 'Please check your inbox for confirmation email.');
+          message:
+              'Please check your inbox for confirmation email.');
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
       debugPrint(error.toString());
-      context.showErrorSnackBar(message: unexpectedErrorMessage);
+      context.showErrorSnackBar(
+          message: unexpectedErrorMessage);
     }
   }
 
@@ -986,7 +1023,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 if (val == null || val.isEmpty) {
                   return 'Required';
                 }
-                final isValid = RegExp(r'^[A-Za-z0-9_]{3,24}$').hasMatch(val);
+                final isValid =
+                    RegExp(r'^[A-Za-z0-9_]{3,24}$')
+                        .hasMatch(val);
                 if (!isValid) {
                   return '3-24 long with alphanumeric or underscore';
                 }
@@ -1001,9 +1040,11 @@ class _RegisterPageState extends State<RegisterPage> {
             spacer,
             TextButton(
                 onPressed: () {
-                  Navigator.of(context).push(LoginPage.route());
+                  Navigator.of(context)
+                      .push(LoginPage.route());
                 },
-                child: const Text('I already have an account'))
+                child:
+                    const Text('I already have an account'))
           ],
         ),
       ),
@@ -1026,7 +1067,8 @@ class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
   static Route<void> route() {
-    return MaterialPageRoute(builder: (context) => const LoginPage());
+    return MaterialPageRoute(
+        builder: (context) => const LoginPage());
   }
 
   @override
@@ -1050,7 +1092,8 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (_) {
-      context.showErrorSnackBar(message: unexpectedErrorMessage);
+      context.showErrorSnackBar(
+          message: unexpectedErrorMessage);
     }
     if (mounted) {
       setState(() {
@@ -1075,13 +1118,15 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           TextFormField(
             controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
+            decoration:
+                const InputDecoration(labelText: 'Email'),
             keyboardType: TextInputType.emailAddress,
           ),
           spacer,
           TextFormField(
             controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: const InputDecoration(
+                labelText: 'Password'),
             obscureText: true,
           ),
           spacer,
@@ -1129,20 +1174,21 @@ class SplashPageState extends State<SplashPage> {
     await Future.delayed(Duration.zero);
 
     try {
-      final session = await SupabaseAuth.instance.initialSession;
+      final session =
+          await SupabaseAuth.instance.initialSession;
       if (session == null) {
-        Navigator.of(context)
-            .pushAndRemoveUntil(RegisterPage.route(), (_) => false);
+        Navigator.of(context).pushAndRemoveUntil(
+            RegisterPage.route(), (_) => false);
       } else {
-        Navigator.of(context)
-            .pushAndRemoveUntil(RoomsPage.route(), (_) => false);
+        Navigator.of(context).pushAndRemoveUntil(
+            RoomsPage.route(), (_) => false);
       }
     } catch (_) {
       context.showErrorSnackBar(
         message: 'Error occured during session refresh',
       );
-      Navigator.of(context)
-          .pushAndRemoveUntil(RegisterPage.route(), (_) => false);
+      Navigator.of(context).pushAndRemoveUntil(
+          RegisterPage.route(), (_) => false);
     }
   }
 
@@ -1175,20 +1221,25 @@ $$ language sql security definer;
 
 
 alter table public.profiles enable row level security;
-create policy "Public profiles are viewable by everyone." on public.profiles for select using (true);
+create policy "Public profiles are viewable by everyone."
+  on public.profiles for select using (true);
 
 
 alter table public.rooms enable row level security;
-create policy "Users can view rooms that they have joined" on public.rooms for select using (is_room_participant(id));
+create policy "Users can view rooms that they have joined"
+  on public.rooms for select using (is_room_participant(id));
 
 
 alter table public.room_participants enable row level security;
-create policy "Participants of the room can view other participants." on public.room_participants for select using (is_room_participant(room_id));
+create policy "Participants of the room can view other participants."
+  on public.room_participants for select using (is_room_participant(room_id));
 
 
 alter table public.messages enable row level security;
-create policy "Users can view messages on rooms they are in." on public.messages for select using (is_room_participant(room_id));
-create policy "Users can insert messages on rooms they are in." on public.messages for insert with check (is_room_participant(room_id) and profile_id = auth.uid());
+create policy "Users can view messages on rooms they are in."
+  on public.messages for select using (is_room_participant(room_id));
+create policy "Users can insert messages on rooms they are in."
+  on public.messages for insert with check (is_room_participant(room_id) and profile_id = auth.uid());
 ```
 
 Notice that we have created a handy `is_room_participant` function that will return whether a particular user is a participant or not in a specific room. 
