@@ -1,17 +1,15 @@
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
-import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.2/mod.ts'
+import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.3/mod.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.1.0'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const BACKGROUND_IMAGE_STD =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/lw6_ticket_regular.jpg'
-const BACKGROUND_IMAGE_GOLDEN =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/lw6_ticket_gold.jpg'
-const SUPA_CHECKMARK =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/supaverified.png'
+const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6'
+const BACKGROUND_IMAGE_STD = `${STORAGE_URL}/lw6_ticket_regular.jpg`
+const BACKGROUND_IMAGE_GOLDEN = `${STORAGE_URL}/lw6_ticket_gold.jpg`
+const SUPA_CHECKMARK = `${STORAGE_URL}/supaverified.png`
 
 // Load custom font
-const FONT_URL =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/CircularStd-Bold.otf'
+const FONT_URL = `${STORAGE_URL}/CircularStd-Bold.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 
 export async function handler(req: Request) {
@@ -27,13 +25,17 @@ export async function handler(req: Request) {
       status: 400,
     })
 
-  const fontData = await font
-
-  const numDigits = `${Number(ticketNumber)}`.length
-  const prefix = `00000000`.slice(numDigits)
-
   try {
-    return new ImageResponse(
+    // Try to get image from Supabase Storage CDN.
+    const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png`)
+    if (storageResponse.ok) return storageResponse
+
+    // Else, generate image ad upload to storage.
+    const fontData = await font
+    const numDigits = `${Number(ticketNumber)}`.length
+    const prefix = `00000000`.slice(numDigits)
+
+    const generatedImage = new ImageResponse(
       (
         <div
           style={{
@@ -176,6 +178,25 @@ export async function handler(req: Request) {
         },
       }
     )
+
+    const supabaseAdminClient = createClient(
+      // Supabase API URL - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_URL') ?? '',
+      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Upload image to storage.
+    const { error } = await supabaseAdminClient.storage
+      .from('images')
+      // @ts-ignore: need to fix type in og_edge
+      .upload(`lw6/tickets/${username}.png`, generatedImage.body, {
+        cacheControl: '31536000',
+        upsert: false,
+      })
+    if (error) throw error
+
+    return generatedImage
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

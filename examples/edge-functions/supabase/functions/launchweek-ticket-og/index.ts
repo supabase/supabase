@@ -8,7 +8,5 @@ import { handler } from './handler.tsx'
 
 console.log(`Function "launchweek-ticket-og" up and running!`)
 
-// @ts-ignore
+// @ts-ignore: need to fix type in og_edge
 serve(handler)
-
-// To deploy: supabase functions deploy launchweek-ticket-og --no-verify-jwt

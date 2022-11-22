@@ -9,10 +9,10 @@ Generate Open Graph images with Deno and Supabase Edge Functions, no framework n
 ## Run locally
 
 ```bash
-deno run --allow-all --watch --no-clear-screen supabase/functions/launchweek-ticket-og/index.ts
+supabase functions serve launchweek-ticket-og --no-verify-jwt
 ```
 
-Navigate to http://localhost:8000/?ticketNumber=1234&username=thorwebdev&name=Thor%20%E9%9B%B7%E7%A5%9E%20Schaeff
+Navigate to http://localhost:54321/functions/v1/launchweek-ticket-og?ticketNumber=3524&username=thorwebdev&name=Thor%20%E9%9B%B7%E7%A5%9E%20Schaeff
 
 ## Deploy
 
