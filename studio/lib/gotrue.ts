@@ -40,18 +40,13 @@ export const getIdentity = (gotrueUser: User) => {
 
 // NOTE: do not use any imports in this function,
 // as it is use standalone in the documents head
-export const getNextPath = () => {
-  if (typeof window === 'undefined') {
-    // make sure this method is SSR safe
-    return '/projects'
-  }
-
+export const getNextPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
   const returnTo = searchParams.get('next')
 
   searchParams.delete('next')
 
-  const next = returnTo ?? '/projects'
+  const next = returnTo ?? fallback
   const remainingSearchParams = searchParams.toString()
 
   if (next === 'new-project') {
