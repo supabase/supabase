@@ -54,6 +54,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     }
   }
 
+  // [Joshen] Kaizen: Use UI library's SidePanel for this
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
     const sidebar = document.querySelector('.sidebar-menu-container')
@@ -62,10 +63,6 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     sidebar.classList.toggle('hidden')
     contentPane.classList.toggle('hidden')
   }
-
-  useEffect(() => {
-    if (mobileMenuOpen) toggleMobileMenu()
-  }, [asPath])
 
   return (
     <nav
@@ -200,7 +197,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
           <div className="flex items-center justify-between space-x-6 bg-scale-300 border border-scale-700 pl-3 pr-1.5 py-1.5 rounded">
             <div className="flex items-center space-x-2">
               <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
-              <p className="text-scale-800 text-sm">Search docs</p>
+              <p className="text-scale-800 text-sm">Search</p>
             </div>
             <div className="flex items-center space-x-1">
               <div className="hidden text-scale-1200 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">

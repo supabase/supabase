@@ -6,6 +6,7 @@ import {
   jsonSyntaxHighlight,
   ResponseCodeFormatter,
   SelectionDetailedRow,
+  SelectionDetailedTimestampRow,
   SeverityFormatter,
 } from '../LogsFormatters'
 
@@ -30,14 +31,7 @@ const AuthSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
         </div>
       </div>
 
-      <SelectionDetailedRow
-        label="ISO Timestamp"
-        value={
-          isUnixMicro(log.timestamp)
-            ? unixMicroToIsoTimestamp(log.timestamp)
-            : String(log.timestamp)
-        }
-      />
+      <SelectionDetailedTimestampRow value={log.timestamp} />
       {parsed?.status && (
         <SelectionDetailedRow
           label="Status"

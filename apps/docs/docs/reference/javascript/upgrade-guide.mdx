@@ -27,8 +27,8 @@ _Optionally_ if you are using custom configuration with `createClient` then foll
 >
 <TabPanel id="1.0x" label="Before">
 
-```ts title="src/supabaseClient.ts"
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+```ts title=src/supabaseClient.ts
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   schema: 'custom',
   persistSession: false,
 })
@@ -37,8 +37,8 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 
-```ts title="src/supabaseClient.ts"
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+```ts title=src/supabaseClient.ts
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: {
     schema: 'custom',
   },
@@ -316,6 +316,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 </TabPanel>
 </Tabs>
+
+#### Cookie methods
+
+The cookie-related methods like `setAuthCookie` and `getUserByCookie` have been removed.
+
+For Next.js you can use the [Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs) to help you manage cookies.
+If you can't use the Auth Helpers, you can use [server-side rendering](https://supabase.com/docs/guides/auth/server-side-rendering).
+
+Some the [PR](https://github.com/supabase/gotrue-js/pull/340) for additional background information.
 
 ### Data methods
 

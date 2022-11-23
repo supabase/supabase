@@ -12,7 +12,7 @@ jobs:
         with:
           ref: master
       - uses: sobolevn/misspell-fixer-action@master
-      - uses: peter-evans/create-pull-request@v2.4.4
+      - uses: peter-evans/create-pull-request@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
