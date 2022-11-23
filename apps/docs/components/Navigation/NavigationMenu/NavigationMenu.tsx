@@ -38,7 +38,7 @@ const SideNav = () => {
       case url.includes(`/docs/guides/realtime`) && url:
         setLevel('realtime')
         break
-      case url.includes(`/docs/edge-functions`) && url:
+      case url.includes(`/docs/guides/edge-functions`) && url:
         setLevel('functions')
         break
       case url.includes(`/docs/reference`) && url:

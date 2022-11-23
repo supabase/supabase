@@ -292,19 +292,13 @@ export default function Ref(props) {
                           <h5 className="mb-3 text-base">Parameters</h5>
                           <div className="">
                             {parameters.map((param) => {
-                              const overrides = item.params
+                              // grab override params from yaml file
+                              const overrideParams = item.overrideParams
 
-                              if (overrides) console.log(`overrides ${item.title}`, overrides)
-
-                              const overide = overrides?.filter((x) => {
+                              // params from the yaml file can override the params from parameters if it matches the name
+                              const overide = overrideParams?.filter((x) => {
                                 return param.name === x.name
                               })
-
-                              // console.log('overide', overide)
-
-                              if (overide) {
-                                console.log('overrides has override', overide)
-                              }
 
                               const paramItem = overide?.length > 0 ? overide[0] : param
 
