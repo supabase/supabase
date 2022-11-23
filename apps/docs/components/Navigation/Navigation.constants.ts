@@ -307,7 +307,6 @@ export const menuItems: NavMenu = {
           name: 'Developer Tools',
           url: undefined,
           items: [
-            { name: 'Estuary', url: '/guides/integrations/estuary', items: [] },
             { name: 'pgMustard', url: '/guides/integrations/pgmustard', items: [] },
             { name: 'Prisma', url: '/guides/integrations/prisma', items: [] },
             { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
