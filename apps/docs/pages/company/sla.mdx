@@ -1,7 +1,8 @@
----
-id: sla
-title: Service Level Agreement
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Service Level Agreement',
+}
 
 The following Service Level Agreement, which is incorporated into and forms part of the Subscription Agreement between Supabase, Inc. ("Supabase") and Customer (the "Agreement"), will apply to the Services for Enterprise Customers specified in an Order Form during the applicable Subscription Term:
 
@@ -86,3 +87,7 @@ An Information request about Supabase or feature request.
 | 4. Low         | 2 business days<br />Monday - Friday  | 2 business days<br />Monday - Friday  | 1 business day<br />Monday - Friday    |
 
 Business hours are from 6am to 6pm (local time), except where otherwise stated.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
