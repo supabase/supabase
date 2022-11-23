@@ -173,7 +173,7 @@ const Step = ({ children, title, step }) => {
               {/* <div className="h-[2px] w-full bg-scale-500"></div> */}
               <div
                 ref={ref}
-                className="sticky w-full top-[150px] z-10 p-5 rounded-lg
+                className="sticky w-full top-[64px] z-10 p-5 rounded-lg
       
       flex gap-3 items-center
       backdrop-blur-lg backdrop-filter bg-white-1200 dark:bg-whiteA-300
