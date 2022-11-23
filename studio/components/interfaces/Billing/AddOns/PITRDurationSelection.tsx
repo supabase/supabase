@@ -29,7 +29,7 @@ const PITRDurationSelection: FC<Props> = ({
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
-  const canUsePITR = getSemanticVersion(ui.selectedProject?.kpsVersion ?? '') > 141044
+  const canUsePITR = getSemanticVersion(ui.selectedProject?.dbVersion ?? '') > 141044
 
   return (
     <div className="space-y-4">
