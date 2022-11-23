@@ -8,5 +8,4 @@ import { handler } from './handler.tsx'
 
 console.log(`Function "launchweek-ticket-og" up and running!`)
 
-// @ts-ignore: need to fix type in og_edge
 serve(handler)

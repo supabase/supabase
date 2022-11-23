@@ -1,5 +1,5 @@
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
-import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.3/mod.ts'
+import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
@@ -27,7 +27,7 @@ export async function handler(req: Request) {
 
   try {
     // Try to get image from Supabase Storage CDN.
-    const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png`)
+    const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png?version=dev`) // TODO change for prod.
     if (storageResponse.ok) return storageResponse
 
     // Else, generate image ad upload to storage.
@@ -189,9 +189,8 @@ export async function handler(req: Request) {
     // Upload image to storage.
     const { error } = await supabaseAdminClient.storage
       .from('images')
-      // @ts-ignore: need to fix type in og_edge
-      .upload(`lw6/tickets/${username}.png`, generatedImage.body, {
-        cacheControl: '31536000',
+      .upload(`lw6/tickets/${username}.png`, generatedImage.body!, {
+        // cacheControl: '31536000', // TODO add for prod
         upsert: false,
       })
     if (error) throw error
