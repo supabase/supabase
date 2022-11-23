@@ -38,7 +38,7 @@
     "json-stringify-safe": "^5.0.1",
     "prettier": "^2.5.1",
     "ts-jest": "^27.0.7",
-    "turbo": "^1.4.6"
+    "turbo": "^1.4.7"
   },
   "repository": {
     "type": "git",
