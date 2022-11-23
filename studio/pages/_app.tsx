@@ -33,6 +33,7 @@ import { dart } from 'lib/constants/prism'
 import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
+import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -89,6 +90,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useAutoAuthRedirect()
 
   const getLayout = Component.getLayout ?? ((page) => page)
 

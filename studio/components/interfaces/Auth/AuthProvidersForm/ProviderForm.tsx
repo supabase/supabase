@@ -46,7 +46,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
     const { error } = await authConfig.update(payload)
 
     if (!error) {
-      resetForm({ values: payload, initialValues: payload })
+      resetForm({ values: { ...values }, initialValues: { ...values } })
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
     } else {

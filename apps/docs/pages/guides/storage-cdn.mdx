@@ -1,0 +1,40 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-cdn',
+  title: 'Storage CDN',
+  description: 'How Supabase Storage caches objects with a CDN',
+  sidebar_label: 'CDN',
+}
+
+## CDN basics
+
+All assets uploaded to storage are cached on a Content Delivery Network (CDN).
+
+To improve the latency for users all around the world, Supabase uses a CDN. CDNs are a geographically distributed set of servers or **nodes** which caches content from an **origin server**. For Supabase Storage, the origin is the storage server running in the [same region as your project](https://app.supabase.com/project/_/settings/general).
+
+Let’s walk through an example of how a CDN helps with performance. A new bucket is created for a Supabase project launched in Singapore. All requests to the Supabase Storage API first hit the CDN. A user from the United States requests an object and is routed to the U.S. CDN. At this point, that CDN node does not have the object in its cache and pings the origin server in Singapore. Another user, also in the United States, requests the same object and is served directly from the CDN cache in the United States instead of routing the request back to Singapore.
+
+Aside from performance, CDNs also help with security and availability by mitigating Distributed Denial of Service and other application attacks.
+
+## Cache duration
+
+By default, assets are cached both in the CDN and in the user's browser for 1 hour. After this, the CDN nodes ping the storage server to see if an object has been updated.
+
+You can modify this cache time when you are [uploading](/docs/reference/javascript/storage-from-upload) or [updating](/docs/reference/javascript/storage-from-update) an object by modifying the `cacheControl` parameter.
+
+If you expect the object to not change at a given URL, setting a longer cache duration is preferable.
+
+If you need to update the version of the object stored in the CDN, there are various cache-busting techniques you can use. The most common way to do this is to add a version query parameter in the URL. For example, you can use a URL like `/storage/v1/object/sign/profile-pictures/cat.jpg?token=eyJh...&version=1` in your applications and set a long cache time of 1 year. When you want to update the cat picture, you can increment the version query parameter in the URL. The CDN will treat `/storage/v1/object/sign/profile-pictures/cat.jpg?token=eyJh...&version=2` as a new object and pings the origin for the updated version.
+
+Note that CDNs might still evict your object from their cache if it has not been requested for a while from a specific region. For example, if no user from United States requests your object, it will be removed from the CDN cache even if you set a very long cache control duration.
+
+The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
+
+## Public vs Private Buckets
+
+Objects in public buckets do not require any Authorization to access objects. This leads to a better cache hit rate compared to private buckets. For private buckets, permissions for accessing each object is checked on a per user level. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both the users since they might have different security policies attached to them. On the other hand, if two different users access the same object in a public bucket from the same region, it results in a cache hit for the second user.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

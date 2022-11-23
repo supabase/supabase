@@ -55,7 +55,7 @@ article h1 {
 .docs-width {
   max-width: calc(100% - var(--sidebar-width));
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     max-width: none;
   }
 }
@@ -67,7 +67,6 @@ article h1 {
 
 .width-full {
   width: 100% !important;
-  max-width: max-content !important;
 }
 
 .p:not(.prose *):not(.overwrite) {
@@ -100,15 +99,11 @@ pre[class*='language-'] {
     overflow-wrap: anywhere;
   }
   .method-list-item-validation {
-    @apply flex flex-wrap gap-2;
+    @apply flex flex-wrap gap-2 items-center;
   }
   .method-list-item-description {
     @apply text-sm space-y-2;
   }
-}
-
-.method-list-group li:last-child {
-  border-bottom: 1px solid var(--colors-scale3);
 }
 
 .method-list-title-isChild {
@@ -126,7 +121,7 @@ pre[class*='language-'] {
 }
 
 .method-list-group {
-  @apply p-0 m-0 list-none;
+  @apply p-0 m-0 list-none border-b;
 }
 
 .method-list-group .method-list-group {
@@ -187,7 +182,9 @@ pre[class*='language-'] {
 }
 
 // format <code> inside <p>
-p code {
+h2 code,
+h3 code,
+h4 code {
   word-break: keep-all !important;
   white-space: nowrap !important;
   padding: 0.1rem 0.35rem !important;
@@ -199,9 +196,12 @@ p code {
     display: none;
   }
 }
+
 // code inside admonitions
 .admonition-content p code {
   @apply bg-scale-300;
+  word-break: keep-all !important;
+  white-space: nowrap !important;
 }
 
 article p strong {
@@ -213,6 +213,28 @@ a:has(code) {
   box-shadow: none !important;
 }
 
-pre code {
-  white-space: normal !important;
+// fix code line wrapping
+// need to set this to happen from medium onwards, otherwise the would cause horizontal scroll
+article p code {
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+.short-inline-codeblock {
+  @media screen and (min-width: 769px) {
+    white-space: pre !important;
+  }
+}
+
+// fix firefox issue with li wrapping
+.doc-content-container ul li div.relative {
+  display: inline-block;
+}
+
+// fix ToC links when they have <code> inside
+.toc-menu li a code {
+  background: none;
+  border: none;
 }

@@ -7,7 +7,7 @@ run: download transform format
 # Init - prepare the environment
 ###############################################################################
 
-init: 
+init:
 	cd $(REPO_DIR)/parser && npm install
 
 
@@ -18,7 +18,7 @@ download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v2
 
 download.api.v1:
 	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v0_openapi.json
-	
+
 download.auth.v1:
 	curl -sS https://supabase.github.io/gotrue/swagger.json > $(REPO_DIR)/auth_v1_openapi.json
 
@@ -95,7 +95,7 @@ combine.tsdoc.v2:
 	> $(REPO_DIR)/enrichments/tsdoc_v2/combined.json
 
 ###############################################################################
-# Format everything - easier for git to track changes
+# Format everything - easier for git to track changes.
 ###############################################################################
 format:
 	npx prettier --write .

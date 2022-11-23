@@ -1,14 +1,16 @@
 import dayjs from 'dayjs'
 import useSWR from 'swr'
-import { FC } from 'react'
+import { FC, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 
-import { useStore } from 'hooks'
+import { useStore, useNotifications } from 'hooks'
 import { Project } from 'types'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 import NotificationActions from './NotificationActions'
-import { get } from 'lib/common/fetch'
+import { get, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { Button, IconX } from 'ui'
 
 interface Props {
   notification: Notification
@@ -25,7 +27,9 @@ const NotificationRow: FC<Props> = ({
   onSelectRollbackMigration,
   onSelectFinalizeMigration,
 }) => {
-  const { app } = useStore()
+  const { app, ui } = useStore()
+  const { refresh } = useNotifications()
+  const [dismissing, setDismissing] = useState(false)
   const [project] = app.projects.list((project: Project) => project.id === notification.project_id)
 
   const insertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mma')
@@ -42,6 +46,23 @@ const NotificationRow: FC<Props> = ({
     get
   )
 
+  const dismissNotification = async (notificationId: string) => {
+    if (!notificationId) return
+    setDismissing(true)
+    const { error } = await delete_(`${API_URL}/notifications`, { ids: [notificationId] })
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Failed to dismiss notification',
+        error,
+        duration: 4000,
+      })
+    } else {
+      refresh()
+    }
+    setDismissing(false)
+  }
+
   return (
     <div className="flex py-2">
       <div className="flex min-w-[50px] justify-center">
@@ -49,14 +70,48 @@ const NotificationRow: FC<Props> = ({
           <div className="mt-1.5 h-2 w-2 rounded-full bg-green-900" />
         )}
       </div>
-      <div className="flex-grow mr-8 flex items-center space-x-4">
-        <div className="w-[70%] space-y-2">
-          {formatNotificationText(project, notification, ownerReassignStatus)}
-          {formatNotificationCTAText(availableActions, ownerReassignStatus)}
-          <p className="text-scale-1100 text-sm !mt-2">{insertedAt}</p>
+      <div className="flex-grow mr-8 flex flex-col gap-4">
+        <div className="w-full flex justify-between">
+          <div className="w-9/10 space-y-2">
+            {formatNotificationText(project, notification, ownerReassignStatus)}
+            {formatNotificationCTAText(availableActions, ownerReassignStatus)}
+            <p className="text-scale-1100 text-sm !mt-2">{insertedAt}</p>
+          </div>
+          <div className="w-1/10 flex justify-end">
+            <div>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    className="!px-1 group"
+                    type="text"
+                    loading={dismissing}
+                    icon={
+                      <IconX
+                        size={14}
+                        strokeWidth={2}
+                        className="text-scale-1100 group-hover:text-scale-1200 transition"
+                      />
+                    }
+                    onClick={() => dismissNotification(notification.id)}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">Dismiss</span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </div>
+          </div>
         </div>
-        <div className="w-[30%] col-span-3 flex items-center justify-end">
-          {availableActions.length > 0 && (
+        {(availableActions.length > 0 || changelogLink !== undefined) && (
+          <div className="flex items-center">
             <NotificationActions
               project={project}
               changelogLink={changelogLink}
@@ -67,8 +122,8 @@ const NotificationRow: FC<Props> = ({
               onSelectRollbackMigration={() => onSelectRollbackMigration(project, notification)}
               onSelectFinalizeMigration={() => onSelectFinalizeMigration(project, notification)}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )

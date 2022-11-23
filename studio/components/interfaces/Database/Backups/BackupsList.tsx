@@ -34,7 +34,7 @@ const BackupsList: FC<Props> = ({}) => {
       <UpgradeToPro
         primaryText="Free Plan does not include project backups."
         projectRef={projectRef}
-        secondaryText="Please upgrade to Pro plan for up to 7 days of backups."
+        secondaryText="Please upgrade to the Pro plan for up to 7 days of scheduled backups."
       />
     )
   }

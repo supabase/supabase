@@ -588,13 +588,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/guides/database/introduction',
-    destination: '/guides/database',
-  },
-  {
-    permanent: true,
-    source: '/guides/auth',
-    destination: '/guides/auth/intro',
+    source: '/docs/guides/database/introduction',
+    destination: '/docs/guides/database',
   },
   {
     permanent: false,
@@ -1360,8 +1355,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/guides/database/migrating-between-projects',
-    destination: '/guides/platform/migrating-and-upgrading-projects',
+    source: '/docs/guides/database/migrating-between-projects',
+    destination: '/docs/guides/platform/migrating-and-upgrading-projects',
   },
 
   // supabase-js v1 to v2 redirects
@@ -1539,5 +1534,15 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/dart/getsubscriptions',
     destination: '/docs/reference/dart/v0/getsubscriptions',
+  },
+  {
+    permanent: true,
+    source: '/docs/going-into-prod',
+    destination: '/docs/guides/platform/going-into-prod',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/disk-usage',
+    destination: '/docs/guides/platform/database-usage',
   },
 ]

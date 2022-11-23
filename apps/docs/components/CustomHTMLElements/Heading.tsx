@@ -8,7 +8,6 @@ import { useInView } from 'react-intersection-observer'
 
 const Heading = ({ tag, children }) => {
   const HeadingTag = `${tag}` as any
-
   const anchor = getAnchor(children)
   const link = `#${anchor}`
 
@@ -24,10 +23,10 @@ const Heading = ({ tag, children }) => {
   })
 
   return (
-    <HeadingTag id={anchor} ref={ref} className="group flex gap-1 items-center scroll-mt-24">
+    <HeadingTag id={anchor} ref={ref} className="group scroll-mt-24">
       {removeAnchor(children)}
       {anchor && (
-        <a href={link} className="opacity-0 group-hover:opacity-100 transition">
+        <a href={link} className="ml-2 opacity-0 group-hover:opacity-100 transition">
           #
         </a>
       )}

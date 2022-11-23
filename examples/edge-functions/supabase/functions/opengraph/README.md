@@ -5,6 +5,14 @@ Generate Open Graph images with Deno and Supabase Edge Functions, no framework n
 - Docs: https://deno.land/x/og_edge@0.0.2
 - Demo: https://zdtdtxajzydjqzuktnqx.functions.supabase.co/opengraph
 
+## Run locally
+
+```bash
+supabase functions serve opengraph --no-verify-jwt
+```
+
+Navigate to http://localhost:54321/functions/v1/opengraph
+
 ## Deploy
 
 ```bash
