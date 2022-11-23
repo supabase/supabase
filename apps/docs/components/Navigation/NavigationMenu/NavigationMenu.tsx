@@ -13,9 +13,9 @@ const SideNav = () => {
   const [level, setLevel] = useState('home')
 
   function handleRouteChange(url: string) {
-    console.log('path changed')
-    console.log(url)
-    console.log('LISTEN')
+    // console.log('path changed')
+    // console.log(url)
+    // console.log('LISTEN')
     switch (url) {
       case `/docs`:
         setLevel('home')
