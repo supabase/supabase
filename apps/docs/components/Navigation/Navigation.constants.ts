@@ -282,11 +282,6 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Supabase Marketplace', url: '/guides/integrations/integrations', items: [] },
         {
-          name: 'API',
-          url: undefined, 
-          items: [ {name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] }]
-        },
-        {
           name: 'Auth',
           url: undefined,
           items: [
@@ -312,6 +307,7 @@ export const menuItems: NavMenu = {
             { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
             { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
             { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
+            { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
           ],
         },
         {

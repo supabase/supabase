@@ -3,8 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'zuplo',
   title: 'Zuplo',
-  description:
-    'Shipping a public API backed by Supabase',
+  description: 'Building a public API backed by Supabase.',
 }
 
 [Zuplo](https://zuplo.com) is a fully-managed API gateway that offers the easiest way to securely and safely share your API. In this guide we look at how you can combine Zuplo and Supabase to create a public API with rate-limiting, a self-serve developer portal, and API-key authentication. There is an [accompanying video for this article](https://www.youtube.com/watch?v=GJSkbxMnWxE).
@@ -46,7 +45,7 @@ And in the request handler section, paste the `READ ALL ROWS` URL of your Supaba
 - URL Rewrite: `https://YOUR_SUPABASE_URL.supabase.co/rest/v1/ski-reviews?select=*`
 - Forward Search: `unchecked`
 
-In order to call the Supabase backend I need to add some authentication headers to the outgoing request. 
+In order to call the Supabase backend I need to add some authentication headers to the outgoing request.
 
 Expand the **Policies** section of your route. Click **Add policy** on the **Request** pipeline.
 
