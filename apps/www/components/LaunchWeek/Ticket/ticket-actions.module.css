@@ -1,0 +1,70 @@
+.button {
+  border-radius: var(--space-2x);
+  border: 1px solid #fff;
+  color: #000;
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--text-md);
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  outline: none;
+  transition: background-color 0.2s ease;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  text-align: center;
+  align-items: center;
+  padding: 0 var(--space-4x);
+  height: 55px;
+  width: 100%;
+  max-width: 400px;
+  margin: var(--space-2x) auto;
+}
+
+.loading {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+@media (min-width: 768px) {
+  .button {
+    width: 200px;
+    margin: 0 6px;
+  }
+}
+
+.button:hover,
+.button:focus {
+  background: black;
+  color: #fff;
+}
+
+.first {
+  animation-delay: 2s;
+}
+.second {
+  animation-delay: 2.2s;
+}
+.third {
+  animation-delay: 2.4s;
+}
+
+:global(.ticket-generated) .first {
+  animation-delay: 0.6s;
+}
+:global(.ticket-generated) .second {
+  animation-delay: 0.8s;
+}
+:global(.ticket-generated) .third {
+  animation-delay: 1s;
+}
+
+.linkedin-button {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .linkedin-button {
+    display: grid !important;
+  }
+}

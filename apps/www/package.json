@@ -29,7 +29,7 @@
     "gray-matter": "^4.0.2",
     "markdown-toc": "^1.2.0",
     "marked": "^4.0.12",
-    "next": "latest",
+    "next": "12.1.0",
     "next-compose-plugins": "^2.2.1",
     "next-mdx-remote": "^4.1.0",
     "next-seo": "^4.20.0",
@@ -55,6 +55,7 @@
     "ui": "*",
     "use-debounce": "^7.0.1",
     "uuid": "^8.3.2",
+    "vanilla-tilt": "1.7.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {

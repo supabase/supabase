@@ -85,6 +85,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/launch-week/ticket-image</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/legal/dpa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -898,6 +904,12 @@
     <loc
       >https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</loc
     >
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
