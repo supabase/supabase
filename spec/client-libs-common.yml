@@ -11,354 +11,354 @@ functions:
   - id: initializing
     title: initializing
 
-  - id: sign-up
-    title: signUp()
-    product: 'Auth'
-
-  - id: sign-in-with-password
-    title: signInWithPassword()
-    product: 'Auth'
-
-  - id: sign-in-with-otp
-    title: signInWithOtp()
-    product: 'Auth'
-
-  - id: sign-in-with-oauth
-    title: signInWithOAuth()
-    product: 'Auth'
-
-  - id: sign-out
-    title: signOut()
-    product: 'Auth'
-
-  - id: verify-otp
-    title: verifyOtp()
-    product: 'Auth'
-
-  - id: get-session
-    title: getSession()
-    product: 'Auth'
-
-  - id: get-user
-    title: getUser()
-    product: 'Auth'
-
-  - id: update-user
-    title: updateUser()
-    product: 'Auth'
-
-  - id: set-session
-    title: setSession()
-    product: 'Auth'
-
-  - id: refresh-session
-    title: refreshSession()
-    product: 'Auth'
-
-  - id: on-auth-state-change
-    title: onAuthStateChange()
-    product: 'Auth'
-
-  - id: admin-api
-    title: Overview
-    product: 'Auth-admin'
-
-  - id: get-user-by-id
-    title: getUserById()
-    product: 'Auth-admin'
-
-  - id: list-users
-    title: listUsers()
-    product: 'Auth-admin'
-
-  - id: create-user
-    title: createUser()
-    product: 'Auth-admin'
-
-  - id: delete-user
-    title: deleteUser()
-    product: 'Auth-admin'
-
-  - id: invite-user-by-email
-    title: inviteUserByEmail()
-    product: 'Auth-admin'
-
-  - id: auth-reset-password-for-email
-    title: resetPasswordForEmail()
-    product: 'Auth-admin'
-
-  - id: generate-link
-    title: generateLink()
-    product: 'Auth-admin'
-
-  - id: update-user-by-id
-    title: updateUserById()
-    product: 'Auth-admin'
-
   - id: select
-    title: 'Fetch data: select()'
-    product: 'Database'
+    title: 'Fetching data'
+    product: database
 
   - id: insert
-    title: 'Create data: insert()'
-    product: 'Database'
+    title: 'Insert data'
+    product: 'database'
 
   - id: update
-    title: 'Modify data: update()'
-    product: 'Database'
+    title: 'Update data'
+    product: 'database'
 
   - id: upsert
-    title: 'Upsert data: upsert()'
-    product: 'Database'
+    title: 'Upsert data'
+    product: 'database'
 
   - id: delete
-    title: 'Delete data: delete()'
-    product: 'Database'
+    title: 'Delete data'
+    product: 'database'
 
   - id: rpc
-    title: 'Postgres functions: rpc()'
-    product: 'Database'
+    title: 'Postgres functions'
+    product: 'database'
 
   - id: eq
     title: eq()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: neq
     title: neq()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: gt
     title: gt()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: gte
     title: gte()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: lt
     title: lt()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: lte
     title: lte()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: like
     title: like()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: ilike
     title: ilike()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: is
     title: is()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: in
     title: in()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: contains
     title: contains()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: contained-by
     title: containedBy()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: range-gt
     title: rangeGt()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: range-gte
     title: rangeGte()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: range-lt
     title: rangeLt()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: range-lte
     title: rangeLte()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: range-adjacent
     title: rangeAdjacent()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: overlaps
     title: overlaps()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: text-search
     title: textSearch()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: match
     title: match()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: not
     title: not()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: or
     title: or()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: filter
     title: filter()
-    product: 'Database'
+    product: 'database'
     parent: 'Filters'
 
   - id: using-modifiers
     title: Using Modifiers
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: db-modifiers-select
     title: select()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: order
     title: order()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: limit
     title: limit()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: range
     title: range()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: abort-signal
     title: abortSignal()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: single
     title: single()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: maybeSingle
     title: maybeSingle()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
 
   - id: csv
     title: csv()
-    product: 'Database'
+    product: 'database'
     parent: 'Modifiers'
+
+  - id: sign-up
+    title: Sign up
+    product: 'auth'
+
+  - id: sign-in-with-password
+    title: Sign in with password
+    product: 'auth'
+
+  - id: sign-in-with-otp
+    title: Sign in with OTP
+    product: 'auth'
+
+  - id: sign-in-with-oauth
+    title: Sign in with 0auth
+    product: 'auth'
+
+  - id: sign-out
+    title: signOut()
+    product: 'auth'
+
+  - id: verify-otp
+    title: verifyOtp()
+    product: 'auth'
+
+  - id: get-session
+    title: getSession()
+    product: 'auth'
+
+  - id: get-user
+    title: getUser()
+    product: 'auth'
+
+  - id: update-user
+    title: updateUser()
+    product: 'auth'
+
+  - id: set-session
+    title: setSession()
+    product: 'auth'
+
+  - id: refresh-session
+    title: refreshSession()
+    product: 'auth'
+
+  - id: on-auth-state-change
+    title: onAuthStateChange()
+    product: 'auth'
+
+  - id: admin-api
+    title: Overview
+    product: 'auth-admin'
+
+  - id: get-user-by-id
+    title: getUserById()
+    product: 'auth-admin'
+
+  - id: list-users
+    title: listUsers()
+    product: 'auth-admin'
+
+  - id: create-user
+    title: createUser()
+    product: 'auth-admin'
+
+  - id: delete-user
+    title: deleteUser()
+    product: 'auth-admin'
+
+  - id: invite-user-by-email
+    title: inviteUserByEmail()
+    product: 'auth-admin'
+
+  - id: auth-reset-password-for-email
+    title: resetPasswordForEmail()
+    product: 'auth-admin'
+
+  - id: generate-link
+    title: generateLink()
+    product: 'auth-admin'
+
+  - id: update-user-by-id
+    title: updateUserById()
+    product: 'auth-admin'
 
   - id: invoke
     title: invoke()
-    product: 'Functions'
+    product: 'functions'
 
   - id: subscribe
     title: on().subscribe()
-    product: 'Realtime'
+    product: 'realtime'
 
   - id: get-channels
     title: getChannels()
-    product: 'Realtime'
+    product: 'realtime'
 
   - id: remove-channel
     title: removeChannel()
-    product: 'Realtime'
+    product: 'realtime'
 
   - id: remove-all-channels
     title: removeAllChannels()
-    product: 'Realtime'
+    product: 'realtime'
 
   - id: list-buckets
     title: listBuckets()
-    product: 'Storage'
+    product: 'storage'
 
   - id: get-bucket
     title: getBucket()
-    product: 'Storage'
+    product: 'storage'
 
   - id: create-bucket
     title: createBucket()
-    product: 'Storage'
+    product: 'storage'
 
   - id: empty-bucket
     title: emptyBucket()
-    product: 'Storage'
+    product: 'storage'
 
   - id: update-bucket
     title: updateBucket()
-    product: 'Storage'
+    product: 'storage'
 
   - id: delete-bucket
     title: deleteBucket()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-upload
     title: from.upload()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-update
     title: from.update()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-move
     title: from.move()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-copy
     title: from.copy()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-create-signed-url
     title: from.createSignedUrl()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-create-signed-urls
     title: from.createSignedUrls()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-get-public-url
     title: from.getPublicUrl()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-download
     title: from.download()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-remove
     title: from.remove()
-    product: 'Storage'
+    product: 'storage'
 
   - id: from-list
     title: from.list()
-    product: 'Storage'
+    product: 'storage'
