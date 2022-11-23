@@ -1,6 +1,6 @@
-import { isUnixMicro, PreviewLogData, unixMicroToIsoTimestamp } from '..'
+import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight, SelectionDetailedRow } from '../LogsFormatters'
+import { jsonSyntaxHighlight, SelectionDetailedTimestampRow } from '../LogsFormatters'
 
 const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => (
   <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-6`}>
@@ -10,11 +10,7 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => (
         {log.event_message}
       </div>
     </div>
-
-    <SelectionDetailedRow
-      label="ISO Timestamp"
-      value={isUnixMicro(log.timestamp) ? unixMicroToIsoTimestamp(log.timestamp) : String(log.timestamp)}
-    />
+    <SelectionDetailedTimestampRow value={log.timestamp} />
     <div className="flex flex-col gap-3">
       <h3 className="text-scale-900 text-sm">Metadata</h3>
       <pre

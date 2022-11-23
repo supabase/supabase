@@ -39,7 +39,7 @@ interface Props {
 const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const { ui, app } = useStore()
   const router = useRouter()
-  const { ref, category } = router.query
+  const { ref, subject, category } = router.query
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -82,7 +82,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
   const selectedProject = sortedProjects.find((project) => project.ref === ref)
   const selectedCategory = CATEGORY_OPTIONS.find((option) => {
-    if (option.value.toLowerCase() === category) return option
+    if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
   const initialValues = {
     category: selectedCategory !== undefined ? selectedCategory.value : CATEGORY_OPTIONS[0].value,
@@ -94,7 +94,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         ? sortedProjects[0].ref
         : 'no-project',
     library: 'no-library',
-    subject: '',
+    subject: subject ?? '',
     message: '',
   }
 

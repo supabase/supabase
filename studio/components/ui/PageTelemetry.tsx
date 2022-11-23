@@ -11,8 +11,6 @@ const PageTelemetry: FC = ({ children }) => {
   const { ui } = useStore()
   const { profile } = ui
 
-  const isAuth = router.asPath && router.asPath.includes('auth=true')
-
   useEffect(() => {
     function handleRouteChange() {
       handlePageTelemetry(profile)
@@ -32,15 +30,6 @@ const PageTelemetry: FC = ({ children }) => {
     if (router.route === '/' && router.asPath === '/') {
       handlePageTelemetry(profile)
     }
-    /**
-     * remove auth param from callback url
-     * to do: this causes an issue with sending two page views !
-     *
-     * author @mildtomato
-     */
-    if (isAuth) {
-      router.replace('/?auth=true', '/')
-    }
   }, [])
 
   const handlePageTelemetry = (profile?: User) => {
@@ -49,15 +38,6 @@ const PageTelemetry: FC = ({ children }) => {
        * Get referrer from browser
        */
       let referrer: string | undefined = document.referrer
-
-      /**
-       * When user is logging in for first time, callback url will contain param `signup=true`
-       * If true, we will exclude the referrer, which will likely be `github.com` (or any other provider used in future)
-       */
-
-      if (isAuth) {
-        referrer = undefined
-      }
 
       /**
        * Send page telemetry
