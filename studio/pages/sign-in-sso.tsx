@@ -12,12 +12,14 @@ const SignInSSOPage: NextPageWithLayout = () => {
 
       <div className="my-8 self-center text-sm">
         <div>
-          <span className="text-scale-1000">Don't have an enterprise account?</span>{' '}
-          <Link href="/sign-up">
-            <a className="underline text-scale-1200 hover:text-scale-1100 transition">
-              Sign Up Now
-            </a>
-          </Link>
+          <span className="text-scale-1000">Interested in SSO?</span>{' '}
+          <a
+            href="https://supabase.com/contact/enterprise"
+            rel="noopener noreferrer"
+            className="underline text-scale-1200 hover:text-scale-1100 transition"
+          >
+            Let Us Know
+          </a>
         </div>
       </div>
     </>
