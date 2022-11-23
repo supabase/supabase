@@ -1,7 +1,9 @@
 import React from 'react'
 import { TsDoc } from '~/generator/legacy/definitions'
+import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 
 import { uniqBy } from 'lodash'
+import { slugify, toArrayWithKey, toTitle } from '~/generator/helpers'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
@@ -193,3 +195,51 @@ ${commentObject?.text || ''}
 //     })
 //   })
 // }
+
+// OPENAPI-SPEC-VERSION: 3.0.0
+type v3OperationWithPath = OpenAPIV3.OperationObject & {
+  path: string
+}
+type enrichedOperation = OpenAPIV3.OperationObject & {
+  path: string
+  fullPath: string
+  operationId: string
+}
+export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
+  const specLayout = spec.tags || []
+  const operations: enrichedOperation[] = []
+  console.log('im v3ing')
+  Object.entries(spec.paths).forEach(([key, val]) => {
+    const fullPath = `${apiUrl}${key}`
+
+    toArrayWithKey(val!, 'operation').forEach((o) => {
+      const operation = o as v3OperationWithPath
+      const enriched = {
+        ...operation,
+        path: key,
+        fullPath,
+        operationId: slugify(operation.summary!),
+
+        responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
+      }
+      operations.push(enriched)
+    })
+  })
+
+  const sections = specLayout.map((section) => {
+    return {
+      ...section,
+      title: toTitle(section.name),
+      id: slugify(section.name),
+      operations: operations.filter((operation) => operation.tags?.includes(section.name)),
+    }
+  })
+
+  const content = {
+    info: spec.info,
+    sections,
+    operations,
+  }
+
+  return content
+}
