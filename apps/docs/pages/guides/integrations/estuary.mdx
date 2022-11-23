@@ -1,8 +1,10 @@
----
-id: estuary
-title: 'Estuary'
-description: "Create a real-time data pipeline connecting Firestore and Supabase to make migration simple."
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'estuary',
+  title: 'Estuary',
+  description: 'Create a real-time data pipeline connecting Firestore and Supabase to make migration simple.',
+}
 
 Estuary Flow is a platform for creating [real-time data pipelines at scale](https://www.estuary.dev/).
 It combines the intuitive interface of an ELT service with an event-driven runtime and a variety of open-source connectors. 
@@ -93,3 +95,7 @@ For more information, visit the [Flow docs](https://docs.estuary.dev/). In parti
    * [Guide to create a Data Flow](https://docs.estuary.dev/guides/create-dataflow/)
    * [Firestore capture connector](https://docs.estuary.dev/reference/Connectors/capture-connectors/google-firestore/)
    * [Postgres materializaiton connector](https://docs.estuary.dev/reference/Connectors/materialization-connectors/PostgreSQL/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
