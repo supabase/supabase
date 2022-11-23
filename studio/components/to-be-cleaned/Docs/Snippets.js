@@ -487,7 +487,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signUp({
+let { data, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: '${randomPassword}'
 })
@@ -511,7 +511,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithPassword({
+let { data, error } = await supabase.auth.signInWithPassword({
   email: 'someone@email.com',
   password: '${randomPassword}'
 })
@@ -534,7 +534,7 @@ curl -X POST '${endpoint}/auth/v1/magiclink' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOtp({
+let { data, error } = await supabase.auth.signInWithOtp({
   email: 'someone@email.com'
 })
 `,
@@ -557,7 +557,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signUp({
+let { data, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password'
 })
@@ -580,7 +580,7 @@ curl -X POST '${endpoint}/auth/v1/otp' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOtp({
+let { data, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555'
 })
 `,
@@ -604,7 +604,7 @@ curl -X POST '${endpoint}/auth/v1/verify' \\
     js: {
       language: 'js',
       code: `
-let { session, error } = await supabase.auth.verifyOTP({
+let { data, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456'
 })
@@ -641,7 +641,7 @@ let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.c
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOAuth({
+let { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'
 })
 `,
@@ -660,7 +660,7 @@ curl -X GET '${endpoint}/auth/v1/user' \\
     js: {
       language: 'js',
       code: `
-const user = supabase.auth.user()
+const { data: { user } } = await supabase.auth.getUser()
 `,
     },
   }),
@@ -705,7 +705,7 @@ let { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
     js: {
       language: 'js',
       code: `
-const { user, error } = await supabase.auth.update({
+const { data, error } = await supabase.auth.updateUser({
   email: "new@email.com",
   password: "new-password",
   data: { hello: 'world' }
