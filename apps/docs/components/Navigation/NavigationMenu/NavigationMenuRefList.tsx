@@ -28,6 +28,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
 
   const FunctionLink = ({
     title,
+    id,
     icon,
   }: {
     title: string
