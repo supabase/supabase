@@ -9,6 +9,7 @@ const SignInPage: NextPageWithLayout = () => {
     <>
       <div className="flex flex-col gap-5">
         <SignInWithGitHub />
+        {/* <SignInWithSSO /> */}
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
