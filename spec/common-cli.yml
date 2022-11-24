@@ -1,0 +1,142 @@
+clisCommon: '001'
+commands:
+  - id: supabase-test
+    title: supabase test
+
+  - id: supabase-test-db
+    title: supabase test db
+
+  - id: supabase-stop
+    title: supabase stop
+
+  - id: supabase-status
+    title: supabase status
+
+  - id: supabase-start
+    title: supabase start
+
+  - id: supabase-secrets
+    title: supabase secrets
+
+  - id: supabase-secrets-unset
+    title: supabase secrets unset
+
+  - id: supabase-secrets-set
+    title: supabase secrets set
+
+  - id: supabase-secrets-list
+    title: supabase secrets list
+
+  - id: supabase-projects
+    title: supabase projects
+
+  - id: supabase-projects-list
+    title: supabase projects list
+
+  - id: supabase-projects-create
+    title: supabase projects create
+
+  - id: supabase-orgs
+    title: supabase orgs
+
+  - id: supabase-orgs-list
+    title: supabase orgs list
+
+  - id: supabase-migration
+    title: supabase migration
+
+  - id: supabase-migration-new
+    title: supabase migration new
+
+  - id: supabase-migration-list
+    title: supabase migration list
+
+  - id: supabase-login
+    title: supabase login
+
+  - id: supabase-link
+    title: supabase link
+
+  - id: supabase-init
+    title: supabase init
+
+  - id: supabase-gen
+    title: supabase gen
+
+  - id: supabase-gen-types
+    title: supabase gen types
+
+  - id: supabase-gen-types-typescript
+    title: supabase gen types typescript
+
+  - id: supabase-functions
+    title: supabase functions
+
+  - id: supabase-functions-serve
+    title: supabase functions serve
+
+  - id: supabase-functions-new
+    title: supabase functions new
+
+  - id: supabase-functions-deploy
+    title: supabase functions deploy
+
+  - id: supabase-functions-delete
+    title: supabase functions delete
+
+  - id: supabase-domains
+    title: supabase domains
+
+  - id: supabase-domains-reverify
+    title: supabase domains reverify
+
+  - id: supabase-domains-get
+    title: supabase domains get
+
+  - id: supabase-domains-delete
+    title: supabase domains delete
+
+  - id: supabase-domains-create
+    title: supabase domains create
+
+  - id: supabase-domains-activate
+    title: supabase domains activate
+
+  - id: supabase-db
+    title: supabase db
+
+  - id: supabase-db-reset
+    title: supabase db reset
+
+  - id: supabase-db-remote
+    title: supabase db remote
+
+  - id: supabase-db-remote-commit
+    title: supabase db remote commit
+
+  - id: supabase-db-remote-changes
+    title: supabase db remote changes
+
+  - id: supabase-db-push
+    title: supabase db push
+
+  - id: supabase-db-lint
+    title: supabase db lint
+
+  - id: supabase-db-diff
+    title: supabase db diff
+
+  - id: supabase-completion
+    title: supabase completion
+
+  - id: supabase-completion-zsh
+    title: supabase completion zsh
+
+  - id: supabase-completion-powershell
+    title: supabase completion powershell
+
+  - id: supabase-completion-fish
+    title: supabase completion fish
+
+  - id: supabase-completion-bash
+    title: supabase completion bash
