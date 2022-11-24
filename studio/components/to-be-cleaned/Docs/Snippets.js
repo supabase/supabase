@@ -366,7 +366,7 @@ curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
--H "Prefer: return=representation" \\
+-H "Prefer: return=minimal" \\
 -d '{ "some_column": "someValue", "other_column": "otherValue" }'
 `,
     },
@@ -436,7 +436,7 @@ curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
--H "Prefer: return=representation" \\
+-H "Prefer: return=minimal" \\
 -d '{ "other_column": "otherValue" }'
 `,
     },
