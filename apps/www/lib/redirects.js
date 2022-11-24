@@ -1555,4 +1555,9 @@ module.exports = [
     source: '/sign-up',
     destination: 'https://app.supabase.com/sign-up',
   },
+  {
+    permanent: true,
+    source: '/forgot-password',
+    destination: 'https://app.supabase.com/forgot-password',
+  },
 ]
