@@ -1,18 +1,18 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle, IconExternalLink } from 'ui'
 
 import { useParams } from 'hooks'
-import Panel from 'components/ui/Panel'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import CustomDomainActivate from './CustomDomainActivate'
+import Panel from 'components/ui/Panel'
+import { FormHeader } from 'components/ui/Forms'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import CustomDomainDelete from './CustomDomainDelete'
+import CustomDomainVerify from './CustomDomainVerify'
+import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
-import CustomDomainVerify from './CustomDomainVerify'
 
 const CustomDomainConfig = () => {
   const { ref } = useParams()
@@ -49,46 +49,47 @@ const CustomDomainConfig = () => {
 
   const isUnknownError = isError && !isNoHostnameConfiguredError && !isNotAllowedError
 
-  if (isNoHostnameConfiguredError) {
-    return (
-      <CustomDomainsConfigureHostname
-        projectRef={ref}
-        title={CUSTOM_DOMAINS_TITLE}
-        settings={settings}
-      />
-    )
-  }
-
   return (
-    <>
-      <Panel title={CUSTOM_DOMAINS_TITLE}>
-        <Panel.Content className="space-y-6">
-          {isLoading && <CustomDomainsShimmerLoader />}
+    <div>
+      <FormHeader title="Custom Domains" description="" />
+      {isNoHostnameConfiguredError ? (
+        <CustomDomainsConfigureHostname projectRef={ref} settings={settings} />
+      ) : (
+        <Panel>
+          {isLoading && (
+            <Panel.Content className="space-y-6">
+              <CustomDomainsShimmerLoader />
+            </Panel.Content>
+          )}
 
           {isNotAllowedError && (
-            <UpgradeToPro
-              icon={<IconAlertCircle size={18} strokeWidth={1.5} />}
-              primaryText="Custom domains are a Pro plan add-on"
-              projectRef={ref as string}
-              secondaryText="To configure a custom domain for your project, please upgrade to a Pro plan"
-            />
+            <Panel.Content className="space-y-6">
+              <UpgradeToPro
+                icon={<IconAlertCircle size={18} strokeWidth={1.5} />}
+                primaryText="Custom domains are a Pro plan add-on"
+                projectRef={ref as string}
+                secondaryText="To configure a custom domain for your project, please upgrade to a Pro plan"
+              />
+            </Panel.Content>
           )}
 
           {isUnknownError && (
-            <div className="flex items-center justify-center space-x-2 py-8">
-              <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1100">
-                Failed to retrieve custom domain configuration. Please try again later or{' '}
-                <Link href={`/support/new?ref=${ref}&category=sales`}>
-                  <a className="underline">contact support</a>
-                </Link>
-                .
-              </p>
-            </div>
+            <Panel.Content className="space-y-6">
+              <div className="flex items-center justify-center space-x-2 py-8">
+                <IconAlertCircle size={16} strokeWidth={1.5} />
+                <p className="text-sm text-scale-1100">
+                  Failed to retrieve custom domain configuration. Please try again later or{' '}
+                  <Link href={`/support/new?ref=${ref}&category=sales`}>
+                    <a className="underline">contact support</a>
+                  </Link>
+                  .
+                </p>
+              </div>
+            </Panel.Content>
           )}
 
           {isSuccess && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
               {(data.status === '2_initiated' || data.status === '3_challenge_verified') && (
                 <CustomDomainVerify
                   projectRef={ref}
@@ -106,24 +107,10 @@ const CustomDomainConfig = () => {
               )}
             </div>
           )}
-        </Panel.Content>
-      </Panel>
-    </>
+        </Panel>
+      )}
+    </div>
   )
 }
 
 export default observer(CustomDomainConfig)
-
-const CUSTOM_DOMAINS_TITLE = (
-  <div className="flex-1 flex items-center justify-between">
-    <h5 className="mb-0">Custom Domain</h5>
-
-    <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-      <a target="_blank">
-        <Button type="default" icon={<IconExternalLink />}>
-          Documentation
-        </Button>
-      </a>
-    </Link>
-  </div>
-)

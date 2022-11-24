@@ -1,10 +1,13 @@
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import Link from 'next/link'
+import { useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Button, IconExternalLink, IconTrash } from 'ui'
+
+import { useStore } from 'hooks'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
-import { Button, IconTrash } from 'ui'
+import Panel from 'components/ui/Panel'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -42,7 +45,7 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <Panel.Content>
         <div className="w-full space-y-2">
           <p className="text-xs text-scale-1100">Active custom domain:</p>
           <div className="flex items-center space-x-2">
@@ -51,12 +54,23 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
               <span>{customDomain.hostname}</span>
             </code>
           </div>
-          <p className="text-sm !mt-4">
+          <p className="text-sm text-scale-1100">
             Your custom domain is currently active and is serving traffic
           </p>
         </div>
+      </Panel.Content>
 
-        <div>
+      <div className="w-full border-t border-scale-400" />
+
+      <Panel.Content className="w-full">
+        <div className="flex items-center justify-between">
+          <Link href="https://supabase.com/docs/guides/platform/custom-domains">
+            <a target="_blank">
+              <Button type="default" icon={<IconExternalLink />}>
+                Documentation
+              </Button>
+            </a>
+          </Link>
           <Button
             type="danger"
             icon={<IconTrash />}
@@ -65,7 +79,7 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
             Delete Custom Domain
           </Button>
         </div>
-      </div>
+      </Panel.Content>
 
       <ConfirmModal
         danger
