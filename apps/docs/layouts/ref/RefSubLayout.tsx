@@ -43,7 +43,7 @@ const Section: FC<ISectionContainer> = (props) => {
 
 interface ISectionDetails extends FC {}
 
-const Details: FC<ISectionDetails> = (props) => {
+const Details: FC<ISectionDetails> = (props: any) => {
   return <div className="">{props.children}</div>
 }
 
