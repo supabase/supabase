@@ -55,7 +55,7 @@ export default function CliUsage() {
 
                       {command.subcommands.length > 0 && (
                         <>
-                          <h3 className="text-sm font-bold">Available Commands</h3>
+                          <h3 className="text-md font-bold">Available Commands</h3>
                           <ul>
                             {command.subcommands.map((subcommand) => (
                               <li key={subcommand}>
