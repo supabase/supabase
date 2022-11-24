@@ -1,6 +1,6 @@
 import { TsDoc } from '~/generator/legacy/definitions'
 
-import { uniqBy } from 'lodash'
+import { uniqBy, values, mapValues } from 'lodash'
 import { OpenAPIV3 } from 'openapi-types'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
@@ -231,8 +231,8 @@ const toTitle = (text: string) => {
  * Convert Object to Array of values
  */
 export const toArrayWithKey = (obj: object, keyAs: string) =>
-  _.values(
-    _.mapValues(obj, (value: any, key: string) => {
+  values(
+    mapValues(obj, (value: any, key: string) => {
       value[keyAs] = key
       return value
     })
