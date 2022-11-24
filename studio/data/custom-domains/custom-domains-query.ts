@@ -8,6 +8,8 @@ export type CustomDomainsVariables = {
 }
 
 type CustomDomainStatus =
+  | '0_not_allowed'
+  | '0_no_hostname_configured'
   | '1_not_started'
   | '2_initiated'
   | '3_challenge_verified'
@@ -87,6 +89,32 @@ export async function getCustomDomains(
   }
 
   if (response.error) {
+    // not allowed error and no hostname configured error are
+    // valid steps in the process of setting up a custom domain
+    // so we convert them to data instead of errors
+
+    const isNotAllowedError =
+      (response.error as any)?.code === 400 &&
+      (response.error as any)?.message?.includes('not allowed to set up custom domain')
+
+    if (isNotAllowedError) {
+      return {
+        customDomain: null,
+        status: '0_not_allowed',
+      } as const
+    }
+
+    const isNoHostnameConfiguredError =
+      (response.error as any)?.code === 400 &&
+      (response.error as any)?.message?.includes('custom hostname configuration')
+
+    if (isNoHostnameConfiguredError) {
+      return {
+        customDomain: null,
+        status: '0_no_hostname_configured',
+      } as const
+    }
+
     throw response.error
   }
 

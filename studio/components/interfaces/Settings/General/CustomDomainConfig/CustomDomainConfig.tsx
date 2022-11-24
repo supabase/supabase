@@ -37,22 +37,10 @@ const CustomDomainConfig = () => {
 
   const isLoading = isSettingsLoading || isCustomDomainsLoading
 
-  const isNoHostnameConfiguredError =
-    isError &&
-    (error as any)?.code === 400 &&
-    (error as any)?.message?.includes('custom hostname configuration')
-
-  const isNotAllowedError =
-    isError &&
-    (error as any)?.code === 400 &&
-    (error as any)?.message?.includes('not allowed to set up custom domain')
-
-  const isUnknownError = isError && !isNoHostnameConfiguredError && !isNotAllowedError
-
   return (
     <section>
       <FormHeader title="Custom Domains" description="" />
-      {isNoHostnameConfiguredError ? (
+      {data?.status === '0_no_hostname_configured' ? (
         <CustomDomainsConfigureHostname projectRef={ref} />
       ) : (
         <Panel>
@@ -62,7 +50,7 @@ const CustomDomainConfig = () => {
             </Panel.Content>
           )}
 
-          {isNotAllowedError && (
+          {data?.status === '0_not_allowed' && (
             <Panel.Content className="space-y-6">
               <UpgradeToPro
                 icon={<IconAlertCircle size={18} strokeWidth={1.5} />}
@@ -73,7 +61,7 @@ const CustomDomainConfig = () => {
             </Panel.Content>
           )}
 
-          {isUnknownError && (
+          {isError && (
             <Panel.Content className="space-y-6">
               <div className="flex items-center justify-center space-x-2 py-8">
                 <IconAlertCircle size={16} strokeWidth={1.5} />
