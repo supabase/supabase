@@ -74,12 +74,22 @@ function dereferenceReducer(child: any, kv: KV) {
     // For now I can only dereference parameters
     // because anything else is producing an error when saving to file:
     // TypeError: Converting circular structure to JSON
-    final.kindString == 'Parameter' &&
-    final.type?.type == 'reference' &&
+    final.kindString === 'Parameter' &&
+    final.type?.type === 'reference' &&
     final.type?.id
   ) {
     const dereferenced = kv[final.type.id]
     final.type.dereferenced = dereferenced || {}
+    return final
+  } else if (
+    final.kindString === 'Type alias' &&
+    final.type?.type === 'union'
+  ) {
+    // handles union types that contain nested references
+    // by replacing the reference in-place
+    final.type.types = final.type.types.map((item: any) => {
+      return item.type === 'reference' ? kv[item.id] : item
+    })
     return final
   } else {
     return final

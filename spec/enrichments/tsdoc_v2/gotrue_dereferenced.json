@@ -184,7 +184,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [712, 711, 713]
+                      "children": [
+                        712,
+                        711,
+                        713
+                      ]
                     }
                   ]
                 }
@@ -197,17 +201,23 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [703]
+          "children": [
+            703
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [707]
+          "children": [
+            707
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [708]
+          "children": [
+            708
+          ]
         }
       ],
       "sources": [
@@ -286,7 +296,9 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [698]
+          "children": [
+            698
+          ]
         }
       ],
       "sources": [
@@ -424,7 +436,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [769, 768]
+                              "children": [
+                                769,
+                                768
+                              ]
                             }
                           ]
                         }
@@ -522,7 +537,10 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [773, 772]
+                      "children": [
+                        773,
+                        772
+                      ]
                     }
                   ]
                 }
@@ -676,7 +694,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [783, 782]
+                                  "children": [
+                                    783,
+                                    782
+                                  ]
                                 }
                               ]
                             }
@@ -747,7 +768,12 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [780, 778, 777, 779]
+                      "children": [
+                        780,
+                        778,
+                        777,
+                        779
+                      ]
                     }
                   ]
                 }
@@ -770,17 +796,25 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [763]
+          "children": [
+            763
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [770, 784, 785]
+          "children": [
+            770,
+            784,
+            785
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [774]
+          "children": [
+            774
+          ]
         }
       ],
       "sources": [
@@ -993,7 +1027,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [759, 758, 760]
+                      "children": [
+                        759,
+                        758,
+                        760
+                      ]
                     }
                   ]
                 }
@@ -1016,17 +1054,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [750]
+          "children": [
+            750
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [753, 754]
+          "children": [
+            753,
+            754
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [755]
+          "children": [
+            755
+          ]
         }
       ],
       "sources": [
@@ -1250,7 +1295,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [798, 797, 799]
+                      "children": [
+                        798,
+                        797,
+                        799
+                      ]
                     }
                   ]
                 }
@@ -1273,17 +1322,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [788]
+          "children": [
+            788
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [792, 793]
+          "children": [
+            792,
+            793
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [794]
+          "children": [
+            794
+          ]
         }
       ],
       "sources": [
@@ -1483,7 +1539,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [746, 745, 747]
+                      "children": [
+                        746,
+                        745,
+                        747
+                      ]
                     }
                   ]
                 }
@@ -1506,17 +1566,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [738]
+          "children": [
+            738
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [740, 741]
+          "children": [
+            740,
+            741
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [742]
+          "children": [
+            742
+          ]
         }
       ],
       "sources": [
@@ -1626,12 +1693,16 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [716]
+          "children": [
+            716
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [720]
+          "children": [
+            720
+          ]
         }
       ],
       "sources": [
@@ -1860,7 +1931,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [734, 733, 735]
+                      "children": [
+                        734,
+                        733,
+                        735
+                      ]
                     }
                   ]
                 }
@@ -1873,17 +1948,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [723]
+          "children": [
+            723
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [728, 729]
+          "children": [
+            728,
+            729
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [730]
+          "children": [
+            730
+          ]
         }
       ],
       "sources": [
@@ -2128,7 +2210,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [11, 7, 6]
+                          "children": [
+                            11,
+                            7,
+                            6
+                          ]
                         }
                       ]
                     }
@@ -2444,7 +2530,17 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [400, 403, 407, 404, 401, 406, 405, 402, 399]
+                          "children": [
+                            400,
+                            403,
+                            407,
+                            404,
+                            401,
+                            406,
+                            405,
+                            402,
+                            399
+                          ]
                         }
                       ],
                       "sources": [
@@ -2587,24 +2683,542 @@
                         "type": "union",
                         "types": [
                           {
-                            "type": "reference",
                             "id": 495,
-                            "name": "GenerateSignupLinkParams"
+                            "name": "GenerateSignupLinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 469,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 496,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 498,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 471,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 500,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 473,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 517,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "union",
+                                          "types": [
+                                            {
+                                              "type": "literal",
+                                              "value": "data"
+                                            },
+                                            {
+                                              "type": "literal",
+                                              "value": "redirectTo"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 499,
+                                    "name": "password",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 472,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 497,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 470,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "literal",
+                                      "value": "signup"
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [
+                                      498,
+                                      500,
+                                      499,
+                                      497
+                                    ]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 469,
+                                    "character": 39
+                                  }
+                                ]
+                              }
+                            }
                           },
                           {
-                            "type": "reference",
                             "id": 501,
-                            "name": "GenerateInviteOrMagiclinkParams"
+                            "name": "GenerateInviteOrMagiclinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 476,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 502,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 504,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's email"
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 479,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 505,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 480,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 517,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "union",
+                                          "types": [
+                                            {
+                                              "type": "literal",
+                                              "value": "data"
+                                            },
+                                            {
+                                              "type": "literal",
+                                              "value": "redirectTo"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 503,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 477,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "union",
+                                      "types": [
+                                        {
+                                          "type": "literal",
+                                          "value": "invite"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "magiclink"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [
+                                      504,
+                                      505,
+                                      503
+                                    ]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 476,
+                                    "character": 46
+                                  }
+                                ]
+                              }
+                            }
                           },
                           {
-                            "type": "reference",
                             "id": 506,
-                            "name": "GenerateRecoveryLinkParams"
+                            "name": "GenerateRecoveryLinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 483,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 507,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 509,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's email"
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 486,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 510,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 487,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 517,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "redirectTo"
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 508,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 484,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "literal",
+                                      "value": "recovery"
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [
+                                      509,
+                                      510,
+                                      508
+                                    ]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 483,
+                                    "character": 41
+                                  }
+                                ]
+                              }
+                            }
                           },
                           {
-                            "type": "reference",
                             "id": 511,
-                            "name": "GenerateEmailChangeLinkParams"
+                            "name": "GenerateEmailChangeLinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 490,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 512,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 514,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's email"
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 493,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 515,
+                                    "name": "newEmail",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's new email. Only required if type is 'email_change_current' or 'email_change_new'."
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 497,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 516,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 498,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 517,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "redirectTo"
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 513,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 491,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "union",
+                                      "types": [
+                                        {
+                                          "type": "literal",
+                                          "value": "email_change_current"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "email_change_new"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [
+                                      514,
+                                      515,
+                                      516,
+                                      513
+                                    ]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 490,
+                                    "character": 44
+                                  }
+                                ]
+                              }
+                            }
                           }
                         ]
                       }
@@ -2787,7 +3401,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [39, 38]
+                          "children": [
+                            39,
+                            38
+                          ]
                         }
                       ]
                     }
@@ -2899,7 +3516,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [51]
+                                      "children": [
+                                        51
+                                      ]
                                     }
                                   ]
                                 }
@@ -2928,7 +3547,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [49, 52]
+                              "children": [
+                                49,
+                                52
+                              ]
                             }
                           ]
                         }
@@ -2986,7 +3608,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [56]
+                                      "children": [
+                                        56
+                                      ]
                                     }
                                   ]
                                 }
@@ -3016,7 +3640,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [54, 57]
+                              "children": [
+                                54,
+                                57
+                              ]
                             }
                           ]
                         }
@@ -3133,7 +3760,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [31, 32]
+                          "children": [
+                            31,
+                            32
+                          ]
                         }
                       ]
                     }
@@ -3439,7 +4069,17 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [400, 403, 407, 404, 401, 406, 405, 402, 399]
+                          "children": [
+                            400,
+                            403,
+                            407,
+                            404,
+                            401,
+                            406,
+                            405,
+                            402,
+                            399
+                          ]
                         }
                       ],
                       "sources": [
@@ -3481,17 +4121,30 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [2]
+          "children": [
+            2
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [16]
+          "children": [
+            16
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [43, 65, 40, 58, 33, 46, 27, 61]
+          "children": [
+            43,
+            65,
+            40,
+            58,
+            33,
+            46,
+            27,
+            61
+          ]
         }
       ],
       "sources": [
@@ -3767,7 +4420,16 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [293, 292, 296, 287, 294, 295, 291, 286]
+                              "children": [
+                                293,
+                                292,
+                                296,
+                                287,
+                                294,
+                                295,
+                                291,
+                                286
+                              ]
                             }
                           ],
                           "sources": [
@@ -3919,7 +4581,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [125]
+                                      "children": [
+                                        125
+                                      ]
                                     }
                                   ]
                                 }
@@ -3948,7 +4612,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [123, 126]
+                              "children": [
+                                123,
+                                126
+                              ]
                             }
                           ]
                         }
@@ -4007,7 +4674,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [130]
+                                      "children": [
+                                        130
+                                      ]
                                     }
                                   ]
                                 }
@@ -4037,7 +4706,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [128, 131]
+                              "children": [
+                                128,
+                                131
+                              ]
                             }
                           ]
                         }
@@ -4096,7 +4768,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [135]
+                                      "children": [
+                                        135
+                                      ]
                                     }
                                   ]
                                 }
@@ -4125,7 +4799,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [133, 136]
+                              "children": [
+                                133,
+                                136
+                              ]
                             }
                           ]
                         }
@@ -4384,7 +5061,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [191]
+                              "children": [
+                                191
+                              ]
                             }
                           ]
                         }
@@ -4395,7 +5074,9 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [189]
+                      "children": [
+                        189
+                      ]
                     }
                   ]
                 }
@@ -4470,7 +5151,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [160]
+                          "children": [
+                            160
+                          ]
                         }
                       ]
                     }
@@ -4597,7 +5280,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [198, 197]
+                          "children": [
+                            198,
+                            197
+                          ]
                         }
                       ]
                     }
@@ -4667,7 +5353,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [200, 202]
+                              "children": [
+                                200,
+                                202
+                              ]
                             }
                           ]
                         }
@@ -4723,7 +5412,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [204, 205]
+                              "children": [
+                                204,
+                                205
+                              ]
                             }
                           ]
                         }
@@ -4821,7 +5513,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [154, 155]
+                          "children": [
+                            154,
+                            155
+                          ]
                         }
                       ]
                     }
@@ -5034,7 +5729,11 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [472, 470, 471]
+                                      "children": [
+                                        472,
+                                        470,
+                                        471
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -5074,7 +5773,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [468, 467]
+                              "children": [
+                                468,
+                                467
+                              ]
                             }
                           ],
                           "sources": [
@@ -5308,7 +6010,12 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [457, 456, 454, 455]
+                                          "children": [
+                                            457,
+                                            456,
+                                            454,
+                                            455
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -5326,7 +6033,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [451, 452]
+                                  "children": [
+                                    451,
+                                    452
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -5446,7 +6156,11 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [464, 463, 462]
+                                          "children": [
+                                            464,
+                                            463,
+                                            462
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -5485,7 +6199,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [460, 459]
+                                  "children": [
+                                    460,
+                                    459
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -5675,7 +6392,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [441, 440]
+                                          "children": [
+                                            441,
+                                            440
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -5714,7 +6434,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [436, 438, 437]
+                                  "children": [
+                                    436,
+                                    438,
+                                    437
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -5811,7 +6535,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [448, 447]
+                                          "children": [
+                                            448,
+                                            447
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -5871,7 +6598,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [445, 444, 443]
+                                  "children": [
+                                    445,
+                                    444,
+                                    443
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -5974,7 +6705,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [180]
+                          "children": [
+                            180
+                          ]
                         }
                       ]
                     }
@@ -6167,7 +6900,11 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [426, 425, 424]
+                                          "children": [
+                                            426,
+                                            425,
+                                            424
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -6206,7 +6943,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [420, 422, 421]
+                                  "children": [
+                                    420,
+                                    422,
+                                    421
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -6303,7 +7044,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [433, 432]
+                                          "children": [
+                                            433,
+                                            432
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -6363,7 +7107,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [430, 429, 428]
+                                  "children": [
+                                    430,
+                                    429,
+                                    428
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -6536,7 +7284,12 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [397, 394, 396, 395]
+                          "children": [
+                            397,
+                            394,
+                            396,
+                            395
+                          ]
                         }
                       ],
                       "sources": [
@@ -6624,14 +7377,356 @@
                         "type": "union",
                         "types": [
                           {
-                            "type": "reference",
                             "id": 477,
-                            "name": "VerifyMobileOtpParams"
+                            "name": "VerifyMobileOtpParams",
+                            "kind": 256,
+                            "kindString": "Interface",
+                            "flags": {},
+                            "children": [
+                              {
+                                "id": 481,
+                                "name": "options",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {
+                                  "isOptional": true
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 444,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reflection",
+                                  "declaration": {
+                                    "id": 482,
+                                    "name": "__type",
+                                    "kind": 65536,
+                                    "kindString": "Type literal",
+                                    "flags": {},
+                                    "children": [
+                                      {
+                                        "id": 484,
+                                        "name": "captchaToken",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "Verification token received when the user completes the captcha on the site."
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 448,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      },
+                                      {
+                                        "id": 483,
+                                        "name": "redirectTo",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "A URL to send the user to after they are confirmed."
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 446,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    ],
+                                    "groups": [
+                                      {
+                                        "title": "Properties",
+                                        "kind": 1024,
+                                        "children": [
+                                          484,
+                                          483
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "id": 478,
+                                "name": "phone",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's phone number."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 439,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 479,
+                                "name": "token",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The otp sent to the user's phone number."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 441,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 480,
+                                "name": "type",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's verification type."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 443,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reference",
+                                  "id": 493,
+                                  "name": "MobileOtpType"
+                                }
+                              }
+                            ],
+                            "groups": [
+                              {
+                                "title": "Properties",
+                                "kind": 1024,
+                                "children": [
+                                  481,
+                                  478,
+                                  479,
+                                  480
+                                ]
+                              }
+                            ],
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 437,
+                                "character": 17
+                              }
+                            ]
                           },
                           {
-                            "type": "reference",
                             "id": 485,
-                            "name": "VerifyEmailOtpParams"
+                            "name": "VerifyEmailOtpParams",
+                            "kind": 256,
+                            "kindString": "Interface",
+                            "flags": {},
+                            "children": [
+                              {
+                                "id": 486,
+                                "name": "email",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's email address."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 453,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 489,
+                                "name": "options",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {
+                                  "isOptional": true
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 458,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reflection",
+                                  "declaration": {
+                                    "id": 490,
+                                    "name": "__type",
+                                    "kind": 65536,
+                                    "kindString": "Type literal",
+                                    "flags": {},
+                                    "children": [
+                                      {
+                                        "id": 492,
+                                        "name": "captchaToken",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "Verification token received when the user completes the captcha on the site."
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 462,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      },
+                                      {
+                                        "id": 491,
+                                        "name": "redirectTo",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "A URL to send the user to after they are confirmed."
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 460,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    ],
+                                    "groups": [
+                                      {
+                                        "title": "Properties",
+                                        "kind": 1024,
+                                        "children": [
+                                          492,
+                                          491
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "id": 487,
+                                "name": "token",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The otp sent to the user's email address."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 455,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 488,
+                                "name": "type",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's verification type."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 457,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reference",
+                                  "id": 494,
+                                  "name": "EmailOtpType"
+                                }
+                              }
+                            ],
+                            "groups": [
+                              {
+                                "title": "Properties",
+                                "kind": 1024,
+                                "children": [
+                                  486,
+                                  489,
+                                  487,
+                                  488
+                                ]
+                              }
+                            ],
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 451,
+                                "character": 17
+                              }
+                            ]
                           }
                         ]
                       }
@@ -6660,17 +7755,37 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [75]
+          "children": [
+            75
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [78, 79]
+          "children": [
+            78,
+            79
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [120, 137, 101, 181, 156, 192, 150, 111, 114, 108, 177, 105, 140, 117]
+          "children": [
+            120,
+            137,
+            101,
+            181,
+            156,
+            192,
+            150,
+            111,
+            114,
+            108,
+            177,
+            105,
+            140,
+            117
+          ]
         }
       ],
       "sources": [
@@ -6745,7 +7860,10 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [344, 345]
+          "children": [
+            344,
+            345
+          ]
         }
       ],
       "sources": [
@@ -7001,7 +8119,17 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [400, 403, 407, 404, 401, 406, 405, 402, 399]
+          "children": [
+            400,
+            403,
+            407,
+            404,
+            401,
+            406,
+            405,
+            402,
+            399
+          ]
         }
       ],
       "sources": [
@@ -7179,7 +8307,14 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [362, 360, 359, 358, 361, 363]
+          "children": [
+            362,
+            360,
+            359,
+            358,
+            361,
+            363
+          ]
         }
       ],
       "sources": [
@@ -7249,7 +8384,10 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [518, 519]
+          "children": [
+            518,
+            519
+          ]
         }
       ],
       "sources": [
@@ -7390,7 +8528,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [662, 663]
+                              "children": [
+                                662,
+                                663
+                              ]
                             }
                           ],
                           "sources": [
@@ -7511,7 +8652,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [675]
+                              "children": [
+                                675
+                              ]
                             }
                           ],
                           "sources": [
@@ -7548,7 +8691,10 @@
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [680, 677]
+          "children": [
+            680,
+            677
+          ]
         }
       ],
       "sources": [
@@ -7664,7 +8810,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [557]
+                              "children": [
+                                557
+                              ]
                             }
                           ],
                           "sources": [
@@ -7810,7 +8958,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [561, 560]
+                              "children": [
+                                561,
+                                560
+                              ]
                             }
                           ],
                           "sources": [
@@ -7981,7 +9132,11 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [544, 546, 545]
+                              "children": [
+                                544,
+                                546,
+                                545
+                              ]
                             }
                           ],
                           "sources": [
@@ -8191,7 +9346,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [549]
+                              "children": [
+                                549
+                              ]
                             }
                           ],
                           "sources": [
@@ -8358,7 +9515,11 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [553, 554, 552]
+                              "children": [
+                                553,
+                                554,
+                                552
+                              ]
                             }
                           ],
                           "sources": [
@@ -8395,7 +9556,15 @@
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [635, 644, 632, 649, 647, 641, 638]
+          "children": [
+            635,
+            644,
+            632,
+            649,
+            647,
+            641,
+            638
+          ]
         }
       ],
       "sources": [
@@ -8605,7 +9774,16 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [337, 340, 339, 336, 335, 338, 341, 342]
+          "children": [
+            337,
+            340,
+            339,
+            336,
+            335,
+            338,
+            341,
+            342
+          ]
         }
       ],
       "sources": [
@@ -8719,9 +9897,30 @@
                             "value": "USER_DELETED"
                           },
                           {
-                            "type": "reference",
                             "id": 282,
-                            "name": "AuthChangeEventMFA"
+                            "name": "AuthChangeEventMFA",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "comment": {
+                              "tags": [
+                                {
+                                  "tag": "experimental",
+                                  "text": "\n"
+                                }
+                              ]
+                            },
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 26,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "literal",
+                              "value": "MFA_CHALLENGE_VERIFIED"
+                            }
                           }
                         ]
                       }
@@ -8792,12 +9991,17 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [409]
+          "children": [
+            409
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [410, 414]
+          "children": [
+            410,
+            414
+          ]
         }
       ],
       "sources": [
@@ -8838,7 +10042,9 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [417]
+          "children": [
+            417
+          ]
         }
       ],
       "sources": [
@@ -9282,8 +10488,27 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
-            381, 373, 375, 376, 385, 384, 382, 378, 386, 392, 372, 391, 380, 388, 379, 383, 387,
-            377, 389, 390, 374
+            381,
+            373,
+            375,
+            376,
+            385,
+            384,
+            382,
+            378,
+            386,
+            392,
+            372,
+            391,
+            380,
+            388,
+            379,
+            383,
+            387,
+            377,
+            389,
+            390,
+            374
           ]
         }
       ],
@@ -9327,7 +10552,9 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [365]
+          "children": [
+            365
+          ]
         }
       ],
       "sources": [
@@ -9466,7 +10693,12 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [397, 394, 396, 395]
+          "children": [
+            397,
+            394,
+            396,
+            395
+          ]
         }
       ],
       "sources": [
@@ -9653,7 +10885,15 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [354, 347, 349, 355, 353, 356, 348]
+          "children": [
+            354,
+            347,
+            349,
+            355,
+            353,
+            356,
+            348
+          ]
         }
       ],
       "sources": [
@@ -9804,7 +11044,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [492, 491]
+                  "children": [
+                    492,
+                    491
+                  ]
                 }
               ]
             }
@@ -9858,7 +11101,12 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [486, 489, 487, 488]
+          "children": [
+            486,
+            489,
+            487,
+            488
+          ]
         }
       ],
       "sources": [
@@ -9951,7 +11199,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [484, 483]
+                  "children": [
+                    484,
+                    483
+                  ]
                 }
               ]
             }
@@ -10026,7 +11277,12 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [481, 478, 479, 480]
+          "children": [
+            481,
+            478,
+            479,
+            480
+          ]
         }
       ],
       "sources": [
@@ -10078,9 +11334,30 @@
             "value": "USER_DELETED"
           },
           {
-            "type": "reference",
             "id": 282,
-            "name": "AuthChangeEventMFA"
+            "name": "AuthChangeEventMFA",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "comment": {
+              "tags": [
+                {
+                  "tag": "experimental",
+                  "text": "\n"
+                }
+              ]
+            },
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 26,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "literal",
+              "value": "MFA_CHALLENGE_VERIFIED"
+            }
           }
         ]
       }
@@ -10188,7 +11465,10 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [662, 663]
+              "children": [
+                662,
+                663
+              ]
             }
           ],
           "sources": [
@@ -10282,7 +11562,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [655]
+                          "children": [
+                            655
+                          ]
                         }
                       ],
                       "sources": [
@@ -10318,7 +11600,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [653, 656]
+                  "children": [
+                    653,
+                    656
+                  ]
                 }
               ],
               "sources": [
@@ -10381,7 +11666,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [658, 659]
+                  "children": [
+                    658,
+                    659
+                  ]
                 }
               ],
               "sources": [
@@ -10452,7 +11740,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [675]
+              "children": [
+                675
+              ]
             }
           ],
           "sources": [
@@ -10550,7 +11840,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [668]
+                          "children": [
+                            668
+                          ]
                         }
                       ],
                       "sources": [
@@ -10586,7 +11878,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [666, 669]
+                  "children": [
+                    666,
+                    669
+                  ]
                 }
               ],
               "sources": [
@@ -10649,7 +11944,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [671, 672]
+                  "children": [
+                    671,
+                    672
+                  ]
                 }
               ],
               "sources": [
@@ -10766,7 +12064,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [604, 603]
+                          "children": [
+                            604,
+                            603
+                          ]
                         }
                       ],
                       "sources": [
@@ -10802,7 +12103,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [601, 605]
+                  "children": [
+                    601,
+                    605
+                  ]
                 }
               ],
               "sources": [
@@ -10865,7 +12169,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [607, 608]
+                  "children": [
+                    607,
+                    608
+                  ]
                 }
               ],
               "sources": [
@@ -11049,7 +12356,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [583, 584, 585]
+                                  "children": [
+                                    583,
+                                    584,
+                                    585
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -11088,7 +12399,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [579, 581, 580]
+                          "children": [
+                            579,
+                            581,
+                            580
+                          ]
                         }
                       ],
                       "sources": [
@@ -11124,7 +12439,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [577, 586]
+                  "children": [
+                    577,
+                    586
+                  ]
                 }
               ],
               "sources": [
@@ -11187,7 +12505,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [588, 589]
+                  "children": [
+                    588,
+                    589
+                  ]
                 }
               ],
               "sources": [
@@ -11355,7 +12676,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [626, 624, 625]
+                          "children": [
+                            626,
+                            624,
+                            625
+                          ]
                         }
                       ],
                       "sources": [
@@ -11391,7 +12716,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [622, 627]
+                  "children": [
+                    622,
+                    627
+                  ]
                 }
               ],
               "sources": [
@@ -11454,7 +12782,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [629, 630]
+                  "children": [
+                    629,
+                    630
+                  ]
                 }
               ],
               "sources": [
@@ -11579,7 +12910,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [613, 614]
+                          "children": [
+                            613,
+                            614
+                          ]
                         }
                       ],
                       "sources": [
@@ -11615,7 +12949,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [611, 615]
+                  "children": [
+                    611,
+                    615
+                  ]
                 }
               ],
               "sources": [
@@ -11678,7 +13015,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [617, 618]
+                  "children": [
+                    617,
+                    618
+                  ]
                 }
               ],
               "sources": [
@@ -11774,7 +13114,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [594]
+                          "children": [
+                            594
+                          ]
                         }
                       ],
                       "sources": [
@@ -11810,7 +13152,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [592, 595]
+                  "children": [
+                    592,
+                    595
+                  ]
                 }
               ],
               "sources": [
@@ -11873,7 +13218,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [597, 598]
+                  "children": [
+                    597,
+                    598
+                  ]
                 }
               ],
               "sources": [
@@ -12054,7 +13402,13 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [566, 568, 569, 567, 570]
+                          "children": [
+                            566,
+                            568,
+                            569,
+                            567,
+                            570
+                          ]
                         }
                       ],
                       "sources": [
@@ -12090,7 +13444,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [564, 571]
+                  "children": [
+                    564,
+                    571
+                  ]
                 }
               ],
               "sources": [
@@ -12153,7 +13510,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [573, 574]
+                  "children": [
+                    573,
+                    574
+                  ]
                 }
               ],
               "sources": [
@@ -12276,7 +13636,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [302, 301]
+                          "children": [
+                            302,
+                            301
+                          ]
                         }
                       ],
                       "sources": [
@@ -12312,7 +13675,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [299, 303]
+                  "children": [
+                    299,
+                    303
+                  ]
                 }
               ],
               "sources": [
@@ -12396,7 +13762,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [308, 307]
+                          "children": [
+                            308,
+                            307
+                          ]
                         }
                       ],
                       "sources": [
@@ -12433,7 +13802,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [305, 309]
+                  "children": [
+                    305,
+                    309
+                  ]
                 }
               ],
               "sources": [
@@ -12550,7 +13922,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [690, 689]
+                  "children": [
+                    690,
+                    689
+                  ]
                 }
               ],
               "sources": [
@@ -12613,7 +13988,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [693, 692]
+                  "children": [
+                    693,
+                    692
+                  ]
                 }
               ],
               "sources": [
@@ -12796,7 +14174,12 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [514, 515, 516, 513]
+              "children": [
+                514,
+                515,
+                516,
+                513
+              ]
             }
           ],
           "sources": [
@@ -12926,7 +14309,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [504, 505, 503]
+              "children": [
+                504,
+                505,
+                503
+              ]
             }
           ],
           "sources": [
@@ -12956,24 +14343,542 @@
         "type": "union",
         "types": [
           {
-            "type": "reference",
             "id": 495,
-            "name": "GenerateSignupLinkParams"
+            "name": "GenerateSignupLinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 469,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 496,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 498,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 471,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 500,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 473,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 517,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "union",
+                          "types": [
+                            {
+                              "type": "literal",
+                              "value": "data"
+                            },
+                            {
+                              "type": "literal",
+                              "value": "redirectTo"
+                            }
+                          ]
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 499,
+                    "name": "password",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 472,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 497,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 470,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "literal",
+                      "value": "signup"
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [
+                      498,
+                      500,
+                      499,
+                      497
+                    ]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 469,
+                    "character": 39
+                  }
+                ]
+              }
+            }
           },
           {
-            "type": "reference",
             "id": 501,
-            "name": "GenerateInviteOrMagiclinkParams"
+            "name": "GenerateInviteOrMagiclinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 476,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 502,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 504,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's email"
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 479,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 505,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 480,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 517,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "union",
+                          "types": [
+                            {
+                              "type": "literal",
+                              "value": "data"
+                            },
+                            {
+                              "type": "literal",
+                              "value": "redirectTo"
+                            }
+                          ]
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 503,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 477,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "union",
+                      "types": [
+                        {
+                          "type": "literal",
+                          "value": "invite"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "magiclink"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [
+                      504,
+                      505,
+                      503
+                    ]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 476,
+                    "character": 46
+                  }
+                ]
+              }
+            }
           },
           {
-            "type": "reference",
             "id": 506,
-            "name": "GenerateRecoveryLinkParams"
+            "name": "GenerateRecoveryLinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 483,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 507,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 509,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's email"
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 486,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 510,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 487,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 517,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "redirectTo"
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 508,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 484,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "literal",
+                      "value": "recovery"
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [
+                      509,
+                      510,
+                      508
+                    ]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 483,
+                    "character": 41
+                  }
+                ]
+              }
+            }
           },
           {
-            "type": "reference",
             "id": 511,
-            "name": "GenerateEmailChangeLinkParams"
+            "name": "GenerateEmailChangeLinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 490,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 512,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 514,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's email"
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 493,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 515,
+                    "name": "newEmail",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's new email. Only required if type is 'email_change_current' or 'email_change_new'."
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 497,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 516,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 498,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 517,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "redirectTo"
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 513,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 491,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "union",
+                      "types": [
+                        {
+                          "type": "literal",
+                          "value": "email_change_current"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "email_change_new"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [
+                      514,
+                      515,
+                      516,
+                      513
+                    ]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 490,
+                    "character": 44
+                  }
+                ]
+              }
+            }
           }
         ]
       }
@@ -13114,7 +15019,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [536, 537, 538, 539, 540]
+              "children": [
+                536,
+                537,
+                538,
+                539,
+                540
+              ]
             }
           ],
           "sources": [
@@ -13217,7 +15128,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [525, 526]
+                          "children": [
+                            525,
+                            526
+                          ]
                         }
                       ],
                       "sources": [
@@ -13253,7 +15167,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [523, 527]
+                  "children": [
+                    523,
+                    527
+                  ]
                 }
               ],
               "sources": [
@@ -13337,7 +15254,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [531, 532]
+                          "children": [
+                            531,
+                            532
+                          ]
                         }
                       ],
                       "sources": [
@@ -13374,7 +15294,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [529, 533]
+                  "children": [
+                    529,
+                    533
+                  ]
                 }
               ],
               "sources": [
@@ -13531,7 +15454,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [509, 510, 508]
+              "children": [
+                509,
+                510,
+                508
+              ]
             }
           ],
           "sources": [
@@ -13667,7 +15594,12 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [498, 500, 499, 497]
+              "children": [
+                498,
+                500,
+                499,
+                497
+              ]
             }
           ],
           "sources": [
@@ -13904,7 +15836,16 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [293, 292, 296, 287, 294, 295, 291, 286]
+              "children": [
+                293,
+                292,
+                296,
+                287,
+                294,
+                295,
+                291,
+                286
+              ]
             }
           ],
           "sources": [
@@ -13972,7 +15913,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [686]
+              "children": [
+                686
+              ]
             }
           ],
           "sources": [
@@ -14062,7 +16005,10 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [561, 560]
+              "children": [
+                561,
+                560
+              ]
             }
           ],
           "sources": [
@@ -14131,7 +16077,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [557]
+              "children": [
+                557
+              ]
             }
           ],
           "sources": [
@@ -14237,7 +16185,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [544, 546, 545]
+              "children": [
+                544,
+                546,
+                545
+              ]
             }
           ],
           "sources": [
@@ -14306,7 +16258,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [549]
+              "children": [
+                549
+              ]
             }
           ],
           "sources": [
@@ -14417,7 +16371,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [553, 554, 552]
+              "children": [
+                553,
+                554,
+                552
+              ]
             }
           ],
           "sources": [
@@ -14546,7 +16504,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [314, 315]
+                          "children": [
+                            314,
+                            315
+                          ]
                         }
                       ],
                       "sources": [
@@ -14582,7 +16543,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [312, 316]
+                  "children": [
+                    312,
+                    316
+                  ]
                 }
               ],
               "sources": [
@@ -14667,7 +16631,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [320, 321]
+                          "children": [
+                            320,
+                            321
+                          ]
                         }
                       ],
                       "sources": [
@@ -14704,7 +16671,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [318, 322]
+                  "children": [
+                    318,
+                    322
+                  ]
                 }
               ],
               "sources": [
@@ -14961,7 +16931,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [472, 470, 471]
+                      "children": [
+                        472,
+                        470,
+                        471
+                      ]
                     }
                   ],
                   "sources": [
@@ -15001,7 +16975,10 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [468, 467]
+              "children": [
+                468,
+                467
+              ]
             }
           ],
           "sources": [
@@ -15136,7 +17113,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [441, 440]
+                          "children": [
+                            441,
+                            440
+                          ]
                         }
                       ],
                       "sources": [
@@ -15175,7 +17155,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [436, 438, 437]
+                  "children": [
+                    436,
+                    438,
+                    437
+                  ]
                 }
               ],
               "sources": [
@@ -15272,7 +17256,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [448, 447]
+                          "children": [
+                            448,
+                            447
+                          ]
                         }
                       ],
                       "sources": [
@@ -15332,7 +17319,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [445, 444, 443]
+                  "children": [
+                    445,
+                    444,
+                    443
+                  ]
                 }
               ],
               "sources": [
@@ -15515,7 +17506,12 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [457, 456, 454, 455]
+                          "children": [
+                            457,
+                            456,
+                            454,
+                            455
+                          ]
                         }
                       ],
                       "sources": [
@@ -15533,7 +17529,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [451, 452]
+                  "children": [
+                    451,
+                    452
+                  ]
                 }
               ],
               "sources": [
@@ -15653,7 +17652,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [464, 463, 462]
+                          "children": [
+                            464,
+                            463,
+                            462
+                          ]
                         }
                       ],
                       "sources": [
@@ -15692,7 +17695,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [460, 459]
+                  "children": [
+                    460,
+                    459
+                  ]
                 }
               ],
               "sources": [
@@ -15852,7 +17858,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [426, 425, 424]
+                          "children": [
+                            426,
+                            425,
+                            424
+                          ]
                         }
                       ],
                       "sources": [
@@ -15891,7 +17901,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [420, 422, 421]
+                  "children": [
+                    420,
+                    422,
+                    421
+                  ]
                 }
               ],
               "sources": [
@@ -15988,7 +18002,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [433, 432]
+                          "children": [
+                            433,
+                            432
+                          ]
                         }
                       ],
                       "sources": [
@@ -16048,7 +18065,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [430, 429, 428]
+                  "children": [
+                    430,
+                    429,
+                    428
+                  ]
                 }
               ],
               "sources": [
@@ -16185,7 +18206,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [327]
+                          "children": [
+                            327
+                          ]
                         }
                       ],
                       "sources": [
@@ -16221,7 +18244,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [325, 328]
+                  "children": [
+                    325,
+                    328
+                  ]
                 }
               ],
               "sources": [
@@ -16287,7 +18313,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [332]
+                          "children": [
+                            332
+                          ]
                         }
                       ],
                       "sources": [
@@ -16324,7 +18352,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [330, 333]
+                  "children": [
+                    330,
+                    333
+                  ]
                 }
               ],
               "sources": [
@@ -16356,14 +18387,356 @@
         "type": "union",
         "types": [
           {
-            "type": "reference",
             "id": 477,
-            "name": "VerifyMobileOtpParams"
+            "name": "VerifyMobileOtpParams",
+            "kind": 256,
+            "kindString": "Interface",
+            "flags": {},
+            "children": [
+              {
+                "id": 481,
+                "name": "options",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {
+                  "isOptional": true
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 444,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 482,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 484,
+                        "name": "captchaToken",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "Verification token received when the user completes the captcha on the site."
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 448,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "id": 483,
+                        "name": "redirectTo",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "A URL to send the user to after they are confirmed."
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 446,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [
+                          484,
+                          483
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "id": 478,
+                "name": "phone",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's phone number."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 439,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 479,
+                "name": "token",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The otp sent to the user's phone number."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 441,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 480,
+                "name": "type",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's verification type."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 443,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reference",
+                  "id": 493,
+                  "name": "MobileOtpType"
+                }
+              }
+            ],
+            "groups": [
+              {
+                "title": "Properties",
+                "kind": 1024,
+                "children": [
+                  481,
+                  478,
+                  479,
+                  480
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 437,
+                "character": 17
+              }
+            ]
           },
           {
-            "type": "reference",
             "id": 485,
-            "name": "VerifyEmailOtpParams"
+            "name": "VerifyEmailOtpParams",
+            "kind": 256,
+            "kindString": "Interface",
+            "flags": {},
+            "children": [
+              {
+                "id": 486,
+                "name": "email",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's email address."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 453,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 489,
+                "name": "options",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {
+                  "isOptional": true
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 458,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 490,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 492,
+                        "name": "captchaToken",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "Verification token received when the user completes the captcha on the site."
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 462,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "id": 491,
+                        "name": "redirectTo",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "A URL to send the user to after they are confirmed."
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 460,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [
+                          492,
+                          491
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "id": 487,
+                "name": "token",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The otp sent to the user's email address."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 455,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 488,
+                "name": "type",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's verification type."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 457,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reference",
+                  "id": 494,
+                  "name": "EmailOtpType"
+                }
+              }
+            ],
+            "groups": [
+              {
+                "title": "Properties",
+                "kind": 1024,
+                "children": [
+                  486,
+                  489,
+                  487,
+                  488
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 451,
+                "character": 17
+              }
+            ]
           }
         ]
       }
@@ -16419,26 +18792,94 @@
     {
       "title": "Classes",
       "kind": 128,
-      "children": [702, 697, 762, 749, 787, 737, 715, 722, 1, 74]
+      "children": [
+        702,
+        697,
+        762,
+        749,
+        787,
+        737,
+        715,
+        722,
+        1,
+        74
+      ]
     },
     {
       "title": "Interfaces",
       "kind": 256,
-      "children": [343, 398, 357, 517, 676, 631, 334, 408, 416, 371, 364, 393, 346, 368, 485, 477]
+      "children": [
+        343,
+        398,
+        357,
+        517,
+        676,
+        631,
+        334,
+        408,
+        416,
+        371,
+        364,
+        393,
+        346,
+        368,
+        485,
+        477
+      ]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
       "children": [
-        283, 282, 660, 651, 673, 664, 599, 575, 620, 609, 590, 562, 297, 619, 687, 494, 511, 501,
-        520, 534, 521, 541, 506, 495, 284, 684, 558, 555, 542, 547, 550, 493, 310, 281, 465, 434,
-        449, 418, 683, 323, 476
+        283,
+        282,
+        660,
+        651,
+        673,
+        664,
+        599,
+        575,
+        620,
+        609,
+        590,
+        562,
+        297,
+        619,
+        687,
+        494,
+        511,
+        501,
+        520,
+        534,
+        521,
+        541,
+        506,
+        495,
+        284,
+        684,
+        558,
+        555,
+        542,
+        547,
+        550,
+        493,
+        310,
+        281,
+        465,
+        434,
+        449,
+        418,
+        683,
+        323,
+        476
       ]
     },
     {
       "title": "Functions",
       "kind": 64,
-      "children": [694]
+      "children": [
+        694
+      ]
     }
   ],
   "sources": [
