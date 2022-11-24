@@ -1545,4 +1545,9 @@ module.exports = [
     source: '/docs/guides/platform/disk-usage',
     destination: '/docs/guides/platform/database-usage',
   },
+  {
+    permanent: true,
+    source: '/sign-in',
+    destination: 'https://app.supabase.com/sign-in',
+  },
 ]
