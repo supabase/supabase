@@ -30,9 +30,11 @@ import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
 import { ComesFrom } from '~/components/ComesFrom'
 import Link from 'next/link'
+import Param from '~/components/Params'
+import Options from '~/components/Options'
+import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
-const marginTop = 256
-export default function Ref(props) {
+export default function JSReference(props) {
   // const myRef = useRef(null)
 
   //console.log('props', props)
@@ -40,11 +42,6 @@ export default function Ref(props) {
 
   const [offsetY, setOffsetY] = useState(0)
   const [sections, setSections] = useState([])
-
-  // useEffect(() => {
-  //   window.scrollTo(0, 0)
-  //   setOffsetY(0)
-  // }, [])
 
   useEffect(() => {
     const els: HTMLElement[] = Array.from(document.querySelectorAll('div.ref-container'))
@@ -63,62 +60,9 @@ export default function Ref(props) {
     setSections(allSections)
   }, [])
 
-  // useEffect(() => {
-  //   if (sections.length <= 1) return
-
-  //   const onScroll = () => {
-  //     console.log('SCROLL EVENT')
-  //     setOffsetY(window.pageYOffset)
-  //   }
-  //   window.addEventListener('scroll', debounce(onScroll, 500))
-
-  //   return () => window.removeEventListener('scroll', onScroll)
-  // }, [sections])
-
-  // useEffect(() => {
-  //   if (sections.length === 0) return
-
-  //   if (sections.length === 1) {
-  //     sections[0].isActive = true
-  //     return
-  //   }
-
-  //   sections.forEach((section, index) => {
-  //     if (index === 0) {
-  //       section.isActive = sections[index + 1].boundingTop > offsetY + marginTop
-  //     } else {
-  //       if (sections[index + 1]) {
-  //         section.isActive =
-  //           sections[index + 1].boundingTop > offsetY + marginTop &&
-  //           sections[index].boundingTop <= offsetY + marginTop
-  //       } else {
-  //         section.isActive = sections[index].boundingTop <= offsetY + marginTop
-  //       }
-  //     }
-  //   })
-  // }, [sections, offsetY])
-
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver((entries) => {
-  //     // console.log('entries', entries)
-  //     const entry = entries[0]
-  //     // console.log('entry', entry)
-  //   })
-  //   // console.log('myRef', myRef.current)
-  //   observer.observe(myRef.current)
-  // }, [])
-
   const router = useRouter()
 
   function updateUrl(key) {
-    // router.replace(
-    //   {
-    //     pathname: `/ref/js/${key}`,
-    //     // query: { sortBy: 'price' },
-    //   }
-    //   // undefined,
-    //   // { shallow: true }
-    // )
     router.replace(
       {
         pathname: `/ref/js/${key}`,
@@ -130,393 +74,246 @@ export default function Ref(props) {
   }
 
   return (
-    <div>
-      <div className="flex my-16">
-        {/* <div className="px-10 fixed">
-          {sections.map((x, i) => {
-            return (
-              <Link href={`#${x.topic}`} key={i}>
-                <a
-                  className={[
-                    'block text-sm hover:text-scale-1200 text-scale-1100 cursor-pointer',
-                    sections && sections[i].isActive ? 'text-brand-900' : 'text-scale-1100',
-                  ].join(' ')}
-                  // key={i}
-                  // onClick={() => {
-                  //   window.scrollTo(0, x.boundingTop - marginTop)
-                  //   setOffsetY(x.boundingTop - marginTop)
-                  // }}
-                >
-                  {x.topic}
-                </a>
-              </Link>
-            )
-          })}
-        </div> */}
+    <RefSubLayout>
+      {jsSpec.functions.map((item, itemIndex) => {
+        const hasTsRef = item['$ref'] || null
+        const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
+        const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
-        <div className="w-full">
-          <div
-            className="flex flex-col gap-32 mx-auto max-w-5xl"
-            // ref={myRef}
-          >
-            {jsSpec.functions.map((item, itemIndex) => {
-              // if (item['$ref']) console.log('$ref', item['$ref'])
-              // if (item.id !== 'select()') return <div>hidden section</div>
-              // const sectionRef = useRef(null)
+        // console.log(`parameters ${item.title}`, parameters)
 
-              // console.log('x', x)
-              const hasTsRef = item['$ref'] || null
-              // console.log('hasTsRef', hasTsRef)
-              // console.log('jsTypeSpec', jsTypeSpec)
-              const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
-              // console.log('tsDefinition', tsDefinition)
-              // console.log(`tsDefinition for ${item.title ?? item.id}`, tsDefinition)
+        const functionMarkdownContent = props?.docs[itemIndex]?.content
+        const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
 
-              // useEffect(() => {
-              //   const observer = new IntersectionObserver((entries) => {
-              //     // console.log('entries', entries)
-              //     const entry = entries[0]
-
-              //     // console.log(
-              //     //   x.id,
-              //     //   'intersectiong',
-              //     //   entry.isIntersecting,
-              //     //   'visible',
-              //     //   entry.isVisible
-              //     // )
-              //   })
-              //   // console.log('myRef', myRef.current)
-              //   observer.observe(sectionRef.current)
-              // }, [])
-
-              const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
-
-              console.log(`parameters ${item.title}`, parameters)
-
-              // @ts-ignore
-              // const [serialFunctionMarkdownContent, setSerialFunctionMarkdownContent] =
-              //   useState(null)
-
-              const functionMarkdownContent = props?.docs[itemIndex]?.content
-
-              // useEffect(() => {
-              //   async function makeContent() {
-              //     setSerialFunctionMarkdownContent(
-              //       await serialize(functionMarkdownContent, {
-              //         mdxOptions: {
-              //           remarkPlugins: [remarkGfm],
-              //           format: 'mdx',
-              //         },
-              //       })
-              //     )
-              //   }
-              //   makeContent()
-              // }, [])
-
-              // console.log('serialFunctionMarkdownContent', serialFunctionMarkdownContent)
-
-              const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
-
-              return (
-                <div>
-                  <div
-                    className="grid grid-cols-2 ref-container gap-10"
-                    id={item.id}
-                    // ref={sectionRef}
-                  >
-                    <div className="prose" key={item.id}>
-                      <header
-                        className={[
-                          // 'border-b sticky top-16 z-10',
-                          ' mb-16',
-                        ].join(' ')}
-                      >
-                        <h2
-                          className="text-2xl not-prose text-scale-1200 capitalize mb-4 scroll-mt-16"
-                          onClick={() => updateUrl(item.id)}
-                        >
-                          {examples.functions[itemIndex].title ??
-                            examples.functions[itemIndex].id ??
-                            item.name ??
-                            item.id}
-                        </h2>
-                        {shortText && (
-                          <>
-                            <p
-                              className="text-base text-scale-1100 not-prose"
-                              dangerouslySetInnerHTML={{ __html: shortText }}
-                            ></p>
-                            <ComesFrom
+        return (
+          <>
+            <RefSubLayout.Section
+              key={item.id}
+              title={
+                examples.functions[itemIndex].title ??
+                examples.functions[itemIndex].id ??
+                item.name ??
+                item.id
+              }
+              id={item.id}
+            >
+              <RefSubLayout.Details>
+                <>
+                  <header className={['mb-16'].join(' ')}>
+                    {/* <h2
+                      className="text-2xl text-scale-1200 capitalize mb-4 scroll-mt-16"
+                      onClick={() => updateUrl(item.id)}
+                    >
+                      {examples.functions[itemIndex].title ??
+                        examples.functions[itemIndex].id ??
+                        item.name ??
+                        item.id}
+                    </h2> */}
+                    {shortText && (
+                      <>
+                        <p
+                          className="text-sm text-scale-1100"
+                          dangerouslySetInnerHTML={{ __html: shortText }}
+                        ></p>
+                        {/* <ComesFrom
                               link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
                               text="combined.json"
-                            />
-                          </>
-                        )}
-                      </header>
+                            /> */}
+                      </>
+                    )}
+                  </header>
 
-                      {item.description && (
-                        <>
-                          <ComesFrom
+                  {item.description && (
+                    <div className="prose">
+                      {/* <ComesFrom
                             link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
-                          />
-                          <p className="text-lg not-prose">{item.description}</p>
-                        </>
-                      )}
-                      <hr />
-                      {functionMarkdownContent && (
-                        <>
-                          <ComesFrom
+                          /> */}
+                      <p className="text-sm">{item.description}</p>
+                    </div>
+                  )}
+                  {functionMarkdownContent && (
+                    <div className="prose">
+                      {/* <ComesFrom
                             link="https://github.com/supabase/supabase/pull/10095/files#diff-bf42aab7d324c5330e4ae65d94803cd6da686d2241015536b0263e7f76aeca35"
                             text="auth.signUp().mdx"
-                          />
-                          <MDXRemote {...functionMarkdownContent} components={components} />
-                        </>
-                      )}
-                      {item.notes && (
-                        <div>
-                          <ComesFrom
+                          /> */}
+                      <MDXRemote {...functionMarkdownContent} components={components} />
+                    </div>
+                  )}
+                  {item.notes && (
+                    <div className="prose">
+                      {/* <ComesFrom
                             link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml#L105"
                             text="supabase_js_v2"
-                          />
-                          <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
-                        </div>
-                      )}
-                      {/* // parameters */}
-                      {parameters && (
-                        <>
-                          <ComesFrom
+                          /> */}
+                      <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
+                    </div>
+                  )}
+                  {/* // parameters */}
+                  {parameters && (
+                    <div className="not-prose mt-12">
+                      {/* <ComesFrom
                             link="https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
-                          />
-                          <h5 className="mb-3 text-base">Parameters</h5>
-                          <div className="">
-                            {parameters.map((param) => {
-                              // grab override params from yaml file
-                              const overrideParams = item.overrideParams
+                          /> */}
+                      <h5 className="mb-3 text-base">Parameters</h5>
+                      <ul className="">
+                        {parameters.map((param) => {
+                          // grab override params from yaml file
+                          const overrideParams = item.overrideParams
 
-                              // params from the yaml file can override the params from parameters if it matches the name
-                              const overide = overrideParams?.filter((x) => {
-                                return param.name === x.name
-                              })
+                          // params from the yaml file can override the params from parameters if it matches the name
+                          const overide = overrideParams?.filter((x) => {
+                            return param.name === x.name
+                          })
 
-                              const paramItem = overide?.length > 0 ? overide[0] : param
+                          const paramItem = overide?.length > 0 ? overide[0] : param
 
-                              return (
-                                <div className="border-t border-b py-5 flex flex-col gap-3">
-                                  <div className="flex gap-3 items-center">
-                                    <span className="text-sm text-scale-1200 font-mono font-medium">
-                                      {paramItem.name ?? 'no-name'}
-                                    </span>
-                                    <span>
-                                      {paramItem.isOptional ? (
-                                        <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">
-                                          Optional
-                                        </div>
-                                      ) : (
-                                        <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-                                          REQUIRED
-                                        </div>
-                                      )}
-                                    </span>
-                                    <span className="text-scale-900 text-xs">
-                                      {paramItem.type ?? 'no type'}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-scale-1000 m-0">
-                                    {paramItem.description ?? 'nodescription'}
-                                  </p>
-                                  {paramItem.subContent && (
-                                    <div className="mt-3">
-                                      {param.subContent.map((param) => {
-                                        return (
-                                          <div
-                                            className="px-5 py-3 first:border-t border-b border-l border-r
-                                            border-scale-500
-
-                                            first:rounded-tl-lg first:rounded-tr-lg
-                                            last:rounded-bl-lg last:rounded-br-lg
-
-                                            flex flex-col gap-3
-                                          "
-                                          >
-                                            <div className="flex gap-3 items-center">
-                                              <span className="text-sm text-scale-1200 font-mono font-medium">
-                                                {param.name ?? 'no-name'}
-                                              </span>
-                                              <span>
-                                                {param.isOptional ? (
-                                                  <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">
-                                                    Optional
-                                                  </div>
-                                                ) : (
-                                                  <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-                                                    REQUIRED
-                                                  </div>
-                                                )}
-                                              </span>
-                                              <span className="text-scale-900 text-xs">
-                                                {param.type ?? 'no type'}
-                                              </span>
-                                            </div>
-                                            <p className="text-sm text-scale-1000 m-0">
-                                              {param.description ?? 'nodescription'}
-                                            </p>
-                                          </div>
-                                        )
-                                      })}
-                                    </div>
-                                  )}
+                          return (
+                            <Param {...paramItem}>
+                              {paramItem.subContent && (
+                                <div className="mt-3">
+                                  <Options>
+                                    {param.subContent.map((param) => {
+                                      return <Options.Option {...param} />
+                                    })}
+                                  </Options>
                                 </div>
-                              )
-                            })}
-                          </div>
-                          {/* <div dangerouslySetInnerHTML={{ __html: parameters }}></div> */}
-                        </>
-                      )}
+                              )}
+                            </Param>
+                          )
+                        })}
+                      </ul>
+                      {/* <div dangerouslySetInnerHTML={{ __html: parameters }}></div> */}
                     </div>
-                    <div className="w-full">
-                      <div className="sticky top-24">
-                        {item.examples && (
-                          <>
-                            {' '}
-                            <ComesFrom
-                              className="mb-5"
-                              link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml"
-                              text="supabase_js_v2"
-                            />
-                            <Tabs
-                              defaultActiveId={item.examples[0].id}
-                              size="small"
-                              type="underlined"
-                              scrollable
-                            >
-                              {item.examples &&
-                                item.examples.map((example, exampleIndex) => {
-                                  const exampleString = `
+                  )}
+                </>
+              </RefSubLayout.Details>
+              <RefSubLayout.Examples>
+                {item.examples && (
+                  <>
+                    {' '}
+                    <ComesFrom
+                      className="mb-5"
+                      link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml"
+                      text="supabase_js_v2"
+                    />
+                    <Tabs
+                      defaultActiveId={item.examples[0].id}
+                      size="small"
+                      type="underlined"
+                      scrollable
+                    >
+                      {item.examples &&
+                        item.examples.map((example, exampleIndex) => {
+                          const exampleString = `
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 `
-                                  const currentExampleId = example.id
-                                  const staticExample = item.examples[exampleIndex]
+                          const currentExampleId = example.id
+                          const staticExample = item.examples[exampleIndex]
 
-                                  const response = staticExample.response
-                                  const sql = staticExample?.data?.sql
-                                  const tables = staticExample?.data?.tables
+                          const response = staticExample.response
+                          const sql = staticExample?.data?.sql
+                          const tables = staticExample?.data?.tables
+
+                          return (
+                            <Tabs.Panel id={example.id} label={example.name}>
+                              {tables &&
+                                tables.length > 0 &&
+                                tables.map((table) => {
+                                  // console.log(table)
+
+                                  // @ts-ignore
+                                  // const [content, setContent] = useState(null)
+
+                                  // // @ts-ignore
+                                  // useEffect(() => {
+                                  //   async function makeContent() {
+                                  //     setContent(
+                                  //       await serialize(table.content, {
+                                  //         mdxOptions: {
+                                  //           remarkPlugins: [remarkGfm],
+                                  //           format: 'mdx',
+                                  //         },
+                                  //       })
+                                  //     )
+                                  //   }
+                                  //   makeContent()
+                                  // }, [])
 
                                   return (
-                                    <Tabs.Panel id={example.id} label={example.name}>
-                                      {tables &&
-                                        tables.length > 0 &&
-                                        tables.map((table) => {
-                                          // console.log(table)
+                                    <div className="bg-scale-300 border rounded prose max-w-none">
+                                      <div className="bg-scale-200 px-5 py-2">
+                                        <div className="flex gap-2 items-center">
+                                          <div className="text-brand-900">
+                                            <IconDatabase size={16} />
+                                          </div>
+                                          <h5 className="text-xs text-scale-1200">{table.name}</h5>
+                                        </div>
+                                      </div>
 
-                                          // @ts-ignore
-                                          // const [content, setContent] = useState(null)
-
-                                          // // @ts-ignore
-                                          // useEffect(() => {
-                                          //   async function makeContent() {
-                                          //     setContent(
-                                          //       await serialize(table.content, {
-                                          //         mdxOptions: {
-                                          //           remarkPlugins: [remarkGfm],
-                                          //           format: 'mdx',
-                                          //         },
-                                          //       })
-                                          //     )
-                                          //   }
-                                          //   makeContent()
-                                          // }, [])
-
-                                          return (
-                                            <div className="bg-scale-300 border rounded prose max-w-none">
-                                              <div className="bg-scale-200 px-5 py-2">
-                                                <div className="flex gap-2 items-center">
-                                                  <div className="text-brand-900">
-                                                    <IconDatabase size={16} />
-                                                  </div>
-                                                  <h5 className="text-xs text-scale-1200">
-                                                    {table.name}
-                                                  </h5>
-                                                </div>
-                                              </div>
-
-                                              {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
-                                              {/* {content && <MDXRemote {...content} />} */}
-                                            </div>
-                                          )
-                                        })}
-                                      {sql && (
-                                        <CodeBlock
-                                          className="useless-code-block-class"
-                                          language="sql"
-                                          hideLineNumbers={true}
-                                        >
-                                          {sql}
-                                        </CodeBlock>
-                                      )}
-                                      <CodeBlock
-                                        className="useless-code-block-class"
-                                        language="js"
-                                        hideLineNumbers={true}
-                                      >
-                                        {exampleString +
-                                          (example.code &&
-                                            example.code
-                                              .replace('```', '')
-                                              .replace('js', '')
-                                              .replace('```', ''))}
-                                      </CodeBlock>
-                                      {response && (
-                                        <>
-                                          <ComesFrom
-                                            className="mb-5 mt-5"
-                                            link="https://github.com/supabase/supabase/pull/10095/files#diff-c514c66b77772b9e3d9a5403c136ee52dfeaaeacb1d8138ea85ce35ee64e5006"
-                                            text="examples.yml"
-                                          />
-                                          <CodeBlock
-                                            className="useless-code-block-class"
-                                            language="json"
-                                            hideLineNumbers={true}
-                                          >
-                                            {response}
-                                          </CodeBlock>
-                                        </>
-                                      )}
-                                    </Tabs.Panel>
+                                      {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
+                                      {/* {content && <MDXRemote {...content} />} */}
+                                    </div>
                                   )
                                 })}
-                            </Tabs>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
+                              {sql && (
+                                <CodeBlock
+                                  className="useless-code-block-class"
+                                  language="sql"
+                                  hideLineNumbers={true}
+                                >
+                                  {sql}
+                                </CodeBlock>
+                              )}
+                              <CodeBlock
+                                className="useless-code-block-class"
+                                language="js"
+                                hideLineNumbers={true}
+                              >
+                                {exampleString +
+                                  (example.code &&
+                                    example.code
+                                      .replace('```', '')
+                                      .replace('js', '')
+                                      .replace('```', ''))}
+                              </CodeBlock>
+                              {response && (
+                                <>
+                                  <ComesFrom
+                                    className="mb-5 mt-5"
+                                    link="https://github.com/supabase/supabase/pull/10095/files#diff-c514c66b77772b9e3d9a5403c136ee52dfeaaeacb1d8138ea85ce35ee64e5006"
+                                    text="examples.yml"
+                                  />
+                                  <CodeBlock
+                                    className="useless-code-block-class"
+                                    language="json"
+                                    hideLineNumbers={true}
+                                  >
+                                    {response}
+                                  </CodeBlock>
+                                </>
+                              )}
+                            </Tabs.Panel>
+                          )
+                        })}
+                    </Tabs>
+                  </>
+                )}
+              </RefSubLayout.Examples>
+            </RefSubLayout.Section>
+          </>
+        )
+      })}
+    </RefSubLayout>
   )
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  /**
-   * This is our collection of human readable titles and IDs
-   */
-  let markdownDocs = [
-    {
-      title: 'Inserting data',
-      id: 'select()',
-    },
-    { title: 'Deleting data', id: 'delete()' },
-  ]
-
   const pages = jsSpec.functions.map((x) => x.id)
   // console.log('pages', pages)
 

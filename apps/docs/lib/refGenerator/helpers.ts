@@ -1,9 +1,6 @@
-import React from 'react'
 import { TsDoc } from '~/generator/legacy/definitions'
-import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 
 import { uniqBy } from 'lodash'
-import { slugify, toArrayWithKey, toTitle } from '~/generator/helpers'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
@@ -71,9 +68,9 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
 
     let heading = 'Properties' // old `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
     subContent = methodListGroup([heading].concat(properties)) // old join // .join('\n'))
-    return methodListItemLabel(labelParams, subContent)
+    return { ...labelParams, subContent }
   }
-  return methodListItemLabel(labelParams, subContent)
+  return { ...labelParams, subContent }
 }
 
 const isDereferenced = (paramDefinition: TsDoc.TypeDefinition) => {
@@ -105,50 +102,19 @@ const methodListGroup = (items) => {
   // `
 }
 
-const methodListItemLabel = ({ name, isOptional, type, description }, subContent) => {
-  return {
-    name,
-    isOptional,
-    type,
-    description,
-    subContent,
-  }
-  // `
-  // <li className="method-list-item">
-  //   <h4 className="method-list-item-label">
-  //     <span className="method-list-item-label-name">
-  //       ${name}
-  //     </span>
-  //     <span className="method-list-item-label-badge ${!isOptional && 'required'}">
-  //       ${isOptional ? 'optional' : 'required'}
-  //     </span>
-  //     <span className="method-list-item-validation">
-  //       ${type}
-  //     </span>
-  //   </h4>
-  //   <div class="method-list-item-description">
-
-  // ${description ? description : 'No description provided. '}
-
-  //   </div>
-  //   ${subContent}
-  // </li>
-  // `
-}
-
 function generateLabelParam(param: any) {
   let labelParams: any = {}
   if (typeof param.type === 'string' && param.type === 'literal') {
     labelParams = {
       name: param.name ?? param.value,
-      isOptional: !!param.flags?.isOptional,
+      isOptional: Boolean(param.flags?.isOptional) || 'defaultValue' in param,
       type: param.type,
       description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
     }
   } else {
     labelParams = {
       name: param.name ?? extractParamTypeAsString(param),
-      isOptional: !!param.flags?.isOptional,
+      isOptional: Boolean(param.flags?.isOptional) || 'defaultValue' in param,
       type: extractParamTypeAsString(param),
       description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
     }
@@ -197,49 +163,58 @@ ${commentObject?.text || ''}
 // }
 
 // OPENAPI-SPEC-VERSION: 3.0.0
-type v3OperationWithPath = OpenAPIV3.OperationObject & {
-  path: string
-}
-type enrichedOperation = OpenAPIV3.OperationObject & {
-  path: string
-  fullPath: string
-  operationId: string
-}
-export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
-  const specLayout = spec.tags || []
-  const operations: enrichedOperation[] = []
-  console.log('im v3ing')
-  Object.entries(spec.paths).forEach(([key, val]) => {
-    const fullPath = `${apiUrl}${key}`
+// type v3OperationWithPath = OpenAPIV3.OperationObject & {
+//   path: string
+// }
+// type enrichedOperation = OpenAPIV3.OperationObject & {
+//   path: string
+//   fullPath: string
+//   operationId: string
+// }
+// export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
+//   const specLayout = spec.tags || []
+//   const operations: enrichedOperation[] = []
+//   console.log('im v3ing')
+//   Object.entries(spec.paths).forEach(([key, val]) => {
+//     const fullPath = `${apiUrl}${key}`
 
-    toArrayWithKey(val!, 'operation').forEach((o) => {
-      const operation = o as v3OperationWithPath
-      const enriched = {
-        ...operation,
-        path: key,
-        fullPath,
-        operationId: slugify(operation.summary!),
+//     toArrayWithKey(val!, 'operation').forEach((o) => {
+//       const operation = o as v3OperationWithPath
+//       const enriched = {
+//         ...operation,
+//         path: key,
+//         fullPath,
+//         operationId: slugify(operation.summary!),
 
-        responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
-      }
-      operations.push(enriched)
+//         responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
+//       }
+//       operations.push(enriched)
+//     })
+//   })
+
+const slugify = (text: string) => {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/[. )(]/g, '-') // Replace spaces and brackets -
+    .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+    .replace(/\-\-+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, '') // Trim - from end of text
+}
+
+// Uppercase the first letter of a string
+const toTitle = (text: string) => {
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
+
+/**
+ * Convert Object to Array of values
+ */
+export const toArrayWithKey = (obj: object, keyAs: string) =>
+  _.values(
+    _.mapValues(obj, (value: any, key: string) => {
+      value[keyAs] = key
+      return value
     })
-  })
-
-  const sections = specLayout.map((section) => {
-    return {
-      ...section,
-      title: toTitle(section.name),
-      id: slugify(section.name),
-      operations: operations.filter((operation) => operation.tags?.includes(section.name)),
-    }
-  })
-
-  const content = {
-    info: spec.info,
-    sections,
-    operations,
-  }
-
-  return content
-}
+  )
