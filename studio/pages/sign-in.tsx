@@ -1,15 +1,20 @@
+import Link from 'next/link'
+
+import { useFlag } from 'hooks'
+import { NextPageWithLayout } from 'types'
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
+import SignInWithSSO from 'components/interfaces/SignIn/SignInWithSSO'
 import { SignInLayout } from 'components/layouts'
-import Link from 'next/link'
-import { NextPageWithLayout } from 'types'
 
 const SignInPage: NextPageWithLayout = () => {
+  const showSsoLogin = useFlag('mfaSso')
+
   return (
     <>
       <div className="flex flex-col gap-5">
         <SignInWithGitHub />
-        {/* <SignInWithSSO /> */}
+        <SignInWithSSO />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

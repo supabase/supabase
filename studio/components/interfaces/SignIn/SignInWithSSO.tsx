@@ -1,12 +1,14 @@
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, IconLock } from 'ui'
 
 const SignInWithSSO = () => {
   return (
     <Link href="/sign-in-sso">
-      <Button block size="small" type="text">
-        Continue with SSO
-      </Button>
+      <a>
+        <Button block size="large" type="outline" icon={<IconLock width={18} height={18} />}>
+          Continue with SSO
+        </Button>
+      </a>
     </Link>
   )
 }
