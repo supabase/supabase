@@ -51,6 +51,43 @@ You can enable third-party providers with the click of a button by navigating to
 
 ![OAuth Logins.](/docs/img/supabase-oauth-logins.png)
 
+### Redirect URLs and wildcards
+
+When using third-party providers, the [Supabase client library](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect) redirects the user to the provider. When the third-party provider successfully authenticates the user, the provider redirects the user to the Supabase Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or [add additional redirect URLs](https://app.supabase.com/project/_/auth/settings).
+
+You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel. See the [full list of supported patterns](https://pkg.go.dev/github.com/gobwas/glob#Compile).
+
+#### Netlify preview URLs
+
+For deployments with Netlify, set the `SITE_URL` to your official site URL. Add the following additional redirect URLs for local development and deployment previews:
+
+- `http://localhost:3000/*/*`
+- `https://**--my_org.netlify.app/*`
+
+#### Vercel preview URLs
+
+For deployments with Vercel, set the `SITE_URL` to your official site URL. Add the following additional redirect URLs for local development and deployment previews:
+
+- `http://localhost:3000/*/*`
+- `https://**vercel.app/*/*`
+
+Vercel provides an environment variable for the URL of the deployment called `NEXT_PUBLIC_VERCEL_URL`. See the [Vercel docs](https://vercel.com/docs/concepts/projects/environment-variables#system-environment-variables) for more details. You can use this variable to dynamically redirect depending on the environment:
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github'
+  options: {
+    redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : "http://localhost:3000"
+  }
+}
+```
+
+#### Mobile deep linking URIs
+
+For mobile applications you can use deep linking URIs. For example for your `SITE_URL` you can specify something like `com.supabase://login-callback/` and for additional redirect URLs something like `com.supabase.staging://login-callback/` if needed.
+
 ## Authorization
 
 When you need granular authorization rules, nothing beats PostgreSQL's Row Level Security (RLS).

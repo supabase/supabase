@@ -27,7 +27,7 @@ const UpgradeToPro: FC<Props> = ({ primaryText, projectRef, secondaryText }) => 
             <p className="text-sm text-scale-1100">{secondaryText}</p>
           </div>
         </div>
-        <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+        <Link href={`/project/${projectRef}/settings/billing/update`}>
           <Button type="primary">Upgrade to Pro</Button>
         </Link>
       </div>
