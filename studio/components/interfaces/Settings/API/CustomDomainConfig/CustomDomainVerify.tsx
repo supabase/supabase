@@ -1,40 +1,33 @@
 import { ProjectSettingsResponse } from 'data/config/project-settings-query'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { Alert, Button, IconAlertCircle, IconRefreshCw } from 'ui'
+import { Alert, Button, IconAlertCircle, IconHelpCircle, IconRefreshCw } from 'ui'
 import DNSRecord from './DNSRecord'
+import InformationBox from 'components/ui/InformationBox'
+import { useState } from 'react'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
   customDomain: CustomDomainResponse
   settings?: ProjectSettingsResponse
-  isSuccessfullyAdded: boolean
 }
 
-const CustomDomainVerify = ({
-  projectRef,
-  customDomain,
-  settings,
-  isSuccessfullyAdded,
-}: CustomDomainVerifyProps) => {
+const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
   const { ui } = useStore()
+
+  const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
     useCustomDomainReverifyMutation({
       onSuccess: (res) => {
-        if (res.status === '2_initiated') {
-          // [Joshen TODO] - Is this what it means? Do we also need to cover for 3_challenge_verified?
-          ui.setNotification({
-            category: 'info',
-            message:
-              'Unable to verify records from DNS provider yet. Do check again in a bit as it may take up to 24 hours for changes in DNS records to propagate',
-            duration: 6000,
-          })
-        }
+        if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
+
+  const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) {
@@ -44,65 +37,118 @@ const CustomDomainVerify = ({
     reverifyCustomDomain({ projectRef })
   }
 
+  const onCancelCustomDomain = async () => {
+    if (!projectRef) {
+      throw new Error('Project ref is required')
+    }
+    try {
+      await deleteCustomDomain({ projectRef })
+    } catch (error: any) {
+      ui.setNotification({ category: 'error', message: error.message })
+    }
+  }
+
   return (
     <>
-      {isSuccessfullyAdded && (
-        <Alert
-          withIcon
-          closable
-          variant="success"
-          title="Your custom domain has been successfully added"
-        >
-          Please verify the domain by adding the listed records below to your domain's DNS settings.
-        </Alert>
-      )}
       <div>
-        <h4 className="text-scale-1200">Set the following record(s) in your DNS provider:</h4>
+        <h4 className="text-scale-1200 mb-2">
+          Successfully added your custom domain{' '}
+          <code className="text-sm">{customDomain.hostname}</code>
+        </h4>
         <p className="text-sm text-scale-1100">
-          Please note that it may take up to 24 hours for the DNS records to propagate.
+          Set the following record(s) in your DNS provider, then click verify to confirm your
+          control over the domain
         </p>
         <p className="text-sm text-scale-1100">
           Records which have been successfully verified will be removed from this list below.
         </p>
+        <div className="mt-4 mb-2">
+          <InformationBox
+            hideCollapse
+            defaultVisibility
+            icon={
+              isNotVerifiedYet ? (
+                <IconAlertCircle className="text-scale-1100" strokeWidth={1.5} />
+              ) : (
+                <IconHelpCircle className="text-scale-1100" strokeWidth={1.5} />
+              )
+            }
+            title={
+              isNotVerifiedYet
+                ? 'Unable to verify records from DNS provider yet.'
+                : 'Please note that it may take up to 24 hours for the DNS records to propagate.'
+            }
+            description={
+              isNotVerifiedYet
+                ? 'Do check again in a bit as it may take up to 24 hours for changes in DNS records to propagate.'
+                : undefined
+            }
+          />
+        </div>
       </div>
 
-      {customDomain.verification_errors?.includes(
-        'custom hostname does not CNAME to this zone.'
-      ) && (
-        <DNSRecord
-          showLabel
-          type="CNAME"
-          name={customDomain.hostname}
-          value={settings?.autoApiService.app_config.endpoint ?? 'Loading...'}
-        />
-      )}
-
-      {customDomain.ownership_verification && (
-        <DNSRecord
-          type={customDomain.ownership_verification.type}
-          name={customDomain.ownership_verification.name}
-          value={customDomain.ownership_verification.value}
-        />
-      )}
-
-      {customDomain.ssl.status === 'pending_validation' && (
-        <DNSRecord
-          type="TXT"
-          name={customDomain.ssl.txt_name ?? 'Loading...'}
-          value={customDomain.ssl.txt_value ?? 'Loading...'}
-        />
-      )}
-
-      {customDomain.ssl.status === 'pending_deployment' && (
-        <div className="flex items-center justify-center space-x-2 py-8">
-          <IconAlertCircle size={16} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1100">
-            SSL certificate is being deployed. Please wait a few minutes and try again.
-          </p>
+      <div className="space-y-2">
+        <div className="flex gap-4">
+          <div className="w-[50px]">
+            <p className="text-scale-1100 text-sm">Type</p>
+          </div>
+          <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
+            <div className="flex flex-row space-x-2 justify-between col-span-12">
+              <label className="block text-scale-1100 text-sm break-all">Name</label>
+            </div>
+          </div>
+          <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
+            <div className="flex flex-row space-x-2 justify-between col-span-12">
+              <label className="block text-scale-1100 text-sm break-all">Content</label>
+            </div>
+          </div>
         </div>
-      )}
 
-      {
+        {customDomain.verification_errors?.includes(
+          'custom hostname does not CNAME to this zone.'
+        ) && (
+          <DNSRecord
+            type="CNAME"
+            name={customDomain.hostname}
+            value={settings?.autoApiService.app_config.endpoint ?? 'Loading...'}
+          />
+        )}
+
+        {customDomain.ownership_verification && (
+          <DNSRecord
+            type={customDomain.ownership_verification.type}
+            name={customDomain.ownership_verification.name}
+            value={customDomain.ownership_verification.value}
+          />
+        )}
+
+        {customDomain.ssl.status === 'pending_validation' && (
+          <DNSRecord
+            type="TXT"
+            name={customDomain.ssl.txt_name ?? 'Loading...'}
+            value={customDomain.ssl.txt_value ?? 'Loading...'}
+          />
+        )}
+
+        {customDomain.ssl.status === 'pending_deployment' && (
+          <div className="flex items-center justify-center space-x-2 py-8">
+            <IconAlertCircle size={16} strokeWidth={1.5} />
+            <p className="text-sm text-scale-1100">
+              SSL certificate is being deployed. Please wait a few minutes and try again.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center space-x-2 justify-end">
+        <Button
+          type="default"
+          onClick={onCancelCustomDomain}
+          loading={isDeleting}
+          className="self-end"
+        >
+          Cancel
+        </Button>
         <Button
           icon={<IconRefreshCw />}
           onClick={onReverifyCustomDomain}
@@ -111,7 +157,7 @@ const CustomDomainVerify = ({
         >
           Verify
         </Button>
-      }
+      </div>
     </>
   )
 }

@@ -4,38 +4,23 @@ export type DNSRecordProps = {
   type: string
   name: string
   value: string
-  showLabel?: boolean
 }
 
-const DNSRecord = ({ type, name, value, showLabel = false }: DNSRecordProps) => {
+const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
   return (
-    <div className="flex gap-4">
-      <Input
+    <div className="flex gap-4 items-center">
+      {/* <Input
         readOnly
         disabled
-        label={showLabel ? 'Type' : ''}
         className="input-mono"
         value={type.toUpperCase()}
         layout="vertical"
-      />
-      <Input
-        readOnly
-        copy
-        disabled
-        label={showLabel ? 'Name' : ''}
-        className="input-mono flex-1"
-        value={name}
-        layout="vertical"
-      />
-      <Input
-        readOnly
-        copy
-        disabled
-        label={showLabel ? 'Value' : ''}
-        className="input-mono flex-1"
-        value={value}
-        layout="vertical"
-      />
+      /> */}
+      <div className="w-[50px]">
+        <p className="font-mono text-base">{type.toUpperCase()}</p>
+      </div>
+      <Input readOnly copy disabled className="input-mono flex-1" value={name} layout="vertical" />
+      <Input readOnly copy disabled className="input-mono flex-1" value={value} layout="vertical" />
     </div>
   )
 }
