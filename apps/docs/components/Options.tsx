@@ -6,7 +6,13 @@ interface IOptions {
   name?: string
 }
 
-const Options: FC<IOptions> = (props) => {
+type IOption = AcceptedValue | any
+
+type OptionsSubComponents = {
+  Option: IOption
+}
+
+const Options: FC<IOptions> & OptionsSubComponents = (props) => {
   const [open, setOpen] = useState(false)
   return (
     <div className="mt-0">
@@ -40,8 +46,6 @@ const Options: FC<IOptions> = (props) => {
   )
 }
 
-type IOption = AcceptedValue | any
-
 const Option: FC<IOption> = (props) => {
   return (
     <div
@@ -72,7 +76,6 @@ const Option: FC<IOption> = (props) => {
   )
 }
 
-// @ts-ignore
 Options.Option = Option
 
 export default Options
