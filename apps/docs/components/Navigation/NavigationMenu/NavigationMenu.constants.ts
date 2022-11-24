@@ -393,7 +393,11 @@ export const integrations = {
       name: 'Auth',
       url: undefined,
       items: [
-        { name: 'Auth0', url: '/guides/integrations/auth0', items: [] },
+        {
+          name: 'Auth0',
+          url: '/guides/integrations/auth0',
+          items: [],
+        },
         { name: 'Authsignal', url: '/guides/integrations/authsignal', items: [] },
         { name: 'Clerk', url: '/guides/integrations/clerk', items: [] },
         { name: 'keyri', url: '/guides/integrations/keyri', items: [] },
