@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import * as yup from 'yup'
-import { Form, Input } from 'ui'
+import { Button, Form, IconExternalLink, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -74,9 +75,17 @@ const CustomDomainsConfigureHostname = ({
                     handleReset={handleReset}
                     disabled={!true}
                     helper={
-                      !true
-                        ? "You need additional permissions to update your project's custom domain settings"
-                        : undefined
+                      !true ? (
+                        "You need additional permissions to update your project's custom domain settings"
+                      ) : (
+                        <Link href="https://supabase.com/docs/guides/platform/custom-domains">
+                          <a target="_blank">
+                            <Button type="default" icon={<IconExternalLink />}>
+                              Documentation
+                            </Button>
+                          </a>
+                        </Link>
+                      )
                     }
                   />
                 </div>
