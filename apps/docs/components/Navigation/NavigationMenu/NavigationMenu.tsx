@@ -44,7 +44,8 @@ const SideNav = () => {
       case url.includes(`/docs/guides/integrations`) && url:
         setLevel('integrations')
         break
-      case url.includes(`/docs/platform`) && url:
+      case url.includes(`/docs/guides/platform`) ||
+        (url.includes(`/docs/guides/hosting/platform`) && url):
         setLevel('platform')
         break
       case url.includes(`/docs/new/reference/javascript/`) && url:
@@ -117,7 +118,7 @@ const SideNav = () => {
       {
         label: 'Edge Functions',
         icon: 'functions.svg',
-        href: '/guides/edge-functions',
+        href: '/guides/functions',
         level: 'functions',
       },
     ],
@@ -137,7 +138,7 @@ const SideNav = () => {
       {
         label: 'Platform',
         icon: 'platform.svg',
-        href: '/guides/platform',
+        href: '/guides/hosting/platform',
         level: 'platform',
       },
     ],

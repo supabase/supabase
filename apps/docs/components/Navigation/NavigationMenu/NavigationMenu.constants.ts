@@ -504,8 +504,8 @@ export const reference_javascript = {
 }
 
 export const reference_cli = {
-  icon: '/img/icons/javascript-icon.svg',
-  title: 'javascript-js',
+  icon: '/img/icons/cli-icon.svg',
+  title: 'Supabase CLI',
   parent: '/reference',
   items: [
     {

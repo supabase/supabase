@@ -94,7 +94,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
                 <IconChevronLeft size={10} strokeWidth={3} />
               </div>
             </div>
-            <span>Main Menu</span>
+            <span>Back to reference</span>
           </a>
         </Link>
         <div className="flex items-center gap-3 my-3">
@@ -114,7 +114,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
           {clientLibsCommon.functions
             .filter((x) => x.product === 'database')
             .map((x, index) => {
-              console.log(functions)
+              // console.log(functions)
               return (
                 <>
                   <FunctionLink {...x} />
@@ -128,7 +128,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
           {clientLibsCommon.functions
             .filter((x) => x.product === 'auth')
             .map((x, index) => {
-              console.log(functions)
+              // console.log(functions)
               return (
                 <>
                   <FunctionLink {...x} />
@@ -140,7 +140,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
           {clientLibsCommon.functions
             .filter((x) => x.product === 'storage')
             .map((x, index) => {
-              console.log(functions)
+              // console.log(functions)
               return (
                 <>
                   <FunctionLink {...x} />
@@ -152,7 +152,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
           {clientLibsCommon.functions
             .filter((x) => x.product === 'realtime')
             .map((x, index) => {
-              console.log(functions)
+              // console.log(functions)
               return (
                 <>
                   <FunctionLink {...x} />
@@ -164,7 +164,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
           {clientLibsCommon.functions
             .filter((x) => x.product === 'functions')
             .map((x, index) => {
-              console.log(functions)
+              // console.log(functions)
               return (
                 <>
                   <FunctionLink {...x} />
