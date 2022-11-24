@@ -1,5 +1,5 @@
 // @ts-expect-error
-import specFile from '~/../../spec/cli_v1_config.yaml' assert { type: 'yml' }
+import specFile from '~/../../spec/realtime_v0_config.yaml' assert { type: 'yml' }
 
 import ReactMarkdown from 'react-markdown'
 
@@ -22,14 +22,14 @@ export type Parameter = {
 }
 
 // Parameters are grouped on the page by tag
-const TAGS = ['general', 'auth', 'api', 'database', 'dashboard', 'local']
+const TAGS = ['general', 'database']
 
 export default function CliUsage() {
   return (
     <div>
       <div className="flex my-16">
         <div className="w-full prose">
-          <h1 className="text-4xl mb-16">{specFile.info.title}</h1>
+          <h1 className="text-4xl mb-16">{specFile.info.title} Configuration</h1>
           <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
           <div>
             {TAGS.map((tag) =>
@@ -37,7 +37,7 @@ export default function CliUsage() {
                 .filter((param: Parameter) => param.tags[0] === tag)
                 .map((parameter: Parameter, index) => (
                   <div>
-                    {index === 0 && <h2 className="text-xl capitalize">{tag}</h2>}
+                    {index === 0 && <h2 className="text-xl capitalize">{tag} Settings</h2>}
                     <div className="mt-8">
                       <div>
                         <h2 className="text-xl font-medium text-scale-1200 font-mono">
