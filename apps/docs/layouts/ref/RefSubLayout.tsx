@@ -28,13 +28,13 @@ const Section: FC<ISectionContainer> = (props) => {
   return (
     <article key={props.id} id={props.id}>
       <header className="not-prose mb-12">
-        <h1
+        <h2
           className={['text-xl font-medium text-scale-1200', props.monoFont && 'font-mono'].join(
             ' '
           )}
         >
           {props.title}
-        </h1>
+        </h2>
       </header>
       <div className="grid grid-cols-2 ref-container gap-16">{props.children}</div>
     </article>
