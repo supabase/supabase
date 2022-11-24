@@ -24,14 +24,12 @@ export type CustomDomainsConfigureHostnameProps = {
   projectRef?: string
   title: ReactNode
   settings?: ProjectSettingsResponse
-  onSuccessfullyAdded: () => void
 }
 
 const CustomDomainsConfigureHostname = ({
   projectRef,
   title,
   settings,
-  onSuccessfullyAdded,
 }: CustomDomainsConfigureHostnameProps) => {
   const { ui } = useStore()
 
@@ -47,7 +45,6 @@ const CustomDomainsConfigureHostname = ({
         projectRef,
         customDomain: values.domain,
       })
-      onSuccessfullyAdded()
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -99,21 +96,6 @@ const CustomDomainsConfigureHostname = ({
                     placeholder="subdomain.example.com"
                   />
                 </FormSectionContent>
-                <div className="col-span-12">
-                  <InformationBox
-                    hideCollapse
-                    defaultVisibility
-                    icon={<IconAlertCircle strokeWidth={2} />}
-                    title="Setup a CNAME record first before adding a custom domain"
-                    description={
-                      <p>
-                        Create a CNAME record in your DNS provider pointing to{' '}
-                        <code>{settings?.autoApiService.app_config.endpoint ?? 'Loading...'}</code>{' '}
-                        with as low a TTL as possible before adding your custom domain above.
-                      </p>
-                    }
-                  />
-                </div>
               </FormSection>
             </FormPanel>
           </>

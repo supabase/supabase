@@ -16,7 +16,6 @@ import CustomDomainVerify from './CustomDomainVerify'
 
 const CustomDomainConfig = () => {
   const { ref } = useParams()
-  const [isSuccessfullyAdded, setIsSuccessfullyAdded] = useState(false)
 
   const { isLoading: isSettingsLoading, data: settings } = useProjectSettingsQuery({
     projectRef: ref,
@@ -56,7 +55,6 @@ const CustomDomainConfig = () => {
         projectRef={ref}
         title={CUSTOM_DOMAINS_TITLE}
         settings={settings}
-        onSuccessfullyAdded={() => setIsSuccessfullyAdded(true)}
       />
     )
   }
@@ -64,7 +62,7 @@ const CustomDomainConfig = () => {
   return (
     <>
       <Panel title={CUSTOM_DOMAINS_TITLE}>
-        <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+        <Panel.Content className="space-y-6">
           {isLoading && <CustomDomainsShimmerLoader />}
 
           {isNotAllowedError && (
@@ -96,7 +94,6 @@ const CustomDomainConfig = () => {
                   projectRef={ref}
                   customDomain={data.customDomain}
                   settings={settings}
-                  isSuccessfullyAdded={isSuccessfullyAdded}
                 />
               )}
 
