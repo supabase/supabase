@@ -3,7 +3,7 @@ import { useFlag } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
 import { General, Infrastructure, DeleteProjectPanel } from 'components/interfaces/Settings/General'
-import CustomDomainConfig from 'components/interfaces/Settings/API/CustomDomainConfig/CustomDomainConfig'
+import CustomDomainConfig from 'components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const isCustomDomainsEnabled = useFlag('customDomains')
