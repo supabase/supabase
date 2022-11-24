@@ -37,7 +37,10 @@ export default function CliUsage() {
     <RefSubLayout>
       <div className="flex my-16">
         <div className="w-full">
-          <p className="">{cliSpec.info.description}</p>
+          <div className="grid gap-16">
+            <h1 className="text-4xl">{cliSpec.info.title}</h1>
+            <p className="">{cliSpec.info.description}</p>
+          </div>
 
           <div className="grid gap-32 mx-auto max-w-5xl mt-24">
             {cliSpec.commands.map((command: Command, commandIndex) => {
