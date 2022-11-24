@@ -140,14 +140,14 @@ function generateLabelParam(param: any) {
   if (typeof param.type === 'string' && param.type === 'literal') {
     labelParams = {
       name: param.name ?? param.value,
-      isOptional: !!param.flags?.isOptional,
+      isOptional: Boolean(param.flags?.isOptional) || 'defaultValue' in param,
       type: param.type,
       description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
     }
   } else {
     labelParams = {
       name: param.name ?? extractParamTypeAsString(param),
-      isOptional: !!param.flags?.isOptional,
+      isOptional: Boolean(param.flags?.isOptional) || 'defaultValue' in param,
       type: extractParamTypeAsString(param),
       description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
     }
