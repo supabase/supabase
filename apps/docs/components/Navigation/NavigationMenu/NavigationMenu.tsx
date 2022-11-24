@@ -5,17 +5,14 @@ import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import NavigationMenuCliList from './NavigationMenuCliList'
 
 const SideNav = () => {
-  console.log('sidebar rerendered')
   const router = useRouter()
 
   const [level, setLevel] = useState('home')
 
   function handleRouteChange(url: string) {
-    // console.log('path changed')
-    // console.log(url)
-    // console.log('LISTEN')
     switch (url) {
       case `/docs`:
         setLevel('home')
@@ -63,7 +60,6 @@ const SideNav = () => {
   }
 
   useEffect(() => {
-    console.log(router)
     handleRouteChange(router.basePath + router.asPath)
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
@@ -71,8 +67,6 @@ const SideNav = () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
   }, [router.events])
-
-  // handleRouteChange(router.asPath)
 
   const home = [
     [
@@ -149,51 +143,6 @@ const SideNav = () => {
     ],
   ]
 
-  const auth = [
-    {
-      label: 'back',
-      icon: 'home.svg',
-      href: '',
-      level: 'home',
-    },
-  ]
-
-  const ref = [
-    {
-      label: 'back',
-      icon: 'home.svg',
-      href: '',
-      level: 'home',
-    },
-    {
-      label: 'supabase-js v2',
-      icon: 'home.svg',
-      href: '/reference/javascript/start',
-      level: 'ref_js',
-    },
-    {
-      label: 'supabase-js v1',
-      icon: 'home.svg',
-      href: '/reference/javascript/v1/start',
-      level: 'ref_js',
-    },
-    {
-      label: 'supabase-dart v1',
-      icon: 'home.svg',
-      href: '/reference/dart/start',
-      level: 'ref_dart',
-    },
-  ]
-
-  const ref_js = [
-    {
-      label: 'back to ref',
-      icon: 'home.svg',
-      href: '/reference',
-      level: 'ref',
-    },
-  ]
-
   return (
     <div className="flex relative">
       {/* // main menu */}
@@ -255,7 +204,7 @@ const SideNav = () => {
 
       {/* reference level */}
       <NavigationMenuRefList id={'reference_javascript'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuRefList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuCliList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
 
       {/* // ref menu */}
       {/* <div
