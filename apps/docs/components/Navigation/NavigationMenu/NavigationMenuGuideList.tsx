@@ -69,7 +69,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                 <>
                   {x.items.map((subItem, subItemIndex) => {
                     // console.log('router', router)
-                    console.log('subitem url', subItem.url)
+                    //console.log('subitem url', subItem.url)
                     return (
                       <>
                         {subItemIndex === 0 && (
