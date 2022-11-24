@@ -86,100 +86,111 @@ export default function JSReference(props) {
         const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
 
         return (
-          <RefSubLayout.Section>
-            <div className="prose" key={item.id}>
-              <header className={['mb-16'].join(' ')}>
-                <h2
-                  className="text-2xl text-scale-1200 capitalize mb-4 scroll-mt-16"
-                  onClick={() => updateUrl(item.id)}
-                >
-                  {examples.functions[itemIndex].title ??
-                    examples.functions[itemIndex].id ??
-                    item.name ??
-                    item.id}
-                </h2>
-                {shortText && (
-                  <>
-                    <p
-                      className="text-sm text-scale-1100"
-                      dangerouslySetInnerHTML={{ __html: shortText }}
-                    ></p>
-                    {/* <ComesFrom
+          <>
+            <RefSubLayout.Section
+              key={item.id}
+              title={
+                examples.functions[itemIndex].title ??
+                examples.functions[itemIndex].id ??
+                item.name ??
+                item.id
+              }
+              id={item.id}
+            >
+              <RefSubLayout.Details>
+                <>
+                  <header className={['mb-16'].join(' ')}>
+                    {/* <h2
+                      className="text-2xl text-scale-1200 capitalize mb-4 scroll-mt-16"
+                      onClick={() => updateUrl(item.id)}
+                    >
+                      {examples.functions[itemIndex].title ??
+                        examples.functions[itemIndex].id ??
+                        item.name ??
+                        item.id}
+                    </h2> */}
+                    {shortText && (
+                      <>
+                        <p
+                          className="text-sm text-scale-1100"
+                          dangerouslySetInnerHTML={{ __html: shortText }}
+                        ></p>
+                        {/* <ComesFrom
                               link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
                               text="combined.json"
                             /> */}
-                  </>
-                )}
-              </header>
+                      </>
+                    )}
+                  </header>
 
-              {item.description && (
-                <>
-                  {/* <ComesFrom
+                  {item.description && (
+                    <div className="prose">
+                      {/* <ComesFrom
                             link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
                           /> */}
-                  <p className="text-sm">{item.description}</p>
-                </>
-              )}
-              {functionMarkdownContent && (
-                <>
-                  {/* <ComesFrom
+                      <p className="text-sm">{item.description}</p>
+                    </div>
+                  )}
+                  {functionMarkdownContent && (
+                    <div className="prose">
+                      {/* <ComesFrom
                             link="https://github.com/supabase/supabase/pull/10095/files#diff-bf42aab7d324c5330e4ae65d94803cd6da686d2241015536b0263e7f76aeca35"
                             text="auth.signUp().mdx"
                           /> */}
-                  <MDXRemote {...functionMarkdownContent} components={components} />
-                </>
-              )}
-              {item.notes && (
-                <div>
-                  {/* <ComesFrom
+                      <MDXRemote {...functionMarkdownContent} components={components} />
+                    </div>
+                  )}
+                  {item.notes && (
+                    <div className="prose">
+                      {/* <ComesFrom
                             link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml#L105"
                             text="supabase_js_v2"
                           /> */}
-                  <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
-                </div>
-              )}
-              {/* // parameters */}
-              {parameters && (
-                <div className="not-prose mt-12">
-                  {/* <ComesFrom
+                      <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
+                    </div>
+                  )}
+                  {/* // parameters */}
+                  {parameters && (
+                    <div className="not-prose mt-12">
+                      {/* <ComesFrom
                             link="https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
                           /> */}
-                  <h5 className="mb-3 text-base">Parameters</h5>
-                  <ul className="">
-                    {parameters.map((param) => {
-                      // grab override params from yaml file
-                      const overrideParams = item.overrideParams
+                      <h5 className="mb-3 text-base">Parameters</h5>
+                      <ul className="">
+                        {parameters.map((param) => {
+                          // grab override params from yaml file
+                          const overrideParams = item.overrideParams
 
-                      // params from the yaml file can override the params from parameters if it matches the name
-                      const overide = overrideParams?.filter((x) => {
-                        return param.name === x.name
-                      })
+                          // params from the yaml file can override the params from parameters if it matches the name
+                          const overide = overrideParams?.filter((x) => {
+                            return param.name === x.name
+                          })
 
-                      const paramItem = overide?.length > 0 ? overide[0] : param
+                          const paramItem = overide?.length > 0 ? overide[0] : param
 
-                      return (
-                        <Param {...paramItem}>
-                          {paramItem.subContent && (
-                            <div className="mt-3">
-                              <Options>
-                                {param.subContent.map((param) => {
-                                  return <Options.Option {...param} />
-                                })}
-                              </Options>
-                            </div>
-                          )}
-                        </Param>
-                      )
-                    })}
-                  </ul>
-                  {/* <div dangerouslySetInnerHTML={{ __html: parameters }}></div> */}
-                </div>
-              )}
-            </div>
-            <div className="w-full">
-              <div className="sticky top-24">
+                          return (
+                            <Param {...paramItem}>
+                              {paramItem.subContent && (
+                                <div className="mt-3">
+                                  <Options>
+                                    {param.subContent.map((param) => {
+                                      return <Options.Option {...param} />
+                                    })}
+                                  </Options>
+                                </div>
+                              )}
+                            </Param>
+                          )
+                        })}
+                      </ul>
+                      {/* <div dangerouslySetInnerHTML={{ __html: parameters }}></div> */}
+                    </div>
+                  )}
+                </>
+              </RefSubLayout.Details>
+              <RefSubLayout.Examples>
                 {item.examples && (
                   <>
                     {' '}
@@ -293,9 +304,9 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                     </Tabs>
                   </>
                 )}
-              </div>
-            </div>
-          </RefSubLayout.Section>
+              </RefSubLayout.Examples>
+            </RefSubLayout.Section>
+          </>
         )
       })}
     </RefSubLayout>
