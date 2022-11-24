@@ -455,8 +455,8 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                     id="message"
                     label="Message"
                     placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
-                    limit={500}
-                    labelOptional="500 character limit"
+                    limit={5000}
+                    labelOptional="5000 character limit"
                   />
                 </div>
                 <div className="space-y-4 px-6">
