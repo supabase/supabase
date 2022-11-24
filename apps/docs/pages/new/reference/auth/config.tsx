@@ -1,10 +1,10 @@
 // @ts-expect-error
-import specFile from '~/../../spec/realtime_v0_config.yaml' assert { type: 'yml' }
+import specFile from '~/../../spec/gotrue_v1_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
 import ReactMarkdown from 'react-markdown'
 
 // Parameters are grouped on the page by tag
-const TAGS = ['general', 'database']
+const TAGS = ['general']
 
 export default function Config() {
   return (
@@ -19,7 +19,7 @@ export default function Config() {
                 .filter((param: Parameter) => param.tags[0] === tag)
                 .map((parameter: Parameter, index) => (
                   <div>
-                    {index === 0 && <h2 className="text-xl capitalize">{tag} Settings</h2>}
+                    {index === 0 && <h2 className="text-xl capitalize">{tag}</h2>}
                     <div className="mt-8">
                       <div>
                         <h2 className="text-xl font-medium text-scale-1200 font-mono">
