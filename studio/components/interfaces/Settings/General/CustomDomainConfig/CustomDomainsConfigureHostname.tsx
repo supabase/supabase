@@ -22,13 +22,9 @@ const schema = yup.object({
 
 export type CustomDomainsConfigureHostnameProps = {
   projectRef?: string
-  settings?: ProjectSettingsResponse
 }
 
-const CustomDomainsConfigureHostname = ({
-  projectRef,
-  settings,
-}: CustomDomainsConfigureHostnameProps) => {
+const CustomDomainsConfigureHostname = ({ projectRef }: CustomDomainsConfigureHostnameProps) => {
   const { ui } = useStore()
 
   const { mutateAsync: createCustomDomain } = useCustomDomainCreateMutation()
