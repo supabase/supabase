@@ -8,7 +8,13 @@ import { useProfile, useStore, usePermissions } from 'hooks'
 import Error500 from '../../pages/500'
 import { NextPageWithLayout } from 'types'
 
-const PLATFORM_ONLY_PAGES = ['reports', 'settings']
+const PLATFORM_ONLY_PAGES = [
+  'reports',
+  'settings',
+  'auth/providers',
+  'auth/templates',
+  'auth/url-configuration',
+]
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
@@ -23,7 +29,7 @@ export function withAuth<T>(
 
     const { ref, slug } = router.query
     const { app, ui } = rootStore
-    const page = router.pathname.split('/')[3]
+    const page = router.pathname.split('/').slice(3).join('/')
 
     const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
@@ -37,7 +43,9 @@ export function withAuth<T>(
       mutate: mutatePermissions,
     } = usePermissions(profile, returning)
 
-    const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
+    const isAccessingBlockedPage =
+      !IS_PLATFORM &&
+      PLATFORM_ONLY_PAGES.some((platformOnlyPage) => page.startsWith(platformOnlyPage))
     const isRedirecting =
       isAccessingBlockedPage ||
       checkRedirectTo(isLoading, router, profile, error, redirectTo, redirectIfFound)
