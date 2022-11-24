@@ -3531,7 +3531,7 @@ functions:
             const { data, error } = await supabase
               .from('countries')
               .select()
-              .like('name', '%alba%')
+              .ilike('name', '%alba%')
             ```
 
           </TabPanel>
