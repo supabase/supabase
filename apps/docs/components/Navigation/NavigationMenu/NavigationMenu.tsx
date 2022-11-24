@@ -53,6 +53,9 @@ const SideNav = () => {
       case url.includes(`/docs/new/reference/javascript/`) && url:
         setLevel('reference_javascript')
         break
+      case url.includes(`/docs/new/reference/cli/`) && url:
+        setLevel('reference_cli')
+        break
 
       default:
         break
@@ -252,6 +255,7 @@ const SideNav = () => {
 
       {/* reference level */}
       <NavigationMenuRefList id={'reference_javascript'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuRefList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
 
       {/* // ref menu */}
       {/* <div

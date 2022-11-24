@@ -30,6 +30,8 @@ import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
 import { ComesFrom } from '~/components/ComesFrom'
 import Link from 'next/link'
+import Param from '~/components/Params'
+import Options from '~/components/Options'
 
 const marginTop = 256
 export default function Ref(props) {
@@ -228,11 +230,11 @@ export default function Ref(props) {
                       <header
                         className={[
                           // 'border-b sticky top-16 z-10',
-                          ' mb-16',
+                          'mb-16',
                         ].join(' ')}
                       >
                         <h2
-                          className="text-2xl not-prose text-scale-1200 capitalize mb-4 scroll-mt-16"
+                          className="text-2xl text-scale-1200 capitalize mb-4 scroll-mt-16"
                           onClick={() => updateUrl(item.id)}
                         >
                           {examples.functions[itemIndex].title ??
@@ -243,54 +245,53 @@ export default function Ref(props) {
                         {shortText && (
                           <>
                             <p
-                              className="text-base text-scale-1100 not-prose"
+                              className="text-sm text-scale-1100"
                               dangerouslySetInnerHTML={{ __html: shortText }}
                             ></p>
-                            <ComesFrom
+                            {/* <ComesFrom
                               link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
                               text="combined.json"
-                            />
+                            /> */}
                           </>
                         )}
                       </header>
 
                       {item.description && (
                         <>
-                          <ComesFrom
+                          {/* <ComesFrom
                             link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
-                          />
-                          <p className="text-lg not-prose">{item.description}</p>
+                          /> */}
+                          <p className="text-sm">{item.description}</p>
                         </>
                       )}
-                      <hr />
                       {functionMarkdownContent && (
                         <>
-                          <ComesFrom
+                          {/* <ComesFrom
                             link="https://github.com/supabase/supabase/pull/10095/files#diff-bf42aab7d324c5330e4ae65d94803cd6da686d2241015536b0263e7f76aeca35"
                             text="auth.signUp().mdx"
-                          />
+                          /> */}
                           <MDXRemote {...functionMarkdownContent} components={components} />
                         </>
                       )}
                       {item.notes && (
                         <div>
-                          <ComesFrom
+                          {/* <ComesFrom
                             link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml#L105"
                             text="supabase_js_v2"
-                          />
+                          /> */}
                           <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
                         </div>
                       )}
                       {/* // parameters */}
                       {parameters && (
-                        <>
-                          <ComesFrom
+                        <div className="not-prose mt-12">
+                          {/* <ComesFrom
                             link="https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/combined.json"
                             text="combined.json"
-                          />
+                          /> */}
                           <h5 className="mb-3 text-base">Parameters</h5>
-                          <div className="">
+                          <ul className="">
                             {parameters.map((param) => {
                               // grab override params from yaml file
                               const overrideParams = item.overrideParams
@@ -303,76 +304,22 @@ export default function Ref(props) {
                               const paramItem = overide?.length > 0 ? overide[0] : param
 
                               return (
-                                <div className="border-t border-b py-5 flex flex-col gap-3">
-                                  <div className="flex gap-3 items-center">
-                                    <span className="text-sm text-scale-1200 font-mono font-medium">
-                                      {paramItem.name ?? 'no-name'}
-                                    </span>
-                                    <span>
-                                      {paramItem.isOptional ? (
-                                        <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">
-                                          Optional
-                                        </div>
-                                      ) : (
-                                        <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-                                          REQUIRED
-                                        </div>
-                                      )}
-                                    </span>
-                                    <span className="text-scale-900 text-xs">
-                                      {paramItem.type ?? 'no type'}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-scale-1000 m-0">
-                                    {paramItem.description ?? 'nodescription'}
-                                  </p>
+                                <Param {...paramItem}>
                                   {paramItem.subContent && (
                                     <div className="mt-3">
-                                      {param.subContent.map((param) => {
-                                        return (
-                                          <div
-                                            className="px-5 py-3 first:border-t border-b border-l border-r
-                                            border-scale-500
-
-                                            first:rounded-tl-lg first:rounded-tr-lg
-                                            last:rounded-bl-lg last:rounded-br-lg
-
-                                            flex flex-col gap-3
-                                          "
-                                          >
-                                            <div className="flex gap-3 items-center">
-                                              <span className="text-sm text-scale-1200 font-mono font-medium">
-                                                {param.name ?? 'no-name'}
-                                              </span>
-                                              <span>
-                                                {param.isOptional ? (
-                                                  <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">
-                                                    Optional
-                                                  </div>
-                                                ) : (
-                                                  <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-                                                    REQUIRED
-                                                  </div>
-                                                )}
-                                              </span>
-                                              <span className="text-scale-900 text-xs">
-                                                {param.type ?? 'no type'}
-                                              </span>
-                                            </div>
-                                            <p className="text-sm text-scale-1000 m-0">
-                                              {param.description ?? 'nodescription'}
-                                            </p>
-                                          </div>
-                                        )
-                                      })}
+                                      <Options>
+                                        {param.subContent.map((param) => {
+                                          return <Options.Option {...param} />
+                                        })}
+                                      </Options>
                                     </div>
                                   )}
-                                </div>
+                                </Param>
                               )
                             })}
-                          </div>
+                          </ul>
                           {/* <div dangerouslySetInnerHTML={{ __html: parameters }}></div> */}
-                        </>
+                        </div>
                       )}
                     </div>
                     <div className="w-full">
