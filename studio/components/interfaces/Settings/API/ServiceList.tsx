@@ -5,7 +5,6 @@ import { IconAlertCircle, Input } from 'ui'
 
 import {
   useStore,
-  useFlag,
   useProjectSettings,
   useProjectPostgrestConfig,
   useJwtSecretUpdateStatus,
@@ -16,7 +15,6 @@ import PostgrestConfig from './PostgrestConfig'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
-import CustomDomainConfig from './CustomDomainConfig/CustomDomainConfig'
 
 interface Props {
   projectRef: string
@@ -26,8 +24,6 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
-
-  const isCustomDomainsEnabled = useFlag('customDomains')
 
   const { services, isError, mutateSettings } = useProjectSettings(ref as string | undefined)
   const { mutateConfig } = useProjectPostgrestConfig(ref as string | undefined)
@@ -102,12 +98,6 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
         <section>
           <PostgrestConfig />
         </section>
-
-        {isCustomDomainsEnabled && (
-          <section className="mt-8">
-            <CustomDomainConfig />
-          </section>
-        )}
       </div>
     </>
   )

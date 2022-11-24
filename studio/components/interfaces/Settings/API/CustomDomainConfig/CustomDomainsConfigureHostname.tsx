@@ -1,3 +1,8 @@
+import * as yup from 'yup'
+import { Form, Input } from 'ui'
+import { observer } from 'mobx-react-lite'
+
+import { useStore } from 'hooks'
 import {
   FormActions,
   FormPanel,
@@ -5,14 +10,8 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import InformationBox from 'components/ui/InformationBox'
 import { ProjectSettingsResponse } from 'data/config/project-settings-query'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { ReactNode } from 'react'
-import { Form, IconAlertCircle, Input } from 'ui'
-import * as yup from 'yup'
 
 const FORM_ID = 'custom-domains-form'
 
@@ -22,13 +21,11 @@ const schema = yup.object({
 
 export type CustomDomainsConfigureHostnameProps = {
   projectRef?: string
-  title: ReactNode
   settings?: ProjectSettingsResponse
 }
 
 const CustomDomainsConfigureHostname = ({
   projectRef,
-  title,
   settings,
 }: CustomDomainsConfigureHostnameProps) => {
   const { ui } = useStore()
@@ -67,7 +64,6 @@ const CustomDomainsConfigureHostname = ({
           <>
             <FormPanel
               disabled={true}
-              header={title}
               footer={
                 <div className="flex py-4 px-8">
                   <FormActions
