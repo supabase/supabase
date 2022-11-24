@@ -1,4 +1,4 @@
-import specFile from '~/../../spec/storage_v0_openapi.json' assert { type: 'json' }
+import specFile from '~/../../spec/api_v0_openapi.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
 import { Tabs } from '~/../../packages/ui'
 // @ts-ignore
