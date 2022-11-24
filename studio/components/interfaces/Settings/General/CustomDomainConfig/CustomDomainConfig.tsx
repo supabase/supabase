@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle, IconExternalLink } from 'ui'
+import { IconAlertCircle } from 'ui'
 
 import { useParams } from 'hooks'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
@@ -53,7 +53,7 @@ const CustomDomainConfig = () => {
     <div>
       <FormHeader title="Custom Domains" description="" />
       {isNoHostnameConfiguredError ? (
-        <CustomDomainsConfigureHostname projectRef={ref} settings={settings} />
+        <CustomDomainsConfigureHostname projectRef={ref} />
       ) : (
         <Panel>
           {isLoading && (
