@@ -9,7 +9,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
 
   const menu = NavItems[id]
 
-  console.log('router', router)
+  //console.log('router', router)
 
   return (
     <div
