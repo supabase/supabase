@@ -50,7 +50,7 @@ const CustomDomainConfig = () => {
   const isUnknownError = isError && !isNoHostnameConfiguredError && !isNotAllowedError
 
   return (
-    <div>
+    <section>
       <FormHeader title="Custom Domains" description="" />
       {isNoHostnameConfiguredError ? (
         <CustomDomainsConfigureHostname projectRef={ref} />
@@ -109,7 +109,7 @@ const CustomDomainConfig = () => {
           )}
         </Panel>
       )}
-    </div>
+    </section>
   )
 }
 
