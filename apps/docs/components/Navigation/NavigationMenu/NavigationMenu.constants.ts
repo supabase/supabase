@@ -468,9 +468,9 @@ export const reference = {
       items: [
         {
           name: 'Supabase CLI',
-          url: '/new/reference/cli',
+          url: '/new/reference/cli/start',
           items: [],
-          icon: '/img/icons/javascript.svg',
+          icon: '/img/icons/cli.svg',
         },
         {
           name: 'Management API',
@@ -486,6 +486,26 @@ export const reference = {
 export const reference_javascript = {
   icon: '/img/icons/javascript-icon.svg',
   title: 'javascript-js',
+  parent: '/reference',
+  items: [
+    {
+      name: 'Getting Started',
+      items: [
+        {
+          name: 'fake link',
+          href: '/reference/javascript/start',
+          level: 'reference_javascript',
+          items: [],
+          icon: '/img/icons/javascript.svg',
+        },
+      ],
+    },
+  ],
+}
+
+export const reference_cli = {
+  icon: '/img/icons/cli-icon.svg',
+  title: 'Supabase CLI',
   parent: '/reference',
   items: [
     {

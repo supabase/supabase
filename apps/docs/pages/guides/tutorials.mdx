@@ -1,0 +1,85 @@
+import Layout from '~/layouts/DefaultLayout'
+import Link from 'next/link'
+import { GlassPanel } from 'ui'
+
+export const meta = {
+  title: 'Tutorials',
+}
+
+## Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text
+
+### Popular Guides
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  {topArticles.map((item) => {
+    return (
+      <Link
+        href={`/new/${item.href}`}
+        key={item.title}
+        passHref
+      >
+        <a className={item.span ?? 'col-span-4'}>
+          <GlassPanel
+            title="Social Login"
+            header="/docs/img/cards/sample-card-header-4.svg"
+            span="col-span-6"
+            background={false}
+          >
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )})}
+
+</div>
+
+export const topArticles = [
+  {
+    title: 'Database',
+    header: '/docs/img/cards/sample-card-header-4.svg',
+    href: '/auth/auth-login',
+    description: 'Social Login allows the user to sign into a third party website instead of.',
+    span: 'col-span-6',
+  },
+  {
+    title: 'Auth',
+    header: '/docs/img/cards/sample-card-header-4.svg',
+    icon: 'auth',
+    href: '/auth/auth-login',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-6',
+  },
+  {
+    title: 'Storage',
+    header: '/docs/img/cards/sample-card-header-4.svg',
+    icon: 'storage',
+    href: '/auth/auth-login',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Realtime',
+    header: '/docs/img/cards/sample-card-header-4.svg',
+    icon: 'realtime',
+    href: '/auth/auth-login',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Edge Functions',
+    header: '/docs/img/cards/sample-card-header-4.svg',
+    icon: 'functions',
+    href: '/auth/auth-login',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
