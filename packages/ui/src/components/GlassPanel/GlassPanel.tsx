@@ -4,13 +4,13 @@ import { Item } from '../Accordion/Accordion'
 interface Props {
   title: string
   span?: string
-  icon?: string
+  icon?: string | React.ReactNode
   children?: React.ReactNode
   header?: string
   background?: boolean
 }
 
-const GlassPanel = ({ title, span, icon, children, header, background = true }: Props) => {
+const GlassPanel = ({ title, span, icon, children, header, background = true, img }: Props) => {
   return (
     <div
       className={[
@@ -47,10 +47,12 @@ const GlassPanel = ({ title, span, icon, children, header, background = true }: 
         )}
       >
         <div className="flex items-center gap-3">
-          {icon && (
+          {typeof icon === 'string' ? (
             <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
               <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${icon}.svg`} />
             </div>
+          ) : (
+            icon
           )}
           <h5 className="text-base text-scale-1200">{title}</h5>
         </div>

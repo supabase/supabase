@@ -30,7 +30,7 @@ hello world
   {products.map((product) => {
     return (
       <Link
-        href={`/new/${product.href}`}
+        href={`${product.href}`}
         key={product.title}
         passHref
       >
@@ -52,7 +52,7 @@ hello world
   {apis.map((product) => {
     return (
       <Link
-        href={`/new/${product.href}`}
+        href={`/${product.href}`}
         key={product.title}
         passHref
       >
@@ -74,7 +74,7 @@ hello world
   {platform.map((product) => {
     return (
       <Link
-        href={`/new/${product.href}`}
+        href={`/${product.href}`}
         key={product.title}
         passHref
       >
@@ -94,14 +94,14 @@ export const products = [
   {
     title: 'Database',
     icon: 'database',
-    href: 'database',
+    href: '/guides/database',
     description: 'Social Login allows the user to sign into a third party website instead of.',
     span: 'col-span-6',
   },
   {
     title: 'Auth',
     icon: 'auth',
-    href: 'auth',
+    href: '/guides/auth',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
@@ -110,7 +110,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Storage',
     icon: 'storage',
-    href: 'storage',
+    href: '/guides/storage',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
@@ -118,7 +118,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Realtime',
     icon: 'realtime',
-    href: 'realtime',
+    href: '/guides/realtime',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
@@ -126,7 +126,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Edge Functions',
     icon: 'functions',
-    href: 'functions',
+    href: '/guides/functions',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
