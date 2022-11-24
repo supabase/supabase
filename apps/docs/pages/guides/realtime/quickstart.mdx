@@ -147,7 +147,7 @@ channel.on('presence', { event: 'join' }, ({ newPresences }) => {
 })
 
 channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
-  console.log('Users have left: ', newPresences)
+  console.log('Users have left: ', leftPresences)
 })
 
 channel.subscribe(async (status) => {
