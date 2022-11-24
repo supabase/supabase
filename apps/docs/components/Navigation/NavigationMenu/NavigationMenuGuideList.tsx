@@ -9,6 +9,8 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
 
   const menu = NavItems[id]
 
+  console.log('router', router)
+
   return (
     <div
       className={[
@@ -47,17 +49,27 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
             className="w-5 rounded"
           />
           {/* </div> */}
-          <h2 className={['text-scale-1200 ', !menu.title && 'capitalize'].join(' ')}>
+          <h2
+            className={[
+              ' ',
+              !menu.title && 'capitalize',
+              id === router.pathname ? 'text-brand-900' : 'hover:text-brand-900 text-scale-1200',
+            ].join(' ')}
+          >
             {menu.title ?? currentLevel}
           </h2>
         </div>
 
         {menu.items.map((x, index) => {
+          // console.log('1st type of link?', x.items && x.items.length > 0)
+          console.log()
           return (
             <div key={x.name}>
               {x.items && x.items.length > 0 ? (
                 <>
                   {x.items.map((subItem, subItemIndex) => {
+                    // console.log('router', router)
+                    console.log('subitem url', subItem.url)
                     return (
                       <>
                         {subItemIndex === 0 && (
@@ -70,7 +82,14 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                         )}
                         <li key={subItem.name}>
                           <Link href={`/${subItem.url}`} passHref>
-                            <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900">
+                            <a
+                              className={[
+                                'cursor-pointer transition text-sm',
+                                subItem.url === router.pathname
+                                  ? 'text-brand-900'
+                                  : 'hover:text-brand-900 text-scale-1000',
+                              ].join(' ')}
+                            >
                               {subItem.name}
                             </a>
                           </Link>
@@ -86,7 +105,14 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                 <>
                   <li>
                     <Link href={`/${x.url}`} passHref>
-                      <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
+                      <a
+                        className={[
+                          'cursor-pointer transition text-sm',
+                          x.url === router.pathname
+                            ? 'text-brand-900'
+                            : 'hover:text-brand-900 text-scale-1000',
+                        ].join(' ')}
+                      >
                         {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
                         {x.name}
                       </a>
