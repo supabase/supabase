@@ -1540,4 +1540,9 @@ module.exports = [
     source: '/docs/going-into-prod',
     destination: '/docs/guides/platform/going-into-prod',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/disk-usage',
+    destination: '/docs/guides/platform/database-usage',
+  },
 ]

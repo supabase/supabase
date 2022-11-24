@@ -155,7 +155,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.50.2
+    image: supabase/postgres-meta:v0.52.1
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy

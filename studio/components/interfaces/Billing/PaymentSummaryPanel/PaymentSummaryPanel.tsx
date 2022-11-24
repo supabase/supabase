@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
-import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
@@ -358,16 +358,54 @@ const PaymentSummaryPanel: FC<Props> = ({
         </div>
 
         <div className="flex items-center justify-end">
-          <Button
-            block
-            type="primary"
-            size="medium"
-            loading={isSubmitting}
-            disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
-            onClick={() => validateOrder()}
-          >
-            Confirm payment
-          </Button>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <Button
+                block
+                type="primary"
+                size="medium"
+                loading={isSubmitting}
+                disabled={
+                  isSubmitting ||
+                  isLoadingPaymentMethods ||
+                  !hasChangesToPlan ||
+                  !selectedPaymentMethod
+                }
+                onClick={() => validateOrder()}
+              >
+                Confirm payment
+              </Button>
+            </Tooltip.Trigger>
+            {!hasChangesToPlan ? (
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    No changes made to your subscription
+                  </span>
+                </div>
+              </Tooltip.Content>
+            ) : !selectedPaymentMethod ? (
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">Please select a payment method</span>
+                </div>
+              </Tooltip.Content>
+            ) : (
+              <></>
+            )}
+          </Tooltip.Root>
         </div>
       </div>
 
