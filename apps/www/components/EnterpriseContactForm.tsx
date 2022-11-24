@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from 'ui'
+import { Button, Form, Input, Listbox } from 'ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
 import supabase from '~/lib/supabase'
@@ -118,16 +118,32 @@ const EnterpriseContactForm = () => {
               </div>
 
               <div>
-                <Select label="Company Size" id="companySize" name="companySize" layout="vertical">
-                  <Select.Option value="">{'--'}</Select.Option>
-                  <Select.Option value="1-10">1-10 Employees</Select.Option>
-                  <Select.Option value="11-50">11-50 Employees</Select.Option>
-                  <Select.Option value="51-200">51-200 Employees</Select.Option>
-                  <Select.Option value="201-500">201-500 Employees</Select.Option>
-                  <Select.Option value="501-1000">501-1000 Employees</Select.Option>
-                  <Select.Option value="1001-5000">1001-5000 Employees</Select.Option>
-                  <Select.Option value="5001+">5001+ Employees</Select.Option>
-                </Select>
+                <Listbox label="Company Size" id="companySize" name="companySize" layout="vertical">
+                  <Listbox.Option label="---" value="">
+                    {'---'}
+                  </Listbox.Option>
+                  <Listbox.Option label="1-10" value="1-10">
+                    1-10 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="11-50" value="11-50">
+                    11-50 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="51-200" value="51-200">
+                    51-200 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="201-500" value="201-500">
+                    201-500 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="501-1000" value="501-1000">
+                    501-1000 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="1001-5000" value="1001-5000">
+                    1001-5000 Employees
+                  </Listbox.Option>
+                  <Listbox.Option label="5001+" value="5001+">
+                    5001+ Employees
+                  </Listbox.Option>
+                </Listbox>
               </div>
 
               <div>
@@ -141,18 +157,18 @@ const EnterpriseContactForm = () => {
               </div>
 
               <div>
-                <Select
+                <Listbox
                   label="Country / Main Timezone"
                   id="country"
                   name="country"
                   layout="vertical"
                 >
                   {countries.map(({ code, name }) => (
-                    <Select.Option key={code} value={code}>
+                    <Listbox.Option label={name} key={code} value={code}>
                       {name}
-                    </Select.Option>
+                    </Listbox.Option>
                   ))}
-                </Select>
+                </Listbox>
               </div>
 
               <div className="">
