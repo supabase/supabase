@@ -5,9 +5,9 @@ import * as NavItems from './NavigationMenu.constants'
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 // @ts-expect-error
-import clientLibsCommon from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
+import clientLibsCommon from '~/../../spec/common-cli.yml' assert { type: 'yml' }
 
-const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
+const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   const router = useRouter()
 
   const menu = NavItems[id]
@@ -19,7 +19,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
     }
     data = {
       ...data,
-      ...clientLibsCommon.functions.filter((x) => {
+      ...clientLibsCommon.commands.filter((x) => {
         return x.id === func.id
       })[0],
     }
@@ -67,6 +67,37 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
     return <div className="h-px w-full bg-green-500 my-3"></div>
   }
 
+  const MenuSections = [
+    {
+      key: 'general',
+      label: 'General',
+    },
+    {
+      key: 'secrets',
+      label: 'Secrets',
+    },
+    {
+      key: 'projects',
+      label: 'Projects',
+    },
+    {
+      key: 'organizations',
+      label: 'Organizations',
+    },
+    {
+      key: 'migration',
+      label: 'Migration',
+    },
+    {
+      key: 'database',
+      label: 'Database',
+    },
+    {
+      key: 'completion',
+      label: 'Completion',
+    },
+  ]
+
   return (
     <div
       className={[
@@ -108,69 +139,27 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
           </h2>
         </div>
         <ul>
-          <Divider />
-          <SideMenuTitle title="Database" />
+          {MenuSections.map((section) => {
+            return (
+              <>
+                <Divider />
+                <SideMenuTitle title={section.label} />
 
-          {clientLibsCommon.functions
-            .filter((x) => x.product === 'database')
-            .map((x, index) => {
-              console.log(functions)
-              return (
-                <>
-                  <FunctionLink {...x} />
-                </>
-              )
-            })}
+                {clientLibsCommon.commands
+                  .filter((x) => x.product === section.key)
+                  .map((x, index) => {
+                    console.log(functions)
+                    return (
+                      <>
+                        <FunctionLink {...x} />
+                      </>
+                    )
+                  })}
+              </>
+            )
+          })}
 
           <Divider />
-          <SideMenuTitle title="Auth" />
-
-          {clientLibsCommon.functions
-            .filter((x) => x.product === 'auth')
-            .map((x, index) => {
-              console.log(functions)
-              return (
-                <>
-                  <FunctionLink {...x} />
-                </>
-              )
-            })}
-          <Divider />
-          <SideMenuTitle title="Storage" />
-          {clientLibsCommon.functions
-            .filter((x) => x.product === 'storage')
-            .map((x, index) => {
-              console.log(functions)
-              return (
-                <>
-                  <FunctionLink {...x} />
-                </>
-              )
-            })}
-          <Divider />
-          <SideMenuTitle title="Realtime" />
-          {clientLibsCommon.functions
-            .filter((x) => x.product === 'realtime')
-            .map((x, index) => {
-              console.log(functions)
-              return (
-                <>
-                  <FunctionLink {...x} />
-                </>
-              )
-            })}
-          <Divider />
-          <SideMenuTitle title="Functions" />
-          {clientLibsCommon.functions
-            .filter((x) => x.product === 'functions')
-            .map((x, index) => {
-              console.log(functions)
-              return (
-                <>
-                  <FunctionLink {...x} />
-                </>
-              )
-            })}
         </ul>
         {menu.extras && (
           <>
@@ -199,4 +188,4 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
   )
 }
 
-export default NavigationMenuRefList
+export default NavigationMenuCliList

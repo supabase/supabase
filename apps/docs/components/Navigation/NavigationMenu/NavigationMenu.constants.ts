@@ -470,7 +470,7 @@ export const reference = {
           name: 'Supabase CLI',
           url: '/new/reference/cli/start',
           items: [],
-          icon: '/img/icons/javascript.svg',
+          icon: '/img/icons/cli.svg',
         },
         {
           name: 'Management API',
