@@ -24,16 +24,9 @@ const CustomDomainConfig = () => {
   const {
     isLoading: isCustomDomainsLoading,
     isError,
-    error,
     isSuccess,
     data,
-  } = useCustomDomainsQuery(
-    { projectRef: ref },
-    {
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  )
+  } = useCustomDomainsQuery({ projectRef: ref })
 
   const isLoading = isSettingsLoading || isCustomDomainsLoading
 
