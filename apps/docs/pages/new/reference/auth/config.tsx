@@ -1,7 +1,6 @@
 // @ts-expect-error
 import specFile from '~/../../spec/realtime_v0_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
-
 import ReactMarkdown from 'react-markdown'
 
 // Parameters are grouped on the page by tag
