@@ -1,4 +1,4 @@
-import specFile from '~/../../spec/storage_v0_openapi.json' assert { type: 'json' }
+import specFile from '~/../../spec/transforms/storage_v0_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
 import { Tabs } from '~/../../packages/ui'
 
@@ -35,8 +35,6 @@ export type ApiParameter = {
 // @ts-ignore
 const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
 
-console.log('zans', generatedSpec)
-
 export default function Config() {
   return (
     <RefSubLayout>
@@ -50,7 +48,7 @@ export default function Config() {
           <div className="grid gap-32 mx-auto max-w-5xl mt-24">
             {generatedSpec.sections.map((section) => (
               <>
-                <h2 className="text-4xl">{section.title}</h2>
+                <h2 className="text-3xl">{section.title}</h2>
                 {section.operations.map((operation: any) => (
                   <div className="border-b pb-8">
                     <RefSubLayout.Section
