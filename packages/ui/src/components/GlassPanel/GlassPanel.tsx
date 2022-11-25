@@ -8,9 +8,19 @@ interface Props {
   children?: React.ReactNode
   header?: string
   background?: boolean
+  isDarkMode?: boolean
 }
 
-const GlassPanel = ({ title, span, icon, children, header, background = true, img }: Props) => {
+const GlassPanel = ({
+  title,
+  span,
+  icon,
+  children,
+  header,
+  background = true,
+  img,
+  isDarkMode,
+}: Props) => {
   return (
     <div
       className={[
@@ -49,7 +59,10 @@ const GlassPanel = ({ title, span, icon, children, header, background = true, im
         <div className="flex items-center gap-3">
           {typeof icon === 'string' ? (
             <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
-              <img className="bg-green-600 w-5" src={`/docs/img/icons/menu/${icon}.svg`} />
+              <img
+                className="bg-green-600 w-5"
+                src={`/docs/img/icons/menu/${icon}${!isDarkMode ? '-light' : ''}.svg`}
+              />
             </div>
           ) : (
             icon
