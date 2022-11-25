@@ -13,6 +13,7 @@ import InformationBox from 'components/ui/InformationBox'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -51,6 +52,7 @@ const PITR = () => {
   const { configuration, error, isLoading } = backups
 
   const ref = ui.selectedProject?.ref ?? 'default'
+  const tier = ui.selectedProject?.subscription_tier
   const isEnabled = configuration.walg_enabled
 
   const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
@@ -63,8 +65,12 @@ const PITR = () => {
     return isPITRSelfServeEnabled ? (
       <UpgradeToPro
         projectRef={ref}
-        primaryText="Free Plan does not include point in time recovery."
-        secondaryText="Please upgrade to the Pro plan to enable point in time recovery for your project."
+        primaryText="Point in time recovery is a Pro plan add-on."
+        secondaryText={
+          tier === PRICING_TIER_PRODUCT_IDS.FREE
+            ? 'Please upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
+            : 'Please enable the add-on to enable point in time recovery for your project.'
+        }
       />
     ) : (
       <InformationBox

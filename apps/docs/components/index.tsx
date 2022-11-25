@@ -18,6 +18,7 @@ import { Heading } from './CustomHTMLElements'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
+import InlineCodeTag from './CustomHTMLElements/InlineCode'
 
 const components = {
   Admonition,
@@ -55,6 +56,7 @@ const components = {
     return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
   },
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
+  inlineCode: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
 }
 
 export default components

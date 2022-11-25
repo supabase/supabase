@@ -1,14 +1,14 @@
-import { useParams, useStore } from 'hooks'
-import { auth, STORAGE_KEY } from 'lib/gotrue'
+import { useStore } from 'hooks'
+import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
+import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { useSWRConfig } from 'swr'
-import { Button, IconFile, IconFileText } from 'ui'
+import { Button, IconFileText } from 'ui'
 
 type SignInLayoutProps = {
   heading: string
@@ -24,22 +24,27 @@ const SignInLayout = ({
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
-  const { returnTo } = useParams()
-  const router = useRouter()
-  const { cache } = useSWRConfig()
+  const pushNext = usePushNext()
   const { ui } = useStore()
+  const { cache } = useSWRConfig()
   const { theme } = ui
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const hasReturnTo = searchParams.has('returnTo')
+    const hasNext = searchParams.has('next')
+    const shouldRedirect = !hasReturnTo && !hasNext
+
+    if (!shouldRedirect) {
+      // If there's a returnTo or next, then this redirect will be handled by useAutoAuthRedirect() in _app.tsx
+      return
+    }
+
     ;(async () => {
       const { error } = await auth.initialize()
 
       if (error) {
-        ui.setNotification({
-          category: 'error',
-          message: error.message,
-        })
-
+        // if there was a problem signing in via the url, don't redirect
         return
       }
 
@@ -48,16 +53,11 @@ const SignInLayout = ({
       } = await auth.getSession()
 
       if (session) {
-        ui.setNotification({
-          category: 'success',
-          message: `Signed in successfully!`,
-        })
-
         // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
         // @ts-ignore
         cache.clear()
 
-        await router.push(returnTo ?? '/projects')
+        await pushNext()
       }
     })()
   }, [])
@@ -80,7 +80,7 @@ const SignInLayout = ({
       <Head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if (window.localStorage.getItem('${STORAGE_KEY}')) {window.location.replace('/projects')}`,
+            __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace(window._getReturnToPath())}`,
           }}
         />
       </Head>
