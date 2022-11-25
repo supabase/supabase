@@ -32,7 +32,7 @@ export type Command = {
   usage?: string
 }
 
-export default function CliUsage() {
+export default function Config() {
   return (
     <RefSubLayout>
       <div className="flex my-16">
