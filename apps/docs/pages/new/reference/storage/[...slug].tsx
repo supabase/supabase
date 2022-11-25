@@ -80,7 +80,11 @@ export default function Config() {
                                         <div className="flex gap-4 items-center">
                                           <span className="font-bold">{parameter.name}</span>
                                           <span className="font-mono text-xs break-all">
-                                            {parameter.required && 'required'}
+                                            {parameter.required && (
+                                              <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
+                                                REQUIRED
+                                              </div>
+                                            )}
                                           </span>
                                         </div>
                                         <div className="mt-4 flex gap-4 items-center">
