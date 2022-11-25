@@ -16,7 +16,7 @@ info:
       version: '0.0.1'
 
 functions:
-  - id: 'installing'  
+  - id: 'installing'
     name: 'Installing'
     description: |
       ## Dart
@@ -42,7 +42,7 @@ functions:
 
       For the most part `supabase_flutter` shares the same API as `supabase` with few exceptions such as initialization or OAuth sign in.
 
-  Initializing:
+  - Initializing:
     description: |
       ## Dart
       You can initialize a new Supabase client using the `SupabaseClient()` method.
@@ -70,7 +70,7 @@ functions:
           }
           ```
 
-  auth.signUp():
+  - auth.signUp():
     description: |
       Creates a new user.
     notes: |
@@ -93,7 +93,7 @@ functions:
         description: |
           If you are using Flutter, you can sign up with OAuth providers using the [`signInWithProvider()`](/docs/reference/dart/v0/auth-signinwithprovider) method available on `supabase_flutter`.
 
-  auth.signIn():
+  - auth.signIn():
     description: |
       Log in an existing user, or login via a third-party provider.
     notes: |
@@ -131,7 +131,7 @@ functions:
           final url = res.data?.url;
           final error = res.error;
           ```
-  auth.signInWithProvider():
+  - auth.signInWithProvider():
     description: |
       Signs the user in using third party OAuth providers.
     notes: |
@@ -175,7 +175,7 @@ functions:
           })
           const oAuthToken = session.provider_token // use to access provider API
           ```
-  auth.signOut():
+  - auth.signOut():
     description: |
       Signs out the current user, if there is a logged in user.
     examples:
@@ -188,7 +188,7 @@ functions:
           final error = res.error;
           ```
 
-  auth.session():
+  - auth.session():
     description: |
       Returns the session data, if there is an active session.
     examples:
@@ -199,7 +199,7 @@ functions:
           final session = supabase.auth.session();
           ```
 
-  auth.user():
+  - auth.user():
     description: |
       Returns the user data, if there is a logged in user.
     examples:
@@ -210,7 +210,7 @@ functions:
           final user = supabase.auth.user();
           ```
 
-  auth.update():
+  - auth.update():
     description: |
       Updates user data, if there is a logged in user.
     notes: |
@@ -228,7 +228,7 @@ functions:
           final error = res.error;
           ```
 
-  auth.onAuthStateChange():
+  - auth.onAuthStateChange():
     description: |
       Receive a notification every time an auth event happens.
     examples:
@@ -242,7 +242,7 @@ functions:
           });
           ```
 
-  Reset Password (Email):
+  - Reset Password (Email):
     description: |
       Sends a reset request to an email address.
     notes: |
@@ -285,7 +285,7 @@ functions:
 
           final error = res.error;
           ```
-  invoke():
+  - invoke():
     title: 'invoke()'
     description: |
       Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
@@ -329,7 +329,7 @@ functions:
             },
           );
           ```
-  select():
+  - select():
     description: |
       Performs vertical filtering with SELECT.
     title: 'Fetch data: select()'
@@ -448,7 +448,7 @@ functions:
             .execute();
           ```
 
-  insert():
+  - insert():
     description: |
       Performs an INSERT into the table.
     title: 'Create data: insert()'
@@ -478,7 +478,7 @@ functions:
             ]).execute();
           ```
 
-  update():
+  - update():
     description: |
       Performs an UPDATE on the table.
     title: 'Modify data: update()'
@@ -515,7 +515,7 @@ functions:
             .execute();
           ```
 
-  upsert():
+  - upsert():
     description: |
       Performs an UPSERT into the table.
     title: 'Upsert data: upsert()'
@@ -560,7 +560,7 @@ functions:
             .execute(count: CountOption.exact);
           ```
 
-  delete():
+  - delete():
     description: |
       Performs a DELETE on the table.
     title: 'Delete data: delete()'
@@ -578,7 +578,7 @@ functions:
             .execute();
           ```
 
-  rpc():
+  - rpc():
     title: 'Stored Procedures: rpc()'
     description: |
       You can call stored procedures as a "Remote Procedure Call".
@@ -613,7 +613,7 @@ functions:
             .execute(count: CountOption.exact);
           ```
 
-  subscribe():
+  - subscribe():
     description: |
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
@@ -706,7 +706,7 @@ functions:
             .subscribe();
           ```
 
-  removeSubscription():
+  - removeSubscription():
     description: |
       Removes an active subscription and returns the number of open connections.
     title: 'removeSubscription()'
@@ -720,7 +720,7 @@ functions:
           supabase.removeSubscription(mySubscription);
           ```
 
-  getSubscriptions():
+  - getSubscriptions():
     description: |
       Returns an array of all your subscriptions.
     title: 'getSubscriptions()'
@@ -732,7 +732,7 @@ functions:
           final subscriptions = supabase.getSubscriptions();
           ```
 
-  stream():
+  - stream():
     description: |
       Notifies of data at the queried table.
     title: 'stream()'
@@ -780,7 +780,7 @@ functions:
             .execute();
           ```
 
-  storage.listBuckets():
+  - storage.listBuckets():
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
@@ -799,7 +799,7 @@ functions:
             .listBuckets()
           ```
 
-  storage.getBucket():
+  - storage.getBucket():
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
@@ -818,7 +818,7 @@ functions:
             .getBucket('avatars')
           ```
 
-  storage.createBucket():
+  - storage.createBucket():
     description: |
       Creates a new Storage bucket
     title: 'createBucket()'
@@ -836,7 +836,7 @@ functions:
             .createBucket('avatars');
           ```
 
-  storage.emptyBucket():
+  - storage.emptyBucket():
     description: |
       Removes all objects inside a single bucket.
     title: 'emptyBucket()'
@@ -853,7 +853,7 @@ functions:
             .storage
             .emptyBucket('avatars');
           ```
-  storage.updateBucket():
+  - storage.updateBucket():
     description: |
       Updates a new Storage bucket
     title: 'updateBucket()'
@@ -871,7 +871,7 @@ functions:
             .updateBucket('avatars', { public: false });
           ```
 
-  storage.deleteBucket():
+  - storage.deleteBucket():
     description: |
       Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
     title: 'deleteBucket()'
@@ -889,7 +889,7 @@ functions:
             .deleteBucket('avatars');
           ```
 
-  storage.from.upload():
+  - storage.from.upload():
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
@@ -913,7 +913,7 @@ functions:
             ));
           ```
 
-  storage.from.update():
+  - storage.from.update():
     description: |
       Replaces an existing file at the specified path with a new one.
     title: 'from.update()'
@@ -936,7 +936,7 @@ functions:
             ));
           ```
 
-  storage.from.move():
+  - storage.from.move():
     description: |
       Moves an existing file, optionally renaming it at the same time.
     title: 'from.move()'
@@ -955,7 +955,7 @@ functions:
             .move('public/avatar1.png', 'private/avatar2.png');
           ```
 
-  storage.from.createSignedUrl():
+  - storage.from.createSignedUrl():
     description: |
       Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
     title: 'from.createSignedUrl()'
@@ -976,7 +976,7 @@ functions:
           final signedURL = res.data;
           ```
 
-  storage.from.getPublicUrl():
+  - storage.from.getPublicUrl():
     description: |
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
@@ -998,7 +998,7 @@ functions:
           final publicURL = res.data;
           ```
 
-  storage.from.download():
+  - storage.from.download():
     description: |
       Downloads a file.
     title: 'from.download()'
@@ -1017,7 +1017,7 @@ functions:
             .download('avatar1.png');
           ```
 
-  storage.from.remove():
+  - storage.from.remove():
     description: |
       Deletes files within the same bucket
     title: 'from.remove()'
@@ -1036,7 +1036,7 @@ functions:
             .remove(['avatar1.png']);
           ```
 
-  storage.from.list():
+  - storage.from.list():
     description: |
       Lists all the files within a bucket.
     title: 'from.list()'
@@ -1054,13 +1054,13 @@ functions:
             .from('avatars')
             .list();
           ```
-  Using Modifiers:
+  - Using Modifiers:
     description: |
       Modifiers can be used on `select()` queries. 
 
       If a Stored Procedure returns a table response, you can also apply modifiers to the `rpc()` function.
 
-  limit():
+  - limit():
     description: |
       Limits the result with the specified count.
     examples:
@@ -1085,7 +1085,7 @@ functions:
             .execute();
           ```
 
-  order():
+  - order():
     description: |
       Orders the result with the specified column.
     examples:
@@ -1110,7 +1110,7 @@ functions:
             .execute();
           ```
 
-  range():
+  - range():
     description: |
       Limits the result to rows within the specified range, inclusive.
     examples:
@@ -1125,7 +1125,7 @@ functions:
             .execute();
           ```
 
-  single():
+  - single():
     description: |
       Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
@@ -1140,7 +1140,7 @@ functions:
             .execute();
           ```
 
-  Using Filters:
+  - Using Filters:
     description: |
       Filters can be used on `select()`, `update()`, and `delete()` queries. 
 
@@ -1177,7 +1177,7 @@ functions:
         .execute();
       ```
 
-  .or():
+  - .or():
     description: |
       Finds all rows satisfying at least one of the filters.
     notes: |
@@ -1220,7 +1220,7 @@ functions:
       #       .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
       #     ```
 
-  .not():
+  - .not():
     description: |
       Finds all rows which doesn't satisfy the filter.
     notes: |
@@ -1272,7 +1272,7 @@ functions:
             .execute();
           ```
 
-  .match():
+  - .match():
     description: |
       Finds all rows whose columns match the specified `query` object.
     examples:
@@ -1314,7 +1314,7 @@ functions:
             .execute();
           ```
 
-  .eq():
+  - .eq():
     description: |
       Finds all rows whose value on the stated `column` exactly matches the specified `value`.
     examples:
@@ -1356,7 +1356,7 @@ functions:
             .execute();
           ```
 
-  .neq():
+  - .neq():
     description: |
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
     examples:
@@ -1398,7 +1398,7 @@ functions:
             .execute();
           ```
 
-  .gt():
+  - .gt():
     description: |
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
     examples:
@@ -1440,7 +1440,7 @@ functions:
             .execute();
           ```
 
-  .gte():
+  - .gte():
     description: |
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
     examples:
@@ -1482,7 +1482,7 @@ functions:
             .execute();
           ```
 
-  .lt():
+  - .lt():
     description: |
       Finds all rows whose value on the stated `column` is less than the specified `value`.
     examples:
@@ -1524,7 +1524,7 @@ functions:
             .execute();
           ```
 
-  .lte():
+  - .lte():
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
@@ -1567,7 +1567,7 @@ functions:
             .execute();
           ```
 
-  .like():
+  - .like():
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
@@ -1610,7 +1610,7 @@ functions:
             .execute();
           ```
 
-  .ilike():
+  - .ilike():
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
     examples:
@@ -1652,7 +1652,7 @@ functions:
             .execute();
           ```
 
-  .is_():
+  - .is_():
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
 
@@ -1696,7 +1696,7 @@ functions:
             .execute();
           ```
 
-  .in_():
+  - .in_():
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
 
@@ -1740,7 +1740,7 @@ functions:
             .execute();
           ```
 
-  .contains():
+  - .contains():
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1780,7 +1780,7 @@ functions:
             .execute();
           ```
 
-  .containedBy():
+  - .containedBy():
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1820,7 +1820,7 @@ functions:
             .execute();
           ```
 
-  .rangeLt():
+  - .rangeLt():
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1860,7 +1860,7 @@ functions:
             .execute();
           ```
 
-  .rangeGt():
+  - .rangeGt():
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1900,7 +1900,7 @@ functions:
             .execute();
           ```
 
-  .rangeGte():
+  - .rangeGte():
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1940,7 +1940,7 @@ functions:
             .execute();
           ```
 
-  .rangeLte():
+  - .rangeLte():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.rangeLte'
     examples:
       - name: With `select()`
@@ -1981,7 +1981,7 @@ functions:
             .execute();
           ```
 
-  .rangeAdjacent():
+  - .rangeAdjacent():
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2021,7 +2021,7 @@ functions:
             .execute();
           ```
 
-  .overlaps():
+  - .overlaps():
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2061,7 +2061,7 @@ functions:
             .execute();
           ```
 
-  .textSearch():
+  - .textSearch():
     description: |
       Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
     examples:
@@ -2125,7 +2125,7 @@ functions:
             .execute();
           ```
 
-  .filter():
+  - .filter():
     description: |
       Finds all rows whose `column` satisfies the filter.
     notes: |
