@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
-import { useProfile, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 interface ITokenInfo {
   organization_name?: string | undefined
@@ -23,7 +24,7 @@ const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = router.query
   const { ui, app } = useStore()
-  const { profile } = useProfile()
+  const { data: profile } = useProfileQuery()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(false)

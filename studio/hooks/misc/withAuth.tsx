@@ -4,9 +4,10 @@ import { NextRouter, useRouter } from 'next/router'
 
 import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { IS_PLATFORM } from 'lib/constants'
-import { useProfile, useStore, usePermissions } from 'hooks'
+import { useStore, usePermissions } from 'hooks'
 import Error500 from '../../pages/500'
 import { NextPageWithLayout } from 'types'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 const PLATFORM_ONLY_PAGES = ['reports', 'settings']
 
@@ -28,14 +29,25 @@ export function withAuth<T>(
     const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
 
-    const returning =
-      app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
-    const { profile, isLoading, error } = useProfile(returning)
+    const {
+      data: profile,
+      isLoading,
+      error,
+    } = useProfileQuery({
+      onSuccess(profile) {
+        ui.setProfile(profile)
+
+        if (!app.organizations.isInitialized) app.organizations.load()
+        if (!app.projects.isInitialized) app.projects.load()
+        mutatePermissions()
+      },
+    })
+
     const {
       permissions,
       isLoading: isPermissionLoading,
       mutate: mutatePermissions,
-    } = usePermissions(profile, returning)
+    } = usePermissions(profile)
 
     const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
     const isRedirecting =
@@ -43,19 +55,6 @@ export function withAuth<T>(
       checkRedirectTo(isLoading, router, profile, error, redirectTo, redirectIfFound)
 
     useEffect(() => {
-      // This should run before redirecting
-      if (!isLoading) {
-        if (!profile) {
-          ui.setProfile(undefined)
-        } else if (returning !== 'minimal') {
-          ui.setProfile(profile)
-
-          if (!app.organizations.isInitialized) app.organizations.load()
-          if (!app.projects.isInitialized) app.projects.load()
-          mutatePermissions()
-        }
-      }
-
       if (!isPermissionLoading) {
         ui.setPermissions(permissions)
       }
@@ -64,7 +63,7 @@ export function withAuth<T>(
       if (isRedirecting) {
         router.push(redirectTo)
       }
-    }, [isLoading, isPermissionLoading, isRedirecting, profile, permissions])
+    }, [isLoading, isPermissionLoading, isRedirecting, permissions])
 
     useEffect(() => {
       if (!isLoading && router.isReady) {
