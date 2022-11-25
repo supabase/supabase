@@ -109,6 +109,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               <meta name="viewport" content="initial-scale=1.0, width=device-width" />
               <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
             </Head>
+
             <PageTelemetry>
               <RouteValidationWrapper>
                 <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
