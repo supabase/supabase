@@ -69,7 +69,7 @@ const PITR = () => {
         secondaryText={
           tier === PRICING_TIER_PRODUCT_IDS.FREE
             ? 'Please upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
-            : 'Please purchase the add-on to enable point in time recovery for your project.'
+            : 'Please enable the add-on to enable point in time recovery for your project.'
         }
       />
     ) : (
