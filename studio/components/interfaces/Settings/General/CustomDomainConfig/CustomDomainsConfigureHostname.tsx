@@ -2,8 +2,9 @@ import Link from 'next/link'
 import * as yup from 'yup'
 import { Button, Form, IconExternalLink, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import {
   FormActions,
   FormPanel,
@@ -11,7 +12,6 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { ProjectSettingsResponse } from 'data/config/project-settings-query'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 
 const FORM_ID = 'custom-domains-form'
@@ -27,6 +27,7 @@ export type CustomDomainsConfigureHostnameProps = {
 const CustomDomainsConfigureHostname = ({ projectRef }: CustomDomainsConfigureHostnameProps) => {
   const { ui } = useStore()
 
+  const canConfigureCustomDomain = checkPermissions(PermissionAction.UPDATE, 'projects')
   const { mutateAsync: createCustomDomain } = useCustomDomainCreateMutation()
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
@@ -60,7 +61,7 @@ const CustomDomainsConfigureHostname = ({ projectRef }: CustomDomainsConfigureHo
         return (
           <>
             <FormPanel
-              disabled={true}
+              disabled={!canConfigureCustomDomain}
               footer={
                 <div className="flex py-4 px-8">
                   <FormActions
@@ -71,7 +72,7 @@ const CustomDomainsConfigureHostname = ({ projectRef }: CustomDomainsConfigureHo
                     handleReset={handleReset}
                     disabled={!true}
                     helper={
-                      !true ? (
+                      !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
                         <Link href="https://supabase.com/docs/guides/platform/custom-domains">
@@ -91,6 +92,7 @@ const CustomDomainsConfigureHostname = ({ projectRef }: CustomDomainsConfigureHo
                 <FormSectionContent loading={false}>
                   <Input
                     id="domain"
+                    disabled={!canConfigureCustomDomain}
                     className="w-full"
                     type="text"
                     name="domain"
