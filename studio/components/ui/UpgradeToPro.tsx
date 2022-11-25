@@ -36,7 +36,7 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
           <Link href={`/project/${projectRef}/settings/billing/update`}>
             <a>
               <Button type="primary">
-                {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Purchase Add-on'}
+                {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Modify subscription'}
               </Button>
             </a>
           </Link>
