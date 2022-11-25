@@ -36,7 +36,7 @@ const Section: FC<ISectionContainer> = ({ id, title, monoFont, children }) => {
   return (
     <article key={id} id={id} className="scroll-mt-24">
       <StickyHeader id={id} title={title} monoFont={monoFont} />
-      <div className="grid grid-cols-2 ref-container gap-16">{children}</div>
+      <div className="grid lg:grid-cols-2 ref-container gap-16">{children}</div>
     </article>
   )
 }
@@ -48,7 +48,6 @@ const StickyHeader: FC<StickyHeader> = ({ id, title, monoFont }) => {
     threshold: 1,
     rootMargin: '-20% 0% -35% 0px',
     onChange: (inView, entry) => {
-      //console.log('zans', 'running')
       //if (inView) router.push(entry.target.id, undefined, { shallow: true })
     },
   })
