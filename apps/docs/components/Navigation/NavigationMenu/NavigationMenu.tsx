@@ -6,10 +6,11 @@ import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 import NavigationMenuCliList from './NavigationMenuCliList'
+import { useTheme } from '~/components/Providers'
 
 const SideNav = () => {
   const router = useRouter()
-
+  const { isDarkMode } = useTheme()
   const [level, setLevel] = useState('home')
 
   function handleRouteChange(url: string) {
@@ -73,19 +74,19 @@ const SideNav = () => {
     [
       {
         label: 'Home',
-        icon: 'home.svg',
+        icon: 'home',
         href: '',
         level: 'home',
       },
       {
         label: 'Getting started',
-        icon: 'getting-started.svg',
+        icon: 'getting-started',
         href: '/getting-started',
         level: 'gettingstarted',
       },
       {
         label: 'Tutorials',
-        icon: 'tutorials.svg',
+        icon: 'tutorials',
         href: '/guides/tutorials',
         level: 'tutorials',
       },
@@ -93,31 +94,31 @@ const SideNav = () => {
     [
       {
         label: 'Database',
-        icon: 'database.svg',
+        icon: 'database',
         href: '/guides/database',
         level: 'database',
       },
       {
         label: 'Auth',
-        icon: 'auth.svg',
+        icon: 'auth',
         href: '/guides/auth',
         level: 'auth',
       },
       {
         label: 'Storage',
-        icon: 'storage.svg',
+        icon: 'storage',
         href: '/guides/storage',
         level: 'storage',
       },
       {
         label: 'Realtime',
-        icon: 'realtime.svg',
+        icon: 'realtime',
         href: '/guides/realtime',
         level: 'realtime',
       },
       {
         label: 'Edge Functions',
-        icon: 'functions.svg',
+        icon: 'functions',
         href: '/guides/functions',
         level: 'functions',
       },
@@ -125,19 +126,19 @@ const SideNav = () => {
     [
       {
         label: 'API Reference',
-        icon: 'reference.svg',
+        icon: 'reference',
         href: '/reference',
         level: 'reference',
       },
       {
         label: 'Integrations',
-        icon: 'integrations.svg',
+        icon: 'integrations',
         href: '/guides/integrations',
         level: 'integrations',
       },
       {
         label: 'Platform',
-        icon: 'platform.svg',
+        icon: 'platform',
         href: '/guides/hosting/platform',
         level: 'platform',
       },
@@ -176,7 +177,9 @@ const SideNav = () => {
                             ].join(' ')}
                           >
                             <img
-                              src={`${router.basePath}/img/icons/menu/${link.icon}`}
+                              src={`${router.basePath}/img/icons/menu/${
+                                isDarkMode ? link.icon : `${link.icon}-light`
+                              }.svg`}
                               className="opacity-75 w-4.5 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
                             />
                             {link.label}
