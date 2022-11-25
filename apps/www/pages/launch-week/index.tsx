@@ -33,29 +33,29 @@ export default function launchweek() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col !pb-0 items-center lg:pt-32 gap-8">
+        <SectionContainer className="flex flex-col !pb-0 items-center lg:pt-32 gap-4">
           <img
             src="/images/launchweek/launchweek-logo--light.svg"
-            className="md:40 w-40 dark:hidden lg:w-64"
+            className="md:40 w-40 dark:hidden lg:w-80"
           />
           <img
             src="/images/launchweek/launchweek-logo--dark.svg"
-            className="md:40 hidden w-40 dark:block lg:w-64"
+            className="md:40 hidden w-40 dark:block lg:w-80"
           />
           <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
           {/* <LaunchHero /> */}
           {/* {!shippingHasStarted && <PreLaunchTeaser />} */}
         </SectionContainer>
-        <SectionContainer className="flex flex-col gap-2 items-center max-w-[420px] text-center pb-8">
+        <SectionContainer className="flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4">
           <span className="text-scale-1200">Coming soon</span>
           <p className="text-scale-1000 text-sm">
             Register to get your ticket and stay tuned all week for daily announcements
           </p>
         </SectionContainer>
         <SectionContainer className="flex flex-col items-center !p-0">
-          <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1">
+          <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]">
             <input
-              className="mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full"
+              className="mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full w-full"
               placeholder="Enter email"
             />
             <button className="px-4 py-1 rounded-full bg-scale-300 text-scale-1200 border border-scale-600 text-xs hover:bg-scale-400">
@@ -63,7 +63,10 @@ export default function launchweek() {
             </button>
           </form>
         </SectionContainer>
-        <div className="testGradient"></div>
+        <div className="flair">
+          <div className="flair_mask_a"></div>
+          <div className="flair_mask_b"></div>
+        </div>
         <SectionContainer
           className={[
             'grid flex-col gap-24 lg:gap-16',
