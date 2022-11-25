@@ -9,13 +9,6 @@ export type DNSRecordProps = {
 const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
   return (
     <div className="flex gap-4 items-center">
-      {/* <Input
-        readOnly
-        disabled
-        className="input-mono"
-        value={type.toUpperCase()}
-        layout="vertical"
-      /> */}
       <div className="w-[50px]">
         <p className="font-mono text-base">{type.toUpperCase()}</p>
       </div>
