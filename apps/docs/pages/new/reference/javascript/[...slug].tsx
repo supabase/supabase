@@ -1,16 +1,10 @@
-import {
-  useEffect,
-  // useRef,
-  useState,
-} from 'react'
-// pages/index.js
+import { useEffect } from 'react'
 
 import fs from 'fs'
 
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import remarkGfm from 'remark-gfm'
 import components from '~/components/index'
 import { getAllDocs } from '~/lib/docs'
 
@@ -29,49 +23,19 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
 import { ComesFrom } from '~/components/ComesFrom'
-import Link from 'next/link'
 import Param from '~/components/Params'
 import Options from '~/components/Options'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 export default function JSReference(props) {
-  // const myRef = useRef(null)
-
-  //console.log('props', props)
-  // console.log({ jsSpec })
-
-  const [offsetY, setOffsetY] = useState(0)
-  const [sections, setSections] = useState([])
+  const router = useRouter()
+  const slug = router.query.slug[0]
 
   useEffect(() => {
-    const els: HTMLElement[] = Array.from(document.querySelectorAll('div.ref-container'))
-
-    const allSections = els.map((el: HTMLElement, index: number) => {
-      const { top: boundingTop } = el.getBoundingClientRect()
-
-      return {
-        topic: el.getAttribute('id')!,
-        boundingTop,
-        isActive: index === 0,
-      }
-    })
-
-    // console.log('allSections', allSections)
-    setSections(allSections)
-  }, [])
-
-  const router = useRouter()
-
-  function updateUrl(key) {
-    router.replace(
-      {
-        pathname: `/ref/js/${key}`,
-        // query: { sortBy: 'price' },
-      },
-      undefined,
-      { scroll: false }
-    )
-  }
+    if (document && slug !== 'start') {
+      document.querySelector(`#${slug}`).scrollIntoView()
+    }
+  })
 
   return (
     <RefSubLayout>
@@ -79,8 +43,6 @@ export default function JSReference(props) {
         const hasTsRef = item['$ref'] || null
         const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
         const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
-
-        // console.log(`parameters ${item.title}`, parameters)
 
         const functionMarkdownContent = props?.docs[itemIndex]?.content
         const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
@@ -100,63 +62,34 @@ export default function JSReference(props) {
               <RefSubLayout.Details>
                 <>
                   <header className={['mb-16'].join(' ')}>
-                    {/* <h2
-                      className="text-2xl text-scale-1200 capitalize mb-4 scroll-mt-16"
-                      onClick={() => updateUrl(item.id)}
-                    >
-                      {examples.functions[itemIndex].title ??
-                        examples.functions[itemIndex].id ??
-                        item.name ??
-                        item.id}
-                    </h2> */}
                     {shortText && (
                       <>
                         <p
                           className="text-sm text-scale-1100"
                           dangerouslySetInnerHTML={{ __html: shortText }}
                         ></p>
-                        {/* <ComesFrom
-                              link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
-                              text="combined.json"
-                            /> */}
                       </>
                     )}
                   </header>
 
                   {item.description && (
                     <div className="prose">
-                      {/* <ComesFrom
-                            link="https://raw.githubusercontent.com/supabase/supabase/master/spec/enrichments/tsdoc_v2/combined.json"
-                            text="combined.json"
-                          /> */}
                       <p className="text-sm">{item.description}</p>
                     </div>
                   )}
                   {functionMarkdownContent && (
                     <div className="prose">
-                      {/* <ComesFrom
-                            link="https://github.com/supabase/supabase/pull/10095/files#diff-bf42aab7d324c5330e4ae65d94803cd6da686d2241015536b0263e7f76aeca35"
-                            text="auth.signUp().mdx"
-                          /> */}
                       <MDXRemote {...functionMarkdownContent} components={components} />
                     </div>
                   )}
                   {item.notes && (
                     <div className="prose">
-                      {/* <ComesFrom
-                            link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml#L105"
-                            text="supabase_js_v2"
-                          /> */}
                       <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
                     </div>
                   )}
                   {/* // parameters */}
                   {parameters && (
                     <div className="not-prose mt-12">
-                      {/* <ComesFrom
-                            link="https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/combined.json"
-                            text="combined.json"
-                          /> */}
                       <h5 className="mb-3 text-base">Parameters</h5>
                       <ul className="">
                         {parameters.map((param) => {
@@ -185,7 +118,6 @@ export default function JSReference(props) {
                           )
                         })}
                       </ul>
-                      {/* <div dangerouslySetInnerHTML={{ __html: parameters }}></div> */}
                     </div>
                   )}
                 </>
@@ -225,26 +157,6 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                               {tables &&
                                 tables.length > 0 &&
                                 tables.map((table) => {
-                                  // console.log(table)
-
-                                  // @ts-ignore
-                                  // const [content, setContent] = useState(null)
-
-                                  // // @ts-ignore
-                                  // useEffect(() => {
-                                  //   async function makeContent() {
-                                  //     setContent(
-                                  //       await serialize(table.content, {
-                                  //         mdxOptions: {
-                                  //           remarkPlugins: [remarkGfm],
-                                  //           format: 'mdx',
-                                  //         },
-                                  //       })
-                                  //     )
-                                  //   }
-                                  //   makeContent()
-                                  // }, [])
-
                                   return (
                                     <div className="bg-scale-300 border rounded prose max-w-none">
                                       <div className="bg-scale-200 px-5 py-2">
@@ -255,9 +167,6 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                           <h5 className="text-xs text-scale-1200">{table.name}</h5>
                                         </div>
                                       </div>
-
-                                      {/* <ReactMarkdown>{table.content}</ReactMarkdown> */}
-                                      {/* {content && <MDXRemote {...content} />} */}
                                     </div>
                                   )
                                 })}
@@ -315,7 +224,6 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
   const pages = jsSpec.functions.map((x) => x.id)
-  // console.log('pages', pages)
 
   /**
    * Read all the markdown files that might have
@@ -325,10 +233,6 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
    */
   const allMarkdownDocs = await Promise.all(
     pages.map(async (x, i) => {
-      // const doc = getDocsBySlug(`docs/ref/database/${x}`)
-
-      // if (i >= 5) return null
-
       const pathName = `docs/ref/js/${x}.mdx`
 
       function checkFileExists(x) {
@@ -346,10 +250,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
       const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
       const { data, content } = matter(fileContents)
-      // console.log('docBySlug', content)
-      // console.log()
 
-      // if (content) console.log(content)
       return {
         id: x,
         title: x,
@@ -359,8 +260,6 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
       }
     })
   )
-
-  // console.log('allMarkdownDocs', allMarkdownDocs)
 
   return {
     props: {
