@@ -39,6 +39,11 @@ const examples = [
     href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/opengraph',
   },
   {
+    name: 'OG Image Generation & Storage CDN Caching',
+    description: 'Cache generated images with Supabase Storage CDN.',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/og-image-with-storage-cdn',
+  },
+  {
     name: 'Get User Location',
     description: `Get user location data from user's IP address.`,
     href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/location',
