@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
-import { IconTrash, IconClipboard, IconEdit } from '@supabase/ui'
+import { IconTrash, IconClipboard, IconEdit } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { formatClipboardValue, copyToClipboard } from '../../utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -21,6 +21,8 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
         const { props } = p
         const { rowIdx } = props
         const row = state.rows[rowIdx]
+        if (!row) return
+
         const { error } = state.rowService!.delete([row])
         if (error) {
           if (state.onError) state.onError(error)

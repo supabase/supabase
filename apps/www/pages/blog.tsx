@@ -11,7 +11,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 
@@ -39,7 +39,7 @@ function Blog(props: any) {
   const router = useRouter()
 
   useEffect(() => {
-    // contruct an array of blog posts
+    // construct an array of blog posts
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
     shiftedBlogs.shift()
@@ -167,9 +167,9 @@ function FeaturedThumb(blog: PostTypes) {
             </div>
 
             <div className="grid w-max grid-flow-col grid-rows-4 gap-4">
-              {author.map((author: any) => {
+              {author.map((author: any, i: number) => {
                 return (
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3" key={i}>
                     {author.author_image_url && (
                       <div className="relative h-10 w-10 overflow-auto">
                         <Image

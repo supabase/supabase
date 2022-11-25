@@ -24,14 +24,10 @@ export default function Introduction({ autoApiService, selectedLang }) {
         </article>
       </div>
 
-      <h2 className="doc-heading">Getting Started</h2>
+      <h2 className="doc-heading">API URL</h2>
       <div className="doc-section ">
         <article className="text ">
-          <p>Your API consists of both a RESTful interface and a realtime interface.</p>
-          <p>
-            For interacting with the realtime streams, we provide client libraries that handle the
-            websockets.
-          </p>
+          <p>The API URL for your project.</p>
         </article>
         <article className="code">
           <CodeSnippet
@@ -44,9 +40,9 @@ export default function Introduction({ autoApiService, selectedLang }) {
       <h2 className="doc-heading">Client Libraries</h2>
       <div className="doc-section">
         <article className="text ">
-          <p>Your API consists of both a RESTful interface and a realtime interface.</p>
+          <p>Your API consists of both a RESTful interface and a Realtime interface.</p>
           <p>
-            For interacting with the realtime streams, we provide client libraries that handle the
+            For interacting with the Realtime streams, we provide client libraries that handle the
             websockets.
           </p>
         </article>

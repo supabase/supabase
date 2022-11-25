@@ -147,7 +147,8 @@ export const createPayloadForUpdatePolicy = (
     payload.check = formattedPolicyFormFields.check || undefined
   }
   if (!isEqual(formattedPolicyFormFields.roles, originalPolicyFormFields.roles)) {
-    payload.roles = formattedPolicyFormFields.roles || undefined
+    if (formattedPolicyFormFields.roles.length === 0) payload.roles = ['public']
+    else payload.roles = formattedPolicyFormFields.roles || undefined
   }
 
   return payload

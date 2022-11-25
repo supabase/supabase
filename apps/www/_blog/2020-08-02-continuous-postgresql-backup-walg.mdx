@@ -13,8 +13,6 @@ date: '08-02-2020'
 
 Have you ever wanted to restore your database's state to a particular moment in time? This post explains how, using WAL-G.
 
-<!--truncate-->
-
 ## Introduction
 
 [WAL-G](https://github.com/wal-g/wal-g) is an [open-source continuous archiving tool](https://www.citusdata.com/blog/introducing-wal-g-faster-restores-for-postgres/) used to easily set up and recover from [physical backups](/blog/postgresql-physical-logical-backups) in Postgres. It mainly handles the storage and retrieval of physical backups and WAL archives to and from a chosen cloud storage provider. In this post, we will walk you through on how to effortlessly set up WAL-G for your database as well as guide you on what to do if and when disaster strikes.

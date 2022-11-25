@@ -15,7 +15,7 @@ import InvestorData from 'data/Investors'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Button, Card, Space } from '@supabase/ui'
+import { Button, Card, Space } from 'ui'
 import { NextSeo } from 'next-seo'
 
 type Props = {}
@@ -62,7 +62,7 @@ const Header = () => {
     <>
       <div
         className="
-          sm:py-18 
+          sm:py-18
           container relative mx-auto px-6 py-16 text-center md:py-24 lg:px-16 lg:py-24
           xl:px-20"
       >
@@ -252,9 +252,9 @@ const Investors = () => {
           <div key={x.name}>
             <div
               className="
-              dark:bg-scale-400 
+              dark:bg-scale-400
               col-span-1 flex h-32 content-end
-              items-center justify-center 
+              items-center justify-center
               bg-gray-50"
             >
               <div className="relative h-8 w-full overflow-auto">
@@ -265,7 +265,7 @@ const Investors = () => {
                   objectFit="scale-down"
                   objectPosition="center"
                   className="
-                    opacity-50 
+                    opacity-50
                     contrast-0
                     filter
                   "

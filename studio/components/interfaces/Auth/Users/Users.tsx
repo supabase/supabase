@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from 'ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
@@ -26,6 +26,11 @@ const Users = () => {
     PageState.filterInputValue = e.target.value
   }
 
+  function onVerifiedFilterChange(e: any) {
+    PageState.filterVerified = e
+    onSearchUser()
+  }
+
   function onFilterKeyPress(e: any) {
     // enter key
     if (e.keyCode == 13) onSearchUser()
@@ -33,6 +38,7 @@ const Users = () => {
 
   function onSearchUser() {
     PageState.filterKeywords = PageState.filterInputValue
+    PageState.filterVerified = PageState.filterVerified
     PageState.fetchData(1)
   }
 
@@ -47,9 +53,9 @@ const Users = () => {
   }
 
   return (
-    <div className="">
-      <div className="flex justify-between px-6 pt-6 pb-2">
-        <div className="relative flex space-x-1">
+    <div>
+      <div className="justify-between px-6 pt-6 pb-2 md:flex">
+        <div className="relative flex space-x-4">
           <Input
             size="small"
             value={PageState.filterInputValue}
@@ -70,8 +76,25 @@ const Users = () => {
               ),
             ]}
           />
+          <Listbox
+            size="small"
+            value={PageState.filterVerified}
+            onChange={onVerifiedFilterChange}
+            name="verified"
+            id="verified"
+          >
+            <Listbox.Option label="All Users" value="">
+              All Users
+            </Listbox.Option>
+            <Listbox.Option label="Verified Users" value="verified">
+              Verified Users
+            </Listbox.Option>
+            <Listbox.Option label="Un-Verified Users" value="unverified">
+              Un-Verified Users
+            </Listbox.Option>
+          </Listbox>
         </div>
-        <div className="flex items-center">
+        <div className="mt-4 flex items-center md:mt-0">
           <Button
             className="mr-2"
             size="tiny"
@@ -85,9 +108,9 @@ const Users = () => {
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
-      <section className="overflow-visible mt-4 px-6">
-        <div className="relative section-block--body rounded">
-          <div className="align-middle inline-block min-w-full">
+      <section className="users-table-container mt-4 overflow-visible px-6">
+        <div className="section-block--body relative overflow-x-auto rounded">
+          <div className="inline-block min-w-full align-middle">
             <UsersList />
           </div>
         </div>

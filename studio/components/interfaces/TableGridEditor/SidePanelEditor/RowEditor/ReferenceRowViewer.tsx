@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import { SidePanel, IconLoader, IconXCircle } from '@supabase/ui'
+import { SidePanel, IconLoader, IconXCircle } from 'ui'
 import { PostgresRelationship } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
@@ -51,12 +51,12 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
           {loading ? (
             <div className="flex h-full flex-col items-center justify-center space-y-2">
               <IconLoader className="animate-spin" />
-              <p className="text-scale-1100 text-sm">Loading reference row</p>
+              <p className="text-sm text-scale-1100">Loading reference row</p>
             </div>
           ) : !row ? (
             <div className="flex h-full flex-col items-center justify-center space-y-2">
               <IconXCircle />
-              <p className="text-scale-1100 text-sm">
+              <p className="text-sm text-scale-1100">
                 Unable to find the corresponding row in {foreignKey?.target_table_schema}.
                 {foreignKey?.target_table_name}
               </p>

@@ -1,4 +1,4 @@
-import { IconInfo } from '@supabase/ui'
+import { IconInfo } from 'ui'
 import Link from 'next/link'
 
 const BackupsError = () => {

@@ -3,7 +3,7 @@ import { FC, useEffect, createContext } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Badge, Input, SidePanel } from '@supabase/ui'
+import { Badge, Input, SidePanel } from 'ui'
 import { useStore } from 'hooks'
 
 import InputName from './InputName'
@@ -61,7 +61,7 @@ class CreateHookFormState {
       enabled_mode: this.enabledMode.value,
       events: this.events.value,
       function_args: [
-        this.serviceUrl.value,
+        this.serviceUrl.value.replaceAll(' ', ''),
         this.serviceMethod.value,
         JSON.stringify(mapValues(keyBy(this.serviceHeaders.value, 'name'), 'value')),
         formatArguments(this.serviceParams.value),
@@ -412,10 +412,10 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
 
               {_localState.formState.serviceHeaders.value.length > 0 && (
                 <>
-                  <SidePanel.Seperator />
+                  <SidePanel.Separator />
                   <div className="space-y-2 px-6">
                     <div className="flex items-center space-x-2">
-                      <h5 className="text-scale-1200 text-base">HTTP Headers</h5>
+                      <h5 className="text-base text-scale-1200">HTTP Headers</h5>
                       <Badge color="gray">Read only</Badge>
                     </div>
                     <div className="space-y-2">
@@ -442,15 +442,19 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
                       )}
                     </div>
                   </div>
+                  <p className="mx-6 mt-12 text-sm text-scale-1100">
+                    <strong>Note:</strong> You can only edit a webhook's name and mode. To change
+                    other settings, you'll need to delete and recreate the webhook.
+                  </p>
                 </>
               )}
 
               {_localState.formState.serviceParams.value.length > 0 && (
                 <>
-                  <SidePanel.Seperator />
+                  <SidePanel.Separator />
                   <div className="space-y-2 px-6">
                     <div className="flex items-center space-x-2">
-                      <h5 className="text-scale-1200 text-base">HTTP Parameters</h5>
+                      <h5 className="text-base text-scale-1200">HTTP Parameters</h5>
                       <Badge color="gray">Read only</Badge>
                     </div>
                     <div className="space-y-2">
@@ -485,15 +489,15 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
               <div className="px-6">
                 <InputName />
               </div>
-              <SidePanel.Seperator />
+              <SidePanel.Separator />
               <div className="space-y-6 px-6">
-                <h5 className="text-scale-1200 text-base">Conditions to fire hook</h5>
+                <h5 className="text-base text-scale-1200">Conditions to fire hook</h5>
                 <TableSelection />
                 <CheckboxEvents />
               </div>
-              <SidePanel.Seperator />
+              <SidePanel.Separator />
               <div className="space-y-6 px-6">
-                <h5 className="text-scale-1200 text-base">Type of hook</h5>
+                <h5 className="text-base text-scale-1200">Type of hook</h5>
                 <RadioGroupHookService />
               </div>
               <ServiceConfigForm />

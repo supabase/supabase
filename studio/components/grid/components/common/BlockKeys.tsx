@@ -1,9 +1,10 @@
-import * as React from 'react'
+import { FC, useCallback, KeyboardEvent, ReactNode } from 'react'
 
-type BlockKeysProps = {
+interface BlockKeysProps {
+  value: string | null
+  children: ReactNode
   onEscape?: (value: string | null) => void
   onEnter?: (value: string | null) => void
-  value: string | null
 }
 
 /**
@@ -11,9 +12,9 @@ type BlockKeysProps = {
  * We use this with cell editor to allow editor component to handle keys.
  * Example: press enter to add newline on textEditor
  */
-export const BlockKeys: React.FC<BlockKeysProps> = ({ onEscape, onEnter, value, children }) => {
-  const handleKeyDown = React.useCallback(
-    (ev: React.KeyboardEvent<HTMLDivElement>) => {
+export const BlockKeys: FC<BlockKeysProps> = ({ value, children, onEscape, onEnter }) => {
+  const handleKeyDown = useCallback(
+    (ev: KeyboardEvent<HTMLDivElement>) => {
       switch (ev.key) {
         case 'Escape':
           ev.stopPropagation()
@@ -21,7 +22,10 @@ export const BlockKeys: React.FC<BlockKeysProps> = ({ onEscape, onEnter, value, 
           break
         case 'Enter':
           ev.stopPropagation()
-          if (onEnter) onEnter(value)
+          if (!ev.shiftKey && onEnter) {
+            ev.preventDefault()
+            onEnter(value)
+          }
           break
       }
     },
@@ -29,7 +33,7 @@ export const BlockKeys: React.FC<BlockKeysProps> = ({ onEscape, onEnter, value, 
   )
 
   function onBlur() {
-    if (onEscape) onEscape(value)
+    if (onEnter) onEnter(value)
   }
 
   return (

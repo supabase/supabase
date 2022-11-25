@@ -346,6 +346,7 @@
 
 .sb-grid-checkbox-editor__input {
   @apply h-4 w-4;
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 /*
@@ -385,7 +386,10 @@
 */
 
 .sb-grid-select-editor {
-  @apply h-full w-full;
+  button {
+    @apply border-none rounded-none shadow-none;
+    box-shadow: none !important
+  }
 }
 
 /*
@@ -589,7 +593,7 @@
 } */
 
 .foreign-table-modal__content-container__inner__overflow {
-  @apply w-full overflow-scroll;
+  @apply w-full overflow-auto;
 }
 
 .foreign-table-modal__filter {
@@ -617,7 +621,7 @@
 }
 
 .foreign-table-modal__row-item {
-  @apply border-scale-400 dark:border-scale-500 overflow-scroll rounded border border-solid px-5 py-2 shadow-sm first:mt-2;
+  @apply border-scale-400 dark:border-scale-500 overflow-auto rounded border border-solid px-5 py-2 shadow-sm first:mt-2;
 }
 
 .foreign-table-modal__row-item__inner {

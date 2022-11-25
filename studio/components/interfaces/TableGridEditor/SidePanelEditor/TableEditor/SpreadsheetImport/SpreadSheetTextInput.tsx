@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 
 interface Props {
   input: string
@@ -9,7 +9,7 @@ interface Props {
 const SpreadSheetTextInput: FC<Props> = ({ input, onInputChange }) => (
   <div className="space-y-10">
     <div>
-      <p className="text-sm text-scale-1100 mb-2">
+      <p className="mb-2 text-sm text-scale-1100">
         Copy a table from a spreadsheet program such as Google Sheets or Excel and paste it in the
         field below. The first row should be the headers of the table, and your headers should not
         include any special characters other than hyphens (<code>-</code>) or underscores (

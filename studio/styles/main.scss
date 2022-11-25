@@ -21,7 +21,7 @@ html,
 body,
 #__next,
 .main {
-  height: 100vh;
+  height: 100%;
   padding: 0;
   margin: 0;
   -moz-osx-font-smoothing: grayscale;
@@ -126,6 +126,10 @@ input[type='submit']:hover {
   @apply btn-primary-hover;
 }
 
+input::placeholder {
+  @apply text-scale-900;
+}
+
 .form-group input::placeholder {
   @apply text-scale-900;
 }
@@ -210,4 +214,8 @@ div.fixed.inset-0 {
   textarea {
     @apply text-sm;
   }
+}
+
+.capitalize-sentence:first-letter {
+  text-transform: capitalize;
 }

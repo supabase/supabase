@@ -32,7 +32,7 @@ const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles })
         <MultiSelect
           options={formattedRoles}
           value={selectedRoles}
-          placeholder="Defaults to all roles if none selected"
+          placeholder="Defaults to all (public) roles if none selected"
           searchPlaceholder="Search for a role"
           onChange={onUpdateSelectedRoles}
         />

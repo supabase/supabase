@@ -21,7 +21,7 @@ export const TEMPLATES: LogTemplate[] = [
     description: 'Count of commits made by users on the database',
     mode: 'custom',
     searchString: `select
-  p.user_name, 
+  p.user_name,
   count(*) as count
 from postgres_logs
   left join unnest(metadata) as m on true
@@ -38,7 +38,7 @@ group by
     description: 'List all IP addresses that used the Supabase API',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   h.x_real_ip
 from edge_logs
   left join unnest(metadata) as m on true
@@ -52,8 +52,8 @@ where h.x_real_ip is not null
     label: 'Requests by Country',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
-    searchString: `select 
-  cf.country, 
+    searchString: `select
+  cf.country,
   count(*) as count
 from edge_logs
   left join unnest(metadata) as m on true
@@ -71,11 +71,11 @@ order by
     mode: 'custom',
     description: 'List all Supabase API requests that are slow',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.origin_time
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.origin_time > 1000
@@ -90,11 +90,11 @@ limit 100
     description: 'List all Supabase API requests that responded witha 5XX status code',
     mode: 'custom',
     searchString: `select
-  cast(timestamp as datetime) as timestamp, 
+  cast(timestamp as datetime) as timestamp,
   event_message,
   r.status_code
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.response) as r
 where
   r.status_code >= 500
@@ -113,11 +113,11 @@ limit 100
   r.search as params,
   count(timestamp) as c
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
-group by 
+group by
   path,
-  params 
+  params
 order by
   c desc
 limit 100
@@ -132,7 +132,7 @@ limit 100
   cast(timestamp as datetime) as timestamp,
   event_message
 from edge_logs
-  cross join unnest(metadata) as m 
+  cross join unnest(metadata) as m
   cross join unnest(m.request) as r
 where
   path like '%rest/v1%'
@@ -163,6 +163,7 @@ limit 100
   },
   {
     label: 'Error Count by User',
+    description: 'Count of errors by users',
     mode: 'custom',
     searchString: `select
   count(t.timestamp) as count,
@@ -182,6 +183,21 @@ limit 100
 `,
     for: ['database'],
   },
+  {
+    label: 'Auth Endpoint Events',
+    description: 'Endpoint events filtered by path',
+    mode: 'custom',
+    searchString: `select
+  t.timestamp,
+  event_message
+from auth_logs as t
+where
+  regexp_contains(event_message,"level.{3}(info|warning||error|fatal)")
+  -- and regexp_contains(event_message,"path.{3}(/token|/recover|/signup|/otp)")
+limit 100
+`,
+    for: ['database'],
+  },
 ]
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
@@ -197,9 +213,9 @@ const _SQL_FILTER_COMMON = {
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadataParsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.noError': `metadataParsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.log': `metadataParsed.error_severity = 'LOG'`,
+    'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.log': `parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
@@ -214,7 +230,9 @@ export const SQL_FILTER_TEMPLATES: any = {
 
     'method.get': `request.method = 'GET'`,
     'method.post': `request.method = 'POST'`,
-    'method.del': `request.method = 'DEL'`,
+    'method.put': `request.method = 'PUT'`,
+    'method.patch': `request.method = 'PATCH'`,
+    'method.delete': `request.method = 'DELETE'`,
     'method.options': `request.method = 'OPTIONS'`,
   },
   function_edge_logs: {
@@ -233,10 +251,32 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
+    "severity.error": `REGEXP_CONTAINS(event_message, "level.{3}error|level.{3}fatal")`,
+    "severity.warning": `REGEXP_CONTAINS(event_message, "level.{3}warning")`,
+    "severity.info": `REGEXP_CONTAINS(event_message, "level.{3}info")`,
+    "status_code.server_error": `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}`,
+    "status_code.client_error": `REGEXP_CONTAINS(event_message, "status.{3}4[0-9]{2}")`,
+    "status_code.redirection": `REGEXP_CONTAINS(event_message, "status.{3}3[0-9]{2}")`,
+    "status_code.success": `REGEXP_CONTAINS(event_message, "status.{3}2[0-9]{2}")`,
+    "endpoints.admin": `REGEXP_CONTAINS(event_message, "path.{3}/admin")`,
+    "endpoints.signup": `REGEXP_CONTAINS(event_message, "path.{3}/signup|path.{3}/invite|path.{3}/verify")`,
+    "endpoints.authentication": `REGEXP_CONTAINS(event_message, "path.{3}/token|path.{3}/authorize|path.{3}/callback|path.{3}/otp|path.{3}/magiclink")`,
+    "endpoints.recover": `REGEXP_CONTAINS(event_message, "path.{3}/recover")`,
+    "endpoints.user": `REGEXP_CONTAINS(event_message, "path.{3}/user")`,
+    "endpoints.logout": `REGEXP_CONTAINS(event_message, "path.{3}/logout")`,
   },
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  storage_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  postgrest_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
+  pgbouncer_logs: {
+    ..._SQL_FILTER_COMMON,
+  }
 }
 
 export enum LogsTableName {
@@ -246,6 +286,9 @@ export enum LogsTableName {
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
   REALTIME = 'realtime_logs',
+  STORAGE = 'storage_logs',
+  PGBOUNCER = "pgbouncer_logs",
+  POSTGREST = "postgrest_logs"
 }
 
 export const LOGS_TABLES = {
@@ -255,6 +298,9 @@ export const LOGS_TABLES = {
   fn_edge: LogsTableName.FN_EDGE,
   auth: LogsTableName.AUTH,
   realtime: LogsTableName.REALTIME,
+  storage: LogsTableName.STORAGE,
+  postgrest: LogsTableName.POSTGREST,
+  pgbouncer: LogsTableName.PGBOUNCER
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -264,6 +310,9 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
+  [LogsTableName.STORAGE]: 'Object storage logs',
+  [LogsTableName.PGBOUNCER]: 'Postgres connection pooler logs',
+  [LogsTableName.POSTGREST]: 'RESTful API web server logs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {
@@ -367,8 +416,23 @@ export const FILTER_OPTIONS: FilterTableSet = {
           description: '',
         },
         {
+          key: 'put',
+          label: 'PUT',
+          description: '',
+        },
+        {
           key: 'post',
           label: 'POST',
+          description: '',
+        },
+        {
+          key: 'patch',
+          label: 'PATCH',
+          description: '',
+        },
+        {
+          key: 'delete',
+          label: 'DELETE',
           description: '',
         },
       ],
@@ -427,6 +491,93 @@ export const FILTER_OPTIONS: FilterTableSet = {
       ],
     },
   },
+
+  // auth logs
+  auth_logs: {
+    severity: {
+      label: 'Severity',
+      key: 'severity',
+      options: [
+        {
+          key: 'error',
+          label: 'Error',
+          description: 'Show all events that have error or fatal severity',
+        },
+        {
+          key: 'warning',
+          label: 'Warning',
+          description: 'Show all events that have warning severity',
+        },
+        {
+          key: 'info',
+          label: 'Info',
+          description: 'Show all events that have error severity',
+        },
+      ],
+    },
+    status_code: {
+      label: 'Status Code',
+      key: 'status_code',
+      options: [
+        {
+          key: 'server_error',
+          label: 'Server Error',
+          description: 'Show all requests with 5XX status code',
+        },
+        {
+          key: 'client_error',
+          label: 'Client Error',
+          description: 'Show all requests with 4XX status code',
+        },
+        {
+          key: 'redirection',
+          label: 'Redirection',
+          description: 'Show all requests that have 3XX status code',
+        },
+        {
+          key: 'success',
+          label: 'Success',
+          description: 'Show all requests that have 2XX status code',
+        },
+      ],
+    },
+    endpoints: {
+      label: 'Endpoints',
+      key: 'endpoints',
+      options: [
+        {
+          key: 'admin',
+          label: 'Admin',
+          description: 'Show all admin requests',
+        },
+        {
+          key: 'signup',
+          label: 'Sign up',
+          description: 'Show all signup and authorization requests',
+        },
+        {
+          key: 'recover',
+          label: "Password Recovery",
+          description: 'Show all password recovery requests',
+        },
+        {
+          key: 'authentication',
+          label: 'Authentication',
+          description: 'Show all authentication flow requests (login, otp, and Oauth2)',
+        },
+        {
+          key: 'user',
+          label: 'User',
+          description: 'Show all user data requests',
+        },
+        {
+          key: 'logout',
+          label: 'Logout',
+          description: 'Show all logout requests',
+        },
+      ],
+    },
+  }
 }
 
 export const LOGS_TAILWIND_CLASSES = {
@@ -447,14 +598,14 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     calcTo: () => '',
   },
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     default: true,

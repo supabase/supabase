@@ -10,7 +10,7 @@ import {
   Alert,
   IconMoreHorizontal,
   IconX,
-} from '@supabase/ui'
+} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -117,7 +117,7 @@ const PaymentMethods: FC<Props> = ({
             loading={loading}
             footer={
               !loading && (
-                <div className="flex justify-between w-full">
+                <div className="flex w-full justify-between">
                   {!canUpdatePaymentMethods ? (
                     <p className="text-sm text-scale-1000">
                       {enablePermissions
@@ -190,11 +190,11 @@ const PaymentMethods: FC<Props> = ({
                                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                                   <div
                                     className={[
-                                      'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                                      'border-scale-200 w-48 border text-center', //border
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                      'w-48 border border-scale-200 text-center', //border
                                     ].join(' ')}
                                   >
-                                    <span className="text-scale-1200 text-xs">
+                                    <span className="text-xs text-scale-1200">
                                       Your default payment method cannot be deleted
                                     </span>
                                   </div>

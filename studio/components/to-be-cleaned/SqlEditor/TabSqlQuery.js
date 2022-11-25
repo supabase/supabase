@@ -1,11 +1,12 @@
 import Split from 'react-split'
 import Editor from '@monaco-editor/react'
 import DataGrid from '@supabase/react-data-grid'
+import classNames from 'classnames'
 import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
+import { Button, Dropdown, IconCheck, IconChevronDown, IconClipboard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -78,6 +79,7 @@ const TabSqlQuery = observer(() => {
         <MonacoEditor
           error={sqlEditorStore.activeTab.sqlQueryError}
           updateSqlSnippet={updateSqlSnippet}
+          setUpdatingRequired={contentStore.setUpdatingRequired.bind(contentStore)}
         />
         <div>
           <UtilityPanel updateSqlSnippet={updateSqlSnippet} />
@@ -88,7 +90,7 @@ const TabSqlQuery = observer(() => {
 })
 export default TabSqlQuery
 
-const MonacoEditor = ({ error, updateSqlSnippet }) => {
+const MonacoEditor = ({ error, updateSqlSnippet, setUpdatingRequired }) => {
   const sqlEditorStore = useSqlStore()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
@@ -173,12 +175,16 @@ const MonacoEditor = ({ error, updateSqlSnippet }) => {
     // this is so any SQL run will be whatever is currently in monaco editor
     sqlEditorStore.activeTab.setQuery(value)
 
+    // inform the content store that the SQL has changed and needs to be persisted
+    // this is so we can block the tab being closed if an update is required
+    setUpdatingRequired?.()
+
     // debounce changes
     debounceUpdateSqlSnippet(value)
   }
 
   return (
-    <div className="dark:border-dark flex-grow overflow-y-auto border-b">
+    <div className="flex-grow overflow-y-auto border-b dark:border-dark">
       <Editor
         className="monaco-editor"
         theme={'supabase'}
@@ -284,7 +290,9 @@ const UtilityTabResults = observer(() => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 text-sm text-scale-1000">
-          Click <code>RUN</code> to execute your query.
+          Click <code>RUN</code> or hit{' '}
+          <code>{window.navigator.platform.match(/^Mac/) ? '⌘' : 'Ctrl'} + Enter</code> to execute
+          your query.
         </p>
       </div>
     )
@@ -299,20 +307,37 @@ const UtilityTabResults = observer(() => {
 
 const Results = ({ results }) => {
   const [cellPosition, setCellPosition] = useState(undefined)
+  const [copiedCell, setCopiedCell] = useState(undefined)
 
   useKeyboardShortcuts(
     {
       'Command+c': (event) => {
         event.stopPropagation()
-        onCopyCell()
+        onCopySelectedCell()
       },
       'Control+c': (event) => {
         event.stopPropagation()
-        onCopyCell()
+        onCopySelectedCell()
       },
     },
     ['INPUT', 'TEXTAREA']
   )
+
+  useEffect(() => {
+    let timeoutId = 0
+
+    if (copiedCell) {
+      timeoutId = setTimeout(() => {
+        setCopiedCell(undefined)
+      }, 1000)
+    }
+
+    return () => {
+      // we need to clear previous timeout to prevent checkmark flickering
+      // when clicking `Copy` button multiple times in a short time
+      timeoutId && clearTimeout(timeoutId)
+    }
+  }, [copiedCell])
 
   if (results?.error) {
     return (
@@ -329,8 +354,33 @@ const Results = ({ results }) => {
     )
   }
 
-  const formatter = (column, row) => {
-    return <span className="font-mono text-xs">{JSON.stringify(row[column])}</span>
+  const handleCopyClick = (column, row, rowIndex) => {
+    copyToClipboard(formatClipboardValue(row[column]), () => {
+      setCopiedCell(`${column},${rowIndex}`)
+    })
+  }
+
+  const formatter = (column, row, rowIndex) => {
+    const isCopied = copiedCell === `${column},${rowIndex}`
+
+    return (
+      <div className="group sb-grid-select-cell__formatter overflow-hidden">
+        <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
+
+        {row[column] && (
+          <Button
+            type="outline"
+            icon={isCopied ? <IconCheck size="tiny" /> : <IconClipboard size="tiny" />}
+            onClick={() => handleCopyClick(column, row, rowIndex)}
+            className={classNames(
+              'mx-1 group-hover:block group-hover:opacity-50 hover:opacity-100',
+              !isCopied && 'hidden'
+            )}
+            title="Copy"
+          />
+        )}
+      </div>
+    )
   }
   const columnRender = (name) => {
     return <div className="flex h-full items-center justify-center font-mono">{name}</div>
@@ -338,7 +388,7 @@ const Results = ({ results }) => {
   const columns = Object.keys(results[0]).map((key) => ({
     key,
     name: key,
-    formatter: ({ row }) => formatter(key, row),
+    formatter: ({ row }) => formatter(key, row, results.indexOf(row)),
     headerRenderer: () => columnRender(key),
     resizable: true,
     width: 120,
@@ -348,10 +398,13 @@ const Results = ({ results }) => {
     setCellPosition(position)
   }
 
-  function onCopyCell() {
+  function onCopySelectedCell() {
     if (columns && cellPosition) {
       const { idx, rowIdx } = cellPosition
-      const colKey = columns[idx].key
+      const column = columns[idx]
+      if (!column) return
+
+      const colKey = column.key
       const cellValue = results[rowIdx]?.[colKey] ?? ''
       const value = formatClipboardValue(cellValue)
       copyToClipboard(value)

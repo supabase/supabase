@@ -15,8 +15,6 @@ PostgreSQL backups can be categorized into two types: _logical_ and _physical_. 
 
 We'll cover some of the many tools you can use for Postgres backups in future posts.
 
-<!--truncate-->
-
 ## Logical Backups
 
 This form of backup is typically achieved by [translating all the data into a set of SQL commands and writing it into a single file](https://www.postgresql.org/docs/current/backup-dump.html). This can then be fed to any database cluster to recreate everything. In your CLI, performing logical backups can be as easy as:

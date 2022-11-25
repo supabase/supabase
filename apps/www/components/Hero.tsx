@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, Space } from '@supabase/ui'
+import { Button, IconBookOpen, Space } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'
@@ -22,7 +22,7 @@ const Hero = () => {
                     <div>
                       <h1
                         className="
-                        text-scale-1200 
+                        text-scale-1200
                         text-2xl sm:text-3xl sm:leading-none lg:text-4xl
                         xl:text-5xl
                         "
@@ -33,8 +33,8 @@ const Hero = () => {
                       <div>
                         <p className="p mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg ">
                           Supabase is an open source Firebase alternative. Start your project with a
-                          Postgres Database, Authentication, instant APIs, Realtime subscriptions
-                          and Storage.
+                          Postgres database, Authentication, instant APIs, Edge Functions, Realtime
+                          subscriptions, and Storage.
                         </p>
                       </div>
                     </div>

@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable, runInAction } from 'mobx'
-import { Button, Select, IconPlusCircle, IconX, IconChevronRight, Listbox } from '@supabase/ui'
+import { Button, Select, IconPlusCircle, IconX, IconChevronRight, Listbox } from 'ui'
 import Divider from 'components/ui/Divider'
 
 import { Dictionary } from 'components/grid'
@@ -280,11 +280,11 @@ const IntegrationProject: FC = observer(() => {
         </Select>
       </div>
       <div
-        className="bg-panel-header-light dark:bg-panel-header-dark border-border-secondary-light dark:border-border-secondary-dark 
-      w-full rounded-sm border"
+        className="w-full rounded-sm border border-border-secondary-light 
+      bg-panel-header-light dark:border-border-secondary-dark dark:bg-panel-header-dark"
       >
         <div className="flex items-center justify-between p-6">
-          <h4 className="text-lg my-auto mr-8 capitalize">{name}</h4>
+          <h4 className="my-auto mr-8 text-lg capitalize">{name}</h4>
           <Button disabled={loading || !!errorMsg} loading={loading} onClick={onClick}>
             Deploy
           </Button>
@@ -485,7 +485,7 @@ const ProjectLinkList: FC = observer(() => {
       </ul>
       <div className="py-2">
         {_store.projectLinkRemaining == 0 ? (
-          <p className="text-scale-1000 text-sm">
+          <p className="text-sm text-scale-1000">
             All Vercel projects for selected scope have been added
           </p>
         ) : (
@@ -498,7 +498,7 @@ const ProjectLinkList: FC = observer(() => {
             >
               {`Add another Vercel Project`}
             </Button>
-            <p className="text-scale-1000 text-sm">
+            <p className="text-sm text-scale-1000">
               {_store.projectLinkRemaining} project(s) remaining
             </p>
           </div>
@@ -612,7 +612,7 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
             </div>
           )}
         </div>
-        {error && <p className="text-scale-1000 text-sm">{error}</p>}
+        {error && <p className="text-sm text-scale-1000">{error}</p>}
         {_store.waitingIntegration && result && (
           <p
             className={`text-sm ${

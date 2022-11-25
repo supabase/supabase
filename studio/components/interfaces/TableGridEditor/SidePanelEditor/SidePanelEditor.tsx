@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
-import { Query, Dictionary, SupaTable } from 'components/grid'
-import { Modal } from '@supabase/ui'
+import { Query, Dictionary } from 'components/grid'
+import { Modal } from 'ui'
 import {
   PostgresRelationship,
   PostgresTable,
@@ -70,12 +70,18 @@ const SidePanelEditor: FC<Props> = ({
     configuration: { identifiers: any; rowIdx: number },
     onComplete: Function
   ) => {
-    if (!project || !selectedTable) {
+    if (!project || selectedTable === undefined) {
       // TODO(alaister): should we have an error state here?
-      return
-    }
+      return}
 
     let saveRowError = false
+    // @ts-ignore
+    const enumArrayColumns = selectedTable.columns
+      .filter((column) => {
+        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
+
     if (isNewRecord) {
       try {
         const result = await createTableRow({
@@ -83,6 +89,7 @@ const SidePanelEditor: FC<Props> = ({
           connectionString: project.connectionString,
           table: selectedTable as any,
           payload,
+          enumArrayColumns
         })
 
         onRowCreated(result[0])
@@ -101,6 +108,7 @@ const SidePanelEditor: FC<Props> = ({
               table: selectedTable as any,
               configuration,
               payload,
+              enumArrayColumns
             })
 
             onRowUpdated(result[0], configuration.rowIdx)
@@ -134,7 +142,11 @@ const SidePanelEditor: FC<Props> = ({
     resolve: any
   ) => {
     const response = isNewRecord
-      ? await meta.createColumn(payload as CreateColumnPayload, foreignKey)
+      ? await meta.createColumn(
+          payload as CreateColumnPayload,
+          selectedTable as PostgresTable,
+          foreignKey
+        )
       : await meta.updateColumn(
           configuration.columnId as string,
           payload as UpdateColumnPayload,
@@ -303,7 +315,7 @@ const SidePanelEditor: FC<Props> = ({
         }}
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>

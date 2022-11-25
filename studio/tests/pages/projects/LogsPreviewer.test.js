@@ -3,18 +3,9 @@ import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(utc)
 
-// mock the fetch function
-jest.mock('lib/common/fetch')
 import { get } from 'lib/common/fetch'
-
-// mock mobx
-jest.mock('mobx-react-lite')
-import { observer } from 'mobx-react-lite'
-observer.mockImplementation((v) => v)
-
-// mock the router
-jest.mock('next/router')
 import { useRouter } from 'next/router'
+
 const defaultRouterMock = () => {
   const router = jest.fn()
   router.query = {}
@@ -24,58 +15,15 @@ const defaultRouterMock = () => {
 }
 useRouter.mockReturnValue(defaultRouterMock())
 
-// mock monaco editor
-jest.mock('@monaco-editor/react')
-import Editor, { useMonaco } from '@monaco-editor/react'
-Editor = jest.fn()
-Editor.mockImplementation((props) => {
-  return (
-    <textarea className="monaco-editor" onChange={(e) => props.onChange(e.target.value)}></textarea>
-  )
-})
-useMonaco.mockImplementation((v) => v)
-
-// mock usage flags
-jest.mock('components/ui/Flag/Flag')
-import Flag from 'components/ui/Flag/Flag'
-Flag.mockImplementation(({ children }) => <>{children}</>)
-jest.mock('hooks')
-import { useFlag } from 'hooks'
-useFlag.mockReturnValue(true)
-
-import { SWRConfig } from 'swr'
-jest.mock('components/interfaces/Settings/Logs/LogsPreviewer')
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-LogsPreviewer.mockImplementation((props) => {
-  const Comp = jest.requireActual('components/interfaces/Settings/Logs/LogsPreviewer').default
-  // wrap with SWR to reset the cache each time
-  return (
-    <SWRConfig
-      value={{
-        provider: () => new Map(),
-        shouldRetryOnError: false,
-      }}
-    >
-      <Comp {...props} />
-    </SWRConfig>
-  )
-})
-
-jest.mock('hooks')
 import { useProjectSubscription } from 'hooks'
-useProjectSubscription = jest.fn((ref) => ({
-  subscription: {
-    tier: {
-      supabase_prod_id: 'tier_free',
-    },
-  },
-}))
-
-import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
+
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
@@ -87,23 +35,94 @@ test.each([
   {
     queryType: 'api',
     tableName: undefined,
-    allLog: logDataFixture({
-      id: 'some-id',
-      request: { path: 'some-path', method: 'POST' },
+    tableLog: logDataFixture({
+      path: 'some-path',
+      method: 'POST',
       status_code: '400',
       metadata: undefined,
     }),
-    singleLog: {
-      id: 'some-id',
+    selectionLog: logDataFixture({
       metadata: [{ request: [{ method: 'POST' }] }],
-    },
+    }),
     tableTexts: [/POST/, /some\-path/, /400/],
-    selectionTexts: [/POST/],
+    selectionTexts: [/POST/, /Timestamp/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
   },
-  // TODO: add more tests for each type of ui
+  {
+    queryType: 'database',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      error_severity: 'ERROR',
+      event_message: 'some db event',
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      metadata: [
+        {
+          parsed: [
+            {
+              application_type: 'client backend',
+              error_severity: 'ERROR',
+              hint: 'some pg hint',
+            },
+          ],
+        },
+      ],
+    }),
+    tableTexts: [/ERROR/, /some db event/],
+    selectionTexts: [
+      /client backend/,
+      /some pg hint/,
+      /ERROR/,
+      /Timestamp/,
+      RegExp(`${new Date().getFullYear()}.+`, 'g'),
+    ],
+  },
+  {
+    queryType: 'auth',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+    }),
+    selectionLog: logDataFixture({
+      event_message: JSON.stringify({
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      }),
+    }),
+    tableTexts: [/auth\-path/, /some message/, /INFO/],
+    selectionTexts: [
+      /auth\-path/,
+      /some message/,
+      /INFO/,
+      /300/,
+      /Timestamp/,
+      RegExp(`${new Date().getFullYear()}.+`, 'g'),
+    ],
+  },
+  // these all use teh default selection/table renderers
+  ...['pgbouncer', 'postgrest', 'storage', 'realtime'].map((queryType) => ({
+    queryType,
+    tableName: undefined,
+    tableLog: logDataFixture({
+      event_message: 'some message',
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      metadata: [{ some: [{ nested: 'value' }] }],
+    }),
+    tableTexts: [/some message/],
+    selectionTexts: [/some/, /nested/, /value/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
+  })),
 ])(
   'selection $queryType $tableName , can display log data and metadata',
-  async ({ queryType, tableName, allLog, singleLog, tableTexts, selectionTexts }) => {
+  async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
     get.mockImplementation((url) => {
       // counts
       if (url.includes('count')) {
@@ -111,10 +130,10 @@ test.each([
       }
       // single
       if (url.includes('where+id')) {
-        return { result: [singleLog] }
+        return { result: [selectionLog] }
       }
-      // all
-      return { result: [allLog] }
+      // table
+      return { result: [tableLog] }
     })
     render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 
@@ -298,7 +317,7 @@ test('bug: load older btn does not error out when previous page is empty', async
   // clicking load older multiple times should not give error
   await waitFor(() => {
     expect(screen.queryByText(/Sorry/)).toBeNull()
-    expect(screen.queryByText(/An error occured/)).toBeNull()
+    expect(screen.queryByText(/An error occurred/)).toBeNull()
     expect(screen.queryByText(/undefined/)).toBeNull()
   })
 })
@@ -308,7 +327,7 @@ test('log event chart hide', async () => {
     return { result: [] }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await screen.findByText('Events')
+  await screen.findByText(/Logs \/ Time/)
   const toggle = await screen.findByText(/Chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
@@ -350,9 +369,30 @@ test('filters alter generated query', async () => {
   userEvent.click(await screen.findByText(/Save/))
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('599'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+  })
+
+  // should be able to clear the filters
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByRole('button', { name: 'Clear' }))
+  get.mockClear()
+
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByText(/400 codes/))
+  userEvent.click(await screen.findByText(/Save/))
+
+  await waitFor(() => {
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('299'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('400'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('499'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
   })
@@ -369,5 +409,30 @@ test('filters accept filterOverride', async () => {
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
+  })
+})
+
+describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscription.mockReturnValue({
+      subscription: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
+        },
+      },
+    })
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(4, 'months').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+    await screen.findByText('Log retention') // assert modal title is present
   })
 })

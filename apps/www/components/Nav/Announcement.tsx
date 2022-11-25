@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import _announcement from '~/data/Announcement.json'
-import { IconChevronRight, IconX } from '@supabase/ui'
+import { IconChevronRight, IconX } from 'ui'
 import { useRouter } from 'next/router'
 
 interface AnnouncementProps {
@@ -52,19 +52,19 @@ const Announcement = () => {
       <div
         onClick={handleLink}
         className="
-          launch-week-gradientBg--anouncement-bar
+          launch-week-gradientBg--announcement-bar
           to-green-1000
           hover:from-green-1000
           hover:to-green-1100 relative flex
-          cursor-pointer flex-row        
-          space-x-3 
+          cursor-pointer flex-row
+          space-x-3
           overflow-hidden bg-gradient-to-r from-green-900
           text-white
         "
       >
         <div
           className="
-            mx-auto flex items-center justify-center divide-white p-3 text-sm font-medium lg:container lg:divide-x 
+            mx-auto flex items-center justify-center divide-white p-3 text-sm font-medium lg:container lg:divide-x
             lg:px-16 xl:px-20
           "
         >

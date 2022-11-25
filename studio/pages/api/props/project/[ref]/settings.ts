@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+
 import apiWrapper from 'lib/api/apiWrapper'
+import { PROJECT_ENDPOINT } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -29,7 +31,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       id: 1,
       inserted_at: undefined,
       jwt_secret: '-',
-      name: 'Default Project',
+      name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
       ref: 'default',
       region: 'ap-southeast-1',
       status: 'ACTIVE_HEALTHY',
@@ -55,7 +57,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         app: { id: 1, name: 'Auto API' },
         app_config: {
           db_schema: 'public',
-          endpoint: process.env.SUPABASE_URL,
+          endpoint: PROJECT_ENDPOINT,
           realtime_enabled: true,
         },
       },

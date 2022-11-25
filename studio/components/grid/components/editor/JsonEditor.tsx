@@ -1,9 +1,9 @@
-import * as React from 'react'
-
+import { Popover } from 'ui'
+import { useState, useCallback } from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
-import { useTrackedState } from '../../store'
-import { BlockKeys, MonacoEditor, NullValue } from '../common'
-import { Popover } from '@supabase/ui'
+
+import { useTrackedState } from 'components/grid/store'
+import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
 
 export function JsonEditor<TRow, TSummaryRow = unknown>({
   row,
@@ -11,16 +11,21 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
   onRowChange,
 }: EditorProps<TRow, TSummaryRow>) {
   const state = useTrackedState()
-  const [isPopoverOpen, setIsPopoverOpen] = React.useState(true)
+
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as unknown
-  const jsonString = initialValue ? JSON.stringify(initialValue) : ''
-  const prettyJsonValue = prettifyJSON(jsonString)
-  const [value, setValue] = React.useState<string | null>(prettyJsonValue)
+  const jsonString = prettifyJSON(initialValue ? JSON.stringify(initialValue) : '')
 
-  const onEscape = React.useCallback((newValue: string | null) => {
-    commitChange(newValue)
+  const [isPopoverOpen, setIsPopoverOpen] = useState(true)
+  const [value, setValue] = useState<string | null>(jsonString)
+
+  const cancelChanges = useCallback(() => {
+    onRowChange(row, true)
     setIsPopoverOpen(false)
+  }, [])
+
+  const saveChanges = useCallback((newValue: string | null) => {
+    commitChange(newValue)
   }, [])
 
   function onChange(_value: string | undefined) {
@@ -31,12 +36,14 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
   function commitChange(newValue: string | null) {
     if (!newValue) {
       onRowChange({ ...row, [column.key]: null }, true)
+      setIsPopoverOpen(false)
     } else if (verifyJSON(newValue)) {
       const jsonValue = JSON.parse(newValue)
       onRowChange({ ...row, [column.key]: jsonValue }, true)
+      setIsPopoverOpen(false)
     } else {
       const { onError } = state
-      if (onError) onError(Error('invalid input'))
+      if (onError) onError(Error('Please enter a valid JSON'))
     }
   }
 
@@ -48,13 +55,17 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
       sideOffset={-35}
       className="rounded-none"
       overlay={
-        <BlockKeys value={value} onEscape={onEscape}>
+        <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
           <MonacoEditor
             width={`${gridColumn?.width || column.width}px`}
             value={value ?? ''}
             language="json"
             onChange={onChange}
           />
+          <div className="flex items-center justify-end p-2 bg-scale-400 space-x-2">
+            <p className="text-xs text-scale-1100">Save changes</p>
+            <code className="text-xs">⏎</code>
+          </div>
         </BlockKeys>
       }
     >

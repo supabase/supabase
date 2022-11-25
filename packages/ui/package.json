@@ -1,0 +1,39 @@
+{
+  "name": "ui",
+  "version": "0.0.0",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "scripts": {
+    "build:icons": "node --experimental-modules internals/populate-icons.js"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.0.0",
+    "@mertasan/tailwindcss-variables": "^2.0.1",
+    "@radix-ui/colors": "^0.1.8",
+    "@radix-ui/react-accordion": "^0.1.5",
+    "@radix-ui/react-collapsible": "^0.1.5",
+    "@radix-ui/react-context-menu": "^0.1.0",
+    "@radix-ui/react-dialog": "^0.1.5",
+    "@radix-ui/react-dropdown-menu": "^0.1.4",
+    "@radix-ui/react-popover": "^0.1.0",
+    "@radix-ui/react-portal": "^0.1.3",
+    "@radix-ui/react-tabs": "^0.1.0",
+    "@tailwindcss/forms": "^0.4.0",
+    "@tailwindcss/typography": "^0.5.0",
+    "autoprefixer": "^10.4.2",
+    "deepmerge": "^4.2.2",
+    "formik": "^2.2.9",
+    "lodash": "^4.17.20",
+    "postcss": "^8.4.5",
+    "prop-types": "^15.7.2",
+    "react-feather": "^2.0.10",
+    "tailwindcss": "^3.0.15",
+    "tailwindcss-radix": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "typescript": "4.3.4"
+  }
+}

@@ -15,6 +15,9 @@ export interface IOpenApiStore {
   isLoading: boolean
 
   load: () => void
+
+  setUrl: (url: string) => void
+  setHeaders: (headers: { [prop: string]: any }) => void
 }
 export default class OpenApiStore implements IOpenApiStore {
   STATES = {
@@ -125,5 +128,18 @@ export default class OpenApiStore implements IOpenApiStore {
 
   setError(value: any) {
     this.error = value
+  }
+
+  setUrl(url: string) {
+    this.url = url
+
+    // if the url changes, we need to reset the state
+    this.state = this.STATES.INITIAL
+    this.data = undefined
+    this.error = null
+  }
+
+  setHeaders(headers: { [prop: string]: any }) {
+    this.headers = headers
   }
 }

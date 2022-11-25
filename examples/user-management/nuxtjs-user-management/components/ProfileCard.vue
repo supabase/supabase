@@ -1,18 +1,20 @@
 <template>
-  <div className="card">
-    <p>Username: {{ state.propProfile.username }}</p>
-    <p>Website: {{ state.propProfile.website }}</p>
-    <p>
-      <small>
-        Last updated
-        {{
-          state.lastUpdated
-            ? `${state.lastUpdated.toLocaleDateString()}
-        ${state.lastUpdated.toLocaleTimeString()}`
-            : "Never"
-        }}
-      </small>
-    </p>
+  <div class="profileCard">
+    <div class="userInfo">
+      <p class="username">{{ state.propProfile.username }}</p>
+      <p class="website">{{ state.propProfile.website }}</p>
+      <p>
+        <small>
+          Last updated
+          {{
+            state.lastUpdated
+              ? `${state.lastUpdated.toLocaleDateString()}
+          ${state.lastUpdated.toLocaleTimeString()}`
+              : "Never"
+          }}
+        </small>
+      </p>
+    </div>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
 import Link from 'next/link'
-import { Button, IconMessageCircle, IconGitHub, Divider, IconMail } from '@supabase/ui'
+import { Button, IconMessageCircle, IconGitHub, Divider, IconMail } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 // Import Swiper styles if swiper used on page
@@ -122,11 +122,11 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    dark:bg-scale-400 justify-space-evenly
-                    flex flex-row gap-2 rounded rounded-t-none border-b
-                    border-r border-l
-                    border-gray-100 bg-white p-5
-                    pt-14 dark:border-gray-600"
+                    dark:bg-scale-400 flex flex-row
+                    gap-2 rounded rounded-t-none border-b border-r
+                    border-l border-gray-100
+                    bg-white p-5 pt-14
+                    dark:border-gray-600 lg:justify-evenly"
                   >
                     <Link
                       href="https://github.com/supabase/supabase/discussions"
@@ -134,7 +134,7 @@ const Index = ({}: Props) => {
                     >
                       <a target="_blank">
                         <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
-                          Join The Discussion
+                          Join the discussion
                         </Button>
                       </a>
                     </Link>

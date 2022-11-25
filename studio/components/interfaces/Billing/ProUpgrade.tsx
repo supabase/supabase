@@ -2,9 +2,9 @@ import { FC, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
+import { Button, IconHelpCircle, Toggle, Modal } from 'ui'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
@@ -12,21 +12,28 @@ import Divider from 'components/ui/Divider'
 import {
   PaymentSummaryPanel,
   ComputeSizeSelection,
+  PITRDurationSelection,
+  CustomDomainSelection,
   StripeSubscription,
   AddNewPaymentMethodModal,
 } from './'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { SubscriptionPreview } from './Billing.types'
-import { formSubscriptionUpdatePayload } from './Billing.utils'
 import UpdateSuccess from './UpdateSuccess'
-import { formatComputeSizes } from './AddOns/AddOns.utils'
+import { PaymentMethod, SubscriptionPreview } from './Billing.types'
+import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
+import { DatabaseAddon } from './AddOns/AddOns.types'
+import {
+  formatComputeSizes,
+  formatCustomDomainOptions,
+  formatPITROptions,
+} from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
 
 // Do not allow compute size changes for af-south-1
 
 interface Props {
-  products: { tiers: any[]; addons: any[] }
-  paymentMethods?: any[]
+  products: { tiers: any[]; addons: DatabaseAddon[] }
+  paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
   onSelectBack: () => void
@@ -41,17 +48,18 @@ const ProUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
+  const isCustomDomainsEnabled = useFlag('customDomains')
+  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
+  const pitrDurationOptions = formatPITROptions(addons)
+  const customDomainOptions = formatCustomDomainOptions(addons)
+  const currentAddons = getCurrentAddons(currentSubscription, addons)
 
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
   const projectRegion = ui.selectedProject?.region ?? ''
-
-  const currentComputeSize =
-    computeSizes.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
-    computeSizes.find((option: any) => option.metadata.supabase_prod_id === 'addon_instance_micro')
 
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(
     // If project is currently free, default to enabling spend caps
@@ -66,8 +74,27 @@ const ProUpgrade: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
-  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
+  // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
+  // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
+  // of unnecessary state management on this complex page.
+  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(
+    currentAddons.computeSize
+  )
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<DatabaseAddon>(
+    currentAddons.pitrDuration
+  )
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
+    currentAddons.customDomains
+  )
+
+  // [Joshen] Scaffolded here
+  const selectedAddons = {
+    computeSize: selectedComputeSize,
+    pitrDuration: selectedPITRDuration,
+    customDomains: selectedCustomDomainOption,
+  }
+
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string>('')
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   const selectedTier = isSpendCapEnabled
@@ -78,25 +105,25 @@ const ProUpgrade: FC<Props> = ({
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
-  const isChangingComputeSize = currentComputeSize?.id !== selectedComputeSize.id
+  const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
-      setSelectedPaymentMethod(paymentMethods[0].id)
+      setSelectedPaymentMethodId(paymentMethods[0].id)
     }
   }, [isLoadingPaymentMethods, paymentMethods])
 
   useEffect(() => {
     getSubscriptionPreview()
-  }, [selectedComputeSize, isSpendCapEnabled])
+  }, [selectedComputeSize, selectedPITRDuration, selectedCustomDomainOption, isSpendCapEnabled])
 
   const getSubscriptionPreview = async () => {
     if (!selectedTier) return
 
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
-      selectedComputeSize,
-      selectedPaymentMethod,
+      selectedAddons,
+      selectedPaymentMethodId,
       projectRegion
     )
 
@@ -115,8 +142,8 @@ const ProUpgrade: FC<Props> = ({
   const onConfirmPayment = async () => {
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
-      selectedComputeSize,
-      selectedPaymentMethod,
+      selectedAddons,
+      selectedPaymentMethodId,
       projectRegion
     )
 
@@ -163,11 +190,11 @@ const ProUpgrade: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10">
-          <div className="relative space-y-4 px-5">
+        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
+          <div className="relative space-y-4">
             <BackButton onClick={() => onSelectBack()} />
             <div className="space-y-8">
-              <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
+              <h4 className="text-lg text-scale-900">Change your project's subscription</h4>
               <div
                 className="space-y-8 overflow-scroll pb-8"
                 style={{ height: 'calc(100vh - 9rem - 57px)' }}
@@ -178,7 +205,7 @@ const ProUpgrade: FC<Props> = ({
                       <h3 className="text-xl">
                         Welcome to <span className="text-brand-900">Pro</span>
                       </h3>
-                      <p className="text-scale-1100 text-base">
+                      <p className="text-base text-scale-1100">
                         Your new subscription will begin immediately after payment
                       </p>
                     </>
@@ -187,13 +214,13 @@ const ProUpgrade: FC<Props> = ({
                       <h3 className="text-3xl">
                         Managing your <span className="text-brand-900">Pro</span> plan
                       </h3>
-                      <p className="text-scale-1100 text-base">
+                      {/* <p className="text-base text-scale-1100">
                         Your billing cycle will reset after payment
-                      </p>
+                      </p> */}
                     </>
                   )}
                 </div>
-                <div className="bg-panel-body-light dark:bg-panel-body-dark border-panel-border-light border-panel-border-dark flex items-center justify-between gap-16 rounded border px-6 py-4 drop-shadow-sm">
+                <div className="flex items-center justify-between gap-16 rounded border border-panel-border-light border-panel-border-dark bg-panel-body-light px-6 py-4 drop-shadow-sm dark:bg-panel-body-dark">
                   <div>
                     <div className="flex items-center space-x-2">
                       <p>Enable spend cap</p>
@@ -204,7 +231,7 @@ const ProUpgrade: FC<Props> = ({
                         onClick={() => setShowSpendCapHelperModal(true)}
                       />
                     </div>
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-sm text-scale-1100">
                       If enabled, additional resources will not be charged on a per-usage basis
                     </p>
                   </div>
@@ -215,13 +242,37 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
+                    {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
+                      <>
+                        <Divider light />
+                        <CustomDomainSelection
+                          options={customDomainOptions}
+                          currentOption={
+                            isManagingProSubscription ? currentAddons.customDomains : undefined
+                          }
+                          selectedOption={selectedAddons.customDomains}
+                          onSelectOption={setSelectedCustomDomainOption}
+                        />
+                      </>
+                    )}
+                    {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
+                      <>
+                        <Divider light />
+                        <PITRDurationSelection
+                          pitrDurationOptions={pitrDurationOptions}
+                          currentPitrDuration={
+                            isManagingProSubscription ? currentAddons.pitrDuration : undefined
+                          }
+                          selectedPitrDuration={selectedAddons.pitrDuration}
+                          onSelectOption={setSelectedPITRDuration}
+                        />
+                      </>
+                    )}
                     <Divider light />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}
-                      currentComputeSize={
-                        isManagingProSubscription ? currentComputeSize : undefined
-                      }
-                      selectedComputeSize={selectedComputeSize}
+                      currentComputeSize={currentAddons.computeSize}
+                      selectedComputeSize={selectedAddons.computeSize}
                       onSelectOption={setSelectedComputeSize}
                     />
                   </>
@@ -230,19 +281,21 @@ const ProUpgrade: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[32rem]">
+        <div className="w-[34rem]">
           <PaymentSummaryPanel
             isRefreshingPreview={isRefreshingPreview}
             subscriptionPreview={subscriptionPreview}
-            currentPlan={currentSubscription.tier}
-            selectedPlan={selectedTier}
             isSpendCapEnabled={isSpendCapEnabled}
-            currentComputeSize={currentComputeSize}
-            selectedComputeSize={selectedComputeSize}
+            // Current subscription configuration based on DB
+            currentPlan={currentSubscription.tier}
+            currentAddons={currentAddons}
+            // Selected subscription configuration based on UI
+            selectedPlan={selectedTier}
+            selectedAddons={selectedAddons}
             paymentMethods={paymentMethods}
             isLoadingPaymentMethods={isLoadingPaymentMethods}
-            selectedPaymentMethod={selectedPaymentMethod}
-            onSelectPaymentMethod={setSelectedPaymentMethod}
+            selectedPaymentMethod={selectedPaymentMethodId}
+            onSelectPaymentMethod={setSelectedPaymentMethodId}
             onSelectAddNewPaymentMethod={() => {
               setShowAddPaymentMethodModal(true)
             }}
@@ -281,11 +334,11 @@ const ProUpgrade: FC<Props> = ({
               </p>
               {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
               {/* Maybe ideate this in Figma first but this is good enough for now */}
-              <div className="border-scale-600 bg-scale-500 rounded border">
+              <div className="rounded border border-scale-600 bg-scale-500">
                 <div className="flex items-center px-4 pt-2 pb-1">
-                  <p className="text-scale-1100 w-[50%] text-sm">Item</p>
-                  <p className="text-scale-1100 w-[25%] text-sm">Limit</p>
-                  <p className="text-scale-1100 w-[25%] text-sm">Rate</p>
+                  <p className="w-[50%] text-sm text-scale-1100">Item</p>
+                  <p className="w-[25%] text-sm text-scale-1100">Limit</p>
+                  <p className="w-[25%] text-sm text-scale-1100">Rate</p>
                 </div>
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">
@@ -315,11 +368,11 @@ const ProUpgrade: FC<Props> = ({
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
-                              'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                              'border-scale-200 border ', //border
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                              'border border-scale-200 ', //border
                             ].join(' ')}
                           >
-                            <span className="text-scale-1200 text-xs">
+                            <span className="text-xs text-scale-1200">
                               Monthly Active Users: A user that has made an API request in the last
                               month
                             </span>
@@ -346,7 +399,7 @@ const ProUpgrade: FC<Props> = ({
               </div>
             </div>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
               <Button block type="primary" onClick={() => setShowSpendCapHelperModal(false)}>

@@ -1,4 +1,4 @@
-import { Alert } from '@supabase/ui'
+import { Alert } from 'ui'
 
 const AlphaPreview = () => {
   return (

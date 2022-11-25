@@ -1,12 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import {
-  Button,
-  IconArrowUpRight,
-  IconBriefcase,
-  IconEye,
-  IconLink,
-  IconShield,
-} from '@supabase/ui'
+import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions.json'
@@ -112,9 +105,9 @@ function AuthPage() {
                       />
                     </svg>
                   </div>
-                  {AuthProviders.map((auth) => {
+                  {AuthProviders.map((auth, i) => {
                     return (
-                      <div className="flex w-fit items-center">
+                      <div className="flex w-fit items-center" key={i}>
                         <Image
                           src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                           alt={`${auth.name} auth login icon`}

@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from '@supabase/ui'
+import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from 'ui'
 
 import {
   FormActions,
@@ -216,7 +216,7 @@ const SmtpForm = () => {
                 header={
                   <FormSectionLabel>
                     <span>SMTP Provider Settings</span>
-                    <p className="text-scale-900 my-4">
+                    <p className="my-4 text-scale-900">
                       Your SMTP Credentials will always be encrypted in our database.
                     </p>
                   </FormSectionLabel>
@@ -255,7 +255,7 @@ const SmtpForm = () => {
                     name="SMTP_MAX_FREQUENCY"
                     label="Minimum interval between emails being sent"
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
-                    actions={<span className="text-scale-900 mr-3">seconds</span>}
+                    actions={<span className="mr-3 text-scale-900">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
                   <InputNumber
@@ -264,7 +264,7 @@ const SmtpForm = () => {
                     min={0}
                     label="Rate limit for sending emails"
                     descriptionText="How many emails can be sent per hour."
-                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                    actions={<span className="mr-3 text-scale-900">emails per hour</span>}
                     disabled={!canUpdateConfig}
                   />
                   <Input

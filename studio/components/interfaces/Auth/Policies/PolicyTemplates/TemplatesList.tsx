@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Menu } from '@supabase/ui'
+import { Menu } from 'ui'
 import { PolicyTemplate } from './PolicyTemplates.constants'
 
 interface Props {
@@ -15,18 +15,19 @@ const TemplatesList: FC<Props> = ({
   selectedTemplate,
   setSelectedTemplate = () => {},
 }) => (
-  <div className="dark:border-dark flex flex-col justify-between border-r" style={{ width: '30%' }}>
+  <div className="flex flex-col justify-between border-r dark:border-dark" style={{ width: '30%' }}>
     <div
       className="hide-scrollbar  divide-border-primary space-y-0 divide-y divide-solid overflow-y-auto"
       style={{ maxHeight: '24rem' }}
     >
       <Menu type="border">
-        {templates.map((template) => {
+        {templates.map((template, i) => {
           const active = selectedTemplate === template
           return (
             <div
+              key={i}
               className={
-                'hover:bg-scale-400 border-scale-400 border-b ' +
+                'border-b border-scale-400 hover:bg-scale-400 ' +
                 (active ? 'bg-scale-300 dark:bg-scale-500' : '')
               }
             >
@@ -44,7 +45,7 @@ const TemplatesList: FC<Props> = ({
     </div>
     {templatesNote && (
       <div className="px-4 py-2">
-        <p className="text-scale-900 text-xs">{templatesNote}</p>
+        <p className="text-xs text-scale-900">{templatesNote}</p>
       </div>
     )}
   </div>

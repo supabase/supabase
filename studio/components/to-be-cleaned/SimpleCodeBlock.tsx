@@ -10,7 +10,7 @@ import Highlight, { defaultProps } from 'prism-react-renderer'
 import defaultTheme from 'prism-react-renderer/themes/palenight'
 import Clipboard from 'clipboard'
 import rangeParser from 'parse-numeric-range'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import { copyToClipboard } from 'lib/helpers'
 
 const highlightLinesRangeRegex = /{([\d,-]+)}/
@@ -92,7 +92,7 @@ const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, meta
                 )
               })}
             </pre>
-            <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity absolute right-0 top-0">
+            <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
               <Button
                 size="tiny"
                 type="default"

@@ -25,10 +25,14 @@ import {
   TextEditor,
   TimeEditor,
   TimeWithTimezoneEditor,
-} from '../components/editor'
-import { AddColumn, ColumnHeader, SelectColumn } from '../components/grid'
-import { COLUMN_MIN_WIDTH } from '../constants'
-import { BooleanFormatter, DefaultFormatter, ForeignKeyFormatter } from '../components/formatter'
+} from 'components/grid/components/editor'
+import { AddColumn, ColumnHeader, SelectColumn } from 'components/grid/components/grid'
+import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import {
+  BooleanFormatter,
+  DefaultFormatter,
+  ForeignKeyFormatter,
+} from 'components/grid/components/formatter'
 
 const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 

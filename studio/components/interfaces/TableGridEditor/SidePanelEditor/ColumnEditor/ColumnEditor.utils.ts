@@ -11,6 +11,8 @@ import { uuidv4 } from 'lib/helpers'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 const isSQLExpression = (input: string) => {
+  if (['CURRENT_DATE'].includes(input)) return true
+
   if (input[0] === '(' && input[input.length - 1] === ')') {
     return true
   }
@@ -60,7 +62,7 @@ export const generateColumnFieldFromPostgresColumn = (
     name: column.name,
     comment: column?.comment ?? '',
     format: isArray ? column.format.slice(1) : column.format,
-    defaultValue: unescapeLiteral(column?.default_value as string),
+    defaultValue: column?.default_value as string | null,
     isArray: isArray,
     isNullable: column.is_nullable,
     isIdentity: column.is_identity,
@@ -103,8 +105,13 @@ export const generateCreateColumnPayload = (
 
 export const generateUpdateColumnPayload = (
   originalColumn: PostgresColumn,
+  table: PostgresTable,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
+  // @ts-ignore
+  const primaryKeyColumns = table.primary_keys.map((key) => key.name)
+  const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
+
   // Only append the properties which are getting updated
   const defaultValue = field.defaultValue
   const type = field.isArray ? `${field.format}[]` : field.format
@@ -120,7 +127,7 @@ export const generateUpdateColumnPayload = (
   if (!isEqual(originalColumn.format, type)) {
     payload.type = type
   }
-  if (!isEqual(unescapeLiteral(originalColumn.default_value as string), defaultValue)) {
+  if (!isEqual(originalColumn.default_value as string, defaultValue)) {
     payload.defaultValue = defaultValue
     payload.defaultValueFormat =
       isNull(defaultValue) || isSQLExpression(defaultValue)
@@ -135,6 +142,9 @@ export const generateUpdateColumnPayload = (
   }
   if (!isEqual(originalColumn.is_unique, field.isUnique)) {
     payload.isUnique = field.isUnique
+  }
+  if (!isEqual(isOriginallyPrimaryKey, field.isPrimaryKey)) {
+    payload.isPrimaryKey = field.isPrimaryKey
   }
 
   return payload
@@ -194,60 +204,4 @@ export const getColumnForeignKey = (column: PostgresColumn, table: PostgresTable
 const formatArrayToPostgresArray = (arrayString: string) => {
   if (!arrayString) return null
   return arrayString.replaceAll('[', '{').replaceAll(']', '}')
-}
-
-export const unescapeLiteral = (value: string) => {
-  if (!value) return value
-
-  // Handle combinations - this is really not the best solution imo
-  // It's a log(n) attempt to strip off the ::type strings
-  if (value.includes('||')) {
-    const formattedValue = []
-    let found = false
-    for (let i = 0; i < value.length; i++) {
-      if (value[i] === ':') found = true
-      if (((value[i] === ' ' || value[i] === ')') && found) || i === value.length - 1) found = false
-      if (!found) formattedValue.push(value[i])
-    }
-    return formattedValue.join('')
-  }
-
-  const splits = value.split("'::")
-  if (splits.length <= 1) return value
-
-  // Handle timezones
-  if (value.toLowerCase().includes('time zone')) {
-    return `${splits[0].toLowerCase()}')`
-  }
-
-  // Handle json
-  if (value.toLowerCase().includes('json')) {
-    return splits[0].slice(1)
-  }
-
-  let temp = splits[0].slice(1).replace("'{", '{')
-  if (
-    value.endsWith('integer[]') ||
-    value.endsWith('real[]') ||
-    value.endsWith('bigint[]') ||
-    value.endsWith('smallint[]')
-  ) {
-    temp = temp.replace(/{/g, '[')
-    temp = temp.replace(/}/g, ']')
-    return temp
-  } else {
-    const matches = temp.match(/\{([^{}]+)\}/g)
-    if (matches) {
-      const array = [...matches]
-      array.forEach((x) => {
-        let _x = x.replace(/{/g, '{"')
-        _x = _x.replace(/}/g, '"}')
-        _x = _x.replace(/,/g, '","')
-        temp = temp.replace(x, _x)
-      })
-      temp = temp.replace(/{/g, '[')
-      temp = temp.replace(/}/g, ']')
-    }
-    return temp
-  }
 }

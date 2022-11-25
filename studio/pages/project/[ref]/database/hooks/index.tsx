@@ -28,10 +28,10 @@ const HooksPage: NextPageWithLayout = () => {
   const canReadWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       fetchHooks()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   const fetchHooks = async () => {
     meta.hooks.load()

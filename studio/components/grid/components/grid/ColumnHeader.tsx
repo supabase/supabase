@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IconKey, IconLink } from '@supabase/ui'
+import { IconKey, IconLink } from 'ui'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 import { XYCoord } from 'dnd-core'
 import { useDispatch } from '../../store'
@@ -19,6 +19,7 @@ export function ColumnHeader<R>({
   const columnKey = column.key
   const columnFormat = getColumnFormat(columnType, format)
   const state = useTrackedState()
+  const hoverValue = column.name as string
 
   // keep state.gridColumns' order in sync with data grid component
   if (state.gridColumns[columnIdx].key != columnKey) {
@@ -122,7 +123,9 @@ export function ColumnHeader<R>({
               <IconKey size="tiny" strokeWidth={2} />
             </div>
           )}
-          <span className="sb-grid-column-header__inner__name">{column.name}</span>
+          <span className="sb-grid-column-header__inner__name" title={hoverValue}>
+            {column.name}
+          </span>
           <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
         </div>
         <ColumnMenu column={column} />

@@ -1,10 +1,11 @@
 <template>
-  <div>
-    <div v-for="profile in state.propProfiles" :key="profile.id">
-      <profile-card :profile="profile" />
-    </div>
+  <div class="profileList">
+    <template v-for="profile in state.propProfiles">
+      <profile-card :key="profile.id" :profile="profile" />
+    </template>
   </div>
 </template>
+
 <script>
 import ProfileCard from "./ProfileCard.vue";
 export default {

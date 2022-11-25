@@ -8,7 +8,7 @@ import {
   IconTrash,
   IconLock,
   IconUnlock,
-} from '@supabase/ui'
+} from 'ui'
 import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
 

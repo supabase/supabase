@@ -19,17 +19,20 @@ const PageLayout = ({ children }: PropsWithChildren<{}>) => {
     projectKpsVersion: undefined,
     filterInputValue: '',
     filterKeywords: '',
+    filterVerified: undefined,
     users: [],
     totalUsers: 0,
     usersLoading: true,
     page: 1,
     pageLimit: 10,
     get fetchQuery() {
-      return {
+      let queryObj = {
         limit: this.pageLimit,
         offset: (this.page - 1) * this.pageLimit,
         keywords: this.filterKeywords,
       }
+
+      return this.filterVerified ? { ...queryObj, verified: this.filterVerified } : queryObj
     },
     get fromRow() {
       const value = this.pageLimit * (this.page - 1) + 1

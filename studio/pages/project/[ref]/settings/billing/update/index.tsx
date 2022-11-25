@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Modal } from '@supabase/ui'
+import { Button, Modal } from 'ui'
 
-import { useStore, useSubscriptionStats } from 'hooks'
+import { useFreeProjectLimitCheck, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
-import {
-  API_URL,
-  DEFAULT_FREE_PROJECTS_LIMIT,
-  PRICING_TIER_PRODUCT_IDS,
-  STRIPE_PRODUCT_IDS,
-} from 'lib/constants'
+import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -21,11 +16,11 @@ import { NextPageWithLayout } from 'types'
 const BillingUpdate: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
+  const orgSlug = ui.selectedOrganization?.slug
   const projectRef = ui.selectedProject?.ref
 
-  const subscriptionStats = useSubscriptionStats()
-  const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
-  const freeProjectsOwned = subscriptionStats.total_active_free_projects ?? 0
+  const { membersExceededLimit } = useFreeProjectLimitCheck(orgSlug as string)
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [showConfirmDowngrade, setShowConfirmDowngrade] = useState(false)
@@ -97,7 +92,7 @@ const BillingUpdate: NextPageWithLayout = () => {
   }
 
   const onConfirmDowngrade = () => {
-    if (freeProjectsOwned >= freeProjectsLimit) {
+    if (hasMembersExceedingFreeTierLimit) {
       setShowDowngradeError(true)
       setShowConfirmDowngrade(false)
       setSelectedPlan(undefined)
@@ -143,19 +138,32 @@ const BillingUpdate: NextPageWithLayout = () => {
       <Modal
         hideFooter
         visible={showDowngradeError}
-        size="small"
-        header="Free tier limit exceeded"
+        size="medium"
+        header="Your organization has members who have exceeded their free project limits"
         onCancel={() => setShowDowngradeError(false)}
       >
         <div className="space-y-4 py-4">
           <Modal.Content>
-            <p className="text-scale-1100 text-sm">
-              Your account is entitled up to {freeProjectsLimit} free projects across all
-              organizations you own. You will need to delete or upgrade an existing free project
-              first, before being able to downgrade this project.
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-scale-1100">
+                The following members have reached their maximum limits for the number of active
+                free tier projects within organizations where they are an administrator or owner:
+              </p>
+              <ul className="list-disc pl-5 text-sm text-scale-1100">
+                {(membersExceededLimit || []).map((member, idx: number) => (
+                  <li key={`member-${idx}`}>
+                    {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
+                    free projects)
+                  </li>
+                ))}
+              </ul>
+              <p className="text-sm text-scale-1100">
+                These members will need to either delete, pause, or upgrade one or more of these
+                projects before you're able to downgrade this project.
+              </p>
+            </div>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
               <Button

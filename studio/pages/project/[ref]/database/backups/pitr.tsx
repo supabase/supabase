@@ -1,53 +1,104 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Tabs } from '@supabase/ui'
+import { IconAlertCircle, Tabs } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
-import { DatabaseLayout } from 'components/layouts'
-import { PITRBackupSelection } from 'components/interfaces/Database'
 import { NextPageWithLayout } from 'types'
+import { useStore, checkPermissions, useFlag } from 'hooks'
+import { DatabaseLayout } from 'components/layouts'
+import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import InformationBox from 'components/ui/InformationBox'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
+import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
-const DatabaseScheduledBackups: NextPageWithLayout = () => {
+const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
-
   const ref = ui.selectedProject?.ref ?? 'default'
-
-  const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-5 pt-12 pb-20">
-      <h3 className="text-scale-1200 text-xl">Backups</h3>
+      <h3 className="text-xl text-scale-1200">Backups</h3>
 
       <Tabs
         type="underlined"
+        size="small"
         activeId="pitr"
         onChange={(id: any) => {
           if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
         }}
       >
-        <Tabs.Panel id="scheduled" label="Scheduled" />
+        <Tabs.Panel id="scheduled" label="Scheduled backups" />
         <Tabs.Panel id="pitr" label="Point in Time" />
       </Tabs>
 
-      <div className="space-y-4">
-        <p className="text-scale-1100 text-sm">
-          Restore your project from a specific date and time.
-        </p>
-        {canReadPhysicalBackups ? (
-          <PITRBackupSelection />
-        ) : (
-          <NoPermission resourceText="view PITR backups" />
-        )}
+      <div className="space-y-8">
+        <PITR />
       </div>
     </div>
   )
 }
 
-DatabaseScheduledBackups.getLayout = (page) => (
+DatabasePhysicalBackups.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-export default observer(DatabaseScheduledBackups)
+const PITR = () => {
+  const { ui, backups } = useStore()
+  const { configuration, error, isLoading } = backups
+
+  const ref = ui.selectedProject?.ref ?? 'default'
+  const tier = ui.selectedProject?.subscription_tier
+  const isEnabled = configuration.walg_enabled
+
+  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
+  const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
+  if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
+
+  if (isLoading) return <Loading />
+  if (error) return <BackupsError />
+  if (!isEnabled)
+    return isPITRSelfServeEnabled ? (
+      <UpgradeToPro
+        projectRef={ref}
+        primaryText="Point in time recovery is a Pro plan add-on."
+        secondaryText={
+          tier === PRICING_TIER_PRODUCT_IDS.FREE
+            ? 'Please upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
+            : 'Please enable the add-on to enable point in time recovery for your project.'
+        }
+      />
+    ) : (
+      <InformationBox
+        hideCollapse
+        defaultVisibility
+        title={
+          <div>
+            <p>
+              Point in time backups is an Enterprise feature. Reach out to us{' '}
+              <Link
+                href={`/support/new?ref=${ref}&category=sales&subject=Interest%20in%20enabling%20PITR%20for%20my%20project`}
+              >
+                <a className="text-brand-900">here</a>
+              </Link>{' '}
+              if you're interested!
+            </p>
+          </div>
+        }
+        icon={<IconAlertCircle size={18} strokeWidth={2} />}
+      />
+    )
+
+  return (
+    <>
+      <PITRNotice />
+      <PITRSelection />
+    </>
+  )
+}
+
+export default observer(DatabasePhysicalBackups)

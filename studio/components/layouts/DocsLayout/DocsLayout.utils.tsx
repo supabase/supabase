@@ -1,5 +1,5 @@
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { IconBook, IconBookOpen } from '@supabase/ui'
+import { IconBook, IconBookOpen } from 'ui'
 
 export const generateDocsMenu = (
   ref: string,
@@ -34,7 +34,7 @@ export const generateDocsMenu = (
           url: `/project/${ref}/api?page=tables-intro`,
           items: [],
         },
-        ...tables.map((table) => {
+        ...tables.sort().map((table) => {
           return {
             name: table,
             key: table,

@@ -45,8 +45,11 @@ function TagBlogsPage(props: Props) {
           </div>
           <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
             {blogs.map((blog: PostTypes, idx: number) => (
-              <div className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4">
-                <BlogListItem post={blog} key={idx} />
+              <div
+                className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
+                key={idx}
+              >
+                <BlogListItem post={blog} />
               </div>
             ))}
           </ol>

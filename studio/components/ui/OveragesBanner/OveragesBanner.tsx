@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC } from 'react'
-import { Alert, Button } from '@supabase/ui'
+import { Alert, Button } from 'ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -57,9 +57,9 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
     tier === PRICING_TIER_PRODUCT_IDS.FREE
       ? 'Upgrade to the pro tier to support the growth of your project.'
       : tier === PRICING_TIER_PRODUCT_IDS.PRO
-      ? ''
+      ? 'Consider disabling spend cap to support the growth of your project'
       : tier === PRICING_TIER_PRODUCT_IDS.PAYG
-      ? ''
+      ? "As you have disabled spend cap, additional resources will be charged on a per-usage basis. You can check your project's usage details for more information."
       : ''
 
   return (
@@ -84,8 +84,8 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
         }
         actions={
           minimal ? (
-            <div className="h-full flex items-center">
-              <Link href={`/project/${ref}/settings/billing`}>
+            <div className="flex h-full items-center">
+              <Link href={`/project/${ref}/settings/billing/subscription`}>
                 <a>
                   <Button type="default">Explore usage details</Button>
                 </a>

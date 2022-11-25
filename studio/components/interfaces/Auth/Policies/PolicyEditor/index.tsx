@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Modal } from '@supabase/ui'
+import { Modal } from 'ui'
 
 import PolicyName from './PolicyName'
 import PolicyDefinition from './PolicyDefinition'
@@ -45,7 +45,7 @@ const PolicyEditor: FC<Props> = ({
             onUpdatePolicyName={(name) => onUpdatePolicyFormFields({ name })}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         {isNewPolicy && (
           <>
             <Modal.Content>
@@ -54,7 +54,7 @@ const PolicyEditor: FC<Props> = ({
                 onSelectOperation={(command) => onUpdatePolicyFormFields({ command })}
               />
             </Modal.Content>
-            <Modal.Seperator />
+            <Modal.Separator />
           </>
         )}
         <Modal.Content>
@@ -64,7 +64,7 @@ const PolicyEditor: FC<Props> = ({
             onUpdateSelectedRoles={(roles) => onUpdatePolicyFormFields({ roles })}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <PolicyDefinition
             operation={operation}

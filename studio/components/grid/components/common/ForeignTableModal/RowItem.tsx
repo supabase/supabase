@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Menu } from '@supabase/ui'
+import { Menu } from 'ui'
 import { Dictionary } from '../../../types'
 
 interface RowItemProps {
@@ -23,7 +23,7 @@ export const RowItem: React.FC<RowItemProps> = ({ item, onSelect, columnNames })
 
             return (
               <div className="foreign-table-modal__row-item__inner__key-item" key={`item-${j}`}>
-                <p className="text-sm text-scale-1000 foreign-table-modal__row-item__inner__key-item__key">
+                <p className="foreign-table-modal__row-item__inner__key-item__key text-sm text-scale-1000">
                   {key}
                 </p>
                 <p className="text-sm font-bold">

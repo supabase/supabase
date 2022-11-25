@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { object, string } from 'yup'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
+import { Button, Form, IconMail, Input, Modal, Select } from 'ui'
 
 import { Member, User, Role } from 'types'
 import { checkPermissions, useFlag, useOrganizationDetail, useStore } from 'hooks'
@@ -27,7 +27,10 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
 
   const [isOpen, setIsOpen] = useState(false)
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
-  const canInviteMembers = checkPermissions(PermissionAction.CREATE, 'user_invites')
+
+  const canInviteMembers = roles.some(({ id: role_id }) =>
+    checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
+  )
 
   const initialValues = { email: '', role: '' }
 
@@ -54,11 +57,11 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
       }
     }
 
-    setSubmitting(true)
-
     const roleId = enablePermissions
       ? Number(values.role)
       : roles.find((role) => role.name === 'Developer')?.id ?? roles[0].id
+
+    setSubmitting(true)
 
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
@@ -105,11 +108,11 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">
+              <span className="text-xs text-scale-1200">
                 You need additional permissions to invite a member to this organization
               </span>
             </div>
@@ -177,7 +180,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
                     </div>
                   </div>
                 </Modal.Content>
-                <Modal.Seperator />
+                <Modal.Separator />
                 <Modal.Content>
                   <div className="pt-2 pb-3">
                     <Button

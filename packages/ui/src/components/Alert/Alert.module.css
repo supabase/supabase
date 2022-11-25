@@ -1,0 +1,63 @@
+/* .sbui-alert-container {
+  @apply rounded-md p-4;
+}
+
+.sbui-alert-container--danger {
+  @apply bg-red-600 bg-opacity-10 text-red-600;
+}
+
+.sbui-alert-container--warning {
+  @apply bg-yellow-600 bg-opacity-10 text-yellow-600;
+}
+
+.sbui-alert-container--info {
+  @apply bg-blue-600 bg-opacity-10 text-blue-600;
+}
+
+.sbui-alert-container--success {
+  @apply bg-green-600 bg-opacity-10 text-green-600;
+} */
+
+/* .sbui-alert-title {
+  @apply m-0 text-sm font-medium;
+}
+
+.sbui-alert-description {
+  @apply mt-2 text-sm;
+}
+
+.sbui-alert-description--danger {
+  @apply text-red-500;
+}
+
+.sbui-alert-description--warning {
+  @apply text-yellow-500;
+}
+
+.sbui-alert-description--info {
+  @apply text-blue-500;
+}
+
+.sbui-alert-description--success {
+  @apply text-green-500;
+}
+
+.sbui-close-button {
+  @apply cursor-pointer inline-flex transition ease-in-out duration-200 bg-transparent border-transparent rounded-md p-1.5 focus:outline-none;
+}
+
+.sbui-close-button--success {
+  @apply text-green-500 hover:bg-green-600 hover:bg-opacity-10;
+}
+
+.sbui-close-button--danger {
+  @apply text-red-500 hover:bg-red-600 hover:bg-opacity-10;
+}
+
+.sbui-close-button--warning {
+  @apply text-yellow-500 hover:bg-yellow-600 hover:bg-opacity-10;
+}
+
+.sbui-close-button--info {
+  @apply text-blue-500 hover:bg-blue-600 hover:bg-opacity-10;
+} */

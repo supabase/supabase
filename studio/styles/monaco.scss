@@ -32,12 +32,17 @@ span.th.tr.td.textarea {
 }
 
 .grid-monaco-editor,
-.monaco-editor .suggest-widget .main {
-  max-height: none;
-  height: inherit;
-  width: 100%;
-  margin: inherit;
-  padding: inherit;
-  overflow: inherit;
-  background-color: inherit;
+.monaco-editor .suggest-widget {
+  .main {
+    max-height: none;
+    height: inherit;
+    width: 100%;
+    margin: inherit;
+    padding: inherit;
+    overflow: inherit;
+  }
+
+  .monaco-list-row.focused .main {
+    background: var(--vscode-quickInput-background);
+  }
 }

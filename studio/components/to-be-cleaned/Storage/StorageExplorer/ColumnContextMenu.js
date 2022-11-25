@@ -39,8 +39,8 @@ const ColumnContextMenu = ({
         <Item onClick={() => onSelectSort(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>Last accessed</Item>
       </Submenu>
       <Submenu label="Sort by order">
-        <Item onClick={() => onSelectSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>Asc</Item>
-        <Item onClick={() => onSelectSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>Desc</Item>
+        <Item onClick={() => onSelectSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>Ascending</Item>
+        <Item onClick={() => onSelectSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>Descending</Item>
       </Submenu>
     </Menu>
   )

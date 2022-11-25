@@ -106,6 +106,21 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     if (!mounted) setMounted(true)
   }, [])
 
+  // TODO(alaister): update this to react-query
+  // useEffect(() => {
+  //   if (state.refreshPageFlag === REFRESH_PAGE_IMMEDIATELY) {
+  //     fetchPage(state, dispatch, sorts, filters)
+  //   } else if (state.refreshPageFlag !== 0) {
+  //     refreshPageDebounced(state, dispatch, sorts, filters)
+  //   }
+  // }, [state.refreshPageFlag])
+
+  // useEffect(() => {
+  //   if (state.totalRows === TOTAL_ROWS_RESET) {
+  //     fetchCount(state, dispatch, filters)
+  //   }
+  // }, [state.totalRows])
+
   useEffect(() => {
     if (mounted) {
       dispatch({ type: 'UPDATE_FILTERS', payload: {} })
@@ -147,15 +162,15 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   useEffect(() => {
     if (!state.metaService) return
 
-    if (
-      !state.table ||
-      (typeof props.table === 'string' &&
-        state.table!.name !== props.table &&
-        state.table!.schema !== props.schema) ||
-      (typeof props.table !== 'string' &&
-        JSON.stringify(props.table) !== JSON.stringify(state.table))
-    ) {
-      const { savedState } = initTable(props, state, dispatch, sort as string[], filter as string[])
+    const initializeData = async () => {
+      const { savedState } = await initTable(
+        props,
+        state,
+        dispatch,
+        sort as string[],
+        filter as string[]
+      )
+
       if (savedState.sorts || savedState.filters) {
         setParams((prevParams) => {
           return {
@@ -166,7 +181,18 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         })
       }
     }
-  }, [state.metaService, state.table, props.table, props.schema])
+
+    const refreshView =
+      typeof props.table === 'string' &&
+      state?.table?.name !== props.table &&
+      state?.table?.schema !== props.schema
+    const refreshTable =
+      typeof props.table !== 'string' && JSON.stringify(props.table) !== JSON.stringify(state.table)
+
+    if (!state.table || refreshView || refreshTable) {
+      initializeData()
+    }
+  }, [state.metaService, state.table, table, props.schema])
 
   return (
     <div className="sb-grid">

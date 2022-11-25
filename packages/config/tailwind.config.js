@@ -16,13 +16,13 @@ module.exports = ui({
   mode: 'JIT',
   content: [
     '../../packages/common/**/*.{ts,tsx}',
+    '../../packages/ui/**/*.{tsx,ts,js}',
     './src/**/*.{ts,tsx,mdx}',
     './components/**/*.tsx',
     './layouts/**/*.tsx',
     './pages/**/*.{tsx,mdx}',
     './_blog/*.mdx',
     // purge styles from supabase ui theme
-    '../../node_modules/@supabase/ui/dist/config/default-theme.js',
   ],
   darkMode: 'class', // 'media' or 'class'
   // mode: 'jit',
@@ -102,12 +102,16 @@ module.exports = ui({
               border: '1px solid ' + theme('borderColor.DEFAULT'),
               borderRadius: theme('borderRadius.lg'),
             },
+            td: {
+              borderBottom: '1px solid ' + theme('colors.scale[400]'),
+            },
             code: {
               fontWeight: '400',
               padding: '0.2rem 0.4rem',
               backgroundColor: theme('colors.scale[400]'),
               border: '1px solid ' + theme('colors.scale[500]'),
               borderRadius: theme('borderRadius.lg'),
+              wordBreak: 'break-all',
             },
             a: {
               transition: 'box-shadow 0.1s ease-in-out',

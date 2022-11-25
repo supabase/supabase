@@ -25,6 +25,7 @@ export interface UpdateColumnPayload {
   isIdentity?: boolean
   isNullable?: boolean
   isUnique?: boolean
+  isPrimaryKey?: boolean
   identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
 }
 

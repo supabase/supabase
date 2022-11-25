@@ -14,7 +14,7 @@ import {
   IconPlus,
   IconSave,
   IconSettings,
-} from '@supabase/ui'
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -305,7 +305,7 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-scale-1200 text-xl">Reports</h1>
+      <h1 className="text-xl text-scale-1200">Reports</h1>
 
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
@@ -318,13 +318,13 @@ const Reports = () => {
 
           {startDate && endDate && (
             <div className="hidden items-center space-x-1 lg:flex ">
-              <span className="text-scale-1100 text-sm">
+              <span className="text-sm text-scale-1100">
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
               <span className="text-scale-900">
                 <IconArrowRight size={12} />
               </span>
-              <span className="text-scale-1100 text-sm">
+              <span className="text-sm text-scale-1100">
                 {dayjs(endDate).format('MMM D, YYYY')}
               </span>
             </div>
@@ -366,11 +366,11 @@ const Reports = () => {
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                    'border-scale-200 border',
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-scale-1200 text-xs">
+                  <span className="text-xs text-scale-1200">
                     You need additional permissions to update this project's report
                   </span>
                 </div>
@@ -381,7 +381,7 @@ const Reports = () => {
       </div>
 
       {config.layout.length <= 0 ? (
-        <div className="dark:border-dark flex min-h-full items-center justify-center rounded border-2 border-dashed p-16">
+        <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 dark:border-dark">
           {canUpdateReport ? (
             <Dropdown side="bottom" align="center" overlay={<MetricOptions />}>
               <Button as="span" type="default" iconRight={<IconPlus />}>
@@ -389,7 +389,7 @@ const Reports = () => {
               </Button>
             </Dropdown>
           ) : (
-            <p className="text-scale-1000 text-sm">No charts set up yet in report</p>
+            <p className="text-sm text-scale-1000">No charts set up yet in report</p>
           )}
         </div>
       ) : (

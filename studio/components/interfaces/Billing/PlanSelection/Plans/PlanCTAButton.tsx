@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, IconLoader } from '@supabase/ui'
+import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useFlag } from 'hooks'
@@ -86,7 +86,7 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
         {ctaText}
       </Button>
       {!disabled && projectUpdateDisabled && (
-        <p className="text-scale-1100 text-sm">
+        <p className="text-sm text-scale-1100">
           Subscription changes are currently disabled, our engineers are working on a fix
         </p>
       )}

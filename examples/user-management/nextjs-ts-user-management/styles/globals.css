@@ -367,7 +367,8 @@ button.primary,
   background-color: #2a2a2a;
 }
 
-.auth-widget .button > .loader {
+.auth-widget .button > .loader,
+.account .button > .loader {
   width: 17px;
   animation: spin 1s linear infinite;
   filter: invert(1);

@@ -1,9 +1,9 @@
-import { Accordion, Input } from '@supabase/ui'
+import { Accordion, Input } from 'ui'
 import { ErrorRendererProps } from './DefaultErrorRenderer'
 
 const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, isCustomQuery }) => (
-  <div className="text-scale-1100 flex flex-col gap-2">
-    <div className="text-sm flex flex-col gap-1">
+  <div className="flex flex-col gap-2 text-scale-1100">
+    <div className="flex flex-col gap-1 text-sm">
       <p>This query requires too much memory to be executed.</p>
       <p>
         {isCustomQuery
@@ -27,7 +27,7 @@ const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, i
           size="tiny"
           value={JSON.stringify(error, null, 2)}
           borderless
-          className="font-mono w-full mt-4"
+          className="mt-4 w-full font-mono"
           copy
           rows={5}
         />

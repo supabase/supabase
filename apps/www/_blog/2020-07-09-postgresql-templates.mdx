@@ -13,8 +13,6 @@ date: '07-09-2020'
 
 Whenever you create a new database in Postgres, you are actually [basing it off an already present database](https://www.postgresql.org/docs/current/manage-ag-templatedbs.html) in your cluster.
 
-<!--truncate-->
-
 This database, `template1`, and another, called `template0`, are standard system databases that exist in every newly created database cluster. Don't believe me? Why not quickly [spin up a database](/docs/postgres/server/about) and see it for yourself with this query:
 
 ```sql

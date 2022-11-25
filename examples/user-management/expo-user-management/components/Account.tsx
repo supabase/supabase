@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from 'react-native-elements'
-import { ApiError, Session } from '@supabase/supabase-js'
+import { Session } from '@supabase/supabase-js'
+import Avatar from './Avatar'
 
 export default function Account({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
   const [website, setWebsite] = useState('')
-  const [avatar_url, setAvatarUrl] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
 
   useEffect(() => {
     if (session) getProfile()
@@ -17,13 +18,12 @@ export default function Account({ session }: { session: Session }) {
   async function getProfile() {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
-      if (!user) throw new Error('No user on the session!')
+      if (!session?.user) throw new Error('No user on the session!')
 
       let { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
-        .eq('id', user.id)
+        .eq('id', session?.user.id)
         .single()
       if (error && status !== 406) {
         throw error
@@ -35,7 +35,9 @@ export default function Account({ session }: { session: Session }) {
         setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
-      Alert.alert((error as ApiError).message)
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -52,24 +54,25 @@ export default function Account({ session }: { session: Session }) {
   }) {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
-      if (!user) throw new Error('No user on the session!')
+      if (!session?.user) throw new Error('No user on the session!')
 
       const updates = {
-        id: user.id,
+        id: session?.user.id,
         username,
         website,
         avatar_url,
         updated_at: new Date(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates, { returning: 'minimal' })
+      let { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
       }
     } catch (error) {
-      Alert.alert((error as ApiError).message)
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -77,6 +80,16 @@ export default function Account({ session }: { session: Session }) {
 
   return (
     <View>
+      <View>
+        <Avatar 
+          size={200}
+          url={avatarUrl} 
+          onUpload={(url: string) => {
+            setAvatarUrl(url)
+            updateProfile({ username, website, avatar_url: url })
+          }} 
+        />
+      </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input label="Email" value={session?.user?.email} disabled />
       </View>
@@ -90,7 +103,7 @@ export default function Account({ session }: { session: Session }) {
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
           title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url })}
+          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
           disabled={loading}
         />
       </View>

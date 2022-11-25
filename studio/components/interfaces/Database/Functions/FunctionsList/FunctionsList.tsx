@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { uniqBy, map as lodashMap, includes } from 'lodash'
-import { Button, IconSearch, IconLoader, Input } from '@supabase/ui'
+import { Button, IconSearch, IconLoader, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -53,11 +53,11 @@ const FunctionsList: FC<any> = ({
             onClickCta={() => createFunction()}
           >
             <AlphaPreview />
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
               commands such as declarations, assignments, loops, flow-of-control, etc.
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               It's stored on the database server and can be invoked using the SQL interface.
             </p>
           </ProductEmptyState>
@@ -83,11 +83,11 @@ const FunctionsList: FC<any> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                      'border-scale-200 border',
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-scale-1200 text-xs">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to create functions
                     </span>
                   </div>
@@ -96,7 +96,7 @@ const FunctionsList: FC<any> = ({
             </Tooltip.Root>
           </div>
           {filteredFunctions.length <= 0 && (
-            <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
+            <div className="mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md dark:border-dark">
               <p>No results match your filter query</p>
               <Button type="outline" onClick={() => setFilterString('')}>
                 Reset filter

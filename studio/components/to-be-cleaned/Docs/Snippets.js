@@ -33,6 +33,28 @@ const supabaseUrl = '${endpoint}'
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)`,
     },
+    python: {
+      language: 'python',
+      code: `
+import os
+from supabase import create_client, Client
+
+url: str = '${endpoint}'
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+`,
+    },
+    dart: {
+      language: 'dart',
+      code: `
+final supabaseUrl = '${endpoint}'
+final supabaseKey = String.fromEnvironment('SUPABASE_KEY')
+
+Future<void> main() async {
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  runApp(MyApp());
+}`,
+    },
   }),
   authKey: (title, varName, apikey) => ({
     title: `${title}`,
@@ -118,11 +140,14 @@ else console.log(data)
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('*', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-all-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -135,11 +160,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('INSERT', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-insert-channel')
+  .on(
+    'postgres_changes', 
+    { event: 'INSERT', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -152,11 +180,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('UPDATE', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-update-channel')
+  .on(
+    'postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -169,11 +200,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}')
-  .on('DELETE', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-delete-channel')
+  .on(
+    'postgres_changes',
+    { event: 'DELETE', schema: 'public', table: '${resourceId}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -186,11 +220,14 @@ const ${listenerName} = supabase
     js: {
       language: 'js',
       code: `
-const ${listenerName} = supabase
-  .from('${resourceId}:${columnName}=eq.${value}')
-  .on('*', payload => {
-    console.log('Change received!', payload)
-  })
+const ${listenerName} = supabase.channel('custom-filter-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: '${resourceId}', filter: '${columnName}=eq.${value}' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
   .subscribe()`,
     },
   }),
@@ -450,7 +487,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signUp({
+let { data, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: '${randomPassword}'
 })
@@ -474,7 +511,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithPassword({
+let { data, error } = await supabase.auth.signInWithPassword({
   email: 'someone@email.com',
   password: '${randomPassword}'
 })
@@ -497,7 +534,7 @@ curl -X POST '${endpoint}/auth/v1/magiclink' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOtp({
+let { data, error } = await supabase.auth.signInWithOtp({
   email: 'someone@email.com'
 })
 `,
@@ -520,7 +557,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signUp({
+let { data, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password'
 })
@@ -543,7 +580,7 @@ curl -X POST '${endpoint}/auth/v1/otp' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOtp({
+let { data, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555'
 })
 `,
@@ -567,7 +604,7 @@ curl -X POST '${endpoint}/auth/v1/verify' \\
     js: {
       language: 'js',
       code: `
-let { session, error } = await supabase.auth.verifyOTP({
+let { data, error } = await supabase.auth.verifyOTP({
   phone: '+13334445555',
   token: '123456'
 })
@@ -604,7 +641,7 @@ let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.c
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOAuth({
+let { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'
 })
 `,
@@ -623,7 +660,7 @@ curl -X GET '${endpoint}/auth/v1/user' \\
     js: {
       language: 'js',
       code: `
-const user = supabase.auth.user()
+const { data: { user } } = await supabase.auth.getUser()
 `,
     },
   }),
@@ -668,7 +705,7 @@ let { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
     js: {
       language: 'js',
       code: `
-const { user, error } = await supabase.auth.update({
+const { data, error } = await supabase.auth.updateUser({
   email: "new@email.com",
   password: "new-password",
   data: { hello: 'world' }
@@ -684,7 +721,7 @@ const { user, error } = await supabase.auth.update({
 curl -X POST '${endpoint}/auth/v1/logout' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
--H "Authorization: Bearer USER_TOKEN"'
+-H "Authorization: Bearer USER_TOKEN"
 `,
     },
     js: {
