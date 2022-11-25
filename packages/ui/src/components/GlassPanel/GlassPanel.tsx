@@ -61,7 +61,7 @@ const GlassPanel = ({
             <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
               <img
                 className="bg-green-600 w-5"
-                src={`/docs/img/icons/menu/${icon}${!isDarkMode ? '-light' : ''}.svg`}
+                src={`/docs/img/icons/menu/${icon}${isDarkMode && !isDarkMode ? '-light' : ''}.svg`}
               />
             </div>
           ) : (
