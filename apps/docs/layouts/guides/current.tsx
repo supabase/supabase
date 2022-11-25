@@ -3,7 +3,9 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
 import components from '~/components'
+import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import useHash from '~/hooks/useHash'
 import { getPageType } from '~/lib/helpers'
 
 interface Props {
@@ -14,7 +16,11 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
+  const [hash] = useHash()
   const [active, setActive] = useState(false)
+
+  const articleRef = useRef()
+  const [tocList, setTocList] = useState([])
 
   const { asPath } = useRouter()
   const page = getPageType(asPath)
@@ -29,8 +35,11 @@ const Layout: FC<Props> = (props) => {
     }
   }, [])
 
-  const articleRef = useRef()
-  const [tocList, setTocList] = useState([])
+  useEffect(() => {
+    if (hash && tocList.length > 0) {
+      highlightSelectedTocItem(hash as string)
+    }
+  }, [hash, JSON.stringify(tocList)])
 
   useEffect(() => {
     const articleEl = articleRef.current as HTMLElement
