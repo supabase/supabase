@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { useProjectSettings, useStore, withAuth } from 'hooks'
+import { useParams, useStore, withAuth } from 'hooks'
 import BaseLayout from 'components/layouts'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
@@ -13,6 +13,7 @@ import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModa
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import ToggleBucketPublicModal from 'components/to-be-cleaned/Storage/ToggleBucketPublicModal'
 import NoPermission from 'components/ui/NoPermission'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 interface Props {
   title: string
@@ -22,7 +23,7 @@ interface Props {
 const StorageLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
   const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   const storageExplorerStore = useStorageStore()
   const {
@@ -39,20 +40,22 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     buckets,
   } = storageExplorerStore || {}
 
-  const { services, isLoading } = useProjectSettings(ref as string | undefined)
-  const apiService = find(services ?? [], (service) => service.app.id === 1)
-  const projectUrl = apiService?.app_config?.endpoint ?? ''
-  const serviceKey = find(apiService?.service_api_keys ?? [], (key) => key.tags === 'service_role')
-  const canAccessStorage = !isLoading && services && serviceKey
+  const { data: settings, isLoading } = useProjectApiQuery({
+    projectRef,
+  })
+
+  const projectUrl = settings?.autoApiService.app_config.endpoint ?? ''
+  const serviceKey = settings?.autoApiService.serviceApiKey
+  const canAccessStorage = !isLoading && settings && serviceKey
 
   useEffect(() => {
-    if (!isLoading && services) initializeStorageStore()
+    if (!isLoading && settings) initializeStorageStore()
   }, [isLoading])
 
   const initializeStorageStore = async () => {
     if (projectUrl) {
       if (serviceKey) {
-        storageExplorerStore.initStore(ref, projectUrl, serviceKey.api_key)
+        storageExplorerStore.initStore(projectRef, projectUrl, serviceKey)
         await storageExplorerStore.fetchBuckets()
       }
     } else {
@@ -67,7 +70,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
 
   const onSelectCreateBucket = async (bucketName: string, isPublic: boolean) => {
     const bucket = await createBucket(bucketName, isPublic)
-    if (bucket.name) router.push(`/project/${ref}/storage/buckets/${bucket.name}`)
+    if (bucket.name) router.push(`/project/${projectRef}/storage/buckets/${bucket.name}`)
   }
 
   const onSelectDeleteBucket = async (bucket: any) => {

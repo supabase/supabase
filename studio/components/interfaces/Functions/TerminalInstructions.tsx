@@ -1,12 +1,12 @@
-import { useRouter } from 'next/router'
-import { Button, IconTerminal, IconMaximize2, IconMinimize2, IconBookOpen, IconCode } from 'ui'
-import { useProjectSettings } from 'hooks'
-import { useAccessTokens } from 'hooks/queries/useAccessTokens'
-import { Commands } from './Functions.types'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { FC, useState } from 'react'
-import { useStore } from 'hooks'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useParams } from 'hooks'
+import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FC, useState } from 'react'
+import { Button, IconBookOpen, IconCode, IconMaximize2, IconMinimize2, IconTerminal } from 'ui'
+import { Commands } from './Functions.types'
 
 interface Props {
   closable?: boolean
@@ -14,21 +14,19 @@ interface Props {
 
 const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   const router = useRouter()
-  const { ref } = router.query
-  const { ui } = useStore()
-
-  const { tokens } = useAccessTokens()
-  const { services } = useProjectSettings(ref as string | undefined)
+  const { ref: projectRef } = useParams()
 
   const [showInstructions, setShowInstructions] = useState(!closable)
 
-  // Get the API service
-  const API_SERVICE_ID = 1
-  const apiService = (services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
-  const apiKeys = apiService?.service_api_keys ?? []
-  const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
+  const { tokens } = useAccessTokens()
 
-  const endpoint = apiService?.app_config.endpoint ?? ''
+  const { data: settings } = useProjectApiQuery({
+    projectRef,
+  })
+
+  const anonKey = settings?.autoApiService.defaultApiKey
+  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
+
   const endpointSections = endpoint.split('.')
   const functionsEndpoint = [
     ...endpointSections.slice(0, 1),
@@ -37,8 +35,8 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   ].join('.')
 
   // get the .co or .net TLD from the restUrl
-  const restUrl = ui.selectedProject?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+  const restUrl = settings?.autoApiService.restUrl ?? ''
+  const restUrlTld = new URL(restUrl).hostname.split('.').pop()
 
   const commands: Commands[] = [
     {
@@ -54,20 +52,20 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
       comment: 'Create a function',
     },
     {
-      command: `supabase functions deploy hello-world --project-ref ${ref}`,
+      command: `supabase functions deploy hello-world --project-ref ${projectRef}`,
       description: 'Deploys function at ./functions/hello-world/index.ts',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">supabase</span> functions deploy hello-world
-            --project-ref {ref}
+            --project-ref {projectRef}
           </>
         )
       },
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.${restUrlTld}/hello-world' -H 'Authorization: Bearer ${
+      command: `curl -L -X POST 'https://${projectRef}.functions.supabase.${restUrlTld}/hello-world' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
