@@ -1,33 +1,26 @@
-import { FC, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useEffect, useRef } from 'react'
 import { IconAlertCircle, Input } from 'ui'
 
-import {
-  useStore,
-  useProjectSettings,
-  useProjectPostgrestConfig,
-  useJwtSecretUpdateStatus,
-} from 'hooks'
+import { useJwtSecretUpdateStatus, useParams, useProjectPostgrestConfig, useStore } from 'hooks'
 
 import Panel from 'components/ui/Panel'
-import PostgrestConfig from './PostgrestConfig'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
+import PostgrestConfig from './PostgrestConfig'
 
-interface Props {
-  projectRef: string
-}
-
-const ServiceList: FC<Props> = ({ projectRef }) => {
+const ServiceList = () => {
   const { ui } = useStore()
-  const router = useRouter()
-  const { ref } = router.query
 
-  const { services, isError, mutateSettings } = useProjectSettings(ref as string | undefined)
-  const { mutateConfig } = useProjectPostgrestConfig(ref as string | undefined)
-  const { jwtSecretUpdateError, jwtSecretUpdateStatus }: any = useJwtSecretUpdateStatus(ref)
+  const { ref: projectRef } = useParams()
+  const { data: settings, isError } = useProjectApiQuery({
+    projectRef,
+  })
+
+  const { mutateConfig } = useProjectPostgrestConfig(projectRef as string | undefined)
+  const { jwtSecretUpdateError, jwtSecretUpdateStatus }: any = useJwtSecretUpdateStatus(projectRef)
 
   const previousJwtSecretUpdateStatus = useRef()
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
@@ -39,7 +32,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
       switch (jwtSecretUpdateStatus) {
         case Updated:
           mutateConfig()
-          mutateSettings()
+          // mutateSettings()
           ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
           break
         case Failed:
@@ -54,10 +47,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
     previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
   }, [jwtSecretUpdateStatus])
 
-  // Get the API service
-  const API_SERVICE_ID = 1
-  const apiService = services ? services.find((x: any) => x.app.id == API_SERVICE_ID) : {}
-  const apiConfig = apiService?.app_config
+  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
   return (
     <>
@@ -78,7 +68,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                   readOnly
                   disabled
                   className="input-mono"
-                  value={`https://${apiConfig?.endpoint ?? '-'}`}
+                  value={`https://${endpoint ?? '-'}`}
                   descriptionText="A RESTful endpoint for querying and managing your database."
                   layout="horizontal"
                 />
