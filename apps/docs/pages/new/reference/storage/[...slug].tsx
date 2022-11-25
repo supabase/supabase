@@ -1,10 +1,9 @@
 import specFile from '~/../../spec/api_v0_openapi.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
 import { Tabs } from '~/../../packages/ui'
+
 // @ts-ignore
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import Options from '~/components/Options'
-import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 export type AcceptedValue = {
@@ -51,12 +50,12 @@ export default function Config() {
               return (
                 <RefSubLayout.Section title={section.title} id={section.id} monoFont={false}>
                   <RefSubLayout.Details>
-                    <div className="grid ref-container" id={section.id}>
+                    <div className="grid" id={section.id}>
                       <div className="border-b pb-8" key={section.id}>
                         <p>{section.description}</p>
                         <div>
                           {section.operations.map((operation: enrichedOperation) => (
-                            <>
+                            <div className="grid md:grid-cols-2 md:gap-12">
                               <div className="my-8">
                                 <p className="text-xl">{operation.summary}</p>
                                 <div className="mt-4">
@@ -115,42 +114,41 @@ export default function Config() {
                                   </ul>
                                 </div>
                               </div>
-
-                              <h2 className="text-xl">Responses</h2>
-                              <Tabs
-                                scrollable
-                                size="small"
-                                type="underlined"
-                                defaultActiveId={operation.responseList[0].responseCode}
-                              >
-                                {operation.responseList.map((response) => (
-                                  <Tabs.Panel
-                                    id={response.responseCode}
-                                    label={response.responseCode}
-                                  >
-                                    <p>{response.description}</p>
-                                    {response?.content && response?.content['application/json'] && (
-                                      <div className="mt-8">
-                                        <CodeBlock language="bash" className="relative">
-                                          {JSON.stringify(
-                                            response.content['application/json'],
-                                            null,
-                                            2
-                                          )}
-                                        </CodeBlock>
-                                      </div>
-                                    )}
-                                  </Tabs.Panel>
-                                ))}
-                              </Tabs>
-                            </>
+                              <RefSubLayout.Examples>
+                                <h2 className="text-xl">Responses</h2>
+                                <Tabs
+                                  scrollable
+                                  size="small"
+                                  type="underlined"
+                                  defaultActiveId={operation.responseList[0].responseCode}
+                                >
+                                  {operation.responseList.map((response) => (
+                                    <Tabs.Panel
+                                      id={response.responseCode}
+                                      label={response.responseCode}
+                                    >
+                                      <p>{response.description}</p>
+                                      {response?.content && response?.content['application/json'] && (
+                                        <div className="mt-8">
+                                          <CodeBlock language="bash" className="relative">
+                                            {JSON.stringify(
+                                              response.content['application/json'],
+                                              null,
+                                              2
+                                            )}
+                                          </CodeBlock>
+                                        </div>
+                                      )}
+                                    </Tabs.Panel>
+                                  ))}
+                                </Tabs>
+                              </RefSubLayout.Examples>
+                            </div>
                           ))}
                         </div>
                       </div>
                     </div>
                   </RefSubLayout.Details>
-
-                  <RefSubLayout.Examples>right side</RefSubLayout.Examples>
                 </RefSubLayout.Section>
               )
             })}
