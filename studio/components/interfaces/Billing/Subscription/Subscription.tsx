@@ -5,7 +5,7 @@ import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag, useProjectUsage } from 'hooks'
+import { checkPermissions, useStore, useFlag, useParams } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
@@ -14,6 +14,7 @@ import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import NoPermission from 'components/ui/NoPermission'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface Props {
   project: any
@@ -34,8 +35,7 @@ const Subscription: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const router = useRouter()
-
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
   const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
@@ -44,7 +44,7 @@ const Subscription: FC<Props> = ({
     ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
     : ui.selectedOrganization?.is_owner
 
-  const { usage, isLoading: loadingUsage } = useProjectUsage(ref as string)
+  const { data: usage, isLoading: loadingUsage } = useProjectUsageQuery({ projectRef })
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -62,7 +62,7 @@ const Subscription: FC<Props> = ({
         ? 0
         : Object.keys(usage)
             .map((productKey) => {
-              return usage[productKey].cost
+              return usage[productKey as keyof ProjectUsageResponse].cost
             })
             .reduce((prev, current) => prev + current, 0)
 
@@ -185,9 +185,11 @@ const Subscription: FC<Props> = ({
               {isPayg &&
                 USAGE_BASED_PRODUCTS.map((product) => {
                   return product.features.map((feature) => {
-                    const amount = usage?.[feature.key]?.usage ?? 0
-                    const limit = usage?.[feature.key]?.limit ?? 0
-                    const cost = (usage?.[feature.key]?.cost ?? 0).toFixed(2)
+                    const amount = usage?.[feature.key as keyof ProjectUsageResponse]?.usage ?? 0
+                    const limit = usage?.[feature.key as keyof ProjectUsageResponse]?.limit ?? 0
+                    const cost = (
+                      usage?.[feature.key as keyof ProjectUsageResponse]?.cost ?? 0
+                    ).toFixed(2)
 
                     return (
                       <CostBreakdownRow

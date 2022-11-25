@@ -33,6 +33,7 @@ const ProjectUsage: FC<Props> = ({}) => {
     `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
     get
   )
+  console.log('data:', data)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDate = dayjs()

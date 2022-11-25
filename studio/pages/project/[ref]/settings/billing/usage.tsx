@@ -10,7 +10,7 @@ import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PAYGUsage } from 'components/interfaces/Billing'
-import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import ProjectUsageBars from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -97,7 +97,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           {dateRange && <PAYGUsage dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project?.ref} />
+        <ProjectUsageBars projectRef={project?.ref} />
       )}
     </div>
   )

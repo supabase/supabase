@@ -1,11 +1,12 @@
 import { FC } from 'react'
 import { Loading } from 'ui'
 
-import { useProjectSubscription, useProjectUsage } from 'hooks'
+import { useProjectSubscription } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface ProjectUsageMinimalProps {
   projectRef?: string
@@ -15,7 +16,7 @@ interface ProjectUsageMinimalProps {
 // [Joshen] This is currently not being used anywhere as of 011122
 
 const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter }) => {
-  const { usage, error: usageError, isLoading } = useProjectUsage(projectRef)
+  const { data: usage, error: usageError, isLoading } = useProjectUsageQuery({ projectRef })
   const { subscription, error: subscriptionError } = useProjectSubscription(projectRef)
 
   if (
@@ -37,8 +38,8 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
       {usage && (
         <div className="space-y-8">
           {product.features.map((feature) => {
-            const featureUsage = usage[feature.key]
-            const usageRatio = featureUsage.usage / featureUsage.limit
+            const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
+            const usageRatio = (featureUsage.usage ?? 0) / featureUsage.limit
             const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
             const isExceeded = usageRatio >= 1
 
@@ -50,7 +51,7 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
                   barClass={`${
                     isExceeded ? 'bg-red-900' : isApproaching ? 'bg-yellow-900' : 'bg-brand-900'
                   }`}
-                  value={featureUsage.usage}
+                  value={featureUsage.usage ?? 0}
                   max={featureUsage.limit}
                   labelBottom={formatBytes(featureUsage.usage)}
                   labelTop={formatBytes(featureUsage.limit)}
