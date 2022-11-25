@@ -1,13 +1,14 @@
 import { FC, useEffect } from 'react'
 import { Badge, IconAlertCircle, Loading } from 'ui'
 
-import { useStore, useProjectUsage } from 'hooks'
+import { useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface Props {
   projectRef?: string
@@ -15,7 +16,7 @@ interface Props {
 
 const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
-  const { usage, error, isLoading } = useProjectUsage(projectRef)
+  const { data: usage, error, isLoading } = useProjectUsageQuery({ projectRef })
 
   const projectHasNoLimits =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
@@ -28,7 +29,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project's usage data: ${error?.message ?? 'unknown'}`,
+        message: `Failed to get project's usage data: ${(error as any)?.message ?? 'unknown'}`,
       })
     }
   }, [error])
@@ -53,8 +54,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
               showUsageExceedMessage &&
               product.features
                 .map((feature) => {
-                  const featureUsage = usage[feature.key]
-                  return featureUsage.usage / featureUsage.limit > 1
+                  const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
+                  return (featureUsage.usage ?? 0) / featureUsage.limit > 1
                 })
                 .some((x) => x === true)
             return (
@@ -99,7 +100,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   ) : (
                     <tbody>
                       {product.features.map((feature) => {
-                        const featureUsage = usage[feature.key]
+                        const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
                         const usageValue = featureUsage.usage || 0
                         const usageRatio = usageValue / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
