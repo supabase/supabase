@@ -55,7 +55,10 @@ const StickyHeader: FC<StickyHeader> = ({ id, title, monoFont }) => {
   return (
     <h2
       ref={ref}
-      className={['text-xl font-medium text-scale-1200 mb-12', monoFont && 'font-mono'].join(' ')}
+      className={[
+        'text-xl font-medium text-scale-1200 mb-12 max-w-xl',
+        monoFont && 'font-mono',
+      ].join(' ')}
     >
       {title}
     </h2>
