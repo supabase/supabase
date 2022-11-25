@@ -10,14 +10,11 @@ import prettier from 'prettier'
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
 
-  const guidesPages = await globby(['docs/*.mdx', 'docs/guides/**/*.mdx', 'docs/handbook/**/*.mdx'])
-
-  const rawReferencePages = await globby([
+  const rawPages = await globby([
     // guides
     'docs/*.mdx',
     '!docs/404.mdx',
-    'docs/guides/**/*.mdx',
-    'docs/handbook/**/*.mdx',
+    'pages/**/*.mdx',
     // reference
     'docs/reference/*.mdx',
     'docs/reference/javascript/*.mdx',
@@ -41,7 +38,7 @@ async function generate() {
     'docs/reference/auth/generated/*.mdx',
   ])
 
-  const pages = rawReferencePages.map((x) => {
+  const pages = rawPages.map((x) => {
     let string = x
     string = string.replace('/generated', '')
     string = string.replace('.mdx', '')
@@ -58,9 +55,11 @@ async function generate() {
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         ${pages
           .map((path) => {
+            // fix homepage
+            path = path.replace('pages/index', '')
             return `
               <url>
-                  <loc>${`https://supabase.com/${path}`}</loc>
+                  <loc>${`https://supabase.com/${path.replace('pages/', 'docs/')}`}</loc>
                   <changefreq>weekly</changefreq>
                   <changefreq>0.5</changefreq>
               </url>

@@ -1,12 +1,9 @@
 import { GoTrueClient, User } from '@supabase/gotrue-js'
 
-export const GOTRUE_URL =
-  process.env.NEXT_PUBLIC_GOTRUE_URL || `${process.env.SUPABASE_URL}/auth/v1`
-
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 
 export const auth = new GoTrueClient({
-  url: GOTRUE_URL,
+  url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: true,
 })
@@ -39,4 +36,17 @@ export const getIdentity = (gotrueUser: User) => {
   } catch (err) {
     return { identity: null, error: err }
   }
+}
+
+// NOTE: do not use any imports in this function,
+// as it is use standalone in the documents head
+export const getReturnToPath = (fallback = '/projects') => {
+  const searchParams = new URLSearchParams(location.search)
+  let returnTo = searchParams.get('returnTo') ?? fallback
+
+  searchParams.delete('returnTo')
+
+  const remainingSearchParams = searchParams.toString()
+
+  return returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
 }

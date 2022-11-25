@@ -9,7 +9,7 @@ export default function LinkCard({
 }: {
   title: string
   description: string
-  icon: ReactElement
+  icon: any
   link: string
 }) {
   return (

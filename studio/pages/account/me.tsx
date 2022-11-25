@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { IconArrowRight, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { Button, IconArrowRight, IconMoon, IconSun, Input, Listbox } from 'ui'
 
 import { Session } from '@supabase/supabase-js'
 import { AccountLayout } from 'components/layouts'
@@ -60,45 +60,24 @@ const ProfileCard = observer(() => {
   const [session, setSession] = useState<Session | null>(null)
 
   useEffect(() => {
+    let cancel = false
     ;(async () => {
       const {
         data: { session },
       } = await auth.getSession()
-
-      if (session) {
-        setSession(session)
-      }
+      if (session && !cancel) setSession(session)
     })()
+
+    return () => {
+      cancel = true
+    }
   }, [])
 
   return (
     <article className="max-w-4xl p-4">
       <section>
-        <Profile />
+        <Profile session={session} />
       </section>
-
-      {session?.user.app_metadata.provider === 'email' && (
-        <section>
-          <Panel
-            title={
-              <h5 key="panel-title" className="mb-0">
-                Password
-              </h5>
-            }
-          >
-            <Panel.Content>
-              <div>
-                You can change your password on the{' '}
-                <Link href="/reset-password">
-                  <a className="text-blue-1000 hover:text-blue-1100 transition">
-                    password reset page <IconArrowRight width={16} height={16} className="inline" />
-                  </a>
-                </Link>
-              </div>
-            </Panel.Content>
-          </Panel>
-        </section>
-      )}
 
       <section>
         {/* @ts-ignore */}
@@ -127,7 +106,7 @@ const ProfileCard = observer(() => {
   )
 })
 
-const Profile = observer(() => {
+const Profile = observer(({ session }: any) => {
   const { ui } = useStore()
 
   return (
@@ -154,6 +133,22 @@ const Profile = observer(() => {
             layout="horizontal"
             value={ui.profile?.primary_email ?? ''}
           />
+          {session?.user.app_metadata.provider === 'email' && (
+            <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4">
+              <div className="flex flex-col space-y-2 col-span-4 ">
+                <p className="text-scale-1100 break-all">Password</p>
+              </div>
+              <div className="col-span-8">
+                <Link href="/reset-password">
+                  <a>
+                    <Button type="default" size="medium">
+                      Reset password
+                    </Button>
+                  </a>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </Panel.Content>
     </Panel>
