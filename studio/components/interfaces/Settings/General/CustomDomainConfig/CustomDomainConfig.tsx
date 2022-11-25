@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle } from 'ui'
 
-import { useParams } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import Panel from 'components/ui/Panel'
@@ -13,10 +13,13 @@ import CustomDomainVerify from './CustomDomainVerify'
 import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 const CustomDomainConfig = () => {
+  const { ui } = useStore()
   const { ref } = useParams()
 
+  const tier = ui.selectedProject?.subscription_tier
   const { isLoading: isSettingsLoading, data: settings } = useProjectSettingsQuery({
     projectRef: ref,
   })
@@ -49,7 +52,11 @@ const CustomDomainConfig = () => {
                 icon={<IconAlertCircle size={18} strokeWidth={1.5} />}
                 primaryText="Custom domains are a Pro plan add-on"
                 projectRef={ref as string}
-                secondaryText="To configure a custom domain for your project, please upgrade to a Pro plan"
+                secondaryText={
+                  tier === PRICING_TIER_PRODUCT_IDS.FREE
+                    ? 'To configure a custom domain for your project, please upgrade to the Pro plan and purchase the add-on'
+                    : 'To configure a custom domain for your project, please purchase the add-on'
+                }
               />
             </Panel.Content>
           )}
