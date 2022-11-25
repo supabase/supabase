@@ -91,3 +91,39 @@ export const formatPITROptions = (addons: DatabaseAddon[]) => {
   if (pitrOptions.length === 0) return []
   else return [noPITROption].concat(pitrOptions)
 }
+
+export const formatCustomDomainOptions = (addons: DatabaseAddon[]) => {
+  const customDomainOrder = ['addon_custom_domains']
+  const noCustomDomainOption: DatabaseAddon = {
+    id: undefined,
+    name: 'Disable Custom Domains',
+    metadata: {
+      default_price_id: undefined,
+      supabase_prod_id: 'addon_custom_domains_disabled',
+      features: '',
+    },
+    prices: [
+      {
+        id: undefined,
+        currency: 'usd',
+        recurring: {
+          interval: 'month',
+          usage_type: 'licensed',
+          interval_count: 1,
+          aggregate_usage: null,
+          trial_period_days: null,
+        },
+        unit_amount: 0,
+      },
+    ],
+  }
+
+  const customDomainOptions = customDomainOrder
+    .map((id: string) => {
+      return addons.find((option) => option.metadata.supabase_prod_id === id)
+    })
+    .filter((option) => option !== undefined) as DatabaseAddon[]
+
+  if (customDomainOptions.length === 0) return []
+  else return [noCustomDomainOption].concat(customDomainOptions)
+}
