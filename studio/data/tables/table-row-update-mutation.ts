@@ -9,16 +9,18 @@ export type TableRowUpdateVariables = {
   table: SupaTable
   configuration: { identifiers: any }
   payload: any
+  enumArrayColumns: string[]
 }
 
 export function getTableRowUpdateSql({
   table,
   configuration,
   payload,
-}: Pick<TableRowUpdateVariables, 'table' | 'payload' | 'configuration'>) {
+  enumArrayColumns
+}: Pick<TableRowUpdateVariables, 'table' | 'payload' | 'configuration' | 'enumArrayColumns'>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .update(payload, { returning: true })
+    .update(payload,{ returning: true, enumArrayColumns })
     .match(configuration.identifiers)
     .toSql()
 }
@@ -29,8 +31,9 @@ export async function updateTableRow({
   table,
   payload,
   configuration,
+  enumArrayColumns
 }: TableRowUpdateVariables) {
-  const sql = getTableRowUpdateSql({ table, configuration, payload })
+  const sql = getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns })
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 

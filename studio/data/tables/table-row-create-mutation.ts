@@ -8,15 +8,17 @@ export type TableRowCreateVariables = {
   connectionString?: string
   table: SupaTable
   payload: any
+  enumArrayColumns: string[]
 }
 
 export function getTableRowCreateSql({
   table,
   payload,
-}: Pick<TableRowCreateVariables, 'table' | 'payload'>) {
+  enumArrayColumns
+}: Pick<TableRowCreateVariables, 'table' | 'payload' | 'enumArrayColumns'>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .insert([payload], { returning: true })
+    .insert([payload],{ returning: true, enumArrayColumns })
     .toSql()
 }
 
@@ -25,8 +27,9 @@ export async function createTableRow({
   connectionString,
   table,
   payload,
+  enumArrayColumns
 }: TableRowCreateVariables) {
-  const sql = getTableRowCreateSql({ table, payload })
+  const sql = getTableRowCreateSql({ table, payload, enumArrayColumns })
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 
