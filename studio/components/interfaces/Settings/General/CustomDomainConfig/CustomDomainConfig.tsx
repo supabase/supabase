@@ -54,7 +54,7 @@ const CustomDomainConfig = () => {
                 projectRef={ref as string}
                 secondaryText={
                   tier === PRICING_TIER_PRODUCT_IDS.FREE
-                    ? 'To configure a custom domain for your project, please upgrade to the Pro plan and purchase the add-on'
+                    ? 'To configure a custom domain for your project, please upgrade to the Pro plan with the custom domains add-on selected'
                     : 'To configure a custom domain for your project, please purchase the add-on'
                 }
               />
