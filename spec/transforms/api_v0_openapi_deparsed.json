@@ -31,6 +31,18 @@
                       },
                       "created_at": {
                         "type": "string"
+                      },
+                      "database": {
+                        "type": "object",
+                        "properties": {
+                          "host": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["host", "version"]
                       }
                     },
                     "required": ["id", "organization_id", "name", "region", "created_at"]
@@ -82,6 +94,7 @@
                       "ap-southeast-2",
                       "eu-west-1",
                       "eu-west-2",
+                      "eu-west-3",
                       "eu-central-1",
                       "ca-central-1",
                       "ap-south-1",
@@ -119,6 +132,18 @@
                     },
                     "created_at": {
                       "type": "string"
+                    },
+                    "database": {
+                      "type": "object",
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["host", "version"]
                     }
                   },
                   "required": ["id", "organization_id", "name", "region", "created_at"]
@@ -1482,6 +1507,18 @@
       }
     },
     "schemas": {
+      "DatabaseResponse": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": ["host", "version"]
+      },
       "ProjectResponse": {
         "type": "object",
         "properties": {
@@ -1499,6 +1536,18 @@
           },
           "created_at": {
             "type": "string"
+          },
+          "database": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": ["host", "version"]
           }
         },
         "required": ["id", "organization_id", "name", "region", "created_at"]
@@ -1530,6 +1579,7 @@
               "ap-southeast-2",
               "eu-west-1",
               "eu-west-2",
+              "eu-west-3",
               "eu-central-1",
               "ca-central-1",
               "ap-south-1",

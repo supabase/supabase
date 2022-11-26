@@ -694,6 +694,11 @@
   "components": {
     "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
     "schemas": {
+      "DatabaseResponse": {
+        "type": "object",
+        "properties": { "host": { "type": "string" }, "version": { "type": "string" } },
+        "required": ["host", "version"]
+      },
       "ProjectResponse": {
         "type": "object",
         "properties": {
@@ -701,7 +706,8 @@
           "organization_id": { "type": "string" },
           "name": { "type": "string" },
           "region": { "type": "string" },
-          "created_at": { "type": "string" }
+          "created_at": { "type": "string" },
+          "database": { "$ref": "#/components/schemas/DatabaseResponse" }
         },
         "required": ["id", "organization_id", "name", "region", "created_at"]
       },
@@ -723,6 +729,7 @@
               "ap-southeast-2",
               "eu-west-1",
               "eu-west-2",
+              "eu-west-3",
               "eu-central-1",
               "ca-central-1",
               "ap-south-1",

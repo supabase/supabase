@@ -167,11 +167,15 @@ ${commentObject?.text || ''}
 type v3OperationWithPath = OpenAPIV3.OperationObject & {
   path: string
 }
-type enrichedOperation = OpenAPIV3.OperationObject & {
+
+export type enrichedOperation = OpenAPIV3.OperationObject & {
   path: string
   fullPath: string
   operationId: string
+  operation: string
+  responseList: []
 }
+
 export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
   const specLayout = spec.tags || []
   const operations: enrichedOperation[] = []

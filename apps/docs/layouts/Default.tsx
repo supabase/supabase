@@ -19,8 +19,6 @@ interface Props {
 const Layout: FC<Props> = ({ meta, children, toc }) => {
   const { asPath } = useRouter()
 
-  console.log('asPath', asPath)
-
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
