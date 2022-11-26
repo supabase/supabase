@@ -74,19 +74,19 @@ const SideNav = () => {
     [
       {
         label: 'Home',
-        icon: 'home',
-        href: '',
+        icon: '/img/icons/menu/home',
+        href: '/',
         level: 'home',
       },
       {
         label: 'Getting started',
-        icon: 'getting-started',
+        icon: '/img/icons/menu/getting-started',
         href: '/getting-started',
         level: 'gettingstarted',
       },
       {
         label: 'Tutorials',
-        icon: 'tutorials',
+        icon: '/img/icons/menu/tutorials',
         href: '/guides/tutorials',
         level: 'tutorials',
       },
@@ -94,101 +94,95 @@ const SideNav = () => {
     [
       {
         label: 'Database',
-        icon: 'database',
+        icon: '/img/icons/menu/database',
         href: '/guides/database',
         level: 'database',
       },
       {
         label: 'Auth',
-        icon: 'auth',
+        icon: '/img/icons/menu/auth',
         href: '/guides/auth',
         level: 'auth',
       },
       {
         label: 'Storage',
-        icon: 'storage',
+        icon: '/img/icons/menu/storage',
         href: '/guides/storage',
         level: 'storage',
       },
       {
         label: 'Realtime',
-        icon: 'realtime',
+        icon: '/img/icons/menu/realtime',
         href: '/guides/realtime',
         level: 'realtime',
       },
       {
         label: 'Edge Functions',
-        icon: 'functions',
+        icon: '/img/icons/menu/functions',
         href: '/guides/functions',
         level: 'functions',
       },
     ],
     [
+      // {
+      //   label: 'API Reference',
+      //   icon: '/img/icons/menu/reference',
+      //   href: '/reference',
+      //   level: 'reference',
+      // },
       {
-        label: 'API Reference',
-        icon: 'reference',
-        href: '/reference',
-        level: 'reference',
+        label: 'Platform',
+        icon: '/img/icons/menu/platform',
+        href: '/guides/hosting/platform',
+        level: 'platform',
       },
       {
         label: 'Integrations',
-        icon: 'integrations',
+        icon: '/img/icons/menu/integrations',
         href: '/guides/integrations',
         level: 'integrations',
-      },
-      {
-        label: 'Platform',
-        icon: 'platform',
-        href: '/guides/hosting/platform',
-        level: 'platform',
       },
     ],
     [
       {
-        label: 'Javascript Client',
-        icon: 'api.svg',
+        label: 'Client Libraries Reference',
+      },
+      {
+        label: 'JavaScript Client',
+        icon: '/img/icons/javascript-icon',
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
       {
-        label: 'supabase-py',
-        icon: 'api.svg',
+        label: 'Python Client Library',
+        icon: '/img/icons/python-icon',
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
       {
-        label: 'supabase-dart',
-        icon: 'api.svg',
+        label: 'Dart Client Library',
+        icon: '/img/icons/dart-icon',
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
+      },
+      {
+        label: 'Tools Reference',
       },
       {
         label: 'Mangement API',
-        icon: 'api.svg',
+        icon: '/img/icons/api-icon',
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
       {
         label: 'CLI',
-        icon: 'api.svg',
+        icon: '/img/icons/cli-icon',
         href: '/new/reference/cli/start',
         level: 'reference_javascript',
       },
       {
-        label: 'Auth server',
-        icon: 'api.svg',
-        href: '/new/reference/javascript/start',
-        level: 'reference_javascript',
-      },
-      {
-        label: 'Storage server',
-        icon: 'api.svg',
-        href: '/new/reference/javascript/start',
-        level: 'reference_javascript',
-      },
-      {
-        label: 'Realtime server',
-        icon: 'api.svg',
+        label: 'Self hosting server',
+        icon: '/img/icons/menu/platform',
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
@@ -217,26 +211,38 @@ const SideNav = () => {
                 )}
                 <div className="flex flex-col gap-3" key={`section-${sectionIndex}`}>
                   {section.map((link) => {
-                    return (
-                      <Link href={link.href} passHref>
-                        <a key={link.label}>
-                          <li
-                            className={[
-                              'group flex items-center gap-3',
-                              'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
-                            ].join(' ')}
-                          >
-                            <img
-                              src={`${router.basePath}/img/icons/menu/${
-                                isDarkMode ? link.icon : `${link.icon}-light`
-                              }.svg`}
-                              className="opacity-75 w-4.5 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
-                            />
-                            {link.label}
-                          </li>
-                        </a>
-                      </Link>
-                    )
+                    if (!link.href) {
+                      return (
+                        <span className="font-mono uppercase text-xs text-scale-900">
+                          {link.label}
+                        </span>
+                      )
+                    } else {
+                      return (
+                        <Link href={link.href} passHref>
+                          <a key={link.label}>
+                            <li
+                              className={[
+                                'group flex items-center gap-3',
+                                'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
+                              ].join(' ')}
+                            >
+                              <img
+                                src={`${router.basePath}${
+                                  !link.icon.includes('png')
+                                    ? link.icon
+                                    : isDarkMode
+                                    ? link.icon
+                                    : `${link.icon}-light`
+                                }${!link.icon.includes('png') ? '.svg' : ''}`}
+                                className="opacity-75 w-4 h-4 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
+                              />
+                              {link.label}
+                            </li>
+                          </a>
+                        </Link>
+                      )
+                    }
                   })}
                 </div>
               </>

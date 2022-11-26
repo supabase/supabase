@@ -26,14 +26,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
   return (
     <div className="flex my-16">
       <div className="w-full">
-        <div
-          className={[
-            'flex flex-col mx-auto',
-            process.env.NEXT_PUBLIC_EXPERIMENTAL_REF === 'true' ? 'max-w-7xl' : 'max-w-5xl',
-          ].join(' ')}
-        >
-          {props.children}
-        </div>
+        <div className={['flex flex-col mx-auto', 'max-w-7xl'].join(' ')}>{props.children}</div>
       </div>
     </div>
   )

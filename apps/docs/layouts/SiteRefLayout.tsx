@@ -41,7 +41,7 @@ const SiteRefLayout = ({ children }) => {
                     <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
                   </a>
                 </Link>
-                {router.asPath.includes('/new/reference/') && <RefSwitcher />}
+                {/* {router.asPath.includes('/new/reference/') && <RefSwitcher />} */}
               </div>
               <div className="h-4 bg-scale-200 w-full"></div>
               <div className="bg-gradient-to-b from-scale-200 to-transparent h-4 w-full"></div>
@@ -57,7 +57,7 @@ const SiteRefLayout = ({ children }) => {
               <div className="sticky top-0 z-10">
                 <TopNavBarRef />
               </div>
-              <div className="grow px-5 max-w-7xl mx-auto">
+              <div className="grow px-5 max-w-7xl mx-auto py-16">
                 {children}
                 <hr className="border-scale-400  mt-32"></hr>
                 <div className="flex flex-row gap-3 mt-6">

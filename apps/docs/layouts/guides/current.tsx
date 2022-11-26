@@ -82,7 +82,7 @@ const Layout: FC<Props> = (props) => {
         }}
       />
 
-      <div className={['grid gap-12 grid-cols-12 relative'].join(' ')}>
+      <div className={['grid grid-cols-12 relative'].join(' ')}>
         <div
           className={[
             'relative',
@@ -97,7 +97,7 @@ const Layout: FC<Props> = (props) => {
             ref={articleRef}
             className={`${
               props.meta?.hide_table_of_contents || !hasTableOfContents ? '' : ''
-            } prose dark:prose-dark mt-8 `}
+            } prose dark:prose-dark max-w-none`}
           >
             <h1>{props.meta.title}</h1>
             <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
