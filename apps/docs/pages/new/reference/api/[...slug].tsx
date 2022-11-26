@@ -1,4 +1,4 @@
-import specFile from '~/../../spec/transforms/storage_v0_openapi_deparsed.json' assert { type: 'json' }
+import specFile from '~/../../spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
 import { Tabs } from '~/../../packages/ui'
 
@@ -31,10 +31,10 @@ export type ApiParameter = {
     example: string
   }
 }
-
 // @ts-ignore
 const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
 
+console.log({ generatedSpec })
 export default function Config() {
   return (
     <RefSubLayout>
@@ -59,7 +59,9 @@ export default function Config() {
                       <RefSubLayout.Details>
                         <div className="mt-4">
                           <code className="text-md flex gap-4 text-md text-scale-900 break-all">
-                            <span className="uppercase">{operation.operation}</span>
+                            <span className="uppercase whitespace-nowrap	">
+                              {operation.operation}
+                            </span>
                             {operation.fullPath}
                           </code>
                         </div>
@@ -75,22 +77,27 @@ export default function Config() {
                                     .filter((parameter: any) => parameter.in === 'path')
                                     .map((parameter: any) => (
                                       <li className="mt-8 border-b pb-6">
-                                        <div className="flex gap-4 items-center">
-                                          <span className="font-bold">{parameter.name}</span>
-                                          <span className="font-mono text-xs break-all">
-                                            {parameter.required && (
-                                              <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-                                                REQUIRED
-                                              </div>
-                                            )}
-                                          </span>
+                                        <div>
+                                          <div className="flex gap-4 items-center">
+                                            <span className="font-bold">{parameter.name}</span>
+                                            <div className="font-mono text-xs break-all">
+                                              {parameter.required && (
+                                                <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
+                                                  REQUIRED
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                          <p className="mt-4">{parameter.description}</p>
                                         </div>
-                                        <div className="mt-4 flex gap-4 items-center">
-                                          <span>Example:</span>
-                                          <span className="font-mono text-xs break-all">
-                                            {parameter.example}
-                                          </span>
-                                        </div>
+                                        {parameter.example && (
+                                          <div className="mt-4 flex gap-4 items-center">
+                                            <span>Example:</span>
+                                            <span className="font-mono text-xs break-all">
+                                              {parameter.example}
+                                            </span>
+                                          </div>
+                                        )}
                                       </li>
                                     ))}
                               </ul>
