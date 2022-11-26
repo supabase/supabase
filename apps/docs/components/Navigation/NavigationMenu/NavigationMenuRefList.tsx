@@ -84,11 +84,11 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
         {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
-        <Link href={`${menu.parent ?? '/'}`} passHref>
+        <Link href="/" passHref>
           <a
             className={[
               'flex items-center gap-1 text-xs group mb-3',
-              'text-base transition-all duration-200 text-brand-900 hover:text-brand-1200 hover:cursor-pointer ',
+              'text-base transition-all duration-200 text-scale-1100 hover:text-brand-1200 hover:cursor-pointer ',
             ].join(' ')}
           >
             <div className="relative w-2">
@@ -96,25 +96,25 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
                 <IconChevronLeft size={10} strokeWidth={3} />
               </div>
             </div>
-            <span>Back to reference</span>
+            <span>Back to Main Menu</span>
           </a>
         </Link>
         {/* )} */}
-        {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && (
-          <div className="flex items-center gap-3 my-3">
-            <img
-              src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
-              className="w-5 rounded"
-            />
-            <h2
-              className={['font-mono text-sm text-brand-1200 ', !menu.title && 'capitalize'].join(
-                ' '
-              )}
-            >
-              supabase-js
-            </h2>
-          </div>
-        )}
+        {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
+        <div className="flex items-center gap-3 my-3">
+          <img
+            src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            className="w-5 rounded"
+          />
+          <h2
+            className={['font-mono text-sm text-brand-1200 ', !menu.title && 'capitalize'].join(
+              ' '
+            )}
+          >
+            supabase-js
+          </h2>
+        </div>
+        {/* )} */}
         <ul className="">
           <Divider />
           <SideMenuTitle title="Database" />
