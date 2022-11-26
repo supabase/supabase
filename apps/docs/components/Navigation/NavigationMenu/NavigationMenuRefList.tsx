@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { IconChevronLeft } from 'ui'
+import { IconChevronLeft, IconCommand, IconSearch } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 // @ts-expect-error
 import clientLibsCommon from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
+import { SearchButton } from '~/components/DocSearch'
 
 const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
   const router = useRouter()
@@ -82,6 +83,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
+        {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
         <Link href={`${menu.parent ?? '/'}`} passHref>
           <a
             className={[
@@ -97,17 +99,23 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
             <span>Back to reference</span>
           </a>
         </Link>
-        <div className="flex items-center gap-3 my-3">
-          <img
-            src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
-            className="w-5 rounded"
-          />
-
-          <h2 className={['text-scale-1200 ', !menu.title && 'capitalize'].join(' ')}>
-            {menu.title ?? currentLevel}
-          </h2>
-        </div>
-        <ul>
+        {/* )} */}
+        {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && (
+          <div className="flex items-center gap-3 my-3">
+            <img
+              src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+              className="w-5 rounded"
+            />
+            <h2
+              className={['font-mono text-sm text-brand-1200 ', !menu.title && 'capitalize'].join(
+                ' '
+              )}
+            >
+              supabase-js
+            </h2>
+          </div>
+        )}
+        <ul className="">
           <Divider />
           <SideMenuTitle title="Database" />
 

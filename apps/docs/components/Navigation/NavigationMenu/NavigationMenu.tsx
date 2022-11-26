@@ -142,6 +142,56 @@ const SideNav = () => {
         level: 'platform',
       },
     ],
+    [
+      {
+        label: 'Javascript Client',
+        icon: 'api.svg',
+        href: '/new/reference/javascript/start',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'supabase-py',
+        icon: 'api.svg',
+        href: '/new/reference/javascript/start',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'supabase-dart',
+        icon: 'api.svg',
+        href: '/new/reference/javascript/start',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'Mangement API',
+        icon: 'api.svg',
+        href: '/new/reference/javascript/start',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'CLI',
+        icon: 'api.svg',
+        href: '/new/reference/cli/start',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'Auth server',
+        icon: 'api.svg',
+        href: '/new/reference/javascript/start',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'Storage server',
+        icon: 'api.svg',
+        href: '/new/reference/javascript/start',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'Realtime server',
+        icon: 'api.svg',
+        href: '/new/reference/javascript/start',
+        level: 'reference_javascript',
+      },
+    ],
   ]
 
   return (

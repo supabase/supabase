@@ -18,7 +18,14 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
   return (
     <div className="flex my-16">
       <div className="w-full">
-        <div className="flex flex-col gap-32 mx-auto max-w-5xl">{props.children}</div>
+        <div
+          className={[
+            'flex flex-col mx-auto',
+            process.env.NEXT_PUBLIC_EXPERIMENTAL_REF === 'true' ? 'max-w-7xl' : 'max-w-5xl',
+          ].join(' ')}
+        >
+          {props.children}
+        </div>
       </div>
     </div>
   )
@@ -26,7 +33,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 
 const Section: FC<ISectionContainer> = (props) => {
   return (
-    <article key={props.id} id={props.id}>
+    <article key={props.id} id={props.id} className="py-16">
       <header className="not-prose mb-12">
         <h2
           className={['text-xl font-medium text-scale-1200', props.monoFont && 'font-mono'].join(
