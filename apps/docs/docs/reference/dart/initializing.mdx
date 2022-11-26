@@ -47,7 +47,7 @@ Future<void> main() async {
 
 ### Call `initialize()`multiple times
 
-You can initialize Supabase multiple times in your app. When doing so, remember to call `dispose()` before every time you initialize again.
+You can initialize Supabase multiple times in your app. When doing so, call `dispose()` each time before you initialize again.
 
 ```dart
 Supabase.instance.dispose();
