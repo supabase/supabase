@@ -125,7 +125,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
                 <IconChevronLeft size={10} strokeWidth={3} />
               </div>
             </div>
-            <span>Back to reference</span>
+            <span>Back to menu</span>
           </a>
         </Link>
         <div className="flex items-center gap-3 my-3">

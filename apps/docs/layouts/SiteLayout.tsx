@@ -4,8 +4,9 @@ import { useRouter } from 'next/router'
 import Footer from '~/components/Footer'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import SiteRefLayout from './SiteRefLayout'
 
-const Layout = ({ children }) => {
+const Layout = (props) => {
   const router = useRouter()
 
   useEffect(() => {
@@ -19,7 +20,13 @@ const Layout = ({ children }) => {
   }, [])
 
   if (process.env.NEXT_PUBLIC_NEW_DOCS !== 'true') {
-    return <>{children}</>
+    return <>{props.children}</>
+  }
+
+  return SiteRefLayout(props)
+
+  if (process.env.NEXT_PUBLIC_EXPERIMENTAL_REF && router.asPath.includes('/reference/')) {
+    return SiteRefLayout(props)
   }
 
   return (
@@ -37,7 +44,7 @@ const Layout = ({ children }) => {
             <NavigationMenu />
           </div>
           <div className="col-span-9">
-            {children}
+            {props.children}
             <hr className="border-scale-400  mt-32"></hr>
             <div className="flex flex-row gap-3 mt-6">
               <span className="text-xs text-scale-900">Supabase 2022</span>

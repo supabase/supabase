@@ -510,7 +510,7 @@ export const reference_javascript = {
 export const reference_cli = {
   icon: '/img/icons/cli-icon.svg',
   title: 'Supabase CLI',
-  parent: '/reference',
+  parent: '/',
   items: [
     {
       name: 'Getting Started',
@@ -561,3 +561,71 @@ export const reference_cli = {
 //   'reference/auth': AuthServerNav,
 //   'reference/storage': StorageServerNav,
 // ]
+
+export const references = [
+  {
+    label: 'Client libraries',
+    items: [
+      {
+        label: 'supabase-js',
+        versions: ['v2', 'v1'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/javascript-icon.svg',
+        url: '/new/reference/javascript/start',
+      },
+      {
+        label: 'supabase-py',
+        description: 'something about the reference',
+        icon: '/docs/img/icons/python-icon.svg',
+        url: '/new/reference/python/start',
+      },
+      {
+        label: 'supabase-dart',
+        versions: ['v1', 'v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/dart-icon.svg',
+        url: '/new/reference/dart/start',
+      },
+    ],
+  },
+  {
+    label: 'Platform Tools',
+    items: [
+      {
+        label: 'CLI',
+        description: 'something about the reference',
+        icon: '/docs/img/icons/cli-icon.svg',
+        url: '/new/reference/cli/start',
+      },
+      {
+        label: 'Management API',
+        description: 'something about the reference',
+        icon: '/docs/img/icons/api-icon.svg',
+        url: '/new/reference/management-api/start',
+      },
+    ],
+  },
+  {
+    label: 'Self Hosting',
+    items: [
+      {
+        label: 'Auth server',
+        description: 'something about the reference',
+        icon: '/docs/img/icons/menu/auth.svg',
+        url: '/reference/auth/start',
+      },
+      {
+        label: 'Storage server',
+        description: 'something about the reference',
+        icon: '/docs/img/icons/menu/storage.svg',
+        url: '/reference/storage/start',
+      },
+      {
+        label: 'Realtime server',
+        description: 'something about the reference',
+        icon: '/docs/img/icons/menu/realtime.svg',
+        url: '/reference/realtime/start',
+      },
+    ],
+  },
+]
