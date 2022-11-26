@@ -1,7 +1,9 @@
 import Layout from '~/layouts/DefaultLayout'
 import Link from 'next/link'
+// import { useTheme } from '~/components/Providers'
 import { GlassPanel } from 'ui'
-const { isDarkMode } = useTheme()
+
+{/* // export const { isDarkMode } = useTheme() */}
 
 export const meta = {
   title: 'Auth',
@@ -25,7 +27,7 @@ export const meta = {
             header="/docs/img/cards/sample-card-header-4.svg"
             span="col-span-6"
             background={false}
-            isDarkMode={isDarkMode}
+            //* isDarkMode={isDarkMode} 
           >
             {item.description}
           </GlassPanel>
