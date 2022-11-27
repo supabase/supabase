@@ -29,7 +29,7 @@ const examples = [
   },
   {
     name: 'Working with Supabase Storage',
-    description: 'An example on reading a file from Supbase Storage.',
+    description: 'An example on reading a file from Supabase Storage.',
     href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
   },
   {
@@ -37,6 +37,11 @@ const examples = [
     description:
       'Generate Open Graph images with Deno and Supabase Edge Functions, no framework needed.',
     href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/opengraph',
+  },
+  {
+    name: 'OG Image Generation & Storage CDN Caching',
+    description: 'Cache generated images with Supabase Storage CDN.',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/og-image-with-storage-cdn',
   },
   {
     name: 'Get User Location',

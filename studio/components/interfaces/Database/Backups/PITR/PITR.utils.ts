@@ -1,6 +1,15 @@
+import { StripeProduct } from 'components/interfaces/Billing'
 import dayjs from 'dayjs'
 import { ALL_TIMEZONES } from './PITR.constants'
 import { Time, Timezone } from './PITR.types'
+
+export const getPITRRetentionDuration = (addons: StripeProduct[]) => {
+  const pitrAddon = addons.find((addon) => addon.supabase_prod_id.startsWith('addon_pitr'))
+  if (!pitrAddon) return 0
+
+  const daysString = pitrAddon.supabase_prod_id.split('_')[2]
+  return Number(daysString.split('days')[0])
+}
 
 export const getDatesBetweenRange = (start: Date, end: Date) => {
   const arr = []

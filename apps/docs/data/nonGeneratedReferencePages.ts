@@ -21,6 +21,8 @@ const nonGeneratedReferencePages = [
   'docs/reference/auth/release-notes',
   'docs/reference/storage',
   'docs/reference/storage/release-notes',
+  'docs/reference/realtime',
+  'docs/reference/realtime/release-notes',
 ]
 
 export default nonGeneratedReferencePages

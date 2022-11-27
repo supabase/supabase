@@ -14,6 +14,7 @@
     "prettier:write": "prettier --write ."
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.4.4",
     "@headlessui/react": "^1.4.1",
     "@monaco-editor/react": "^4.3.1",
     "@next/bundle-analyzer": "^12.0.4",
@@ -27,7 +28,9 @@
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/shared-types": "^0.1.29",
-    "@supabase/supabase-js": "^2.0.0",
+    "@supabase/supabase-js": "^2.1.1",
+    "@tanstack/react-query": "^4.16.1",
+    "@tanstack/react-query-devtools": "^4.16.1",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",
     "awesome-debounce-promise": "^2.1.0",
@@ -77,6 +80,7 @@
     "sass": "^1.43.4",
     "scheduler": "^0.20.2",
     "semver": "^6.3.0",
+    "shared-data": "*",
     "sqlstring": "^2.3.2",
     "swr": "^1.2.1",
     "ui": "*",
@@ -84,6 +88,7 @@
     "uniforms-bridge-json-schema": "^3.6.2",
     "uuid": "^8.3.2",
     "yup": "^0.32.11",
+    "yup-password": "^0.2.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
@@ -113,6 +118,7 @@
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
     "@types/react-window-infinite-loader": "^1.0.5",
+    "@types/recharts": "^1.8.23",
     "@types/semver": "^7.3.9",
     "@types/sqlstring": "^2.3.0",
     "@types/uuid": "^8.3.4",
@@ -128,6 +134,6 @@
     "storybook-dark-mode": "^1.0.4",
     "tailwindcss": "^3.0.22",
     "ts-jest": "^27.0.7",
-    "typescript": "4.3.4"
+    "typescript": "4.8.4"
   }
 }
