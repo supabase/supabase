@@ -430,8 +430,8 @@ launch week
   }
 }
 
-.flair {
-  height: 500px;
+.gradient-container {
+  min-height: 500px;
   position: relative;
   background: radial-gradient(
     circle at 50% -100%,
@@ -441,17 +441,17 @@ launch week
   );
 }
 
-.flair_mask_a {
+.flair-mask-a {
   position: absolute;
   background-color: var(--colors-brand8);
   left: 0;
   top: 0;
   width: 100%;
   height: 500px;
-  clip-path: ellipse(52% 100px at 50% 3px);
+  clip-path: ellipse(52% 135px at 50% 3px);
 }
 
-.flair_mask_b {
+.flair-mask-b {
   position: absolute;
   /* var colors-brand not working :/ */
   background-color: var(--colors-scale2);
@@ -459,44 +459,69 @@ launch week
   top: 0;
   width: 100%;
   height: 500px;
-  clip-path: ellipse(52% 100px at 50% 0px);
+  clip-path: ellipse(52% 135px at 50% 0px);
 }
 
-.testGradient {
-  margin: 0 auto;
-  width: 100%;
-  height: 200px;
-  border-bottom: 0;
-  background: radial-gradient(
-    circle at 50% -100%,
-    rgba(0, 155, 112, 1) 0%,
-    rgba(28, 28, 28, 1) 70%,
-    rgba(28, 28, 28, 1) 100%
-  );
+.orbit {
+  width: 192px;
+  height: 192px;
+  border-radius: 50%;
+  background: var(--colors-scale2) content-box;
+  border: 1px solid gray;
+  box-shadow: 0 0 0 50px var(--colors-scale2), 0 0 0 51px gray, 0 0 0 100px var(--colors-scale2),
+    0 0 0 101px gray, 0 0 0 150px var(--colors-scale2), 0 0 0 151px gray;
+  margin: auto;
   position: relative;
-  overflow: hidden;
 }
 
-.testGradient:after {
-  content: '';
+.orbit span {
   position: absolute;
-  height: 140px;
-  left: -10%;
-  right: -10%;
-  border-radius: 50%;
-  bottom: 156px;
-  background: #1c1c1c;
-  z-index: 2;
+  height: 45px;
+  width: 45px;
+  background: blue;
+  border-radius: inherit;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateX(var(--d, 0px));
 }
 
-.testGradient:before {
-  content: '';
-  position: absolute;
-  height: 138px;
-  left: -10%;
-  right: -10%;
-  border-radius: 50%;
-  bottom: 154px;
-  background: var(--colors-brand6);
-  z-index: 1;
+.planet1 {
+  --d: 96px;
+  --r: -90deg;
+}
+
+.planet2 {
+  --d: 146px;
+  --r: -137deg;
+}
+
+.planet3 {
+  --d: 196px;
+  --r: -45deg;
+}
+
+.planet4 {
+  --d: 246px;
+  --r: -110deg;
+}
+
+.radial-mask {
+  /* -webkit-mask-image: conic-gradient(
+    from 0deg at 45% 47%,
+    #ffffffff 0%,
+    #000000ff 25%,
+    #000000ff 50%,
+    #000000ff 75%,
+    #ffffffff 100%
+  );
+  mask-image: conic-gradient(
+    from 0deg at 45% 47%,
+    #ffffffff 0%,
+    #000000ff 25%,
+    #000000ff 50%,
+    #000000ff 75%,
+    #ffffffff 100%
+  ); */
+
+  -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 1), transparent);
 }
