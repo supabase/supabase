@@ -1,0 +1,109 @@
+---
+id: protocol
+title: Realtime Protocol
+description: Understanding Realtime Protocol
+sidebar_label: Protocol
+---
+
+The Realtime Protocal is a set of message formats that you send and receive from the Realtime server.
+
+## Connection
+
+In the initial message, the client sends a message specifying the features that wants to use (Broadcase, Presence, Postgres Changes).
+
+```json
+{
+   "event": "phx_join",
+   "topic": $TOPIC,
+   "payload": {
+      "config": {
+         "broadcast": {
+            "self": true
+         },
+         "presence": {
+            "key": ""
+         },
+         "postgres_changes": [
+            {
+               "event": $EVENT,
+               "schema": $SCHEMA,
+               "table": $TABLE,
+               "filter": $FILTER
+            }
+         ]
+      }
+   },
+   "ref": $REF_NUMBER
+}
+```
+
+In response, the server sends the Postgres configuration with a unique ID. With this ID, the client should route incoming changes to the appropriate callback.
+
+```json
+{
+   "event": "phx_reply",
+   "payload": {
+      "response": {
+         "postgres_changes": [
+            {
+               "id": 13399220,
+               "event": "*",
+               "filter": $FILTER,
+               "schema": $SCHEMA,
+               "table": $TABLE
+            }
+         ]
+      },
+      "status": "ok"
+   },
+   "ref": $REF_NUMBER,
+   "topic": $TOPIC
+}
+```
+
+## System messages
+
+System message are used to inform a client about the status of the Postgres subscription. The `payload.status` indicates if the subscription successful or not.
+The body of the `payload.message` can be "Subscribed to PostgreSQL" or "Subscribing to PostgreSQL failed" with subscription params.
+
+```json
+{
+   "event": "system",
+   "payload":{
+      "channel": "any",
+      "extension": "postgres_changes",
+      "message": $MESSAGE,
+      "status": "ok" | "error"
+   },
+   "ref":null,
+   "topic": $TOPIC
+}
+```
+
+## Heartbeat
+
+The heartbeat message should be sent every 60 seconds to avoid a connection timeout.
+
+```json
+{
+   "topic": "phoenix",
+   "event": "heartbeat",
+   "payload": {},
+   "ref": $REF_NUMBER
+}
+```
+
+## Access Token
+
+To update the access token, you need to send to the server a message specifying a new token in the `payload.access_token` value.
+
+```json
+{
+   "topic": $TOPIC,
+   "event": "access_token",
+   "payload":{
+      "access_token": $NEW_JWT_TOKEN
+   },
+   "ref": $REF_NUMBER
+}
+```
