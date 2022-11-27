@@ -9,6 +9,9 @@ import PreLaunchTeaser from '~/components/LaunchWeek/PreLaunchTeaser'
 import ScheduleInfo from '~/components/LaunchWeek/ScheduleInfo'
 import { WeekDayProps } from '~/components/LaunchWeek/types'
 
+import { ArrowRightIcon } from '@heroicons/react/outline'
+import { Badge, Modal } from 'ui'
+
 const days = _days as WeekDayProps[]
 
 export default function launchweek() {
@@ -63,11 +66,58 @@ export default function launchweek() {
             </button>
           </form>
         </SectionContainer>
-        <div className="flair">
-          <div className="flair_mask_a"></div>
-          <div className="flair_mask_b"></div>
+        <div className="gradient-container">
+          <div className="flair-mask-a"></div>
+          <div className="flair-mask-b"></div>
+          <div className="flex justify-between pt-80 mx-6 md:mx-16 lg:mx-40 overflow-hidden">
+            <div className="flex-1 relative overflow-hidden radial-mask">
+              <div className="orbit absolute top-[75%]">
+                <span className="planet1"></span>
+                <span className="planet2"></span>
+                <span className="planet3"></span>
+                <span className="planet4"></span>
+              </div>
+            </div>
+            <div className="flex flex-col flex-1">
+              <Badge
+                color="brand"
+                size="large"
+                className="text-center flex justify-center mb-6 w-40"
+              >
+                <p className="flex items-center gap-2 p-1">Currently happening</p>
+              </Badge>
+              <h2 className="text-scale-1200 text-5xl mb-6">See creators using Supabase</h2>
+              <p className="text-scale-800 text-base md:max-w-xl mb-16">
+                Description about Content Storm, something to tie it up with Launch Week
+              </p>
+
+              <h3 className="text-scale-1200 text-sm mb-2">Coding Garden</h3>
+              <p className="text-scale-800 text-base md:max-w-[60%] mb-2">
+                If needed this is a short description about the type of content this is linking to.
+              </p>
+              <div className="flex items-center">
+                <a href="www.google.com" className="text-bas text-brand-1100 mr-3">
+                  Livestreaming Typescript
+                </a>{' '}
+                <div className="w-4 text-brand-1100">
+                  <ArrowRightIcon />
+                </div>
+              </div>
+            </div>
+            {/* <div className="dark:bg-scale-300 flex flex-col gap-4 overflow-hidden rounded-md border bg-white shadow-sm md:max-w-lg">
+              <div className="flex flex-col gap-3 p-10 pb-0">
+                <h3 className="text-scale-1200 text-lg">You can still win a lucky gold ticket</h3>
+                <p className="text-scale-1100 text-sm">
+                  A few of the lucky attendees for Launch Week will get a limited edition Supabase
+                  goodie bag.
+                </p>
+              </div>
+              <div className="px-10"></div>
+              <img src="/images/launchweek/gold-ticket.svg" className="w-full" />
+            </div> */}
+          </div>
         </div>
-        <SectionContainer
+        {/* <SectionContainer
           className={[
             'grid flex-col gap-24 lg:gap-16',
             !shippingHasStarted && 'lg:grid-cols-2 ',
@@ -89,7 +139,7 @@ export default function launchweek() {
         </SectionContainer>
         <SectionContainer>
           <HackathonSection />
-        </SectionContainer>
+        </SectionContainer> */}
       </DefaultLayout>
     </>
   )
