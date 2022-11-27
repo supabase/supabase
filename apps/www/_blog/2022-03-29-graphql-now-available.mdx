@@ -67,9 +67,6 @@ create table "Account"(
     "createdAt" timestamp not null,
     "updatedAt" timestamp not null
 );
-
--- Rebuild the GraphQL Schema Cache
-select graphql.rebuild_schema();
 ```
 
 Translates to the GraphQL base type

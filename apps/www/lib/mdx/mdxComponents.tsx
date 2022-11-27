@@ -4,6 +4,7 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import ImageGrid from '~/components/ImageGrid'
 import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
+import InlineCodeTag from '~/components/InlineCode'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -47,6 +48,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       }
       return <img {...props} />
     },
+    code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
   }
 
   return components

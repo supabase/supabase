@@ -836,7 +836,6 @@ pages:
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -855,7 +854,6 @@ pages:
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -945,7 +943,6 @@ pages:
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1020,6 +1017,24 @@ pages:
               .storage
               .from('avatars')
               .createSignedUrl('avatar1.png', 60);
+          ```
+
+  storage.from.createSignedUrls():
+    title: 'from.createSignedUrls()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - name: Create Signed URLs
+        isSpotlight: true
+        dart: |
+          ```dart
+            final List<String> signedUrls = await supabase
+              .storage
+              .from('avatars')
+              .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60);
           ```
 
   storage.from.getPublicUrl():
@@ -1100,9 +1115,14 @@ pages:
           ```
   Using Modifiers:
     description: |
-      Modifiers can be used on `select()` queries. 
+      Filters work on the row level—they allow you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to
+      change the format of the response (e.g., returning a CSV string).
 
-      If a Stored Procedure returns a table response, you can also apply modifiers to the `rpc()` function.
+      Modifiers must be specified after filters. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
 
   limit():
     description: |
@@ -1180,13 +1200,17 @@ pages:
 
   Using Filters:
     description: |
+      Filters allow you to only return rows that match certain conditions.
+
       Filters can be used on `select()`, `update()`, and `delete()` queries. 
 
-      If a Stored Procedure returns a table response, you can also apply filters.
+      If a Database function returns a table response, you can also apply filters.
 
       ### Applying Filters
 
-      You must apply your filters to the end of your query. For example:
+      Filters must be applied after any of `select()`, `update()`, `upsert()`,
+      `delete()`, and `rpc()` and before
+      [modifiers](/docs/reference/dart/using-modifiers).
 
       ```dart
       final data = await supabase
@@ -1202,7 +1226,8 @@ pages:
 
       ### Chaining
 
-      Filters can be chained together to produce advanced queries. For example:
+      Filters can be chained together to produce advanced queries. For example,
+      to query cities with population between 1,000 and 10,000:
 
       ```dart
       final data = await supabase
@@ -1211,6 +1236,146 @@ pages:
         .gte('population', 1000)
         .lt('population', 10000);
       ```
+
+      ### Conditional Chaining
+
+      Filters can be built up one step at a time and then executed. For example:
+
+      ```dart
+      final filterByName = null;
+      final filterPopLow = 1000;
+      final filterPopHigh = 10000;
+
+      var query = supabase
+        .from('cities')
+        .select('name, country_id');
+
+      if (filterByName != null)  { query = query.eq('name', filterByName); }
+      if (filterPopLow != null)  { query = query.gte('population', filterPopLow); }
+      if (filterPopHigh != null) { query = query.lt('population', filterPopHigh); }
+
+      final data = await query;
+      ```
+
+      ### Filter by values within a JSON column
+
+      <Tabs>
+      <TabItem value="schema" label="Schema">
+
+        ```sql
+        create table
+          users (
+            id int8 primary key,
+            name text,
+            address jsonb
+          );
+
+        insert into
+          users (id, name, address)
+        values
+          (1, 'Michael', '{ "postcode": 90210 }'),
+          (2, 'Jane', null);
+        ```
+
+      </TabItem>
+      <TabItem default value="dart" label="Flutter">
+
+        ```dart
+        final data = await supabase
+          .from('users')
+          .select()
+          .eq('address->postcode', 90210);
+        ```
+
+      </TabItem>
+      <TabItem value="result" label="Result">
+
+        ```json
+        {
+          "data": [
+            {
+              "id": 1,
+              "name": "Michael",
+              "address": {
+                "postcode": 90210
+              }
+            }
+          ],
+          "status": 200,
+          "statusText": "OK"
+        }
+        ```
+
+      </TabItem>
+      </Tabs>
+
+      ### Filter Foreign Tables
+
+      You can filter on foreign tables in your `select()` query using dot
+      notation:
+
+      <Tabs>
+      <TabItem value="schema" label="Schema">
+
+        ```sql
+        create table
+          countries (id int8 primary key, name text);
+        create table
+          cities (
+            id int8 primary key,
+            country_id int8 not null references countries,
+            name text
+          );
+
+        insert into
+          countries (id, name)
+        values
+          (1, 'Germany'),
+          (2, 'Indonesia');
+        insert into
+          cities (id, country_id, name)
+        values
+          (1, 2, 'Bali'),
+          (2, 1, 'Munich');
+        ```
+
+      </TabItem>
+      <TabItem default value="dart" label="Flutter">
+
+        ```dart
+        final data = await supabase
+          .from('countries')
+          .select('''
+            name,
+            cities!inner (
+              name
+            )
+          ''')
+          .eq('cities.name', 'Bali');
+        ```
+
+      </TabItem>
+      <TabItem value="result" label="Result">
+
+        ```json
+        {
+          "data": [
+            {
+              "name": "Indonesia",
+              "cities": [
+                {
+                  "name": "Bali"
+                }
+              ]
+            }
+          ],
+          "status": 200,
+          "statusText": "OK"
+        }
+        ```
+
+      </TabItem>
+      </Tabs>
 
   .or():
     description: |
@@ -1521,7 +1686,6 @@ pages:
   .lte():
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1560,7 +1724,6 @@ pages:
   .like():
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1895,7 +2058,6 @@ pages:
           ```
 
   .rangeLte():
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - name: With `select()`
         isSpotlight: true

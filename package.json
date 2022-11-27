@@ -7,7 +7,7 @@
   "private": true,
   "workspaces": [
     "apps/www",
-    "apps/temp-docs",
+    "apps/docs",
     "studio",
     "tests",
     "packages/*"
@@ -17,7 +17,7 @@
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
-    "dev:docs": "turbo run dev --filter=temp-docs --parallel",
+    "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,json}\"",
@@ -57,6 +57,8 @@
   ],
   "dependencies": {
     "@mdx-js/react": "^2.1.1",
+    "mdx-mermaid": "^1.3.2",
+    "mermaid": "^9.2.2",
     "mini-svg-data-uri": "^1.4.4"
   }
 }

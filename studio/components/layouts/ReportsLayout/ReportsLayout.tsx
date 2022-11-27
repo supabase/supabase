@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth } from 'hooks'
@@ -6,12 +6,11 @@ import BaseLayout from '..'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateReportsMenu } from './ReportsMenu.utils'
 
-interface Props {
-  title: string
-  children: ReactNode
+interface ReportsLayoutProps {
+  title?: string
 }
 
-const ReportsLayout: FC<Props> = ({ title, children }) => {
+const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps>) => {
   const { ui } = useStore()
   const project = ui.selectedProject
 

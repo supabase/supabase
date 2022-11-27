@@ -65,7 +65,7 @@ const Wizard: NextPageWithLayout = () => {
       }
       footer={
         <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => router.push('/')}>
+          <Button type="default" onClick={() => router.push('/projects')}>
             Cancel
           </Button>
           <div className="flex items-center space-x-3">

@@ -537,7 +537,7 @@ export const FILTER_OPTIONS: FilterTableSet = {
         {
           key: 'success',
           label: 'Success',
-          description: 'Show all requests that have 2xx status code',
+          description: 'Show all requests that have 2XX status code',
         },
       ],
     },
