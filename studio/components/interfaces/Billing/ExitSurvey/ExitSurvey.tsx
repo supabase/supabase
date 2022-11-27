@@ -139,10 +139,10 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         }
       }
 
-      // Submit feedback to Freshdesk
+      // Submit exit survey to Hubspot
       const feedbackRes = await post(`${API_URL}/feedback/send`, {
         projectRef,
-        subject: 'Subscription cancellation - Exit survey',
+        subject: 'Subscription cancellation - Exit survey [Downgrade]',
         tags: ['dashboard-exitsurvey'],
         category: 'Billing',
         message: generateFeedbackMessage(selectedReasons, downgradeMessage),

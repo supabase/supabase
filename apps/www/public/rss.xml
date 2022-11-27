@@ -5,9 +5,44 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 19 Oct 2022 02:02:30 +0000</lastBuildDate>
+      <lastBuildDate>Wed, 16 Nov 2022 03:03:30 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</guid>
+  <title>Fetching and caching Supabase data in Next.js 13 Server Components</title>
+  <link>https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</link>
+  <description>Next.js 13 introduces new data fetching and caching methods to enable React Server Components and Suspense.</description>
+  <pubDate>Wed, 16 Nov 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/authentication-in-ionic-angular</guid>
+  <title>Authentication in Ionic Angular with Supabase</title>
+  <link>https://supabase.com/blog/authentication-in-ionic-angular</link>
+  <description>Learn how to build an Ionic Angular app with authentication, Row Level Security, and Magic Link auth.</description>
+  <pubDate>Mon, 07 Nov 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-update-october-2022</guid>
+  <title>Supabase Beta October 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-update-october-2022</link>
+  <description>New SDKs, quickstarts, Functions tricks, and more. But, more importantly, Launch Week 6️ has a date!</description>
+  <pubDate>Tue, 01 Nov 2022 02:02:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-commitfest</guid>
+  <title>What is PostgreSQL commitfest and how to contribute</title>
+  <link>https://supabase.com/blog/postgresql-commitfest</link>
+  <description>A time-tested method for contributing to the core Postgres code</description>
+  <pubDate>Wed, 26 Oct 2022 02:02:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-flutter-sdk-v1-released</guid>
+  <title>supabase-flutter v1 Released</title>
+  <link>https://supabase.com/blog/supabase-flutter-sdk-v1-released</link>
+  <description>We've released supabase-flutter v1. More intuitive way of accessing Supabase from your Flutter application.</description>
+  <pubDate>Thu, 20 Oct 2022 02:02:30 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-js-v2-released</guid>
   <title>supabase-js v2 Released</title>
   <link>https://supabase.com/blog/supabase-js-v2-released</link>
@@ -124,7 +159,7 @@
   <title>Supabase CLI v1 and Management API Beta</title>
   <link>https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta</link>
   <description>We are moving Supabase CLI v1 out of beta, and releasing Management API beta.</description>
-  <pubDate>Sun, 14 Aug 2022 16:04:00 +0000</pubDate>
+  <pubDate>Sun, 14 Aug 2022 02:02:30 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-series-b</guid>
@@ -186,7 +221,7 @@
   <guid>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</guid>
   <title>Flutter Tutorial: building a Flutter chat app</title>
   <link>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</link>
-  <description>How to create a real time chat app using Flutter.</description>
+  <description>Learn how to build a Flutter chat app with open source and scalable backend (inc. auth, realtime, database, and more).</description>
   <pubDate>Wed, 29 Jun 2022 02:02:30 +0000</pubDate>
 </item>
 <item>

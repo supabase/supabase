@@ -1,0 +1,233 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'logs',
+  title: 'Logging',
+  description: 'Getting started with Supabase Platform Log Browser',
+}
+
+The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
+
+<Admonition type="note">
+
+These features are not currently available for self-hosting and local development.<br/>
+This is on the roadmap and you can follow the progress in the [Logflare repository](https://github.com/Logflare/logflare).
+
+</Admonition>
+
+## Product Logs
+
+Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
+
+<!--
+To update the screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example.
+-->
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="api"
+>
+<TabPanel id="api" label="API">
+
+[API logs](https://app.supabase.com/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/api).
+
+![API Logs](/docs/img/guides/platform/logs/logs-api.png)
+
+</TabPanel>
+<TabPanel id="postgres" label="Postgres">
+
+[Postgres logs](https://app.supabase.com/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
+
+By default, query logs are disabled for all new Supabase projects, as they can reveal metadata about the contents of your database (e.g. table and column names). If you'd like to enable query logs, you can enable and configure the [pgAudit extension](https://www.pgaudit.org/):
+
+- [Enable the pgAudit extension for your project](https://app.supabase.com/project/_/database/extensions)
+- [Reboot the DB](https://app.supabase.com/project/_/settings/general); a "Fast database reboot" is sufficient, and faster than a full project restart
+- Configure `pgaudit.log` to the [appropriate value](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog)
+- You should be able to view query logs in your [log explorer](https://app.supabase.com/project/_/logs/explorer) now
+
+As an example, if you wanted to enable logs for writes and DDL statements for a single session, you could execute within the session:
+
+```sql
+set pgaudit.log = 'write, ddl';
+```
+
+To _permanently_ enable logs for all statements that relate to roles and privileges, you could execute (followed by a db reboot):
+
+```sql
+alter system set pgaudit.log to 'role';
+```
+
+To remove a system-wide setting, you can use (followed by a db reboot):
+
+```sql
+alter system reset pgaudit.log
+```
+
+![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
+
+</TabPanel>
+<TabPanel id="auth" label="Auth">
+
+[Auth logs](https://app.supabase.com/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
+
+![Auth Logs](/docs/img/guides/platform/logs/logs-auth.png)
+
+</TabPanel>
+<TabPanel id="storage" label="Storage">
+
+[Storage logs](https://app.supabase.com/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
+
+![Storage Logs](/docs/img/guides/platform/logs/logs-storage.png)
+
+</TabPanel>
+<TabPanel id="realtime" label="Realtime">
+
+[Realtime logs](https://app.supabase.com/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
+
+![Realtime Logs](/docs/img/guides/platform/logs/logs-realtime.png)
+
+</TabPanel>
+<TabPanel id="functions" label="Edge Functions">
+
+For each [Edge Function](https://app.supabase.com/project/_/functions), logs are available under the following tabs:
+
+**Invocations**
+
+The Invocations tab displays the edge logs of function calls.
+
+![Function Edge Logs](/docs/img/guides/platform/logs/logs-functions-edge.png)
+
+**Logs**
+
+The Logs tab displays logs emitted during function execution.
+
+![Function Logs](/docs/img/guides/platform/logs/logs-functions.png)
+
+</TabPanel>
+</Tabs>
+
+## Logs Explorer
+
+The [Logs Explorer](https://app.supabase.com/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
+
+![Logs Explorer](/docs/img/guides/platform/logs/logs-explorer.png)
+
+You can access the following logs from the **Sources** drop-down:
+
+- `auth_logs`: GoTrue server logs, containing authentication/authorization activity.
+- `edge_logs`: Edge network logs, containing request and response metadata retrieved from Cloudflare.
+- `function_edge_logs`: Edge network logs for only edge functions, containing network requests and response metadata for each execution.
+- `function_logs`: Function internal logs, containing any `console` logging from within the edge function.
+- `postgres_logs`: Postgres database logs, containing statements executed by connected applications.
+- `realtime_logs`: Realtime server logs, containing client connection information.
+- `storage_logs`: Storage server logs, containing object upload and retrieval information.
+
+## Querying with the Logs Explorer
+
+The Logs Explorer uses BigQuery and supports all [available SQL functions and operators](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators).
+
+### Timestamp Display and Behavior
+
+Each log entry is stored with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to utilize the `timestamp` field in a query.
+
+Raw top-level timestamp values are rendered as unix microsecond. To render the timestamps in a human-readable format, use the `DATETIME()` function to convert the unix timestamp display into an ISO-8601 timestamp.
+
+```sql
+-- timestamp column without datetime()
+select timestamp from ....
+--  1664270180000
+
+-- timestamp column with datetime()
+select datetime(timestamp) from ....
+-- 2022-09-27T09:17:10.439Z
+```
+
+### Unnesting Arrays
+
+Each log event stores metadata an array of objects with multiple levels, and can be seen by selecting single log events in the Logs Explorer. To query arrays, use `unnest()` on each array field and add it to the query as a join. This allows you to reference the nested objects with an alias and select their individual fields.
+
+For example, to query the edge logs without any joins:
+
+```sql
+select timestamp, metadata from edge_logs t
+```
+
+The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects:
+
+<!--  Scene is here https://app.excalidraw.com/s/8gj16loJfGZ/3HzccK9MyLx -->
+
+![Without Unnesting](/docs/img/unnesting-none.png)
+
+Perform a `cross join unnest()` to work with the keys nested in the `metadata` key.
+
+To query for a nested value, add a join for each array level:
+
+```sql
+select timestamp, request.method, header.cf_ipcountry
+from edge_logs t
+cross join unnest(t.metadata) as metadata
+cross join unnest(metadata.request) as request
+cross join unnest(request.headers) as header
+```
+
+This surfaces the following columns available for selection:
+![With Two Level Unnesting](/docs/img/unnesting-2.png)
+
+This allows you to select the `method` and `cf_ipcountry` columns. In JS dot notation, the full paths for each selected column are:
+
+- `metadata[].request[].method`
+- `metadata[].request[].headers[].cf_ipcountry`
+
+### LIMIT and Result Row Limitations
+
+The Logs Explorer has a maximum of 1000 rows per run. Use `LIMIT` to optimize your queries by reducing the number of rows returned further.
+
+### Best Practices
+
+1. Include a filter over **timestamp**
+
+Querying your entire log history might seem appealing. For **Enterprise** customers that have a large retention range, you run the risk of timeouts due additional time required to scan the larger dataset.
+
+2. Avoid selecting large nested objects. Select individual values instead.
+
+When querying large objects, the columnar storage engine selects each column associated with each nested key, resulting in a large number of columns being selected. This inadvertently impacts the query speed and may result in timeouts or memory errors, especially for projects with a lot of logs.
+
+Instead, select only the values required.
+
+```sql
+-- ❌ Avoid doing this
+select
+  datetime(timestamp),
+  m as metadata  -- <- metadata contains many nested keys
+from edge_logs t
+cross join unnest(t.metadata) as m;
+
+-- ✅ Do this
+select
+datetime(timestamp),
+r.method   -- <- select only the required values
+from edge_logs t
+cross join unnest(t.metadata) as m
+cross join unnest(m.request) as r
+```
+
+### Examples and Templates
+
+The Logs Explorer includes **Templates** (available in the Templates tab or the dropdown in the Query tab) to help you get started.
+
+For example, you can enter the following query in the SQL Editor to retrieve each user's IP address:
+
+```sql
+select datetime(timestamp), h.x_real_ip
+from edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) AS r
+  cross join unnest(r.headers) AS h
+where h.x_real_ip is not null and r.method = "GET"
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

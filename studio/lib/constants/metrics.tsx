@@ -64,7 +64,7 @@ export const METRICS = [
     category: METRIC_CATEGORIES.API,
   },
   {
-    key: 'total_realtime_get_requests',
+    key: 'total_realtime_requests',
     label: 'Realtime Connection Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_REALTIME,
@@ -81,12 +81,6 @@ export const METRICS = [
   //   provider: 'daily-stats',
   //   category: METRIC_CATEGORIES.API_REALTIME,
   // },
-  {
-    key: 'total_realtime_requests',
-    label: 'Connection Requests',
-    provider: 'daily-stats',
-    category: METRIC_CATEGORIES.API_REALTIME,
-  },
 
   /**
    * API

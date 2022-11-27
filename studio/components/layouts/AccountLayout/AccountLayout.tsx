@@ -3,7 +3,7 @@ import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
-import { auth } from 'lib/gotrue'
+import { auth, STORAGE_KEY } from 'lib/gotrue'
 import { useStore, withAuth, useFlag } from 'hooks'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import WithSidebar from './WithSidebar'
@@ -27,8 +27,8 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
 
   const onClickLogout = async () => {
     await auth.signOut()
-    localStorage.clear();
-    router.reload()
+    localStorage.removeItem(STORAGE_KEY)
+    window.location.href = '/sign-in'
   }
 
   const organizationsLinks = app.organizations
@@ -48,9 +48,9 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       key: 'projects',
       links: [
         {
-          isActive: router.pathname === '/',
+          isActive: router.pathname === '/projects',
           label: 'All projects',
-          href: '/',
+          href: '/projects',
           key: 'all-projects-item',
         },
       ],
