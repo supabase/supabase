@@ -16,6 +16,36 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/register',
+        destination: '/sign-up',
+        permanent: false,
+      },
+      {
+        source: '/signup',
+        destination: '/sign-up',
+        permanent: false,
+      },
+      {
+        source: '/signin',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/login',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/log-in',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
         permanent: true,

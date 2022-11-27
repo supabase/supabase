@@ -1,4 +1,6 @@
 import AuthLayout from './AuthLayout/AuthLayout'
+import SignInLayout from './SignInLayout/SignInLayout'
+import ForgotPasswordLayout from './SignInLayout/ForgotPasswordLayout'
 import ProjectLayout, { ProjectLayoutWithAuth } from './ProjectLayout/ProjectLayout'
 import TableEditorLayout from './TableEditorLayout/TableEditorLayout'
 import SQLEditorLayout from './SQLEditorLayout/SQLEditorLayout'
@@ -17,6 +19,8 @@ import LogsLayout from './LogsLayout/LogsLayout'
 export {
   ProjectLayoutWithAuth,
   AuthLayout,
+  SignInLayout,
+  ForgotPasswordLayout,
   DatabaseLayout,
   DocsLayout,
   TableEditorLayout,

@@ -13,7 +13,7 @@ const Header: FC<Props> = () => {
   return (
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
-        <Link href="/">
+        <Link href="/projects">
           <a>
             <img
               src="/img/supabase-logo.svg"
@@ -34,16 +34,20 @@ const Header: FC<Props> = () => {
 
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
-  const { routeSlug } = router.query
+  const { routeSlug, ...queryParams } = router.query
+  const queryString =
+    Object.keys(queryParams).length > 0
+      ? new URLSearchParams(queryParams as Record<string, string>).toString()
+      : ''
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
       if (!Array.isArray(slug)) {
-        return `/project/${projectRef}`
+        return `/project/${projectRef}?${queryString}`
       }
 
       const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
-      return `/project/${projectRef}/${slugPath}`
+      return `/project/${projectRef}/${slugPath}?${queryString}`
     }
   }
 

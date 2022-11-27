@@ -17,3 +17,8 @@ export const USAGE_COLORS = {
   404: 'var(--colors-amber7)',
   500: 'var(--colors-red9)',
 }
+
+export enum DateTimeFormats {
+  FULL = 'MMM D, YYYY, hh:mma',
+  DATE_ONLY = 'MMM D, YYYY',
+}

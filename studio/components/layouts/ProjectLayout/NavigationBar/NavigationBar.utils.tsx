@@ -84,23 +84,18 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
           ? buildingUrl
           : `/project/${ref}/auth/users`),
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'storage',
-            label: 'Storage',
-            icon: <IconArchive size={18} strokeWidth={2} />,
-            link:
-              ref &&
-              (isProjectPaused
-                ? homeUrl
-                : isProjectBuilding
-                ? buildingUrl
-                : `/project/${ref}/storage/buckets`),
-          },
-        ]
-      : []),
-
+    {
+      key: 'storage',
+      label: 'Storage',
+      icon: <IconArchive size={18} strokeWidth={2} />,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/storage/buckets`),
+    },
     ...(IS_PLATFORM
       ? [
           {
