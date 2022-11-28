@@ -35,7 +35,9 @@ const SecretsManagement: FC<Props> = ({}) => {
     }
   })
 
-  console.log(secrets)
+  const onConfirmUpdateSecret = async () => {
+    if (!selectedSecretToEdit) return
+  }
 
   return (
     <>

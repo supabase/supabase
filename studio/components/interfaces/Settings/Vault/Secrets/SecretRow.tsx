@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { timeout } from 'lib/helpers'
 import { FC, useState } from 'react'
 import {
   Button,
@@ -13,14 +12,17 @@ import {
   IconMoreVertical,
   IconLoader,
 } from 'ui'
+import { VaultSecret } from 'types'
+import { useStore } from 'hooks'
 
 interface Props {
-  secret: any
+  secret: VaultSecret
   onSelectEdit: (secret: any) => void
   onSelectRemove: (secret: any) => void
 }
 
 const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
+  const { vault } = useStore()
   const [isLoading, setIsLoading] = useState(false)
   const [revealedValue, setRevealedValue] = useState<string>()
   const description = secret?.description ?? 'No description provided'
@@ -28,9 +30,11 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
   const revealSecret = async () => {
     setIsLoading(true)
     if (revealedValue === undefined) {
-      // Some DB call
-      await timeout(1000)
-      setRevealedValue(secret.secret)
+      setRevealedValue(
+        secret.decryptedSecret !== undefined
+          ? secret.decryptedSecret
+          : await vault.fetchSecretValue(secret.id)
+      )
     } else {
       setRevealedValue(undefined)
     }

@@ -26,7 +26,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   const { vault, ui } = useStore()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [selectedSort, setSelectedSort] = useState<'comment' | 'created'>('created')
+  const [selectedSort, setSelectedSort] = useState<'name' | 'created'>('created')
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
 
@@ -36,7 +36,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
     searchValue
       ? vault.listKeys(
           (key: any) =>
-            (key?.comment ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
+            (key?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
             key.id.toLowerCase().includes(searchValue.toLowerCase())
         )
       : vault.listKeys()
@@ -50,7 +50,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
 
   const addKey = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    const res = await vault.addKey(values.description)
+    const res = await vault.addKey(values.name)
     if (!res.error) {
       ui.setNotification({ category: 'success', message: 'Successfully added new key' })
       setShowAddKeyModal(false)
@@ -100,8 +100,8 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                 <Listbox.Option id="created" value="created" label="Sort by created at">
                   Created at
                 </Listbox.Option>
-                <Listbox.Option id="comment" value="comment" label="Sort by description">
-                  Description
+                <Listbox.Option id="name" value="name" label="Sort by name">
+                  Name
                 </Listbox.Option>
               </Listbox>
             </div>
@@ -128,16 +128,16 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                       <div className="space-y-1 min-w-[37%] max-w-[37%]">
                         <p
                           className="text-sm truncate text-scale-1200"
-                          title={key.comment || DEFAULT_KEY_NAME}
+                          title={key.name || DEFAULT_KEY_NAME}
                         >
-                          {key.comment || DEFAULT_KEY_NAME}
+                          {key.name || DEFAULT_KEY_NAME}
                         </p>
                         <p title={key.id} className="text-xs text-scale-1100 font-bold truncate">
                           ID: <span className="font-mono">{key.id}</span>
                         </p>
                       </div>
                       <div className="flex items-center space-x-2 w-[33%]">
-                        {key.status === 'default' && <Badge color="green">Default</Badge>}
+                        {key.name === 'default_vault_key' && <Badge color="green">Default</Badge>}
                       </div>
                       <div className="flex items-center justify-end w-[30%] space-x-4">
                         <p className="text-sm text-scale-1100">
@@ -149,11 +149,11 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                               type="default"
                               className="py-2"
                               icon={<IconTrash />}
-                              disabled={key.status === 'default'}
+                              disabled={key.name === 'default_vault_key'}
                               onClick={() => setSelectedKeyToRemove(key)}
                             />
                           </Tooltip.Trigger>
-                          {key.status === 'default' && (
+                          {key.name === 'default_vault_key' && (
                             <Tooltip.Content side="bottom">
                               <Tooltip.Arrow className="radix-tooltip-arrow" />
                               <div
@@ -225,7 +225,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
               </p>
               <div className="space-y-2">
                 <p className="text-sm text-scale-1200">
-                  {selectedKeyToRemove?.comment ?? DEFAULT_KEY_NAME}
+                  {selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}
                 </p>
                 <p className="text-xs text-scale-1100">
                   <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
@@ -260,11 +260,14 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
               <div className="py-4">
                 <Modal.Content>
                   <p className="text-sm mb-4">
-                    Keys are of standard UUID types - you can provide a description to your key for
-                    better identification.
+                    Provide a name for your key for easier identification.
                   </p>
                   <div className="space-y-4 pb-4">
-                    <Input id="name" label="Key Name" />
+                    <Input
+                      id="name"
+                      label="Key Name"
+                      descriptionText="Keys are of standard UUID types."
+                    />
                   </div>
                 </Modal.Content>
                 <Modal.Separator />

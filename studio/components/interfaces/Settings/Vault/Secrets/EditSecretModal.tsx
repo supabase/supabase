@@ -1,8 +1,6 @@
 import { FC, useState, useEffect } from 'react'
 import { Modal, Form, Input, Button, IconEyeOff, IconEye } from 'ui'
-
-import { useStore } from 'hooks'
-import EncryptionKeySelector from '../EncryptionKeySelector'
+import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface Props {
   selectedSecret: any
@@ -43,8 +41,9 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
       <Form
         id="add-new-secret-form"
         initialValues={{
-          secret: selectedSecret?.secret ?? '',
+          name: selectedSecret?.name ?? '',
           description: selectedSecret?.description ?? '',
+          secret: selectedSecret?.secret ?? '',
         }}
         validate={validate}
         validateOnBlur={false}
@@ -55,6 +54,8 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
             <div className="py-4">
               <Modal.Content>
                 <div className="space-y-4 pb-4">
+                  <Input id="name" label="Name" />
+                  <Input id="description" label="Description" labelOptional="Optional" />
                   <Input
                     id="secret"
                     type={showSecretValue ? 'text' : 'password'}
@@ -69,7 +70,6 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
                       </div>
                     }
                   />
-                  <Input id="description" label="Description" labelOptional="Optional" />
                 </div>
               </Modal.Content>
               <Modal.Separator />
@@ -77,7 +77,7 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
                 <div className="py-4">
                   <EncryptionKeySelector
                     id="keyId"
-                    descriptionId="keyDescription"
+                    nameId="keyDescription"
                     label="Select a key to encrypt your secret with"
                     labelOptional="Optional"
                     selectedKeyId={selectedKeyId}

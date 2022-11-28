@@ -1,39 +1,7 @@
 import { Query } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
+import { VaultSecret } from 'types'
 import { IRootStore } from '../RootStore'
-
-const MOCK_SECRETS = [
-  {
-    key_id: '095f4bfe-f63c-420b-8849-f1e455ee3a02',
-    description: 'Client access key for dashboard',
-    created_at: '2022-11-01 06:43:48.492465',
-    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686', // encrypted secret value
-  },
-  {
-    key_id: '095f4bfe-f63c-420b-8849-f1e455ee3a02',
-    description: 'Secret key for server',
-    created_at: '2022-11-20 06:43:48.492465',
-    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
-  },
-  {
-    key_id: '57bfa919-e81b-4afc-a3b4-372981b2a39a',
-    description: 'This is a bit more of a secret key',
-    created_at: '2022-11-18 06:43:48.492465',
-    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
-  },
-  {
-    key_id: '57bfa919-e81b-4afc-a3b4-372981b2a39a',
-    description: undefined,
-    created_at: '2022-11-05 06:43:48.492465',
-    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
-  },
-  {
-    key_id: '57bfa919-e81b-4afc-a3b4-372981b2a39a',
-    description: 'This is a pretty long description that Im testing if it should wrap or not',
-    created_at: '2022-11-3 06:43:48.492465',
-    secret: '74d97ba2-f9e3-4a64-a032-8427cd6bd686',
-  },
-]
 
 export interface IVaultStore {
   isLoading: boolean
@@ -46,25 +14,20 @@ export interface IVaultStore {
   addKey: (name?: string) => any
   deleteKey: (id: string) => any
 
-  listSecrets: (filter?: any) => Secret[]
-  addSecret: (name?: string) => any
+  listSecrets: (filter?: any) => VaultSecret[]
+  addSecret: (secret: Partial<VaultSecret>) => any
   updateSecret: (payload: any) => any
   deleteSecret: (id: string) => any
+  fetchSecretValue: (id: string) => any
 }
 
 interface EncryptionKey {
   id: string
   key_id: number
+  name: string
   comment: string
   created: string
   status: string
-}
-
-interface Secret {
-  key_id: string
-  description: string
-  created_at: string
-  secret: string
 }
 
 export default class VaultStore implements IVaultStore {
@@ -77,7 +40,7 @@ export default class VaultStore implements IVaultStore {
     LOADED: 'loaded',
   }
 
-  data: { keys: EncryptionKey[]; secrets: Secret[] } = { keys: [], secrets: [] }
+  data: { keys: EncryptionKey[]; secrets: VaultSecret[] } = { keys: [], secrets: [] }
   state = this.STATES.INITIAL
   error = null
 
@@ -101,14 +64,18 @@ export default class VaultStore implements IVaultStore {
   async fetchData() {
     const vault = { keys: [], secrets: [] }
 
-    const query = new Query()
+    const keysQuery = new Query()
       .from('key', 'pgsodium')
-      .select('id,key_id,comment,created,status')
+      .select('id,key_id,name,comment,created,status')
       .toSql()
-    const keys = await this.rootStore.meta.query(query)
+    const keys = await this.rootStore.meta.query(keysQuery)
     if (!keys.error) vault.keys = keys
 
-    const secrets: any = MOCK_SECRETS
+    const secretsQuery = new Query()
+      .from('secrets', 'vault')
+      .select('id,name,description,secret,key_id,created_at')
+      .toSql()
+    const secrets = await this.rootStore.meta.query(secretsQuery)
     if (!secrets.error) vault.secrets = secrets
 
     this.data = vault
@@ -145,7 +112,7 @@ export default class VaultStore implements IVaultStore {
   async addKey(name?: string) {
     const res =
       name !== undefined
-        ? await this.rootStore.meta.query(`select * from pgsodium.create_key('${name}')`)
+        ? await this.rootStore.meta.query(`select * from pgsodium.create_key(name := '${name}')`)
         : await this.rootStore.meta.query(`select * from pgsodium.create_key()`)
     if (!res.error) {
       this.data.keys = this.data.keys.concat(res)
@@ -176,9 +143,46 @@ export default class VaultStore implements IVaultStore {
     }
   }
 
-  async addSecret(name?: string) {}
+  async addSecret(newSecret: Partial<VaultSecret>) {
+    const { name, description, secret, key_id } = newSecret
+    const query = new Query()
+      .from('secrets', 'vault')
+      .insert([{ name, description, secret, key_id }], { returning: true })
+      .toSql()
+    const res = await this.rootStore.meta.query(query)
+    if (!res.error) {
+      this.data.secrets = this.data.secrets.concat(res)
+    }
+    return res
+  }
 
   async updateSecret(payload: any) {}
 
-  async deleteSecret(id: string) {}
+  async deleteSecret(id: string) {
+    const query = new Query().from('secrets', 'vault').delete().match({ id }).toSql()
+    const res = await this.rootStore.meta.query(query)
+    if (!res.error) {
+      this.data.secrets = this.data.secrets.filter((secret) => secret.id !== id)
+    }
+    return res
+  }
+
+  async fetchSecretValue(id: string) {
+    const query = new Query()
+      .from('decrypted_secrets', 'vault')
+      .select('decrypted_secret')
+      .match({ id })
+      .toSql()
+    const res = await this.rootStore.meta.query(query)
+    if (!res.error) {
+      this.data.secrets = this.data.secrets.map((secret) => {
+        if (secret.id === id) {
+          return { ...secret, decryptedSecret: res[0].decrypted_secret }
+        } else {
+          return secret
+        }
+      })
+    }
+    return res[0].decrypted_secret
+  }
 }
