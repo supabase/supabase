@@ -86,7 +86,7 @@ export default class VaultStore implements IVaultStore {
     let { LOADING, ERROR, LOADED } = this.STATES
     try {
       this.error = null
-      this.state = LOADING
+      if (this.state !== LOADED) this.state = LOADING
       await this.fetchData()
       this.state = LOADED
       return this.data
@@ -156,7 +156,9 @@ export default class VaultStore implements IVaultStore {
     return res
   }
 
-  async updateSecret(payload: any) {}
+  async updateSecret(payload: any) {
+    const query = new Query().from('decrypted_secrets', 'vault')
+  }
 
   async deleteSecret(id: string) {
     const query = new Query().from('secrets', 'vault').delete().match({ id }).toSql()
