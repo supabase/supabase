@@ -43,48 +43,56 @@ export default function TicketActions({ username, golden = false }: Props) {
     }
   }, [downloadUrl])
 
+  const ActionStyle = ({ children }: any) => {
+    return (
+      <div className="rounded-full bg-gradient-to-r from-scale-100 via-scale-300 to-scale-700 px-5 py-2 dark:text-white">
+        {children}
+      </div>
+    )
+  }
+
   return (
     <>
-      <a
-        className={cn(styles.button, styleUtils.appear, styles.first, 'icon-button')}
-        href={tweetUrl}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        {/* <IconTwitter width={24} /> Tweet it! */}
-      </a>
-      <a
-        className={cn(
-          styles.button,
-          styleUtils.appear,
-          styles.second,
-          'icon-button',
-          // LinkedIn Share widget doesn’t work on mobile
-          styles['linkedin-button']
-        )}
-        href={linkedInUrl}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        {/* <IconLinkedin width={20} /> Share on LinkedIn */}
-      </a>
-      <a
-        className={cn(styles.button, styleUtils.appear, styles.third, 'icon-button', {
-          [styles.loading]: loading,
-        })}
-        href={loading ? undefined : downloadUrl}
-        onClick={(e) => {
-          if (imgReady) return
+      <ActionStyle>
+        <a
+          href={tweetUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          className="bg-gradient-to-r from-white via-white to-[#1a7a4c85] bg-clip-text text-transparent"
+        >
+          {/* <IconTwitter width={24} /> Tweet it! */}
+          Tweet it
+        </a>
+      </ActionStyle>
+      <ActionStyle>
+        <a
+          href={linkedInUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          className="bg-gradient-to-r from-white via-white to-[#1a7a4c85] bg-clip-text text-transparent"
+        >
+          {/* <IconLinkedin width={20} /> Share on LinkedIn */}
+          Share on Linkedin
+        </a>
+      </ActionStyle>
+      <ActionStyle>
+        <a
+          className="bg-gradient-to-r from-white via-white to-[#1a7a4c85] bg-clip-text text-transparent"
+          href={loading ? undefined : downloadUrl}
+          onClick={(e) => {
+            if (imgReady) return
 
-          e.preventDefault()
-          downloadLink.current = e.currentTarget
-          // Wait for the image download to finish
-          setLoading(true)
-        }}
-        download="ticket.png"
-      >
-        {loading ? <LoadingDots size={4} /> : <>{/* <IconDownload width={24} /> Download */}</>}
-      </a>
+            e.preventDefault()
+            downloadLink.current = e.currentTarget
+            // Wait for the image download to finish
+            setLoading(true)
+          }}
+          download="ticket.png"
+        >
+          Download
+          {loading ? <LoadingDots size={4} /> : <>{/* <IconDownload width={24} /> Download */}</>}
+        </a>
+      </ActionStyle>
     </>
   )
 }
