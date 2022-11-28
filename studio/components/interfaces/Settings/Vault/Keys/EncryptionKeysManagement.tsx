@@ -90,17 +90,27 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
             <Input
               className="w-64"
               size="small"
-              placeholder="Search by description or ID"
+              placeholder="Search by name or ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
               icon={<IconSearch strokeWidth={2} size={16} />}
             />
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
-                <Listbox.Option id="created" value="created" label="Sort by created at">
+                <Listbox.Option
+                  id="created"
+                  className="max-w-[180px]"
+                  value="created"
+                  label="Sort by created at"
+                >
                   Created at
                 </Listbox.Option>
-                <Listbox.Option id="name" value="name" label="Sort by name">
+                <Listbox.Option
+                  id="name"
+                  className="max-w-[180px]"
+                  value="name"
+                  label="Sort by name"
+                >
                   Name
                 </Listbox.Option>
               </Listbox>

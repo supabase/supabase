@@ -14,7 +14,7 @@ interface Props {}
 const SecretsManagement: FC<Props> = ({}) => {
   const { vault } = useStore()
   const [searchValue, setSearchValue] = useState<string>('')
-  const [selectedSort, setSelectedSort] = useState<'created_at' | 'description'>('created_at')
+  const [selectedSort, setSelectedSort] = useState<'created_at' | 'name'>('created_at')
   const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<any>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
@@ -23,7 +23,7 @@ const SecretsManagement: FC<Props> = ({}) => {
     searchValue.length > 0
       ? vault.listSecrets(
           (secret: any) =>
-            (secret?.description ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
+            (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
             secret.key_id.toLowerCase().includes(searchValue.toLowerCase())
         )
       : vault.listSecrets()
@@ -47,20 +47,35 @@ const SecretsManagement: FC<Props> = ({}) => {
             <Input
               className="w-64"
               size="small"
-              placeholder="Search by description or key ID"
+              placeholder="Search by name or key ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
               icon={<IconSearch strokeWidth={2} size={16} />}
             />
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
-                <Listbox.Option id="created_at" value="created_at" label="Sort by created at">
+                <Listbox.Option
+                  id="created_at"
+                  className="max-w-[180px]"
+                  value="created_at"
+                  label="Sort by created at"
+                >
                   Created at
                 </Listbox.Option>
-                <Listbox.Option id="description" value="description" label="Sort by description">
-                  Description
+                <Listbox.Option
+                  id="name"
+                  className="max-w-[180px]"
+                  value="name"
+                  label="Sort by name"
+                >
+                  Name
                 </Listbox.Option>
-                <Listbox.Option id="key_id" value="key_id" label="Sort by key ID">
+                <Listbox.Option
+                  id="key_id"
+                  className="max-w-[180px]"
+                  value="key_id"
+                  label="Sort by key ID"
+                >
                   Key ID
                 </Listbox.Option>
               </Listbox>

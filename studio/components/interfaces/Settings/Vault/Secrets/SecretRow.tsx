@@ -25,7 +25,7 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
   const { vault } = useStore()
   const [isLoading, setIsLoading] = useState(false)
   const [revealedValue, setRevealedValue] = useState<string>()
-  const description = secret?.description ?? 'No description provided'
+  const name = secret?.name ?? 'No name provided'
 
   const revealSecret = async () => {
     setIsLoading(true)
@@ -44,9 +44,16 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
   return (
     <div className="px-6 py-4 flex items-center space-x-4">
       <div className="space-y-1 min-w-[35%] max-w-[35%]">
-        <p className="text-sm text-scale-1200" title={description}>
-          {description}
-        </p>
+        <div>
+          <p className="text-sm text-scale-1200" title={name}>
+            {name}
+          </p>
+          {secret.description !== undefined && (
+            <p className="text-sm text-scale-1100" title={secret.description}>
+              {secret.description}
+            </p>
+          )}
+        </div>
         <div className="flex items-center space-x-2">
           <IconKey size={14} strokeWidth={2} />
           <p className="text-scale-1100 font-mono text-xs" title={secret.key_id}>
