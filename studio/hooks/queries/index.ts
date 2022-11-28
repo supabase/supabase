@@ -1,6 +1,4 @@
 export * from './useJwtSecretUpdateStatus'
-export * from './useOrganizationDetail'
-export * from './useOrganizationRoles'
 export * from './useFreeProjectLimitCheck'
 export * from './useProjectAuthConfig'
 export * from './useProjectSubscription'
