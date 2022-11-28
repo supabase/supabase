@@ -84,7 +84,7 @@ const SecretsManagement: FC<Props> = ({}) => {
 
         {/* Table of secrets */}
         <div className="border border-scale-500 rounded">
-          {vault.isLoading ? (
+          {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader className="animate-spin text-scale-1100" size={16} strokeWidth={1.5} />
               <p className="text-sm text-scale-1200">Loading secrets from the Vault</p>
