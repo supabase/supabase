@@ -30,7 +30,9 @@ export function generateParameters(tsDefinition: any) {
   } else functionDeclaration = tsDefinition?.type?.declaration
   if (!functionDeclaration) return ''
 
-  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures[0].parameters // PMC: seems flaky.. why the [0]?
+  // Functions can have multiple signatures - select the last one since that
+  // tends to be closer to primitive types (citation needed).
+  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures.at(-1).parameters
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
