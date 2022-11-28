@@ -18,12 +18,12 @@
 }
 
 .visual--gold {
-  background-color: gold;
   /* border: 10px solid;
   border-image-slice: 1;
   border-width: 2px;
   border-radius: 16px; */
-  background: linear-gradient(#fff000, var(--gold-secondary));
+  background-color: linear-gradient(#fff000, var(--gold-secondary));
+  background-color: gold;
   border: 1px solid rgba(255, 255, 0, 0.629);
   animation: svg-shadow 2s ease-in-out infinite alternate;
   /* filter: drop-shadow(2.45223px 8.5828px 73.5669px #FFBD14);  */
@@ -35,13 +35,11 @@
 
 @keyframes svg-shadow {
   from {
-    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px var(--gold-primary))
-      drop-shadow(0 0 6px var(--gold-accent));
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #d99f0c) drop-shadow(0 0 6px #d99f0c);
   }
 
   to {
-    filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px var(--gold-accent))
-      drop-shadow(0 0 9px var(--gold-primary));
+    filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #d99f0c);
   }
 }
 

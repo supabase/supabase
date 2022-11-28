@@ -45,7 +45,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   //     scrollTo(divRef.current, -30)
   //   }
   // }, [divRef, sharePage])
-
+  golden = true
   return (
     <div
       className={cn(styles['ticket-layout'], {
@@ -69,7 +69,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
               <p className="text-2xl dark:text-white mb-4">Congratulations, you have a ticket!</p>
             )}
           </h2>
-          <p className="text-sm dark:text-scale-900 max-w-[380px]">
+          <h2 className="text-sm dark:text-scale-900 max-w-[380px]">
             {sharePage ? (
               <>
                 Join {name ?? 'us'} on {DATE}.
@@ -85,7 +85,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
                 sure you don’t skip your chance.
               </>
             )}
-          </p>
+          </h2>
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
           {!sharePage ? (
