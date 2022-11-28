@@ -35,10 +35,6 @@ const SecretsManagement: FC<Props> = ({}) => {
     }
   })
 
-  const onConfirmUpdateSecret = async () => {
-    if (!selectedSecretToEdit) return
-  }
-
   return (
     <>
       <div className="space-y-4">
