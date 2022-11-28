@@ -76,6 +76,8 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
               </>
             ) : golden ? (
               <>Claim your ticket with GitHub and Tweet it to redeem your swag pack!</>
+            ) : username ? (
+              <>Here is your unique ticket image to brag on socials.</>
             ) : (
               <>
                 This means you’re in. Generate a unique ticket image with your GitHub profile cause

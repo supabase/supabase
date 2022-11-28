@@ -41,9 +41,9 @@ export default function TicketProfile({
           )} dark:text-white`}
         >
           <span
-            className={cn(styles.skeleton, styles.wrapper, {
+            className={`${cn(styles.skeleton, styles.wrapper, {
               [styles.show]: ticketGenerationState === 'loading',
-            })}
+            })} text-4xl`}
           >
             {name || username || 'Your Name'}
           </span>
@@ -54,13 +54,21 @@ export default function TicketProfile({
               [styles.show]: ticketGenerationState === 'loading',
             })}
           >
-            <span className={cn(styles.githubIcon, { [styles['githubIcon-golden']]: golden })}>
+            <span className={`${golden ? 'text-white' : 'text-scale-1100'}`}>
               {/* <GithubIcon
                 color={golden ? 'var(--gold-primary)' : 'var(--secondary-color)'}
                 size={20 * size}
               /> */}
+              {username ? `@${username}` : <>username</>}
             </span>
-            {username ? `@${username}` : <>username</>}
+
+            <img
+              alt="Supabase disconnected badge"
+              src={`/images/launchweek/supabadge-${
+                username ? 'connected' : golden ? 'gold' : 'disconnected'
+              }.svg`}
+              className="ml-2"
+            />
           </span>
         </p>
       </div>
