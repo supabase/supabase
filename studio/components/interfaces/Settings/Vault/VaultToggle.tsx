@@ -10,18 +10,74 @@ import {
   FormSectionContent,
 } from 'components/ui/Forms'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { PostgresExtension } from '@supabase/postgres-meta'
 
 interface Props {}
 
 const VaultToggle: FC<Props> = () => {
+  const { meta, ui } = useStore()
   const formId = 'project-vault-settings'
   const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
+  const [vaultExtension] = meta.extensions.list(
+    (ext: PostgresExtension) => ext.name.toLowerCase() === 'supabase_vault'
+  )
+
+  // [Joshen TODO] Need to put this logic correctly once i can toggle vault extension
+  const isEnabled = vaultExtension?.installed_version !== null
   const initialValues = { enabled: true }
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
-    console.log('onSubmit', values)
+    if (vaultExtension === undefined) return
+
+    setSubmitting(true)
+    if (values.enabled) {
+      // Enable Vault
+      const { error: createSchemaError } = await meta.query(
+        `create schema if not exists ${vaultExtension.schema}`
+      )
+      if (createSchemaError) {
+        return ui.setNotification({
+          error: createSchemaError,
+          category: 'error',
+          message: `Failed to create schema: ${createSchemaError.message}`,
+        })
+      }
+      const { error: createExtensionError } = await meta.extensions.create({
+        schema: vaultExtension.schema,
+        name: vaultExtension.name,
+        version: vaultExtension.default_version,
+        cascade: true,
+      })
+      if (createExtensionError) {
+        ui.setNotification({
+          error: createExtensionError,
+          category: 'error',
+          message: `Failed to enable Vault for your project: ${createExtensionError.message}`,
+        })
+      } else {
+        ui.setNotification({
+          category: 'success',
+          message: 'Vault is not enabled for your project',
+        })
+      }
+    } else {
+      // Disable Vault
+      const response: any = await meta.extensions.del(vaultExtension.name)
+      if (response.error) {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to disable Vault: ${response.error.message}`,
+        })
+      } else {
+        ui.setNotification({
+          category: 'success',
+          message: 'Vault is not disabled for your project',
+        })
+      }
+    }
+    setSubmitting(false)
   }
 
   return (

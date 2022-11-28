@@ -19,3 +19,13 @@ export interface ChartIntervals {
   startUnit: 'hour' | 'day'
   format: 'MMM D, h:mma' | 'MMM D, ha' | 'MMM D'
 }
+
+export interface VaultSecret {
+  id: string
+  name: string
+  description: string
+  secret: string
+  decryptedSecret?: string
+  key_id: string
+  created_at: string
+}

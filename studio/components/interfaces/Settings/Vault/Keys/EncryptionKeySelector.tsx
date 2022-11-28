@@ -4,7 +4,7 @@ import { useStore } from 'hooks'
 
 interface Props {
   id?: string
-  descriptionId?: string
+  nameId?: string
   label?: string
   labelOptional?: string
   selectedKeyId?: any
@@ -14,7 +14,7 @@ interface Props {
 
 const EncryptionKeySelector: FC<Props> = ({
   id = 'keyId',
-  descriptionId = 'keyDescription',
+  nameId = 'keyName',
   label = 'Encryption key',
   labelOptional,
   selectedKeyId,
@@ -30,6 +30,7 @@ const EncryptionKeySelector: FC<Props> = ({
         id={id}
         label={label}
         size="small"
+        defaultValue={selectedKeyId}
         value={selectedKeyId}
         labelOptional={labelOptional}
         onChange={onSelectKey}
@@ -61,9 +62,8 @@ const EncryptionKeySelector: FC<Props> = ({
       </Listbox>
       {selectedKeyId === 'create-new' && (
         <Input
-          id={descriptionId}
-          label="Description"
-          labelOptional="Optional"
+          id={nameId}
+          label="Name"
           onChange={(event) => onUpdateDescription(event.target.value)}
         />
       )}

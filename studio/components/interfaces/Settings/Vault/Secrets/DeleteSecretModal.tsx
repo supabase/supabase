@@ -1,12 +1,37 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Modal } from 'ui'
+import { VaultSecret } from 'types'
+import { useStore } from 'hooks'
 
 interface Props {
-  selectedSecret: any
+  selectedSecret: VaultSecret
   onClose: () => void
 }
 
 const DeleteSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
+  const { vault, ui } = useStore()
+
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const onConfirmDeleteSecret = async () => {
+    setIsDeleting(true)
+    const res = await vault.deleteSecret(selectedSecret.id)
+    if (res.error) {
+      ui.setNotification({
+        error: res.error,
+        category: 'error',
+        message: `Failed to delete secret: ${res.error.message}`,
+      })
+    } else {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted secret ${selectedSecret.name}`,
+      })
+      onClose()
+    }
+    setIsDeleting(false)
+  }
+
   return (
     <Modal
       closable
@@ -14,7 +39,8 @@ const DeleteSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
       alignFooter="right"
       visible={selectedSecret !== undefined}
       onCancel={onClose}
-      onConfirm={onClose}
+      onConfirm={onConfirmDeleteSecret}
+      loading={isDeleting}
       header={<h5 className="text-sm text-scale-1200">Confirm to delete secret</h5>}
     >
       <div className="py-4">
