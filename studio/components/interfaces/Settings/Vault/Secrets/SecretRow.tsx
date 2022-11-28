@@ -13,7 +13,8 @@ import {
   IconLoader,
 } from 'ui'
 import { VaultSecret } from 'types'
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
+import Link from 'next/link'
 
 interface Props {
   secret: VaultSecret
@@ -23,6 +24,8 @@ interface Props {
 
 const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
   const { vault } = useStore()
+  const { ref } = useParams()
+
   const [isLoading, setIsLoading] = useState(false)
   const [revealedValue, setRevealedValue] = useState<string>()
   const name = secret?.name ?? 'No name provided'
@@ -60,12 +63,14 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
             strokeWidth={2}
             className="text-scale-1000 transition group-hover:text-brand-900"
           />
-          <p
-            className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand-900"
-            title={secret.key_id}
-          >
-            {secret.key_id}
-          </p>
+          <Link href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}>
+            <a
+              className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand-900"
+              title={secret.key_id}
+            >
+              {secret.key_id}
+            </a>
+          </Link>
         </div>
       </div>
       <div className="flex items-center space-x-2 w-[40%]">

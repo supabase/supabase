@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FC, Fragment, useState } from 'react'
+import { FC, Fragment, useEffect, useState } from 'react'
 import {
   Alert,
   Input,
@@ -14,9 +14,11 @@ import {
   Badge,
   IconKey,
   IconLoader,
+  IconX,
 } from 'ui'
 import { useStore } from 'hooks'
 import Divider from 'components/ui/Divider'
+import { useRouter } from 'next/router'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
@@ -24,13 +26,18 @@ interface Props {}
 
 const EncryptionKeysManagement: FC<Props> = ({}) => {
   const { vault, ui } = useStore()
+  const router = useRouter()
+  const { id } = router.query
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'name' | 'created'>('created')
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
-
   const [isDeletingKey, setIsDeletingKey] = useState(false)
+
+  useEffect(() => {
+    if (id !== undefined) setSearchValue(id as string)
+  }, [id])
 
   const keys = (
     searchValue
@@ -88,12 +95,25 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
-              className="w-64"
+              className="w-64 input-clear"
               size="small"
               placeholder="Search by name or ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
               icon={<IconSearch strokeWidth={2} size={16} />}
+              actions={
+                searchValue.length > 0
+                  ? [
+                      <Button
+                        size="tiny"
+                        type="text"
+                        icon={<IconX />}
+                        className="px-1"
+                        onClick={() => setSearchValue('')}
+                      />,
+                    ]
+                  : []
+              }
             />
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
