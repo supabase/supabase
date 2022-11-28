@@ -56,9 +56,12 @@ const GlassPanel = ({
             "
       />
       <div
-        className={['px-8 pb-8', 'flex flex-col', icon ? 'gap-6' : 'gap-2', !header && 'pt-8'].join(
-          ' '
-        )}
+        className={[
+          'px-8 pb-8 relative',
+          'flex flex-col',
+          icon ? 'gap-6' : 'gap-2',
+          !header ? 'pt-8' : '',
+        ].join(' ')}
       >
         <div className="flex items-center gap-3">
           {typeof icon === 'string' ? (

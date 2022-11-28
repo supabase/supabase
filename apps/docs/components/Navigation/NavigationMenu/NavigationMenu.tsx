@@ -7,6 +7,7 @@ import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 import NavigationMenuCliList from './NavigationMenuCliList'
 import { useTheme } from 'common/Providers'
+import Image from 'next/image'
 
 const SideNav = () => {
   const router = useRouter()
@@ -150,18 +151,21 @@ const SideNav = () => {
       {
         label: 'JavaScript Client',
         icon: '/img/icons/javascript-icon',
+        hasLightIcon: false,
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
       {
         label: 'Python Client Library',
         icon: '/img/icons/python-icon',
+        hasLightIcon: false,
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
       {
         label: 'Dart Client Library',
         icon: '/img/icons/dart-icon',
+        hasLightIcon: false,
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
@@ -171,18 +175,21 @@ const SideNav = () => {
       {
         label: 'Mangement API',
         icon: '/img/icons/api-icon',
+        hasLightIcon: false,
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
       {
         label: 'CLI',
         icon: '/img/icons/cli-icon',
+        hasLightIcon: false,
         href: '/new/reference/cli/start',
         level: 'reference_javascript',
       },
       {
         label: 'Self hosting server',
         icon: '/img/icons/menu/platform',
+        hasLightIcon: false,
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
@@ -228,14 +235,15 @@ const SideNav = () => {
                                 'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
                               ].join(' ')}
                             >
-                              <img
+                              <Image
+                                alt={link.label}
                                 src={`${router.basePath}${
-                                  !link.icon.includes('png')
-                                    ? link.icon
-                                    : isDarkMode
+                                  isDarkMode && !link.hasLightIcon
                                     ? link.icon
                                     : `${link.icon}-light`
                                 }${!link.icon.includes('png') ? '.svg' : ''}`}
+                                width={17}
+                                height={17}
                                 className="opacity-75 w-4 h-4 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
                               />
                               {link.label}
