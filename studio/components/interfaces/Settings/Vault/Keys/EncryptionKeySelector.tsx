@@ -48,7 +48,7 @@ const EncryptionKeySelector: FC<Props> = ({
         {keys.map((key) => (
           <Listbox.Option
             key={key.id}
-            label={key.status === 'default' ? `${key.id} (Default)` : key.id}
+            label={key.name === 'default_vault_key' ? `${key.id} (Default)` : key.id}
             value={key.id}
           >
             <div className="space-y-1">

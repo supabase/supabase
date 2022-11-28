@@ -16,7 +16,7 @@ export interface IVaultStore {
 
   listSecrets: (filter?: any) => VaultSecret[]
   addSecret: (secret: Partial<VaultSecret>) => any
-  updateSecret: (payload: any) => any
+  updateSecret: (id: string, payload: Partial<VaultSecret>) => any
   deleteSecret: (id: string) => any
   fetchSecretValue: (id: string) => any
 }
@@ -156,8 +156,20 @@ export default class VaultStore implements IVaultStore {
     return res
   }
 
-  async updateSecret(payload: any) {
-    const query = new Query().from('decrypted_secrets', 'vault')
+  async updateSecret(id: string, payload: Partial<VaultSecret>) {
+    const query = new Query()
+      .from('decrypted_secrets', 'vault')
+      .update(payload, { returning: true })
+      .match({ id })
+      .toSql()
+    const res = await this.rootStore.meta.query(query)
+    if (!res.error) {
+      this.data.secrets = this.data.secrets.map((secret) => {
+        if (secret.id === res[0].id) return res[0]
+        else return secret
+      })
+    }
+    return res
   }
 
   async deleteSecret(id: string) {
