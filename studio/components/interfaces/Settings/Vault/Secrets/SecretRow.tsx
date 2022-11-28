@@ -54,9 +54,16 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
             </p>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          <IconKey size={14} strokeWidth={2} />
-          <p className="text-scale-1100 font-mono text-xs" title={secret.key_id}>
+        <div className="flex items-center space-x-2 group">
+          <IconKey
+            size={14}
+            strokeWidth={2}
+            className="text-scale-1000 transition group-hover:text-brand-900"
+          />
+          <p
+            className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand-900"
+            title={secret.key_id}
+          >
             {secret.key_id}
           </p>
         </div>
