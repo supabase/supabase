@@ -51,7 +51,7 @@ export default function TicketVisual({
           <TicketMonoMobile golden={golden} />
         </div>
         <div className={styles.logo}>
-          <img src="/images/launchweek/ticket-logo-dark.svg" />
+          <img src={`/images/launchweek/ticket-logo-${golden ? 'light' : 'dark'}.svg`} />
         </div>
         <div className={styles.profile}>
           <TicketProfile

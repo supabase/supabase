@@ -65,7 +65,7 @@ export default function TicketProfile({
             <img
               alt="Supabase disconnected badge"
               src={`/images/launchweek/supabadge-${
-                username ? 'connected' : golden ? 'gold' : 'disconnected'
+                golden ? 'gold' : username ? 'connected' : 'disconnected'
               }.svg`}
               className="ml-2"
             />
