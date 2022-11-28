@@ -194,8 +194,9 @@ const SideNav = () => {
       {/* // main menu */}
       <div
         className={[
-          'absolute transition-all duration-150 ease-out',
-          level === 'home' ? 'opacity-100 ml-0 delay-150' : 'opacity-0 -ml-8',
+          '',
+          'transition-all duration-150 ease-out',
+          level === 'home' ? 'opacity-100 ml-0 delay-150' : 'opacity-0 -ml-8 invisible absolute',
           // level !== 'home' && 'opacity-0 invisible'
         ].join(' ')}
       >

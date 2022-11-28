@@ -78,30 +78,25 @@ const TopNavBarRef: FC = () => {
 
   return (
     <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300">
-      <div className="px-5 max-w-7xl mx-auto flex items-center h-full">
-        <div className="col-span-3 flex items-center">
-          <button className="mr-4 block stroke-2 lg:hidden" onClick={toggleMobileMenu}>
-            <IconMenu className="text-scale-1100" />
-          </button>
-          {versions.length > 0 && (
-            <div className="ml-8">
-              <Listbox
-                size="small"
-                defaultValue={version}
-                style={{ width: '70px' }}
-                onChange={onSelectVersion}
-              >
-                {versions.map((version) => (
-                  <Listbox.Option key={version} label={version} value={version}>
-                    {version}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
-            </div>
-          )}
+      <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
+        <div className={['lg:hidden'].join(' ')}>
+          <Link href="/">
+            <a className=" flex items-center gap-2">
+              <Image
+                className="cursor-pointer"
+                src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+                width={96}
+                height={24}
+                alt="Supabase Logo"
+              />
+              <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
+            </a>
+          </Link>
+          {/* {router.asPath.includes('/new/reference/') && <RefSwitcher />} */}
         </div>
+
         <div className="flex items-center gap-12">
-          <SearchButton className="w-96">
+          <SearchButton className="w-full lg:w-96">
             <div
               className="
               flex 
@@ -113,15 +108,15 @@ const TopNavBarRef: FC = () => {
               transition
               hover:border-scale-600
               hover:bg-scaleA-300 
-              border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded"
+              border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded"
             >
               <div className="flex items-center space-x-2">
                 <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
-                <p className="text-scale-1100 text-sm group-hover:text-scale-1200 transition">
+                <p className="hidden md:flex text-scale-1100 text-sm group-hover:text-scale-1200 transition">
                   Search docs...
                 </p>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className="hidden md:flex items-center space-x-1">
                 <div className="text-scale-1200 md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
                   <IconCommand size={12} strokeWidth={1.5} />
                   <span className="text-[12px]">K</span>
@@ -211,7 +206,7 @@ const TopNavBarRef: FC = () => {
             </Dropdown>
           </div> */}
 
-          <Dropdown
+          {/* <Dropdown
             size="small"
             align="start"
             side="bottom"
@@ -266,9 +261,9 @@ const TopNavBarRef: FC = () => {
                 </div>
               </div>
             </div>
-          </Dropdown>
+          </Dropdown> */}
         </div>
-        <div className="grow flex items-center justify-end gap-3">
+        <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button
             type="text"
             as="a"

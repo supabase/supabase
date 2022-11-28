@@ -38,11 +38,15 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                 <IconChevronLeft size={10} strokeWidth={3} />
               </div>
             </div>
-            <span>Main Menu</span>
+            <span>Back to Home</span>
           </a>
         </Link>
 
-        <div className="flex items-center gap-3 my-3">
+        <div
+          className="flex items-center gap-3 my-3 
+        
+        invisible md:visible"
+        >
           {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
           <img
             src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
