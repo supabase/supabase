@@ -50,7 +50,7 @@
 .username {
   display: inline-block;
   font-size: calc(1em * var(--size));
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
   display: flex;
   align-items: center;
   margin: 0;

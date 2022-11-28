@@ -47,8 +47,13 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
         .eq('email', email)
         .select()
         .single()
-        .then(({ data, error }) => {
+        .then(async ({ error }) => {
           if (error) return supabase.auth.signOut()
+          const { data } = await supabase
+            .from('lw6_tickets_golden')
+            .select('*')
+            .eq('username', username)
+            .single()
           setUserData(data)
           setFormState('default')
 
@@ -64,13 +69,24 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   }, [session])
 
   async function register(email: string, token?: string): Promise<ConfUser> {
-    const { data, error } = await supabase!.from('lw6_tickets').insert({ email })
+    const { error } = await supabase!.from('lw6_tickets').insert({ email })
+    if (error) {
+      console.log({ error })
+      return {
+        id: 'new',
+        ticketNumber: 1234,
+        name: '',
+        username: '',
+        golden: false,
+      }
+    }
+    const { data } = await supabase!.from('lw6_tickets_golden').select('*').limit(1).single()
     return {
-      id: 'new',
-      ticketNumber: 1234,
-      name: '',
-      username: '',
-      golden: false,
+      id: data?.id ?? 'new',
+      ticketNumber: data?.ticketNumber ?? 1234,
+      name: data?.name ?? '',
+      username: data?.username ?? '',
+      golden: data?.golden ?? false,
     }
   }
 

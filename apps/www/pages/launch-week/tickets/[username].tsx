@@ -7,6 +7,7 @@ import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
 import { createClient } from '@supabase/supabase-js'
 import { useState } from 'react'
+import { FastGlobOptionsWithoutCwd } from 'globby'
 
 type Props = {
   username: string | null
@@ -30,11 +31,9 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
     return <Error statusCode={404} />
   }
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?ticketNumber=${encodeURIComponent(
-    ticketNumber ?? ''
-  )}&username=${encodeURIComponent(username ?? '')}&name=${encodeURIComponent(name ?? '')}${
-    golden ? '&golden=true' : ''
-  }`
+  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?username=${encodeURIComponent(
+    username ?? ''
+  )}`
 
   return (
     <>
@@ -83,16 +82,17 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const username = params?.username?.toString() || null
   let name: string | null | undefined
   let ticketNumber: number | null | undefined
-  const GOLDEN_TICKETS = (process.env.GOLDEN_TICKETS?.split(',') ?? []).map((n) => Number(n))
+  let golden = false
 
   if (username) {
     const { data: user } = await supabaseAdmin!
-      .from('lw6_tickets')
-      .select('name, ticketNumber')
+      .from('lw6_tickets_golden')
+      .select('name, ticketNumber, golden')
       .eq('username', username)
       .single()
     name = user?.name
     ticketNumber = user?.ticketNumber
+    golden = user?.golden ?? false
   }
   return {
     props: {
@@ -100,7 +100,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       usernameFromParams: username || null,
       name: ticketNumber ? name || username || null : null,
       ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
-      golden: GOLDEN_TICKETS.includes(ticketNumber ?? SAMPLE_TICKET_NUMBER),
+      golden,
     },
     revalidate: 5,
   }
