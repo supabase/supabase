@@ -52,7 +52,7 @@ const EncryptionKeySelector: FC<Props> = ({
             value={key.id}
           >
             <div className="space-y-1">
-              <p>{key.comment || 'No description provided'}</p>
+              <p>{key.name || 'No name provided'}</p>
               <p className="text-xs">
                 ID: <span className="font-mono">{key.id}</span>
               </p>
