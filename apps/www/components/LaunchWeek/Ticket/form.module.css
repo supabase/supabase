@@ -36,7 +36,7 @@
   font-size: 1.1em;
   line-height: 1.4;
   margin-bottom: 32px;
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
 }
 
 @media (min-width: 1200px) {
@@ -86,7 +86,7 @@
 }
 
 .input::placeholder {
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
 }
 
 .input-label {
@@ -231,7 +231,7 @@
 .or-divider {
   width: 100%;
   text-align: center;
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
   margin: var(--space-4x) 0;
 }
 

@@ -21,7 +21,7 @@
 .description {
   font-size: 20px;
   line-height: 1.4;
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
   text-align: center;
   margin: 30px auto;
   max-width: 350px;

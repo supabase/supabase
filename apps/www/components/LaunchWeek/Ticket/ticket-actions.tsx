@@ -23,11 +23,9 @@ export default function TicketActions({ username, golden = false }: Props) {
   const { userData } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${text}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?ticketNumber=${encodeURIComponent(
-    userData.ticketNumber ?? ''
-  )}&username=${encodeURIComponent(userData.username ?? '')}&name=${encodeURIComponent(
-    userData.name ?? ''
-  )}${userData.golden ? '&golden=true' : ''}`
+  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?username=${encodeURIComponent(
+    userData.username ?? ''
+  )}`
 
   useEffect(() => {
     setImgReady(false)

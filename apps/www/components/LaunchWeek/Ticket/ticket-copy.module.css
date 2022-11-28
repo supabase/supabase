@@ -1,5 +1,5 @@
 .wrapper {
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,7 +66,7 @@
 }
 
 .mobile-copy * {
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
   transition: color 0.2s ease;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .field * {
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
   transition: color 0.2s ease;
 }
 

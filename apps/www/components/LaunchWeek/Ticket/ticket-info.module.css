@@ -36,7 +36,7 @@
   /* text-transform: uppercase; */
   font-size: calc(18px * var(--size));
 
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
 }
 
 .date-golden {
@@ -77,7 +77,7 @@
   margin-bottom: var(--space-12x);
   font-size: calc(18px * var(--size));
 
-  color: var(--secondary-color);
+  color: var(--lw-secondary-color);
 }
 
 .url-golden {
