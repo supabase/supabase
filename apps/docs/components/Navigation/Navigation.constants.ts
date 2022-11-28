@@ -244,6 +244,7 @@ export const menuItems: NavMenu = {
       label: 'Storage',
       items: [
         { name: 'Overview', url: '/guides/storage', items: [] },
+        { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
         { name: 'CDN', url: '/guides/storage-cdn', items: [] },
       ],
     },
