@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 import RefSwitcher from '~/components/Navigation/RefSwitcher'
 import { useEffect, useState } from 'react'

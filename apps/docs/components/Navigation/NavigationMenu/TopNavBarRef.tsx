@@ -17,7 +17,7 @@ import {
 } from 'ui'
 import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 import { getPageType } from '~/lib/helpers'
 
@@ -99,15 +99,15 @@ const TopNavBarRef: FC = () => {
           <SearchButton className="w-full lg:w-96">
             <div
               className="
-              flex 
+              flex
               group
-              items-center 
-              justify-between 
-              bg-scaleA-200 
-              border 
+              items-center
+              justify-between
+              bg-scaleA-200
+              border
               transition
               hover:border-scale-600
-              hover:bg-scaleA-300 
+              hover:bg-scaleA-300
               border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded"
             >
               <div className="flex items-center space-x-2">
@@ -129,15 +129,15 @@ const TopNavBarRef: FC = () => {
             <div className="w-64">
               <div
                 className="
-              flex 
+              flex
               group
-              items-center 
-              justify-between 
-              bg-scaleA-200 
-              border 
+              items-center
+              justify-between
+              bg-scaleA-200
+              border
               transition
               hover:border-scale-600
-              hover:bg-scaleA-300 
+              hover:bg-scaleA-300
               border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
               rounded-tr-none
               rounded-br-none
@@ -177,15 +177,15 @@ const TopNavBarRef: FC = () => {
               <div className="w-32">
                 <div
                   className="
-              flex 
+              flex
               group
-              items-center 
-              justify-between 
-              bg-scaleA-200 
-              border 
+              items-center
+              justify-between
+              bg-scaleA-200
+              border
               transition
               hover:border-scale-600
-              hover:bg-scaleA-300 
+              hover:bg-scaleA-300
               border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
               font-mono
 
@@ -231,15 +231,15 @@ const TopNavBarRef: FC = () => {
             <div className="w-96">
               <div
                 className="
-              flex 
+              flex
               gap-3
               group
-              items-center 
-              bg-scaleA-200 
-              border 
+              items-center
+              bg-scaleA-200
+              border
               transition
               hover:border-scale-600
-              hover:bg-scaleA-300 
+              hover:bg-scaleA-300
               border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
               font-mono
               "

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Item } from '../Accordion/Accordion'
+import { useTheme } from 'common/Providers'
 
 interface Props {
   title: string
@@ -8,7 +9,8 @@ interface Props {
   children?: React.ReactNode
   header?: string
   background?: boolean
-  isDarkMode?: boolean
+  img?: string
+  hasLightIcon?: boolean
 }
 
 const GlassPanel = ({
@@ -19,8 +21,10 @@ const GlassPanel = ({
   header,
   background = true,
   img,
-  isDarkMode,
+  hasLightIcon,
 }: Props) => {
+  const { isDarkMode } = useTheme()
+
   return (
     <div
       className={[
@@ -61,7 +65,9 @@ const GlassPanel = ({
             <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
               <img
                 className="bg-green-600 w-5"
-                src={`/docs/img/icons/menu/${icon}${isDarkMode && !isDarkMode ? '-light' : ''}.svg`}
+                src={`/docs/img/icons/menu/${icon}${
+                  hasLightIcon && !isDarkMode ? '-light' : ''
+                }.svg`}
               />
             </div>
           ) : (
