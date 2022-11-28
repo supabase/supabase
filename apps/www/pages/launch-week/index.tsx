@@ -82,7 +82,7 @@ export default function launchweek() {
               <Badge
                 color="brand"
                 size="large"
-                className="text-center flex justify-center mb-6 w-40"
+                className="text-center flex justify-center mb-6 w-40 bg-gradient-to-r from-white to-mint-900 text-black "
               >
                 <p className="flex items-center gap-2 p-1">Currently happening</p>
               </Badge>
