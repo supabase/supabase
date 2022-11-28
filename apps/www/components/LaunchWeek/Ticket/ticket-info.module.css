@@ -1,6 +1,5 @@
 .info {
   display: flex;
-  flex-direction: column;
   gap: 0px;
   margin-bottom: 64px;
   padding: 32px;
@@ -34,7 +33,7 @@
 
 .date {
   /* text-transform: uppercase; */
-  font-size: calc(18px * var(--size));
+  /* font-size: calc(18px * var(--size)); */
 
   color: var(--lw-secondary-color);
 }
@@ -47,7 +46,7 @@
   .date {
     margin-bottom: 0;
     line-height: 1.15;
-    font-size: calc(20px * var(--size));
+    /* font-size: calc(20px * var(--size)); */
   }
 }
 

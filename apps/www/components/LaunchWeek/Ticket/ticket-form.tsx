@@ -75,13 +75,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
           }}
         >
           <p className={`${username && 'text-scale-500'}`}>
-            {formState === 'loading' ? (
-              <LoadingDots size={4} />
-            ) : username ? (
-              'Done!'
-            ) : (
-              'Connect with GitHub'
-            )}
+            {username ? 'Done!' : 'Connect with GitHub'}
           </p>
           {username ? (
             <span className={ticketFormStyles.checkIcon}>
@@ -89,9 +83,11 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
             </span>
           ) : null}
         </button>
-        <p className={'text-xs text-scale-300 dark:text-scale-900 pl-1'}>
-          Only public info will be used.
-        </p>
+        {!username && (
+          <p className={'text-xs text-scale-300 dark:text-scale-900 pl-1'}>
+            Only public info will be used.
+          </p>
+        )}
       </div>
     </form>
   )

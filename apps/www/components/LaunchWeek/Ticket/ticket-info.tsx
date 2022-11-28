@@ -11,10 +11,10 @@ export default function TicketInfo({
 }) {
   return (
     <div className={styles.info}>
-      <div className={cn(styles.date, { [styles['date-golden']]: golden })}>
+      <div className={`${cn(styles.date, { [styles['date-golden']]: golden })} text-sm`}>
         <div>{DATE}</div>
       </div>
-      <div className={cn(styles.url, { [styles['url-golden']]: golden })}>{siteUrlForTicket}</div>
+      {/* <div className={cn(styles.url, { [styles['url-golden']]: golden })}>{siteUrlForTicket}</div> */}
     </div>
   )
 }
