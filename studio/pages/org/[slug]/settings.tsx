@@ -4,14 +4,7 @@ import { useRouter } from 'next/router'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 import { Member, NextPageWithLayout, Organization, Project, Role, User } from 'types'
-import {
-  useFlag,
-  useOrganizationDetail,
-  useOrganizationRoles,
-  useStore,
-  withAuth,
-  useParams,
-} from 'hooks'
+import { useFlag, useStore, withAuth, useParams } from 'hooks'
 import { AccountLayoutWithoutAuth } from 'components/layouts'
 import {
   GeneralSettings,
@@ -19,6 +12,8 @@ import {
   BillingSettings,
   InvoicesSettings,
 } from 'components/interfaces/Organization'
+import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 
 export const PageContext = createContext(null)
 
@@ -28,8 +23,9 @@ const OrgSettingsLayout = withAuth(
     const router = useRouter()
     const { slug } = useParams()
 
-    const { roles: allRoles } = useOrganizationRoles(slug)
+    const { data } = useOrganizationRolesQuery({ slug })
     const enableBillingOnlyReadOnly = useFlag('enableBillingOnlyReadOnlyRoles')
+    const allRoles = data?.roles
     const roles = enableBillingOnlyReadOnly
       ? allRoles
       : (allRoles ?? []).filter((role) =>
@@ -114,7 +110,7 @@ const OrganizationSettings: NextPageWithLayout = () => {
   const PageState: any = useContext(PageContext)
   const { ui, app } = useStore()
   const [selectedTab, setSelectedTab] = useState('GENERAL')
-  const { members, isError: isOrgDetailError } = useOrganizationDetail(slug || '')
+  const { data, isError: isOrgDetailError } = useOrganizationDetailQuery({ slug })
   const hash = router.asPath.split('#')[1]?.toUpperCase()
 
   useEffect(() => {
@@ -144,9 +140,9 @@ const OrganizationSettings: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!isOrgDetailError) {
-      PageState.members = members ?? []
+      PageState.members = data?.members ?? []
     }
-  }, [members, isOrgDetailError])
+  }, [data?.members, isOrgDetailError])
 
   if (!ui.selectedOrganization || !PageState.organization) return <div />
 
