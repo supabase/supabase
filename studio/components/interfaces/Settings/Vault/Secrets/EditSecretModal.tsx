@@ -1,7 +1,9 @@
+import { isEmpty } from 'lodash'
 import { FC, useState, useEffect } from 'react'
+import { Modal, Form, Input, Button, IconEyeOff, IconEye } from 'ui'
+
 import { useStore } from 'hooks'
 import { VaultSecret } from 'types'
-import { Modal, Form, Input, Button, IconEyeOff, IconEye } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
@@ -11,10 +13,11 @@ interface Props {
 }
 
 const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
-  const { vault } = useStore()
-  const [isLoadingSecretValue, setIsLoadingSecretValue] = useState(false)
-  const [showSecretValue, setShowSecretValue] = useState(false)
+  const { ui, vault } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
+  const [secretValue, setSecretValue] = useState<string>()
+  const [showSecretValue, setShowSecretValue] = useState(false)
+  const [isLoadingSecretValue, setIsLoadingSecretValue] = useState(false)
 
   let INITIAL_VALUES = {
     name: selectedSecret?.name ?? '',
@@ -25,7 +28,10 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
   useEffect(() => {
     if (selectedSecret !== undefined) {
       setShowSecretValue(false)
-      setSelectedKeyId(selectedSecret?.key_id)
+      setSelectedKeyId(selectedSecret.key_id)
+      if (selectedSecret.decryptedSecret !== undefined) {
+        setSecretValue(selectedSecret.decryptedSecret)
+      }
     }
   }, [selectedSecret])
 
@@ -37,9 +43,28 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
   }
 
   const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
+    const payload: Partial<VaultSecret> = {}
+    if (values.name !== selectedSecret.name) payload.name = values.name
+    if (values.description !== selectedSecret.description) payload.description = values.description
+    if (values.secret !== secretValue) payload.secret = values.secret
+    if (selectedKeyId !== selectedSecret.key_id) payload.key_id = selectedKeyId
 
-    setSubmitting(false)
+    if (!isEmpty(payload)) {
+      setSubmitting(true)
+      const res = await vault.updateSecret(selectedSecret.id, payload)
+      if (!res.error) {
+        ui.setNotification({ category: 'success', message: 'Successfully updated secret' })
+        setSubmitting(false)
+        onClose()
+      } else {
+        ui.setNotification({
+          error: res.error,
+          category: 'error',
+          message: `Failed to update secret: ${res.error.message}`,
+        })
+        setSubmitting(false)
+      }
+    }
   }
 
   return (
@@ -69,6 +94,7 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
             if (selectedSecret === undefined) return
             setIsLoadingSecretValue(true)
             const res = await vault.fetchSecretValue(selectedSecret.id)
+            setSecretValue(res)
             resetForm({
               values: { ...INITIAL_VALUES, secret: res },
               initialValues: { ...INITIAL_VALUES, secret: res },
