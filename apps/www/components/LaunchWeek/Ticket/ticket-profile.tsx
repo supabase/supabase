@@ -34,11 +34,11 @@ export default function TicketProfile({
       </span>
       <div className={styles.text}>
         <p
-          className={cn(
+          className={`${cn(
             styles.name,
             { [styles['name-blank']]: !username },
             { [styles['name-golden']]: golden }
-          )}
+          )} dark:text-white`}
         >
           <span
             className={cn(styles.skeleton, styles.wrapper, {
@@ -60,7 +60,7 @@ export default function TicketProfile({
                 size={20 * size}
               /> */}
             </span>
-            {username || <>username</>}
+            {username ? `@${username}` : <>username</>}
           </span>
         </p>
       </div>

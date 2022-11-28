@@ -11,6 +11,10 @@ import { WeekDayProps } from '~/components/LaunchWeek/types'
 
 import { ArrowRightIcon } from '@heroicons/react/outline'
 import { Badge, Modal } from 'ui'
+import { useEffect, useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
+import { useRouter } from 'next/router'
+import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 
 const days = _days as WeekDayProps[]
 
@@ -19,6 +23,26 @@ export default function launchweek() {
   const shippingHasStarted = false
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
+
+  const [supabase] = useState(() =>
+    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+  )
+  const [session, setSession] = useState<Session | null>(null)
+  // const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
+  const { query } = useRouter()
+  const ticketNumber = query.ticketNumber?.toString()
+  const defaultUserData = {
+    id: query.id?.toString(),
+    ticketNumber: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
+    name: query.name?.toString(),
+    username: query.username?.toString(),
+  }
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session)
+    })
+  }, [])
 
   return (
     <>
@@ -50,13 +74,13 @@ export default function launchweek() {
           {/* {!shippingHasStarted && <PreLaunchTeaser />} */}
         </SectionContainer>
         <SectionContainer className="flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4">
-          <span className="text-scale-1200">Coming soon</span>
+          {/* <span className="text-scale-1200">Coming soon</span>
           <p className="text-scale-1000 text-sm">
             Register to get your ticket and stay tuned all week for daily announcements
-          </p>
+          </p> */}
         </SectionContainer>
         <SectionContainer className="flex flex-col items-center !p-0">
-          <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]">
+          {/* <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]">
             <input
               className="mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full w-full"
               placeholder="Enter email"
@@ -64,7 +88,13 @@ export default function launchweek() {
             <button className="px-4 py-1 rounded-full bg-scale-300 text-scale-1200 border border-scale-600 text-xs hover:bg-scale-400">
               Submit
             </button>
-          </form>
+          </form> */}
+          <TicketContainer
+            supabase={supabase}
+            session={session}
+            defaultUserData={defaultUserData}
+            defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
+          />
         </SectionContainer>
         <div className="gradient-container">
           <div className="flair-mask-a"></div>

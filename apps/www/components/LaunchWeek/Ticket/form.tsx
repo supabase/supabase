@@ -156,13 +156,13 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
     <>
       <div
         className={cn(
-          styleUtils.appear,
           styleUtils['appear-fifth'],
-          [styles.formInfo, styles[`formInfo${align}`]].join(' ')
+          [styles[`formInfo${align}`]].join(' '),
+          'flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4'
         )}
       >
-        <h3>Get a ticket</h3>
-        <p>
+        <h3 className="text-scale-1200">Get a ticket</h3>
+        <p className="text-scale-1000 text-sm">
           A few of the lucky attendees will get a limited edition Supabase goodie bag. Make sure you
           don’t skip your chance.
         </p>
@@ -188,43 +188,31 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
         </div>
       ) : (
         <form
-          className={cn(styles.form, styles[`form${align}`], {
-            [styles['share-page']]: sharePage,
-            [styleUtils.appear]: !errorTryAgain,
-            [styleUtils['appear-fifth']]: !errorTryAgain && !sharePage,
-            [styleUtils['appear-third']]: !errorTryAgain && sharePage,
-          })}
+          className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]"
           onSubmit={onSubmit}
         >
-          <div className={styles['form-row']}>
-            <label
-              htmlFor="email-input-field"
-              className={cn(styles['input-label'], {
-                [styles.focused]: focused,
-              })}
-            >
-              <input
-                className={styles.input}
-                autoComplete="off"
-                type="email"
-                id="email-input-field"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                placeholder="Enter email to register free"
-                aria-label="Your email address"
-                required
-              />
-            </label>
-            <button
-              type="submit"
-              className={cn(styles.submit, styles.register, styles[formState])}
-              disabled={formState === 'loading'}
-            >
-              {formState === 'loading' ? <LoadingDots size={4} /> : <>Register</>}
-            </button>
-          </div>
+          <input
+            className={`mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full w-full border-none`}
+            autoComplete="off"
+            type="email"
+            id="email-input-field"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="Enter email"
+            aria-label="Your email address"
+            required
+          />
+          <button
+            type="submit"
+            className={
+              'px-4 py-1 rounded-full bg-scale-300 text-scale-1200 border border-scale-600 text-xs hover:bg-scale-400'
+            }
+            disabled={formState === 'loading'}
+          >
+            Register
+          </button>
           {/* <Captcha ref={captchaRef} onVerify={handleRegister} /> */}
         </form>
       )}

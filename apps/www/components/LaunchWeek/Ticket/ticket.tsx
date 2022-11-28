@@ -66,12 +66,10 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
                 You won a golden ticket! <br /> Claim it now!
               </>
             ) : (
-              <>
-                You're in. <br /> Make it unique.
-              </>
+              <p className="text-2xl dark:text-white mb-4">Congratulations, you have a ticket!</p>
             )}
           </h2>
-          <p className={cn(styles.description, styleUtils.appear, styleUtils['appear-second'])}>
+          <p className="text-sm dark:text-scale-900 max-w-[380px]">
             {sharePage ? (
               <>
                 Join {name ?? 'us'} on {DATE}.
@@ -80,8 +78,9 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
               <>Claim your ticket with GitHub and Tweet it to redeem your swag pack!</>
             ) : (
               <>
-                Generate a unique ticket image with <br className={styleUtils['hide-on-mobile']} />
-                your GitHub profile.
+                This means you’re in. Generate a unique ticket image with your GitHub profile cause
+                a few of the lucky attendees will get a limited edition Supabase goodie bag. Make
+                sure you don’t skip your chance.
               </>
             )}
           </p>
@@ -114,7 +113,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           <>
             {username ? (
               <div>
-                <div className={styles['ticket-actions']}>
+                <div className={`${styles['ticket-actions']} gap-10`}>
                   <TicketActions username={username} golden={golden} />
                 </div>
                 <div className={styles['ticket-copy']}>

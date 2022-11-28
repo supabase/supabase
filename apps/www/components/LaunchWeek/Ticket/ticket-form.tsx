@@ -63,40 +63,35 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
         })
       }}
     >
-      <div className={cn(formStyles['form-row'], ticketFormStyles['form-row'])}>
-        <div className={cn(formStyles['github-wrapper'])}>
-          <button
-            type="submit"
-            className={cn(
-              formStyles.submit,
-              formStyles['generate-with-github'],
-              formStyles[formState]
+      <div>
+        <button
+          type="submit"
+          className="rounded-full bg-scale-300 py-1 px-3 border border-scale-400 dark:text-white text-sm mb-1"
+          disabled={formState === 'loading' || Boolean(username)}
+          onClick={() => {
+            // if (formRef && formRef.current && isMobileOrTablet()) {
+            //   scrollTo(formRef.current, formRef.current.offsetHeight);
+            // }
+          }}
+        >
+          <p className={`${username && 'text-scale-500'}`}>
+            {formState === 'loading' ? (
+              <LoadingDots size={4} />
+            ) : username ? (
+              'Done!'
+            ) : (
+              'Connect with GitHub'
             )}
-            disabled={formState === 'loading' || Boolean(username)}
-            onClick={() => {
-              // if (formRef && formRef.current && isMobileOrTablet()) {
-              //   scrollTo(formRef.current, formRef.current.offsetHeight);
-              // }
-            }}
-          >
-            <div className={ticketFormStyles.generateWithGithub}>
-              <span className={ticketFormStyles.githubIcon}>
-                {/* <GithubIcon color="#fff" size={24} /> */}
-              </span>
-              {formState === 'loading' ? (
-                <LoadingDots size={4} />
-              ) : (
-                username || 'Generate with GitHub'
-              )}
-            </div>
-            {username ? (
-              <span className={ticketFormStyles.checkIcon}>
-                {/* <CheckIcon color="#fff" size={24} /> */}
-              </span>
-            ) : null}
-          </button>
-          <p className={ticketFormStyles.description}>Only public info will be used.</p>
-        </div>
+          </p>
+          {username ? (
+            <span className={ticketFormStyles.checkIcon}>
+              {/* <CheckIcon color="#fff" size={24} /> */}
+            </span>
+          ) : null}
+        </button>
+        <p className={'text-xs text-scale-300 dark:text-scale-900 pl-1'}>
+          Only public info will be used.
+        </p>
       </div>
     </form>
   )

@@ -25,14 +25,16 @@ export default function TicketVisual({
   ticketGenerationState = 'default',
   golden = false,
 }: Props) {
-  // golden = true;
-
+  // golden = true
+  console.log(ticketNumber)
   const router = useRouter()
   const basePath = router.basePath
+
   return (
     <>
       <div
         className={[styles.visual, golden ? styles['visual--gold'] : ''].join(' ')}
+        // className={`rounded-2xl shadow-xl shadow-brand-500`}
         style={{ ['--size' as string]: size }}
       >
         <div className={styles['horizontal-ticket']}>
@@ -49,7 +51,7 @@ export default function TicketVisual({
           <TicketMonoMobile golden={golden} />
         </div>
         <div className={styles.logo}>
-          <img src="/images/launchweek/launchweek-logo--dark.svg" />
+          <img src="/images/launchweek/ticket-logo-dark.svg" />
         </div>
         <div className={styles.profile}>
           <TicketProfile
@@ -69,9 +71,11 @@ export default function TicketVisual({
           />
         </div>
         {ticketNumber && (
-          <div className={styles['ticket-number-wrapper']}>
+          <div className={`${styles['ticket-number-wrapper']} dark:text-white`}>
             <div
-              className={cn(styles['ticket-number'], { [styles['ticket-number-golden']]: golden })}
+              className={`${cn(styles['ticket-number'], {
+                [styles['ticket-number-golden']]: golden,
+              })} bg-gradient-to-r from-white via-white to-black bg-clip-text text-transparent`}
             >
               <TicketNumber number={ticketNumber} />
             </div>
