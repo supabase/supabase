@@ -47,7 +47,10 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
     if (values.name !== selectedSecret.name) payload.name = values.name
     if (values.description !== selectedSecret.description) payload.description = values.description
     if (values.secret !== secretValue) payload.secret = values.secret
-    if (selectedKeyId !== selectedSecret.key_id) payload.key_id = selectedKeyId
+    if (selectedKeyId !== selectedSecret.key_id) {
+      payload.key_id = selectedKeyId
+      payload.secret = values.secret
+    }
 
     if (!isEmpty(payload)) {
       setSubmitting(true)
