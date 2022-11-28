@@ -31,15 +31,19 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
     title,
     id,
     icon,
+    product,
+    library,
   }: {
     title: string
     name: string
     id: string
     icon?: string
+    product?: string
+    library: string
   }) => {
     return (
       <li key={id}>
-        <Link href={`#${id}`} passHref>
+        <Link href={`/new/reference/${library}/${id}`} passHref>
           <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
             {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
             {title}
@@ -53,8 +57,8 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
     return (
       <span
         className="
-    font-mono text-xs uppercase 
-    text-scale-1200 font-medium 
+    font-mono text-xs uppercase
+    text-scale-1200 font-medium
     tracking-wider
     mb-3
     "
@@ -99,6 +103,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
             <span>Back to Main Menu</span>
           </a>
         </Link>
+        {console.log(menu)}
         {/* )} */}
         {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
         <div className="flex items-center gap-3 my-3">
@@ -111,21 +116,21 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
               ' '
             )}
           >
-            supabase-js
+            {menu.title}
           </h2>
         </div>
         {/* )} */}
         <ul className="">
           <Divider />
           <SideMenuTitle title="Database" />
-
+          {console.log({ clientLibsCommon })}
           {clientLibsCommon.functions
             .filter((x) => x.product === 'database')
             .map((x, index) => {
               // console.log(functions)
               return (
                 <>
-                  <FunctionLink {...x} />
+                  <FunctionLink {...x} library={menu.title} />
                 </>
               )
             })}

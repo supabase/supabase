@@ -489,7 +489,7 @@ export const reference = {
 
 export const reference_javascript = {
   icon: '/img/icons/javascript-icon.svg',
-  title: 'javascript-js',
+  title: 'javascript',
   parent: '/reference',
   items: [
     {
@@ -501,6 +501,26 @@ export const reference_javascript = {
           level: 'reference_javascript',
           items: [],
           icon: '/img/icons/javascript.svg',
+        },
+      ],
+    },
+  ],
+}
+
+export const reference_dart = {
+  icon: '/img/icons/dart-icon.svg',
+  title: 'dart',
+  parent: '/reference',
+  items: [
+    {
+      name: 'Getting Started',
+      items: [
+        {
+          name: 'fake link',
+          href: '/reference/dart/start',
+          level: 'reference_dart',
+          items: [],
+          icon: '/img/icons/dart.svg',
         },
       ],
     },
