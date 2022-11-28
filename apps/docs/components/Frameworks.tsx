@@ -1,5 +1,5 @@
 import ButtonCard from './ButtonCard'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 const Frameworks = () => {
   const { isDarkMode } = useTheme()

@@ -5,7 +5,7 @@ import { FC, useEffect, useState } from 'react'
 import { Button, IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Input, Listbox } from 'ui'
 import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 import { getPageType } from '~/lib/helpers'
 
@@ -106,15 +106,15 @@ const TopNavBar: FC = () => {
             <SearchButton className="w-full">
               <div
                 className="
-              flex 
+              flex
               group
-              items-center 
-              justify-between 
-              bg-scaleA-200 
-              border 
+              items-center
+              justify-between
+              bg-scaleA-200
+              border
               transition
               hover:border-scale-600
-              hover:bg-scaleA-300 
+              hover:bg-scaleA-300
               border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded"
               >
                 <div className="flex items-center space-x-2">

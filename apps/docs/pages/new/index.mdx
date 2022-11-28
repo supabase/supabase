@@ -14,13 +14,13 @@ Hello danny
 
 <div className="border rounded p-12">
 
-In this 25-minute guide, we’ll be building a collaborative user managment app using NextJS and Supabase.
+In this 25-minute guide, we'll be building a collaborative user managment app using NextJS and Supabase.
 As users add and move rectangles in a canvas, changes will be automatically synced and persisted, allowing for a canvas that updates in real-time across clients.
 Users will also be able to see other users selections, and undo and redo actions.
 
 </div>
 
-In this 25-minute guide, we’ll be building a collaborative user managment app using NextJS and Supabase.
+In this 25-minute guide, we'll be building a collaborative user managment app using NextJS and Supabase.
 As users add and move rectangles in a canvas, changes will be automatically synced and persisted, allowing for a canvas that updates in real-time across clients.
 Users will also be able to see other users selections, and undo and redo actions.
 
@@ -59,7 +59,7 @@ hello world
         <a className={product.span ?? 'col-span-4'}>
           <GlassPanel {...product} background={false}>
             {product.description}
-          </GlassPanel> 
+          </GlassPanel>
         </a>
       </Link>
     )
@@ -81,7 +81,7 @@ hello world
         <a className={product.span ?? 'col-span-4'}>
           <GlassPanel {...product} background={false}>
             {product.description}
-          </GlassPanel> 
+          </GlassPanel>
         </a>
       </Link>
     )
@@ -94,6 +94,7 @@ export const products = [
   {
     title: 'Database',
     icon: 'database',
+    hasLightIcon: true,
     href: '/guides/database',
     description: 'Social Login allows the user to sign into a third party website instead of.',
     span: 'col-span-6',
@@ -101,6 +102,7 @@ export const products = [
   {
     title: 'Auth',
     icon: 'auth',
+    hasLightIcon: true,
     href: '/guides/auth',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -110,6 +112,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Storage',
     icon: 'storage',
+    hasLightIcon: true,
     href: '/guides/storage',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -118,6 +121,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Realtime',
     icon: 'realtime',
+    hasLightIcon: true,
     href: '/guides/realtime',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -126,6 +130,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Edge Functions',
     icon: 'functions',
+    hasLightIcon: true,
     href: '/guides/functions',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -137,6 +142,7 @@ export const apis = [
   {
     title: 'Severless APIs',
     icon: 'reference',
+    hasLightIcon: true,
     href: 'database',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -145,6 +151,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Managment API',
     icon: 'reference',
+    hasLightIcon: true,
     href: 'auth',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -153,6 +160,7 @@ Social Login allows the user to sign into a third party website instead of creat
   {
     title: 'Client libraries',
     icon: 'reference',
+    hasLightIcon: true,
     href: 'storage',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -165,6 +173,7 @@ export const platform = [
     header: '/docs/img/cards/sample-card-header-3.svg',
     title: 'Dashboard guides',
     icon: 'reference',
+    hasLightIcon: true,
     href: 'database',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -175,6 +184,7 @@ Social Login allows the user to sign into a third party website instead of creat
     header: '/docs/img/cards/sample-card-header-2.svg',
     title: 'Integrations',
     icon: 'integrations',
+    hasLightIcon: true,
     href: 'auth',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
@@ -185,6 +195,7 @@ Social Login allows the user to sign into a third party website instead of creat
     header: '/docs/img/cards/sample-card-header-4.svg',
     title: 'Glossary',
     icon: 'reference',
+    hasLightIcon: true,
     href: 'storage',
     description: `
   Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.

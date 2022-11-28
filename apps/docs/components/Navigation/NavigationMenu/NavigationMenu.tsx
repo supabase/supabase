@@ -6,7 +6,7 @@ import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 import NavigationMenuCliList from './NavigationMenuCliList'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 const SideNav = () => {
   const router = useRouter()

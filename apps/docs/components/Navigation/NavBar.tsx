@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconCommand, Listbox } from 'ui'
-import { useTheme } from '../Providers'
+import { useTheme } from 'common/Providers'
 import { REFERENCES } from './Navigation.constants'
 import { SearchButton } from '../DocSearch'
 
