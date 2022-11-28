@@ -238,7 +238,11 @@ const SideNav = () => {
                               <Image
                                 alt={link.label}
                                 src={`${router.basePath}${
-                                  isDarkMode && !link.hasLightIcon
+                                  !link.hasLightIcon
+                                    ? isDarkMode
+                                      ? link.icon
+                                      : `${link.icon}-light`
+                                    : isDarkMode
                                     ? link.icon
                                     : `${link.icon}-light`
                                 }${!link.icon.includes('png') ? '.svg' : ''}`}
