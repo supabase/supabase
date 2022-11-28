@@ -26,7 +26,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
   return (
     <div className="flex my-16">
       <div className="w-full">
-        <div className={['flex flex-col mx-auto', 'max-w-7xl'].join(' ')}>{props.children}</div>
+        <div className={['grid gap-24 mx-auto', 'max-w-7xl'].join(' ')}>{props.children}</div>
       </div>
     </div>
   )
@@ -56,7 +56,7 @@ const StickyHeader: FC<StickyHeader> = ({ id, title, monoFont }) => {
     <h2
       ref={ref}
       className={[
-        'text-xl font-medium text-scale-1200 mb-12 max-w-xl',
+        'text-xl font-medium text-scale-1200 mb-8 max-w-xl',
         monoFont && 'font-mono',
       ].join(' ')}
     >

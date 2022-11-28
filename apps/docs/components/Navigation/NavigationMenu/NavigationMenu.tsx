@@ -53,6 +53,9 @@ const SideNav = () => {
       case url.includes(`/docs/new/reference/javascript/`) && url:
         setLevel('reference_javascript')
         break
+      case url.includes(`/docs/new/reference/dart/`) && url:
+        setLevel('reference_dart')
+        break
       case url.includes(`/docs/new/reference/cli/`) && url:
         setLevel('reference_cli')
         break
@@ -166,8 +169,8 @@ const SideNav = () => {
         label: 'Dart Client Library',
         icon: '/img/icons/dart-icon',
         hasLightIcon: false,
-        href: '/new/reference/javascript/start',
-        level: 'reference_javascript',
+        href: '/new/reference/dart/start',
+        level: 'reference_dart',
       },
       {
         label: 'Tools Reference',
@@ -275,6 +278,7 @@ const SideNav = () => {
 
       {/* reference level */}
       <NavigationMenuRefList id={'reference_javascript'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuRefList id={'reference_dart'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuCliList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
 
       {/* // ref menu */}
