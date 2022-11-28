@@ -157,6 +157,7 @@ export default class MetaStore implements IMetaStore {
     'realtime',
     'storage',
     'supabase_functions',
+    'vault',
     'graphql',
     'graphql_public',
   ]
@@ -299,7 +300,7 @@ export default class MetaStore implements IMetaStore {
         publish_insert: true,
         publish_update: true,
         publish_delete: true,
-        tables: []
+        tables: [],
       })
       if (publicationCreateError) throw publicationCreateError
       realtimePublication = publication
@@ -315,7 +316,7 @@ export default class MetaStore implements IMetaStore {
         : publicTables
             .filter((t: any) => t.id !== table.id)
             .map((t: any) => `${t.schema}.${t.name}`)
-      const { error } =  await this.publications.update(id, { tables: realtimeTables })
+      const { error } = await this.publications.update(id, { tables: realtimeTables })
       publicationUpdateError = error
     } else {
       const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
