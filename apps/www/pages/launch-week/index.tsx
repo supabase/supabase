@@ -110,9 +110,9 @@ export default function launchweek() {
           <div className="flair-mask-a"></div>
           <div className="flair-mask-b"></div>
         </div>
-        <div>
-          <div className="flex justify-between pt-80 mx-6 md:mx-16 lg:mx-40 overflow-hidden">
-            <div className="flex-1 relative overflow-hidden radial-mask">
+        {/* <div>
+          <div className="flex justify-between pt-80 mx-6 md:mx-16 lg:mx-40 overflow-hidden"> */}
+        {/* <div className="flex-1 relative overflow-hidden radial-mask">
               <div className="orbit absolute top-[75%]">
                 <span className="planet1"></span>
                 <span className="planet2"></span>
@@ -147,8 +147,8 @@ export default function launchweek() {
                   <ArrowRightIcon />
                 </div>
               </div>
-            </div>
-            {/* <div className="dark:bg-scale-300 flex flex-col gap-4 overflow-hidden rounded-md border bg-white shadow-sm md:max-w-lg">
+            </div> */}
+        {/* <div className="dark:bg-scale-300 flex flex-col gap-4 overflow-hidden rounded-md border bg-white shadow-sm md:max-w-lg">
               <div className="flex flex-col gap-3 p-10 pb-0">
                 <h3 className="text-scale-1200 text-lg">You can still win a lucky gold ticket</h3>
                 <p className="text-scale-1100 text-sm">
@@ -159,8 +159,8 @@ export default function launchweek() {
               <div className="px-10"></div>
               <img src="/images/launchweek/gold-ticket.svg" className="w-full" />
             </div> */}
-          </div>
-        </div>
+        {/* </div>
+        </div> */}
         {/* <SectionContainer
           className={[
             'grid flex-col gap-24 lg:gap-16',
