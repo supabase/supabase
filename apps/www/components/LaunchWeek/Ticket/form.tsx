@@ -30,6 +30,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   const [errorMsg, setErrorMsg] = useState('')
   const [errorTryAgain, setErrorTryAgain] = useState(false)
   const [focused, setFocused] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [formState, setFormState] = useState<FormState>('default')
   const { setPageState, setUserData, session, userData, supabase } = useConfData()
   const router = useRouter()
