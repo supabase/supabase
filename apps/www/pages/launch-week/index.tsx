@@ -15,10 +15,13 @@ import { useEffect, useState } from 'react'
 import { createClient, Session } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
+import { useTheme } from '~/components/Providers'
 
 const days = _days as WeekDayProps[]
 
 export default function launchweek() {
+  const { isDarkMode } = useTheme()
+
   // TODO: update days json
   const shippingHasStarted = false
   const title = 'Launch Week 6'
@@ -45,8 +48,8 @@ export default function launchweek() {
   }, [])
 
   useEffect(() => {
-    document.body.className = 'bg-[#121212]'
-  }, [])
+    document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
+  }, [isDarkMode])
 
   return (
     <>
@@ -121,24 +124,26 @@ export default function launchweek() {
               <Badge
                 color="brand"
                 size="large"
-                className="text-center flex justify-center mb-6 w-40 bg-gradient-to-r from-white to-mint-900 text-black "
+                className="text-center flex justify-center mb-6 w-40 bg-gradient-to-r from-white to-mint-900  "
               >
-                <p className="flex items-center gap-2 p-1">Currently happening</p>
+                <p className="flex items-center gap-2 p-1 text-white dark:text-black">
+                  Currently happening
+                </p>
               </Badge>
               <h2 className="text-scale-1200 text-5xl mb-6">See creators using Supabase</h2>
-              <p className="text-scale-800 text-base md:max-w-xl mb-16">
+              <p className="text-scale-900 text-base md:max-w-xl mb-16">
                 Description about Content Storm, something to tie it up with Launch Week
               </p>
 
-              <h3 className="text-scale-1200 text-sm mb-2">Coding Garden</h3>
-              <p className="text-scale-800 text-base md:max-w-[60%] mb-2">
+              <h3 className="text-scale-1200 text-lg mb-2">Coding Garden</h3>
+              <p className="text-scale-1000 text-base md:max-w-[60%] mb-2">
                 If needed this is a short description about the type of content this is linking to.
               </p>
               <div className="flex items-center">
                 <a href="www.google.com" className="text-bas text-brand-1100 mr-3">
                   Livestreaming Typescript
                 </a>{' '}
-                <div className="w-4 text-brand-1100">
+                <div className="w-4 text-brand-1100 -rotate-45">
                   <ArrowRightIcon />
                 </div>
               </div>
