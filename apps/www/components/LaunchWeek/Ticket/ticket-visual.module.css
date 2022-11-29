@@ -16,7 +16,7 @@
   border: 1px solid #1c5f52;
   animation: blank-svg-shadow 2s ease-in-out infinite alternate;
 
-  background-image: url('/images/launchweek/green-ticket.svg');
+  background-image: url('/images/launchweek/regular-ticket-background.png');
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -30,7 +30,7 @@
   background-color: #dea513;
   border: 1px solid rgba(255, 255, 0, 0.629);
   animation: svg-shadow 2s ease-in-out infinite alternate;
-  background-image: url('/images/launchweek/golden-ticket.svg');
+  background-image: url('/images/launchweek/gold-ticket-background.png');
   /* filter: drop-shadow(2.45223px 8.5828px 73.5669px #FFBD14);  */
   /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
 }
