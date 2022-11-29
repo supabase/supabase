@@ -281,7 +281,7 @@ launch week
 }
 
 .launch-week-gradientBg--announcement-bar {
-  background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
+  background: radial-gradient(circle, rgba(51, 68, 60, 1) 0%, rgba(0, 0, 0, 1) 100%);
   background-color: hsl(0, 0%, 11%);
   width: 100%;
   clear: both;
