@@ -40,7 +40,12 @@ interface Props {
     payload: CreateColumnPayload | UpdateColumnPayload,
     foreignKey: Partial<PostgresRelationship> | undefined,
     isNewRecord: boolean,
-    configuration: { columnId: string | undefined },
+    configuration: {
+      columnId: string | undefined
+      isEncrypted: boolean
+      keyId?: string
+      keyName?: string
+    },
     resolve: any
   ) => void
   updateEditorDirty: () => void
@@ -64,7 +69,7 @@ const ColumnEditor: FC<Props> = ({
     (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
   )
   const keys = vault.listKeys()
-  const defaultKey = keys.find((key) => key.status === 'default')
+  const defaultKey = keys.find((key) => key.name === 'default_vault_key') || keys[0]
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -139,7 +144,7 @@ const ColumnEditor: FC<Props> = ({
           columnId: column?.id,
           isEncrypted: columnFields.isEncrypted,
           keyId: columnFields.keyId,
-          keyDescription: columnFields.keyDescription,
+          keyName: columnFields.keyName,
         }
 
         // [Joshen TODO], we'll need to update the callback here to
@@ -324,9 +329,10 @@ const ColumnEditor: FC<Props> = ({
               {columnFields.isEncrypted && (
                 <EncryptionKeySelector
                   label="Select a key to encrypt your column with"
+                  error={errors?.keyName}
                   selectedKeyId={columnFields.keyId}
                   onSelectKey={(id) => onUpdateField({ keyId: id })}
-                  onUpdateDescription={(desc) => onUpdateField({ keyDescription: desc })}
+                  onUpdateDescription={(name) => onUpdateField({ keyName: name })}
                 />
               )}
             </FormSectionContent>

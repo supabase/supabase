@@ -26,6 +26,8 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
     const errors: any = {}
     if (values.name.length === 0) errors.name = 'Please provide a name for your secret'
     if (values.secret.length === 0) errors.secret = 'Please enter your secret value'
+    if (selectedKeyId === 'create-new' && values.keyName.length === 0)
+      errors.keyName = 'Please provide a name for your new key'
     return errors
   }
 
@@ -34,7 +36,7 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
     let encryptionKeyId = selectedKeyId
 
     if (values.keyId === 'create-new') {
-      const addKeyRes = await vault.addKey(values.keyDescription || undefined)
+      const addKeyRes = await vault.addKey(values.keyName || undefined)
       if (addKeyRes.error) {
         return ui.setNotification({
           error: addKeyRes.error,
@@ -81,7 +83,7 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
     >
       <Form
         id="add-new-secret-form"
-        initialValues={{ name: '', description: '', secret: '', keyId: '', keyDescription: '' }}
+        initialValues={{ name: '', description: '', secret: '', keyId: '', keyName: '' }}
         validate={validate}
         validateOnBlur={false}
         onSubmit={onAddNewSecret}
@@ -114,7 +116,7 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
                 <div className="py-4 space-y-4">
                   <EncryptionKeySelector
                     id="keyId"
-                    nameId="keyDescription"
+                    nameId="keyName"
                     label="Select a key to encrypt your secret with"
                     labelOptional="Optional"
                     selectedKeyId={selectedKeyId}
