@@ -296,6 +296,7 @@ export const menuItems: NavMenu = {
             { name: 'keyri', url: '/guides/integrations/keyri', items: [] },
             { name: 'Stytch', url: '/guides/integrations/stytch', items: [] },
             { name: 'SuperTokens', url: '/guides/integrations/supertokens', items: [] },
+            { name: 'Picket', url: '/guides/integrations/picket', items: [] },
           ],
         },
         {
