@@ -7,7 +7,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 1px solid #333;
+  border: 1px solid #999;
 }
 
 @media (min-width: 768px) {
@@ -72,7 +72,7 @@
 
 .empty-icon {
   display: block;
-  background: linear-gradient(135deg, #b4b6b8, #7f8183);
+  background: linear-gradient(135deg, #cfb014, #fafafa);
   width: 60px;
 }
 
