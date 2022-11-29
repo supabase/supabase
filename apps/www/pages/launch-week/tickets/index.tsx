@@ -49,11 +49,11 @@ export default function TicketHome() {
           <div>
             <img
               src="/images/launchweek/launchweek-logo--light.svg"
-              className="md:40 w-40 dark:hidden lg:w-80 mb-7"
+              className="md:40 w-40 dark:hidden lg:w-80 mb-6"
             />
             <img
               src="/images/launchweek/launchweek-logo--dark.svg"
-              className="md:40 hidden w-40 dark:block lg:w-80 mb-7"
+              className="md:40 hidden w-40 dark:block lg:w-80 mb-6"
             />
             <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
           </div>
