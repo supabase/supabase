@@ -70,9 +70,9 @@ export interface ColumnField {
   isPrimaryKey: boolean
   isNewColumn: boolean
 
-  isEncrypted?: boolean
+  isEncrypted: boolean
   keyId?: string
-  keyDescription?: string
+  keyName?: string
 }
 
 export interface PostgresDataTypeOption {

@@ -8,6 +8,7 @@ interface Props {
   label?: string
   labelOptional?: string
   selectedKeyId?: any
+  error?: string
   onSelectKey: (keyId: string) => void
   onUpdateDescription?: (desc: string) => void
 }
@@ -18,6 +19,7 @@ const EncryptionKeySelector: FC<Props> = ({
   label = 'Encryption key',
   labelOptional,
   selectedKeyId,
+  error,
   onSelectKey = () => {},
   onUpdateDescription = () => {},
 }) => {
@@ -64,6 +66,7 @@ const EncryptionKeySelector: FC<Props> = ({
         <Input
           id={nameId}
           label="Name"
+          error={error}
           onChange={(event) => onUpdateDescription(event.target.value)}
         />
       )}

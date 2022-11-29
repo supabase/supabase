@@ -122,17 +122,19 @@ const SidePanelEditor: FC<Props> = ({
     payload: CreateColumnPayload | UpdateColumnPayload,
     foreignKey: Partial<PostgresRelationship> | undefined,
     isNewRecord: boolean,
-    configuration: { columnId?: string },
+    configuration: { columnId?: string; isEncrypted: boolean; keyId?: string; keyName?: string },
     resolve: any
   ) => {
+    const { columnId, ...securityConfig } = configuration
     const response = isNewRecord
       ? await meta.createColumn(
           payload as CreateColumnPayload,
           selectedTable as PostgresTable,
-          foreignKey
+          foreignKey,
+          securityConfig
         )
       : await meta.updateColumn(
-          configuration.columnId as string,
+          columnId as string,
           payload as UpdateColumnPayload,
           selectedTable as PostgresTable,
           foreignKey
