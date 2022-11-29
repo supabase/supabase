@@ -45,7 +45,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   //     scrollTo(divRef.current, -30)
   //   }
   // }, [divRef, sharePage])
-  // golden = true
+  golden = true
   return (
     <div
       className={cn(styles['ticket-layout'], {
