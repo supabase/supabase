@@ -71,7 +71,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
               </p>
             )}
           </h2>
-          <h2 className="text-sm dark:text-scale-900 max-w-[380px]">
+          <h2 className="text-sm dark:text-scale-900 text-[#7E868C] max-w-[380px]">
             {sharePage ? (
               <>
                 Join {name ?? 'us'} on {DATE}.

@@ -45,7 +45,7 @@ export default function TicketActions({ username, golden = false }: Props) {
 
   const ActionStyle = ({ children }: any) => {
     return (
-      <div className="rounded-full bg-[#2E2E2E] px-5 py-1 text-white border border-[#3E3E3E]">
+      <div className="rounded-full bg-scale-300 dark:bg-[#2E2E2E] px-5 py-1 dark:text-white text-scale-900 border dark:border-[#3E3E3E] border-scale-400">
         {children}
       </div>
     )
