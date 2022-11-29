@@ -91,14 +91,24 @@ export async function handler(req: Request) {
                 textOverflow: 'clip',
               }}
             >
-              <p
+              <div
                 style={{
-                  fontSize: '60px',
-                  lineHeight: '66px',
+                  display: 'flex',
+                  color: 'transparent',
+                  backgroundImage:
+                    'linear-gradient(90deg, #F8F9FA 1.73%, rgba(248, 249, 250, 0.5) 100%)',
+                  backgroundClip: 'text',
                 }}
               >
-                {name}
-              </p>
+                <p
+                  style={{
+                    fontSize: '60px',
+                    lineHeight: '60px',
+                  }}
+                >
+                  {name}
+                </p>
+              </div>
               {/* Username and supaverified checkmark */}
               <div
                 style={{
