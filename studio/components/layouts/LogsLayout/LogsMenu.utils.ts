@@ -21,7 +21,7 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Edge',
+                name: 'API Edge Network',
                 key: 'edge-logs',
                 url: `/project/${ref}/logs/edge-logs`,
                 items: [],
