@@ -85,42 +85,40 @@ The Logs tab displays logs emitted during function execution.
 
 ---
 
-## Advanced Configuration
-
-### Logging Postgres Queries
+## Logging Postgres Queries
 
 By default, query logs are disabled for new Supabase projects, as they can reveal metadata about the contents of your database (such as table and column names).
 
 To enable query logs, enable and configure the [pgAudit extension](https://www.pgaudit.org/):
 
-1. [Enable the pgAudit extension](https://app.supabase.com/project/_/database/extensions)
-2. [Perform a "Fast database reboot"](https://app.supabase.com/project/_/settings/general)
-3. Configure `pgaudit.log` (see below). Perform another reboot if needed.
-4. View your query logs under [Logs > Postgres Logs](https://app.supabase.com/project/_/logs/postgres-logs)
+1. [Enable the pgAudit extension](https://app.supabase.com/project/_/database/extensions).
+2. [Restart your project](https://app.supabase.com/project/_/settings/general) using the **Fast database reboot** option.
+3. Configure `pgaudit.log` (see below). Perform a fast reboot if needed.
+4. View your query logs under [Logs > Postgres Logs](https://app.supabase.com/project/_/logs/postgres-logs).
 
-#### Configuring `pgaudit.log`
+### Configuring `pgaudit.log` {#configuring-pgaudit-log}
 
-The stored value under `pgaudit.log` determines the classes of statements that wll be logged by pgAudit. Refer to the pgAudit documentation for the [full list of values](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog)
+The stored value under `pgaudit.log` determines the classes of statements that are logged by pgAudit. Refer to the pgAudit documentation for the [full list of values](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog).
 
-To enable logging for function calls/do blocks, writes and DDL statements for a single session, execute the following within the session:
+To enable logging for function calls/do blocks, writes, and DDL statements for a single session, execute the following within the session:
 
 ```sql
 -- temporary single-session config update
 set pgaudit.log = 'function, write, ddl';
 ```
 
-To _permanently_ set a logging configuration (beyond a single session), execute the following, then perform a reboot:
+To _permanently_ set a logging configuration (beyond a single session), execute the following, then perform a fast reboot:
 
 ```sql
--- equivalent permanent config update. Reboot is needed
-alter system set pgaudit.log to 'function, write, ddl';
+-- equivalent permanent config update.
+alter role postgres set pgaudit.log to 'function, write, ddl';
 ```
 
-To reset system-wide settings, execute the following, then perform a reboot:
+To reset system-wide settings, execute the following, then perform a fast reboot:
 
 ```sql
--- resets stored config. Reboot is needed.
-alter system reset pgaudit.log;
+-- resets stored config.
+alter role postgres reset pgaudit.log
 ```
 
 ## Logs Explorer
