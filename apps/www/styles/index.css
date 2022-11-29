@@ -470,8 +470,8 @@ launch week
     rgba(57, 97, 125, 0.32) 0%,
     rgba(57, 97, 125, 0.32) 5%,
     rgba(0, 222, 209, 0.75) 8%,
-    #fff 65%,
-    #fff 100%
+    #f8f9fa 65%,
+    #f8f9fa 100%
   );
 }
 
@@ -511,6 +511,10 @@ launch week
   height: 500px;
   -webkit-clip-path: ellipse(52% 135px at 50% 3px);
   clip-path: ellipse(52% 213px at 50% -75px);
+}
+
+.light .flair-mask-b {
+  background-color: #fff;
 }
 
 @media only screen and (min-width: 600px) {
