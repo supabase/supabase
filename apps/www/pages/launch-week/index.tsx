@@ -44,6 +44,10 @@ export default function launchweek() {
     })
   }, [])
 
+  useEffect(() => {
+    document.body.className = 'bg-[#121212]'
+  }, [])
+
   return (
     <>
       <NextSeo
