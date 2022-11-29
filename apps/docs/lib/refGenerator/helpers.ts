@@ -1,6 +1,6 @@
 import { TsDoc } from '~/generator/legacy/definitions'
 
-import { uniqBy, values, mapValues } from 'lodash'
+import { values, mapValues } from 'lodash'
 import { OpenAPIV3 } from 'openapi-types'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
@@ -37,81 +37,99 @@ export function generateParameters(tsDefinition: any) {
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
   let parameters = paramDefinitions.map((x) => recurseThroughParams(x)) // old join // .join(`\n`)
-  return methodListGroup(parameters)
+  return parameters
 }
 
-function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
-  // If this is a reference to another Param, let's use the reference instead
-  // @ts-ignore
-  let param = isDereferenced(paramDefinition) ? paramDefinition.type?.dereferenced : paramDefinition
+function recurseThroughParams(paramDefinition: any) {
+  const param = { ...paramDefinition }
   const labelParams = generateLabelParam(param)
-  let subContent = ''
 
-  let children = param?.children
-  if (param.type?.declaration?.children) {
-    children = param.type?.declaration?.children
-  } else if (isUnion(param)) {
-    // We don't want to show the union types if it's a literal
-    const nonLiteralVariants = param.type.types.filter(({ type }) => type !== 'literal')
-
-    if (nonLiteralVariants.length === 0) {
-      children = null
-    } else {
-      children = nonLiteralVariants
+  let children: any[]
+  if (param.type?.type === 'literal') {
+    // skip: literal types have no children
+  } else if (param.type?.type === 'intrinsic') {
+    // primitive types
+    if (!['string', 'number', 'boolean', 'object', 'unknown'].includes(param.type?.name)) {
+      throw new Error('unexpected intrinsic type')
     }
-  } else if (param.type === 'reflection') {
-    children = param.declaration.children
+  } else if (param.type?.dereferenced) {
+    const dereferenced = param.type.dereferenced
+
+    if (dereferenced.children) {
+      children = dereferenced.children
+    } else if (dereferenced.type?.declaration?.children) {
+      children = dereferenced.type.declaration.children
+    } else if (dereferenced.type?.type === 'union') {
+      // skip: we don't want to show unions as nested parameters
+    } else if (Object.keys(dereferenced).length === 0) {
+      // skip: {} have no children
+    } else {
+      throw new Error('unexpected case for dereferenced param type')
+    }
+  } else if (param.type?.type === 'reflection') {
+    const declaration = param.type.declaration
+
+    if (!declaration) {
+      throw new Error('reflection must have a declaration')
+    }
+
+    if (declaration.children) {
+      children = declaration.children
+    } else if (declaration.signatures) {
+      // skip: functions have no children
+    } else if (declaration.name === '__type') {
+      // skip: mostly inlined object type
+    } else {
+      throw new Error('unexpected case for reflection param type')
+    }
+  } else if (param.type?.type === 'indexedAccess') {
+    // skip: too complex, e.g. PromisifyMethods<Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>>
+  } else if (param.type?.type === 'reference') {
+    // skip: mostly unexported types
+  } else if (param.type?.type === 'union') {
+    // skip: we don't want to show unions as nested parameters
+  } else if (param.type?.type === 'array') {
+    // skip: no use for it for now
+  } else {
+    throw new Error('unexpected param type')
   }
 
-  if (!!children) {
-    let properties = children
+  if (children) {
+    const properties = children
       .sort((a, b) => a.name?.localeCompare(b.name)) // first alphabetical
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
-
-    let heading = 'Properties' // old `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
-    subContent = methodListGroup([heading].concat(properties)) // old join // .join('\n'))
-    return { ...labelParams, subContent }
+    labelParams.subContent = properties
   }
-  return { ...labelParams, subContent }
+  return labelParams
 }
 
-const isDereferenced = (paramDefinition: TsDoc.TypeDefinition) => {
-  // @ts-ignore
-  return paramDefinition.type?.type == 'reference' && paramDefinition.type?.dereferenced?.id
-}
-
-const isUnion = (paramDefinition: TsDoc.TypeDefinition) => {
-  return paramDefinition.type?.type == 'union'
-}
-
-const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
-  // @ts-ignore
-  const joined = paramDefinition.type.types.reduce((acc, x) => {
-    acc.push(...(x.declaration?.children || []))
-    return acc
-  }, [])
-
-  return uniqBy(joined, 'name')
-}
-
-const methodListGroup = (items) => {
-  return items
-  // old
-  // `
-  // <ul className="method-list-group">
-  //   ${items}
-  // </ul>
-  // `
-}
+// const isDereferenced = (paramDefinition: TsDoc.TypeDefinition) => {
+//   // @ts-ignore
+//   return paramDefinition.type?.type == 'reference' && paramDefinition.type?.dereferenced?.id
+// }
 
 function generateLabelParam(param: any) {
   let labelParams: any = {}
-  if (typeof param.type === 'string' && param.type === 'literal') {
+  if (param.type?.type === 'intrinsic' && param.type?.name === 'unknown') {
     labelParams = {
       name: param.name ?? param.value,
       isOptional: Boolean(param.flags?.isOptional) || 'defaultValue' in param,
-      type: param.type,
+      type: 'any',
+      description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
+    }
+  } else if (param.type?.declaration?.signatures) {
+    labelParams = {
+      name: param.name ?? param.value,
+      isOptional: Boolean(param.flags?.isOptional) || 'defaultValue' in param,
+      type: 'function',
+      description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
+    }
+  } else if (param.type?.type === 'literal') {
+    labelParams = {
+      name: param.name ?? param.value,
+      isOptional: Boolean(param.flags?.isOptional) || 'defaultValue' in param,
+      type: typeof param.type.value === 'string' ? `"${param.type.value}"` : `${param.type.value}`,
       description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
     }
   } else {
@@ -129,17 +147,35 @@ function extractParamTypeAsString(paramDefinition) {
   if (paramDefinition.type?.name) {
     // return `<code>${paramDefinition.type.name}</code>` // old
     return paramDefinition.type.name
-  } else if (paramDefinition.type?.type == 'union') {
-    return paramDefinition.type.types.map((x) =>
-      x.value
-        ? x.value // old `<code>${x.value}</code>`
-        : x.name
-        ? x.name // `<code>${x.name}</code>`
-        : x.type
-        ? x.type // `<code>${x.type}</code>`
-        : ''
-    )
-    // .join(' | ') // dont need to join now
+  } else if (paramDefinition.type?.type === 'union') {
+    // only do this for literal/primitive types - for complex objects we just return 'object'
+    if (paramDefinition.type.types.every(({ type }) => ['literal', 'intrinsic'].includes(type))) {
+      return paramDefinition.type.types.map((x) => {
+        if (x.type === 'literal') {
+          if (typeof x.value === 'string') {
+            return `"${x.value}"`
+          }
+          return `${x.value}`
+        } else if (x.type === 'intrinsic') {
+          if (x.name === 'unknown') {
+            return 'any'
+          }
+          return x.name
+        }
+      })
+        .join(' | ')
+    }
+  } else if (paramDefinition.type?.type === 'array') {
+    const elementType = paramDefinition.type.elementType
+
+    if (elementType.type === 'intrinsic') {
+      if (elementType.name === 'unknown') {
+        return 'any[]'
+      }
+      return `${elementType.name}[]`
+    }
+
+    return 'object[]'
   }
 
   return 'object' // old '<code>object</code>'
