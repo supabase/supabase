@@ -10,6 +10,7 @@ interface ActionBarProps {
   backButtonLabel?: string
   applyFunction?: (resolve: any) => void
   closePanel: () => void
+  formId?: string
 }
 const ActionBar: FC<ActionBarProps> = ({
   loading = false,
@@ -20,6 +21,7 @@ const ActionBar: FC<ActionBarProps> = ({
   backButtonLabel = 'Back',
   applyFunction = undefined,
   closePanel = () => {},
+  formId,
 }) => {
   const [isRunning, setIsRunning] = useState(false)
 
@@ -33,7 +35,7 @@ const ActionBar: FC<ActionBarProps> = ({
   }
 
   return (
-    <div className="flex w-full justify-between space-x-3 border-t border-scale-500 px-3 py-4">
+    <div className="flex justify-between w-full px-3 py-4 space-x-3 border-t border-scale-500">
       <Button size="small" onClick={closePanel} type="default" htmlType="button">
         {backButtonLabel}
       </Button>
@@ -53,7 +55,13 @@ const ActionBar: FC<ActionBarProps> = ({
       ) : !hideApply ? (
         // New solution, when using the Form component, loading is handled by the Form itself
         // Does not require applyFunction() callback
-        <Button size="small" disabled={disableApply} loading={loading} htmlType="submit">
+        <Button
+          size="small"
+          disabled={disableApply}
+          loading={loading}
+          htmlType="submit"
+          form={formId}
+        >
           {applyButtonLabel}
         </Button>
       ) : (

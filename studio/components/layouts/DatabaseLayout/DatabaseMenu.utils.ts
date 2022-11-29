@@ -32,6 +32,12 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/database/extensions`,
           items: [],
         },
+        {
+          name: 'Wrappers',
+          key: 'wrappers',
+          url: `/project/${ref}/database/wrappers`,
+          items: [],
+        },
         { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
         {
           name: 'Replication',
