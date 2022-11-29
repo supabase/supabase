@@ -229,7 +229,6 @@ export const menuItems: NavMenu = {
         { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
         { name: 'Auth', url: '/guides/functions/auth', items: [] },
         { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
-        { name: 'Examples', url: '/guides/functions/examples', items: [] },
         { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
       ],
     },
