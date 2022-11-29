@@ -86,7 +86,7 @@ export default function launchweek() {
             Register to get your ticket and stay tuned all week for daily announcements
           </p> */}
         {/* </SectionContainer> */}
-        <SectionContainer className="flex flex-col items-center md:!p-0">
+        <SectionContainer className="flex flex-col items-center xs:!p-0">
           {/* <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]">
             <input
               className="mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full w-full"

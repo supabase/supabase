@@ -155,16 +155,16 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   useEmailQueryParam('email', setEmail)
 
   return (
-    <div className="mt-16">
+    <div className="xs:mt-8 lw_mid:mt-16">
       <div
         className={cn(
           styleUtils['appear-fifth'],
           [styles[`formInfo${align}`]].join(' '),
-          `grid gap-2 items-center max-w-[420px] !pb-4`
+          `flex flex-col gap-2 sm:items-center lw_mid:items-start !pb-4`
         )}
       >
         <p className="text-scale-1200 text-base w-full">Coming soon</p>
-        <p className="text-scale-1000 text-base">
+        <p className="text-scale-1000 text-base max-w-[420px]">
           Register to get your ticket and stay tuned all week for daily announcements
         </p>
       </div>
@@ -188,7 +188,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           </div>
         </div>
       ) : (
-        <form className="relative max-w-[380px] m-auto" onSubmit={onSubmit}>
+        <form className="relative max-w-[380px] xs:m-auto lw_mid:ml-0" onSubmit={onSubmit}>
           <input
             className={`
             transition-all

@@ -17,6 +17,13 @@
   }
 }
 
+@media (max-width: 768px) {
+  .info {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 .logo {
   /* margin-bottom: var(--space-6x); */
   /* max-width: 96px; */
