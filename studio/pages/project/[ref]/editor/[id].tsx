@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Modal } from 'ui'
+import { Checkbox, Modal } from 'ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
@@ -24,6 +24,8 @@ const TableEditorPage: NextPage = () => {
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [isDuplicating, setIsDuplicating] = useState<boolean>(false)
+  const [isDeleteWithCascade, setIsDeleteWithCascade] = useState(false)
+
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
@@ -70,6 +72,7 @@ const TableEditorPage: NextPage = () => {
   const onDeleteColumn = (column: PostgresColumn) => {
     setIsDeleting(true)
     setSelectedColumnToDelete(column)
+    setIsDeleteWithCascade(false)
   }
 
   const onAddTable = () => {
@@ -87,6 +90,7 @@ const TableEditorPage: NextPage = () => {
   const onDeleteTable = (table: PostgresTable) => {
     setIsDeleting(true)
     setSelectedTableToDelete(table)
+    setIsDeleteWithCascade(false)
   }
 
   const onDuplicateTable = (table: PostgresTable) => {
@@ -141,7 +145,9 @@ const TableEditorPage: NextPage = () => {
     try {
       if (isUndefined(selectedTableToDelete)) return
 
-      const response: any = await meta.tables.del(selectedTableToDelete.id)
+      const response: any = await meta.tables.del(selectedTableToDelete.id, {
+        cascade: isDeleteWithCascade,
+      })
       if (response.error) throw response.error
 
       const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
@@ -217,9 +223,17 @@ const TableEditorPage: NextPage = () => {
         }
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected table? This action cannot be undone.
-            </p>
+            <div className="py-4 space-y-4">
+              <p className="text-sm text-scale-1100">
+                Are you sure you want to delete the selected table? This action cannot be undone.
+              </p>
+              <Checkbox
+                label="Drop with cascade?"
+                description="Deletes the table and its dependent objects"
+                checked={isDeleteWithCascade}
+                onChange={() => setIsDeleteWithCascade(!isDeleteWithCascade)}
+              />
+            </div>
           </Modal.Content>
         }
         buttonLabel="Delete"

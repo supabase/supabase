@@ -2,9 +2,8 @@ import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
-// import { Button } from 'ui'
+import { observer } from 'mobx-react-lite'
 import {
-  Alert,
   Button,
   Dropdown,
   IconChevronDown,
@@ -60,7 +59,6 @@ const TableEditorMenu: FC<Props> = ({
   const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const [searchText, setSearchText] = useState<string>('')
-  const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
   // We may need to shift this to the schema store and do something like meta.schema.loadViews()
@@ -68,12 +66,10 @@ const TableEditorMenu: FC<Props> = ({
   useEffect(() => {
     let cancel = false
     const fetchViews = async (selectedSchema: string) => {
-      const views: SchemaView[] = await meta.schemas.getViews(selectedSchema)
-      if (!cancel) setSchemaViews(views)
+      await meta.schemas.loadViews(selectedSchema)
     }
-    if (selectedSchema) {
-      fetchViews(selectedSchema)
-    }
+    if (selectedSchema) fetchViews(selectedSchema)
+
     return () => {
       cancel = true
     }
@@ -93,8 +89,8 @@ const TableEditorMenu: FC<Props> = ({
 
   const filteredSchemaViews =
     searchText.length === 0
-      ? schemaViews
-      : schemaViews.filter((view) => view.name.includes(searchText))
+      ? meta.schemas.views
+      : meta.schemas.views.filter((view) => view.name.includes(searchText))
 
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
     meta.excludedSchemas.includes(schema?.name ?? '')
@@ -117,7 +113,6 @@ const TableEditorMenu: FC<Props> = ({
             // @ts-ignore
             onChange={(name: string) => {
               setSearchText('')
-              setSchemaViews([])
               onSelectSchema(name)
             }}
           >
@@ -296,24 +291,24 @@ const TableEditorMenu: FC<Props> = ({
           <Menu.Group
             // @ts-ignore
             title={
-              <>
-                <div className="flex w-full items-center justify-between">
-                  <span>All views</span>
-                </div>
-              </>
+              <div className="flex w-full items-center justify-between">
+                <span>All views</span>
+              </div>
             }
           />
 
-          {schemaViews.map((view: SchemaView) => {
+          {meta.schemas.views.map((view: SchemaView) => {
             const viewId = Base64.encode(JSON.stringify(view))
             const isActive = id === viewId
             return (
               <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
-                <Menu.Item key={viewId} rounded active={isActive}>
-                  <div className="flex justify-between">
-                    <p className="truncate">{view.name}</p>
-                  </div>
-                </Menu.Item>
+                <a>
+                  <Menu.Item key={viewId} rounded active={isActive}>
+                    <div className="flex justify-between">
+                      <p className="truncate">{view.name}</p>
+                    </div>
+                  </Menu.Item>
+                </a>
               </Link>
             )
           })}
@@ -339,4 +334,4 @@ const TableEditorMenu: FC<Props> = ({
   )
 }
 
-export default TableEditorMenu
+export default observer(TableEditorMenu)

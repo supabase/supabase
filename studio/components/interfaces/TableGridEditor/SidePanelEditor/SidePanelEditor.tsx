@@ -149,6 +149,10 @@ const SidePanelEditor: FC<Props> = ({
       closePanel()
     }
 
+    if (configuration.isEncrypted) {
+      await meta.schemas.loadViews(selectedTable?.schema ?? '')
+    }
+
     resolve()
   }
 
