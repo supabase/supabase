@@ -112,7 +112,6 @@ Adding MFA to your app involves these four steps:
    authorization rules across your app: on the frontend, backend, API servers or
    Row-Level Security policies.
 
-
 ### Add enrollment flow
 
 An enrollment flow provides a UI for users to set up additional authentication factors.
@@ -146,16 +145,11 @@ Enrolling a factor for use with MFA takes three steps:
    steps 2 and 3.
 
 
-
 #### Example: React
 
 Below is an example that creates a new `EnrollMFA` component that illustrates
 the important pieces of the MFA enrollment flow.
 
-<Admonition type="note">
-A user can only unenroll a factor after completing the enrollment flow and obtaining
-an `aal2` JWT claim.
-</Admonition>
 - When the component appears on screen, the `supabase.auth.mfa.enroll()` API is
   called once to start the process of enrolling a new factor for the current
   user.
@@ -253,7 +247,7 @@ export function EnrollMFA({
 
 ### Add unenrollment flow
 
-An Unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts.
+An unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts.
 Most applications do so via a factor management page where users can view and unlink selected factors.
 
 To unenroll a factor, a user simply needs to call `supabase.auth.mfa.unenroll()` with the id of the factor they wish to unenroll.
@@ -272,10 +266,12 @@ first going through the MFA process and attaining the `aal2` level. Here are som
 - Once the user has selected a factor to unenroll they can type in the factorId and hit the `Unenroll` button
   which creates a confirmation modal.
 
-```tsx
-import React from 'react';
-import ReactDOM from 'react-dom';
+<Admonition type="note">
+A user can only unenroll a factor after completing the enrollment flow and obtaining
+an `aal2` JWT claim.
+</Admonition>
 
+```tsx
 /**
  * UnenrollMFA shows a simple table with the list of factors together with a button to unenroll.
  * When a user types in the factorId of the factor that they wish to unenroll
@@ -283,7 +279,6 @@ import ReactDOM from 'react-dom';
 export function UnenrollMFA() {
   const [factorId, setFactorId] = useState('')
   const [factors, setFactors] = useState([])
-  const [modalIsOpen, setIsOpen] = React.useState(false);
   const [error, setError] = useState('') // holds an error message
 
   useEffect(() => {
