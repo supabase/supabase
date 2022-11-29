@@ -163,7 +163,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           `grid gap-2 items-center max-w-[420px] !pb-4`
         )}
       >
-        <h3 className="text-scale-1200 text-base">Coming soon</h3>
+        <p className="text-scale-1200 text-base w-full">Coming soon</p>
         <p className="text-scale-1000 text-base">
           Register to get your ticket and stay tuned all week for daily announcements
         </p>
@@ -188,7 +188,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           </div>
         </div>
       ) : (
-        <form className="relative" onSubmit={onSubmit}>
+        <form className="relative max-w-[380px]" onSubmit={onSubmit}>
           <input
             className={`
             transition-all
