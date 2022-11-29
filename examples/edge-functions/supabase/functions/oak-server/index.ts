@@ -1,13 +1,22 @@
-import { Application } from 'https://deno.land/x/oak/mod.ts'
+import { Application, Router } from 'https://deno.land/x/oak/mod.ts'
+
+const router = new Router()
+router
+  // Note: path will be prefixed with function name
+  .get('/oak-server', (context) => {
+    context.response.body = 'This is an example Oak server running on Edge Functions!'
+  })
+  .post('/oak-server/greet', (context) => {
+    // Note: request body will be streamed to the function as chunks, set limit to 0 to fully read it.
+    const result = context.request.body({ type: 'json', limit: 0 })
+    const body = await result.value
+    const name = body.name || 'you'
+
+    context.response.body = { msg: `Hey ${name}!` }
+  })
 
 const app = new Application()
-
-app.use(async (ctx) => {
-  const result = ctx.request.body({ type: 'json', limit: 0 })
-  const body = await result.value
-  const name = body.name || 'you'
-
-  ctx.response.body = { msg: `Hey ${name}!` }
-})
+app.use(router.routes())
+app.use(router.allowedMethods())
 
 await app.listen({ port: 8000 })
