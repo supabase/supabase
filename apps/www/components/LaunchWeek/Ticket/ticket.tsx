@@ -66,9 +66,9 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           >
             {sharePage ? (
               name ? (
-                <>{name}'s Ticket</>
+                <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">{name}’s Ticket</p>
               ) : (
-                <>{SITE_NAME}</>
+                <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">{SITE_NAME}</p>
               )
             ) : golden ? (
               <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">
@@ -82,7 +82,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           </h1>
           <h2 className="text-sm dark:text-scale-900 text-[#7E868C] max-w-[380px]">
             {sharePage ? (
-              <p className="mt-4">
+              <p className="mb-24">
                 Join {name ?? 'us'} on {DATE}.
               </p>
             ) : golden ? (
