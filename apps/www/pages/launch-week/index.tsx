@@ -104,8 +104,13 @@ export default function launchweek() {
           />
         </SectionContainer>
         <div className="gradient-container">
+          <div className="gradient-mask"></div>
+          <div className="gradient-mask--masked"></div>
+
           <div className="flair-mask-a"></div>
           <div className="flair-mask-b"></div>
+        </div>
+        <div>
           <div className="flex justify-between pt-80 mx-6 md:mx-16 lg:mx-40 overflow-hidden">
             <div className="flex-1 relative overflow-hidden radial-mask">
               <div className="orbit absolute top-[75%]">
