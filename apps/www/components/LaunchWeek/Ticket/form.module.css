@@ -57,7 +57,6 @@
 @media (min-width: 1200px) {
   .formInfoLeft {
     text-align: left;
-    margin: inherit;
   }
   .formInfoCenter {
     text-align: center;

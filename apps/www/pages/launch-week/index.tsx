@@ -61,7 +61,7 @@ export default function launchweek() {
           url: `https://supabase.com/launch-week`,
           images: [
             {
-              url: `https://supabase.com/images/launchweek/og-image.jpg`,
+              url: `https://supabase.com/images/launchweek/launch-week-6.jpg`,
             },
           ],
         }}
