@@ -52,7 +52,7 @@ flutter_bloc: ^8.0.0
 
 Since the app has evolved, we also need to update our table schema. In order to store rooms data, we will add a rooms table. We will also modify the messages table to add a foreign key constraint to the rooms table so that we can tell which message belongs to which room.
 
-We will also intorudce a `create_new_room` function, which is a [database function](https://supabase.com/docs/guides/database/functions) that handles chat room creation. It knows to create a new room if a chat room with the two users does not exist yet, or to just return the room ID if it already exists. 
+We will also introduce a `create_new_room` function, which is a [database function](https://supabase.com/docs/guides/database/functions) that handles chat room creation. It knows to create a new room if a chat room with the two users does not exist yet, or to just return the room ID if it already exists. 
 
 ```sql
 -- *** Table definitions ***
@@ -1154,7 +1154,7 @@ import 'package:my_chat_app/pages/rooms_page.dart';
 import 'package:my_chat_app/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Page to redirect users to the appropreate page depending on the initial auth state
+/// Page to redirect users to the appropriate page depending on the initial auth state
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
 
