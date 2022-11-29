@@ -413,7 +413,7 @@ export default class MetaStore implements IMetaStore {
       this.rootStore.ui.setNotification({
         id: toastId,
         category: 'success',
-        message: `Successfully created column ${column.name}`,
+        message: `Successfully created column "${column.name}"`,
       })
     } catch (error: any) {
       this.rootStore.ui.setNotification({

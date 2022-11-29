@@ -89,8 +89,8 @@ const TableEditorMenu: FC<Props> = ({
 
   const filteredSchemaViews =
     searchText.length === 0
-      ? meta.schemas.views
-      : meta.schemas.views.filter((view) => view.name.includes(searchText))
+      ? meta.schemas.views || []
+      : (meta.schemas.views || []).filter((view) => view.name.includes(searchText))
 
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
     meta.excludedSchemas.includes(schema?.name ?? '')
