@@ -12,7 +12,7 @@ import { WeekDayProps } from '~/components/LaunchWeek/types'
 import { ArrowRightIcon } from '@heroicons/react/outline'
 import { Badge, Modal } from 'ui'
 import { useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, Session } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 
@@ -60,7 +60,7 @@ export default function launchweek() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col !pb-0 items-center lg:pt-32 gap-4">
+        <SectionContainer className="flex flex-col !pb-24 items-center lg:pt-32 gap-4">
           <img
             src="/images/launchweek/launchweek-logo--light.svg"
             className="md:40 w-40 dark:hidden lg:w-80"
@@ -73,12 +73,12 @@ export default function launchweek() {
           {/* <LaunchHero /> */}
           {/* {!shippingHasStarted && <PreLaunchTeaser />} */}
         </SectionContainer>
-        <SectionContainer className="flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4">
-          {/* <span className="text-scale-1200">Coming soon</span>
+        {/* <SectionContainer className="flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4"> */}
+        {/* <span className="text-scale-1200">Coming soon</span>
           <p className="text-scale-1000 text-sm">
             Register to get your ticket and stay tuned all week for daily announcements
           </p> */}
-        </SectionContainer>
+        {/* </SectionContainer> */}
         <SectionContainer className="flex flex-col items-center !p-0">
           {/* <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]">
             <input

@@ -62,6 +62,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
           options: { redirectTo: `${SITE_ORIGIN}/launch-week/tickets` },
         })
       }}
+      className="flex flex-col items-center xl:block"
     >
       <div>
         <button

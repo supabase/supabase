@@ -43,7 +43,9 @@ export default function TicketProfile({
           <span
             className={`${cn(styles.skeleton, styles.wrapper, {
               [styles.show]: ticketGenerationState === 'loading',
-            })} text-4xl`}
+            })} text-4xl bg-gradient-to-r ${
+              golden ? 'to-[#ffe8af]' : 'to-slate-900'
+            } from-white via-white bg-clip-text text-transparent`}
           >
             {name || username || 'Your Name'}
           </span>
