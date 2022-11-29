@@ -505,8 +505,8 @@ launch week
   position: absolute;
   background-color: #121212;
   top: 0px;
-  left: -10%;
   width: 110%;
+  left: -5%;
 
   height: 500px;
   -webkit-clip-path: ellipse(52% 135px at 50% 3px);

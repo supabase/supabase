@@ -189,10 +189,10 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
         <form className="relative" onSubmit={onSubmit}>
           <input
             className={`
+            transition-all
+            
             border border-scale-300 bg-scaleA-200 h-10
-
-            disabled:bg-scale-50 disabled:text-scale-500 disabled:border-scale-200 disabled:shadow-none
-            focus:invalid:border-scale-500 focus:invalid:ring-scaleA-300
+            focus:border-scale-500 focus:ring-scaleA-300
 
             text-scale-1200 text-sm rounded-full w-full px-5`}
             autoComplete="off"
@@ -209,8 +209,10 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           <button
             type="submit"
             className={[
+              'transition-all',
               'absolute bg-scale-300 text-scale-1200 border border-scale-600 text-sm hover:bg-scale-400',
               'rounded-full px-4',
+              'focus:invalid:border-scale-500 focus:invalid:ring-scaleA-300',
               'absolute right-1 my-auto h-8 top-0 bottom-0',
             ].join(' ')}
             disabled={formState === 'loading'}
