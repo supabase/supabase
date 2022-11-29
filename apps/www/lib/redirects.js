@@ -7,7 +7,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/storage-caching',
-    destination: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
   },
   {
     permanent: true,
