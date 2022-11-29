@@ -14,6 +14,9 @@ router
 
     context.response.body = { msg: `Hey ${name}!` }
   })
+  .get('/oak-server/redirect', (context) => {
+    context.response.redirect('https://www.example.com')
+  })
 
 const app = new Application()
 app.use(router.routes())
