@@ -48,11 +48,11 @@ export default function TicketHome() {
         <SectionContainer className="flex flex-col gap-8 !pb-0 md:gap-16 lg:gap-16">
           <img
             src="/images/launchweek/launchweek-logo--light.svg"
-            className="md:40 w-28 dark:hidden lg:w-48"
+            className="md:40 w-40 dark:hidden lg:w-80"
           />
           <img
             src="/images/launchweek/launchweek-logo--dark.svg"
-            className="md:40 hidden w-28 dark:block lg:w-48"
+            className="md:40 hidden w-40 dark:block lg:w-80"
           />
           <TicketContainer
             supabase={supabase}
