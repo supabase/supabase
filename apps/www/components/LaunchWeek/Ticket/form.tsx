@@ -161,10 +161,9 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           'flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4'
         )}
       >
-        <h3 className="text-scale-1200">Get a ticket</h3>
-        <p className="text-scale-1000 text-sm">
-          A few of the lucky attendees will get a limited edition Supabase goodie bag. Make sure you
-          don’t skip your chance.
+        <h3 className="text-scale-1200 text-base">Coming soon</h3>
+        <p className="text-scale-1000 text-base">
+          Register to get your ticket and stay tuned all week for daily announcements
         </p>
       </div>
       {formState === 'error' ? (

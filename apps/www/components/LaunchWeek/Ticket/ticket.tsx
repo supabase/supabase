@@ -45,7 +45,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   //     scrollTo(divRef.current, -30)
   //   }
   // }, [divRef, sharePage])
-  golden = true
+  // golden = true
   return (
     <div
       className={cn(styles['ticket-layout'], {
@@ -53,7 +53,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
       })}
     >
       <div ref={divRef}>
-        <div className={styles['ticket-text']}>
+        <div className={`${styles['ticket-text']} flex flex-col items-center xl:block`}>
           <h2 className={cn(styles.hero, styleUtils.appear, styleUtils['appear-first'])}>
             {sharePage ? (
               name ? (
@@ -62,9 +62,9 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
                 <>{SITE_NAME}</>
               )
             ) : golden ? (
-              <>
+              <p className="text-2xl dark:text-white mb-4">
                 You won a golden ticket! <br /> Claim it now!
-              </>
+              </p>
             ) : (
               <p className="text-2xl dark:text-white mb-4">Congratulations, you have a ticket!</p>
             )}
