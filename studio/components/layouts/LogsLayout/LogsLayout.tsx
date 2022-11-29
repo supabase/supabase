@@ -17,7 +17,6 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const router = useRouter()
   const pathArr = router.pathname.split('/')
   const page = pathArr[pathArr.length - 1]
-  console.log(page)
 
   const project = ui.selectedProject
 
