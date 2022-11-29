@@ -322,7 +322,7 @@ const ColumnEditor: FC<Props> = ({
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Toggle
                 label="Encrypt Column"
-                descriptionText="Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE)"
+                descriptionText={`Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE). Decrypted values will be stored within the "decrypted_${selectedTable.name}" view.`}
                 checked={columnFields.isEncrypted}
                 onChange={() => onUpdateField({ isEncrypted: !columnFields.isEncrypted })}
               />
