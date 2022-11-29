@@ -108,15 +108,14 @@
   position: absolute;
   top: 90px;
   width: 100%;
-  height: 100%;
   padding: 46px 29px;
 }
 
 @media (min-width: 768px) {
   .profile {
-    top: calc(48px * var(--size));
-    padding: calc(44px * var(--size)) calc(160px * var(--size)) calc(44px * var(--size))
-      calc(63px * var(--size));
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 65px;
   }
 }
 
