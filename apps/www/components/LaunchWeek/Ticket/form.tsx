@@ -188,7 +188,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           </div>
         </div>
       ) : (
-        <form className="relative max-w-[380px]" onSubmit={onSubmit}>
+        <form className="relative max-w-[380px] m-auto" onSubmit={onSubmit}>
           <input
             className={`
             transition-all
