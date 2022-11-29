@@ -75,7 +75,9 @@ export default function TicketVisual({
             <div
               className={`${cn(styles['ticket-number'], {
                 [styles['ticket-number-golden']]: golden,
-              })} bg-gradient-to-r from-white via-white to-black bg-clip-text text-transparent`}
+              })} bg-gradient-to-r  from-white via-white ${
+                golden ? 'to-[#ffe8af]' : 'to-slate-900'
+              } bg-clip-text !text-transparent`}
             >
               <TicketNumber number={ticketNumber} />
             </div>

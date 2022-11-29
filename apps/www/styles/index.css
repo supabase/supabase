@@ -435,7 +435,7 @@ launch week
   position: relative;
   background: radial-gradient(
     circle at 50% -100%,
-    rgba(0, 155, 112, 1) 0%,
+    #2d626a 0%,
     rgba(28, 28, 28, 1) 70%,
     rgba(28, 28, 28, 1) 100%
   );
@@ -443,7 +443,7 @@ launch week
 
 .flair-mask-a {
   position: absolute;
-  background-color: var(--colors-brand8);
+  background-color: #2f5f66;
   left: 0;
   top: 0;
   width: 100%;
