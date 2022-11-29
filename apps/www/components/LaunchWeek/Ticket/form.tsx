@@ -190,12 +190,11 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           <input
             className={`
             transition-all
-            
+
             border border-scale-300 bg-scaleA-200 h-10
             focus:border-scale-500 focus:ring-scaleA-300
 
             text-scale-1200 text-sm rounded-full w-full px-5`}
-            autoComplete="off"
             type="email"
             id="email-input-field"
             value={email}
