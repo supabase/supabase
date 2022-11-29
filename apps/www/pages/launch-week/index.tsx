@@ -86,7 +86,7 @@ export default function launchweek() {
             Register to get your ticket and stay tuned all week for daily announcements
           </p> */}
         {/* </SectionContainer> */}
-        <SectionContainer className="flex flex-col items-center !p-0">
+        <SectionContainer className="flex flex-col items-center md:!p-0">
           {/* <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]">
             <input
               className="mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full w-full"
@@ -105,10 +105,10 @@ export default function launchweek() {
         </SectionContainer>
         <div className="gradient-container">
           <div className="gradient-mask"></div>
-          <div className="gradient-mask--masked"></div>
+          <div className="gradient-mask--masked bottom-of-the-circle"></div>
 
-          <div className="flair-mask-a"></div>
-          <div className="flair-mask-b"></div>
+          <div className="flair-mask-a the-stroke-of-the-circle"></div>
+          <div className="flair-mask-b inside-the-circle"></div>
         </div>
         {/* <div>
           <div className="flex justify-between pt-80 mx-6 md:mx-16 lg:mx-40 overflow-hidden"> */}

@@ -431,7 +431,7 @@ launch week
 }
 
 .gradient-container {
-  min-height: 500px;
+  min-height: 300px;
   position: relative;
   max-width: 1600px;
   margin: 0 auto;
@@ -444,6 +444,13 @@ launch week
     #121212 80%,
     #121212 100%
   ); */
+}
+@media screen and (max-width: 769px) {
+  .gradient-container {
+    min-width: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 .gradient-mask {
@@ -469,12 +476,30 @@ launch week
     circle at 50% -35%,
     rgba(57, 97, 125, 0.32) 0%,
     rgba(57, 97, 125, 0.32) 5%,
-    rgba(0, 222, 209, 0.75) 8%,
-    #f8f9fa 65%,
-    #f8f9fa 100%
+    rgb(113 191 187 / 75%) 8%,
+    #ffffff 65%,
+    #ffffff 100%
   );
 }
 
+@media screen and (max-width: 769px) {
+  .gradient-mask {
+    width: 100%;
+  }
+
+  .light .gradient-mask {
+    background: radial-gradient(
+      circle at 50% -35%,
+      rgba(57, 97, 125, 0.32) 0%,
+      rgba(57, 97, 125, 0.32) 5%,
+      rgb(155 246 241 / 75%) 8%,
+      #90cebd 65%,
+      #67eae8 100%
+    );
+  }
+}
+
+/* The bottom part below the stroke */
 .gradient-mask--masked {
   z-index: -10;
   position: absolute;
@@ -490,6 +515,17 @@ launch week
   background: radial-gradient(circle at 50% -60%, rgba(255, 255, 255, 0) 0%, #fff 65%);
 }
 
+@media screen and (max-width: 769px) {
+  .gradient-mask--masked {
+    background: radial-gradient(circle at 50% -40%, rgba(255, 255, 255, 0) 0%, #121212 65%);
+  }
+
+  .light .gradient-mask--masked {
+    background: radial-gradient(circle at 50% -40%, rgba(255, 255, 255, 0) 0%, #fff 65%);
+  }
+}
+
+/* The stroke on the circle */
 .flair-mask-a {
   position: absolute;
   background-color: #375965;
@@ -501,6 +537,11 @@ launch week
   clip-path: ellipse(52% 213px at 50% -75px);
 }
 
+.light .flair-mask-a {
+  background-color: #d7d7d7;
+}
+
+/* The inside of the circle */
 .flair-mask-b {
   position: absolute;
   background-color: #121212;
