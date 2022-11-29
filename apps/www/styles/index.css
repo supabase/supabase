@@ -433,33 +433,33 @@ launch week
 .gradient-container {
   min-height: 500px;
   position: relative;
-  background: radial-gradient(
-    circle at 50% -100%,
-    #2d626a 0%,
-    rgba(28, 28, 28, 1) 70%,
-    rgba(28, 28, 28, 1) 100%
-  );
+  background: radial-gradient(circle at 50% -100%, #2d626a 0%, #121212 70%, #121212 100%);
 }
 
 .flair-mask-a {
   position: absolute;
-  background-color: #2f5f66;
+  background-color: #375965;
   left: 0;
-  top: 0;
-  width: 100%;
+  top: 1px;
+  width: 80%;
+  right: 0;
+  margin: 0 auto;
   height: 500px;
-  clip-path: ellipse(52% 135px at 50% 3px);
+  -webkit-clip-path: ellipse(52% 135px at 50% 3px);
+  clip-path: ellipse(52% 213px at 50% -75px);
 }
 
 .flair-mask-b {
   position: absolute;
-  /* var colors-brand not working :/ */
-  background-color: var(--colors-scale2);
+  background-color: #121212;
   left: 0;
-  top: 0;
-  width: 100%;
+  top: 0px;
+  width: 80%;
+  right: 0;
+  margin: 0 auto;
   height: 500px;
-  clip-path: ellipse(52% 135px at 50% 0px);
+  -webkit-clip-path: ellipse(52% 135px at 50% 3px);
+  clip-path: ellipse(52% 213px at 50% -75px);
 }
 
 .orbit {
