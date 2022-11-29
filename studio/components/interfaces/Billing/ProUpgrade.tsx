@@ -13,6 +13,7 @@ import {
   PaymentSummaryPanel,
   ComputeSizeSelection,
   PITRDurationSelection,
+  CustomDomainSelection,
   StripeSubscription,
   AddNewPaymentMethodModal,
 } from './'
@@ -21,7 +22,11 @@ import UpdateSuccess from './UpdateSuccess'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
 import { DatabaseAddon } from './AddOns/AddOns.types'
-import { formatComputeSizes, formatPITROptions } from './AddOns/AddOns.utils'
+import {
+  formatComputeSizes,
+  formatCustomDomainOptions,
+  formatPITROptions,
+} from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
 
 // Do not allow compute size changes for af-south-1
@@ -43,12 +48,14 @@ const ProUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
+  const isCustomDomainsEnabled = useFlag('customDomains')
   const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
   const pitrDurationOptions = formatPITROptions(addons)
-  const { currentComputeSize, currentPITRDuration } = getCurrentAddons(currentSubscription, addons)
+  const customDomainOptions = formatCustomDomainOptions(addons)
+  const currentAddons = getCurrentAddons(currentSubscription, addons)
 
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
@@ -67,10 +74,27 @@ const ProUpgrade: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
 
+  // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
+  // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
+  // of unnecessary state management on this complex page.
+  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(
+    currentAddons.computeSize
+  )
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<DatabaseAddon>(
+    currentAddons.pitrDuration
+  )
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
+    currentAddons.customDomains
+  )
+
+  // [Joshen] Scaffolded here
+  const selectedAddons = {
+    computeSize: selectedComputeSize,
+    pitrDuration: selectedPITRDuration,
+    customDomains: selectedCustomDomainOption,
+  }
+
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string>('')
-  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(currentComputeSize)
-  const [selectedPITRDuration, setSelectedPITRDuration] =
-    useState<DatabaseAddon>(currentPITRDuration)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   const selectedTier = isSpendCapEnabled
@@ -81,7 +105,7 @@ const ProUpgrade: FC<Props> = ({
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
-  const isChangingComputeSize = currentComputeSize?.id !== selectedComputeSize.id
+  const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
@@ -91,15 +115,14 @@ const ProUpgrade: FC<Props> = ({
 
   useEffect(() => {
     getSubscriptionPreview()
-  }, [selectedComputeSize, selectedPITRDuration, isSpendCapEnabled])
+  }, [selectedComputeSize, selectedPITRDuration, selectedCustomDomainOption, isSpendCapEnabled])
 
   const getSubscriptionPreview = async () => {
     if (!selectedTier) return
 
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
-      selectedComputeSize,
-      selectedPITRDuration,
+      selectedAddons,
       selectedPaymentMethodId,
       projectRegion
     )
@@ -119,8 +142,7 @@ const ProUpgrade: FC<Props> = ({
   const onConfirmPayment = async () => {
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
-      selectedComputeSize,
-      selectedPITRDuration,
+      selectedAddons,
       selectedPaymentMethodId,
       projectRegion
     )
@@ -220,15 +242,28 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
+                    {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
+                      <>
+                        <Divider light />
+                        <CustomDomainSelection
+                          options={customDomainOptions}
+                          currentOption={
+                            isManagingProSubscription ? currentAddons.customDomains : undefined
+                          }
+                          selectedOption={selectedAddons.customDomains}
+                          onSelectOption={setSelectedCustomDomainOption}
+                        />
+                      </>
+                    )}
                     {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
                       <>
                         <Divider light />
                         <PITRDurationSelection
                           pitrDurationOptions={pitrDurationOptions}
                           currentPitrDuration={
-                            isManagingProSubscription ? currentPITRDuration : undefined
+                            isManagingProSubscription ? currentAddons.pitrDuration : undefined
                           }
-                          selectedPitrDuration={selectedPITRDuration}
+                          selectedPitrDuration={selectedAddons.pitrDuration}
                           onSelectOption={setSelectedPITRDuration}
                         />
                       </>
@@ -236,8 +271,8 @@ const ProUpgrade: FC<Props> = ({
                     <Divider light />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}
-                      currentComputeSize={currentComputeSize}
-                      selectedComputeSize={selectedComputeSize}
+                      currentComputeSize={currentAddons.computeSize}
+                      selectedComputeSize={selectedAddons.computeSize}
                       onSelectOption={setSelectedComputeSize}
                     />
                   </>
@@ -253,12 +288,10 @@ const ProUpgrade: FC<Props> = ({
             isSpendCapEnabled={isSpendCapEnabled}
             // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}
-            currentComputeSize={currentComputeSize}
-            currentPITRDuration={currentPITRDuration}
+            currentAddons={currentAddons}
             // Selected subscription configuration based on UI
             selectedPlan={selectedTier}
-            selectedComputeSize={selectedComputeSize}
-            selectedPITRDuration={selectedPITRDuration}
+            selectedAddons={selectedAddons}
             paymentMethods={paymentMethods}
             isLoadingPaymentMethods={isLoadingPaymentMethods}
             selectedPaymentMethod={selectedPaymentMethodId}
