@@ -35,7 +35,9 @@ export default function TicketVisual({
       <div
         className={[styles.visual, golden ? styles['visual--gold'] : ''].join(' ')}
         // className={`rounded-2xl shadow-xl shadow-brand-500`}
-        style={{ ['--size' as string]: size }}
+        style={{
+          ['--size' as string]: size,
+        }}
       >
         <div className={styles['horizontal-ticket']}>
           {/* {username ? <TicketColored golden={golden} /> : <TicketMono golden={golden} />} */}
