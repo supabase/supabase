@@ -607,7 +607,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             body: JSON.stringify({ foo: 'bar' })
           })
           ```
@@ -617,7 +617,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             responseType: 'text',
             body: JSON.stringify({ foo: 'bar' })
           })
@@ -628,7 +628,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.functions.invoke('hello', {
+          const { data, error } = await supabase.functions.invoke('hello', {
             headers: {
               "my-custom-header": 'my-custom-header-value'
             },

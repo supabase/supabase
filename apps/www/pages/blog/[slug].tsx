@@ -128,6 +128,7 @@ function BlogPostPage(props: any) {
     <>
       <NextSeo
         title={props.blog.title}
+        description={props.blog.description}
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,

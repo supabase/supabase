@@ -14,7 +14,7 @@ import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceed
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
-import Divider from 'components/ui/Divider'
+import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -111,6 +111,10 @@ const LogTable = ({
         break
       case 'functions':
         columns = FunctionsLogsColumnRender
+        break
+
+      case 'auth':
+        columns = AuthColumnRenderer
         break
 
       default:

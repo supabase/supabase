@@ -1,0 +1,150 @@
+[
+  {
+    "title": "Product",
+    "links": [
+      {
+        "text": "Database",
+        "url": "/database"
+      },
+      {
+        "text": "Auth",
+        "url": "/auth"
+      },
+      {
+        "text": "Functions",
+        "url": "/edge-functions"
+      },
+      {
+        "text": "Realtime",
+        "url": "/realtime"
+      },
+      {
+        "text": "Storage",
+        "url": "/storage"
+      },
+      {
+        "text": "Pricing",
+        "url": "/pricing"
+      },
+      {
+        "text": "Beta",
+        "url": "/beta"
+      }
+    ]
+  },
+  {
+    "title": "Resources",
+    "links": [
+      {
+        "text": "Support",
+        "url": "/support"
+      },
+      {
+        "text": "System Status",
+        "url": "https://status.supabase.com/"
+      },
+      {
+        "text": "Integrations",
+        "url": "/partners/integrations"
+      },
+      {
+        "text": "Experts",
+        "url": "/partners/experts"
+      },
+      {
+        "text": "Brand Assets / Logos",
+        "url": "/brand-assets"
+      },
+      {
+        "text": "DPA",
+        "url": "/legal/dpa"
+      },
+      {
+        "text": "SOC2",
+        "url": "/legal/soc2"
+      }
+    ]
+  },
+  {
+    "title": "Developers",
+    "links": [
+      {
+        "text": "Documentation",
+        "url": "/docs"
+      },
+      {
+        "text": "API Reference",
+        "url": "/docs/reference"
+      },
+      {
+        "text": "Changelog",
+        "url": "/changelog"
+      },
+      {
+        "text": "Contributing",
+        "url": "/docs/handbook/contributing"
+      },
+      {
+        "text": "Open Source",
+        "url": "/docs/oss"
+      },
+      {
+        "text": "SupaSquad",
+        "url": "/docs/handbook/supasquad"
+      },
+      {
+        "text": "DevTo",
+        "url": "https://dev.to/supabase"
+      },
+      {
+        "text": "RSS",
+        "url": "/rss.xml"
+      }
+    ]
+  },
+  {
+    "title": "Company",
+    "links": [
+      {
+        "text": "Blog",
+        "url": "/blog"
+      },
+      {
+        "text": "Careers",
+        "url": "https://about.supabase.com/careers"
+      },
+      {
+        "text": "Company",
+        "url": "/company"
+      },
+      {
+        "text": "Terms of Service",
+        "url": "/docs/company/terms"
+      },
+      {
+        "text": "Privacy Policy",
+        "url": "/docs/company/privacy"
+      },
+      {
+        "text": "Acceptable Use Policy",
+        "url": "/docs/company/aup"
+      },
+      {
+        "text": "Service Level Agreement",
+        "url": "/docs/company/sla"
+      },
+      {
+        "text": "Humans.txt",
+        "url": "/humans.txt"
+      },
+      {
+        "text": "Lawyers.txt",
+        "url": "/lawyers.txt"
+      },
+      {
+        "text": "Security.txt",
+        "url": "/.well-known/security.txt"
+      }
+    ]
+  }
+]

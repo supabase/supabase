@@ -30,10 +30,10 @@ export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
 
 export const PRESET_CONFIG = {
   [Presets.OVERVIEW]: {
-    title: 'API Usage',
+    title: '',
     sql: {
       statusCodes: `
-  select 
+  select
     timestamp_trunc(timestamp, hour) as timestamp,
     r.status_code as status_code,
     count(status_code) as count
@@ -82,9 +82,9 @@ ORDER BY
     method,
     status_code
   ORDER BY
-    sum DESC, 
-    count desc, 
-    avg_origin_time DESC 
+    sum DESC,
+    count desc,
+    avg_origin_time DESC
   LIMIT 50
 `,
     },

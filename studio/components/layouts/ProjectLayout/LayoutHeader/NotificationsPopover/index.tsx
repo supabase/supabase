@@ -99,7 +99,9 @@ const NotificationsPopover: FC<Props> = () => {
     if (!projectToApplyMigration) return
     const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/owner-reassign`, {})
     if (!res.error) {
-      await app.projects.fetchDetail(projectToApplyMigration.ref, (project) => meta.setProjectDetails(project))
+      await app.projects.fetchDetail(projectToApplyMigration.ref, (project) =>
+        meta.setProjectDetails(project)
+      )
       ui.setNotification({
         category: 'success',
         message: `Successfully applied migration for project "${projectToApplyMigration.name}"`,
@@ -121,7 +123,9 @@ const NotificationsPopover: FC<Props> = () => {
       {}
     )
     if (!res.error) {
-      await app.projects.fetchDetail(projectToRollbackMigration.ref, (project) => meta.setProjectDetails(project))
+      await app.projects.fetchDetail(projectToRollbackMigration.ref, (project) =>
+        meta.setProjectDetails(project)
+      )
       ui.setNotification({
         category: 'success',
         message: `Successfully rolled back migration for project "${projectToRollbackMigration.name}"`,
@@ -143,7 +147,9 @@ const NotificationsPopover: FC<Props> = () => {
       {}
     )
     if (!res.error) {
-      await app.projects.fetchDetail(projectToFinalizeMigration.ref, (project) => meta.setProjectDetails(project))
+      await app.projects.fetchDetail(projectToFinalizeMigration.ref, (project) =>
+        meta.setProjectDetails(project)
+      )
       ui.setNotification({
         category: 'success',
         message: `Successfully finalized migration for project "${projectToFinalizeMigration.name}"`,
