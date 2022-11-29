@@ -94,6 +94,10 @@ const ColumnEditor: FC<Props> = ({
     }
 
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
+    if (changes.format !== 'text' && columnFields.isEncrypted) {
+      updatedColumnFields.isEncrypted = false
+    }
+
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
 
@@ -322,7 +326,21 @@ const ColumnEditor: FC<Props> = ({
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Toggle
                 label="Encrypt Column"
-                descriptionText={`Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE). Decrypted values will be stored within the "decrypted_${selectedTable.name}" view.`}
+                disabled={columnFields.format !== 'text'}
+                // @ts-ignore
+                descriptionText={
+                  <div className="space-y-2">
+                    <p>
+                      Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE).
+                      Decrypted values will be stored within the "decrypted_{selectedTable.name}"
+                      view.
+                    </p>
+                    <p>
+                      Note: Only columns of <code className="text-xs">text</code> type can be
+                      encrypted.
+                    </p>
+                  </div>
+                }
                 checked={columnFields.isEncrypted}
                 onChange={() => onUpdateField({ isEncrypted: !columnFields.isEncrypted })}
               />
