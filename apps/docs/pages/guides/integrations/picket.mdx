@@ -550,12 +550,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
 ```
 
 This is a long file, but don't be intimidated. The page is actually straightforward. It
--   1.
-    Verifies server-side that the user is authenticated and if they are not redirects them to the homepage
--   2.
-    Checks to see if they already have `todos` . If so, it returns them. If not, it initializes them for the users
--   3.
-    We render the `todos` and when the user selects or deselects a todo, we update the data in the database
+  1. Verifies server-side that the user is authenticated and if they are not redirects them to the homepage
+  2. Checks to see if they already have `todos` . If so, it returns them. If not, it initializes them for the users
+  3. We render the `todos` and when the user selects or deselects a todo, we update the data in the database
 
 ## Step 8: Try it Out!
 
