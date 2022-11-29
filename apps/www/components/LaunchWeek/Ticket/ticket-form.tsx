@@ -75,7 +75,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
             // }
           }}
         >
-          <p className={`${username && 'text-scale-500'}`}>
+          <p className={`${username && 'text-scale-900'}`}>
             {username ? 'Done!' : 'Connect with GitHub'}
           </p>
           {username ? (
@@ -85,7 +85,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
           ) : null}
         </button>
         {!username && (
-          <p className={'text-xs text-scale-300 dark:text-scale-900 pl-1'}>
+          <p className={'text-xs text-scale-700 dark:text-scale-900 pl-1'}>
             Only public info will be used.
           </p>
         )}

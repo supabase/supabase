@@ -4,6 +4,7 @@ import { SITE_URL } from '~/lib/constants'
 import styleUtils from './utils.module.css'
 // import IconCopy from '~/components/LaunchWeek/Ticket/icons/icon-copy'
 import styles from './ticket-copy.module.css'
+import { IconCopy, IconCheck } from 'ui'
 
 type Props = {
   username: string
@@ -23,20 +24,26 @@ export default function TicketCopy({ username }: Props) {
     }
   }, [])
 
-  const copiedText = (
-    <span
-      className={cn(styles.copied, {
-        [styles.visible]: copied,
-      })}
-    >
-      Copied!
-    </span>
-  )
+  console.log({ copied })
+
+  const copiedText = <span className="absolute -right-2 text-xs">Copied!</span>
+
+  // background: none;
+  // outline: none;
+  // border: none;
+  // z-index: 2;
+  // border-radius: var(--space-2x);
+  // width: 40px;
+  // display: flex;
+  // align-items: center;
+  // justify-content: center;
+  // margin-right: -10px;
 
   const copyButton = (
     <button
       type="button"
-      className={styles['copy-button']}
+      name="Copy"
+      className="w-24 flex items-center -mr-4 cursor-pointer z-10"
       ref={buttonRef}
       onClick={() => {
         navigator.clipboard.writeText(url).then(() => {
@@ -47,28 +54,24 @@ export default function TicketCopy({ username }: Props) {
         })
       }}
     >
-      {/* <IconCopy /> */}
+      {copied ? <IconCheck /> : <IconCopy />}
     </button>
   )
 
   return (
     <div className={cn(styles.wrapper, styleUtils.appear)}>
-      <div className={styles['label-wrapper']}>
-        <div className={styles.label}>Your ticket URL:</div>
+      <div className="flex gap-4 items-center max-w-md justify-between">
+        <div className="font-bold">Your ticket URL:</div>
         <div
           className={cn(styles['mobile-copy'], {
             [styles['mobile-copy-disabled']]: !copyEnabled,
           })}
         >
-          {copiedText}
+          {copied && copiedText}
           {copyButton}
         </div>
       </div>
-      <div
-        className={cn(styles.field, {
-          [styles['desktop-copy-disabled']]: !copyEnabled,
-        })}
-      >
+      <div className="flex items-center ml-4">
         <span
           className={styles.url}
           ref={scrollRef}
@@ -95,12 +98,8 @@ export default function TicketCopy({ username }: Props) {
           })}
           style={{ opacity: fadeOpacity }}
         />
-        <div
-          className={cn(styles['desktop-copy'], styleUtils['hide-on-mobile'], {
-            [styles['desktop-copy-disabled']]: !copyEnabled,
-          })}
-        >
-          {copiedText}
+        <div className="relative">
+          {copied && copiedText}
           {copyButton}
         </div>
       </div>
