@@ -436,6 +436,12 @@ launch week
   background: radial-gradient(circle at 50% -100%, #2d626a 0%, #121212 70%, #121212 100%);
 }
 
+.light .gradient-container {
+  min-height: 500px;
+  position: relative;
+  background: radial-gradient(circle at 50% -100%, #68d1e0 0%, #ffffff 70%, #ffffff 100%);
+}
+
 .flair-mask-a {
   position: absolute;
   background-color: #375965;
@@ -460,6 +466,10 @@ launch week
   height: 500px;
   -webkit-clip-path: ellipse(52% 135px at 50% 3px);
   clip-path: ellipse(52% 213px at 50% -75px);
+}
+
+.light .flair-mask-b {
+  background-color: #fff;
 }
 
 .orbit {
