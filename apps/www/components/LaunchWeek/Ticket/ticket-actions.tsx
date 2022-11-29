@@ -45,7 +45,7 @@ export default function TicketActions({ username, golden = false }: Props) {
 
   const ActionStyle = ({ children }: any) => {
     return (
-      <div className="rounded-full bg-gradient-to-r from-scale-100 via-scale-300 to-scale-700 px-5 py-2 dark:text-white">
+      <div className="rounded-full bg-[#2E2E2E] px-5 py-1 text-white border border-[#3E3E3E]">
         {children}
       </div>
     )
@@ -54,30 +54,19 @@ export default function TicketActions({ username, golden = false }: Props) {
   return (
     <>
       <ActionStyle>
-        <a
-          href={tweetUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-          className="bg-gradient-to-r from-white via-white to-[#1a7a4c85] bg-clip-text text-transparent"
-        >
+        <a href={tweetUrl} rel="noopener noreferrer" target="_blank">
           {/* <IconTwitter width={24} /> Tweet it! */}
           Tweet it
         </a>
       </ActionStyle>
       <ActionStyle>
-        <a
-          href={linkedInUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-          className="bg-gradient-to-r from-white via-white to-[#1a7a4c85] bg-clip-text text-transparent"
-        >
+        <a href={linkedInUrl} rel="noopener noreferrer" target="_blank">
           {/* <IconLinkedin width={20} /> Share on LinkedIn */}
           Share on Linkedin
         </a>
       </ActionStyle>
       <ActionStyle>
         <a
-          className="bg-gradient-to-r from-white via-white to-[#1a7a4c85] bg-clip-text text-transparent"
           href={loading ? undefined : downloadUrl}
           onClick={(e) => {
             if (imgReady) return

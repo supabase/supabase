@@ -62,11 +62,13 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
                 <>{SITE_NAME}</>
               )
             ) : golden ? (
-              <p className="text-2xl dark:text-white mb-4">
+              <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">
                 You won a golden ticket! <br /> Claim it now!
               </p>
             ) : (
-              <p className="text-2xl dark:text-white mb-4">Congratulations, you have a ticket!</p>
+              <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">
+                Congratulations, you have a ticket!
+              </p>
             )}
           </h2>
           <h2 className="text-sm dark:text-scale-900 max-w-[380px]">
