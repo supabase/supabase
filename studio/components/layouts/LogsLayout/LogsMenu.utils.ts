@@ -13,13 +13,21 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
     ...(IS_PLATFORM
       ? [
           {
+            title: 'Logs Explorer',
             items: [
-              {
-                name: 'Logs Explorer',
-                key: 'explorer',
-                url: `/project/${ref}/logs/explorer`,
-                items: [],
-              },
+              { key: 'explorer', name: 'Query', root: true },
+              { key: 'saved', name: 'Saved Queries' },
+              { key: 'recent', name: 'Recent Queries' },
+              { key: 'templates', name: 'Templates' },
+            ].map(({ key, name, root }) => ({
+              name,
+              key,
+              url: `/project/${ref}/logs/explorer${root ? '' : '/' + key}`,
+              items: [],
+            })),
+          },
+          {
+            items: [
               {
                 name: 'API Edge Network',
                 key: 'edge-logs',

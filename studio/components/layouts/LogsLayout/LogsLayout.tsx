@@ -15,7 +15,9 @@ interface LogsLayoutProps {
 const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
   const { ui } = useStore()
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const pathArr = router.pathname.split('/')
+  const page = pathArr[pathArr.length - 1]
+  console.log(page)
 
   const project = ui.selectedProject
 
