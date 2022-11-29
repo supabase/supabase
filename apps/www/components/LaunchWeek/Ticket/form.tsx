@@ -186,15 +186,14 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           </div>
         </div>
       ) : (
-        <form
-          className="relative"
-          // className="m-4 flex bg-scale-100 border-scale-600 border rounded-full p-0.5 pl-1 min-w-[260px]"
-          onSubmit={onSubmit}
-        >
+        <form className="relative" onSubmit={onSubmit}>
           <input
             className={`
-            border border-scale-300 bg-scaleA-200 h-12
-            
+            border border-scale-300 bg-scaleA-200 h-10
+
+            disabled:bg-scale-50 disabled:text-scale-500 disabled:border-scale-200 disabled:shadow-none
+            focus:invalid:border-scale-500 focus:invalid:ring-scaleA-300
+
             text-scale-1200 text-sm rounded-full w-full px-5`}
             autoComplete="off"
             type="email"
@@ -210,8 +209,9 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           <button
             type="submit"
             className={[
-              'px-4 py-1 absolute rounded-full bg-scale-300 text-scale-1200 border border-scale-600 text-sm hover:bg-scale-400',
-              'absolute right-0 top-0 bottom-0',
+              'absolute bg-scale-300 text-scale-1200 border border-scale-600 text-sm hover:bg-scale-400',
+              'rounded-full px-4',
+              'absolute right-1 my-auto h-8 top-0 bottom-0',
             ].join(' ')}
             disabled={formState === 'loading'}
           >
