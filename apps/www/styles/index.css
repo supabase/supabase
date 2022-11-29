@@ -433,23 +433,54 @@ launch week
 .gradient-container {
   min-height: 500px;
   position: relative;
-  background: radial-gradient(circle at 50% -100%, #2d626a 0%, #121212 70%, #121212 100%);
+  max-width: 1600px;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  /* background: radial-gradient(
+    circle at 50% -150%,
+    #39617d 0%,
+    #00ded1 30%,
+    #121212 80%,
+    #121212 100%
+  ); */
 }
 
-.light .gradient-container {
-  min-height: 500px;
-  position: relative;
-  background: radial-gradient(circle at 50% -100%, #68d1e0 0%, #ffffff 70%, #ffffff 100%);
+.gradient-mask {
+  z-index: -10;
+  position: absolute;
+  min-height: 100%;
+  width: 75%;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  background: radial-gradient(
+    circle at 50% -35%,
+    rgba(57, 97, 125, 0.32) 0%,
+    rgba(57, 97, 125, 0.32) 5%,
+    rgba(0, 222, 209, 0.75) 8%,
+    #121212 65%,
+    #121212 100%
+  );
+}
+
+.gradient-mask--masked {
+  z-index: -10;
+  position: absolute;
+  min-height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  background: radial-gradient(circle at 50% -60%, rgba(255, 255, 255, 0) 0%, #121212 65%);
 }
 
 .flair-mask-a {
   position: absolute;
   background-color: #375965;
-  left: 0;
-  top: 1px;
-  width: 80%;
-  right: 0;
-  margin: 0 auto;
+  top: 1.5px;
+  width: 110%;
+  left: -5%;
   height: 500px;
   -webkit-clip-path: ellipse(52% 135px at 50% 3px);
   clip-path: ellipse(52% 213px at 50% -75px);
@@ -458,18 +489,39 @@ launch week
 .flair-mask-b {
   position: absolute;
   background-color: #121212;
-  left: 0;
   top: 0px;
-  width: 80%;
-  right: 0;
-  margin: 0 auto;
+  left: -10%;
+  width: 110%;
+
   height: 500px;
   -webkit-clip-path: ellipse(52% 135px at 50% 3px);
   clip-path: ellipse(52% 213px at 50% -75px);
 }
 
-.light .flair-mask-b {
-  background-color: #fff;
+@media only screen and (min-width: 600px) {
+  .flair-mask-a {
+    top: 1.5px;
+    margin: 0 auto;
+    width: 89.5%;
+    left: 0;
+    right: 0;
+  }
+  .flair-mask-b {
+    top: 0px;
+    margin: 0 auto;
+    width: 90%;
+    left: 0;
+    right: 0;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .flair-mask-a {
+    width: 69.5%;
+  }
+  .flair-mask-b {
+    width: 70%;
+  }
 }
 
 .orbit {
