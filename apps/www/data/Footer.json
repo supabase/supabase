@@ -11,12 +11,16 @@
         "url": "/auth"
       },
       {
-        "text": "Storage",
-        "url": "/storage"
-      },
-      {
         "text": "Functions",
         "url": "/edge-functions"
+      },
+      {
+        "text": "Realtime",
+        "url": "/realtime"
+      },
+      {
+        "text": "Storage",
+        "url": "/storage"
       },
       {
         "text": "Pricing",
@@ -36,8 +40,8 @@
         "url": "/support"
       },
       {
-        "text": "Brand Assets / Logos",
-        "url": "/brand-assets"
+        "text": "System Status",
+        "url": "https://status.supabase.com/"
       },
       {
         "text": "Integrations",
@@ -48,16 +52,8 @@
         "url": "/partners/experts"
       },
       {
-        "text": "System Status",
-        "url": "https://status.supabase.com/"
-      },
-      {
-        "text": "Terms of service",
-        "url": "/docs/company/terms"
-      },
-      {
-        "text": "Privacy Policy",
-        "url": "/docs/company/privacy"
+        "text": "Brand Assets / Logos",
+        "url": "/brand-assets"
       },
       {
         "text": "DPA",
@@ -78,15 +74,31 @@
       },
       {
         "text": "API Reference",
-        "url": "/docs/guides/api"
-      },
-      {
-        "text": "Guides",
-        "url": "/docs/"
+        "url": "/docs/reference"
       },
       {
         "text": "Changelog",
         "url": "/changelog"
+      },
+      {
+        "text": "Contributing",
+        "url": "/docs/handbook/contributing"
+      },
+      {
+        "text": "Open Source",
+        "url": "/docs/oss"
+      },
+      {
+        "text": "SupaSquad",
+        "url": "/docs/handbook/supasquad"
+      },
+      {
+        "text": "DevTo",
+        "url": "https://dev.to/supabase"
+      },
+      {
+        "text": "RSS",
+        "url": "/rss.xml"
       }
     ]
   },
@@ -98,16 +110,28 @@
         "url": "/blog"
       },
       {
-        "text": "Open Source",
-        "url": "/docs/oss"
-      },
-      {
         "text": "Careers",
         "url": "/careers"
       },
       {
         "text": "Company",
         "url": "/company"
+      },
+      {
+        "text": "Terms of Service",
+        "url": "/docs/company/terms"
+      },
+      {
+        "text": "Privacy Policy",
+        "url": "/docs/company/privacy"
+      },
+      {
+        "text": "Acceptable Use Policy",
+        "url": "/docs/company/aup"
+      },
+      {
+        "text": "Service Level Agreement",
+        "url": "/docs/company/sla"
       },
       {
         "text": "Humans.txt",

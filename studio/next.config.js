@@ -16,6 +16,36 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/register',
+        destination: '/sign-up',
+        permanent: false,
+      },
+      {
+        source: '/signup',
+        destination: '/sign-up',
+        permanent: false,
+      },
+      {
+        source: '/signin',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/login',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
+        source: '/log-in',
+        destination: '/sign-in',
+        permanent: false,
+      },
+      {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
         permanent: true,
@@ -33,6 +63,51 @@ const nextConfig = {
       {
         source: '/project/:ref/settings',
         destination: '/project/:ref/settings/general',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/auth/settings',
+        destination: '/project/:ref/auth/users',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/postgres-logs',
+        destination: '/project/:ref/logs/postgres-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/postgrest-logs',
+        destination: '/project/:ref/logs/postgrest-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/pgbouncer-logs',
+        destination: '/project/:ref/logs/pgbouncer-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/realtime-logs',
+        destination: '/project/:ref/logs/realtime-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/logs',
+        destination: '/project/:ref/logs/storage-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/auth/logs',
+        destination: '/project/:ref/logs/auth-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/logs-explorer',
+        destination: '/project/:ref/logs/explorer',
         permanent: true,
       },
     ]

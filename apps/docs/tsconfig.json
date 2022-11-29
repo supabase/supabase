@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "noImplicitAny": false,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "module": "esnext"
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/guides/append-test.js"],
+  "exclude": ["node_modules"]
+}

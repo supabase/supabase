@@ -1,5 +1,34 @@
 Pricing Changelog
 
+### 02 Nov 2022
+----
+
+Database
+- guidance on backups > 1TB in size
+- Removed "Realtime functionality" as it is redundant with new realtime section
+Auth
+- added “advanced security features”
+- MAUs changed to unlimited for Enterprise
+Realtime
+— Added new realtime section
+- Concurrent Peak Connections
+- Max Messages Per Month
+- Max Message Size
+Edge Functions
+- Runtime hours removed
+- Number of functions, usage pricing added after limit on Pro
+- Invocations, usage pricing added after limit on Pro
+Support
+- Security features moved to own section
+Platform Security and Compliance
+- New section made
+- added Access roles
+- added Custom Domains
+- added Vanity URLs added
+Database Compute Add ons
+- New label “Optimized Compute”
+
+
 ### 16 June 2022
 ----
 

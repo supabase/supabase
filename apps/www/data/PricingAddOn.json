@@ -1,11 +1,11 @@
 {
   "database": {
-    "title": "Database",
+    "title": "Optimized Compute",
     "features": [
-      "Fully Managed PostgreSQL",
-      "Dedicated Postgres Database",
-      "Optimized Database Instances",
-      "Realtime Functionality"
+      "For projects that need dedicated compute",
+      "For scaling number of connections",
+      "Additional CPU & RAM options",
+      "Additional Disk IO Bandwidth"
     ],
     "rows": [
       {

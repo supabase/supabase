@@ -373,6 +373,7 @@ launch week
 
 :root {
   --auth-ui-card-height: 50vh;
+  --lw-secondary-color: #8a8f98;
 }
 
 .glow-area {
@@ -420,4 +421,11 @@ launch week
 
 .recharts-surface {
   overflow: visible;
+}
+
+/* Fix inline code block wrapping */
+@media screen and (min-width: 769px) {
+  .short-inline-codeblock {
+    white-space: pre !important;
+  }
 }
