@@ -53,11 +53,20 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
       })}
     >
       <div ref={divRef}>
-        <div className={`${styles['ticket-text']} flex flex-col items-center xl:block`}>
-          <h2 className={cn(styles.hero, styleUtils.appear, styleUtils['appear-first'])}>
+        <div
+          className={`${styles['ticket-text']} text-scale-1200 flex flex-col items-center xl:block`}
+        >
+          <h1
+            className={cn(
+              styles.hero,
+              styleUtils.appear,
+              styleUtils['appear-first'],
+              'text-xl md:text-3xl'
+            )}
+          >
             {sharePage ? (
               name ? (
-                <>{name}’s Ticket</>
+                <>{name}'s Ticket</>
               ) : (
                 <>{SITE_NAME}</>
               )
@@ -70,12 +79,12 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
                 Congratulations, you have a ticket!
               </p>
             )}
-          </h2>
+          </h1>
           <h2 className="text-sm dark:text-scale-900 text-[#7E868C] max-w-[380px]">
             {sharePage ? (
-              <>
+              <p className="mt-4">
                 Join {name ?? 'us'} on {DATE}.
-              </>
+              </p>
             ) : golden ? (
               <>Claim your ticket with GitHub and Tweet it to redeem your swag pack!</>
             ) : username ? (
@@ -91,10 +100,12 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
           {!sharePage ? (
-            <TicketForm
-              defaultUsername={username ?? undefined}
-              setTicketGenerationState={setTicketGenerationState}
-            />
+            <>
+              <TicketForm
+                defaultUsername={username ?? undefined}
+                setTicketGenerationState={setTicketGenerationState}
+              />
+            </>
           ) : (
             <Form sharePage align="Left" />
           )}

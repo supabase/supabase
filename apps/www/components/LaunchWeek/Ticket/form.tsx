@@ -6,6 +6,7 @@ import LoadingDots from './loading-dots'
 import styleUtils from './utils.module.css'
 import styles from './form.module.css'
 import useEmailQueryParam from '~/components/LaunchWeek/Ticket/hooks/use-email-query-param'
+import { IconLoader } from '~/../../packages/ui'
 // import Captcha, { useCaptcha } from './captcha'
 
 type FormState = 'default' | 'loading' | 'error'
@@ -154,12 +155,12 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   useEmailQueryParam('email', setEmail)
 
   return (
-    <>
+    <div className="mt-16">
       <div
         className={cn(
           styleUtils['appear-fifth'],
           [styles[`formInfo${align}`]].join(' '),
-          'flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4'
+          `grid gap-2 items-center max-w-[420px] !pb-4`
         )}
       >
         <h3 className="text-scale-1200 text-base">Coming soon</h3>
@@ -195,7 +196,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
             border border-scale-300 bg-scaleA-200 h-10
             focus:border-scale-500 focus:ring-scaleA-300
 
-            text-scale-1200 text-sm rounded-full w-full px-5`}
+            text-scale-1000 text-sm rounded-full w-full px-5`}
             type="email"
             id="email-input-field"
             value={email}
@@ -217,11 +218,17 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
             ].join(' ')}
             disabled={formState === 'loading'}
           >
-            Register
+            {formState === 'loading' ? (
+              <div className="flex items-center gap-2">
+                <IconLoader /> Registering
+              </div>
+            ) : (
+              'Register'
+            )}
           </button>
           {/* <Captcha ref={captchaRef} onVerify={handleRegister} /> */}
         </form>
       )}
-    </>
+    </div>
   )
 }

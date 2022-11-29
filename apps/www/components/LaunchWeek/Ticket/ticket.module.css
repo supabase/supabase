@@ -1,5 +1,4 @@
 .hero {
-  font-size: 30px;
   line-height: 1.15;
   letter-spacing: -0.05em;
   font-weight: 400;
@@ -9,7 +8,6 @@
 
 @media (min-width: 768px) {
   .hero {
-    font-size: 30px;
     line-height: 1;
     /* font-weight: 800; */
     /* max-width: 800px; */
@@ -140,7 +138,6 @@
     grid-template-columns: 1fr 1fr;
   }
   .hero {
-    font-size: 48px;
     text-align: left;
   }
   .description {
