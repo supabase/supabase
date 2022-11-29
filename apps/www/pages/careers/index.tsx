@@ -91,9 +91,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
         <div className="text-scale-1200">
           <div className="container relative mx-auto px-6 py-10 lg:pt-12 lg:px-16 xl:px-20 text-center space-y-4">
             <span className="text-sm text-brand-900 md:text-base">Careers</span>
-            <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-2px]">
+            <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.5px]">
               We’re on a mission to build the best developer platform
-            </h1>
+            </h2>
             <p className="text-sm md:text-base text-scale-1000 max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote possibilities and join our team to help us achieve it.
             </p>
@@ -116,7 +116,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand-900 w-[134px] md:max-w-none"
                   >
                     <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand-900 w-[60px] lg:w-[100px]"></div>
-                    <h1 className="text-3xl lg:text-4xl pt-3 tracking-[-2px]">{company.number}</h1>
+                    <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">
+                      {company.number}
+                    </h2>
                     <ReactMarkdown className="text-scale-1100 text-sm lg:text-base">
                       {company.text}
                     </ReactMarkdown>
@@ -134,9 +136,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     <Globe />
                   </div>
                   <div className="relative -top-[75px] lg:top-0 lg:-left-[325px] xl:-top-[45px] xl:-left-[150px] 2xl:-left-[50px] lg:min-w-[400px] lg:h-fit xl:mt-10">
-                    <h1 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] lg:max-w-xs tracking-[-2px]">
+                    <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] lg:max-w-xs tracking-[-1.5px]">
                       We work together, wherever we are
-                    </h1>
+                    </h2>
                     <p className="text-scale-1100 mt-4 text-xs sm:text-sm lg:text-base md:w-5/6 lg:w-full">
                       Working in a globally distributed team is rewarding but has its challenges. We
                       are across many different timezones, so we use tools like Notion, Slack, and
@@ -144,9 +146,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     </p>
                     <div className="max-w-[300px] sm:max-w-md lg:max-w-md mt-20">
                       <div className="border-t-2 border-brand-900 w-4/12"></div>
-                      <h1 className="text-2xl sm:text-3xl lg:text-4xl pt-2 tracking-[-2px]">
+                      <h2 className="text-2xl sm:text-3xl lg:text-4xl pt-2 tracking-[-1.5px]">
                         We deeply believe in the efficacy of collaborative open source
-                      </h1>
+                      </h2>
                     </div>
                   </div>
                 </div>
@@ -156,7 +158,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 <div className="md:flex md:gap-6">
                   <div className="md:w-1/2">
                     <div>
-                      <h1 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-2px]">What is Supabase</h1>
+                      <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
+                        What is Supabase
+                      </h2>
                       <p className="text-scale-1100 text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
                         Supabase is an open source Firebase alternative, built by developers for
                         developers. Supabase adds auth, realtime, storage, restful APIs, and edge
@@ -242,12 +246,14 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               </SectionContainer>
 
               <SectionContainer>
-                <h1 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-2px]">Human powered</h1>
-                <p className="text-scale-1100 text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+                <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
+                  Human powered
+                </h2>
+                <p className="text-scale-1000 text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
                   As a completely remote and asynchronous team, we focus on these five traits to
                   keep our team effective:
                 </p>
-                <div className="sm:flex items-start justify-between pt-10 space-y-6 sm:space-y-0 md:space-x-4">
+                <div className="grid pt-10 gap-8 grid-cols-3 md:gap-12 md:grid-cols-5">
                   {career.humanPowered.map(
                     (human: { icon: string; title: string; text: string }, i: number) => {
                       return (
@@ -268,7 +274,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             </div>
                           </div>
                           <div className="sm:max-w-[120px] md:max-w-[150px] lg:max-w-[230px]">
-                            <h2 className="text-sm md:text-md xl:text-lg md:pt-4 lg:pt-0 tracking-[-2px]">
+                            <h2 className="text-sm md:text-md xl:text-lg md:pt-4 lg:pt-0">
                               {human.title}
                             </h2>
                             <p className="text-scale-1100 text-xs lg:text-sm">{human.text}</p>
@@ -292,9 +298,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <h1 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-2px]">
+                  <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1.5px]">
                     1,000 + Contributors building Supabase
-                  </h1>
+                  </h2>
                   <p className="text-scale-1100 text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                     We're building a community of communities, bringing together developers from
                     many different backgrounds, as well as new developers looking to get involved
@@ -308,7 +314,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <div
                         className={`${
                           Styles[`contributors-${i}`]
-                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10`}
+                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10 
+                          transition-all hover:scale-105 drop-shadow-sm hover:drop-shadow-md
+                        `}
                         key={i}
                       >
                         <Link href={contributor.html_url}>
@@ -355,16 +363,16 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
           <SectionContainer>
             <div className="xl:flex lg:items-start xl:gap-10 justify-between">
               <div className="xl:min-w-[300px] xl:max-w-[360px]">
-                <h1 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-none tracking-[-2px]">
+                <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-none tracking-[-1.5px]">
                   Great people deserve great benefits
-                </h1>
+                </h2>
               </div>
               <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-6">
                 {career.benefits.map(
                   (benefits: { icon: string; title: string; text: string }, i: number) => {
                     return (
                       <div
-                        className="h-full bg-scale-300 border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
+                        className="h-full bg-white dark:bg-scale-300 drop-shadow-sm border-scale-400 border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
                         <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square rounded-lg flex items-center">
@@ -380,8 +388,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           </div>
                         </div>
                         <div className="h-fit text-sm lg:text-base">
-                          <h2>{benefits.title}</h2>
-                          <ReactMarkdown className="prose pt-1 text-sm xl:text-base">
+                          <h2 className="text-base">{benefits.title}</h2>
+                          <ReactMarkdown className="prose pt-1 text-sm">
                             {benefits.text}
                           </ReactMarkdown>
                         </div>
@@ -405,7 +413,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               </div>
             </div>
             <div className="text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
-              <h1 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-2px]">How we hire</h1>
+              <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">How we hire</h2>
               <p className="text-xs sm:text-sm lg:text-base text-scale-1100 pt-3">
                 The entire process is fully remote and all communication happens over email or via
                 video chat in Google. Meet. The calls are all 1:1 and usually take between 20-45
@@ -445,8 +453,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
 
           <div id="positions" className="positions">
             <SectionContainer>
-              <h1 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-2px]">Open positions</h1>
-              <div className="mt-10 space-y-6">
+              <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">Open positions</h2>
+              <div className="mt-10 space-y-4">
                 {jobs.map(
                   (
                     job: {
@@ -461,8 +469,8 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     return (
                       <div className="cursor-pointer md:cursor-default" key={i}>
                         <Link href={job.absolute_url}>
-                          <div className="text-xs bg-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center">
-                            <h2 className="text-2xl min-w-[300px] lg:min-w-[316px] truncate mr-6 tracking-[-2px]">
+                          <div className="bg-white border-scale-300 drop-shadow-sm dark:bg-scale-300 border dark:border-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-scale-100 dark:hover:bg-scale-400 hover:drop-shadow-md hover:cursor-pointer">
+                            <h2 className="text-base min-w-[300px] lg:min-w-[316px] truncate mr-6">
                               {job.title}
                             </h2>
                             <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
