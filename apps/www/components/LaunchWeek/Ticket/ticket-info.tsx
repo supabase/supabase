@@ -13,13 +13,19 @@ export default function TicketInfo({
   return (
     <div className={styles.info}>
       <div
-        className={`${cn(styles.date, { [styles['date-golden']]: golden })} text-sm ${
+        className={`${cn(styles.date, { [styles['date-golden']]: golden })} text-sm mr-4 ${
           golden && '!text-white'
         }`}
       >
         <div>{DATE}</div>
       </div>
-      {/* <div className={cn(styles.url, { [styles['url-golden']]: golden })}>{siteUrlForTicket}</div> */}
+      <div
+        className={`${cn(styles.date, { [styles['date-golden']]: golden })} text-sm ${
+          golden && '!text-white'
+        }`}
+      >
+        <div>supabase.com/launch-week</div>
+      </div>
     </div>
   )
 }
