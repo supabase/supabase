@@ -187,11 +187,15 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
         </div>
       ) : (
         <form
-          className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]"
+          className="relative"
+          // className="m-4 flex bg-scale-100 border-scale-600 border rounded-full p-0.5 pl-1 min-w-[260px]"
           onSubmit={onSubmit}
         >
           <input
-            className={`mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full w-full border-none`}
+            className={`
+            border border-scale-300 bg-scaleA-200 h-12
+            
+            text-scale-1200 text-sm rounded-full w-full px-5`}
             autoComplete="off"
             type="email"
             id="email-input-field"
@@ -205,9 +209,10 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           />
           <button
             type="submit"
-            className={
-              'px-4 py-1 rounded-full bg-scale-300 text-scale-1200 border border-scale-600 text-xs hover:bg-scale-400'
-            }
+            className={[
+              'px-4 py-1 absolute rounded-full bg-scale-300 text-scale-1200 border border-scale-600 text-sm hover:bg-scale-400',
+              'absolute right-0 top-0 bottom-0',
+            ].join(' ')}
             disabled={formState === 'loading'}
           >
             Register
