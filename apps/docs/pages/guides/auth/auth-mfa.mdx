@@ -263,110 +263,64 @@ For example, to unenroll the nil UUID we would call: `supabase.auth.mfa.unenroll
 #### Example: React
 
 Below is an example that creates a new `UnenrollMFA` component that illustrates
-the important pieces of the MFA enrollment flow. Note that a user can only unenroll a
-
+the important pieces of the MFA enrollment flow. Note that a user can only unenroll factors they own and they can only unenroll factors after
+first going through the MFA process and attaining the `aal2` level. Here are some points of note:
 
 - When the component appears on screen, the `supabase.auth.mfa.listFactors()` API is
   called once to fetch all existing factors together with their details.
-- The existing factors for a user are displayed together with the option to unenroll
-- Once the user has selected a factor to unenroll they can hit the `Unenroll` button
-  which creates a confirmation modal. We use `react-modal` for this modal.
-- `onUnenrolled` is a callback that notifies the other components that Unenrollment
-  has completed.
-- `onCancelled` is a callback that notifies the other components that the user
-  has clicked the `Cancel` button.
+- The existing factors for a user are displayed in a table.
+- Once the user has selected a factor to unenroll they can type in the factorId and hit the `Unenroll` button
+  which creates a confirmation modal.
 
 ```tsx
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Modal from 'react-modal';
-
-...
 
 /**
  * UnenrollMFA shows a simple table with the list of factors together with a button to unenroll.
- * When a user selects a factor and clicks the unenroll button it displays a
- * confirmation popup with the option to unenroll or to cancel. If the user opts
- * to continue, it calls `onUnenroll`. Otherwise, if the user clicks cancel the
- * `onCancelled` callback is called.
+ * When a user types in the factorId of the factor that they wish to unenroll
  */
-export function UnenrollMFA({
-  onEnrolled,
-  onCancelled,
-}: {
-  onUnenrolled: () => void
-  onCancelled: () => void
-}) {
-  const [factorIds, setFactorIds] = useState('')
-  // TODO(Joel) - write the corresponding example
+export function UnenrollMFA() {
+  const [factorId, setFactorId] = useState('')
+  const [factors, setFactors] = useState([])
   const [modalIsOpen, setIsOpen] = React.useState(false);
-  function closeModal() {
-    setIsOpen(false);
-    onCancelled();
-  }
-
-  function openModal() {
-    setIsOpen(true);
-  }
-
   const [error, setError] = useState('') // holds an error message
-
-  const onEnableClicked = () => {
-    setError('')
-    ;(async () => {
-      const challenge = await supabase.auth.mfa.challenge({ factorId })
-      if (challenge.error) {
-        setError(challenge.error.message)
-        throw challenge.error
-      }
-
-      const challengeId = challenge.data.id
-
-      const verify = await supabase.auth.mfa.verify({
-        factorId,
-        challengeId,
-        code: verifyCode,
-      })
-      if (verify.error) {
-        setError(verify.error.message)
-        throw verify.error
-      }
-
-      onEnrolled()
-    })()
-  }
 
   useEffect(() => {
     ;(async () => {
-      const { data, error } = await supabase.auth.mfa.listFactors({
-        userId: <to-be-filled>
-      })
+      const { data, error } = await supabase.auth.mfa.listFactors()
       if (error) {
         throw error
       }
 
-      setFactorIds(data.id)
+      setFactors(data.totp)
     })()
   }, [])
 
   return (
     <>
       {error && <div className="error">{error}</div>}
-      <button onClick={openModal}>Open Modal</button>
-      <Modal
-        isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
-        onRequestClose={closeModal}
-        contentLabel="Unenrollment confirmation modal"
-      >
-        <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Confirm Unenrollment</h2>
-        <div>Do you wish to proceed to unenroll: (todo: fetch-factor-name-here)?</div>
-        <form>
-          <button onClick={()=> supabase.auth.mfa.unenroll()}>Unenroll</button>
-          <button onClick={closeModal}>Cancel</button>
-        </form>
-      </Modal>
-    </div>
+      <tbody>
+       <tr>
+         <td>Factor ID</td>
+         <td>Friendly Name</td>
+         <td>Factor Status</td>
+       </tr>
+       {factors.map(factor => (
+        <tr>
+          <td>{factor.id}</td>
+          <td>{factor.friendly_name}</td>
+          <td>{factor.factor_type}</td>
+          <td>{factor.status}</td>
+        </tr>
+      ))}
+      </tbody>
+      <input
+        type="text"
+        value={verifyCode}
+        onChange={(e) => setFactorId(e.target.value.trim())}
+      />
+      <button onClick={()=> supabase.auth.mfa.unenroll({factorId})}>Unenroll</button>
     </>
   )
 }
