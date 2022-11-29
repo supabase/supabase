@@ -253,30 +253,26 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   As a completely remote and asynchronous team, we focus on these five traits to
                   keep our team effective:
                 </p>
-                <div className="grid pt-10 gap-8 grid-cols-3 md:gap-12 md:grid-cols-5">
+                <div className="grid pt-10 gap-8 grid-cols-2 md:grid-cols-3 lg:gap-12 lg:grid-cols-5">
                   {career.humanPowered.map(
                     (human: { icon: string; title: string; text: string }, i: number) => {
                       return (
-                        <div
-                          key={i}
-                          className="flex sm:block items-center space-x-6 sm:space-x-0 sm:space-y-4 md:w-full"
-                        >
+                        <div key={i} className="flex flex-col gap-3">
                           <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg flex items-center">
                             <div className="relative w-full h-full mx-auto">
                               <Image
                                 src={`/images/career/icons/${human.icon}${
                                   isDarkMode ? '-dark' : '-light'
                                 }.svg`}
+                                className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
                                 alt={`${human.icon} icon`}
                                 layout="fill"
-                                objectFit="cover"
+                                objectFit="fill"
                               />
                             </div>
                           </div>
-                          <div className="sm:max-w-[120px] md:max-w-[150px] lg:max-w-[230px]">
-                            <h2 className="text-sm md:text-md xl:text-lg md:pt-4 lg:pt-0">
-                              {human.title}
-                            </h2>
+                          <div className="">
+                            <h2 className="text-base">{human.title}</h2>
                             <p className="text-scale-1100 text-xs lg:text-sm">{human.text}</p>
                           </div>
                         </div>
@@ -470,7 +466,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <div className="cursor-pointer md:cursor-default" key={i}>
                         <Link href={job.absolute_url}>
                           <div className="bg-white border-scale-300 drop-shadow-sm dark:bg-scale-300 border dark:border-scale-400 p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-scale-100 dark:hover:bg-scale-400 hover:drop-shadow-md hover:cursor-pointer">
-                            <h2 className="text-base min-w-[300px] lg:min-w-[316px] truncate mr-6">
+                            <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
                               {job.title}
                             </h2>
                             <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
