@@ -1,4 +1,4 @@
-import { IconArchive, IconDatabase, IconKey } from 'ui'
+import { IconArchive, IconCode, IconDatabase, IconKey } from 'ui'
 
 export const CANCELLATION_REASONS = [
   'Pricing',
@@ -69,6 +69,27 @@ export const USAGE_BASED_PRODUCTS = [
         units: 'bytes',
         costPerUnit: 0.09,
       },
+    ],
+  },
+  {
+    title: 'Functions',
+    icon: <IconCode className="dark:text-scale-100" size={16} strokeWidth={2} />,
+    features: [
+      {
+        key: 'func_count',
+        attribute: 'func_count',
+        title: 'Function Count',
+        units: 'absolute',
+        costPerUnit: 0.1,
+      },
+     
+      {
+        key: 'func_invocations',
+        attribute: 'func_invocations',
+        title: 'Function Invocations',
+        units: 'absolute',
+        costPerUnit: 0.000002,
+      }
     ],
   },
 ]
