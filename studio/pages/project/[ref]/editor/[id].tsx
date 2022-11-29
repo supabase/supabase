@@ -145,9 +145,7 @@ const TableEditorPage: NextPage = () => {
     try {
       if (isUndefined(selectedTableToDelete)) return
 
-      const response: any = await meta.tables.del(selectedTableToDelete.id, {
-        cascade: isDeleteWithCascade,
-      })
+      const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
       if (response.error) throw response.error
 
       const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
@@ -162,6 +160,7 @@ const TableEditorPage: NextPage = () => {
         category: 'success',
         message: `Successfully deleted ${selectedTableToDelete.name}`,
       })
+      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         error,

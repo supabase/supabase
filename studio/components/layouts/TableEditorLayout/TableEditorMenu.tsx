@@ -78,6 +78,7 @@ const TableEditorMenu: FC<Props> = ({
   const refreshTables = async () => {
     setIsRefreshing(true)
     await meta.tables.load()
+    if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
     setIsRefreshing(false)
   }
 
