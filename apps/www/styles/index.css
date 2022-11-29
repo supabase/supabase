@@ -464,6 +464,17 @@ launch week
   );
 }
 
+.light .gradient-mask {
+  background: radial-gradient(
+    circle at 50% -35%,
+    rgba(57, 97, 125, 0.32) 0%,
+    rgba(57, 97, 125, 0.32) 5%,
+    rgba(0, 222, 209, 0.75) 8%,
+    #fff 65%,
+    #fff 100%
+  );
+}
+
 .gradient-mask--masked {
   z-index: -10;
   position: absolute;
@@ -473,6 +484,10 @@ launch week
   left: 0;
   right: 0;
   background: radial-gradient(circle at 50% -60%, rgba(255, 255, 255, 0) 0%, #121212 65%);
+}
+
+.light .gradient-mask--masked {
+  background: radial-gradient(circle at 50% -60%, rgba(255, 255, 255, 0) 0%, #fff 65%);
 }
 
 .flair-mask-a {
