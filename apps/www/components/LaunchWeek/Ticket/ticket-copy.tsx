@@ -69,14 +69,14 @@ export default function TicketCopy({ username }: Props) {
       className={cn(
         styleUtils.appear,
         styleUtils['appear-third'],
-        'bg-scaleA-300 h-8 rounded border border-scale-400 w-full'
+        'bg-scaleA-200 h-8 rounded border border-scale-400 w-full'
       )}
     >
-      <div className="px-3 h-full flex items-center gap-3 w-full truncate relative">
+      <div className="px-3 h-full flex items-center gap-3 w-full truncate relative pr-20">
         <div className="text-scale-900 text-sm hidden lg:flex">Your ticket URL:</div>
-        <div className="flex items-center truncate shrink-0">
-          <span
-            className={['text-xs font-mono text-scale-1200 truncate shrink-0'].join(' ')}
+        <div className="flex items-center truncate">
+          <p
+            className={['text-xs font-mono text-scale-1200 truncate'].join(' ')}
             ref={scrollRef}
             onScroll={() => {
               if (!scrolling) {
@@ -95,7 +95,7 @@ export default function TicketCopy({ username }: Props) {
             }}
           >
             {url}
-          </span>
+          </p>
         </div>
         <div className="absolute right-3 with-auto height-auto flex items-center">
           {copied && copiedText}

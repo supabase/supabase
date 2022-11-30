@@ -34,7 +34,7 @@ export default function Conf({
       }}
     >
       {pageState === 'registration' && !sharePage ? (
-        <Form />
+        <Form align={defaultPageState === 'registration' ? 'Center' : 'Left'} />
       ) : (
         <Ticket
           username={userData.username}

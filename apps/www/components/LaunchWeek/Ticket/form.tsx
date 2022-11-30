@@ -159,8 +159,8 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
       <div
         className={cn(
           styleUtils['appear-fifth'],
-          [styles[`formInfo${align}`]].join(' '),
-          `flex flex-col gap-2 items-center xl:items-start`
+          'flex flex-col gap-2 items-center xl:items-start',
+          align === 'Left' ? 'text-center xl:text-left' : 'text-center'
         )}
       >
         <p className="text-scale-1200 text-base w-full">Coming soon</p>
