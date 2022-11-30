@@ -68,14 +68,9 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
                 <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{SITE_NAME}</p>
               )
             ) : golden ? (
-              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
-                You got a Golden ticket. This means you're in, and you also won a Supabase goodie
-                bag. Tweet it to redeem your swag pack!
-              </p>
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">Congratulations!</p>
             ) : (
-              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
-                Congratulations, you have a ticket!
-              </p>
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">You have a ticket!</p>
             )}
           </h1>
           <h2 className="text-base dark:text-scale-1000 max-w-[520px]">
@@ -84,13 +79,17 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
                 Join {name ?? 'us'} on {DATE}.
               </p>
             ) : golden ? (
-              <>Claim your ticket with GitHub and Tweet it to redeem your swag pack!</>
+              <>
+                You got a Golden ticket. This means you’re in, and you also won a Supabase goodie
+                bag. Tweet it to redeem your swag pack!
+              </>
             ) : username ? (
               <>Here is your unique ticket image for bragging on socials!</>
             ) : (
               <>
-                This means you're in. Make sure you connect your ticket with your GitHub profile. A
-                few of the lucky attendees will get a limited edition Supabase goodie bag
+                This means you're in. Generate a unique ticket image with your GitHub profile, cause
+                a few of the lucky attendees will get a limited edition Supabase goodie bag. Make
+                sure you don't skip your chance.
               </>
             )}
           </h2>
