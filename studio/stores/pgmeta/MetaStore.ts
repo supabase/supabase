@@ -406,9 +406,10 @@ export default class MetaStore implements IMetaStore {
           if (addKeyRes.error) throw addKeyRes.error
           else encryptionKey = addKeyRes[0].id
         }
-        const query = `security label for pgsodium on column "${column.table}"."${column.name}" is 'ENCRYPT WITH KEY ID ${encryptionKey}';`
-        const encryptColumnRes = await this.rootStore.meta.query(query)
-        if (encryptColumnRes.error) throw encryptColumnRes.error
+        if (encryptionKey !== undefined) {
+          const encryptColumnRes = await this.rootStore.vault.encryptColumn(column, encryptionKey)
+          if (encryptColumnRes.error) throw encryptColumnRes.error
+        }
       }
       this.rootStore.ui.setNotification({
         id: toastId,

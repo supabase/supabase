@@ -3,12 +3,7 @@ import { PostgresSchema } from '@supabase/postgres-meta'
 
 import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
-import { ResponseError } from 'types'
-
-interface SchemaView {
-  schema: string
-  name: string
-}
+import { SchemaView, ResponseError } from 'types'
 
 export interface ISchemaStore extends IPostgresMetaInterface<PostgresSchema> {
   views: SchemaView[]
