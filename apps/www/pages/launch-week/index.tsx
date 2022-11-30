@@ -60,18 +60,18 @@ export default function launchweek() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col !pb-24 items-center lg:pt-32 gap-4">
-          <img
-            src="/images/launchweek/launchweek-logo--light.svg"
-            className="md:40 w-40 dark:hidden lg:w-80"
-          />
-          <img
-            src="/images/launchweek/launchweek-logo--dark.svg"
-            className="md:40 hidden w-40 dark:block lg:w-80"
-          />
-          <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
-        </SectionContainer>
-        <SectionContainer className="flex flex-col items-center xs:!p-0">
+        <SectionContainer className="flex flex-col !pb-24 items-center lg:pt-32 gap-32">
+          <div className="flex flex-col gap-3">
+            <img
+              src="/images/launchweek/launchweek-logo--light.svg"
+              className="w-40 dark:hidden lg:w-80"
+            />
+            <img
+              src="/images/launchweek/launchweek-logo--dark.svg"
+              className="hidden w-40 dark:block lg:w-80"
+            />
+            <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
+          </div>
           <TicketContainer
             supabase={supabase}
             session={session}
