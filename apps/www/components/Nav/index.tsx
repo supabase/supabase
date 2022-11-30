@@ -238,7 +238,7 @@ const Nav = () => {
                     <Link href="/launch-week">
                       <a
                         className={`
-                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        text-brand-900 hover:text-brand-900 hover:border-brand-1000 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium
                       `}
