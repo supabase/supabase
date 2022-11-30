@@ -28,7 +28,7 @@ export async function handler(req: Request) {
 
   try {
     // Try to get image from Supabase Storage CDN.
-    const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png?version=dev`) // TODO change for prod.
+    const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png?v=3`)
     if (storageResponse.ok) return storageResponse
 
     // Else, generate image ad upload to storage.
@@ -207,7 +207,7 @@ export async function handler(req: Request) {
     const { error } = await supabaseAdminClient.storage
       .from('images')
       .upload(`lw6/tickets/${username}.png`, generatedImage.body!, {
-        // cacheControl: '31536000', // TODO add for prod
+        cacheControl: '31536000',
         upsert: false,
       })
     if (error) throw error
