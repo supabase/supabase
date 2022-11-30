@@ -29,21 +29,30 @@ export default function TicketProfile({
         {username ? (
           <img src={`https://github.com/${username}.png`} alt={username} className={styles.image} />
         ) : (
-          <span className={cn(styles.image, styles['empty-icon'])}>{/* <IconAvatar /> */}</span>
+          <span
+            className={cn(
+              styles.image,
+              golden ? styles['empty-icon--golden'] : styles['empty-icon']
+            )}
+          >
+            {/* <IconAvatar /> */}
+          </span>
         )}
       </span>
       <div className={styles.text}>
         <p
-          className={cn(
+          className={`${cn(
             styles.name,
             { [styles['name-blank']]: !username },
             { [styles['name-golden']]: golden }
-          )}
+          )} dark:text-white`}
         >
           <span
-            className={cn(styles.skeleton, styles.wrapper, {
+            className={`${cn(styles.skeleton, styles.wrapper, {
               [styles.show]: ticketGenerationState === 'loading',
-            })}
+            })} text-4xl bg-gradient-to-r ${
+              golden ? 'to-[#ffe8af]' : 'to-slate-900'
+            } from-white via-white bg-clip-text text-transparent`}
           >
             {name || username || 'Your Name'}
           </span>
@@ -54,13 +63,21 @@ export default function TicketProfile({
               [styles.show]: ticketGenerationState === 'loading',
             })}
           >
-            <span className={cn(styles.githubIcon, { [styles['githubIcon-golden']]: golden })}>
+            <span className={`${golden ? 'text-white' : 'text-scale-1100'}`}>
               {/* <GithubIcon
                 color={golden ? 'var(--gold-primary)' : 'var(--secondary-color)'}
                 size={20 * size}
               /> */}
+              {username ? `@${username}` : <>username</>}
             </span>
-            {username || <>username</>}
+
+            <img
+              alt="Supabase disconnected badge"
+              src={`/images/launchweek/supabadge-${
+                golden ? 'gold' : username ? 'connected' : 'disconnected'
+              }.svg`}
+              className="ml-2"
+            />
           </span>
         </p>
       </div>

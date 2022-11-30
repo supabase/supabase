@@ -1,13 +1,8 @@
-import { useState, useRef, useEffect } from 'react'
-import cn from 'classnames'
+import { useEffect, useRef, useState } from 'react'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
-// import IconTwitter from '~/components/LaunchWeek/Ticket/icons/icon-twitter'
-// import IconLinkedin from '~/components/LaunchWeek/Ticket/icons/icon-linkedin'
-// import IconDownload from '~/components/LaunchWeek/Ticket/icons/icon-download'
-import LoadingDots from './loading-dots'
-import styleUtils from './utils.module.css'
-import styles from './ticket-actions.module.css'
+import { IconDownload, IconLinkedin, IconTwitter } from 'ui'
 import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
+import LoadingDots from './loading-dots'
 
 type Props = {
   username: string
@@ -43,48 +38,63 @@ export default function TicketActions({ username, golden = false }: Props) {
     }
   }, [downloadUrl])
 
+  const ActionStyle = ({ children }: any) => {
+    return (
+      <div className="rounded-full bg-white dark:bg-scale-400 dark:hover:bg-scale-500 py-1 px-3 border border-scale-500 dark:text-white text-sm mb-1 transition-all ease-out hover:bg-scale-500">
+        {children}
+      </div>
+    )
+  }
+
   return (
     <>
-      <a
-        className={cn(styles.button, styleUtils.appear, styles.first, 'icon-button')}
-        href={tweetUrl}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        {/* <IconTwitter width={24} /> Tweet it! */}
-      </a>
-      <a
-        className={cn(
-          styles.button,
-          styleUtils.appear,
-          styles.second,
-          'icon-button',
-          // LinkedIn Share widget doesn’t work on mobile
-          styles['linkedin-button']
-        )}
-        href={linkedInUrl}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        {/* <IconLinkedin width={20} /> Share on LinkedIn */}
-      </a>
-      <a
-        className={cn(styles.button, styleUtils.appear, styles.third, 'icon-button', {
-          [styles.loading]: loading,
-        })}
-        href={loading ? undefined : downloadUrl}
-        onClick={(e) => {
-          if (imgReady) return
+      <ActionStyle>
+        <a
+          href={tweetUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          className="flex items-center gap-2"
+        >
+          <div className="text-scale-900">
+            <IconTwitter size={12} strokeWidth={1.5} />
+          </div>
+          Tweet it
+        </a>
+      </ActionStyle>
+      <ActionStyle>
+        <a
+          href={linkedInUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          className="flex items-center gap-2"
+        >
+          <div className="text-scale-900">
+            <IconLinkedin size={12} strokeWidth={1.5} />
+          </div>
+          Share on Linkedin
+        </a>
+      </ActionStyle>
+      <ActionStyle>
+        <a
+          href={loading ? undefined : downloadUrl}
+          onClick={(e) => {
+            if (imgReady) return
 
-          e.preventDefault()
-          downloadLink.current = e.currentTarget
-          // Wait for the image download to finish
-          setLoading(true)
-        }}
-        download="ticket.png"
-      >
-        {loading ? <LoadingDots size={4} /> : <>{/* <IconDownload width={24} /> Download */}</>}
-      </a>
+            e.preventDefault()
+            downloadLink.current = e.currentTarget
+            // Wait for the image download to finish
+            setLoading(true)
+          }}
+          download="ticket.png"
+          className="flex items-center gap-2"
+        >
+          <div className="text-scale-900">
+            <IconDownload size={12} strokeWidth={1.5} />
+          </div>
+          Download
+          {loading ? <LoadingDots size={4} /> : <>{/* <IconDownload width={24} /> Download */}</>}
+        </a>
+      </ActionStyle>
     </>
   )
 }

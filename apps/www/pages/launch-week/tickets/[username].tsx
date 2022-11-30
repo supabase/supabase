@@ -6,8 +6,9 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
 import { createClient } from '@supabase/supabase-js'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FastGlobOptionsWithoutCwd } from 'globby'
+import { useTheme } from '~/components/Providers'
 
 type Props = {
   username: string | null
@@ -22,6 +23,8 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketShare({ username, ticketNumber, name, golden }: Props) {
+  const { isDarkMode } = useTheme()
+
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
@@ -34,6 +37,10 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
   const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?username=${encodeURIComponent(
     username ?? ''
   )}`
+
+  useEffect(() => {
+    document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
+  }, [isDarkMode])
 
   return (
     <>
@@ -50,16 +57,15 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
           ],
         }}
       />
-      <div className="launch-week-gradientBg"></div>
       <DefaultLayout>
-        <SectionContainer className="flex flex-col gap-8 !pb-0 md:gap-16 lg:gap-16">
+        <SectionContainer className="flex flex-col gap-8 pb-0 md:gap-16 lg:gap-16 items-center xl:items-start">
           <img
             src="/images/launchweek/launchweek-logo--light.svg"
-            className="md:40 w-28 dark:hidden lg:w-48"
+            className="md:40 w-40 dark:hidden lg:w-80"
           />
           <img
             src="/images/launchweek/launchweek-logo--dark.svg"
-            className="md:40 hidden w-28 dark:block lg:w-48"
+            className="md:40 hidden w-40 dark:block lg:w-80"
           />
           <TicketContainer
             supabase={supabase}
