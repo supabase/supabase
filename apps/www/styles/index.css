@@ -529,9 +529,9 @@ launch week
 .flair-mask-a {
   position: absolute;
   background-color: #375965;
-  top: 1.5px;
-  width: 110%;
-  left: -5%;
+  top: 1px;
+  width: 180%;
+  left: -40%;
   height: 500px;
   -webkit-clip-path: ellipse(52% 135px at 50% 3px);
   clip-path: ellipse(52% 213px at 50% -75px);
@@ -546,8 +546,8 @@ launch week
   position: absolute;
   background-color: #121212;
   top: 0px;
-  width: 110%;
-  left: -5%;
+  width: 182%;
+  left: -41%;
 
   height: 500px;
   -webkit-clip-path: ellipse(52% 135px at 50% 3px);
@@ -560,29 +560,46 @@ launch week
 
 @media only screen and (min-width: 600px) {
   .flair-mask-a {
-    top: 1.5px;
+    top: 1px;
     margin: 0 auto;
-    width: 89.5%;
-    left: 0;
+    width: 140%;
+    left: -20%;
     right: 0;
   }
   .flair-mask-b {
     top: 0px;
     margin: 0 auto;
-    width: 90%;
-    left: 0;
+    width: 142%;
+    left: -21%;
     right: 0;
   }
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 960px) {
+  .flair-mask-a {
+    top: 1px;
+    margin: 0 auto;
+    width: 120%;
+    left: -10%;
+    right: 0;
+  }
+  .flair-mask-b {
+    top: 0px;
+    margin: 0 auto;
+    width: 121%;
+    left: -10.5%;
+    right: 0;
+  }
+}
+
+/* @media only screen and (min-width: 1024px) {
   .flair-mask-a {
     width: 69.5%;
   }
   .flair-mask-b {
     width: 70%;
   }
-}
+} */
 
 .orbit {
   width: 192px;
