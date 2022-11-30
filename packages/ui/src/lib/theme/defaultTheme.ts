@@ -690,7 +690,7 @@ export default {
       ...defaults.size.text,
     },
     description: {
-      base: `text-scale-900`,
+      base: `text-scale-1000`,
       ...defaults.size.text,
     },
     group: `space-y-3`,
