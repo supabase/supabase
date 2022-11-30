@@ -64,31 +64,20 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
       }}
       className="flex flex-col items-center xl:block"
     >
-      <div>
-        <button
-          type="submit"
-          className="rounded-full bg-scale-300 py-1 px-3 border border-scale-400 dark:text-white text-sm mb-1 transition-all hover:bg-scale-400"
-          disabled={formState === 'loading' || Boolean(username)}
-          onClick={() => {
-            // if (formRef && formRef.current && isMobileOrTablet()) {
-            //   scrollTo(formRef.current, formRef.current.offsetHeight);
-            // }
-          }}
-        >
-          <span className={`${username && 'text-scale-900'}`}>
-            {username ? 'Done!' : 'Connect with GitHub'}
-          </span>
-          {username ? (
-            <span className={ticketFormStyles.checkIcon}>
-              {/* <CheckIcon color="#fff" size={24} /> */}
+      <div className="flex flex-col gap-3">
+        <div>
+          <button
+            type="submit"
+            className="rounded-full bg-scale-400 py-1 px-3 border border-scale-500 dark:text-white text-sm mb-1 transition-all ease-out hover:bg-scale-500"
+            disabled={formState === 'loading' || Boolean(username)}
+          >
+            <span className={`${username && 'text-scale-900'}`}>
+              {username ? 'Done!' : 'Connect with GitHub'}
             </span>
-          ) : null}
-        </button>
-        {!username && (
-          <p className={'text-xs text-scale-700 dark:text-scale-900 pl-1'}>
-            Only public info will be used.
-          </p>
-        )}
+            {username ? <span className={ticketFormStyles.checkIcon}></span> : null}
+          </button>
+        </div>
+        {!username && <p className={'text-xs text-scale-900'}>Only public info will be used.</p>}
       </div>
     </form>
   )

@@ -46,43 +46,40 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   //   }
   // }, [divRef, sharePage])
   // golden = true
+
   return (
-    <div
-      className={cn(styles['ticket-layout'], {
-        [styles['ticket-share-layout']]: sharePage,
-      })}
-    >
-      <div ref={divRef}>
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16">
+      <div ref={divRef} className="flex flex-col gap-6">
         <div
-          className={`${styles['ticket-text']} text-scale-1200 flex flex-col items-center lw_mid:items-start xl:block`}
+          className={` 
+          text-scale-1200 
+          flex flex-col 
+          items-center
+          text-center xl:text-left
+          xl:items-start
+          gap-3
+          `}
         >
-          <h1
-            className={cn(
-              styles.hero,
-              styleUtils.appear,
-              styleUtils['appear-first'],
-              'text-xl md:text-3xl'
-            )}
-          >
+          <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
             {sharePage ? (
               name ? (
-                <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">{name}’s Ticket</p>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}’s Ticket</p>
               ) : (
-                <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">{SITE_NAME}</p>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{SITE_NAME}</p>
               )
             ) : golden ? (
-              <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
                 You won a golden ticket! <br /> Claim it now!
               </p>
             ) : (
-              <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
                 Congratulations, you have a ticket!
               </p>
             )}
           </h1>
-          <h2 className="text-sm dark:text-scale-900 text-[#7E868C] max-w-[380px]">
+          <h2 className="text-base dark:text-scale-1000 max-w-[520px]">
             {sharePage ? (
-              <p className="xs:mb-12 lw_mid:mb-24">
+              <p>
                 Join {name ?? 'us'} on {DATE}.
               </p>
             ) : golden ? (
@@ -127,11 +124,11 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
         {!sharePage && (
           <>
             {username ? (
-              <div>
-                <div className={`${styles['ticket-actions']} gap-10`}>
+              <div className="flex flex-col gap-6 py-16">
+                <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
                   <TicketActions username={username} golden={golden} />
                 </div>
-                <div className={styles['ticket-copy']}>
+                <div>
                   <TicketCopy username={username} />
                 </div>
               </div>
