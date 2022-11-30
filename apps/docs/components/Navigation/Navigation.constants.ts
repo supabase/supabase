@@ -314,6 +314,7 @@ export const menuItems: NavMenu = {
             { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
             { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
             { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
+            { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
           ],
         },
         {
