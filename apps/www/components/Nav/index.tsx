@@ -374,6 +374,14 @@ const Nav = () => {
                       Blog
                     </a>
                   </Link>
+                  <Link href="/launch-week">
+                    <a
+                      target="_blank"
+                      className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                    >
+                      Launch Week 6
+                    </a>
+                  </Link>
                 </div>
                 <div className="p-3">
                   <p className="text-scale-900 mb-6 text-sm">Products available:</p>
