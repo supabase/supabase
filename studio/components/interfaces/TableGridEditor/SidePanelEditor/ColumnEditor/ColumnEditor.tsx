@@ -5,12 +5,13 @@ import { Dictionary } from 'components/grid'
 import { Checkbox, SidePanel, Input, Button, IconExternalLink, Toggle } from 'ui'
 import {
   PostgresColumn,
+  PostgresExtension,
   PostgresRelationship,
   PostgresTable,
   PostgresType,
 } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnType from './ColumnType'
@@ -60,6 +61,7 @@ const ColumnEditor: FC<Props> = ({
   saveChanges = () => {},
   updateEditorDirty = () => {},
 }) => {
+  const { ref } = useParams()
   const { meta, vault } = useStore()
 
   const isNewRecord = isUndefined(column)
@@ -74,6 +76,11 @@ const ColumnEditor: FC<Props> = ({
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
+
+  const [pgsodiumExtension] = meta.extensions.list(
+    (ext: PostgresExtension) => ext.name.toLowerCase() === 'pgsodium'
+  )
+  const isPgSodiumInstalled = pgsodiumExtension?.installed_version !== null
 
   useEffect(() => {
     if (visible) {
@@ -318,7 +325,7 @@ const ColumnEditor: FC<Props> = ({
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Toggle
                 label="Encrypt Column"
-                disabled={columnFields.format !== 'text'}
+                disabled={!isPgSodiumInstalled || columnFields.format !== 'text'}
                 // @ts-ignore
                 descriptionText={
                   <div className="space-y-2">
@@ -327,10 +334,21 @@ const ColumnEditor: FC<Props> = ({
                       Decrypted values will be stored within the "decrypted_{selectedTable.name}"
                       view.
                     </p>
-                    <p>
-                      Note: Only columns of <code className="text-xs">text</code> type can be
-                      encrypted.
-                    </p>
+                    {!isPgSodiumInstalled ? (
+                      <p>
+                        You will need to{' '}
+                        <Link href={`/project/${ref}/database/extensions?filter=pgsodium`}>
+                          <a className="text-brand-800 hover:text-brand-900 transition">install</a>
+                        </Link>{' '}
+                        the extension <code className="text-xs">pgsodium</code> first before being
+                        able to encrypt your column.
+                      </p>
+                    ) : (
+                      <p>
+                        Note: Only columns of <code className="text-xs">text</code> type can be
+                        encrypted.
+                      </p>
+                    )}
                   </div>
                 }
                 checked={columnFields.isEncrypted}
