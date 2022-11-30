@@ -188,15 +188,16 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           </div>
         </div>
       ) : (
-        <form className="relative max-w-[380px] min-w-[320px] mx-auto xl:mx-0" onSubmit={onSubmit}>
+        <form className="relative mx-auto xl:mx-0" onSubmit={onSubmit}>
           <input
             className={`
               transition-all
               border border-scale-300 bg-scaleA-200 h-10
               focus:border-scale-500 focus:ring-scaleA-300
-              text-scale-1000 text-sm rounded-full w-full px-5
+              text-scale-1200 text-sm rounded-full w-full px-5
             `}
             type="email"
+            autoComplete="email"
             id="email-input-field"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
