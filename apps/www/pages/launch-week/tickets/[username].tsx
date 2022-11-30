@@ -58,7 +58,7 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col gap-0 pb-0 md:gap-16 lg:gap-16">
+        <SectionContainer className="flex flex-col gap-0 pb-0 md:gap-16 lg:gap-16 items-center xl:items-start">
           <img
             src="/images/launchweek/launchweek-logo--light.svg"
             className="md:40 w-40 dark:hidden lg:w-80"

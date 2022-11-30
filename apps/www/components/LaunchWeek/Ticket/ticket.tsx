@@ -48,32 +48,18 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   // golden = true
 
   return (
-    <div
-      className={cn(styles['ticket-layout'], {
-        [styles['ticket-share-layout']]: sharePage,
-      })}
-    >
-      <div ref={divRef}>
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16">
+      <div ref={divRef} className="flex flex-col gap-6">
         <div
-          className={`${styles['ticket-text']} 
+          className={` 
           text-scale-1200 
           flex flex-col 
-
-          
           items-center 
           xl:items-start
-
           gap-3
           `}
         >
-          <h1
-            className={cn(
-              styles.hero,
-              styleUtils.appear,
-              styleUtils['appear-first'],
-              'text-xl md:text-3xl'
-            )}
-          >
+          <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl md:text-3xl')}>
             {sharePage ? (
               name ? (
                 <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}’s Ticket</p>
@@ -90,7 +76,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
               </p>
             )}
           </h1>
-          <h2 className="text-base dark:text-scale-1000">
+          <h2 className="text-base dark:text-scale-1000 max-w-[520px]">
             {sharePage ? (
               <p>
                 Join {name ?? 'us'} on {DATE}.
@@ -137,11 +123,11 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
         {!sharePage && (
           <>
             {username ? (
-              <div>
-                <div className={`${styles['ticket-actions']} gap-10`}>
+              <div className="flex flex-col gap-6 py-16">
+                <div className={`flex gap-3 items-center justify-center`}>
                   <TicketActions username={username} golden={golden} />
                 </div>
-                <div className={styles['ticket-copy']}>
+                <div>
                   <TicketCopy username={username} />
                 </div>
               </div>
