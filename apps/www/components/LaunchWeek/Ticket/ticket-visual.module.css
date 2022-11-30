@@ -134,7 +134,7 @@
 .info {
   z-index: 1;
   position: absolute;
-  bottom: 20px;
+  bottom: 40px;
   width: 100%;
   height: 100%;
   display: flex;
