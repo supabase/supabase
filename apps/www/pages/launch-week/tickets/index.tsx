@@ -51,7 +51,7 @@ export default function TicketHome() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col gap-32">
+        <SectionContainer className="flex flex-col gap-16">
           <div className="flex flex-col gap-3 items-center justify-center xl:justify-start">
             <img
               src="/images/launchweek/launchweek-logo--light.svg"
@@ -61,7 +61,6 @@ export default function TicketHome() {
               src="/images/launchweek/launchweek-logo--dark.svg"
               className="hidden w-40 dark:flex lg:w-80"
             />
-
             <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
           </div>
 
