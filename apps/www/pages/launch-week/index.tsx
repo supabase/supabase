@@ -15,8 +15,6 @@ const days = _days as WeekDayProps[]
 export default function launchweek() {
   const { isDarkMode } = useTheme()
 
-  // TODO: update days json
-  const shippingHasStarted = false
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
 
@@ -24,7 +22,6 @@ export default function launchweek() {
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
   const [session, setSession] = useState<Session | null>(null)
-  // const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const defaultUserData = {
