@@ -15,7 +15,7 @@ export default function TicketCopy({ username }: Props) {
   const [scrolling, setScrolling] = useState(false)
   const [copyEnabled, setCopyEnabled] = useState(false)
   const [copied, setCopied] = useState(false)
-  const scrollRef = useRef<HTMLSpanElement>(null)
+  const scrollRef = useRef<HTMLParagraphElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const url = `${SITE_URL}/tickets/${username}`
   useEffect(() => {
