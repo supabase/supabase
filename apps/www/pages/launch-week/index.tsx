@@ -9,6 +9,8 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { useTheme } from '~/components/Providers'
+import classNames from 'classnames'
+import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 
 const days = _days as WeekDayProps[]
 
@@ -58,7 +60,13 @@ export default function launchweek() {
       />
       <DefaultLayout>
         <SectionContainer className="flex flex-col !pb-24 items-center lg:pt-32 gap-32">
-          <div className="flex flex-col justify-center gap-3">
+          <div
+            className={classNames(
+              styleUtils.appear,
+              styleUtils['appear-first'],
+              'flex flex-col justify-center gap-3'
+            )}
+          >
             <div className="flex justify-center">
               <img
                 src="/images/launchweek/launchweek-logo--light.svg"
@@ -71,19 +79,41 @@ export default function launchweek() {
             </div>
             <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
           </div>
-          <TicketContainer
-            supabase={supabase}
-            session={session}
-            defaultUserData={defaultUserData}
-            defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
-          />
+          <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
+            <TicketContainer
+              supabase={supabase}
+              session={session}
+              defaultUserData={defaultUserData}
+              defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
+            />
+          </div>
         </SectionContainer>
-        <div className="gradient-container">
-          <div className="gradient-mask"></div>
+        <div
+          className={classNames(
+            styleUtils.appear,
+            styleUtils['appear-third'],
+            'gradient-container'
+          )}
+        >
+          <div
+            className={classNames(styleUtils.appear, styleUtils['appear-fourth'], 'gradient-mask')}
+          ></div>
           <div className="gradient-mask--masked bottom-of-the-circle"></div>
 
-          <div className="flair-mask-a the-stroke-of-the-circle"></div>
-          <div className="flair-mask-b inside-the-circle"></div>
+          <div
+            className={classNames(
+              // styleUtils.appear,
+              // styleUtils['appear-second'],
+              'flair-mask-a the-stroke-of-the-circle'
+            )}
+          ></div>
+          <div
+            className={classNames(
+              // styleUtils.appear,
+              // styleUtils['appear-second'],
+              'flair-mask-b inside-the-circle'
+            )}
+          ></div>
         </div>
       </DefaultLayout>
     </>
