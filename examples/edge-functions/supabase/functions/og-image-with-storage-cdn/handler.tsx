@@ -207,6 +207,7 @@ export async function handler(req: Request) {
     const { error } = await supabaseAdminClient.storage
       .from('images')
       .upload(`lw6/tickets/${username}.png`, generatedImage.body!, {
+        contentType: 'image/png',
         cacheControl: '31536000',
         upsert: false,
       })
