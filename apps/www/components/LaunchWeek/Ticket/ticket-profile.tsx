@@ -29,7 +29,14 @@ export default function TicketProfile({
         {username ? (
           <img src={`https://github.com/${username}.png`} alt={username} className={styles.image} />
         ) : (
-          <span className={cn(styles.image, styles['empty-icon'])}>{/* <IconAvatar /> */}</span>
+          <span
+            className={cn(
+              styles.image,
+              golden ? styles['empty-icon--golden'] : styles['empty-icon']
+            )}
+          >
+            {/* <IconAvatar /> */}
+          </span>
         )}
       </span>
       <div className={styles.text}>

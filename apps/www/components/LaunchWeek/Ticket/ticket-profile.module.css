@@ -72,12 +72,22 @@
 
 .empty-icon {
   display: block;
+  background: linear-gradient(135deg, #535352, #212121);
+  width: 60px;
+}
+
+.empty-icon--golden {
+  display: block;
   background: linear-gradient(135deg, #cfb014, #fafafa);
   width: 60px;
 }
 
 @media (min-width: 768px) {
   .empty-icon {
+    width: calc(80px * var(--size));
+  }
+
+  .empty-icon--golden {
     width: calc(80px * var(--size));
   }
 }
