@@ -1,12 +1,12 @@
 ---
 title: Transparent Column Encryption with Postgres
-description: How to turn Postgres into an easy-to-use NoSQL database that retains all the power of SQL
+description: Using pgsodium's Transparent Column Encryption to encrypt data and provide your users with row-level encryption.
 author: michel
 image: transparent-column-encryption-with-postgres.jpg
 thumb: transparent-column-encryption-with-postgres.jpg
 tags:
   - postgres
-date: '2022-11-24'
+date: '2022-11-30'
 toc_depth: 3
 ---
 
@@ -15,6 +15,8 @@ One of the more common questions we receive at Supabase is “how do I encrypt s
 pgsodium's Transparent Column Encryption (TCE) is one of the safest ways, and can be used to encrypt one or more text columns in any number of tables. Using TCE, you can encrypt data so that it doesn't leak into logs as well as providing your users with row-level encryption.
 
 To understand how TCE works, let's first do a deep-dive into an important encryption topic: key derivation.
+
+> This post is a sneak peek of a big feature we are shipping on LW6. To not miss this and all other announcemenets, get your ticket for [Supabase Launch Week 6!](https://supabase.com/launch-week).
 
 ## How Key Derivation Works
 
