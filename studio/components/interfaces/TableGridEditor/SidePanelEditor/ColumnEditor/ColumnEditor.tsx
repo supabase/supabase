@@ -150,14 +150,6 @@ const ColumnEditor: FC<Props> = ({
           keyId: columnFields.keyId,
           keyName: columnFields.keyName,
         }
-
-        // [Joshen TODO], we'll need to update the callback here to
-        // toggle encryption etc onSaveChanges
-        console.log('onSaveChanges', {
-          payload,
-          foreignKey,
-          configuration,
-        })
         saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
       } else {
         resolve()

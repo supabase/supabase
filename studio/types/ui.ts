@@ -29,3 +29,8 @@ export interface VaultSecret {
   key_id: string
   created_at: string
 }
+
+export interface SchemaView {
+  name: string
+  schema: string
+}
