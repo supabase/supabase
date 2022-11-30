@@ -13,7 +13,7 @@ export default function TicketActions({ username, golden = false }: Props) {
   const [imgReady, setImgReady] = useState(false)
   const [loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const permalink = encodeURIComponent(`${SITE_URL}/tickets/${username}`)
+  const permalink = encodeURIComponent(`${SITE_URL}/tickets/${username}?v=6`)
   const text = encodeURIComponent(golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT)
   const { userData } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${text}`
