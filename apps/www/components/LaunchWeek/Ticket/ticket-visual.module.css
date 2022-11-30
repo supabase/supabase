@@ -35,6 +35,12 @@
   /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
 }
 
+@media (max-width: 768px) {
+  .visual {
+    background-size: cover;
+  }
+}
+
 /* .svg-shadow {
 } */
 

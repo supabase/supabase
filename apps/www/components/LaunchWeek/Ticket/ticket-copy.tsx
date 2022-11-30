@@ -60,7 +60,7 @@ export default function TicketCopy({ username }: Props) {
 
   return (
     <div className={cn(styles.wrapper, styleUtils.appear)}>
-      <div className="flex gap-4 items-center max-w-md justify-between">
+      <div className="xs:flex gap-4 items-center max-w-md justify-between hidden sm:visible">
         <div className="font-bold">Your ticket URL:</div>
         <div
           className={cn(styles['mobile-copy'], {
@@ -71,7 +71,7 @@ export default function TicketCopy({ username }: Props) {
           {copyButton}
         </div>
       </div>
-      <div className="flex items-center ml-4">
+      <div className="xs:flex items-center ml-4 hidden sm:visible">
         <span
           className={styles.url}
           ref={scrollRef}
