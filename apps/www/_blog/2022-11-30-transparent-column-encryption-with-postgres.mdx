@@ -245,31 +245,11 @@ We're always thinking about the future possibilities for features and tools that
 
 There's a lot of potential in the world of cryptography with Postgres and pgsodium, and we'd love to hear any ideas you may have as well.  Join us in our [Discord #encryption channel](https://discord.com/channels/839993398554656828/1009906326480101417) if you want to chat more about it with us!
 
-## Example
+## More Postgres Resources
 
-- Add Stripe webhook_secret_ XXXYYYY
-- Receive a payload from Stripe
-- Get signing key out of vault
-- Authenticate the signature - HMAC
-- Store the payload into your database
-
-```sql
-create function receive_stripe_event(payload jsonb)
-language pgpsql
-returns jsonb
-begin
-  # 1. Get the 
-	webhook_secret := select decrypted_secret from vault.decrypted_secrets where associated = 'STRIPE_WEBHOOK'
-
-  # 2. Use webhook secret to authenticate the signature
-  authenticated :=  authenticate_hmac_signature(payload, webhook_secret)
-
-	# 3. Throw if not auth
-  if (!authenticated) raise error
-
-  # 3. Store the payload
-  insert into stripe.events (payload)
-  values (validated);
-end;
-```
-
+- [Postgres Full Text Search vs the rest](https://supabase.com/blog/postgres-full-text-search-vs-the-rest)
+- [Postgres WASM by Snaplet and Supabase](https://supabase.com/blog/postgres-wasm)
+- [Choosing a Postgres Primary Key](https://supabase.com/blog/choosing-a-postgres-primary-key)
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)
