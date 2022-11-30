@@ -35,11 +35,7 @@ export default function Conf({
     >
       <ConfContainer>
         {pageState === 'registration' && !sharePage ? (
-          <>
-            {/* <Hero /> */}
-            <Form />
-            {/* <LearnMore /> */}
-          </>
+          <Form />
         ) : (
           <Ticket
             username={userData.username}

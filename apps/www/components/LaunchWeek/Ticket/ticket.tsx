@@ -46,6 +46,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   //   }
   // }, [divRef, sharePage])
   // golden = true
+
   return (
     <div
       className={cn(styles['ticket-layout'], {
@@ -54,7 +55,16 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
     >
       <div ref={divRef}>
         <div
-          className={`${styles['ticket-text']} text-scale-1200 flex flex-col items-center lw_mid:items-start xl:block`}
+          className={`${styles['ticket-text']} 
+          text-scale-1200 
+          flex flex-col 
+
+          
+          items-center 
+          xl:items-start
+
+          gap-3
+          `}
         >
           <h1
             className={cn(
@@ -66,23 +76,23 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           >
             {sharePage ? (
               name ? (
-                <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">{name}’s Ticket</p>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}’s Ticket</p>
               ) : (
-                <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">{SITE_NAME}</p>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{SITE_NAME}</p>
               )
             ) : golden ? (
-              <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
                 You won a golden ticket! <br /> Claim it now!
               </p>
             ) : (
-              <p className="text-2xl dark:text-white mb-4 tracking-[0.02rem]">
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
                 Congratulations, you have a ticket!
               </p>
             )}
           </h1>
-          <h2 className="text-sm dark:text-scale-900 text-[#7E868C] max-w-[380px]">
+          <h2 className="text-base dark:text-scale-1000">
             {sharePage ? (
-              <p className="xs:mb-12 lw_mid:mb-24">
+              <p>
                 Join {name ?? 'us'} on {DATE}.
               </p>
             ) : golden ? (

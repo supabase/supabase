@@ -155,12 +155,12 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   useEmailQueryParam('email', setEmail)
 
   return (
-    <div className="xs:mt-8 lw_mid:mt-16">
+    <div className="flex flex-col gap-8">
       <div
         className={cn(
           styleUtils['appear-fifth'],
           [styles[`formInfo${align}`]].join(' '),
-          `flex flex-col gap-2 sm:items-center lw_mid:items-start !pb-4`
+          `flex flex-col gap-2 items-center xl:items-start`
         )}
       >
         <p className="text-scale-1200 text-base w-full">Coming soon</p>
@@ -188,15 +188,14 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           </div>
         </div>
       ) : (
-        <form className="relative max-w-[380px] xs:m-auto lw_mid:ml-0" onSubmit={onSubmit}>
+        <form className="relative max-w-[380px] min-w-[320px] mx-auto xl:mx-0" onSubmit={onSubmit}>
           <input
             className={`
-            transition-all
-
-            border border-scale-300 bg-scaleA-200 h-10
-            focus:border-scale-500 focus:ring-scaleA-300
-
-            text-scale-1000 text-sm rounded-full w-full px-5`}
+              transition-all
+              border border-scale-300 bg-scaleA-200 h-10
+              focus:border-scale-500 focus:ring-scaleA-300
+              text-scale-1000 text-sm rounded-full w-full px-5
+            `}
             type="email"
             id="email-input-field"
             value={email}
