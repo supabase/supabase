@@ -94,7 +94,7 @@ const ColumnEditor: FC<Props> = ({
     }
 
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
-    if (changes.format !== 'text' && columnFields.isEncrypted) {
+    if (changes.format && changes.format !== 'text' && columnFields.isEncrypted) {
       updatedColumnFields.isEncrypted = false
     }
 

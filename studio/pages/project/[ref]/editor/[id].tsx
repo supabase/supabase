@@ -227,7 +227,7 @@ const TableEditorPage: NextPage = () => {
                 Are you sure you want to delete the selected table? This action cannot be undone.
               </p>
               <Checkbox
-                label="Drop with cascade?"
+                label="Drop table with cascade?"
                 description="Deletes the table and its dependent objects"
                 checked={isDeleteWithCascade}
                 onChange={() => setIsDeleteWithCascade(!isDeleteWithCascade)}
