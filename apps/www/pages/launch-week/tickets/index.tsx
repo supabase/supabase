@@ -6,8 +6,11 @@ import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
+import { useTheme } from '~/components/Providers'
 
 export default function TicketHome() {
+  const { isDarkMode } = useTheme()
+
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
@@ -28,6 +31,10 @@ export default function TicketHome() {
     })
   }, [])
 
+  useEffect(() => {
+    document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
+  }, [isDarkMode])
+
   return (
     <>
       <NextSeo
@@ -43,9 +50,8 @@ export default function TicketHome() {
           ],
         }}
       />
-      <div className="launch-week-gradientBg"></div>
       <DefaultLayout>
-        <SectionContainer className="flex flex-col gap-8 !pb-0 md:gap-16 lg:gap-16">
+        <SectionContainer>
           <div>
             <img
               src="/images/launchweek/launchweek-logo--light.svg"

@@ -1,19 +1,12 @@
 import { NextSeo } from 'next-seo'
+import _days from '~/components/LaunchWeek/days.json'
+import { WeekDayProps } from '~/components/LaunchWeek/types'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import _days from '~/components/LaunchWeek/days.json'
-import HackathonSection from '~/components/LaunchWeek/HackathonSection'
-import LaunchHero from '~/components/LaunchWeek/LaunchHero'
-import { LaunchSection } from '~/components/LaunchWeek/LaunchSection'
-import PreLaunchTeaser from '~/components/LaunchWeek/PreLaunchTeaser'
-import ScheduleInfo from '~/components/LaunchWeek/ScheduleInfo'
-import { WeekDayProps } from '~/components/LaunchWeek/types'
 
-import { ArrowRightIcon } from '@heroicons/react/outline'
-import { Badge, Modal } from 'ui'
-import { useEffect, useState } from 'react'
 import { createClient, Session } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { useTheme } from '~/components/Providers'
 
@@ -77,26 +70,8 @@ export default function launchweek() {
             className="md:40 hidden w-40 dark:block lg:w-80"
           />
           <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
-          {/* <LaunchHero /> */}
-          {/* {!shippingHasStarted && <PreLaunchTeaser />} */}
         </SectionContainer>
-        {/* <SectionContainer className="flex flex-col gap-2 items-center max-w-[420px] text-center !pb-4"> */}
-        {/* <span className="text-scale-1200">Coming soon</span>
-          <p className="text-scale-1000 text-sm">
-            Register to get your ticket and stay tuned all week for daily announcements
-          </p> */}
-        {/* </SectionContainer> */}
         <SectionContainer className="flex flex-col items-center xs:!p-0">
-          {/* TODO: FIX CRESCENT TO NOT BREAK MOBILE VIEWS... */}
-          {/* <form className="m-4 flex bg-scale-200 border-scale-600 border-2 rounded-full p-0.5 pl-1 min-w-[260px]">
-            <input
-              className="mr-0 text-scale-1200 text-xs bg-scale-200 p-1 rounded-full w-full"
-              placeholder="Enter email"
-            />
-            <button className="px-4 py-1 rounded-full bg-scale-300 text-scale-1200 border border-scale-600 text-xs hover:bg-scale-400">
-              Submit
-            </button>
-          </form> */}
           <TicketContainer
             supabase={supabase}
             session={session}
@@ -104,13 +79,13 @@ export default function launchweek() {
             defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
           />
         </SectionContainer>
-        {/* <div className="gradient-container">
+        <div className="gradient-container">
           <div className="gradient-mask"></div>
           <div className="gradient-mask--masked bottom-of-the-circle"></div>
 
           <div className="flair-mask-a the-stroke-of-the-circle"></div>
           <div className="flair-mask-b inside-the-circle"></div>
-        </div> */}
+        </div>
         {/* <div>
           <div className="flex justify-between pt-80 mx-6 md:mx-16 lg:mx-40 overflow-hidden"> */}
         {/* <div className="flex-1 relative overflow-hidden radial-mask">
