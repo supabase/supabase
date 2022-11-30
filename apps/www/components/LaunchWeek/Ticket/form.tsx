@@ -197,7 +197,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
               transition-all
               border border-scale-300 bg-scaleA-200 h-10
               focus:border-scale-500 focus:ring-scaleA-300
-              text-scale-1200 text-sm rounded-full w-full px-5
+              text-scale-1200 text-base rounded-full w-full px-5
             `}
             type="email"
             autoComplete="email"
