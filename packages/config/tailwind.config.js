@@ -168,10 +168,6 @@ module.exports = ui({
           },
         },
       }),
-      screens: {
-        xs: '320px',
-        lw_mid: '1200px',
-      },
       // screens: {
       //   sm: '640px',
       //   // => @media (min-width: 640px) { ... }

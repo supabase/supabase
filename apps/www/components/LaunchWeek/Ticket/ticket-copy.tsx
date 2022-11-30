@@ -15,7 +15,7 @@ export default function TicketCopy({ username }: Props) {
   const [scrolling, setScrolling] = useState(false)
   const [copyEnabled, setCopyEnabled] = useState(false)
   const [copied, setCopied] = useState(false)
-  const scrollRef = useRef<HTMLSpanElement>(null)
+  const scrollRef = useRef<HTMLParagraphElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const url = `${SITE_URL}/tickets/${username}`
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function TicketCopy({ username }: Props) {
 
   console.log({ copied })
 
-  const copiedText = <span className="absolute -right-2 text-xs">Copied!</span>
+  const copiedText = <span className="text-xs text-scale-1200">Copied!</span>
 
   // background: none;
   // outline: none;
@@ -43,7 +43,7 @@ export default function TicketCopy({ username }: Props) {
     <button
       type="button"
       name="Copy"
-      className="w-24 flex items-center -mr-4 cursor-pointer z-10"
+      className="text-scale-900 hover:text-scale-1200 w-21 flex items-center cursor-pointer"
       ref={buttonRef}
       onClick={() => {
         navigator.clipboard.writeText(url).then(() => {
@@ -54,51 +54,50 @@ export default function TicketCopy({ username }: Props) {
         })
       }}
     >
-      {copied ? <IconCheck /> : <IconCopy />}
+      {copied ? (
+        <div className="text-brand-900">
+          <IconCheck size={14} />
+        </div>
+      ) : (
+        <IconCopy size={14} />
+      )}
     </button>
   )
 
   return (
-    <div className={cn(styles.wrapper, styleUtils.appear)}>
-      <div className="xs:flex gap-4 items-center max-w-md justify-between hidden sm:visible">
-        <div className="font-bold">Your ticket URL:</div>
-        <div
-          className={cn(styles['mobile-copy'], {
-            [styles['mobile-copy-disabled']]: !copyEnabled,
-          })}
-        >
-          {copied && copiedText}
-          {copyButton}
+    <div
+      className={cn(
+        styleUtils.appear,
+        styleUtils['appear-third'],
+        'bg-scaleA-200 h-8 rounded border border-scale-400 w-full'
+      )}
+    >
+      <div className="px-3 h-full flex items-center gap-3 w-full truncate relative pr-20">
+        <div className="text-scale-900 text-sm hidden lg:flex">Your ticket URL:</div>
+        <div className="flex items-center truncate">
+          <p
+            className={['text-xs font-mono text-scale-1200 truncate'].join(' ')}
+            ref={scrollRef}
+            onScroll={() => {
+              if (!scrolling) {
+                setScrolling(true)
+                const animationFrame = requestAnimationFrame(() => {
+                  const scrollableWidth =
+                    (scrollRef.current?.scrollWidth || 0) - (scrollRef.current?.clientWidth || 0)
+                  setFadeOpacity(
+                    (scrollableWidth - (scrollRef.current?.scrollLeft || 0)) /
+                      (scrollableWidth || 1)
+                  )
+                  cancelAnimationFrame(animationFrame)
+                  setScrolling(false)
+                })
+              }
+            }}
+          >
+            {url}
+          </p>
         </div>
-      </div>
-      <div className="xs:flex items-center ml-4 hidden sm:visible">
-        <span
-          className={styles.url}
-          ref={scrollRef}
-          onScroll={() => {
-            if (!scrolling) {
-              setScrolling(true)
-              const animationFrame = requestAnimationFrame(() => {
-                const scrollableWidth =
-                  (scrollRef.current?.scrollWidth || 0) - (scrollRef.current?.clientWidth || 0)
-                setFadeOpacity(
-                  (scrollableWidth - (scrollRef.current?.scrollLeft || 0)) / (scrollableWidth || 1)
-                )
-                cancelAnimationFrame(animationFrame)
-                setScrolling(false)
-              })
-            }
-          }}
-        >
-          {url}
-        </span>
-        <span
-          className={cn(styles.fade, {
-            [styles['desktop-copy-disabled']]: !copyEnabled,
-          })}
-          style={{ opacity: fadeOpacity }}
-        />
-        <div className="relative">
+        <div className="absolute right-3 with-auto height-auto flex items-center">
           {copied && copiedText}
           {copyButton}
         </div>
