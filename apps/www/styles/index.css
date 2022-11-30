@@ -437,6 +437,7 @@ launch week
   margin: 0 auto;
   left: 0;
   right: 0;
+  overflow: hidden;
   /* background: radial-gradient(
     circle at 50% -150%,
     #39617d 0%,
@@ -447,7 +448,6 @@ launch week
 }
 @media screen and (max-width: 769px) {
   .gradient-container {
-    min-width: 500px;
     left: 50%;
     transform: translateX(-50%);
   }
