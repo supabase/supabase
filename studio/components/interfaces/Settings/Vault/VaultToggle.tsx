@@ -61,11 +61,11 @@ const VaultToggle: FC<Props> = () => {
     <div>
       <FormHeader title="Vault" description="Application level encryption for your project" />
       <div
-        className="px-12 py-12 w-full border border-scale-500 rounded bg-no-repeat"
+        className="px-12 py-12 w-full bg-scale-200 border border-scale-500 rounded bg-no-repeat"
         style={{
           backgroundSize: '45%',
           backgroundPosition: '112% 50%',
-          backgroundImage: 'url("/img/supabase-vault.webp")',
+          backgroundImage: 'url("/img/vault.png")',
         }}
       >
         <div className="w-3/5 space-y-8">
