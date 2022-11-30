@@ -1,4 +1,5 @@
-import { FC, useState } from 'react'
+import { useRouter } from 'next/router'
+import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { partition, isNull } from 'lodash'
 import { Input, IconSearch, IconAlertCircle } from 'ui'
@@ -14,6 +15,9 @@ interface Props {}
 
 const Extensions: FC<Props> = ({}) => {
   const { meta } = useStore()
+  const router = useRouter()
+  const { filter } = router.query
+
   const [filterString, setFilterString] = useState<string>('')
 
   const enableVaultExtension = useFlag('vaultExtension')
@@ -37,6 +41,10 @@ const Extensions: FC<Props> = ({}) => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
+
+  useEffect(() => {
+    if (filter !== undefined) setFilterString(filter as string)
+  }, [filter])
 
   return (
     <div className="p-4">
