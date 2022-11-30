@@ -220,7 +220,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           >
             {formState === 'loading' ? (
               <div className="flex items-center gap-2">
-                <IconLoader /> Registering
+                <IconLoader size={14} className="animate-spin" /> Registering
               </div>
             ) : (
               'Register'
