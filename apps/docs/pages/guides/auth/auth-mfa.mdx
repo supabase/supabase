@@ -260,10 +260,10 @@ Below is an example that creates a new `UnenrollMFA` component that illustrates
 the important pieces of the MFA enrollment flow. Note that a user can only unenroll factors they own and they can only unenroll factors after
 first going through the MFA process and attaining the `aal2` level. Here are some points of note:
 
-- When the component appears on screen, the `supabase.auth.mfa.listFactors()` API is
-  called once to fetch all existing factors together with their details.
+- When the component appears on screen, the `supabase.auth.mfa.listFactors()` endpoint
+  fetches all existing factors together with their details.
 - The existing factors for a user are displayed in a table.
-- Once the user has selected a factor to unenroll they can type in the factorId and hit the `Unenroll` button
+- Once the user has selected a factor to unenroll, they can type in the factorId and click **Unenroll**
   which creates a confirmation modal.
 
 <Admonition type="note">
