@@ -63,7 +63,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
             {sharePage ? (
               name ? (
-                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}'s Ticket</p>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}'s ticket</p>
               ) : (
                 <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{SITE_NAME}</p>
               )
