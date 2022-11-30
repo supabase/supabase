@@ -54,12 +54,13 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           className={` 
           text-scale-1200 
           flex flex-col 
-          items-center 
+          items-center
+          text-center xl:text-left
           xl:items-start
           gap-3
           `}
         >
-          <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl md:text-3xl')}>
+          <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
             {sharePage ? (
               name ? (
                 <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}’s Ticket</p>
@@ -124,7 +125,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           <>
             {username ? (
               <div className="flex flex-col gap-6 py-16">
-                <div className={`flex gap-3 items-center justify-center`}>
+                <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
                   <TicketActions username={username} golden={golden} />
                 </div>
                 <div>
