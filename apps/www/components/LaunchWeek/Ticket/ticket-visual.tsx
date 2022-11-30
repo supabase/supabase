@@ -26,7 +26,7 @@ export default function TicketVisual({
   golden = false,
 }: Props) {
   // golden = true
-  console.log(ticketNumber)
+
   const router = useRouter()
   const basePath = router.basePath
 

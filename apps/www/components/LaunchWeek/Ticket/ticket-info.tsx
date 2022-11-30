@@ -9,7 +9,6 @@ export default function TicketInfo({
   logoTextSecondaryColor = 'var(--accents-5)',
   golden = false,
 }) {
-  console.log(golden)
   return (
     <div className={styles.info}>
       <div
