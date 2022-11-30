@@ -1,7 +1,7 @@
 {
-  "show": false,
-  "text": "Launch Week 6 — December 12th",
-  "cta": "",
+  "show": true,
+  "text": "Launch Week 6 begins December 12th",
+  "cta": "Don't miss a thing, get your free ticket",
   "link": "https://supabase.com/launch-week",
   "badge": "Get a reminder"
 }
