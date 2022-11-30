@@ -24,8 +24,6 @@ export default function TicketCopy({ username }: Props) {
     }
   }, [])
 
-  console.log({ copied })
-
   const copiedText = <span className="text-xs text-scale-1200">Copied!</span>
 
   // background: none;
