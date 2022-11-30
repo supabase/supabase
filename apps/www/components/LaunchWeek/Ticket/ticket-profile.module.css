@@ -34,6 +34,7 @@
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin: 0;
+  max-width: 300px;
 }
 
 .name-golden {
@@ -72,14 +73,15 @@
 
 .empty-icon {
   display: block;
-  background: linear-gradient(135deg, #535352, #212121);
+  background: linear-gradient(320deg, #121212, #191919);
   width: 60px;
 }
 
 .empty-icon--golden {
   display: block;
-  background: linear-gradient(135deg, #cfb014, #fafafa);
+  background: linear-gradient(90deg, #fff9eb, #e2ba52);
   width: 60px;
+  border: 1px solid #ecc154ad;
 }
 
 @media (min-width: 768px) {
