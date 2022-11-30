@@ -51,9 +51,9 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16">
       <div ref={divRef} className="flex flex-col gap-6">
         <div
-          className={` 
-          text-scale-1200 
-          flex flex-col 
+          className={`
+          text-scale-1200
+          flex flex-col
           items-center
           text-center xl:text-left
           xl:items-start
@@ -63,13 +63,14 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
           <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
             {sharePage ? (
               name ? (
-                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}’s Ticket</p>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}'s Ticket</p>
               ) : (
                 <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{SITE_NAME}</p>
               )
             ) : golden ? (
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
-                You won a golden ticket! <br /> Claim it now!
+                You got a Golden ticket. This means you're in, and you also won a Supabase goodie
+                bag. Tweet it to redeem your swag pack!
               </p>
             ) : (
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
@@ -85,12 +86,11 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
             ) : golden ? (
               <>Claim your ticket with GitHub and Tweet it to redeem your swag pack!</>
             ) : username ? (
-              <>Here is your unique ticket image to brag on socials.</>
+              <>Here is your unique ticket image for bragging on socials!</>
             ) : (
               <>
-                This means you’re in. Generate a unique ticket image with your GitHub profile cause
-                a few of the lucky attendees will get a limited edition Supabase goodie bag. Make
-                sure you don’t skip your chance.
+                This means you're in. Make sure you connect your ticket with your GitHub profile. A
+                few of the lucky attendees will get a limited edition Supabase goodie bag
               </>
             )}
           </h2>
