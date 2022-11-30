@@ -11,6 +11,7 @@ import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { useTheme } from '~/components/Providers'
 import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
+import { SITE_ORIGIN } from '~/lib/constants'
 
 const days = _days as WeekDayProps[]
 
@@ -53,7 +54,7 @@ export default function launchweek() {
           url: `https://supabase.com/launch-week`,
           images: [
             {
-              url: `https://supabase.com/images/launchweek/launch-week-6.jpg`,
+              url: `${SITE_ORIGIN}/images/launchweek/launch-week-6.jpg`,
             },
           ],
         }}
