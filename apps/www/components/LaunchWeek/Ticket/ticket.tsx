@@ -45,53 +45,63 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   //     scrollTo(divRef.current, -30)
   //   }
   // }, [divRef, sharePage])
+  // golden = true
 
   return (
-    <div
-      className={cn(styles['ticket-layout'], {
-        [styles['ticket-share-layout']]: sharePage,
-      })}
-    >
-      <div ref={divRef}>
-        <div className={styles['ticket-text']}>
-          <h2 className={cn(styles.hero, styleUtils.appear, styleUtils['appear-first'])}>
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16">
+      <div ref={divRef} className="flex flex-col gap-6">
+        <div
+          className={`
+          text-scale-1200
+          flex flex-col
+          items-center
+          text-center xl:text-left
+          xl:items-start
+          gap-3
+          `}
+        >
+          <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
             {sharePage ? (
               name ? (
-                <>{name}’s Ticket</>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}'s ticket</p>
               ) : (
-                <>{SITE_NAME}</>
+                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{SITE_NAME}</p>
               )
             ) : golden ? (
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">Congratulations!</p>
+            ) : (
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">You have a ticket!</p>
+            )}
+          </h1>
+          <h2 className="text-base dark:text-scale-1000 max-w-[520px]">
+            {sharePage ? (
+              <p>
+                Join {name ?? 'us'} on {DATE}.
+              </p>
+            ) : golden ? (
               <>
-                You won a golden ticket! <br /> Claim it now!
+                You got a Golden ticket. This means you’re in, and you also won a Supabase goodie
+                bag. Tweet it to redeem your swag pack!
               </>
+            ) : username ? (
+              <>Here is your unique ticket image for bragging on socials!</>
             ) : (
               <>
-                You're in. <br /> Make it unique.
+                This means you're in. Generate a unique ticket image with your GitHub profile, cause
+                a few of the lucky attendees will get a limited edition Supabase goodie bag. Make
+                sure you don't skip your chance.
               </>
             )}
           </h2>
-          <p className={cn(styles.description, styleUtils.appear, styleUtils['appear-second'])}>
-            {sharePage ? (
-              <>
-                Join {name ?? 'us'} on {DATE}.
-              </>
-            ) : golden ? (
-              <>Claim your ticket with GitHub and Tweet it to redeem your swag pack!</>
-            ) : (
-              <>
-                Generate a unique ticket image with <br className={styleUtils['hide-on-mobile']} />
-                your GitHub profile.
-              </>
-            )}
-          </p>
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
           {!sharePage ? (
-            <TicketForm
-              defaultUsername={username ?? undefined}
-              setTicketGenerationState={setTicketGenerationState}
-            />
+            <>
+              <TicketForm
+                defaultUsername={username ?? undefined}
+                setTicketGenerationState={setTicketGenerationState}
+              />
+            </>
           ) : (
             <Form sharePage align="Left" />
           )}
@@ -113,11 +123,11 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
         {!sharePage && (
           <>
             {username ? (
-              <div>
-                <div className={styles['ticket-actions']}>
+              <div className="flex flex-col gap-6 py-16">
+                <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
                   <TicketActions username={username} golden={golden} />
                 </div>
-                <div className={styles['ticket-copy']}>
+                <div>
                   <TicketCopy username={username} />
                 </div>
               </div>
