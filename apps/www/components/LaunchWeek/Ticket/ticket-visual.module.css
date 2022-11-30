@@ -168,6 +168,7 @@
   line-height: 1;
   width: calc(330px * var(--size));
   text-align: center;
+  background-clip: text;
 }
 
 .ticket-number-golden {
