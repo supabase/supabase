@@ -213,7 +213,7 @@ VALUES
     ('1234-5678-8765-4321', 123);
 ```
 
-Now that you have inserted data, look at the table and notice how the credit card number is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **\*\***\*\***\*\***\*\*\*\***\*\***\*\***\*\***but the key itself is not stored**\*\***\*\***\*\***\*\*\*\***\*\***\*\***\*\***. This means if someone gets a backup or dump of your database, they cannot decrypt the credit card number, they do not have the key, only the key ID:
+Now that you have inserted data, look at the table and notice how the credit card number is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **but the key itself is not stored**. This means if someone gets a backup or dump of your database, they cannot decrypt the credit card number, they do not have the key, only the key ID:
 
 ```sql
 > select * from credit_cards where account_id = 123;
