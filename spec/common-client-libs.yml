@@ -340,7 +340,7 @@ functions:
     url: '/auth-admin-updateuserbyid'
 
   - id: invoke
-    title: invoke()
+    title: Invoke a function
     product: 'functions'
     url: '/invoke'
 
