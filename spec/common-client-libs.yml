@@ -365,81 +365,81 @@ functions:
     url: '/removeallchannels'
 
   - id: list-buckets
-    title: listBuckets()
+    title: List all buckets
     product: 'storage'
     url: '/storage-listbuckets'
 
   - id: get-bucket
-    title: getBucket()
+    title: Retrieve an existing bucket
     product: 'storage'
     url: '/storage-getbucket'
 
   - id: create-bucket
-    title: createBucket()
+    title: Create a new bucket
     product: 'storage'
     url: '/storage-createbucket'
 
   - id: empty-bucket
-    title: emptyBucket()
+    title: Empty an existing bucket
     product: 'storage'
     url: '/storage-emptybucket'
 
   - id: update-bucket
-    title: updateBucket()
+    title: Update an existing bucket
     product: 'storage'
     url: '/storage-updatebucket'
 
   - id: delete-bucket
-    title: deleteBucket()
+    title: Delete an existing bucket
     product: 'storage'
     url: '/storage-deletebucket'
 
   - id: from-upload
-    title: from.upload()
+    title: Upload a file
     product: 'storage'
     url: '/storage-from-upload'
 
   - id: from-update
-    title: from.update()
+    title: Replace an existing file
     product: 'storage'
     url: '/storage-from-update'
 
   - id: from-move
-    title: from.move()
+    title: Move an existing file to a new path
     product: 'storage'
     url: '/storage-from-move'
 
   - id: from-copy
-    title: from.copy()
+    title: Copy an existing file to a new path
     product: 'storage'
     url: '/storage-from-copy'
 
   - id: from-create-signed-url
-    title: from.createSignedUrl()
+    title: Create a signed URL
     product: 'storage'
     url: '/storage-from-createsignedurl'
 
   - id: from-create-signed-urls
-    title: from.createSignedUrls()
+    title: Create signed URLs
     product: 'storage'
     url: '/storage-from-createsignedurls'
 
   - id: from-get-public-url
-    title: from.getPublicUrl()
+    title: Retrieve an asset's URL
     product: 'storage'
     url: '/storage-from-getpublicurl'
 
   - id: from-download
-    title: from.download()
+    title: Download a file
     product: 'storage'
     url: '/storage-from-download'
 
   - id: from-remove
-    title: from.remove()
+    title: Delete files in a bucket
     product: 'storage'
     url: '/storage-from-remove'
 
   - id: from-list
-    title: from.list()
+    title: List files in a bucket
     product: 'storage'
     url: '/storage-from-list'
