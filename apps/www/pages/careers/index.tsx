@@ -50,6 +50,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
       login: 'estee_tey',
       avatar_url: 'https://pbs.twimg.com/profile_images/1589662526941253632/s1cu3vuD_400x400.jpg',
       html_url: 'https://twitter.com/estee_tey',
+    },
+    {
+      login: 'ghostdevv',
+      avatar_url: 'https://avatars.githubusercontent.com/u/47755378?v=4',
+      html_url: 'https://github.com/ghostdevv',
     }
   )
 
@@ -70,6 +75,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 }
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
+  console.log(contributors)
   const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
 
