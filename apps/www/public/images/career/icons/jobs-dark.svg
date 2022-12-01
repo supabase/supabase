@@ -1,0 +1,22 @@
+<svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.615234" y="0.583008" width="48" height="48" rx="8" fill="#164430"/>
+<path d="M38.0239 11.6172L33.7549 15.8862" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M15.7236 33.5352L11.4546 37.8042" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M37.833 37.9954L33.564 33.7263" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M15.915 15.6951L11.646 11.426" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="9.5708" cy="39.6274" rx="2.5" ry="2.5" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="9.5708" cy="9.55298" rx="2.5" ry="2.5" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="6.12842" cy="24.7092" rx="2.5" ry="2.5" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="43.3447" cy="24.7092" rx="2.5" ry="2.5" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="24.7363" cy="6.10107" rx="2.5" ry="2.5" transform="rotate(90 24.7363 6.10107)" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="24.7363" cy="43.3174" rx="2.5" ry="2.5" transform="rotate(90 24.7363 43.3174)" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="39.6791" cy="39.7464" rx="2.5" ry="2.5" transform="rotate(-75 39.6791 39.7464)" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="39.6791" cy="9.67217" rx="2.5" ry="2.5" transform="rotate(-75 39.6791 9.67217)" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="24.7002" cy="23.1504" rx="5" ry="5" fill="#1B543A" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M17.2734 33.9437V33.9437C17.2734 30.7441 19.8672 28.1504 23.0667 28.1504H26.1647C29.3642 28.1504 31.958 30.7441 31.958 33.9437V33.9437" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<ellipse cx="24.7002" cy="24.6675" rx="12" ry="12" stroke="#4CC38A" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M8.62195 12.1765L6.72316 21.6558M9.50586 36.7533L6.86365 27.3889" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M40.0583 12.4807L42.5073 22.3351M40.0583 36.9554L42.5073 27.1" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M36.7715 9.1936L27.3297 6.89027M12.4145 8.77427L22.0908 6.73403" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M36.6646 40.457L27.0219 42.4319M12.3681 40.457L22.0765 42.4319" stroke="#133929" stroke-width="2" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+</svg>

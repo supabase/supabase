@@ -28,7 +28,8 @@ const Home: NextPageWithLayout = () => {
       </div>
 
       <div className="mx-6">
-        {projectTier !== undefined && <OveragesBanner minimal tier={projectTier} />}
+        {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
+        {/* {projectTier !== undefined && <OveragesBanner minimal tier={projectTier} />} */}
       </div>
 
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}

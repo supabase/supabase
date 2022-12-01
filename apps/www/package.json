@@ -21,6 +21,7 @@
     "@supabase/auth-ui-react": "^0.1.6",
     "@supabase/supabase-js": "^2.0.0",
     "classnames": "^2.3.1",
+    "cobe": "^0.6.2",
     "common": "*",
     "config": "*",
     "date-fns": "2.10.0",
@@ -55,6 +56,7 @@
     "ui": "*",
     "use-debounce": "^7.0.1",
     "uuid": "^8.3.2",
+    "vanilla-tilt": "1.7.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
