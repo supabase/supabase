@@ -10,355 +10,436 @@ info:
 functions:
   - id: initializing
     title: initializing
+    url: '/initializing'
 
   - id: select
     title: 'Fetching data'
     product: database
+    url: '/select'
 
   - id: insert
     title: 'Insert data'
     product: 'database'
+    url: '/insert'
 
   - id: update
     title: 'Update data'
     product: 'database'
+    url: '/update'
 
   - id: upsert
     title: 'Upsert data'
     product: 'database'
+    url: '/upsert'
 
   - id: delete
     title: 'Delete data'
     product: 'database'
+    url: '/delete'
 
   - id: rpc
     title: 'Postgres functions'
     product: 'database'
+    url: '/rpc'
 
   - id: eq
     title: eq()
     product: 'database'
     parent: 'Filters'
+    url: '/eq'
 
   - id: neq
     title: neq()
     product: 'database'
     parent: 'Filters'
+    url: '/neq'
 
   - id: gt
     title: gt()
     product: 'database'
     parent: 'Filters'
+    url: '/gt'
 
   - id: gte
     title: gte()
     product: 'database'
     parent: 'Filters'
+    url: '/gte'
 
   - id: lt
     title: lt()
     product: 'database'
     parent: 'Filters'
+    url: '/lt'
 
   - id: lte
     title: lte()
     product: 'database'
     parent: 'Filters'
+    url: '/lte'
 
   - id: like
     title: like()
     product: 'database'
     parent: 'Filters'
+    url: '/like'
 
   - id: ilike
     title: ilike()
     product: 'database'
     parent: 'Filters'
+    url: 'ilike'
 
   - id: is
     title: is()
     product: 'database'
     parent: 'Filters'
+    url: '/is_'
 
   - id: in
     title: in()
     product: 'database'
     parent: 'Filters'
+    url: '/in_'
 
   - id: contains
     title: contains()
     product: 'database'
     parent: 'Filters'
+    url: '/contains'
 
   - id: contained-by
     title: containedBy()
     product: 'database'
     parent: 'Filters'
+    url: '/containedby'
 
   - id: range-gt
     title: rangeGt()
     product: 'database'
     parent: 'Filters'
+    url: '/rangegt'
 
   - id: range-gte
     title: rangeGte()
     product: 'database'
     parent: 'Filters'
+    url: '/rangegte'
 
   - id: range-lt
     title: rangeLt()
     product: 'database'
     parent: 'Filters'
+    url: '/rangelt'
 
   - id: range-lte
     title: rangeLte()
     product: 'database'
     parent: 'Filters'
+    url: '/rangelte'
 
   - id: range-adjacent
     title: rangeAdjacent()
     product: 'database'
     parent: 'Filters'
+    url: '/rangeadjacent'
 
   - id: overlaps
     title: overlaps()
     product: 'database'
     parent: 'Filters'
+    url: '/overlaps'
 
   - id: text-search
     title: textSearch()
     product: 'database'
     parent: 'Filters'
+    url: '/textsearch'
 
   - id: match
     title: match()
     product: 'database'
     parent: 'Filters'
+    url: '/match'
 
   - id: not
     title: not()
     product: 'database'
     parent: 'Filters'
+    url: '/not'
 
   - id: or
     title: or()
     product: 'database'
     parent: 'Filters'
+    url: '/or'
 
   - id: filter
     title: filter()
     product: 'database'
     parent: 'Filters'
+    url: '/filter'
 
   - id: using-modifiers
     title: Using Modifiers
     product: 'database'
     parent: 'Modifiers'
+    url: '/using-modifiers'
 
   - id: db-modifiers-select
     title: select()
     product: 'database'
     parent: 'Modifiers'
+    url: '/select'
 
   - id: order
     title: order()
     product: 'database'
     parent: 'Modifiers'
+    url: '/order'
 
   - id: limit
     title: limit()
     product: 'database'
     parent: 'Modifiers'
+    url: '/limit'
 
   - id: range
     title: range()
     product: 'database'
     parent: 'Modifiers'
+    url: '/range'
 
   - id: abort-signal
     title: abortSignal()
     product: 'database'
     parent: 'Modifiers'
+    url: '/db-abortsignal'
 
   - id: single
     title: single()
     product: 'database'
     parent: 'Modifiers'
+    url: '/single'
 
   - id: maybeSingle
     title: maybeSingle()
     product: 'database'
     parent: 'Modifiers'
+    url: '/maybesingle'
 
   - id: csv
     title: csv()
     product: 'database'
     parent: 'Modifiers'
+    url: '/db-csv'
 
   - id: sign-up
     title: Sign up
     product: 'auth'
+    url: '/auth-signup'
 
   - id: sign-in-with-password
     title: Sign in with password
     product: 'auth'
+    url: '/auth-signinwithpassword'
 
   - id: sign-in-with-otp
     title: Sign in with OTP
     product: 'auth'
+    url: '/auth-signinwithotp'
 
   - id: sign-in-with-oauth
     title: Sign in with 0auth
     product: 'auth'
+    url: '/auth-signinwithoauth'
 
   - id: sign-out
     title: signOut()
     product: 'auth'
+    url: '/auth-signout'
 
   - id: verify-otp
     title: verifyOtp()
     product: 'auth'
+    url: '/auth-verifyotp'
 
   - id: get-session
     title: getSession()
     product: 'auth'
+    url: '/auth-getsession'
 
   - id: get-user
     title: getUser()
     product: 'auth'
+    url: '/auth-getuser'
 
   - id: update-user
     title: updateUser()
     product: 'auth'
+    url: '/auth-updateuser'
 
   - id: set-session
     title: setSession()
     product: 'auth'
+    url: '/auth-setsession'
 
   - id: refresh-session
     title: refreshSession()
     product: 'auth'
+    url: '/auth-refreshsession'
 
   - id: on-auth-state-change
     title: onAuthStateChange()
     product: 'auth'
+    url: '/auth-onauthstatechange'
 
   - id: admin-api
     title: Overview
     product: 'auth-admin'
+    url: '/supabase-auth-admin-api'
 
   - id: get-user-by-id
     title: getUserById()
     product: 'auth-admin'
+    url: '/auth-admin-getuserbyid'
 
   - id: list-users
     title: listUsers()
     product: 'auth-admin'
+    url: '/auth-admin-listusers'
 
   - id: create-user
     title: createUser()
     product: 'auth-admin'
+    url: '/auth-admin-createuser'
 
   - id: delete-user
     title: deleteUser()
     product: 'auth-admin'
+    url: '/auth-admin-deleteuser'
 
   - id: invite-user-by-email
     title: inviteUserByEmail()
     product: 'auth-admin'
+    url: '/auth-admin-inviteuserbyemail'
 
   - id: auth-reset-password-for-email
     title: resetPasswordForEmail()
     product: 'auth-admin'
+    url: '/auth-admin-resetpasswordforemail'
 
   - id: generate-link
     title: generateLink()
     product: 'auth-admin'
+    url: '/auth-admin-generatelink'
 
   - id: update-user-by-id
     title: updateUserById()
     product: 'auth-admin'
+    url: '/auth-admin-updateuserbyid'
 
   - id: invoke
     title: invoke()
     product: 'functions'
+    url: '/invoke'
 
   - id: subscribe
     title: on().subscribe()
     product: 'realtime'
+    url: '/subscribe'
 
   - id: get-channels
     title: getChannels()
     product: 'realtime'
+    url: '/getchannels'
 
   - id: remove-channel
     title: removeChannel()
     product: 'realtime'
+    url: '/removechannel'
 
   - id: remove-all-channels
     title: removeAllChannels()
     product: 'realtime'
+    url: '/removeallchannels'
 
   - id: list-buckets
     title: listBuckets()
     product: 'storage'
+    url: '/storage-listbuckets'
 
   - id: get-bucket
     title: getBucket()
     product: 'storage'
+    url: '/storage-getbucket'
 
   - id: create-bucket
     title: createBucket()
     product: 'storage'
+    url: '/storage-createbucket'
 
   - id: empty-bucket
     title: emptyBucket()
     product: 'storage'
+    url: '/storage-emptybucket'
 
   - id: update-bucket
     title: updateBucket()
     product: 'storage'
+    url: '/storage-updatebucket'
 
   - id: delete-bucket
     title: deleteBucket()
     product: 'storage'
+    url: '/storage-deletebucket'
 
   - id: from-upload
     title: from.upload()
     product: 'storage'
+    url: '/storage-from-upload'
 
   - id: from-update
     title: from.update()
     product: 'storage'
+    url: '/storage-from-update'
 
   - id: from-move
     title: from.move()
     product: 'storage'
+    url: '/storage-from-move'
 
   - id: from-copy
     title: from.copy()
     product: 'storage'
+    url: '/storage-from-copy'
 
   - id: from-create-signed-url
     title: from.createSignedUrl()
     product: 'storage'
+    url: '/storage-from-createsignedurl'
 
   - id: from-create-signed-urls
     title: from.createSignedUrls()
     product: 'storage'
+    url: '/storage-from-createsignedurls'
 
   - id: from-get-public-url
     title: from.getPublicUrl()
     product: 'storage'
+    url: '/storage-from-getpublicurl'
 
   - id: from-download
     title: from.download()
     product: 'storage'
+    url: '/storage-from-download'
 
   - id: from-remove
     title: from.remove()
     product: 'storage'
+    url: '/storage-from-remove'
 
   - id: from-list
     title: from.list()
     product: 'storage'
+    url: '/storage-from-list'
