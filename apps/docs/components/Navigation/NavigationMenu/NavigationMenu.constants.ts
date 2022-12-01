@@ -316,8 +316,15 @@ export const functions = {
   items: [
     { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
-    { name: 'Examples', url: '/guides/functions/examples', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
+    {
+      name: 'Examples',
+      url: '/guides/functions/examples',
+      items: [
+        { name: 'Overview', url: '/guides/functions/examples', items: [] },
+        { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
+      ],
+    },
   ],
 }
 
