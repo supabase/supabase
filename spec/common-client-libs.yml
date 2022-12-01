@@ -294,6 +294,11 @@ functions:
     product: 'auth'
     url: '/auth-onauthstatechange'
 
+  - id: auth-reset-password-for-email
+    title: Send a password reset request
+    product: 'auth'
+    url: '/auth-resetpasswordforemail'
+
   - id: admin-api
     title: Overview
     product: 'auth-admin'
@@ -323,11 +328,6 @@ functions:
     title: Send an email invite link
     product: 'auth-admin'
     url: '/auth-admin-inviteuserbyemail'
-
-  - id: auth-reset-password-for-email
-    title: Send a reset password request
-    product: 'auth-admin'
-    url: '/auth-admin-resetpasswordforemail'
 
   - id: generate-link
     title: Generate an email link
