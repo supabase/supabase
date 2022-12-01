@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/common-library-file
-  itle: Supabase Client libs common
+  title: Supabase Client libs common
   description: |
 
     This file shares info common between the JS and Dart libraries.
