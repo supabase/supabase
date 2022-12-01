@@ -37,6 +37,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   contributors.push(
     {
+      login: 'XquisiteDreamer',
+      avatar_url: 'https://pbs.twimg.com/profile_images/1475874191249399808/H6TPHpq7_400x400.png',
+      html_url: 'https://twitter.com/XquisiteDreamer',
+    },
+    {
       login: 'marijanasimag',
       avatar_url: 'https://avatars.githubusercontent.com/u/46031252?v=4',
       html_url: 'https://github.com/marijanasimag',
