@@ -300,42 +300,42 @@ functions:
     url: '/supabase-auth-admin-api'
 
   - id: get-user-by-id
-    title: getUserById()
+    title: Retrieve a user
     product: 'auth-admin'
     url: '/auth-admin-getuserbyid'
 
   - id: list-users
-    title: listUsers()
+    title: List all users
     product: 'auth-admin'
     url: '/auth-admin-listusers'
 
   - id: create-user
-    title: createUser()
+    title: Create a user
     product: 'auth-admin'
     url: '/auth-admin-createuser'
 
   - id: delete-user
-    title: deleteUser()
+    title: Delete a user
     product: 'auth-admin'
     url: '/auth-admin-deleteuser'
 
   - id: invite-user-by-email
-    title: inviteUserByEmail()
+    title: Send an email invite link
     product: 'auth-admin'
     url: '/auth-admin-inviteuserbyemail'
 
   - id: auth-reset-password-for-email
-    title: resetPasswordForEmail()
+    title: Send a reset password request
     product: 'auth-admin'
     url: '/auth-admin-resetpasswordforemail'
 
   - id: generate-link
-    title: generateLink()
+    title: Generate an email link
     product: 'auth-admin'
     url: '/auth-admin-generatelink'
 
   - id: update-user-by-id
-    title: updateUserById()
+    title: Update a user's data
     product: 'auth-admin'
     url: '/auth-admin-updateuserbyid'
 
