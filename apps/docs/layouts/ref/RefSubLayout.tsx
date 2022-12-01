@@ -1,6 +1,5 @@
 import { useInView } from 'react-intersection-observer'
-import { FC, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { FC } from 'react'
 
 interface ISectionContainer extends FC {
   id: string
@@ -34,7 +33,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 
 const Section: FC<ISectionContainer> = ({ id, title, monoFont, children }) => {
   return (
-    <article key={id} id={id} className="scroll-mt-24">
+    <article key={id} className="scroll-mt-24">
       <StickyHeader id={id} title={title} monoFont={monoFont} />
       <div className="grid lg:grid-cols-2 ref-container gap-16">{children}</div>
     </article>
@@ -42,25 +41,21 @@ const Section: FC<ISectionContainer> = ({ id, title, monoFont, children }) => {
 }
 
 const StickyHeader: FC<StickyHeader> = ({ id, title, monoFont }) => {
-  const router = useRouter()
-
   const { ref } = useInView({
     threshold: 1,
-    rootMargin: '-20% 0% -35% 0px',
+    rootMargin: '30% 0% -35% 0px',
     onChange: (inView, entry) => {
-      //if (inView) router.push(entry.target.id, undefined, { shallow: true })
+      if (inView && window) window.history.pushState(null, '', entry.target.id)
     },
   })
 
   return (
     <h2
       ref={ref}
-      className={[
-        'text-xl font-medium text-scale-1200 mb-8 max-w-xl',
-        monoFont && 'font-mono',
-      ].join(' ')}
+      id={id}
+      className={['text-xl font-medium text-scale-1200 mb-8 ', monoFont && 'font-mono'].join(' ')}
     >
-      {title}
+      <span className="max-w-xl">{title}</span>
     </h2>
   )
 }

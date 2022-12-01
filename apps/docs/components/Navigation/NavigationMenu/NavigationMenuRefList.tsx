@@ -123,7 +123,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
         <ul className="">
           <Divider />
           <SideMenuTitle title="Database" />
-          {console.log({ clientLibsCommon })}
+          {/* {console.log({ clientLibsCommon })} */}
           {clientLibsCommon.functions
             .filter((x) => x.product === 'database')
             .map((x, index) => {
