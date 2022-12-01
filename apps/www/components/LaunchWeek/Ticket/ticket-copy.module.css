@@ -117,7 +117,7 @@
   display: none;
 }
 
-.fade {
+/* .fade {
   position: absolute;
   background: linear-gradient(90deg, rgba(37, 39, 41, 0%) 0%, #252729 100%);
   top: 0;
@@ -128,7 +128,7 @@
   display: block;
   border-radius: var(--space-2x);
   pointer-events: none;
-}
+} */
 
 .desktop-copy.desktop-copy-disabled {
   display: none;
