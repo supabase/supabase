@@ -32,7 +32,7 @@ This powerful API is available to PostgreSQL using the [**pgsodium**](https://gi
 
 To solve this problem, **pgsodium** now has a full key management API, primarily via the table `pgsodium.key` and the `pgsodium.create_key()` function. This key table contains no raw keys, but instead uses libsodium Key IDs to derive keys that are used internally for encryption. A [key derivation function](https://libsodium.gitbook.io/doc/key_derivation) is used with an internal root key that is unavailable to SQL and not stored in the database, but rather managed by you externally using flexible scripts, or by Supabase automatically as part of our service offering.
 
-The simplest way to use **pgsodium** to encrypt and decrypt data is to first create a **\*\***Key ID**\*\***. Valid Key IDs are stored in pgsodium in a special extension table, and they can be created using the `pgsodium.create_key()` function. This function takes a number of arguments depending on how it's used, but the simplest case is to create a new key with no arguments:
+The simplest way to use **pgsodium** to encrypt and decrypt data is to first create a **Key ID**. Valid Key IDs are stored in pgsodium in a special extension table, and they can be created using the `pgsodium.create_key()` function. This function takes a number of arguments depending on how it's used, but the simplest case is to create a new key with no arguments:
 
 ```sql
 select * from pgsodium.create_key();
@@ -96,7 +96,7 @@ TCE works using two dynamically generated objects for tables that contain encryp
 
 To “transparently” decrypt the table, access the dynamically generated view _instead of the table_. For every encrypted column in the table, the view will have an additional decrypted column that shows the decrypted result.
 
-It's worth noting at this point that sometimes there is some confusion about handling encrypted data with TCE. The `T` stands for \***\*\*\*\*\*\***Transparent\***\*\*\*\*\*\*** which means, you can always see decrypted data through the view, where the decrypted data can't be see is when stored on disk, or in pg_dumps, backups, WAL streams, etc. This is often called **\*\*\*\***\*\***\*\*\*\***Encryption At Rest**\*\*\*\***\*\***\*\*\*\*** and is one layer in many that may be used to encrypt and protect your data.
+It's worth noting at this point that sometimes there is some confusion about handling encrypted data with TCE. The `T` stands for **Transparent** which means, you can always see decrypted data through the view, where the decrypted data can't be see is when stored on disk, or in pg_dumps, backups, WAL streams, etc. This is often called **Encryption At Rest** and is one layer in many that may be used to encrypt and protect your data.
 
 Often Transparent encryption is understood to be “Transparent Disk Encryption” or “Full Disk Encryption”, this is where a drive is encrypted but reading and writing that drive is decrypted. TCE is similar to this, where data on disk is encrypted, but it is more fine grained, only particular columns are encrypted. The data is also encrypted in the sense that the table stored on disk contains encrypted data, without the view or the key, pg_dumps and backups still contain encrypted data, this is not possible with disk-only encryption.
 
@@ -213,7 +213,7 @@ VALUES
     ('1234-5678-8765-4321', 123);
 ```
 
-Now that you have inserted data, look at the table and notice how the credit card number is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, ******\*\*******\*\*\*\*******\*\*******but the key itself is not stored******\*\*******\*\*\*\*******\*\*******. This means if someone gets a backup or dump of your database, they cannot decrypt the credit card number, they do not have the key, only the key ID:
+Now that you have inserted data, look at the table and notice how the credit card number is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **\*\***\*\***\*\***\*\*\*\***\*\***\*\***\*\***but the key itself is not stored**\*\***\*\***\*\***\*\*\*\***\*\***\*\***\*\***. This means if someone gets a backup or dump of your database, they cannot decrypt the credit card number, they do not have the key, only the key ID:
 
 ```sql
 > select * from credit_cards where account_id = 123;
@@ -238,7 +238,7 @@ key_id                       | 7f753c4f-8c68-457a-8801-1798b2e9f44d
 nonce                        | \x300a14aa721184ff7cf0f6bf088da267
 ```
 
-Notice how there is a new column called `decrypted_credit_card_number`. This column is not stored in database or on disk at all, it is generated “on-the-fly” as you select from the view. Database dumps do not contain this information, only the view itself, and most importantly, ********\*\*********\*********\*\*********raw decryption keys are never stored********\*\*********\*********\*\*********.
+Notice how there is a new column called `decrypted_credit_card_number`. This column is not stored in database or on disk at all, it is generated “on-the-fly” as you select from the view. Database dumps do not contain this information, only the view itself, and most importantly, **raw decryption keys are never stored**.
 
 ## Future possibilities
 
