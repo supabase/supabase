@@ -180,7 +180,7 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement />
+      {/* <Announcement /> */}
       <div className="sticky top-0 z-50">
         <div className="bg-scale-200 absolute top-0 h-full w-full opacity-80"></div>
         <nav className="border-scale-400 border-b backdrop-blur-sm">
