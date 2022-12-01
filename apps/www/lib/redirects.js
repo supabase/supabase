@@ -1560,4 +1560,9 @@ module.exports = [
     source: '/forgot-password',
     destination: 'https://app.supabase.com/forgot-password',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples',
+    destination: '/docs/guides/functions',
+  },
 ]

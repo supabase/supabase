@@ -1,5 +1,4 @@
 .hero {
-  font-size: 30px;
   line-height: 1.15;
   letter-spacing: -0.05em;
   font-weight: 400;
@@ -9,7 +8,6 @@
 
 @media (min-width: 768px) {
   .hero {
-    font-size: 30px;
     line-height: 1;
     /* font-weight: 800; */
     /* max-width: 800px; */
@@ -111,7 +109,7 @@
 }
 
 .ticket-actions {
-  margin-top: 30px;
+  margin-top: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,7 +138,6 @@
     grid-template-columns: 1fr 1fr;
   }
   .hero {
-    font-size: 48px;
     text-align: left;
   }
   .description {
@@ -152,10 +149,4 @@
 .ticket-visual-wrapper {
   border-radius: calc(16px * var(--size));
   width: 100%;
-}
-
-@media screen and (min-width: 1280px) {
-  .ticket-layout {
-    padding: 0 40px;
-  }
 }

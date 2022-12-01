@@ -62,41 +62,22 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
           options: { redirectTo: `${SITE_ORIGIN}/launch-week/tickets` },
         })
       }}
+      className="flex flex-col items-center xl:block"
     >
-      <div className={cn(formStyles['form-row'], ticketFormStyles['form-row'])}>
-        <div className={cn(formStyles['github-wrapper'])}>
+      <div className="flex flex-col gap-3">
+        <div>
           <button
             type="submit"
-            className={cn(
-              formStyles.submit,
-              formStyles['generate-with-github'],
-              formStyles[formState]
-            )}
+            className="rounded-full bg-scale-400 py-1 px-3 border border-scale-500 dark:text-white text-sm mb-1 transition-all ease-out hover:bg-scale-500"
             disabled={formState === 'loading' || Boolean(username)}
-            onClick={() => {
-              // if (formRef && formRef.current && isMobileOrTablet()) {
-              //   scrollTo(formRef.current, formRef.current.offsetHeight);
-              // }
-            }}
           >
-            <div className={ticketFormStyles.generateWithGithub}>
-              <span className={ticketFormStyles.githubIcon}>
-                {/* <GithubIcon color="#fff" size={24} /> */}
-              </span>
-              {formState === 'loading' ? (
-                <LoadingDots size={4} />
-              ) : (
-                username || 'Generate with GitHub'
-              )}
-            </div>
-            {username ? (
-              <span className={ticketFormStyles.checkIcon}>
-                {/* <CheckIcon color="#fff" size={24} /> */}
-              </span>
-            ) : null}
+            <span className={`${username && 'text-scale-900'}`}>
+              {username ? 'Done!' : 'Connect with GitHub'}
+            </span>
+            {username ? <span className={ticketFormStyles.checkIcon}></span> : null}
           </button>
-          <p className={ticketFormStyles.description}>Only public info will be used.</p>
         </div>
+        {!username && <p className={'text-xs text-scale-900'}>Only public info will be used.</p>}
       </div>
     </form>
   )
