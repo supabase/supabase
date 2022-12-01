@@ -64,6 +64,12 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
 
           // Prefetch the twitter share URL to eagerly generate the page
           fetch(`/launch-week/tickets/${username}`).catch((_) => {})
+          // Prefetch ticket og image.
+          fetch(
+            `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?username=${encodeURIComponent(
+              username ?? ''
+            )}`
+          ).catch((_) => {})
 
           setPageState('ticket')
         })
