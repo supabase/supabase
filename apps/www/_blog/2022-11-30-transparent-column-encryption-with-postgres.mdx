@@ -16,7 +16,11 @@ pgsodium's Transparent Column Encryption (TCE) is one of the safest ways, and ca
 
 To understand how TCE works, let's first do a deep-dive into an important encryption topic: key derivation.
 
-> This post is a sneak peek of a big feature we are shipping on LW6. To not miss this and all other announcemenets, get your ticket for [Supabase Launch Week 6!](https://supabase.com/launch-week).
+<div className="bg-gray-300 rounded-lg p-6 italic">
+
+ This post is a sneak peek of a big feature we are shipping on LW6. To not miss this and all other announcemenets, get your ticket for [Supabase Launch Week 6!](https://supabase.com/launch-week).
+
+</div>
 
 ## How Key Derivation Works
 
@@ -102,7 +106,11 @@ TCE uses one of PostgreSQL's lesser-known features: [`SECURITY LABEL`](https://w
 
 Let's see a simple example of using `SECURITY LABEL` to encrypt a column using **pgsodium**.
 
-> We're using “credit cards” in our examples below, because they are very easy to understand. Please don't store credit cards in your Supabase database - we are not a certified PCI Service Provider.
+<div className="bg-gray-300 rounded-lg p-6 italic">
+
+Note: We're using “credit cards” in our examples below, because they are very easy to understand. Please don't store credit cards in your Supabase database - we are not a certified PCI Service Provider.
+
+</div>
 
 ### One Key ID for the Entire Column
 
@@ -111,12 +119,12 @@ For the simplest case, a column can be encrypted with one Key ID which must be o
 ```sql
 CREATE TABLE credit_cards (
 	id bigserial primary key,
-  credit_card_number text
+	credit_card_number text
 );
 
 SECURITY LABEL FOR pgsodium
 	ON COLUMN credit_cards.credit_card_number
-  IS 'ENCRYPT WITH KEY ID e348034b-3f07-4878-aad6-000511d12826';
+	IS 'ENCRYPT WITH KEY ID e348034b-3f07-4878-aad6-000511d12826';
 ```
 
 The advantage of this approach is simplicity - the user creates one key and labels a column with it.  The cryptographic algorithm for this approach uses a *nonceless* encryption algorithm called `crypto_aead_det_xchacha20()`.  This algorithm is written by the author of libsodium and can be found [here](https://github.com/jedisct1/libsodium-xchacha20-siv).
@@ -130,13 +138,13 @@ A more fine grained approach would be storing one Key ID per row:
 ```sql
 CREATE TABLE credit_cards (
 	id bigserial primary key,
-  credit_card_number text,
+  	credit_card_number text,
 	key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid
 );
 
 SECURITY LABEL FOR pgsodium
 	ON COLUMN credit_cards.credit_card_number
-  IS 'ENCRYPT WITH KEY COLUMN key_id';
+  	IS 'ENCRYPT WITH KEY COLUMN key_id';
 ```
 
 This approach ensures that a key for one user doesn't necessarily decrypt any others. While rows can share key IDs, they don't necessarily have to (unlike the first example above where one key id was used for the entire column). It also acts as a natural partition that can work in conjunction with Row Level Security to share distinct keys between owners.
@@ -154,14 +162,14 @@ Duplicate ciphertexts cannot be used to “attack the key”, it can only reveal
 ```sql
 CREATE TABLE credit_cards (
 	id bigserial primary key,
-  credit_card_number text,
+  	credit_card_number text,
 	key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
-  nonce bytea default pgsodium.crypto_aead_det_noncegen()
+  	nonce bytea default pgsodium.crypto_aead_det_noncegen()
 );
 
 SECURITY LABEL FOR pgsodium
 	ON COLUMN credit_cards.credit_card_number
-  IS 'ENCRYPT WITH KEY COLUMN key_id NONCE nonce';
+  	IS 'ENCRYPT WITH KEY COLUMN key_id NONCE nonce';
 ```
 
 This is the most secure form of TCE - there is a unique key ID and a unique nonce per row. 
@@ -179,15 +187,15 @@ Like above, this is done simply by extending the security label with the associa
 ```sql
 CREATE TABLE credit_cards (
 	id bigserial primary key,
-  credit_card_number text,
-  account_id integer,
+  	credit_card_number text,
+  	account_id integer,
 	key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
-  nonce bytea default pgsodium.crypto_aead_det_noncegen()
+  	nonce bytea default pgsodium.crypto_aead_det_noncegen()
 );
 
 SECURITY LABEL FOR pgsodium
 	ON COLUMN credit_cards.credit_card_number
-  IS 'ENCRYPT WITH KEY COLUMN key_id ASSOCIATED (account_id) NONCE nonce';
+  	IS 'ENCRYPT WITH KEY COLUMN key_id ASSOCIATED (account_id) NONCE nonce';
 ```
 
 The new label indicates which column is to be associated with the secret, and that's it! Your `account_id` and credit card number are now protected under the same authentication signature as the secret itself.
