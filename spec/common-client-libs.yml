@@ -235,62 +235,62 @@ functions:
     url: '/db-csv'
 
   - id: sign-up
-    title: Sign up
+    title: Create a new user
     product: 'auth'
     url: '/auth-signup'
 
   - id: sign-in-with-password
-    title: Sign in with password
+    title: Sign in a user
     product: 'auth'
     url: '/auth-signinwithpassword'
 
   - id: sign-in-with-otp
-    title: Sign in with OTP
+    title: Sign in a user through OTP
     product: 'auth'
     url: '/auth-signinwithotp'
 
   - id: sign-in-with-oauth
-    title: Sign in with 0auth
+    title: Sign in a user through OAuth
     product: 'auth'
     url: '/auth-signinwithoauth'
 
   - id: sign-out
-    title: signOut()
+    title: Sign out a user
     product: 'auth'
     url: '/auth-signout'
 
   - id: verify-otp
-    title: verifyOtp()
+    title: Verify and log in through OTP
     product: 'auth'
     url: '/auth-verifyotp'
 
   - id: get-session
-    title: getSession()
+    title: Retrieve a session
     product: 'auth'
     url: '/auth-getsession'
 
   - id: get-user
-    title: getUser()
+    title: Retrieve a user
     product: 'auth'
     url: '/auth-getuser'
 
   - id: update-user
-    title: updateUser()
+    title: Update a user
     product: 'auth'
     url: '/auth-updateuser'
 
   - id: set-session
-    title: setSession()
+    title: Set the session data
     product: 'auth'
     url: '/auth-setsession'
 
   - id: refresh-session
-    title: refreshSession()
+    title: Retrieve a new session
     product: 'auth'
     url: '/auth-refreshsession'
 
   - id: on-auth-state-change
-    title: onAuthStateChange()
+    title: Listen to auth events
     product: 'auth'
     url: '/auth-onauthstatechange'
 
