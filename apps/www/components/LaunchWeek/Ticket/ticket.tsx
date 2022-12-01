@@ -48,7 +48,7 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
   // golden = true
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-8 2xl:gap-16">
       <div ref={divRef} className="flex flex-col gap-6">
         <div
           className={`

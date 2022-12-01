@@ -73,7 +73,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   async function register(email: string, token?: string): Promise<ConfUser> {
     const { error } = await supabase!.from('lw6_tickets').insert({ email })
     if (error) {
-      console.log({ error })
+      // console.log({ error })
       return {
         id: 'new',
         ticketNumber: 1234,
