@@ -34,7 +34,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 
 const Section: FC<ISectionContainer> = ({ id, title, monoFont, children }) => {
   return (
-    <article key={id} id={id} className="scroll-mt-24">
+    <article key={id} id={id} className="scroll-mt-24 my-16">
       <StickyHeader id={id} title={title} monoFont={monoFont} />
       <div className="grid lg:grid-cols-2 ref-container gap-16">{children}</div>
     </article>

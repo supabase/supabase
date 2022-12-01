@@ -21,10 +21,10 @@ const SiteRefLayout = ({ children }) => {
   return (
     <>
       <main>
-        <img
+        {/* <img
           src={`${router.basePath}/img/gradient-bg.png`}
           className="absolute left-0 w-[520px] top-0 -z-1 pointer-events-none"
-        />
+        /> */}
 
         <div className="flex flex-row h-screen">
           <div
