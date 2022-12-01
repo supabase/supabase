@@ -2,14 +2,18 @@ import { FC, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 
 import Divider from 'components/ui/Divider'
 import { DatabaseAddon } from './AddOns/AddOns.types'
-import { formatComputeSizes, formatPITROptions } from './AddOns/AddOns.utils'
+import {
+  formatComputeSizes,
+  formatCustomDomainOptions,
+  formatPITROptions,
+} from './AddOns/AddOns.utils'
 import {
   AddNewPaymentMethodModal,
   ComputeSizeSelection,
@@ -17,6 +21,7 @@ import {
   StripeSubscription,
   PaymentSummaryPanel,
   UpdateSuccess,
+  CustomDomainSelection,
 } from './'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
@@ -36,6 +41,8 @@ const EnterpriseUpdate: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
+  const isCustomDomainsEnabled = useFlag('customDomains')
+  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref ?? 'default'
@@ -44,12 +51,30 @@ const EnterpriseUpdate: FC<Props> = ({
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
   const pitrDurationOptions = formatPITROptions(addons)
-  const { currentComputeSize, currentPITRDuration } = getCurrentAddons(currentSubscription, addons)
+  const customDomainOptions = formatCustomDomainOptions(addons)
+  const currentAddons = getCurrentAddons(currentSubscription, addons)
+
+  // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
+  // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
+  // of unnecessary state management on this complex page.
+  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(
+    currentAddons.computeSize
+  )
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<DatabaseAddon>(
+    currentAddons.pitrDuration
+  )
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
+    currentAddons.customDomains
+  )
+
+  // [Joshen] Scaffolded here
+  const selectedAddons = {
+    computeSize: selectedComputeSize,
+    pitrDuration: selectedPITRDuration,
+    customDomains: selectedCustomDomainOption,
+  }
 
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<any>()
-  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(currentComputeSize)
-  const [selectedPITRDuration, setSelectedPITRDuration] =
-    useState<DatabaseAddon>(currentPITRDuration)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   const [isRefreshingPreview, setIsRefreshingPreview] = useState(false)
@@ -57,7 +82,7 @@ const EnterpriseUpdate: FC<Props> = ({
   const [isSuccessful, setIsSuccessful] = useState(false)
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
 
-  const isChangingComputeSize = currentComputeSize?.id !== selectedComputeSize.id
+  const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
 
   useEffect(() => {
     getSubscriptionPreview()
@@ -75,8 +100,7 @@ const EnterpriseUpdate: FC<Props> = ({
     const payload = {
       ...formSubscriptionUpdatePayload(
         null,
-        selectedComputeSize,
-        selectedPITRDuration,
+        selectedAddons,
         selectedPaymentMethodId,
         projectRegion
       ),
@@ -100,8 +124,7 @@ const EnterpriseUpdate: FC<Props> = ({
     const payload = {
       ...formSubscriptionUpdatePayload(
         null,
-        selectedComputeSize,
-        selectedPITRDuration,
+        selectedAddons,
         selectedPaymentMethodId,
         projectRegion
       ),
@@ -176,13 +199,24 @@ const EnterpriseUpdate: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
-                    {pitrDurationOptions.length > 0 && (
+                    {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
+                      <>
+                        <Divider light />
+                        <CustomDomainSelection
+                          options={customDomainOptions}
+                          currentOption={currentAddons.customDomains}
+                          selectedOption={selectedAddons.customDomains}
+                          onSelectOption={setSelectedCustomDomainOption}
+                        />
+                      </>
+                    )}
+                    {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
                       <>
                         <Divider light />
                         <PITRDurationSelection
                           pitrDurationOptions={pitrDurationOptions}
-                          currentPitrDuration={currentPITRDuration}
-                          selectedPitrDuration={selectedPITRDuration}
+                          currentPitrDuration={currentAddons.pitrDuration}
+                          selectedPitrDuration={selectedAddons.pitrDuration}
                           onSelectOption={setSelectedPITRDuration}
                         />
                       </>
@@ -190,8 +224,8 @@ const EnterpriseUpdate: FC<Props> = ({
                     <Divider light />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}
-                      currentComputeSize={currentComputeSize}
-                      selectedComputeSize={selectedComputeSize}
+                      currentComputeSize={currentAddons.computeSize}
+                      selectedComputeSize={selectedAddons.computeSize}
                       onSelectOption={setSelectedComputeSize}
                     />
                   </>
@@ -208,11 +242,9 @@ const EnterpriseUpdate: FC<Props> = ({
             subscriptionPreview={subscriptionPreview}
             // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}
-            currentComputeSize={currentComputeSize}
-            currentPITRDuration={currentPITRDuration}
+            currentAddons={currentAddons}
             // Selected subscription configuration based on UI
-            selectedComputeSize={selectedComputeSize}
-            selectedPITRDuration={selectedPITRDuration}
+            selectedAddons={selectedAddons}
             paymentMethods={paymentMethods}
             isLoadingPaymentMethods={isLoadingPaymentMethods}
             selectedPaymentMethod={selectedPaymentMethodId}

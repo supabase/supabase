@@ -4,6 +4,7 @@ const path = require('path')
 const matter = require('gray-matter')
 const dotenv = require('dotenv')
 const algoliasearch = require('algoliasearch/lite')
+const { isEmpty } = require('lodash')
 
 // [Joshen] We initially thought of building out our search using Algolia directly,
 // but eventually decided to just use DocSearch since it provides us a UI and some
@@ -17,12 +18,20 @@ const algoliasearch = require('algoliasearch/lite')
 // A lot of them are not even linked to within the docs site, so just need to
 // double check if they can be removed or if we want them in the side bars.
 const ignoredFiles = [
-  'docs/404.mdx',
-  'docs/support.mdx',
-  'docs/faqs.mdx',
-  'docs/guides.mdx',
-  'docs/guides/database/arrays.mdx',
-  'docs/guides/database/json.mdx',
+  'pages/404.mdx',
+  'pages/faq.mdx',
+  'pages/support.mdx',
+  'pages/oss.tsx',
+  'pages/_app.tsx',
+  'pages/_document.tsx',
+  'pages/[...slug].tsx',
+  'pages/company/aup.md',
+  'pages/company/privacy.md',
+  'pages/company/sla.md',
+  'pages/company/terms.md',
+  'pages/handbook/contributing.mdx',
+  'pages/handbook/introduction.mdx',
+  'pages/handbook/supasquad.mdx',
 ]
 
 const nameMap = {
@@ -69,16 +78,39 @@ async function walk(dir) {
     )
     const index = client.initIndex(indexName)
 
-    const slugs = (await walk('docs')).filter((slug) => !ignoredFiles.includes(slug))
+    const referencePages = await walk('docs')
+    const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
+    const allPages = guidePages.concat(referencePages)
 
-    const searchObjects = slugs
+    const searchObjects = allPages
       .map((slug) => {
+        let id, title, description
         const fileContents = fs.readFileSync(slug, 'utf8')
         const { data, content } = matter(fileContents)
 
-        const { id, title, description } = data
+        if (isEmpty(data)) {
+          // Guide pages do not have front-matter meta, unlike reference pages, have to manually extract
+          const metaIndex = fileContents.indexOf('export const meta = {')
+          if (metaIndex !== -1) {
+            const metaString =
+              fileContents
+                .slice(metaIndex + 20, fileContents.indexOf('}') + 1)
+                .replace(/\n/g, '')
+                .slice(0, -2) + '}'
+            const meta = eval(`(${metaString})`)
+            id = meta.id
+            title = meta.title
+            description = meta.description
+          }
+        } else {
+          id = data.id
+          title = data.title
+          description = data.description
+        }
+
         const url = (slug.includes('/generated') ? slug.replace('/generated', '') : slug)
           .replace('docs', '')
+          .replace('pages', '')
           .replace(/\.mdx$/, '')
         const source = slug.includes('/reference') ? 'reference' : 'guide'
         const object = {
