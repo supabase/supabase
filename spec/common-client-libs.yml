@@ -345,22 +345,22 @@ functions:
     url: '/invoke'
 
   - id: subscribe
-    title: on().subscribe()
+    title: Subscribe to database changes
     product: 'realtime'
     url: '/subscribe'
 
   - id: get-channels
-    title: getChannels()
+    title: Retrieve all channels
     product: 'realtime'
     url: '/getchannels'
 
   - id: remove-channel
-    title: removeChannel()
+    title: Unsubscribe from a channel
     product: 'realtime'
     url: '/removechannel'
 
   - id: remove-all-channels
-    title: removeAllChannels()
+    title: Unsubscribe from all channels
     product: 'realtime'
     url: '/removeallchannels'
 
