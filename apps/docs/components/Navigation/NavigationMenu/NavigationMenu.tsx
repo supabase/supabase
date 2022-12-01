@@ -192,7 +192,6 @@ const SideNav = () => {
       {
         label: 'Self hosting server',
         icon: '/img/icons/menu/platform',
-        hasLightIcon: false,
         href: '/new/reference/javascript/start',
         level: 'reference_javascript',
       },
