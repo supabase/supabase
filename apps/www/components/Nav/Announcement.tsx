@@ -69,9 +69,9 @@ const Announcement = () => {
           "
         >
           <span>{announcement.text}</span>
-          <span className="item-center flex gap-2 px-3">
+          <span className="item-center flex gap-2 pr-8 sm:px-3">
             {announcement.badge && (
-              <div className="bg-[#2E2E2E] text-white py-0.25 rounded-2xl px-3 py-1 border border-gray-1100	">
+              <div className="bg-[#2E2E2E] text-white py-0.25 rounded-2xl px-3 py-1 border border-gray-1100	whitespace-nowrap">
                 {announcement.badge}
               </div>
             )}
