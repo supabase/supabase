@@ -75,7 +75,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
 }
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
-  console.log(contributors)
   const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
 
