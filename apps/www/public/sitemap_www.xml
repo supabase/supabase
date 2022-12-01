@@ -49,19 +49,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/auth</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/database</loc>
+    <loc>https://supabase.com/auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -74,6 +68,18 @@
 
   <url>
     <loc>https://supabase.com/contact/mfa</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/database</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/launch-week/ticket-image</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -898,6 +904,18 @@
     <loc
       >https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</loc
     >
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

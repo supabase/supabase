@@ -226,8 +226,9 @@ export const menuItems: NavMenu = {
       label: 'Edge Functions',
       items: [
         { name: 'Overview', url: '/guides/functions', items: [] },
+        { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
         { name: 'Auth', url: '/guides/functions/auth', items: [] },
-        { name: 'Examples', url: '/guides/functions/examples', items: [] },
+        { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
         { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
       ],
     },
@@ -313,6 +314,7 @@ export const menuItems: NavMenu = {
             { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
             { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
             { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
+            { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
           ],
         },
         {
