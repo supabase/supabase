@@ -57,7 +57,7 @@ const StickyHeader: FC<StickyHeader> = (props) => {
         ' '
       )}
     >
-      props.{props.title && <span className="max-w-xl">{props.title}</span>}
+      {props.title && <span className="max-w-xl">{props.title}</span>}
     </h2>
   )
 }

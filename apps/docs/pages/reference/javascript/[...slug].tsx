@@ -92,7 +92,7 @@ export default function JSReference(props) {
                   {/* // parameters */}
                   {parameters && (
                     <div className="not-prose mt-12">
-                      <h5 className="mb-3 text-base">Parameters</h5>
+                      <h5 className="mb-3 text-base text-scale-1200">Parameters</h5>
                       <ul className="">
                         {parameters.map((param) => {
                           // grab override params from yaml file

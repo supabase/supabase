@@ -45,13 +45,13 @@ const SideNav = () => {
         (url.includes(`/docs/guides/hosting/platform`) && url):
         setLevel('platform')
         break
-      case url.includes(`/docs/reference/javascript/initializing`) && url:
+      case url.includes(`/docs/reference/javascript`) && url:
         setLevel('reference_javascript')
         break
-      case url.includes(`/docs/reference/dart/initializing`) && url:
+      case url.includes(`/docs/reference/dart`) && url:
         setLevel('reference_dart')
         break
-      case url.includes(`/docs/reference/cli/initializing`) && url:
+      case url.includes(`/docs/reference/cli`) && url:
         setLevel('reference_cli')
         break
 
