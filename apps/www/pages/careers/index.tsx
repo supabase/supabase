@@ -1,19 +1,20 @@
-import { useRouter } from 'next/router'
+import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
-import { GetServerSideProps, NextPage } from 'next'
-import DefaultLayout from '~/components/Layouts/Default'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, IconCheck, Badge } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
-import career from '~/data/career.json'
+import { Badge, Button, IconCheck } from 'ui'
 import Globe from '~/components/Globe'
-import Styles from './career.module.css'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useTheme } from '~/components/Providers'
+import career from '~/data/career.json'
+import Styles from './career.module.css'
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export async function getStaticProps() {
   const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
+
   const job_data = await job_res.json()
 
   const contributor_res = await fetch(
@@ -37,6 +38,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   contributors.push(
     {
+      login: 'XquisiteDreamer',
+      avatar_url: 'https://pbs.twimg.com/profile_images/1475874191249399808/H6TPHpq7_400x400.png',
+      html_url: 'https://twitter.com/XquisiteDreamer',
+    },
+    {
       login: 'marijanasimag',
       avatar_url: 'https://avatars.githubusercontent.com/u/46031252?v=4',
       html_url: 'https://github.com/marijanasimag',
@@ -45,6 +51,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
       login: 'estee_tey',
       avatar_url: 'https://pbs.twimg.com/profile_images/1589662526941253632/s1cu3vuD_400x400.jpg',
       html_url: 'https://twitter.com/estee_tey',
+    },
+    {
+      login: 'ghostdevv',
+      avatar_url: 'https://avatars.githubusercontent.com/u/47755378?v=4',
+      html_url: 'https://github.com/ghostdevv',
     }
   )
 

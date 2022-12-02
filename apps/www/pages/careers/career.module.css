@@ -7,7 +7,7 @@
 }
 
 .contributors-1 {
-  @apply left-[17%] top-[76%] xl:left-[3%] xl:top-[69%];
+  @apply hidden xl:block xl:left-[70%] xl:top-[61%];
 }
 
 .contributors-2 {
@@ -27,11 +27,11 @@
 }
 
 .contributors-6 {
-  @apply left-[67%] top-[74%] xl:left-[36%] xl:top-[57%];
+  @apply hidden md:block md:z-10 md:left-[50%] md:top-[61%] xl:block xl:left-[83%] xl:top-[60%];
 }
 
 .contributors-7 {
-  @apply z-10 left-[82%] top-[86%] xl:left-[27%] xl:top-[50%];
+  @apply hidden xl:block xl:left-[78%] xl:top-[45%];
 }
 
 .contributors-8 {
@@ -39,7 +39,7 @@
 }
 
 .contributors-9 {
-  @apply z-10 left-[64%] top-[53%] xl:left-[47%] xl:top-[67%];
+  @apply hidden md:block md:z-10 md:left-[32%] md:top-[89%] xl:block xl:left-[94%] xl:top-[74%];
 }
 
 .contributors-10 {
@@ -67,13 +67,17 @@
 }
 
 .contributors-16 {
-  @apply hidden xl:block xl:left-[70%] xl:top-[61%];
+  @apply left-[17%] top-[76%] xl:left-[3%] xl:top-[69%];
 }
 
 .contributors-17 {
-  @apply hidden md:block md:z-10 md:left-[32%] md:top-[89%] xl:block xl:left-[94%] xl:top-[74%];
+  @apply z-10 left-[64%] top-[53%] xl:left-[47%] xl:top-[67%];
 }
 
 .contributors-18 {
-  @apply hidden md:block md:z-10 md:left-[50%] md:top-[61%] xl:block xl:left-[83%] xl:top-[60%];
+  @apply left-[67%] top-[74%] xl:left-[36%] xl:top-[57%];
+}
+
+.contributors-19 {
+  @apply z-10 left-[82%] top-[86%] xl:left-[27%] xl:top-[50%];
 }
