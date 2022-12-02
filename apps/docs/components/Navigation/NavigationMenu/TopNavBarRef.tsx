@@ -92,7 +92,7 @@ const TopNavBarRef: FC = () => {
               <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
             </a>
           </Link>
-          {/* {router.asPath.includes('/new/reference/') && <RefSwitcher />} */}
+          {/* {router.asPath.includes('/reference/') && <RefSwitcher />} */}
         </div>
 
         <div className="flex items-center gap-12">

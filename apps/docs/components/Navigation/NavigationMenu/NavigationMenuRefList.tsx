@@ -33,6 +33,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
     icon,
     product,
     library,
+    slug,
   }: {
     title: string
     name: string
@@ -40,10 +41,11 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
     icon?: string
     product?: string
     library: string
+    slug: string
   }) => {
     return (
       <li key={id}>
-        <Link href={`/new/reference/${library}/${id}`} passHref>
+        <Link href={`/reference/${library}/${slug}`} passHref>
           <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
             {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
             {title}
@@ -123,7 +125,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
         <ul className="">
           <Divider />
           <SideMenuTitle title="Database" />
-          {console.log({ clientLibsCommon })}
+          {/* {console.log({ clientLibsCommon })} */}
           {clientLibsCommon.functions
             .filter((x) => x.product === 'database')
             .map((x, index) => {

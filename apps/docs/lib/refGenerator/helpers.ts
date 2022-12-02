@@ -150,19 +150,20 @@ function extractParamTypeAsString(paramDefinition) {
   } else if (paramDefinition.type?.type === 'union') {
     // only do this for literal/primitive types - for complex objects we just return 'object'
     if (paramDefinition.type.types.every(({ type }) => ['literal', 'intrinsic'].includes(type))) {
-      return paramDefinition.type.types.map((x) => {
-        if (x.type === 'literal') {
-          if (typeof x.value === 'string') {
-            return `"${x.value}"`
+      return paramDefinition.type.types
+        .map((x) => {
+          if (x.type === 'literal') {
+            if (typeof x.value === 'string') {
+              return `"${x.value}"`
+            }
+            return `${x.value}`
+          } else if (x.type === 'intrinsic') {
+            if (x.name === 'unknown') {
+              return 'any'
+            }
+            return x.name
           }
-          return `${x.value}`
-        } else if (x.type === 'intrinsic') {
-          if (x.name === 'unknown') {
-            return 'any'
-          }
-          return x.name
-        }
-      })
+        })
         .join(' | ')
     }
   } else if (paramDefinition.type?.type === 'array') {
@@ -231,6 +232,7 @@ export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { api
 
         responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
+      // @ts-expect-error // missing 'responses', see OpenAPIV3.OperationObject.responses
       operations.push(enriched)
     })
   })

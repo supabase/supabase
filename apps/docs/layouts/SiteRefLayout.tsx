@@ -21,10 +21,10 @@ const SiteRefLayout = ({ children }) => {
   return (
     <>
       <main>
-        <img
+        {/* <img
           src={`${router.basePath}/img/gradient-bg.png`}
           className="absolute left-0 w-[520px] top-0 -z-1 pointer-events-none"
-        />
+        /> */}
 
         <div className="flex flex-row h-screen">
           <div
@@ -73,7 +73,7 @@ const SiteRefLayout = ({ children }) => {
                           <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
                         </a>
                       </Link>
-                      {/* {router.asPath.includes('/new/reference/') && <RefSwitcher />} */}
+                      {/* {router.asPath.includes('/reference/') && <RefSwitcher />} */}
                     </div>
                     <div className="h-4 bg-scale-200 w-full"></div>
                     <div className="bg-gradient-to-b from-scale-200 to-transparent h-4 w-full"></div>
