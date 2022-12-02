@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import isbot from 'isbot'
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
-  const headers = new Headers(request.headers)
-  console.log('middleware?')
-  console.log({ headers })
-  //return NextResponse.redirect(new URL('/about-2', request.url))
-}
+  if (!isbot(request.headers.get('user-agent'))) return
 
-// See "Matching Paths" below to learn more
-export const config = {
-  //matcher: '/about/:path*',
+  const clientLibs = ['javascript', 'dart']
+
+  for (const lib of clientLibs) {
+    if (request.url.includes(`reference/${lib}`)) {
+      const requestSlug = request.url.split('/').pop()
+
+      return NextResponse.rewrite(
+        new URL(`/docs/reference/${lib}/crawlers/${requestSlug}`, request.url).toString()
+      )
+    }
+  }
 }

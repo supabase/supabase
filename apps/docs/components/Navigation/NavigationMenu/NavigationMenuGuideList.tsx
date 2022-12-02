@@ -43,8 +43,8 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
         </Link>
 
         <div
-          className="flex items-center gap-3 my-3 
-        
+          className="flex items-center gap-3 my-3
+
         invisible md:visible"
         >
           {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
@@ -66,7 +66,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
 
         {menu.items.map((x, index) => {
           // console.log('1st type of link?', x.items && x.items.length > 0)
-          console.log()
+          // console.log()
           return (
             <div key={x.name}>
               {x.items && x.items.length > 0 ? (

@@ -60,7 +60,6 @@ export default function JSReference(props) {
   return (
     <RefSubLayout>
       {jsSpec.functions.map((item, itemIndex) => {
-        console.log({ item })
         const hasTsRef = item['$ref'] || null
         const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
         const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
