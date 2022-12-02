@@ -1,0 +1,31 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import {Button} from 'ui'
+
+export const meta = {
+  id: 'functions',
+  title: 'Edge Functions',
+  description: 'Globally distributed TypeScript functions.',
+  sidebar_label: 'Overview',
+  hide_table_of_contents: true,
+}
+
+Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks). Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
+
+- It is open source.
+- It is portable. Supabase Edge Functions run locally, and on any other Deno-compatible platform (including self-hosted infrastructure).
+- It is TypeScript first and supports WASM.
+- Edge Functions are globally distributed for low-latency.
+
+<Button as="a" href="/docs/guides/functions/quickstart" size="medium">Get started</Button>
+
+## Examples
+
+Check out the [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
+
+<div className="container" style={{ padding: 0 }}>
+  <FunctionsExamples />
+</div>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

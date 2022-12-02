@@ -71,7 +71,7 @@ const NotificationRow: FC<Props> = ({
         )}
       </div>
       <div className="flex-grow mr-8 flex flex-col gap-4">
-        <div className="w-full flex justify-end">
+        <div className="w-full flex justify-between">
           <div className="w-9/10 space-y-2">
             {formatNotificationText(project, notification, ownerReassignStatus)}
             {formatNotificationCTAText(availableActions, ownerReassignStatus)}

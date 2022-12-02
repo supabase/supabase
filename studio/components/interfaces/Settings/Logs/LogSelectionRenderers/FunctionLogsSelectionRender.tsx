@@ -1,9 +1,13 @@
 import dayjs from 'dayjs'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight, SelectionDetailedRow, SeverityFormatter } from '../LogsFormatters'
+import {
+  jsonSyntaxHighlight,
+  SelectionDetailedRow,
+  SelectionDetailedTimestampRow,
+  SeverityFormatter,
+} from '../LogsFormatters'
 
 const FunctionLogsSelectionRender = ({ log }: any) => {
-  const timestamp = dayjs(log.timestamp / 1000)
   const metadata = log.metadata[0]
 
   return (
@@ -22,7 +26,7 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
           valueRender={<SeverityFormatter value={metadata.level} />}
         />
         <SelectionDetailedRow label="Deployment version" value={metadata.version} />
-        <SelectionDetailedRow label="Timestamp" value={timestamp.format('DD MMM, YYYY HH:mm')} />
+        <SelectionDetailedTimestampRow value={log.timestamp} />
         <SelectionDetailedRow label="Execution ID" value={metadata.execution_id} />
         <SelectionDetailedRow label="Deployment ID" value={metadata.deployment_id} />
       </div>

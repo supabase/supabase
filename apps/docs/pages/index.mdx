@@ -1,0 +1,92 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'introduction',
+  title: 'Introduction',
+  description: 'Introduction to Supabase',
+  hide_table_of_contents: true,
+}
+
+Supabase is an open source Firebase alternative providing all the backend features you need to build a product.
+You can use it completely, or just the features you need.
+
+[Start a project](https://app.supabase.com) with the hosted platform or learn how to [host Supabase](/docs/guides/hosting/overview) yourself.
+
+## Learn about features
+
+<div className="grid md:grid-cols-12 gap-4">
+  <div className="col-span-4">
+    <ButtonCard
+      className="card"
+      to={'/guides/auth'}
+      title={'Auth'}
+      description={'User management with Row Level Security.'}
+      style={{ height: '100%' }}
+    />
+  </div>
+  <div className="col-span-4">
+    <ButtonCard
+      className="card"
+      to={'/guides/api'}
+      title={'Auto-generated APIs'}
+      description={'Instantly generate APIs for your database.'}
+      style={{ height: '100%' }}
+    />
+  </div>
+  <div className="col-span-4">
+    <ButtonCard
+      className="card"
+      to={'/guides/database'}
+      title={'Database'}
+      description={'A dedicated, scalable Postgres database.'}
+      style={{ height: '100%' }}
+    />
+  </div>
+  <div className="col-span-4">
+    <ButtonCard
+      className="card"
+      to={'/guides/functions'}
+      title={'Edge Functions'}
+      description={'Server-side functions, distributed globally.'}
+      style={{ height: '100%' }}
+    />
+  </div>
+  <div className="col-span-4">
+    <ButtonCard
+      className="card"
+      to={'/guides/realtime'}
+      title={'Realtime'}
+      description={'Build with Broadcast, Presence, and Postgres Changes.'}
+      style={{ height: '100%' }}
+    />
+  </div>
+  <div className="col-span-4">
+    <ButtonCard
+      className="card"
+      to={'/guides/storage'}
+      title={'File Storage'}
+      description={'Store, organize, and serve large files.'}
+      style={{ height: '100%' }}
+    />
+  </div>
+  <div className="col-span-4">
+    <ButtonCard
+      className="card"
+      to={'/guides/platform/logs'}
+      title={'Observability'}
+      description={'Monitor and debug your infrastucture.'}
+      style={{ height: '100%' }}
+    />
+  </div>
+</div>
+
+## Start with a framework
+
+Supabase is just Postgres, which makes it compatible with a large number of tools and frameworks.
+
+<Frameworks />
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
+

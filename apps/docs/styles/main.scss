@@ -213,13 +213,24 @@ a:has(code) {
   box-shadow: none !important;
 }
 
+// fix code line wrapping
+// need to set this to happen from medium onwards, otherwise the would cause horizontal scroll
+article p code {
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+.short-inline-codeblock {
+  @media screen and (min-width: 769px) {
+    white-space: pre !important;
+  }
+}
+
 // fix firefox issue with li wrapping
 .doc-content-container ul li div.relative {
   display: inline-block;
-}
-
-.doc-content-container ul li a {
-  box-shadow: none !important;
 }
 
 // fix ToC links when they have <code> inside
