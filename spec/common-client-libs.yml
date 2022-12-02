@@ -13,7 +13,7 @@ functions:
     url: '/initializing'
 
   - id: select
-    title: 'Fetching data'
+    title: 'Fetch data'
     product: database
     url: '/select'
 
@@ -38,144 +38,144 @@ functions:
     url: '/delete'
 
   - id: rpc
-    title: 'Postgres functions'
+    title: 'Call a Postgres function'
     product: 'database'
     url: '/rpc'
 
   - id: eq
-    title: eq()
+    title: Return rows where column is equal to a value
     product: 'database'
     parent: 'Filters'
     url: '/eq'
 
   - id: neq
-    title: neq()
+    title: Return rows where column is not equal to a value
     product: 'database'
     parent: 'Filters'
     url: '/neq'
 
   - id: gt
-    title: gt()
+    title: Return rows where column is greater than a value
     product: 'database'
     parent: 'Filters'
     url: '/gt'
 
   - id: gte
-    title: gte()
+    title: Return rows where column is greater than or equal to a value
     product: 'database'
     parent: 'Filters'
     url: '/gte'
 
   - id: lt
-    title: lt()
+    title: Return rows where column is less than a value
     product: 'database'
     parent: 'Filters'
     url: '/lt'
 
   - id: lte
-    title: lte()
+    title: Return rows where column is less than or equal to a value
     product: 'database'
     parent: 'Filters'
     url: '/lte'
 
   - id: like
-    title: like()
+    title: Return rows where column matches a pattern
     product: 'database'
     parent: 'Filters'
     url: '/like'
 
   - id: ilike
-    title: ilike()
+    title: Return rows where column matches a case-insensitive pattern
     product: 'database'
     parent: 'Filters'
     url: 'ilike'
 
   - id: is
-    title: is()
+    title: Return rows where column is a value
     product: 'database'
     parent: 'Filters'
     url: '/is_'
 
   - id: in
-    title: in()
+    title: Return rows where column is in an array
     product: 'database'
     parent: 'Filters'
     url: '/in_'
 
   - id: contains
-    title: contains()
+    title: Return rows where column contains every element in a value
     product: 'database'
     parent: 'Filters'
     url: '/contains'
 
   - id: contained-by
-    title: containedBy()
+    title: Return rows contained by value
     product: 'database'
     parent: 'Filters'
     url: '/containedby'
 
   - id: range-gt
-    title: rangeGt()
+    title: Return rows greater than a range
     product: 'database'
     parent: 'Filters'
     url: '/rangegt'
 
   - id: range-gte
-    title: rangeGte()
+    title: Return rows greater than or equal to a range
     product: 'database'
     parent: 'Filters'
     url: '/rangegte'
 
   - id: range-lt
-    title: rangeLt()
+    title: Return rows less than a range
     product: 'database'
     parent: 'Filters'
     url: '/rangelt'
 
   - id: range-lte
-    title: rangeLte()
+    title: Return rows less than or equal to a range
     product: 'database'
     parent: 'Filters'
     url: '/rangelte'
 
   - id: range-adjacent
-    title: rangeAdjacent()
+    title: Return rows mutually exclusive to a range
     product: 'database'
     parent: 'Filters'
     url: '/rangeadjacent'
 
   - id: overlaps
-    title: overlaps()
+    title: Return rows with a common element
     product: 'database'
     parent: 'Filters'
     url: '/overlaps'
 
   - id: text-search
-    title: textSearch()
+    title: Return rows matching a string
     product: 'database'
     parent: 'Filters'
     url: '/textsearch'
 
   - id: match
-    title: match()
+    title: Return rows matching an associated value
     product: 'database'
     parent: 'Filters'
     url: '/match'
 
   - id: not
-    title: not()
+    title: Return rows that don't satisfy the filter
     product: 'database'
     parent: 'Filters'
     url: '/not'
 
   - id: or
-    title: or()
+    title: Return rows matching at least one filter
     product: 'database'
     parent: 'Filters'
     url: '/or'
 
   - id: filter
-    title: filter()
+    title: Return rows that satisfy the filter
     product: 'database'
     parent: 'Filters'
     url: '/filter'
