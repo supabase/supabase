@@ -17,6 +17,7 @@ import { uniqBy } from 'lodash'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 
+const commonDocSpec = yaml.load(fs.readFileSync('../../spec/common-client-libs.yml', 'utf8'))
 export default async function gen(inputFileName: string, outputDir: string) {
   const docSpec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
   const defRef = docSpec.info.definition ? fs.readFileSync(docSpec.info.definition, 'utf8') : '{}'
@@ -24,7 +25,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
   const definition = JSON.parse(defRef)
   const id = docSpec.info.id
   const allLanguages = docSpec.info.libraries
-  const pages = Object.entries(docSpec.pages).map(([name, x]: [string, OpenRef.Page]) => ({
+  const pages = Object.entries(docSpec.functions).map(([name, x]: [string, OpenRef.Page]) => ({
     ...x,
     pageName: name,
   }))
@@ -38,7 +39,10 @@ export default async function gen(inputFileName: string, outputDir: string) {
   // Generate Pages
   pages.forEach(async (pageSpec: OpenRef.Page) => {
     try {
-      const slug = slugify(pageSpec.pageName)
+      // get the slug from common-client-libs.yml
+      //const slug = slugify(pageSpec.id)
+      console.log(pageSpec.id)
+      const slug = commonDocSpec.functions.find((fn) => fn.id === pageSpec.id).slug
       const hasTsRef = pageSpec['$ref'] || null
       const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, definition)
       if (hasTsRef && !tsDefinition) throw new Error('Definition not found: ' + hasTsRef)
@@ -48,8 +52,8 @@ export default async function gen(inputFileName: string, outputDir: string) {
 
       // Create page
       const content = Page({
-        slug: (docSpec.info.slugPrefix || '') + slug,
-        id: slug,
+        slug: slug,
+        id: pageSpec.id,
         specFileName: docSpec.info.specUrl || inputFileName,
         title: pageSpec.title || pageSpec.pageName,
         description,
@@ -58,7 +62,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
         examples: generateExamples(id, pageSpec['examples'] || [], allLanguages),
         notes: pageSpec.notes,
       })
-
+      //console.log({ slug })
       // Write to disk
       const dest = outputDir + `/${slug}.mdx`
       await writeToDisk(dest, content)
