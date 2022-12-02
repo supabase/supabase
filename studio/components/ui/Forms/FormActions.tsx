@@ -7,6 +7,7 @@ interface Props {
   helper?: React.ReactNode // Helper text to show alongside actions
   disabled?: boolean
   isSubmitting?: boolean
+  submitText?: string
 }
 
 const FormActions = ({
@@ -16,6 +17,7 @@ const FormActions = ({
   helper,
   disabled = false,
   isSubmitting,
+  submitText = 'Save',
 }: Props) => {
   const isDisabled = isSubmitting || disabled || (!hasChanges && hasChanges !== undefined)
 
@@ -39,7 +41,7 @@ const FormActions = ({
           disabled={isDisabled}
           loading={isSubmitting}
         >
-          Save
+          {submitText}
         </Button>
       </div>
     </div>

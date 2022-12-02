@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { IconXCircle } from '~/../../packages/ui'
-import { AcceptedValue } from '~/pages/new/reference/cli/[...slug]'
+import { AcceptedValue } from '~/pages/reference/cli/[...slug]'
 
 interface IOptions {
   name?: string

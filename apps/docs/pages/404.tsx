@@ -33,9 +33,9 @@ export default function Custom404() {
           }`}
         >
           <div className="text-scale-1200 flex w-[320px] flex-col items-center justify-center space-y-3">
-            <h1 className="m-2 text-2xl">Looking for something? 🔍</h1>
+            <h1 className="m-2 text-2xl">Looking for something?</h1>
             <p className="text-center text-sm">
-              We couldn't find the page that you're looking for!
+              We could not find the page that you are looking for!
             </p>
           </div>
           <div className="flex items-center space-x-4">

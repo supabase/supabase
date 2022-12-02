@@ -43,7 +43,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
   }) => {
     return (
       <li key={id}>
-        <Link href={`/new/reference/${library}/${id}`} passHref>
+        <Link href={`/reference/${library}/${id}`} passHref>
           <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
             {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
             {title}
