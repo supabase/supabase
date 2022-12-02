@@ -48,10 +48,11 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
     onCancel()
   }
 
-  const initialValues = Object.fromEntries(
-    wrapper.server.options.map((option) => [option.name, option.defaultValue ?? ''])
+  const [formState, setFormState] = useState(() =>
+    Object.fromEntries(
+      wrapper.server.options.map((option) => [option.name, option.defaultValue ?? ''])
+    )
   )
-
   const [newTables, setNewTables] = useState<any[]>([])
 
   const [isAddTableOpen, setIsAddTableOpen] = useState(false)
@@ -61,7 +62,21 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
     setIsAddTableOpen(false)
   }
 
-  const onSaveChanges = console.log
+  const onSaveChanges = (done: () => void) => {
+    console.log('newTables:', formState, newTables)
+
+    const createWrapperSql = /* SQL */ `
+      create foreign data wrapper stripe_wrapper
+      handler wrappers_handler
+      validator wrappers_validator
+      options (
+        wrapper 'StripeFdw'
+      );
+    `
+
+    done()
+    onCancel()
+  }
 
   return (
     <>
@@ -104,6 +119,10 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
                   defaultValue={option.defaultValue ?? ''}
                   required={option.required ?? false}
                   layout="horizontal"
+                  value={formState[option.name]}
+                  onChange={(e) =>
+                    setFormState((prev) => ({ ...prev, [option.name]: e.target.value }))
+                  }
                 />
               ))}
 
