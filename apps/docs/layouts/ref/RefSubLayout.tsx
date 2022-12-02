@@ -1,22 +1,22 @@
 import { useInView } from 'react-intersection-observer'
 import { FC } from 'react'
 
-interface ISectionContainer extends FC {
+interface ISectionContainer {
   id: string
   title?: string
   monoFont?: boolean
 }
 
 type RefSubLayoutSubComponents = {
-  Section: ISectionContainer
-  Details: ISectionDetails
-  Examples: ISectionExamples
+  Section: FC<ISectionContainer>
+  Details: FC<ISectionDetails>
+  Examples: FC<ISectionExamples>
 }
 
 type StickyHeader = {
   id: string
-  title: string
-  monoFont: boolean
+  title?: string
+  monoFont?: boolean
 }
 
 type RefSubLayoutType = {}
@@ -31,16 +31,16 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
   )
 }
 
-const Section: FC<ISectionContainer> = ({ id, title, monoFont, children }) => {
+const Section: FC<ISectionContainer> = (props) => {
   return (
-    <article key={id} className="scroll-mt-24">
-      <StickyHeader id={id} title={title} monoFont={monoFont} />
-      <div className="grid lg:grid-cols-2 ref-container gap-16">{children}</div>
+    <article key={props.id} className="scroll-mt-24">
+      <StickyHeader id={props.id} title={props.title} monoFont={props.monoFont} />
+      <div className="grid lg:grid-cols-2 ref-container gap-16">{props.children}</div>
     </article>
   )
 }
 
-const StickyHeader: FC<StickyHeader> = ({ id, title, monoFont }) => {
+const StickyHeader: FC<StickyHeader> = (props) => {
   const { ref } = useInView({
     threshold: 1,
     rootMargin: '30% 0% -35% 0px',
@@ -52,21 +52,23 @@ const StickyHeader: FC<StickyHeader> = ({ id, title, monoFont }) => {
   return (
     <h2
       ref={ref}
-      id={id}
-      className={['text-xl font-medium text-scale-1200 mb-8 ', monoFont && 'font-mono'].join(' ')}
+      id={props.id}
+      className={['text-xl font-medium text-scale-1200 mb-8 ', props.monoFont && 'font-mono'].join(
+        ' '
+      )}
     >
-      <span className="max-w-xl">{title}</span>
+      {props.title && <span className="max-w-xl">{props.title}</span>}
     </h2>
   )
 }
 
-interface ISectionDetails extends FC {}
+interface ISectionDetails {}
 
-const Details: FC<ISectionDetails> = (props: any) => {
-  return <div className="">{props.children}</div>
+const Details: FC<ISectionDetails> = (props) => {
+  return <div>{props.children}</div>
 }
 
-interface ISectionExamples extends FC {}
+interface ISectionExamples {}
 
 const Examples: FC<ISectionExamples> = (props) => {
   return (
@@ -76,7 +78,6 @@ const Examples: FC<ISectionExamples> = (props) => {
   )
 }
 
-// @ts-ignore // needs typing with FC type
 RefSubLayout.Section = Section
 RefSubLayout.Details = Details
 RefSubLayout.Examples = Examples
