@@ -1,4 +1,5 @@
 import { NextSeo } from 'next-seo'
+
 import _days from '~/components/LaunchWeek/days.json'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -11,8 +12,9 @@ import { useTheme } from '~/components/Providers'
 import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import { SITE_ORIGIN } from '~/lib/constants'
+import { Accordion, Badge, IconExternalLink } from 'ui'
 
-import { Badge, IconExternalLink } from '~/../../packages/ui'
+// import { Badge, IconExternalLink } from '~/../../packages/ui'
 
 const constellation = [
   [60, 8],
@@ -36,6 +38,9 @@ export default function launchweek() {
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
+
+  const [days, setDays] = useState([])
+
   const [session, setSession] = useState<Session | null>(null)
   const [creators, setCreators] = useState<any>([])
   const [activeCreator, setActiveCreator] = useState<any>(null)
@@ -54,7 +59,33 @@ export default function launchweek() {
     })
 
     getCreators()
+    getDays()
   }, [])
+
+  async function getDays() {
+    try {
+      // setLoading(true)
+      console.log('get data')
+      let supa = await supabase.from('lw6_days').select().order('release_date')
+      // .gt('release_date', `to_timestamptz(${Date.now()})`) Filter days by release date...
+
+      let { data, error, status } = supa
+
+      if (error && status !== 406) {
+        throw error
+      }
+
+      if (data) {
+        console.log(supa)
+        setDays(data)
+      }
+    } catch (error) {
+      // alert('Error loading user data!')
+      console.log(error)
+    } finally {
+      // setLoading(false)
+    }
+  }
 
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
@@ -82,6 +113,34 @@ export default function launchweek() {
     }
   }
 
+  const AccordionHeader = ({ date }: any) => {
+    //todo coming soon check
+
+    console.log(date)
+    const [weekday, month, day] = dayFormat(date.release_date)
+    return (
+      <div className="flex flex-1">
+        <div className="flex gap-4 min-w-[320px]">
+          <Badge>Coming Soon</Badge>
+          <span className="text-scale-900 text-sm">
+            {weekday} | {day} {month} 2022
+          </span>
+        </div>
+        <span className="text-scale-1200">{date.title}</span>
+      </div>
+    )
+  }
+
+  const dayFormat = (timestamp: string) => {
+    const day = new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(timestamp))
+    return day.split(/[\s,]+/)
+  }
+
+  console.log(days)
   return (
     <>
       <NextSeo
@@ -118,14 +177,16 @@ export default function launchweek() {
             </div>
             <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
           </div>
-          <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
-            <TicketContainer
-              supabase={supabase}
-              session={session}
-              defaultUserData={defaultUserData}
-              defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
-            />
-          </div>
+          {!process.env.NEXT_PUBLIC_LW_STARTED && (
+            <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
+              <TicketContainer
+                supabase={supabase}
+                session={session}
+                defaultUserData={defaultUserData}
+                defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
+              />
+            </div>
+          )}
         </SectionContainer>
         <div
           className={classNames(
@@ -153,6 +214,44 @@ export default function launchweek() {
               'flair-mask-b inside-the-circle'
             )}
           ></div>
+          {process.env.NEXT_PUBLIC_LW_STARTED && (
+            <SectionContainer className=" lg:py-72">
+              <Accordion
+                type="default"
+                openBehaviour="multiple"
+                size="large"
+                className="text-scale-900 dark:text-white"
+                justified={false}
+                bordered={false}
+                chevronAlign="right"
+              >
+                {days.length > 0 &&
+                  days.map((day: any, index) => {
+                    console.log(dayFormat(day.release_date))
+                    return (
+                      <div className="border-b pb-3" key={day.id}>
+                        <Accordion.Item header={<AccordionHeader date={day} />} id={`day-${index}`}>
+                          <div className="h-[400px] flex">
+                            <div
+                              className={`flex-1 border rounded-xl border-gray-900 h-full bg-no-repeat bg-[center_top_200px] bg-contain bg-${
+                                day.steps.one ? `[url('${day.steps.one.bgUrl}')]` : 'red-900'
+                              } `}
+                            >
+                              TEST ONE CUBE
+                              <div>wat</div>
+                              <div>keep trying</div>
+                            </div>
+                            <div className="flex-1 bg-green-900 border rounded-xl border-gray-900 h-full">
+                              TEST TWO CUBES
+                            </div>
+                          </div>
+                        </Accordion.Item>
+                      </div>
+                    )
+                  })}
+              </Accordion>
+            </SectionContainer>
+          )}
         </div>
         <SectionContainer
           className={classNames(
