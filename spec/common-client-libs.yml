@@ -187,49 +187,49 @@ functions:
     url: '/using-modifiers'
 
   - id: db-modifiers-select
-    title: select()
+    title: Select the query result
     product: 'database'
     parent: 'Modifiers'
     url: '/select'
 
   - id: order
-    title: order()
+    title: Order the query result
     product: 'database'
     parent: 'Modifiers'
     url: '/order'
 
   - id: limit
-    title: limit()
+    title: limit the query result
     product: 'database'
     parent: 'Modifiers'
     url: '/limit'
 
   - id: range
-    title: range()
+    title: Limit the query result to a range
     product: 'database'
     parent: 'Modifiers'
     url: '/range'
 
   - id: abort-signal
-    title: abortSignal()
+    title: Set an abort signal
     product: 'database'
     parent: 'Modifiers'
     url: '/db-abortsignal'
 
   - id: single
-    title: single()
+    title: Retrieve the query result as one row
     product: 'database'
     parent: 'Modifiers'
     url: '/single'
 
   - id: maybeSingle
-    title: maybeSingle()
+    title: Retrieve the query result as zero or one rows
     product: 'database'
     parent: 'Modifiers'
     url: '/maybesingle'
 
   - id: csv
-    title: csv()
+    title: Retrieve the query result as a CSV string
     product: 'database'
     parent: 'Modifiers'
     url: '/db-csv'
