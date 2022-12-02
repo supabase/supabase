@@ -49,13 +49,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/blog/</loc>
+    <loc>https://supabase.com/auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/auth</loc>
+    <loc>https://supabase.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -85,12 +85,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/edge-functions</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/legal/dpa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -109,13 +103,19 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/realtime</loc>
+    <loc>https://supabase.com/edge-functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc>https://supabase.com/storage</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/realtime</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -916,6 +916,12 @@
 
   <url>
     <loc>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/transparent-column-encryption-with-postgres</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
