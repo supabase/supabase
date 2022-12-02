@@ -19,6 +19,9 @@ import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
 import dartSpec from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
 
+// @ts-expect-error
+import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
+
 import { IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
@@ -37,7 +40,7 @@ export default function DartReference(props) {
   useEffect(() => {
     if (document && slug !== 'start') {
       // re-enable this when the new yaml shape file is moved into this branch
-      //document.querySelector(`#${slug}`).scrollIntoView()
+      document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
 
@@ -74,6 +77,7 @@ export default function DartReference(props) {
                 item.id
               }
               id={item.id}
+              slug={commonLibSpec.functions.find((commonItem) => commonItem.id === item.id).slug}
             >
               <RefSubLayout.Details>
                 <>
