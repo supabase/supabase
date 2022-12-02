@@ -33,7 +33,6 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 }
 
 const Section: FC<ISectionContainer> = (props) => {
-  console.log({ props })
   return (
     <article key={props.id} className="scroll-mt-24">
       <StickyHeader id={props.slug} title={props.title} monoFont={props.monoFont} />
