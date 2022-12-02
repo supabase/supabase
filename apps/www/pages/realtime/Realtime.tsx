@@ -144,7 +144,7 @@ function RealtimePage() {
                 Listen to changes in the Database inserts, updates, and deletes and other changes.
               </p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/postgres-cdc">
+                <Link passHref href="/docs/guides/realtime/postgres-changes">
                   <Button as="a" type="default">
                     View docs
                   </Button>

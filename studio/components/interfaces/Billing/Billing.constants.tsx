@@ -76,20 +76,20 @@ export const USAGE_BASED_PRODUCTS = [
     icon: <IconCode className="dark:text-scale-100" size={16} strokeWidth={2} />,
     features: [
       {
-        key: 'func_count',
-        attribute: 'func_count',
+        key: 'total_func_count',
+        attribute: 'total_func_count',
         title: 'Function Count',
         units: 'absolute',
         costPerUnit: 0.1,
       },
-     
+
       {
-        key: 'func_invocations',
-        attribute: 'func_invocations',
+        key: 'total_func_invocations',
+        attribute: 'total_func_invocations',
         title: 'Function Invocations',
         units: 'absolute',
         costPerUnit: 0.000002,
-      }
+      },
     ],
   },
 ]
