@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 
 import fs from 'fs'
+import toc from 'markdown-toc'
 
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import components from '~/components/index'
-import { getAllDocs } from '~/lib/docs'
+import { getAllDocs, getDocsBySlug } from '~/lib/docs'
 
 import ReactMarkdown from 'react-markdown'
 
@@ -27,8 +28,11 @@ import Param from '~/components/Params'
 import Options from '~/components/Options'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
+import OldLayout from '~/layouts/Default'
+
 export default function JSReference(props) {
   const router = useRouter()
+
   const slug = router.query.slug[0]
 
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
@@ -38,6 +42,18 @@ export default function JSReference(props) {
       document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
+
+  /*
+   * handle old ref pages
+   */
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    return (
+      // @ts-ignore
+      <OldLayout meta={props.meta} toc={props.toc}>
+        <MDXRemote {...props.content} components={components} />
+      </OldLayout>
+    )
+  }
 
   return (
     <RefSubLayout>
@@ -248,8 +264,6 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
       const markdownExists = checkFileExists(pathName)
 
-      console.log(x, 'markdownExists', markdownExists)
-
       const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
       const { data, content } = matter(fileContents)
 
@@ -263,10 +277,41 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     })
   )
 
-  return {
-    props: {
-      docs: allMarkdownDocs,
-    },
+  /*
+   * old content generation
+   * this is for grabbing to old markdown files
+   */
+
+  let slug
+  if (params.slug.length > 1) {
+    slug = `docs/reference/javascript/${params.slug.join('/')}`
+  } else {
+    slug = `docs/reference/javascript/${params.slug[0]}`
+  }
+
+  let doc = getDocsBySlug(slug)
+  const content = await serialize(doc.content || '')
+
+  /*
+   * handle old ref pages
+   */
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    return {
+      props: {
+        /*
+         * old reference docs are below
+         */
+        ...doc,
+        content,
+        toc: toc(doc.content, { maxdepth: 1, firsth1: false }),
+      },
+    }
+  } else {
+    return {
+      props: {
+        docs: allMarkdownDocs,
+      },
+    }
   }
 }
 

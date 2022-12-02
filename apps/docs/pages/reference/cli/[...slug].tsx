@@ -4,6 +4,14 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import { getAllDocs, getDocsBySlug } from '~/lib/docs'
+
+import toc from 'markdown-toc'
+import { serialize } from 'next-mdx-remote/serialize'
+
+import components from '~/components/index'
+import { MDXRemote } from 'next-mdx-remote'
+import OldLayout from '~/layouts/Default'
 
 export type AcceptedValue = {
   id: string
@@ -32,7 +40,19 @@ export type Command = {
   usage?: string
 }
 
-export default function Config() {
+export default function Config(props) {
+  /*
+   * handle old ref pages
+   */
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    return (
+      // @ts-ignore
+      <OldLayout meta={props.meta} toc={props.toc}>
+        <MDXRemote {...props.content} components={components} />
+      </OldLayout>
+    )
+  }
+
   return (
     <RefSubLayout>
       <div className="flex my-16">
@@ -122,4 +142,39 @@ export default function Config() {
       </div>
     </RefSubLayout>
   )
+}
+
+export async function getStaticProps({ params }: { params: { slug: string[] } }) {
+  let slug
+  if (params.slug.length > 1) {
+    slug = `docs/${params.slug.join('/')}`
+  } else {
+    slug = `docs/${params.slug[0]}`
+  }
+
+  let doc = getDocsBySlug(slug)
+  const content = await serialize(doc.content || '')
+
+  return {
+    props: {
+      ...doc,
+      content,
+      toc: toc(doc.content, { maxdepth: 1, firsth1: false }),
+    },
+  }
+}
+
+export function getStaticPaths() {
+  let docs = getAllDocs()
+
+  return {
+    paths: docs.map(() => {
+      return {
+        params: {
+          slug: docs.map((d) => d.slug),
+        },
+      }
+    }),
+    fallback: 'blocking',
+  }
 }

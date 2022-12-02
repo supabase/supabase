@@ -6,13 +6,14 @@ import {
 // pages/index.js
 
 import fs from 'fs'
+import toc from 'markdown-toc'
 
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import remarkGfm from 'remark-gfm'
 import components from '~/components/index'
-import { getAllDocs } from '~/lib/docs'
+import { getAllDocs, getDocsBySlug } from '~/lib/docs'
 
 import ReactMarkdown from 'react-markdown'
 
@@ -28,6 +29,8 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
+
+import OldLayout from '~/layouts/Default'
 
 const marginTop = 256
 export default function Ref(props) {
@@ -123,6 +126,18 @@ export default function Ref(props) {
       },
       undefined,
       { scroll: false }
+    )
+  }
+
+  /*
+   * handle old ref pages
+   */
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    return (
+      // @ts-ignore
+      <OldLayout meta={props.meta} toc={props.toc}>
+        <MDXRemote {...props.content} components={components} />
+      </OldLayout>
     )
   }
 
@@ -421,10 +436,41 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
   // console.log('allMarkdownDocs', allMarkdownDocs)
 
-  return {
-    props: {
-      docs: allMarkdownDocs,
-    },
+  /*
+   * old content generation
+   * this is for grabbing to old markdown files
+   */
+
+  let slug
+  if (params.slug.length > 1) {
+    slug = `docs/reference/javascript/${params.slug.join('/')}`
+  } else {
+    slug = `docs/reference/javascript/${params.slug[0]}`
+  }
+
+  let doc = getDocsBySlug(slug)
+  const content = await serialize(doc.content || '')
+
+  /*
+   * handle old ref pages
+   */
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    return {
+      props: {
+        /*
+         * old reference docs are below
+         */
+        ...doc,
+        content,
+        toc: toc(doc.content, { maxdepth: 1, firsth1: false }),
+      },
+    }
+  } else {
+    return {
+      props: {
+        docs: allMarkdownDocs,
+      },
+    }
   }
 }
 
