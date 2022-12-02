@@ -17,6 +17,8 @@ import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+// @ts-expect-error
+import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
 
 import { IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -58,6 +60,7 @@ export default function JSReference(props) {
   return (
     <RefSubLayout>
       {jsSpec.functions.map((item, itemIndex) => {
+        console.log({ item })
         const hasTsRef = item['$ref'] || null
         const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
         const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
@@ -76,6 +79,7 @@ export default function JSReference(props) {
                 item.id
               }
               id={item.id}
+              slug={commonLibSpec.functions.find((commonItem) => commonItem.id === item.id).slug}
             >
               <RefSubLayout.Details>
                 <>
