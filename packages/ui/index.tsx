@@ -40,7 +40,7 @@ export * from './src/components/Popover'
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/Divider'
-export * from './src/components/ThemeProvider'
+// export * from './src/components/ThemeProvider'
 
 // DATA ENTRY
 

@@ -239,6 +239,8 @@ export default function Ref(props) {
                       )}
 
                       {/* // parameters */}
+                      {/* 
+                      @ts-expect-error */}
                       {parameters && <div dangerouslySetInnerHTML={{ __html: parameters }}></div>}
                     </div>
                     <div className="w-full">
