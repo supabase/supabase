@@ -10,436 +10,441 @@ info:
 functions:
   - id: initializing
     title: initializing
-    url: '/initializing'
+    slug: initializing
 
   - id: select
     title: 'Fetch data'
-    product: database
-    url: '/select'
+    slug: select
+    product: 'database'
 
   - id: insert
     title: 'Insert data'
+    slug: insert
     product: 'database'
-    url: '/insert'
 
   - id: update
     title: 'Update data'
+    slug: update
     product: 'database'
-    url: '/update'
 
   - id: upsert
     title: 'Upsert data'
+    slug: upsert
     product: 'database'
-    url: '/upsert'
 
   - id: delete
     title: 'Delete data'
+    slug: delete
     product: 'database'
-    url: '/delete'
 
   - id: rpc
     title: 'Call a Postgres function'
+    slug: rpc
     product: 'database'
-    url: '/rpc'
+
+  - id: using-filters
+    title: 'Using Filters'
+    slug: using-filters
+    product: 'database'
 
   - id: eq
     title: Return rows where column is equal to a value
+    slug: eq
     product: 'database'
     parent: 'Filters'
-    url: '/eq'
 
   - id: neq
     title: Return rows where column is not equal to a value
+    slug: neq
     product: 'database'
     parent: 'Filters'
-    url: '/neq'
 
   - id: gt
     title: Return rows where column is greater than a value
+    slug: gt
     product: 'database'
     parent: 'Filters'
-    url: '/gt'
 
   - id: gte
     title: Return rows where column is greater than or equal to a value
+    slug: gte
     product: 'database'
     parent: 'Filters'
-    url: '/gte'
 
   - id: lt
     title: Return rows where column is less than a value
+    slug: lt
     product: 'database'
     parent: 'Filters'
-    url: '/lt'
 
   - id: lte
     title: Return rows where column is less than or equal to a value
+    slug: lte
     product: 'database'
     parent: 'Filters'
-    url: '/lte'
 
   - id: like
     title: Return rows where column matches a pattern
+    slug: like
     product: 'database'
     parent: 'Filters'
-    url: '/like'
 
   - id: ilike
     title: Return rows where column matches a case-insensitive pattern
+    slug: ilike
     product: 'database'
     parent: 'Filters'
-    url: 'ilike'
 
   - id: is
     title: Return rows where column is a value
+    slug: is_
     product: 'database'
     parent: 'Filters'
-    url: '/is_'
 
   - id: in
     title: Return rows where column is in an array
+    slug: in_
     product: 'database'
     parent: 'Filters'
-    url: '/in_'
 
   - id: contains
     title: Return rows where column contains every element in a value
+    slug: contains
     product: 'database'
     parent: 'Filters'
-    url: '/contains'
 
   - id: contained-by
     title: Return rows contained by value
+    slug: containedby
     product: 'database'
     parent: 'Filters'
-    url: '/containedby'
 
   - id: range-gt
     title: Return rows greater than a range
+    slug: rangegt
     product: 'database'
     parent: 'Filters'
-    url: '/rangegt'
 
   - id: range-gte
     title: Return rows greater than or equal to a range
+    slug: rangegte
     product: 'database'
     parent: 'Filters'
-    url: '/rangegte'
 
   - id: range-lt
     title: Return rows less than a range
+    slug: rangelt
     product: 'database'
     parent: 'Filters'
-    url: '/rangelt'
 
   - id: range-lte
     title: Return rows less than or equal to a range
+    slug: rangelte
     product: 'database'
     parent: 'Filters'
-    url: '/rangelte'
 
   - id: range-adjacent
     title: Return rows mutually exclusive to a range
+    slug: rangeadjacent
     product: 'database'
     parent: 'Filters'
-    url: '/rangeadjacent'
 
   - id: overlaps
     title: Return rows with a common element
+    slug: overlaps
     product: 'database'
     parent: 'Filters'
-    url: '/overlaps'
 
   - id: text-search
     title: Return rows matching a string
+    slug: textsearch
     product: 'database'
     parent: 'Filters'
-    url: '/textsearch'
 
   - id: match
     title: Return rows matching an associated value
+    slug: match
     product: 'database'
     parent: 'Filters'
-    url: '/match'
 
   - id: not
     title: Return rows that don't satisfy the filter
+    slug: not
     product: 'database'
     parent: 'Filters'
-    url: '/not'
 
   - id: or
     title: Return rows matching at least one filter
+    slug: or
     product: 'database'
     parent: 'Filters'
-    url: '/or'
 
   - id: filter
     title: Return rows that satisfy the filter
+    slug: filter
     product: 'database'
     parent: 'Filters'
-    url: '/filter'
 
   - id: using-modifiers
     title: Using Modifiers
+    slug: using-modifiers
     product: 'database'
     parent: 'Modifiers'
-    url: '/using-modifiers'
 
   - id: db-modifiers-select
     title: Select the query result
+    slug: select
     product: 'database'
     parent: 'Modifiers'
-    url: '/select'
 
   - id: order
     title: Order the query result
+    slug: order
     product: 'database'
     parent: 'Modifiers'
-    url: '/order'
 
   - id: limit
     title: limit the query result
+    slug: limit
     product: 'database'
     parent: 'Modifiers'
-    url: '/limit'
 
   - id: range
     title: Limit the query result to a range
+    slug: range
     product: 'database'
     parent: 'Modifiers'
-    url: '/range'
 
   - id: abort-signal
     title: Set an abort signal
+    slug: db-abortsignal
     product: 'database'
     parent: 'Modifiers'
-    url: '/db-abortsignal'
 
   - id: single
     title: Retrieve the query result as one row
+    slug: single
     product: 'database'
     parent: 'Modifiers'
-    url: '/single'
 
-  - id: maybeSingle
+  - id: maybe-single
     title: Retrieve the query result as zero or one rows
+    slug: maybesingle
     product: 'database'
     parent: 'Modifiers'
-    url: '/maybesingle'
 
   - id: csv
     title: Retrieve the query result as a CSV string
+    slug: db-csv
     product: 'database'
     parent: 'Modifiers'
-    url: '/db-csv'
 
   - id: sign-up
     title: Create a new user
+    slug: auth-signup
     product: 'auth'
-    url: '/auth-signup'
 
   - id: sign-in-with-password
     title: Sign in a user
+    slug: auth-signinwithpassword
     product: 'auth'
-    url: '/auth-signinwithpassword'
 
   - id: sign-in-with-otp
     title: Sign in a user through OTP
+    slug: auth-signinwithotp
     product: 'auth'
-    url: '/auth-signinwithotp'
 
   - id: sign-in-with-oauth
     title: Sign in a user through OAuth
+    slug: auth-signinwithoauth
     product: 'auth'
-    url: '/auth-signinwithoauth'
 
   - id: sign-out
     title: Sign out a user
+    slug: auth-signout
     product: 'auth'
-    url: '/auth-signout'
 
   - id: verify-otp
     title: Verify and log in through OTP
+    slug: auth-verifyotp
     product: 'auth'
-    url: '/auth-verifyotp'
 
   - id: get-session
     title: Retrieve a session
+    slug: auth-getsession
     product: 'auth'
-    url: '/auth-getsession'
 
   - id: get-user
     title: Retrieve a user
+    slug: auth-getuser
     product: 'auth'
-    url: '/auth-getuser'
 
   - id: update-user
     title: Update a user
+    slug: auth-updateuser
     product: 'auth'
-    url: '/auth-updateuser'
 
   - id: set-session
     title: Set the session data
+    slug: auth-setsession
     product: 'auth'
-    url: '/auth-setsession'
 
   - id: refresh-session
     title: Retrieve a new session
+    slug: auth-refreshsession
     product: 'auth'
-    url: '/auth-refreshsession'
 
   - id: on-auth-state-change
     title: Listen to auth events
+    slug: auth-onauthstatechange
     product: 'auth'
-    url: '/auth-onauthstatechange'
 
   - id: auth-reset-password-for-email
     title: Send a password reset request
+    slug: auth-resetpasswordforemail
     product: 'auth'
-    url: '/auth-resetpasswordforemail'
 
   - id: admin-api
     title: Overview
+    slug: supabase-auth-admin-api
     product: 'auth-admin'
-    url: '/supabase-auth-admin-api'
 
   - id: get-user-by-id
     title: Retrieve a user
+    slug: auth-admin-getuserbyid
     product: 'auth-admin'
-    url: '/auth-admin-getuserbyid'
 
   - id: list-users
     title: List all users
+    slug: auth-admin-listusers
     product: 'auth-admin'
-    url: '/auth-admin-listusers'
 
   - id: create-user
     title: Create a user
+    slug: auth-admin-createuser
     product: 'auth-admin'
-    url: '/auth-admin-createuser'
 
   - id: delete-user
     title: Delete a user
+    slug: auth-admin-deleteuser
     product: 'auth-admin'
-    url: '/auth-admin-deleteuser'
 
   - id: invite-user-by-email
     title: Send an email invite link
+    slug: auth-admin-inviteuserbyemail
     product: 'auth-admin'
-    url: '/auth-admin-inviteuserbyemail'
 
   - id: generate-link
     title: Generate an email link
+    slug: auth-admin-generatelink
     product: 'auth-admin'
-    url: '/auth-admin-generatelink'
 
   - id: update-user-by-id
     title: Update a user's data
+    slug: auth-admin-updateuserbyid
     product: 'auth-admin'
-    url: '/auth-admin-updateuserbyid'
 
   - id: invoke
     title: Invoke a function
+    slug: invoke
     product: 'functions'
-    url: '/invoke'
 
   - id: subscribe
     title: Subscribe to database changes
+    slug: subscribe
     product: 'realtime'
-    url: '/subscribe'
 
   - id: get-channels
     title: Retrieve all channels
+    slug: getchannels
     product: 'realtime'
-    url: '/getchannels'
 
   - id: remove-channel
     title: Unsubscribe from a channel
+    slug: removechannel
     product: 'realtime'
-    url: '/removechannel'
 
   - id: remove-all-channels
     title: Unsubscribe from all channels
+    slug: removeallchannels
     product: 'realtime'
-    url: '/removeallchannels'
 
   - id: list-buckets
     title: List all buckets
+    slug: storage-listbuckets
     product: 'storage'
-    url: '/storage-listbuckets'
 
   - id: get-bucket
     title: Retrieve an existing bucket
+    slug: storage-getbucket
     product: 'storage'
-    url: '/storage-getbucket'
 
   - id: create-bucket
     title: Create a new bucket
+    slug: storage-createbucket
     product: 'storage'
-    url: '/storage-createbucket'
 
   - id: empty-bucket
     title: Empty an existing bucket
+    slug: storage-emptybucket
     product: 'storage'
-    url: '/storage-emptybucket'
 
   - id: update-bucket
     title: Update an existing bucket
+    slug: storage-updatebucket
     product: 'storage'
-    url: '/storage-updatebucket'
 
   - id: delete-bucket
     title: Delete an existing bucket
+    slug: storage-deletebucket
     product: 'storage'
-    url: '/storage-deletebucket'
 
   - id: from-upload
     title: Upload a file
+    slug: storage-from-upload
     product: 'storage'
-    url: '/storage-from-upload'
 
   - id: from-update
     title: Replace an existing file
+    slug: storage-from-update
     product: 'storage'
-    url: '/storage-from-update'
 
   - id: from-move
     title: Move an existing file to a new path
+    slug: storage-from-move
     product: 'storage'
-    url: '/storage-from-move'
 
   - id: from-copy
     title: Copy an existing file to a new path
+    slug: storage-from-copy
     product: 'storage'
-    url: '/storage-from-copy'
 
   - id: from-create-signed-url
     title: Create a signed URL
+    slug: storage-from-createsignedurl
     product: 'storage'
-    url: '/storage-from-createsignedurl'
 
   - id: from-create-signed-urls
     title: Create signed URLs
+    slug: storage-from-createsignedurls
     product: 'storage'
-    url: '/storage-from-createsignedurls'
 
   - id: from-get-public-url
     title: Retrieve an asset's URL
+    slug: storage-from-getpublicurl
     product: 'storage'
-    url: '/storage-from-getpublicurl'
 
   - id: from-download
     title: Download a file
+    slug: storage-from-download
     product: 'storage'
-    url: '/storage-from-download'
 
   - id: from-remove
     title: Delete files in a bucket
+    slug: storage-from-remove
     product: 'storage'
-    url: '/storage-from-remove'
 
   - id: from-list
     title: List files in a bucket
+    slug: storage-from-list
     product: 'storage'
-    url: '/storage-from-list'
