@@ -4,8 +4,6 @@ import type { NextRequest } from 'next/server'
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   const headers = new Headers(request.headers)
-  console.log('middleware?')
-  console.log({ headers })
   //return NextResponse.redirect(new URL('/about-2', request.url))
 }
 

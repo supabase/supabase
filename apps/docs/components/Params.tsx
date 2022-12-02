@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Flag } from '~/pages/new/reference/cli/[...slug]'
+import { Flag } from '~/pages/reference/cli/[...slug]'
 
 type IParamProps = Flag | any
 
