@@ -799,7 +799,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/postgres-cdc</loc>
+    <loc>https://supabase.com/docs/guides/realtime/postgres-changes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
