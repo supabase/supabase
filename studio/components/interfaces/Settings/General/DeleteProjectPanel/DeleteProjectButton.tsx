@@ -73,7 +73,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
       if (response.error) throw response.error
       app.onProjectDeleted(response)
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
-      router.push(`/`)
+      router.push(`/projects`)
     } catch (error: any) {
       setLoading(false)
       ui.setNotification({

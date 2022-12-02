@@ -110,15 +110,17 @@ const AlgoliaSearch: FC<Props> = ({}) => {
                                 : 'capitalize'
                             }`}
                           >
-                            {item.category}
-                            {item.version ? ` (${item.version})` : ''}:
+                            <>
+                              {item.category}
+                              {item.version ? ` (${item.version})` : ''}:
+                            </>
                           </p>
                         )}
                         <p>
                           <components.Highlight hit={item} attribute="title" />
                         </p>
                       </div>
-                      <p className="aa-ItemContentSubtitle">{item.description}</p>
+                      <p className="aa-ItemContentSubtitle">{item.description as string}</p>
                     </div>
                   </a>
                 )

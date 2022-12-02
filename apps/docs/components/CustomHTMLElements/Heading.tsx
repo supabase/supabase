@@ -8,7 +8,6 @@ import { useInView } from 'react-intersection-observer'
 
 const Heading = ({ tag, children }) => {
   const HeadingTag = `${tag}` as any
-
   const anchor = getAnchor(children)
   const link = `#${anchor}`
 
