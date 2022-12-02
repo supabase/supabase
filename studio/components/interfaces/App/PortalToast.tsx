@@ -32,14 +32,16 @@ const PortalToast = () => (
           {({ icon, message }) => (
             <>
               {icon}
-              {message}
-              {t.type !== 'loading' && (
-                <div className="ml-4">
-                  <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
-                    <IconX size={14} strokeWidth={2} />
-                  </Button>
-                </div>
-              )}
+              <div className="flex items-center">
+                <div className="w-full break-all">{message}</div>
+                {t.type !== 'loading' && (
+                  <div className="ml-4">
+                    <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
+                      <IconX size={14} strokeWidth={2} />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </ToastBar>
