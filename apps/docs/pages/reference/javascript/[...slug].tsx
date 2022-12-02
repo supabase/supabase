@@ -31,7 +31,7 @@ export default function JSReference(props) {
   const router = useRouter()
   const slug = router.query.slug[0]
 
-  // When user lands on a url like http://supabase.com/docs/new/reference/javascript/sign-up
+  // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
     if (document && slug !== 'start') {

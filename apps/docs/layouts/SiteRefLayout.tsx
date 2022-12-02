@@ -73,7 +73,7 @@ const SiteRefLayout = ({ children }) => {
                           <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
                         </a>
                       </Link>
-                      {/* {router.asPath.includes('/new/reference/') && <RefSwitcher />} */}
+                      {/* {router.asPath.includes('/reference/') && <RefSwitcher />} */}
                     </div>
                     <div className="h-4 bg-scale-200 w-full"></div>
                     <div className="bg-gradient-to-b from-scale-200 to-transparent h-4 w-full"></div>

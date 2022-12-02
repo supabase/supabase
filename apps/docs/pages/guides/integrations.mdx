@@ -19,7 +19,7 @@ export const meta = {
   <h2>{item.name}</h2>
   <div className="grid grid-cols-12 gap-6 not-prose">
     {item.items.map((integration) => (
-      <Link href={`/new/${integration.href}`} key={integration.title} passHref>
+      <Link href={`/${integration.href}`} key={integration.title} passHref>
         <a className={integration.span ?? 'col-span-4'}>
           <GlassPanel
             title={integration.name}
