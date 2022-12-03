@@ -1,7 +1,7 @@
 import { writeAndRun, writeAndTrigger } from './runner'
 import { readFile, saveFile, setCurrentPath } from './file-system'
 import { fileTreeWatcher, runningWatcher, runWatcher, stepWatcher } from './store'
-import { allSteps } from './steps-data'
+import { allSteps } from './store'
 
 function getCurrentStep() {
   return stepWatcher.get()
@@ -76,7 +76,7 @@ runWatcher.subscribe(({ line }) => {
 fileTreeWatcher.subscribe(async (fileTree) => {
   const step = getCurrentStep()
   const solution = step?.solution || []
-  if (solution[0].path) {
+  if (solution[0]?.path) {
     const { path, contents } = step.solution[0]
     const fileContent = await readFile(path)
     if (fileContent === contents) {

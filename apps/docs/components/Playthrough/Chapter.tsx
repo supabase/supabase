@@ -1,33 +1,21 @@
 import React from 'react'
 import * as Collapsible from '@radix-ui/react-collapsible'
 import * as Progress from '@radix-ui/react-progress'
+import { stepWatcher } from './store'
+import { useSubscription } from './watcher'
 import { ChevronDownIcon, CheckCircledIcon, MagicWandIcon, UpdateIcon } from '@radix-ui/react-icons'
-
 import { solveStep } from './steps'
+
 const headerHeight = 96
 
-export function Chapters({ stepIndex, chapterIndex, chapters }) {
-  return (
-    <div className="px-4 relative" style={{ marginBottom: 'calc(50vh)' }}>
-      {chapters.map((chapter, i) => (
-        <Chapter
-          chapter={chapter}
-          key={i}
-          index={i}
-          current={chapterIndex}
-          stepIndex={stepIndex}
-        ></Chapter>
-      ))}
-    </div>
-  )
-}
-
-export function Chapter({ index, current, stepIndex, chapter }) {
+export function Chapter({ chapterIndex, startAtIndex, chapterStepCount, title, children }) {
+  const current = useSubscription(stepWatcher)
   const progress = Math.min(
     100,
-    (100 * Math.max(stepIndex - chapter.startAtIndex, 0)) / chapter.stepCount
+    (100 * Math.max(current.stepIndex - startAtIndex, 0)) / chapterStepCount
   )
-  const isCurrentChapter = index == current
+  const isCurrentChapter = chapterIndex == current.chapterIndex
+
   return (
     <>
       <div
@@ -39,7 +27,7 @@ export function Chapter({ index, current, stepIndex, chapter }) {
           ...(isCurrentChapter ? { position: 'sticky', top: 60, zIndex: 10 } : {}),
         }}
       >
-        <h2 className="text-2xl my-4">{chapter.title}</h2>
+        <h2 className="text-2xl my-4">{title}</h2>
         <Progress.Root
           value={progress}
           max={100}
@@ -63,21 +51,18 @@ export function Chapter({ index, current, stepIndex, chapter }) {
           />
         </Progress.Root>
       </div>
-      {chapter.content.map((child, j) => (
-        <React.Fragment key={j}>
-          {child.type === 'step' ? <Step currentIndex={stepIndex} step={child} /> : child}
-        </React.Fragment>
-      ))}
+      {children}
     </>
   )
 }
 
-function Step({ currentIndex, step }) {
-  const i = step.stepIndex
-  const done = i < currentIndex
-  const current = i == currentIndex
-  const future = i > currentIndex
+export function Step({ stepIndex, children, title }) {
+  const currentStep = useSubscription(stepWatcher)
+  const i = stepIndex
+  const done = i < currentStep.stepIndex
+  const current = i == currentStep.stepIndex
   const [open, setOpen] = React.useState(false)
+
   return (
     <Collapsible.Root
       className={`border rounded-lg p-4 my-4 ${
@@ -94,32 +79,65 @@ function Step({ currentIndex, step }) {
       onOpenChange={(open) => setOpen(open)}
     >
       <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-        <span style={{ flex: 1, lineHeight: '17px' }}>{step.header}</span>
+        <span style={{ flex: 1, lineHeight: '17px' }}>{title}</span>
         <Collapsible.Trigger
-          className={`bg-none border-none ${step.children && !current ? 'block' : 'hidden'}`}
+          className={`bg-none border-none ${children && !current ? 'block' : 'hidden'}`}
         >
           <ChevronDownIcon style={{ color: 'currentcolor' }} />
         </Collapsible.Trigger>
         <button
           onClick={solveStep}
           className={`${
-            step.solution && current && !step.loading ? 'block hover:text-brand-900' : 'hidden'
+            currentStep.solution && current && !currentStep.loading
+              ? 'block hover:text-brand-900'
+              : 'hidden'
           }`}
         >
           <MagicWandIcon height={18} width={18} />
         </button>
-        <div className={`${current && step.loading ? 'block animate-spin' : 'hidden'}`}>
-          <UpdateIcon height={18} width={18} />
+        <div
+          className={`${current && currentStep.loading ? 'block animate-spin' : 'hidden'}`}
+          style={{ animationDuration: '1.6s' }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 2L12 6"></path>
+            <path d="M12 18L12 22"></path>
+            <path d="M4.93 4.93L7.76 7.76"></path>
+            <path d="M16.24 16.24L19.07 19.07"></path>
+            <path d="M2 12L6 12"></path>
+            <path d="M18 12L22 12"></path>
+            <path d="M4.93 19.07L7.76 16.24"></path>
+            <path d="M16.24 7.76L19.07 4.93"></path>
+          </svg>
         </div>
-        <CheckCircledIcon
-          height={18}
-          width={18}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
           className={`${done ? 'text-brand-900' : 'hidden'}`}
-        />
+          viewBox="0 0 24 24"
+        >
+          <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+          <path d="M22 4L12 14.01 9 11.01"></path>
+        </svg>
       </div>
 
-      {step.children && (
-        <Collapsible.Content style={{ padding: '8px 0' }}>{step.children}</Collapsible.Content>
+      {children && (
+        <Collapsible.Content style={{ padding: '8px 0' }}>{children}</Collapsible.Content>
       )}
     </Collapsible.Root>
   )

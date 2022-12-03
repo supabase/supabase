@@ -13,7 +13,7 @@ import CodeBlock from '../CodeBlock/CodeBlock'
 export function GoToFile({ path }) {
   return (
     <button
-      className="underline decoration-green-400 decoration-dotted underline-offset-[3px]"
+      className="underline decoration-green-400 decoration-dotted underline-offset-[3px] font-mono"
       onClick={() => setCurrentPath(path)}
     >
       {path.startsWith('/') ? path.slice(1) : path}
@@ -33,7 +33,7 @@ export function Playground() {
   const serverUrl = useSubscription(serverWatcher)
 
   return (
-    <div className="flex flex-col h-full gap-3" style={{ colorScheme: 'dark' }}>
+    <div className="flex flex-col h-full gap-3 relative" style={{ colorScheme: 'dark' }}>
       <FullEditor />
       {serverUrl ? <Preview serverUrl={serverUrl} /> : null}
       <Terminal hide={serverUrl} />
@@ -47,7 +47,12 @@ function Terminal({ hide }) {
       className={`${hide ? 'hidden' : 'block'} rounded overflow-hidden`}
       style={{ background: '#232323' }}
     >
-      <div className="text-gray-900 px-2 py-1 text-sm">Terminal</div>
+      <div className="text-gray-900 px-2 py-1 text-sm">
+        Terminal
+        <a className=" hover:text-white float-right" href="https://stackblitz.com/">
+          Powered by StackBlitz
+        </a>
+      </div>
       <XTerm className="h-96 pl-2" />
     </div>
   )

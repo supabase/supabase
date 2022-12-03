@@ -4,6 +4,7 @@ type Watcher<T> = {
   subscribe: (callback: (value: T, prev?: T | undefined) => void) => () => void
   notify: (value: T) => void
   get: () => T
+  set: (value: T) => void
 }
 
 export function createWatcher<T>(start?: T): Watcher<T> {
@@ -26,6 +27,9 @@ export function createWatcher<T>(start?: T): Watcher<T> {
     },
     get() {
       return current
+    },
+    set(value: T) {
+      current = value
     },
   }
 }

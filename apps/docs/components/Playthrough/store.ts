@@ -24,7 +24,7 @@ type FileWithContents = {
 export const currentFileWatcher = createWatcher<FileWithContents>()
 
 // steps
-type Step = {
+export type Step = {
   type: 'step'
   header: string
   intro?: any[]
@@ -41,3 +41,13 @@ export const stepWatcher = createWatcher<Step>()
 // commands
 export const runningWatcher = createWatcher<string>()
 export const runWatcher = createWatcher<{ line: string; exitCode: number }>()
+
+// TODO something
+export let allSteps = [] as Step[]
+export const setSteps = (steps: Step[]) => {
+  if (steps === allSteps) {
+    return
+  }
+  allSteps = steps
+  stepWatcher.set(steps[0])
+}

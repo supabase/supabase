@@ -1,4 +1,7 @@
-import { Playthrough } from '~/components/Playthrough'
+import { Browser } from '~/components/Playthrough/Browser'
+import { Playground } from '~/components/Playthrough/Playground'
+import { GoToFile } from '~/components/Playthrough'
+import { saveFileCommand } from '~/components/Playthrough/command'
 import Layout from '~/layouts/PlaythroughLayout'
 
 export const meta = {
@@ -7,7 +10,117 @@ export const meta = {
   description: 'Learn how to use Supabase in your Next App.',
 }
 
-<Playthrough />
+# Next.js
+
+<Chapter title="Step 1: Project set up">
+
+Before we start building we&apos;re going to set up our Database and API. This is as simple as starting a new Project in Supabase and then creating a schema inside the database.
+
+## Create a project
+
+<Step title="Log in" show={<Browser url="app.supabase.com" screen="login" />} />
+
+<Step
+  title='Click on "New Project"'
+  show={<Browser url="app.supabase.com" screen="new project" />}
+/>
+
+<Step
+  title="Enter your project details"
+  show={<Browser url="app.supabase.com" screen="project details" />}
+>
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam
+lacinia, nunc nisl aliquet nisl.
+
+Nec tincidunt nunc nisl eget nunc. Donec auctor, nisl eget aliquam tincidunt, nunc nisl aliquet
+nisl, nec tincidunt nunc nisl eget nunc.
+
+</Step>
+
+<Step
+  title="Wait for the new database to launch"
+  show={<Browser url="app.supabase.com" screen="launch database" />}
+/>
+
+## Set up the database schema
+
+Now we are going to set up the database schema. We can use the User Management Starter quickstart in
+the SQL Editor, or you can just copy/paste the SQL from below and run it yourself.
+
+<Step
+  title="Go to the SQL Editor"
+  show={
+    <Browser url="https://app.supabase.com/project/fwobemhztvkziokpwsfc" screen="go to editor" />
+  }
+/>
+
+<Step
+  title='Select "User Management Starter"'
+  show={<Browser url="https://app.supabase.com/project/fwobemhztvkziokpwsfc/sql" screen="editor" />}
+/>
+
+<Step
+  title="Run the query"
+  show={<Browser url="https://app.supabase.com/project/fwobemhztvkziokpwsfc/sql" screen="query" />}
+>
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+Nec tincidunt nunc nisl eget nunc. Donec auctor, nisl eget aliquam tincidunt, nunc nisl aliquet nisl, nec tincidunt nunc nisl eget nunc.
+
+</Step>
+
+</Chapter>
+
+<Chapter title="Step 2: Project set up">
+
+Lets start building the Next.js app from scratch.
+
+## Initialize a Next.js app
+
+We can use create-next-app to initialize an app called supabase-nextjs
+
+<Step title="Initialize the app with create-next-app" show={<Playground />}>
+
+Run:
+
+```bash solve=command
+npx create-next-app --use-npm --no-eslint --js .
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+Now we need to add a dependency. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+<Step title="Install the Supabase client library" show={<Playground />}>
+
+Run:
+
+```bash solve=command
+npm install @supabase/supabase-js
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+<Step title="Add environment variables" show={<Playground />} intro={[saveFileCommand(".env.local")]}>
+
+Go to <GoToFile path="/.env.local" /> and put your API keys
+
+```py title=.env.local solve=file
+NEXT_PUBLIC_SUPABASE_URL=https://fwobemhztvkziokpwsfc.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3b2JlbWh6dHZremlva3B3c2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY3MzUzNjUsImV4cCI6MTk4MjMxMTM2NX0.8OmPbKgfLNzrvZjpAf7SZRBH4tum5hHd1nOIPlTynlU
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+</Chapter>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

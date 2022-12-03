@@ -1,6 +1,188 @@
-import { Code, Playground, GoToFile } from './Playground'
+import { Browser } from '~/components/Playthrough/Browser'
+import { Playground } from '~/components/Playthrough/Playground'
+import { GoToFile } from '~/components/Playthrough'
+import { saveFileCommand } from '~/components/Playthrough/command'
+import Layout from '~/layouts/PlaythroughLayout'
 
-const accountContents = `import { useState, useEffect } from 'react'
+export const meta = {
+  id: 'play-nextjs',
+  title: 'Playthrough: Next.js',
+  description: 'Learn how to use Supabase in your Next App.',
+}
+
+# Next.js Tutorial
+
+<Chapter title="Project set up">
+
+Before we start building we&apos;re going to set up our Database and API. This is as simple as starting a new Project in Supabase and then creating a schema inside the database.
+
+## Create a project
+
+<Step
+  title='Click on "New Project"'
+  show={<Browser url="app.supabase.com" screen="new project" />}
+/>
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+Nec tincidunt nunc nisl eget nunc. Donec auctor, nisl eget aliquam tincidunt, nunc nisl aliquet nisl, nec tincidunt nunc nisl eget nunc.
+
+</Chapter>
+
+<Chapter title="Initialize app">
+
+Lets start building the Next.js app from scratch.
+
+## Initialize a Next.js app
+
+We can use create-next-app to initialize an app called supabase-nextjs
+
+<Step title="Initialize the Next.js app" show={<Playground />}>
+
+Run:
+
+```bash solve=command
+npx create-next-app --use-npm --no-eslint --js .
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+Now we need to add a dependency. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+<Step title="Install the Supabase client library" show={<Playground />}>
+
+Run:
+
+```bash solve=command
+npm install @supabase/supabase-js
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+<Step title="Add environment variables" show={<Playground />} intro={[saveFileCommand(".env.local")]}>
+
+Go to <GoToFile path="/.env.local" /> and put your API keys
+
+```py title=.env.local solve=file
+NEXT_PUBLIC_SUPABASE_URL=https://fwobemhztvkziokpwsfc.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3b2JlbWh6dHZremlva3B3c2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY3MzUzNjUsImV4cCI6MTk4MjMxMTM2NX0.8OmPbKgfLNzrvZjpAf7SZRBH4tum5hHd1nOIPlTynlU
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+</Chapter>
+
+<Chapter title="The Login component">
+
+Lets start building the Next.js app from scratch.
+
+<Step title="Install auth helpers" show={<Playground />}>
+
+Run:
+
+```bash solve=command
+npm install @supabase/auth-helpers-react @supabase/auth-helpers-nextjs
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+<Step title="Add SessionContextProvider" show={<Playground />}>
+
+Go to <GoToFile path="pages/_app.js" /> and add the context provider:
+
+```js title=pages/_app.js solve=file
+import '../styles/globals.css'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { useState } from 'react'
+
+function MyApp({ Component, pageProps }) {
+  const [supabaseClient] = useState(() =>
+    createBrowserSupabaseClient({ cookieOptions: { sameSite: 'none' } })
+  )
+
+  return (
+    <SessionContextProvider
+      supabaseClient={supabaseClient}
+      initialSession={pageProps.initialSession}
+    >
+      <Component {...pageProps} />
+    </SessionContextProvider>
+  )
+}
+export default MyApp
+```
+
+</Step>
+
+<Step title="Install Supabase Auth UI" show={<Playground />}>
+
+Run:
+
+```bash solve=command
+npm install @supabase/auth-ui-react
+```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum, nisl ut aliquam lacinia, nunc nisl aliquet nisl.
+
+</Step>
+
+<Step title="Add the Auth component" show={<Playground />}>
+
+Go to <GoToFile path="pages/index.js" /> and add:
+
+```js title=pages/index.js solve=file
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+
+const Home = () => {
+  const session = useSession()
+  const supabase = useSupabaseClient()
+
+  return (
+    <div className="container" style={{ padding: '50px 0 100px 0' }}>
+      {!session ? (
+        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
+      ) : (
+        <p>Account page will go here.</p>
+      )}
+    </div>
+  )
+}
+
+export default Home
+```
+
+</Step>
+
+<Step title="Run the app" show={<Playground />} intro={[saveFileCommand("components/Account.js")]}>
+
+You can run the app with:
+
+```bash solve=running
+npm run dev
+```
+
+</Step>
+
+</Chapter>
+
+<Chapter title="The Account component">
+
+<Step title="Create the Account component" show={<Playground />}>
+
+Add a <GoToFile path="components/Account.js" /> file and put this:
+
+```js title=components/Account.js solve=file
+import { useState, useEffect } from 'react'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 export default function Account({ session }) {
@@ -101,18 +283,23 @@ export default function Account({ session }) {
       </div>
 
       <div>
-        <button
-          className="button block"
-          onClick={() => supabase.auth.signOut()}
-        >
+        <button className="button block" onClick={() => supabase.auth.signOut()}>
           Sign Out
         </button>
       </div>
     </div>
   )
-}`
+}
+```
 
-const indexContents = `import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+</Step>
+
+<Step title="Update index.js" show={<Playground />}>
+
+Now in <GoToFile path="components/index.js" /> add:
+
+```js title=components/index.js solve=file
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Account from '../components/Account'
 
@@ -123,11 +310,7 @@ const Home = () => {
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
       {!session ? (
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          theme="dark"
-        />
+        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
       ) : (
         <Account session={session} />
       )}
@@ -135,12 +318,20 @@ const Home = () => {
   )
 }
 
-export default Home`
+export default Home
+```
 
-const stylesContents = `html,
+</Step>
+
+<Step title="Add styles" show={<Playground />}>
+
+Now in <GoToFile path="styles/globals.css" /> add:
+
+```css title=styles/globals.css solve=file
+html,
 body {
-  --custom-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
-    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --custom-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
+    Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   --custom-bg-color: #101010;
   --custom-panel-color: #222;
   --custom-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.8);
@@ -569,57 +760,15 @@ button.primary,
   color: var(--custom-color-brand);
   margin-bottom: 10px;
   text-decoration: none;
-}`
-
-
-export default {
-  title: 'Step 4: The Account component',
-  content: [
-    {
-      type: 'step',
-      header: 'Create the Account component',
-      intro: [
-        {
-          path: 'components/Account.js',
-          contents: ``,
-        },
-      ],
-      solution: [{ path: 'components/Account.js', contents: accountContents }],
-      show: () => <Playground />,
-      children: (
-        <>
-          <p>
-            Add a <GoToFile path="components/Account.js" /> file and put this:
-          </p>
-          <Code language="jsx">{accountContents}</Code>
-        </>
-      ),
-    },
-    {
-      ref: {},
-      type: 'step',
-      header: 'Update index.js',
-      solution: [{ path: 'pages/index.js', contents: indexContents }],
-      show: () => <Playground />,
-      children: (
-        <>
-          <p>
-            Now in <GoToFile path="pages/index.js" /> add:
-          </p>
-          <Code language="jsx">{indexContents}</Code>
-        </>
-      ),
-    },
-    {
-      type: 'step',
-      header: 'Update styles',
-      solution: [{ path: 'styles/globals.css', contents: stylesContents }],
-      show: () => <Playground />,
-    },
-    {
-      type: 'step',
-      header: 'Test',
-      show: () => <Playground />,
-    },
-  ],
 }
+```
+
+</Step>
+
+<Step title="Test" show={<Playground />} />
+
+</Chapter>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

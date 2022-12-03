@@ -1,0 +1,60 @@
+import { Browser } from '~/components/Playthrough/Browser'
+import { Playground } from '~/components/Playthrough/Playground'
+import Layout from '~/layouts/PlaythroughLayout'
+
+export const meta = {
+  id: 'play-test',
+  title: 'Playthrough: Test',
+  description: 'Learn how to use Supabase in your Next App.',
+}
+
+# Test
+
+Hello
+
+<Chapter title="Step 1: Project set up">
+
+Set up
+
+<Step title="Create foo.txt" show={<Playground />}>
+
+Run this
+
+```bash solve=command
+touch foo.js
+```
+
+</Step>
+
+<Step title="Create x" show={<Playground />} >
+
+Create a const in foo.js
+
+```js title=foo.js solve=file
+const x = 'hello foo'
+```
+
+</Step>
+
+<Step title="Log x" show={<Playground />}>
+
+Now add a `console.log`
+
+```js title=foo.js solve=file
+const x = 'hello foo'
+console.log(x)
+```
+
+</Step>
+
+<Step title="The end" show={<Playground />} />
+
+<Step title="The end" show={<Playground />} />
+
+</Chapter>
+
+More stuff
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

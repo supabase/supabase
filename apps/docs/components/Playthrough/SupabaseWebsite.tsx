@@ -20,8 +20,7 @@ export function Login({ onEvent }) {
 export function NewProject({ onEvent }) {
   return (
     <div style={{ width: 400 }}>
-      <div style={{ textAlign: 'left', marginBottom: 12 }}>Lorem Ipsums Org</div>
-      <div className="p-4 border border-gray-900 border-dashed rounded">
+      <div className="p-4 m-4 border border-gray-900 border-dashed rounded">
         <h2 style={{ fontSize: 18 }}>No projects</h2>
         <p style={{ fontSize: 14, color: '#999' }}>Get started by creating a new project.</p>
         <button
