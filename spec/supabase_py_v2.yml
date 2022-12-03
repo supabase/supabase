@@ -63,7 +63,7 @@ pages:
       - name: Sign up.
         code: |
           ```python3
-          {} = supabase.auth.signUp({
+          res = supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -92,26 +92,20 @@ pages:
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
     examples:
       - name: Verify Sms One-Time Password (OTP)
-        isSpotlight: true
         code: |
-          ```js
-          const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
+          ```python3
+          res = supabase.auth.verify_otp(phone, token)
           ```
-      - name: Verify Signup One-Time Password (OTP)
-        isSpotlight: false
-        js: |
-          ```js
-          const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
-          ```
+
   auth.get_session_from_url():
     title: 'get_session_from_url'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
       - name: Get the session data from URL
         isSpotlight: true
-        js: |
-          ```js
-          const { data, error } = await supabase.auth.getSession()
+        code: |
+          ```python3
+          res = supabase.auth.get_session_from_url(url)
           ```
 
   auth.set_session():
@@ -127,12 +121,12 @@ pages:
       - name: Refresh the session
         description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
         isSpotlight: true
-        js: |
-          ```js
-            const { data, error } = supabase.auth.setSession(refresh_token)
+        code: |
+          ```python3
+          res = supabase.auth.set_session(refresh_token)
           ```
   auth.refresh_session():
-    title: 'refreshSession()'
+    title: 'refresh_ession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
@@ -140,39 +134,25 @@ pages:
     examples:
       - name: Refresh session using the current session
         isSpotlight: true
-        js: |
-          ```js
-          const { data: { user, session }, error } = await supabase.auth.refreshSession()
+        code: |
+          ```python3
+          res = supabase.auth.refresh_session()
           ```
-      - name: Refresh session using a passed-in session
-        isSpotlight: true
-        js: |
-          ```js
-          const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
-          ```
-  auth.onAuthStateChange():
-    title: 'onAuthStateChange()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
-    notes: |
-      - Types of auth events: `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `USER_DELETED`, `PASSWORD_RECOVERY`
-      - This isn't functional at the moment as `realtime-py` hasn't been implemented. Please check back again or reach out if you'd like to implement the client library.
-
   Supabase Auth Admin Api:
     title: 'Overview'
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
 
-  auth.admin.getUserById():
-    title: 'getUserById()'
+  auth.admin.get_user_by_id():
+    title: 'get_user_by_id()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
       - Fetches the user object from the database based on the user's id.
-      - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
+      - The `get_user_by_id()` method requires the user's id which maps to the `auth.users.id` column.
     examples:
       - name: Fetch the user object using the access_token jwt.
-        isSpotlight: true
-        js: |
+        code: |
           ```js
           const { data, error } = await supabase.auth.admin.getUserById(1)
           ```
@@ -186,12 +166,12 @@ auth.admin.get_user():
       - name: Get the logged in user with the current existing session
         isSpotlight: true
         js: |
-          ```js
+          ```code
           const { data: { user } } = await supabase.auth.getUser()
           ```
       - name: Get the logged in user with a custom access token jwt.
         isSpotlight: false
-        js: |
+        code: |
           ```js
           const { data: { user } } = await supabase.auth.getUser(jwt)
           ```
@@ -259,7 +239,7 @@ auth.admin.get_user():
           })
           ```
       - name: Auto-confirm the user's phone number
-        js: |
+        code: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
             phone: '1234567890',
