@@ -312,7 +312,14 @@ export default function Account({ session }) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-Let's create a new component for that called `Account.tsx` within a `components` folder.
+We need to create a type definition file for the SQL tables in your project. Create a `utils` folder, and then run the following commands with `PROJECT_ID` replaced with your project's id, which is the same as the subdomain of your `NEXT_PUBLIC_SUPABASE_URL`:
+
+```bash
+npm install --save-dev supabase
+npx supabase gen types typescript --project-id PROJECT_ID > utils/database.types.ts
+```
+
+Now let's create a new component for that called `Account.tsx` within a `components` folder.
 
 ```tsx title=components/Account.tsx
 import { useState, useEffect } from 'react'
