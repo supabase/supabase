@@ -1565,4 +1565,9 @@ module.exports = [
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
   },
+  {
+    permanent: false,
+    source: '/projects',
+    destination: 'https://app.supabase.com/projects',
+  },
 ]
