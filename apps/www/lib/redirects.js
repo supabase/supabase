@@ -1566,7 +1566,7 @@ module.exports = [
     destination: '/docs/guides/functions',
   },
   {
-    permanent: false,
+    permanent: true,
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
   },
