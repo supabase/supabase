@@ -1,7 +1,7 @@
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useState } from 'react'
-import { Checkbox, Input, Listbox, SidePanel, Accordion, Form } from 'ui'
-import { TableOption, Table } from './types'
+import { Accordion, Checkbox, Form, Input, Listbox, SidePanel } from 'ui'
+import { Table, TableOption } from './types'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -11,13 +11,16 @@ export type WrapperTableEditorProps = {
   tables: Table[]
 }
 
+type OnSubmitFn = (values: any, { resetForm }: { resetForm: () => void }) => void
+
 const WrapperTableEditor = ({ visible, onCancel, onSave, tables }: WrapperTableEditorProps) => {
   const [selectedTableIndex, setSelectedTableIndex] = useState<string>('')
 
   const selectedTable = selectedTableIndex === '' ? undefined : tables[parseInt(selectedTableIndex)]
 
-  const onSubmit = (values: any) => {
-    onSave(values)
+  const onSubmit: OnSubmitFn = (values, { resetForm }) => {
+    onSave({ ...values, index: parseInt(selectedTableIndex) })
+    resetForm()
   }
 
   return (
@@ -70,7 +73,7 @@ const Option = ({ option }: { option: TableOption }) => {
     <Input
       key={option.name}
       id={option.name}
-      name={option.name}
+      name={`options.${option.name}`}
       label={option.label}
       placeholder={option.placeholder ?? ''}
       defaultValue={option.defaultValue ?? ''}
@@ -79,7 +82,7 @@ const Option = ({ option }: { option: TableOption }) => {
   )
 }
 
-const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: (values: any) => void }) => {
+const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: OnSubmitFn }) => {
   const requiredOptions =
     table.options.filter((option) => option.editable && option.required && !option.defaultValue) ??
     []
@@ -88,12 +91,13 @@ const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: (values: any) 
       (option) => option.editable && (!option.required || option.defaultValue)
     ) ?? []
 
-  const initialValues = Object.fromEntries(
-    [
-      ['table_name', ''],
-      ['columns', []],
-    ].concat(table.options.map((option) => [option.name, option.defaultValue ?? '']))
-  )
+  const initialValues = {
+    table_name: '',
+    columns: [],
+    options: Object.fromEntries(
+      table.options.map((option) => [option.name, option.defaultValue ?? ''])
+    ),
+  }
 
   return (
     <Form
@@ -101,6 +105,7 @@ const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: (values: any) 
       initialValues={initialValues}
       //  validate={validate}
       onSubmit={onSubmit}
+      enableReinitialize={true}
     >
       {() => (
         <div className="space-y-4">

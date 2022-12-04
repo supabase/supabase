@@ -1,7 +1,9 @@
-import { FC, useState } from 'react'
-import { Button, Checkbox, Form, Input, SidePanel } from 'ui'
+import { useState } from 'react'
+import { Button, Input, SidePanel } from 'ui'
 
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useStore } from 'hooks'
 import { Wrapper } from './types'
 import WrapperTableEditor from './WrapperTableEditor'
@@ -21,38 +23,12 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
-
-    console.log('values:', values)
-    // const { error } = await meta.wrappers.create({
-    //   schema,
-    //   name: wrapper.name,
-    //   version: wrapper.default_version,
-    //   cascade: true,
-    // })
-    // if (error) {
-    //   ui.setNotification({
-    //     error,
-    //     category: 'error',
-    //     message: `Failed to toggle ${wrapper.name.toUpperCase()}: ${error.message}`,
-    //   })
-    // } else {
-    //   ui.setNotification({
-    //     category: 'success',
-    //     message: `${wrapper.name.toUpperCase()} is on.`,
-    //   })
-    // }
-
-    setSubmitting(false)
-    onCancel()
-  }
-
-  const [formState, setFormState] = useState(() =>
+  const getInitialFormState = () =>
     Object.fromEntries(
       wrapper.server.options.map((option) => [option.name, option.defaultValue ?? ''])
     )
-  )
+
+  const [formState, setFormState] = useState(getInitialFormState)
   const [newTables, setNewTables] = useState<any[]>([])
 
   const [isAddTableOpen, setIsAddTableOpen] = useState(false)
@@ -62,17 +38,40 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
     setIsAddTableOpen(false)
   }
 
-  const onSaveChanges = (done: () => void) => {
-    console.log('newTables:', formState, newTables)
+  const { project } = useProjectContext()
+  const { mutateAsync: createFDW } = useFDWCreateMutation()
 
-    const createWrapperSql = /* SQL */ `
-      create foreign data wrapper stripe_wrapper
-      handler wrappers_handler
-      validator wrappers_validator
-      options (
-        wrapper 'StripeFdw'
-      );
-    `
+  const onSaveChanges = async (done: () => void) => {
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Creating foreign data wrapper...`,
+    })
+
+    try {
+      await createFDW({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        wrapper,
+        formState,
+        newTables,
+      })
+
+      // Reset state
+      setFormState(getInitialFormState())
+      setNewTables([])
+
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Created foreign data wrapper successfully!`,
+      })
+    } catch (error: any) {
+      ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: error.message,
+      })
+    }
 
     done()
     onCancel()
