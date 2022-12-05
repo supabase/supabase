@@ -106,7 +106,7 @@ You should see the response `{ "message":"Hello Functions!" }`.
 <details>
 <summary>Implementation details</summary>
 
-- All Edge Functions are `POST` requests.
+- Edge Functions don't serve HTML content (`GET` requests that return `text/html` are rewritten to `text/plain`).
 - The `Authorization` header is required. You can use either the `ANON` key, the `SERVICE_ROLE` key, or a logged-in user's JWT.
 - The Function is proxied through the local API (`http://localhost:54321`)
 

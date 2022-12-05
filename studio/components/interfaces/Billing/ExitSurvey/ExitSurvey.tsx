@@ -8,7 +8,6 @@ import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { CANCELLATION_REASONS } from '../Billing.constants'
-import { generateFeedbackMessage } from './ExitSurvey.utils'
 import { UpdateSuccess } from '../'
 import { SubscriptionPreview } from '../Billing.types'
 import { StripeSubscription } from 'components/interfaces/Billing'
@@ -138,14 +137,11 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           setIsSuccessful(true)
         }
       }
-
-      // Submit exit survey to Hubspot
-      const feedbackRes = await post(`${API_URL}/feedback/send`, {
+      const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-        subject: 'Subscription cancellation - Exit survey [Downgrade]',
-        tags: ['dashboard-exitsurvey'],
-        category: 'Billing',
-        message: generateFeedbackMessage(selectedReasons, downgradeMessage),
+	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+	additionalFeedback: downgradeMessage,
+	exitAction: 'downgrade',
       })
       if (feedbackRes.error) throw feedbackRes.error
     } catch (error: any) {
