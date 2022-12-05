@@ -4,9 +4,24 @@ export enum Presets {
   AUTH = 'auth',
 }
 
+export interface BaseReportParams {
+  iso_timestamp_start: string
+  iso_timestamp_end: string
+}
+
+export type VariableSql = string | ((params: BaseReportParams) => string)
+
+export type PresetSql = string | VariableSql
+
 export interface PresetConfig {
   title: string
-  sql: Record<string, string>
+  queries: Record<
+    string,
+    {
+      sql: PresetSql
+      queryType: 'logs' | 'db'
+    }
+  >
 }
 export interface StatusCodesDatum {
   timestamp: number
