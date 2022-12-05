@@ -349,6 +349,11 @@ functions:
     slug: auth-admin-invoke
     product: 'functions'
 
+  - id: stream
+    title: stream()
+    slug: stream
+    product: 'realtime'
+
   - id: subscribe
     title: on().subscribe()
     slug: subscribe
