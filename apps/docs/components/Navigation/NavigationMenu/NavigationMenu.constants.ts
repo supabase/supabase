@@ -150,6 +150,30 @@ export const cli = {
 
 export const SocialLoginItems = [
   {
+    name: 'Google login',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/0auth-login/auth-google',
+    items: [],
+  },
+  {
+    name: 'Facebook login',
+    icon: '/docs/img/icons/facebook-icon',
+    url: '/guides/auth/0auth-login/auth-facebook',
+    items: [],
+  },
+  {
+    name: 'Twitter login',
+    icon: '/docs/img/icons/twitter-icon',
+    url: '/guides/auth/0auth-login/auth-twitter',
+    items: [],
+  },
+  {
+    name: 'LinkedIn login',
+    icon: '/docs/img/icons/linkedin-icon',
+    url: '/guides/auth/0auth-login/auth-linkedin',
+    items: [],
+  },
+  {
     name: 'Apple login',
     icon: '/docs/img/icons/apple-icon',
     url: '/guides/auth/0auth-login/auth-apple',
@@ -159,24 +183,6 @@ export const SocialLoginItems = [
     name: 'Azure login',
     icon: '/docs/img/icons/microsoft-icon',
     url: '/guides/auth/0auth-login/auth-azure',
-    items: [],
-  },
-  {
-    name: 'Bitbucket login',
-    icon: '/docs/img/icons/bitbucket-icon',
-    url: '/guides/auth/0auth-login/auth-bitbucket',
-    items: [],
-  },
-  {
-    name: 'Discord login',
-    icon: '/docs/img/icons/discord-icon',
-    url: '/guides/auth/0auth-login/auth-discord',
-    items: [],
-  },
-  {
-    name: 'Facebook login',
-    icon: '/docs/img/icons/facebook-icon',
-    url: '/guides/auth/0auth-login/auth-facebook',
     items: [],
   },
   {
@@ -193,21 +199,21 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Google login',
-    icon: '/docs/img/icons/google-icon',
-    url: '/guides/auth/0auth-login/auth-google',
+    name: 'Bitbucket login',
+    icon: '/docs/img/icons/bitbucket-icon',
+    url: '/guides/auth/0auth-login/auth-bitbucket',
+    items: [],
+  },
+  {
+    name: 'Discord login',
+    icon: '/docs/img/icons/discord-icon',
+    url: '/guides/auth/0auth-login/auth-discord',
     items: [],
   },
   {
     name: 'Keycloak login',
     icon: '/docs/img/icons/keycloak-icon',
     url: '/guides/auth/0auth-login/auth-keycloak',
-    items: [],
-  },
-  {
-    name: 'LinkedIn login',
-    icon: '/docs/img/icons/linkedin-icon',
-    url: '/guides/auth/0auth-login/auth-linkedin',
     items: [],
   },
   {
@@ -235,12 +241,6 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Twitter login',
-    icon: '/docs/img/icons/twitter-icon',
-    url: '/guides/auth/0auth-login/auth-twitter',
-    items: [],
-  },
-  {
     name: 'WorkOS login',
     icon: '/docs/img/icons/workos-icon',
     url: '/guides/auth/0auth-login/auth-workos',
@@ -250,21 +250,26 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'Twilio login',
+    name: 'Twilio SMS login',
     icon: '/docs/img/icons/twilio-icon',
-    url: '/guides/auth/auth-twilio',
+    url: '/guides/auth/passwordless-login/phone-sms-otp-twilio',
+    linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
     items: [],
   },
   {
-    name: 'Vonage login',
+    name: 'Vonage SMS login',
     icon: '/docs/img/icons/vonage-icon',
-    url: '/guides/auth/auth-vonage',
+    url: '/guides/auth/passwordless-login/phone-sms-otp-vonage',
+    linkDescription:
+      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses',
     items: [],
+    isDarkMode: true,
   },
   {
-    name: 'MessageBird login',
+    name: 'MessageBird SMS login',
     icon: '/docs/img/icons/messagebird-icon',
-    url: '/guides/auth/auth-messagebird',
+    linkDescription: 'communication between businesses and their customers — across any channel.',
+    url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     items: [],
   },
 ]
@@ -282,13 +287,24 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Email login', url: '/guides/auth/auth-email', items: [] },
-        { name: 'Magic Link login', url: '/guides/auth/auth-magic-link', items: [] },
         {
           name: '0Auth Login',
           url: '/guides/auth/0auth-login',
           items: [...SocialLoginItems],
         },
-        { name: 'Phone Login', url: '/guides/auth/phone-login', items: [...PhoneLoginsItems] },
+        {
+          name: 'Passwordless login',
+          url: '/guides/auth/passwordless-login',
+          items: [
+            {
+              name: 'Magiclink login',
+              icon: '',
+              url: '/guides/auth/passwordless-login/email-otp-magic-link',
+              items: [],
+            },
+            ...PhoneLoginsItems,
+          ],
+        },
       ],
     },
     {

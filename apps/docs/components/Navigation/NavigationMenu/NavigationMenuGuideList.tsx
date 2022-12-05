@@ -11,12 +11,10 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
 
   const menu = NavItems[id]
 
-  console.log('router', router)
-
+  // get url
   const url = router.asPath
-
-  const firstLevelRoute = url.split('/').slice(0, 4).join('/')
-  console.log('firstLevelRoute', firstLevelRoute)
+  // remove the end of the url if a deep link
+  const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
 
   return (
     <Accordion.Root
