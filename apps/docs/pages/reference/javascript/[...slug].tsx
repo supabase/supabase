@@ -84,19 +84,12 @@ export default function JSReference(props) {
               <RefSubLayout.Details>
                 <>
                   <header className={['mb-16'].join(' ')}>
-                    {shortText && (
-                      <>
-                        <p
-                          className="text-sm text-scale-1100"
-                          dangerouslySetInnerHTML={{ __html: shortText }}
-                        ></p>
-                      </>
-                    )}
+                    {shortText && <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>}
                   </header>
 
                   {item.description && (
                     <div className="prose">
-                      <p className="text-sm">{item.description}</p>
+                      <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
                     </div>
                   )}
                   {functionMarkdownContent && (
@@ -208,15 +201,13 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                       .replace('```', ''))}
                               </CodeBlock>
                               {response && (
-                                <>
-                                  <CodeBlock
-                                    className="useless-code-block-class"
-                                    language="json"
-                                    hideLineNumbers={true}
-                                  >
-                                    {response}
-                                  </CodeBlock>
-                                </>
+                                <CodeBlock
+                                  className="useless-code-block-class"
+                                  language="json"
+                                  hideLineNumbers={true}
+                                >
+                                  {response}
+                                </CodeBlock>
                               )}
                             </Tabs.Panel>
                           )
