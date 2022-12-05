@@ -148,6 +148,126 @@ export const cli = {
   ],
 }
 
+export const SocialLoginItems = [
+  {
+    name: 'Apple login',
+    icon: '/docs/img/icons/apple-icon',
+    url: '/guides/auth/auth-apple',
+    items: [],
+  },
+  {
+    name: 'Azure login',
+    icon: '/docs/img/icons/azure-icon',
+    url: '/guides/auth/auth-azure',
+    items: [],
+  },
+  {
+    name: 'Bitbucket login',
+    icon: '/docs/img/icons/bitbucket-icon',
+    url: '/guides/auth/auth-bitbucket',
+    items: [],
+  },
+  {
+    name: 'Discord login',
+    icon: '/docs/img/icons/discord-icon',
+    url: '/guides/auth/auth-discord',
+    items: [],
+  },
+  {
+    name: 'Facebook login',
+    icon: '/docs/img/icons/facebook-icon',
+    url: '/guides/auth/auth-facebook',
+    items: [],
+  },
+  {
+    name: 'Github login',
+    icon: '/docs/img/icons/github-icon',
+    url: '/guides/auth/auth-github',
+    items: [],
+  },
+  {
+    name: 'Gitlab login',
+    icon: '/docs/img/icons/gitlab-icon',
+    url: '/guides/auth/auth-gitlab',
+    items: [],
+  },
+  {
+    name: 'Google login',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/auth-google',
+    items: [],
+  },
+  {
+    name: 'Keycloak login',
+    icon: '/docs/img/icons/keycloak-icon',
+    url: '/guides/auth/auth-keycloak',
+    items: [],
+  },
+  {
+    name: 'LinkedIn login',
+    icon: '/docs/img/icons/linkedin-icon',
+    url: '/guides/auth/auth-linkedin',
+    items: [],
+  },
+  {
+    name: 'Notion login',
+    icon: '/docs/img/icons/notion-icon',
+    url: '/guides/auth/auth-notion',
+    items: [],
+  },
+  {
+    name: 'Slack login',
+    icon: '/docs/img/icons/slack-icon',
+    url: '/guides/auth/auth-slack',
+    items: [],
+  },
+  {
+    name: 'Spotify login',
+    icon: '/docs/img/icons/spotify-icon',
+    url: '/guides/auth/auth-spotify',
+    items: [],
+  },
+  {
+    name: 'Twitch login',
+    icon: '/docs/img/icons/twitch-icon',
+    url: '/guides/auth/auth-twitch',
+    items: [],
+  },
+  {
+    name: 'Twitter login',
+    icon: '/docs/img/icons/twitter-icon',
+    url: '/guides/auth/auth-twitter',
+    items: [],
+  },
+  {
+    name: 'WorkOS login',
+    icon: '/docs/img/icons/workos-icon',
+    url: '/guides/auth/auth-workos',
+    items: [],
+  },
+]
+
+export const PhoneLogins = [
+  {
+    name: 'Twilio login',
+    icon: '/docs/img/icons/twilio-icon',
+    url: '/guides/auth/auth-twilio',
+    items: [],
+  },
+  {
+    name: 'Vonage login',
+    icon: '/docs/img/icons/vonage-icon',
+    url: '/guides/auth/auth-vonage',
+    items: [],
+  },
+  {
+    name: 'MessageBird login',
+    icon: '/docs/img/icons/messagebird-icon',
+    url: '/guides/auth/auth-messagebird',
+    items: [],
+  },
+]
+
 export const auth = {
   icon: '/img/icons/menu/auth.svg',
   label: 'Auth',
@@ -160,31 +280,14 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
-        { name: 'Login with Email', url: '/guides/auth/auth-email', items: [] },
-        { name: 'Login with Magic Link', url: '/guides/auth/auth-magic-link', items: [] },
-        { name: 'Login with Apple', url: '/guides/auth/auth-apple', items: [] },
-        { name: 'Login with Azure', url: '/guides/auth/auth-azure', items: [] },
-        { name: 'Login with Bitbucket', url: '/guides/auth/auth-bitbucket', items: [] },
-        { name: 'Login with Discord', url: '/guides/auth/auth-discord', items: [] },
-        { name: 'Login with Facebook', url: '/guides/auth/auth-facebook', items: [] },
-        { name: 'Login with Github', url: '/guides/auth/auth-github', items: [] },
-        { name: 'Login with Gitlab', url: '/guides/auth/auth-gitlab', items: [] },
-        { name: 'Login with Google', url: '/guides/auth/auth-google', items: [] },
-        { name: 'Login with Keycloak', url: '/guides/auth/auth-keycloak', items: [] },
-        { name: 'Login with LinkedIn', url: '/guides/auth/auth-linkedin', items: [] },
-        { name: 'Login with Notion', url: '/guides/auth/auth-notion', items: [] },
-        { name: 'Login with Slack', url: '/guides/auth/auth-slack', items: [] },
-        { name: 'Login with Spotify', url: '/guides/auth/auth-spotify', items: [] },
-        { name: 'Login with Twitch', url: '/guides/auth/auth-twitch', items: [] },
-        { name: 'Login with Twitter', url: '/guides/auth/auth-twitter', items: [] },
-        { name: 'Login with WorkOS', url: '/guides/auth/auth-workos', items: [] },
-        { name: 'Phone Auth with Twilio', url: '/guides/auth/auth-twilio', items: [] },
-        { name: 'Phone Auth with Vonage', url: '/guides/auth/auth-vonage', items: [] },
+        { name: 'Email login', url: '/guides/auth/auth-email', items: [] },
+        { name: 'Magic Link login', url: '/guides/auth/auth-magic-link', items: [] },
         {
-          name: 'Phone Auth with MessageBird',
-          url: '/guides/auth/auth-messagebird',
-          items: [],
+          name: '0Auth Login',
+          url: '/guides/auth/0auth-login',
+          items: [...SocialLoginItems],
         },
+        { name: 'Phone Login', url: '/guides/auth/phone-login', items: [] },
       ],
     },
     {

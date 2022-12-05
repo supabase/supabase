@@ -1,0 +1,40 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import { IconPanel } from 'ui'
+import Link from 'next/link'
+import { PhoneLogins } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
+
+export const meta = {
+  title: 'Login with social',
+  description: 'Logging in with social accounts',
+}
+
+hello world
+
+asdsa
+
+dasd
+
+## adsd
+
+adsdsddsadasd sdasdsdsadasdasdasdasdasd adsdsddsadasd sdasdsdsadasdasdasdasdasd adsdsddsadasd sdasdsdsadasdasdasdasdasd adsdsddsadasd sdasdsdsadasdasdasdasdasd
+
+<div className="grid grid-cols-12 gap-10 not-prose py-16">
+  {PhoneLogins.map((item) => (  
+    <Link href={`/${item.url}`} key={item.name} passHref>
+      <a className="col-span-4">
+        <IconPanel
+          title={item.name}
+          span="col-span-6"
+          icon={item.icon}
+        >
+          {item.description}
+        </IconPanel>
+      </a>
+    </Link>
+))}
+
+</div>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
