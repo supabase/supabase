@@ -33,7 +33,7 @@ const PortalToast = () => (
             <>
               {icon}
               <div className="flex items-center">
-                <div className="w-full break-all">{message}</div>
+                <div className="toast-message w-full">{message}</div>
                 {t.type !== 'loading' && (
                   <div className="ml-4">
                     <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
