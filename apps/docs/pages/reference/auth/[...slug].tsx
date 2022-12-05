@@ -48,6 +48,7 @@ export default function Config() {
             {generatedSpec.operations.map((operation: any) => (
               <div className="border-b pb-8">
                 <RefSubLayout.Section
+                  slug={operation.id}
                   title={operation.summary}
                   id={operation.operationId}
                   monoFont={false}

@@ -43,7 +43,7 @@ export default function JSReference(props) {
   // find the #sign-up element and scroll to that
   useEffect(() => {
     if (isNewDocs && document && slug !== 'start') {
-      document.querySelector(`#${slug}`).scrollIntoView()
+      document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
 
@@ -294,13 +294,12 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     slug = `docs/reference/javascript/${params.slug[0]}`
   }
 
-  let doc = getDocsBySlug(slug)
-  const content = await serialize(doc.content || '')
-
   /*
    * handle old ref pages
    */
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    let doc = getDocsBySlug(slug)
+    const content = await serialize(doc.content || '')
     return {
       props: {
         /*
