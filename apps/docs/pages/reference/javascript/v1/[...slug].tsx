@@ -450,13 +450,12 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     slug = `docs/reference/javascript/${params.slug[0]}`
   }
 
-  let doc = getDocsBySlug(slug)
-  const content = await serialize(doc.content || '')
-
   /*
    * handle old ref pages
    */
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    let doc = getDocsBySlug(slug)
+    const content = await serialize(doc.content || '')
     return {
       props: {
         /*

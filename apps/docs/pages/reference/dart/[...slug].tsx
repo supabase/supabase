@@ -42,7 +42,7 @@ export default function DartReference(props) {
   useEffect(() => {
     if (isNewDocs && document && slug !== 'start') {
       // re-enable this when the new yaml shape file is moved into this branch
-      document.querySelector(`#${slug}`).scrollIntoView()
+      document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
 
@@ -282,13 +282,12 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     slug = `docs/reference/dart/${params.slug[0]}`
   }
 
-  let doc = getDocsBySlug(slug)
-  const content = await serialize(doc.content || '')
-
   /*
    * handle old ref pages
    */
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    let doc = getDocsBySlug(slug)
+    const content = await serialize(doc.content || '')
     return {
       props: {
         /*
