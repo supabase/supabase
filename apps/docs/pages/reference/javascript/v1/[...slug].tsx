@@ -25,7 +25,6 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-import { ComesFrom } from '~/components/ComesFrom'
 import Param from '~/components/Params'
 import Options from '~/components/Options'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
@@ -143,12 +142,6 @@ export default function JSReference(props) {
               <RefSubLayout.Examples>
                 {item.examples && (
                   <>
-                    {' '}
-                    <ComesFrom
-                      className="mb-5"
-                      link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml"
-                      text="supabase_js_v2"
-                    />
                     <Tabs
                       defaultActiveId={item.examples[0].id}
                       size="small"
@@ -210,20 +203,13 @@ export default function JSReference(props) {
                                       .replace('```', ''))}
                               </CodeBlock>
                               {response && (
-                                <>
-                                  <ComesFrom
-                                    className="mb-5 mt-5"
-                                    link="https://github.com/supabase/supabase/pull/10095/files#diff-c514c66b77772b9e3d9a5403c136ee52dfeaaeacb1d8138ea85ce35ee64e5006"
-                                    text="examples.yml"
-                                  />
-                                  <CodeBlock
-                                    className="useless-code-block-class"
-                                    language="json"
-                                    hideLineNumbers={true}
-                                  >
-                                    {response}
-                                  </CodeBlock>
-                                </>
+                                <CodeBlock
+                                  className="useless-code-block-class"
+                                  language="json"
+                                  hideLineNumbers={true}
+                                >
+                                  {response}
+                                </CodeBlock>
                               )}
                             </Tabs.Panel>
                           )
