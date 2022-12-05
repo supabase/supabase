@@ -1,7 +1,7 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import { IconPanel } from 'ui'
 import Link from 'next/link'
-import { PhoneLogins } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { PhoneLoginsItems } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 export const meta = {
   title: 'Login with social',
@@ -19,7 +19,7 @@ dasd
 adsdsddsadasd sdasdsdsadasdasdasdasdasd adsdsddsadasd sdasdsdsadasdasdasdasdasd adsdsddsadasd sdasdsdsadasdasdasdasdasd adsdsddsadasd sdasdsdsadasdasdasdasdasd
 
 <div className="grid grid-cols-12 gap-10 not-prose py-16">
-  {PhoneLogins.map((item) => (  
+  {PhoneLoginsItems.map((item) => (  
     <Link href={`/${item.url}`} key={item.name} passHref>
       <a className="col-span-4">
         <IconPanel
