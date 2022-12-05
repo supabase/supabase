@@ -30,6 +30,12 @@ const GlassPanel = ({
 }: Props) => {
   const { isDarkMode } = useTheme()
 
+  const IconBackground: React.FC = (props) => (
+    <div className={showIconBg && 'bg-green-600 w-8 h-8 flex items-center justify-center rounded'}>
+      {props.children}
+    </div>
+  )
+
   return (
     <div
       className={[
@@ -70,21 +76,14 @@ const GlassPanel = ({
       >
         <div className="flex items-center gap-3">
           {typeof icon === 'string' ? (
-            showIconBg ? (
-              <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
-                <img
-                  className="w-5"
-                  src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
-                />
-              </div>
-            ) : (
+            <IconBackground>
               <img
                 className="w-5"
                 src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
               />
-            )
+            </IconBackground>
           ) : (
-            icon
+            <IconBackground>{icon}</IconBackground>
           )}
           <h5 className="text-base text-scale-1200">{title}</h5>
         </div>
