@@ -21,9 +21,8 @@ import { Badge } from '~/../../packages/ui'
 import Avatar from '~/components/Avatar'
 
 // TODO
-// check rss
-// change content storm content on hover/click
-// images on orbit
+// planet description on hover
+// links for each user
 const constellation = [
   [10, 10],
   [13, 27],
@@ -74,7 +73,6 @@ export default function launchweek() {
   async function getCreators() {
     try {
       // setLoading(true)
-      console.log('get data')
       let supa = await supabase.from('lw6_creators').select()
 
       let { data, error, status } = supa
@@ -84,7 +82,6 @@ export default function launchweek() {
       }
 
       if (data) {
-        console.log(supa)
         setCreators(data)
       }
     } catch (error) {
@@ -95,7 +92,6 @@ export default function launchweek() {
     }
   }
 
-  console.log({ creators })
   return (
     <>
       <NextSeo
@@ -168,19 +164,21 @@ export default function launchweek() {
             )}
           ></div>
         </div>
-        <SectionContainer className="flex gap-6 min-h-[350px] !py-3">
+        <SectionContainer
+          className={classNames(
+            'flex gap-6 min-h-[350px] !py-3 mb-11 flex-col-reverse md:flex-row',
+            styleUtils.appear,
+            styleUtils['appear-third']
+          )}
+        >
           <div
-            className={`flex-1 bg-[url('/images/launchweek/orbit.svg')] bg-contain bg-no-repeat  bg-bottom relative`} //grid grid-cols-5 grid-rows-5
+            className={`flex-1 bg-[url('/images/launchweek/orbit.svg')] bg-auto bg-no-repeat bg-bottom relative min-h-[360px]`} //grid grid-cols-5 grid-rows-5
           >
             {creators.map((creator: any, index: number) => {
               return (
                 <div
                   className={`justify-self-center absolute`}
-                  onClick={() => {
-                    'wat'
-                  }}
                   onMouseEnter={() => {
-                    console.log(creators[activeCreator])
                     setActiveCreator(index)
                   }}
                   style={{
@@ -188,21 +186,21 @@ export default function launchweek() {
                     left: `${constellation[index][1]}%`,
                   }}
                 >
-                  <a href={creator.link} target="_blank">
-                    <div className="relative group">
-                      <div className="absolute -inset-0.5 bg-brand-600 rounded-full group-hover:blur-md"></div>
-                      <img
-                        className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
-                        src={creator.profile_picture}
-                      />
-                    </div>
-                  </a>
+                  <div className="relative group">
+                    <div className="absolute -inset-0.5 bg-brand-1100 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-md transition duration-500"></div>
+                    <img
+                      className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
+                      src={creator.profile_picture}
+                    />
+                  </div>
                 </div>
               )
             })}
           </div>
           <div className="flex-1">
-            <Badge className="mb-6">Currently happening</Badge>
+            <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#39617D94] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1A7A4C]">
+              Currently happening
+            </Badge>
             <h2 className="text-5xl dark:text-white mb-6">See creators using Supabase</h2>
             <p className="text-slate-900 max-w-[80%] mb-16">
               Description about Content Storm, something to tie it up with Launch Week. To find
@@ -217,12 +215,20 @@ export default function launchweek() {
               <h3 className="dark:text-white">
                 {activeCreator !== null ? `${creators[activeCreator].first_name}` : 'Dummy tytle'}
               </h3>
-              <p className="dark:text-slate-900">
+              <p className="text-slate-900">
                 If needed this is a short description about the type of content this is linking to.
               </p>
               <p className="text-brand-900">
-                <a rel="noopener" target="_blank" href="/blog">
-                  Livestreaming Now
+                <a
+                  rel="noopener"
+                  target="_blank"
+                  href={
+                    creators.length > 0 && activeCreator !== null
+                      ? creators[activeCreator].link
+                      : 'https://supabase.com/blog'
+                  }
+                >
+                  Visit
                 </a>
               </p>
             </div>
