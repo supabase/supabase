@@ -4,20 +4,20 @@ import Link from 'next/link'
 import { SocialLoginItems } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 export const meta = {
-  title: 'Login with social',
+  title: 'Social Login',
   description: 'Logging in with social accounts',
 }
 
 Implement Social Login in a heartbeat with Supabase and increase your registrations.
 
-## What is 0Auth login?
+## What is Social login?
 
-Oauth is an open standard for authentication that allows users to log in to one website or application using their credentials from another website or application.
+Social Login is Oauth, which is an open standard for authentication that allows users to log in to one website or application using their credentials from another website or application.
 It is a way for users to grant third-party applications access to their online accounts without sharing their passwords.
 
 Oauth is commonly used for things like logging in to a social media account from a third-party app. It is a secure and convenient way to authenticate users and share information between applications.
 
-## Why should I use 0Auth logins for my application?
+## Why should I use Social login for my application?
 
 There are several reasons why you might want to add social login to your applications:
 
@@ -31,15 +31,15 @@ There are several reasons why you might want to add social login to your applica
 
 Overall, adding social login to your applications can improve the user experience, increase registration and conversion rates, enhance user engagement, and improve security.
 
-## Setting up a Social Provider to use Supabase 0Auth
+## Setting up a Social Provider app to use Supabase Social Auth
 
 You can follow each of these guides to implement Social 0Auth for any of these providers.
-If you've already set up your social provider you skip ahead and follow the implementation instructions [here](#how-to-add-social-0auth-to-your-application)
+If you've already set up your social provider you skip ahead and follow the implementation instructions [here](#how-to-add-social-0auth-to-your-application).
 
 <div className="grid grid-cols-12 gap-10 not-prose py-8">
   {SocialLoginItems.map((item) => (  
     <Link href={`/${item.url}`} key={item.name} passHref>
-      <a className="col-span-4">
+      <a className="col-span-6 lg:col-span-4 xl:col-span-3">
         <IconPanel
           title={item.name}
           span="col-span-6"
