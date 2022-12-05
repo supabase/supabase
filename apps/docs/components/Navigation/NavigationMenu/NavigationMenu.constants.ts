@@ -157,7 +157,7 @@ export const SocialLoginItems = [
   },
   {
     name: 'Azure login',
-    icon: '/docs/img/icons/azure-icon',
+    icon: '/docs/img/icons/microsoft-icon',
     url: '/guides/auth/auth-azure',
     items: [],
   },
@@ -180,10 +180,11 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Github login',
+    name: 'GitHub login',
     icon: '/docs/img/icons/github-icon',
     url: '/guides/auth/auth-github',
     items: [],
+    isDarkMode: true,
   },
   {
     name: 'Gitlab login',
