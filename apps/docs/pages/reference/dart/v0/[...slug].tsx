@@ -70,12 +70,7 @@ export default function DartReference(props) {
           <>
             <RefSubLayout.Section
               key={item.id}
-              title={
-                examples.functions[itemIndex].title ??
-                examples.functions[itemIndex].id ??
-                item.name ??
-                item.id
-              }
+              title={item.title}
               id={item.id}
               slug={commonLibSpec.functions.find((commonItem) => commonItem.id === item.id).slug}
             >
