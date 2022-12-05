@@ -35,10 +35,12 @@ export default function JSReference(props) {
 
   const slug = router.query.slug[0]
 
+  const isNewDocs = process.env.NEXT_PUBLIC_NEW_DOCS === 'true'
+
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
-    if (document && slug !== 'start') {
+    if (isNewDocs && document && slug !== 'start') {
       document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
@@ -46,7 +48,7 @@ export default function JSReference(props) {
   /*
    * handle old ref pages
    */
-  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+  if (!isNewDocs) {
     return (
       // @ts-ignore
       <OldLayout meta={props.meta} toc={props.toc}>

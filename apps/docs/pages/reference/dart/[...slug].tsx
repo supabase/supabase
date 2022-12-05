@@ -34,8 +34,10 @@ export default function DartReference(props) {
   const router = useRouter()
   const slug = router.query.slug[0]
 
+  const isNewDocs = process.env.NEXT_PUBLIC_NEW_DOCS === 'true'
+
   useEffect(() => {
-    if (document && slug !== 'start') {
+    if (isNewDocs && document && slug !== 'start') {
       // re-enable this when the new yaml shape file is moved into this branch
       //document.querySelector(`#${slug}`).scrollIntoView()
     }
@@ -44,7 +46,7 @@ export default function DartReference(props) {
   /*
    * handle old ref pages
    */
-  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+  if (!isNewDocs) {
     return (
       // @ts-ignore
       <OldLayout meta={props.meta} toc={props.toc}>

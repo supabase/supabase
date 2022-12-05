@@ -41,6 +41,8 @@ export default function Ref(props) {
   const [offsetY, setOffsetY] = useState(0)
   const [sections, setSections] = useState([])
 
+  const isNewDocs = process.env.NEXT_PUBLIC_NEW_DOCS === 'true'
+
   // useEffect(() => {
   //   window.scrollTo(0, 0)
   //   setOffsetY(0)
@@ -132,7 +134,7 @@ export default function Ref(props) {
   /*
    * handle old ref pages
    */
-  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+  if (isNewDocs) {
     return (
       // @ts-ignore
       <OldLayout meta={props.meta} toc={props.toc}>
