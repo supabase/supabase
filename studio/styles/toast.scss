@@ -552,4 +552,12 @@
   animation-name: Toastify__slideOutDown;
 }
 
+.toast-message {
+  max-width: 258px;
+  div[role='status'] {
+    @apply justify-start w-full break-words;
+    word-break: break-word;
+  }
+}
+
 /*# sourceMappingURL=ReactToastify.css.map */
