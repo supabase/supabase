@@ -9,7 +9,6 @@ import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { delete_, post } from 'lib/common/fetch'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
-import { generateFeedbackMessage } from 'components/interfaces/Billing/ExitSurvey/ExitSurvey.utils'
 
 interface Props {
   type?: 'danger' | 'default'
@@ -85,12 +84,11 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
 
     // Submit exit survey to Hubspot for paid projects
     if (!isFree) {
-      const feedbackRes = await post(`${API_URL}/feedback/send`, {
+      const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-        subject: 'Subscription cancellation - Exit survey [Delete]',
-        tags: ['dashboard-exitsurvey'],
-        category: 'Billing',
-        message: generateFeedbackMessage(selectedReasons, cancellationMessage),
+	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+	additionalFeedback: cancellationMessage,
+	exitAction: 'delete',
       })
       if (feedbackRes.error) throw feedbackRes.error
     }

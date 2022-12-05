@@ -1,0 +1,33 @@
+name: Mirror Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Image tag"
+        required: true
+        type: string
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: docker/login-action@v2
+        with:
+          registry: public.ecr.aws
+          username: ${{ secrets.PROD_ACCESS_KEY_ID }}
+          password: ${{ secrets.PROD_SECRET_ACCESS_KEY }}
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: akhilerm/tag-push-action@v2.1.0
+        with:
+          src: docker.io/supabase/studio:${{ inputs.version }}
+          dst: |
+            public.ecr.aws/supabase/studio:${{ inputs.version }}
+            ghcr.io/supabase/studio:${{ inputs.version }}
