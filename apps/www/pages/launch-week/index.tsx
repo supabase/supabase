@@ -24,6 +24,19 @@ import Avatar from '~/components/Avatar'
 // check rss
 // change content storm content on hover/click
 // images on orbit
+const constellation = [
+  [10, 10],
+  [13, 27],
+  [50, 15],
+  [80, 28],
+  [8, 58],
+  [32, 38],
+  [30, 79],
+  [63, 75],
+  [82, 55],
+  [45, 62],
+  [20, 64],
+]
 
 export default function launchweek() {
   const { isDarkMode } = useTheme()
@@ -35,6 +48,8 @@ export default function launchweek() {
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
   const [session, setSession] = useState<Session | null>(null)
+  const [creators, setCreators] = useState<any>([])
+  const [activeCreator, setActiveCreator] = useState<any>(null)
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const defaultUserData = {
@@ -48,12 +63,39 @@ export default function launchweek() {
     supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
     })
+
+    getCreators()
   }, [])
 
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
   }, [isDarkMode])
 
+  async function getCreators() {
+    try {
+      // setLoading(true)
+      console.log('get data')
+      let supa = await supabase.from('lw6_creators').select()
+
+      let { data, error, status } = supa
+
+      if (error && status !== 406) {
+        throw error
+      }
+
+      if (data) {
+        console.log(supa)
+        setCreators(data)
+      }
+    } catch (error) {
+      // alert('Error loading user data!')
+      console.log(error)
+    } finally {
+      // setLoading(false)
+    }
+  }
+
+  console.log({ creators })
   return (
     <>
       <NextSeo
@@ -128,13 +170,36 @@ export default function launchweek() {
         </div>
         <SectionContainer className="flex gap-6 min-h-[350px] !py-3">
           <div
-            className={`flex-1 bg-[url('/images/launchweek/orbit.svg')] bg-contain bg-no-repeat ${styles.mask} grid grid-cols-5 bg-bottom`}
+            className={`flex-1 bg-[url('/images/launchweek/orbit.svg')] bg-contain bg-no-repeat  bg-bottom relative`} //grid grid-cols-5 grid-rows-5
           >
-            <Avatar img="shane-rice.png" caption="Shane" />
-            <Avatar img="shane-rice.png" caption="Shane" />
-            <Avatar img="shane-rice.png" caption="Shane" />
-            <Avatar img="shane-rice.png" caption="Shane" />
-            <Avatar img="shane-rice.png" caption="Shane" />
+            {creators.map((creator: any, index: number) => {
+              return (
+                <div
+                  className={`justify-self-center absolute`}
+                  onClick={() => {
+                    'wat'
+                  }}
+                  onMouseEnter={() => {
+                    console.log(creators[activeCreator])
+                    setActiveCreator(index)
+                  }}
+                  style={{
+                    top: `${constellation[index][0]}%`,
+                    left: `${constellation[index][1]}%`,
+                  }}
+                >
+                  <a href={creator.link} target="_blank">
+                    <div className="relative group">
+                      <div className="absolute -inset-0.5 bg-brand-600 rounded-full group-hover:blur-md"></div>
+                      <img
+                        className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
+                        src={creator.profile_picture}
+                      />
+                    </div>
+                  </a>
+                </div>
+              )
+            })}
           </div>
           <div className="flex-1">
             <Badge className="mb-6">Currently happening</Badge>
@@ -149,7 +214,9 @@ export default function launchweek() {
               </span>
             </p>
             <div className="lg:max-w-[50%]">
-              <h3 className="dark:text-white">Selected User PlaceHolder</h3>
+              <h3 className="dark:text-white">
+                {activeCreator !== null ? `${creators[activeCreator].first_name}` : 'Dummy tytle'}
+              </h3>
               <p className="dark:text-slate-900">
                 If needed this is a short description about the type of content this is linking to.
               </p>
