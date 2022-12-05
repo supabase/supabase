@@ -17,31 +17,30 @@ export const ApiBotsPage: NextPageWithLayout = () => {
   const { ref } = router.query
   const config = PRESET_CONFIG[Presets.AUTH]
   const hooks = hooksFactory(ref as string, config)
-  const [dailyActiveUsers, dailyActiveUsersHandlers] = hooks.dailyActiveUsers()
-  const [newUsers, newUsersHandlers] = hooks.newUsers()
+  const dailyActiveUsers = hooks.dailyActiveUsers()
+  const newUsers = hooks.newUsers()
   const { isLoading, Layout } = usePresetReport(
     [dailyActiveUsers, newUsers],
-    [dailyActiveUsersHandlers, newUsersHandlers]
   )
   return (
     <Layout title={config.title}>
       <div className="grid  lg:grid-cols-4">
         <ReportWidget
           isLoading={isLoading}
-          params={dailyActiveUsers.params}
+          params={dailyActiveUsers[0].params}
           className="col-span-4 col-start-1"
           title="Daily Active Users"
           description="The daily count of active authenticated users"
-          data={dailyActiveUsers.logData}
+          data={dailyActiveUsers[0].logData}
           renderer={renderDailyActiveUsers}
         />
         <ReportWidget
           isLoading={isLoading}
-          params={newUsers.params}
+          params={newUsers[0].params}
           className="col-span-4 col-start-1"
           title="Daily New Users"
           description="The daily count of new user signups"
-          data={newUsers.logData}
+          data={newUsers[0].logData}
           renderer={renderNewUsers}
         />
       </div>

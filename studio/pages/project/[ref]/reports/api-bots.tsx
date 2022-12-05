@@ -14,31 +14,30 @@ export const ApiBotsPage: NextPageWithLayout = () => {
   const { ref } = router.query
   const config = PRESET_CONFIG[Presets.API_BOTS]
   const hooks = hooksFactory(ref as string, config)
-  const [userAgents, userAgentsHandlers] = hooks.userAgents()
-  const [botScores, botScoresHandlers] = hooks.botScores()
+  const userAgents = hooks.userAgents()
+  const botScores = hooks.botScores()
   const { isLoading, Layout } = usePresetReport(
     [userAgents, botScores],
-    [userAgentsHandlers, botScoresHandlers]
   )
   return (
     <Layout title={config.title}>
       <div className="grid  lg:grid-cols-4">
         <ReportWidget
           isLoading={isLoading}
-          params={userAgents.params}
+          params={userAgents[0].params}
           className="col-span-4 col-start-1"
           title="Top User Agents"
           description="The types of user agents using the API and their organization source."
-          data={userAgents.logData}
+          data={userAgents[0].logData}
           renderer={renderUserAgents}
         />
         <ReportWidget
           isLoading={isLoading}
-          params={botScores.params}
+          params={botScores[0].params}
           className="col-span-4 col-start-1"
           title="Bot-like API Requests"
           description="Suspicious bot-like requests, as flagged by Cloudflare"
-          data={botScores.logData}
+          data={botScores[0].logData}
           renderer={renderBotScores}
         />
       </div>
