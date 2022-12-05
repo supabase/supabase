@@ -78,19 +78,12 @@ export default function DartReference(props) {
             <RefSubLayout.Details>
               <>
                 <header className={['mb-16'].join(' ')}>
-                  {shortText && (
-                    <>
-                      <p
-                        className="text-sm text-scale-1100"
-                        dangerouslySetInnerHTML={{ __html: shortText }}
-                      ></p>
-                    </>
-                  )}
+                  {shortText && <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>}
                 </header>
 
                 {item.description && (
                   <div className="prose">
-                    <p className="text-sm">{item.description}</p>
+                    <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
                   </div>
                 )}
                 {functionMarkdownContent && (
