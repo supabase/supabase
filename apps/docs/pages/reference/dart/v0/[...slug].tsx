@@ -15,8 +15,10 @@ import ReactMarkdown from 'react-markdown'
 import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-ignore
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
+
 // @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+import dartSpec from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
+
 // @ts-expect-error
 import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
 
@@ -25,32 +27,27 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-import { ComesFrom } from '~/components/ComesFrom'
 import Param from '~/components/Params'
 import Options from '~/components/Options'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 import OldLayout from '~/layouts/Default'
 
-export default function JSReference(props) {
+export default function DartReference(props) {
   const router = useRouter()
-
   const slug = router.query.slug[0]
 
-  const isNewDocs = process.env.NEXT_PUBLIC_NEW_DOCS === 'true'
-
-  // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
-  // find the #sign-up element and scroll to that
   useEffect(() => {
-    if (isNewDocs && document && slug !== 'start') {
-      document.querySelector(`#${slug}`).scrollIntoView()
+    if (document && slug !== 'start') {
+      // re-enable this when the new yaml shape file is moved into this branch
+      //document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
 
   /*
    * handle old ref pages
    */
-  if (!isNewDocs) {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
     return (
       // @ts-ignore
       <OldLayout meta={props.meta} toc={props.toc}>
@@ -61,7 +58,7 @@ export default function JSReference(props) {
 
   return (
     <RefSubLayout>
-      {jsSpec.functions.map((item, itemIndex) => {
+      {dartSpec.functions.map((item, itemIndex) => {
         const hasTsRef = item['$ref'] || null
         const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
         const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
@@ -113,7 +110,7 @@ export default function JSReference(props) {
                   {/* // parameters */}
                   {parameters && (
                     <div className="not-prose mt-12">
-                      <h5 className="mb-3 text-base text-scale-1200">Parameters</h5>
+                      <h5 className="mb-3 text-base">Parameters</h5>
                       <ul className="">
                         {parameters.map((param) => {
                           // grab override params from yaml file
@@ -127,7 +124,7 @@ export default function JSReference(props) {
                           const paramItem = overide?.length > 0 ? overide[0] : param
 
                           return (
-                            <Param {...paramItem}>
+                            <Param {...paramItem} key={paramItem.title}>
                               {paramItem.subContent && (
                                 <div className="mt-3">
                                   <Options>
@@ -148,12 +145,6 @@ export default function JSReference(props) {
               <RefSubLayout.Examples>
                 {item.examples && (
                   <>
-                    {' '}
-                    <ComesFrom
-                      className="mb-5"
-                      link="https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml"
-                      text="supabase_js_v2"
-                    />
                     <Tabs
                       defaultActiveId={item.examples[0].id}
                       size="small"
@@ -163,11 +154,11 @@ export default function JSReference(props) {
                       {item.examples &&
                         item.examples.map((example, exampleIndex) => {
                           const exampleString = `
-import { createClient } from '@supabase/supabase-js'
+          import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-`
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          `
                           const currentExampleId = example.id
                           const staticExample = item.examples[exampleIndex]
 
@@ -216,11 +207,6 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                               </CodeBlock>
                               {response && (
                                 <>
-                                  <ComesFrom
-                                    className="mb-5 mt-5"
-                                    link="https://github.com/supabase/supabase/pull/10095/files#diff-c514c66b77772b9e3d9a5403c136ee52dfeaaeacb1d8138ea85ce35ee64e5006"
-                                    text="examples.yml"
-                                  />
                                   <CodeBlock
                                     className="useless-code-block-class"
                                     language="json"
@@ -246,7 +232,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  const pages = jsSpec.functions.map((x) => x.id)
+  const pages = dartSpec.functions.map((x) => x.id)
 
   /**
    * Read all the markdown files that might have
@@ -269,6 +255,8 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
       const markdownExists = checkFileExists(pathName)
 
+      console.log(x, 'markdownExists', markdownExists)
+
       const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
       const { data, content } = matter(fileContents)
 
@@ -289,9 +277,9 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
   let slug
   if (params.slug.length > 1) {
-    slug = `docs/reference/javascript/${params.slug.join('/')}`
+    slug = `docs/reference/dart/${params.slug.join('/')}`
   } else {
-    slug = `docs/reference/javascript/${params.slug[0]}`
+    slug = `docs/reference/dart/${params.slug[0]}`
   }
 
   let doc = getDocsBySlug(slug)

@@ -5,6 +5,7 @@ interface ISectionContainer {
   id: string
   title?: string
   monoFont?: boolean
+  slug: string
 }
 
 type RefSubLayoutSubComponents = {
@@ -34,7 +35,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 const Section: FC<ISectionContainer> = (props) => {
   return (
     <article key={props.id} className="scroll-mt-24">
-      <StickyHeader id={props.id} title={props.title} monoFont={props.monoFont} />
+      <StickyHeader id={props.slug} title={props.title} monoFont={props.monoFont} />
       <div className="grid lg:grid-cols-2 ref-container gap-16">{props.children}</div>
     </article>
   )

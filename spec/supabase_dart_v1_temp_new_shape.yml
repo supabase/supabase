@@ -16,7 +16,7 @@ info:
       version: '0.0.1'
 
 functions:
-  - id: auth.signUp()
+  - id: sign-up
     title: 'signUp()'
     description: |
       Creates a new user.
@@ -30,7 +30,7 @@ functions:
           - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/settings), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
-      - id: sign-up.
+      - id: sign-up
         name: Sign up.
         isSpotlight: true
         code: |
@@ -42,13 +42,13 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-      - id: sign-up-with-third-party-providers.
+      - id: sign-up-with-third-party-providers
         name: Sign up with third-party providers.
         hideCodeBlock: true
         description: |
           If you are using Flutter, you can sign up with OAuth providers using the [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) method available on `supabase_flutter`.
 
-  - id: auth.signInWithPassword()
+  - id: sign-in-with-password
     title: 'signInWithPassword()'
     description: |
       Log in an existing user using email or phone number with password.
@@ -78,7 +78,7 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-  - id: auth.signInWithOtp()
+  - id: sign-in-with-otp
     title: 'signInWithOtp()'
     notes: |
       - Requires either an email or phone number.
@@ -87,7 +87,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
     examples:
-      - id: sign-in-with-email.
+      - id: sign-in-with-email
         name: Sign in with email.
         isSpotlight: true
         description: |
@@ -100,7 +100,7 @@ functions:
             emailRedirectTo: kIsWeb ? null : 'io.supabase.flutter://signin-callback/',
           );
           ```
-      - id: sign-in-with-sms-otp.
+      - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP.
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
@@ -109,7 +109,7 @@ functions:
             phone: '+13334445555',
           );
           ```
-  - id: auth.signInWithOAuth()
+  - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     description: |
       Signs the user in using third party OAuth providers.
@@ -124,7 +124,7 @@ functions:
           ```dart
           await supabase.auth.signInWithOAuth(Provider.github);
           ```
-      - id: with`redirectto`
+      - id: sign-in-using-a-third-party-provider-with-redirect
         name: With `redirectTo`
         description: |
           Specify the redirect link to bring back the user via deeplink.
@@ -136,7 +136,7 @@ functions:
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
-      - id: with-scopes
+      - id: sign-in-with-scopes
         name: With scopes
         description: |
           If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
@@ -153,7 +153,7 @@ functions:
           final Session? session = supabase.auth.currentSession;
           final String? oAuthToken = session?.providerToken;
           ```
-  - id: auth.signOut()
+  - id: sign-out
     title: 'signOut()'
     description: |
       Signs out the current user, if there is a logged in user.
@@ -167,7 +167,7 @@ functions:
           ```dart
           await supabase.auth.signOut();
           ```
-  - id: auth.verifyOtp()
+  - id: verify-otp
     title: 'verifyOtp()'
     notes: |
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
@@ -199,7 +199,7 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-  - id: auth.currentSession
+  - id: get-session
     title: 'currentSession'
     description: |
       Returns the session data, if there is an active session.
@@ -211,19 +211,18 @@ functions:
           ```dart
           final Session? session = supabase.auth.currentSession;
           ```
-  - id: auth.currentUser
+  - id: get-user
     title: 'currentUser'
     description: |
       Returns the user data, if there is a logged in user.
     examples:
-      - id: get-the-logged-in-user
-        name: Get the logged in user
+      - name: Get the logged in user
         isSpotlight: true
         code: |
           ```dart
           final User? user = supabase.auth.currentUser;
           ```
-  - id: auth.updateUser()
+  - id: update-user
     title: 'updateUser()'
     description: |
       Updates user data, if there is a logged in user.
@@ -257,7 +256,7 @@ functions:
           );
           final User? updatedUser = res.user;
           ```
-      - id: update-the-user's-metadata
+      - id: update-the-users-metadata
         name: Update the user's metadata
         isSpotlight: true
         code: |
@@ -269,7 +268,7 @@ functions:
           );
           final User? updatedUser = res.user;
           ```
-  - id: auth.onAuthStateChange()
+  - id: on-auth-state-change
     title: 'onAuthStateChange()'
     description: |
       Receive a notification every time an auth event happens.
@@ -286,7 +285,7 @@ functions:
             final Session? session = data.session;
           });
           ```
-      - id: listen-to-a-specific-event
+      - id: list-to-a-specific-event
         name: Listen to a specific event
         code: |
           ```dart
@@ -305,7 +304,7 @@ functions:
 
           authSubscription.cancel();
           ```
-  - id: auth.resetPasswordForEmail
+  - id: auth-reset-password-for-email
     title: 'resetPasswordForEmail()'
     description: |
       Sends a reset request to an email address.
@@ -319,18 +318,18 @@ functions:
       );
       ```
     examples:
-      - id: reset-password-for-flutter
+      - id: reset-password
         name: Reset password for Flutter
         isSpotlight: true
         code: |
-          `redirectTo` is used to open the app via deeplink when user opens the password reset email. 
+          `redirectTo` is used to open the app via deeplink when user opens the password reset email.
           ```dart
           await supabase.auth.resetPasswordForEmail(
             'sample@email.com',
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
-  - id: invoke()
+  - id: invoke
     title: 'invoke()'
     description: |
       Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
@@ -338,7 +337,7 @@ functions:
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
     examples:
-      - id: basic-invocation.
+      - id: basic-invocation
         name: Basic invocation.
         isSpotlight: true
         code: |
@@ -346,7 +345,7 @@ functions:
           final res = await supabase.functions.invoke('hello', body: {'foo': 'baa'});
           final data = res.data;
           ```
-      - id: specifying-response-type.
+      - id: specifying-response-type
         name: Specifying response type.
         description: |
           By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
@@ -360,7 +359,7 @@ functions:
           );
           final data = res.data;
           ```
-      - id: parsing-custom-headers.
+      - id: parsing-custom-headers
         name: Parsing custom headers.
         description: |
           Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
@@ -375,7 +374,7 @@ functions:
             },
           );
           ```
-  - id: select()
+  - id: select
     description: |
       Performs vertical filtering with SELECT.
     title: 'Fetch data: select()'
@@ -424,11 +423,11 @@ functions:
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
         description: |
-          Sometimes you will need to query the same foreign table twice. 
-          In this case, you can use the name of the joined column to identify 
-          which join you intend to use. For convenience, you can also give an 
-          alias for each column. For example, if we had a shop of products, 
-          and we wanted to get the supplier and the purchaser at the same time 
+          Sometimes you will need to query the same foreign table twice.
+          In this case, you can use the name of the joined column to identify
+          which join you intend to use. For convenience, you can also give an
+          alias for each column. For example, if we had a shop of products,
+          and we wanted to get the supplier and the purchaser at the same time
           (both in the users) table:
         code: |
           ```dart
@@ -440,7 +439,7 @@ functions:
       - id: filtering-with-inner-joins
         name: Filtering with inner joins
         description: |
-          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
+          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
         code: |
           ```dart
@@ -468,10 +467,10 @@ functions:
       - id: querying-json-data
         name: Querying JSON data
         description: |
-          If you have data inside of a JSONB column, you can apply select 
-          and query filters to the data values. Postgres offers a 
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
-          for querying JSON data. Also see 
+          If you have data inside of a JSONB column, you can apply select
+          and query filters to the data values. Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for querying JSON data. Also see
           [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         code: |
           ```dart
@@ -495,7 +494,7 @@ functions:
             .csv();
           ```
 
-  - id: insert()
+  - id: insert
     description: |
       Performs an INSERT into the table.
     title: 'Create data: insert()'
@@ -519,7 +518,7 @@ functions:
           ]);
           ```
 
-  - id: update()
+  - id: update
     description: |
       Performs an UPDATE on the table.
     title: 'Modify data: update()'
@@ -539,9 +538,9 @@ functions:
       - id: updating-json-data
         name: Updating JSON data
         description: |
-          Postgres offers a 
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
-          for working with JSON data. Right now it is only possible to update an entire JSON document, 
+          Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for working with JSON data. Right now it is only possible to update an entire JSON document,
           but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
         code: |
           ```dart
@@ -556,12 +555,12 @@ functions:
             .eq('address->postcode', 90210);
           ```
 
-  - id: upsert()
+  - id: upsert
     description: |
       Performs an UPSERT into the table.
     title: 'Upsert data: upsert()'
     notes: |
-      - Primary keys should be included in the data payload in order for an update to work correctly. 
+      - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
     examples:
       - id: upsert-your-data
@@ -576,8 +575,8 @@ functions:
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
         description: |
-          Running the following will cause supabase to upsert data into the `users` table. 
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row 
+          Running the following will cause supabase to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
           based on the column passed into `onConflict`.
         isSpotlight: true
         code: |
@@ -601,7 +600,7 @@ functions:
           final count = res.count;
           ```
 
-  - id: delete()
+  - id: delete
     description: |
       Performs a DELETE on the table.
     title: 'Delete data: delete()'
@@ -619,7 +618,7 @@ functions:
             .match({ 'id': 666 });
           ```
 
-  - id: rpc()
+  - id: rpc
     title: 'Stored Procedures: rpc()'
     description: |
       You can call stored procedures as a "Remote Procedure Call".
@@ -644,7 +643,7 @@ functions:
             .rpc('echo_city', params: { 'name': 'The Shire' });
           ```
 
-  - id: subscribe()
+  - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
@@ -692,8 +691,8 @@ functions:
       - id: listening-to-updates
         name: Listening to updates
         description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can 
-          enable full replication for the table you are listening too: 
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening too:
 
           ```sql
           alter table "your_table" replica identity full;
@@ -711,8 +710,8 @@ functions:
       - id: listening-to-deletes
         name: Listening to deletes
         description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can 
-          enable full replication for the table you are listening too: 
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
 
           ```sql
           alter table "your_table" replica identity full;
@@ -759,14 +758,14 @@ functions:
           }).subscribe();
           ```
 
-  - id: removeChannel()
+  - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
     title: 'removeChannel()'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - id: remove-a-channel
+      - id: removes-a-channel
         name: Remove a channel
         isSpotlight: true
         code: |
@@ -774,7 +773,7 @@ functions:
           final status = await supabase.removeChannel(channel);
           ```
 
-  - id: removeAllChannels()
+  - id: remove-all-channels
     description: |
       Unsubscribes and removes all Realtime channels from Realtime client.
     title: 'removeAllChannels()'
@@ -789,7 +788,7 @@ functions:
           final statuses = await supabase.removeAllChannels();
           ```
 
-  - id: getChannels()
+  - id: get-channels
     description: |
       Returns all Realtime channels.
     title: 'getChannels()'
@@ -802,7 +801,7 @@ functions:
           final channels = supabase.getChannels();
           ```
 
-  - id: stream()
+  - id: stream
     description: |
       Notifies of data at the queried table.
     title: 'stream()'
@@ -835,7 +834,7 @@ functions:
             // Do something awesome with the data
           });
           ```
-      - id: with`order()`
+      - id: with-order
         name: With `order()`
         code: |
           ```dart
@@ -846,7 +845,7 @@ functions:
             // Do something awesome with the data
           });
           ```
-      - id: with`limit()`
+      - id: with-limit
         name: With `limit()`
         code: |
           ```dart
@@ -858,7 +857,7 @@ functions:
             // Do something awesome with the data
           });
           ```
-      - id: using`stream()`with`streambuilder`
+      - id: using-stream-with-stream-builder
         name: Using `stream()` with `StreamBuilder`
         description: |
           When using `stream()` with a `StreamBuilder` within your Flutter application, make sure to store your stream in a variable to prevent refetching upon rebuilding.
@@ -889,14 +888,14 @@ functions:
           }
           ```
 
-  - id: storage.listBuckets()
+  - id: list-buckets
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `select` 
+        - `buckets` permissions: `select`
         - `objects` permissions: none
     examples:
       - id: list-buckets
@@ -909,14 +908,14 @@ functions:
             .listBuckets();
           ```
 
-  - id: storage.getBucket()
+  - id: get-bucket
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `select` 
+        - `buckets` permissions: `select`
         - `objects` permissions: none
     examples:
       - id: get-bucket
@@ -929,13 +928,13 @@ functions:
             .getBucket('avatars');
           ```
 
-  - id: storage.createBucket()
+  - id: create-bucket
     description: |
       Creates a new Storage bucket
     title: 'createBucket()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `insert` 
+        - `buckets` permissions: `insert`
         - `objects` permissions: none
     examples:
       - id: create-bucket
@@ -948,13 +947,13 @@ functions:
             .createBucket('avatars');
           ```
 
-  - id: storage.emptyBucket()
+  - id: empty-bucket
     description: |
       Removes all objects inside a single bucket.
     title: 'emptyBucket()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `select` 
+        - `buckets` permissions: `select`
         - `objects` permissions: `select` and `delete`
     examples:
       - id: empty-bucket
@@ -966,7 +965,7 @@ functions:
             .storage
             .emptyBucket('avatars');
           ```
-  - id: storage.updateBucket()
+  - id: update-bucket
     description: |
       Updates a new Storage bucket
     title: 'updateBucket()'
@@ -985,7 +984,7 @@ functions:
             .updateBucket('avatars', const BucketOptions(public: false));
           ```
 
-  - id: storage.deleteBucket()
+  - id: delete-bucket
     description: |
       Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
     title: 'deleteBucket()'
@@ -1004,14 +1003,14 @@ functions:
             .deleteBucket('avatars');
           ```
 
-  - id: storage.from.upload()
+  - id: from-upload
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `insert`
     examples:
       - id: upload-file
@@ -1027,13 +1026,13 @@ functions:
               );
           ```
 
-  - id: storage.from.update()
+  - id: from-update
     description: |
       Replaces an existing file at the specified path with a new one.
     title: 'from.update()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `update` and `select`
     examples:
       - id: update-file
@@ -1049,13 +1048,13 @@ functions:
               );
           ```
 
-  - id: storage.from.move()
+  - id: from-move
     description: |
       Moves an existing file, optionally renaming it at the same time.
     title: 'from.move()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `update` and `select`
     examples:
       - id: move-file
@@ -1069,13 +1068,13 @@ functions:
             .move('public/avatar1.png', 'private/avatar2.png');
           ```
 
-  - id: storage.from.createSignedUrl()
+  - id: from-create-signed-url
     description: |
       Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
     title: 'from.createSignedUrl()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `select`
     examples:
       - id: create-signed-url
@@ -1089,14 +1088,14 @@ functions:
               .createSignedUrl('avatar1.png', 60);
           ```
 
-  - id: storage.from.getPublicUrl()
+  - id: from-get-public-url
     description: |
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: none
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
@@ -1110,13 +1109,13 @@ functions:
               .getPublicUrl('avatar1.png');
           ```
 
-  - id: storage.from.download()
+  - id: from-download
     description: |
       Downloads a file.
     title: 'from.download()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `select`
     examples:
       - id: download-file
@@ -1130,13 +1129,13 @@ functions:
             .download('avatar1.png');
           ```
 
-  - id: storage.from.remove()
+  - id: from-remove
     description: |
       Deletes files within the same bucket
     title: 'from.remove()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `delete` and `select`
     examples:
       - id: delete-file
@@ -1150,13 +1149,13 @@ functions:
             .remove(['avatar1.png']);
           ```
 
-  - id: storage.from.list()
+  - id: from-list
     description: |
       Lists all the files within a bucket.
     title: 'from.list()'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `select`
     examples:
       - id: list-files-in-a-bucket
@@ -1169,7 +1168,7 @@ functions:
             .from('avatars')
             .list();
           ```
-  - id: Using Modifiers
+  - id: using-modifiers
     title: Using Modifiers
     description: |
       Filters work on the row level—they allow you to return rows that
@@ -1181,11 +1180,12 @@ functions:
       queries that return rows (e.g., `select()` or `rpc()` on a function that
       returns a table response).
 
-  - id: limit()
+  - id: limit
+    title: limit()
     description: |
       Limits the result with the specified count.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1206,11 +1206,12 @@ functions:
             .limit(1,  foreignTable: 'cities' );
           ```
 
-  - id: order()
+  - id: order
+    title: order()
     description: |
       Orders the result with the specified column.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1231,11 +1232,12 @@ functions:
             .order('name', foreignTable: 'cities');
           ```
 
-  - id: range()
+  - id: range
+    title: range()
     description: |
       Limits the result to rows within the specified range, inclusive.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1246,11 +1248,12 @@ functions:
             .range(0,3);
           ```
 
-  - id: single()
+  - id: single
+    title: single()
     description: |
       Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1261,12 +1264,12 @@ functions:
             .single();
           ```
 
-  - id: Using Filters
+  - id: using-filters
     title: Using Filters
     description: |
       Filters allow you to only return rows that match certain conditions.
 
-      Filters can be used on `select()`, `update()`, and `delete()` queries. 
+      Filters can be used on `select()`, `update()`, and `delete()` queries.
 
       If a Database function returns a table response, you can also apply filters.
 
@@ -1441,7 +1444,8 @@ functions:
       </TabItem>
       </Tabs>
 
-  - id: .or()
+  - id: or
+    title: or()
     description: |
       Finds all rows satisfying at least one of the filters.
     notes: |
@@ -1453,7 +1457,7 @@ functions:
         .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
         ```
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1463,7 +1467,7 @@ functions:
             .select('name, country_id')
             .or('id.eq.20,id.eq.30');
           ```
-      - id: use`or`with`and`
+      - id: use-or-with-and
         name: Use `or` with `and`
         code: |
           ```dart
@@ -1473,7 +1477,8 @@ functions:
             .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
           ```
 
-  - id: .not()
+  - id: not
+    title: not()
     description: |
       Finds all rows which doesn't satisfy the filter.
     notes: |
@@ -1487,7 +1492,7 @@ functions:
         .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
         ```
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1497,7 +1502,7 @@ functions:
             .select('name, country_id')
             .not('name', 'eq', 'Paris');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1506,7 +1511,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .not('name', 'eq', 'Paris');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1515,7 +1520,7 @@ functions:
             .delete()
             .not('name', 'eq', 'Paris');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1525,11 +1530,12 @@ functions:
             .not('name', 'eq', 'Paris');
           ```
 
-  - id: .match()
+  - id: match
+    title: match()
     description: |
       Finds all rows whose columns match the specified `query` object.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1539,7 +1545,7 @@ functions:
             .select('name, country_id')
             .match({'name': 'Beijing', 'country_id': 156});
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1548,7 +1554,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .match({'name': 'Beijing', 'country_id': 156});
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1557,7 +1563,7 @@ functions:
             .delete()
             .match({'name': 'Beijing', 'country_id': 156});
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1567,11 +1573,12 @@ functions:
             .match({'name': 'Beijing', 'country_id': 156});
           ```
 
-  - id: .eq()
+  - id: eq
+    title: eq()
     description: |
       Finds all rows whose value on the stated `column` exactly matches the specified `value`.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1581,7 +1588,7 @@ functions:
             .select('name, country_id')
             .eq('name', 'The shire');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1590,7 +1597,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .eq('name', 'San Francisco');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1599,7 +1606,7 @@ functions:
             .delete()
             .eq('name', 'Mordor');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1609,11 +1616,12 @@ functions:
             .eq('name', 'San Francisco');
           ```
 
-  - id: .neq()
+  - id: neq
+    title: neq()
     description: |
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1623,7 +1631,7 @@ functions:
             .select('name, country_id')
             .neq('name', 'The shire');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1632,7 +1640,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .neq('name', 'San Francisco');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1641,7 +1649,7 @@ functions:
             .delete()
             .neq('name', 'Mordor');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1651,11 +1659,12 @@ functions:
             .neq('name', 'Lagos');
           ```
 
-  - id: .gt()
+  - id: gt
+    title: gt()
     description: |
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1665,7 +1674,7 @@ functions:
             .select('name, country_id')
             .gt('country_id', 250);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1674,7 +1683,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .gt('country_id', 250);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1683,7 +1692,7 @@ functions:
             .delete()
             .gt('country_id', 250);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1693,11 +1702,12 @@ functions:
             .gt('country_id', 250);
           ```
 
-  - id: .gte()
+  - id: gte
+    title: gte()
     description: |
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1707,7 +1717,7 @@ functions:
             .select('name, country_id')
             .gte('country_id', 250);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1716,7 +1726,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .gte('country_id', 250);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1725,7 +1735,7 @@ functions:
             .delete()
             .gte('country_id', 250);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1735,11 +1745,12 @@ functions:
             .gte('country_id', 250);
           ```
 
-  - id: .lt()
+  - id: lt
+    title: lt()
     description: |
       Finds all rows whose value on the stated `column` is less than the specified `value`.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1749,7 +1760,7 @@ functions:
             .select('name, country_id')
             .lt('country_id', 250);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1758,7 +1769,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .lt('country_id', 250);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1767,7 +1778,7 @@ functions:
             .delete()
             .lt('country_id', 250);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1777,12 +1788,13 @@ functions:
             .lt('country_id', 250);
           ```
 
-  - id: .lte()
+  - id: lte
+    title: lte()
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1792,7 +1804,7 @@ functions:
             .select('name, country_id')
             .lte('country_id', 250);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1801,7 +1813,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .lte('country_id', 250);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1810,7 +1822,7 @@ functions:
             .delete()
             .lte('country_id', 250);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1820,12 +1832,13 @@ functions:
             .lte('country_id', 250);
           ```
 
-  - id: .like()
+  - id: like
+    title: like()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1835,7 +1848,7 @@ functions:
             .select('name, country_id')
             .like('name', '%la%');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1844,7 +1857,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .like('name', '%la%');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1853,7 +1866,7 @@ functions:
             .delete()
             .like('name', '%la%');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1863,11 +1876,12 @@ functions:
             .like('name', '%la%');
           ```
 
-  - id: .ilike()
+  - id: ilike
+    title: ilike()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1877,7 +1891,7 @@ functions:
             .select('name, country_id')
             .ilike('name', '%la%');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1886,7 +1900,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .ilike('name', '%la%');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1895,7 +1909,7 @@ functions:
             .delete()
             .ilike('name', '%la%');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1905,13 +1919,14 @@ functions:
             .ilike('name', '%la%');
           ```
 
-  - id: .is_()
+  - id: is
+    title: is_()
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
 
       `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1921,7 +1936,7 @@ functions:
             .select('name, country_id')
             .is_('name', null);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1930,7 +1945,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .is_('name', null);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1939,7 +1954,7 @@ functions:
             .delete()
             .is_('name', null);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1949,13 +1964,14 @@ functions:
             .is_('name', null);
           ```
 
-  - id: .in_()
+  - id: in
+    title: in_()
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
 
       `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -1965,7 +1981,7 @@ functions:
             .select('name, country_id')
             .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -1974,7 +1990,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -1983,7 +1999,7 @@ functions:
             .delete()
             .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -1993,9 +2009,10 @@ functions:
             .in_('name', ['Rio de Janeiro', 'San Francisco']);
           ```
 
-  - id: .contains()
+  - id: contains
+    title: contains()
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2005,7 +2022,7 @@ functions:
             .select('name, id, main_exports')
             .contains('main_exports', ['oil']);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2014,7 +2031,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .contains('main_exports', ['oil']);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2023,7 +2040,7 @@ functions:
             .delete()
             .contains('main_exports', ['oil']);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2033,9 +2050,10 @@ functions:
             .contains('main_exports', ['oil']);
           ```
 
-  - id: .containedBy()
+  - id: contained-by
+    title: containedBy()
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2045,7 +2063,7 @@ functions:
             .select('name, id, main_exports')
             .containedBy('main_exports', ['cars', 'food', 'machine']);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2054,7 +2072,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .containedBy('main_exports', ['orks', 'surveillance', 'evil']);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2063,7 +2081,7 @@ functions:
             .delete()
             .containedBy('main_exports', ['cars', 'food', 'machine']);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2073,9 +2091,10 @@ functions:
             .containedBy('main_exports', ['cars', 'food', 'machine']);
           ```
 
-  - id: .rangeLt()
+  - id: range-lt
+    title: rangeLt()
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2085,7 +2104,7 @@ functions:
             .select('name, id, population_range_millions')
             .rangeLt('population_range_millions', '[150, 250]');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2094,7 +2113,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .rangeLt('population_range_millions', '[150, 250]');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2103,7 +2122,7 @@ functions:
             .delete()
             .rangeLt('population_range_millions', '[150, 250]');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2113,9 +2132,10 @@ functions:
             .rangeLt('population_range_millions', '[150, 250]');
           ```
 
-  - id: .rangeGt()
+  - id: range-gt
+    title: rangeGt()
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2125,7 +2145,7 @@ functions:
             .select('name, id, population_range_millions')
             .rangeGt('population_range_millions', '[150, 250]');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2134,7 +2154,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .rangeGt('population_range_millions', '[150, 250]');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2143,7 +2163,7 @@ functions:
             .delete()
             .rangeGt('population_range_millions', '[150, 250]');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2153,9 +2173,10 @@ functions:
             .rangeGt('population_range_millions', '[150, 250]');
           ```
 
-  - id: .rangeGte()
+  - id: range-gte
+    title: rangeGte()
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2165,7 +2186,7 @@ functions:
             .select('name, id, population_range_millions')
             .rangeGte('population_range_millions', '[150, 250]');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2174,7 +2195,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .rangeGte('population_range_millions', '[150, 250]');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2183,7 +2204,7 @@ functions:
             .delete()
             .rangeGte('population_range_millions', '[150, 250]');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2193,10 +2214,11 @@ functions:
             .rangeGte('population_range_millions', '[150, 250]');
           ```
 
-  - id: .rangeLte()
+  - id: range-lte
+    title: rangeLte()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2206,7 +2228,7 @@ functions:
             .select('name, id, population_range_millions')
             .rangeLte('population_range_millions', '[150, 250]');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2215,7 +2237,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .rangeLte('population_range_millions', '[150, 250]');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2224,7 +2246,7 @@ functions:
             .delete()
             .rangeLte('population_range_millions', '[150, 250]');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2234,9 +2256,10 @@ functions:
             .rangeLte('population_range_millions', [150, 250]);
           ```
 
-  - id: .rangeAdjacent()
+  - id: range-adjacent
+    title: rangeAdjacent()
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2246,7 +2269,7 @@ functions:
             .select('name, id, population_range_millions')
             .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2255,7 +2278,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2264,7 +2287,7 @@ functions:
             .delete()
             .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2274,9 +2297,10 @@ functions:
             .rangeAdjacent('population_range_millions', '[70, 185]');
           ```
 
-  - id: .overlaps()
+  - id: overlaps
+    title: overlaps()
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2286,7 +2310,7 @@ functions:
             .select('name, id, main_exports')
             .overlaps('main_exports', ['computers', 'minerals']);
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2295,7 +2319,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .overlaps('main_exports', ['computers', 'minerals']);
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2304,7 +2328,7 @@ functions:
             .delete()
             .overlaps('main_exports', ['computers', 'minerals']);
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
@@ -2314,7 +2338,8 @@ functions:
             .overlaps('main_exports', ['computers', 'minerals']);
           ```
 
-  - id: .textSearch()
+  - id: text-search
+    title: textSearch()
     description: |
       Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
     examples:
@@ -2325,8 +2350,8 @@ functions:
           final data = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', "'fat' & 'cat'", 
-              config: 'english' 
+            .textSearch('catchphrase', "'fat' & 'cat'",
+              config: 'english'
             );
           ```
       - id: basic-normalization
@@ -2337,9 +2362,9 @@ functions:
           final data = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', "'fat' & 'cat'",  
+            .textSearch('catchphrase', "'fat' & 'cat'",
               type: TextSearchType.plain,
-              config: 'english' 
+              config: 'english'
             );
           ```
       - id: full-normalization
@@ -2350,16 +2375,16 @@ functions:
           final data = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', "'fat' & 'cat'",  
+            .textSearch('catchphrase', "'fat' & 'cat'",
               type: TextSearchType.phrase,
-              config: 'english' 
+              config: 'english'
             );
           ```
-      - id: full-normalization
-        name: Full normalization
+      - id: web-search
+        name: Websearch
         description: |
-          Uses PostgreSQL's `websearch_to_tsquery` function. 
-          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 
+          Uses PostgreSQL's `websearch_to_tsquery` function.
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
@@ -2372,13 +2397,14 @@ functions:
           final data = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', "'fat or cat'",  
+            .textSearch('catchphrase', "'fat or cat'",
               type: TextSearchType.websearch,
               config: 'english'
             );
           ```
 
-  - id: .filter()
+  - id: filter
+    title: filter()
     description: |
       Finds all rows whose `column` satisfies the filter.
     notes: |
@@ -2390,7 +2416,7 @@ functions:
           .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
         ```
     examples:
-      - id: with`select()`
+      - id: with-select
         name: With `select()`
         isSpotlight: true
         code: |
@@ -2400,7 +2426,7 @@ functions:
             .select('name, country_id')
             .filter('name', 'in', '("Paris","Tokyo")');
           ```
-      - id: with`update()`
+      - id: with-update
         name: With `update()`
         code: |
           ```dart
@@ -2409,7 +2435,7 @@ functions:
             .update({ 'name': 'Mordor' })
             .filter('name', 'in', '("Paris","Tokyo")');
           ```
-      - id: with`delete()`
+      - id: with-delete
         name: With `delete()`
         code: |
           ```dart
@@ -2418,7 +2444,7 @@ functions:
             .delete()
             .filter('name', 'in', '("Paris","Tokyo")');
           ```
-      - id: with`rpc()`
+      - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
