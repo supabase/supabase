@@ -1,18 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'postgres-cdc',
-  title: 'Postgres CDC',
-  description: "Getting started with Realtime's Postgres CDC feature",
+  id: 'postgres-changes',
+  title: 'Postgres Changes',
+  description: "Getting started with Realtime's Postgres Changes feature",
 }
 
-Realtime's Postgres Change Data Capture (CDC) feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
+Realtime's Postgres Changes feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
 
 Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/auth/row-level-security) enabled and policies in place.
 
 Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table. Your clients should only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to.
 
-Postgres CDC works out of the box for tables in the `public` schema. You can listen to tables in your private schemas by granting table `SELECT` permissions to the database role found in your access token. You can run a query similar to the following:
+Postgres Changes works out of the box for tables in the `public` schema. You can listen to tables in your private schemas by granting table `SELECT` permissions to the database role found in your access token. You can run a query similar to the following:
 
 ```sql
 GRANT SELECT ON "private_schema"."table" TO authenticated;
