@@ -1641,7 +1641,7 @@ functions:
             .single()
           ```
 
-  - id: maybeSingle
+  - id: maybe-single
     title: maybeSingle()
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.maybeSingle'
     examples:

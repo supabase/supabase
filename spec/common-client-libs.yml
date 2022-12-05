@@ -244,6 +244,21 @@ functions:
     slug: auth-signup
     product: 'auth'
 
+  - id: sign-in
+    title: Sign in
+    slug: auth-signin
+    product: 'auth'
+
+  - id: set-auth
+    title: setAuth()
+    slug: auth-setauth
+    product: 'auth'
+
+  - id: send-mobile-otp
+    title: sendMobileOTP()
+    slug: auth-api-sendmobileotp
+    product: 'auth'
+
   - id: sign-in-with-password
     title: Sign in with password
     slug: auth-signinwithpassword
@@ -357,6 +372,21 @@ functions:
   - id: subscribe
     title: on().subscribe()
     slug: subscribe
+    product: 'realtime'
+
+  - id: remove-subscription
+    title: removeSubscription()
+    slug: removesubscription
+    product: 'realtime'
+
+  - id: remove-all-subscriptions
+    title: removeallsubscriptions()
+    slug: removeallsubscriptions
+    product: 'realtime'
+
+  - id: get-subscriptions
+    title: getSubscriptions()
+    slug: getsubscriptions
     product: 'realtime'
 
   - id: get-channels
