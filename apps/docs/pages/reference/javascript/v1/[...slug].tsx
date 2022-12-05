@@ -12,11 +12,11 @@ import { getAllDocs, getDocsBySlug } from '~/lib/docs'
 import ReactMarkdown from 'react-markdown'
 
 // @ts-ignore
-import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
+import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
 // @ts-ignore
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v1_temp_new_shape--reduced.yml' assert { type: 'yml' }
+import jsSpec from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
 // @ts-expect-error
 import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
 
@@ -42,15 +42,15 @@ export default function JSReference(props) {
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
-    if (document && slug !== 'start') {
-      // document.querySelector(`#${slug}`).scrollIntoView()
+    if (isNewDocs && document && slug !== 'start') {
+      document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
 
   /*
    * handle old ref pages
    */
-  if (isNewDocs) {
+  if (!isNewDocs) {
     return (
       // @ts-ignore
       <OldLayout meta={props.meta} toc={props.toc}>
@@ -163,11 +163,11 @@ export default function JSReference(props) {
                       {item.examples &&
                         item.examples.map((example, exampleIndex) => {
                           const exampleString = `
-import { createClient } from '@supabase/supabase-js'
+        import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-`
+        // Create a single supabase client for interacting with your database
+        const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+        `
                           const currentExampleId = example.id
                           const staticExample = item.examples[exampleIndex]
 

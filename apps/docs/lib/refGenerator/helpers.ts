@@ -50,7 +50,8 @@ function recurseThroughParams(paramDefinition: any) {
   } else if (param.type?.type === 'intrinsic') {
     // primitive types
     if (!['string', 'number', 'boolean', 'object', 'unknown'].includes(param.type?.name)) {
-      throw new Error('unexpected intrinsic type')
+      // skip for now
+      //throw new Error('unexpected intrinsic type')
     }
   } else if (param.type?.dereferenced) {
     const dereferenced = param.type.dereferenced
@@ -91,7 +92,8 @@ function recurseThroughParams(paramDefinition: any) {
   } else if (param.type?.type === 'array') {
     // skip: no use for it for now
   } else {
-    throw new Error('unexpected param type')
+    // skip: no use for now
+    //throw new Error(`unexpected param type`)
   }
 
   if (children) {
