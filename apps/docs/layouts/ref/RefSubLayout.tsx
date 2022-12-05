@@ -1,5 +1,6 @@
 import { useInView } from 'react-intersection-observer'
 import { FC } from 'react'
+import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 
 interface ISectionContainer {
   id: string
@@ -34,7 +35,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 
 const Section: FC<ISectionContainer> = (props) => {
   return (
-    <article key={props.id} className="scroll-mt-24">
+    <article key={props.id}>
       <StickyHeader id={props.slug} title={props.title} monoFont={props.monoFont} />
       <div className="grid lg:grid-cols-2 ref-container gap-16">{props.children}</div>
     </article>
@@ -46,7 +47,10 @@ const StickyHeader: FC<StickyHeader> = (props) => {
     threshold: 1,
     rootMargin: '30% 0% -35% 0px',
     onChange: (inView, entry) => {
-      if (inView && window) window.history.pushState(null, '', entry.target.id)
+      if (inView && window) {
+        window.history.pushState(null, '', entry.target.id)
+        highlightSelectedNavItem(entry.target.id)
+      }
     },
   })
 
@@ -54,9 +58,10 @@ const StickyHeader: FC<StickyHeader> = (props) => {
     <h2
       ref={ref}
       id={props.id}
-      className={['text-xl font-medium text-scale-1200 mb-8 ', props.monoFont && 'font-mono'].join(
-        ' '
-      )}
+      className={[
+        'text-xl font-medium text-scale-1200 mb-8 scroll-mt-24',
+        props.monoFont && 'font-mono',
+      ].join(' ')}
     >
       {props.title && <span className="max-w-xl">{props.title}</span>}
     </h2>

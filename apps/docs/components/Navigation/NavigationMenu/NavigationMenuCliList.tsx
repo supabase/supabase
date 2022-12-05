@@ -37,7 +37,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
     icon?: string
   }) => {
     return (
-      <li key={id}>
+      <li key={id} className="function-link-item text-scale-1000">
         <Link href={`#${id}`} passHref>
           <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
             {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
@@ -52,8 +52,8 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
     return (
       <span
         className="
-    font-mono text-xs uppercase 
-    text-scale-1200 font-medium 
+    font-mono text-xs uppercase
+    text-scale-1200 font-medium
     tracking-wider
     mb-3
     "
@@ -138,7 +138,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
             {menu.title ?? currentLevel}
           </h2>
         </div>
-        <ul>
+        <ul className="function-link-list">
           {MenuSections.map((section) => {
             return (
               <>
