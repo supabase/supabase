@@ -42,10 +42,7 @@ const ResetDbPassword: FC<any> = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
 
-  const enablePermissions = useFlag('enablePermissions')
-  const canResetDbPassword = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'projects')
-    : ui.selectedOrganization?.is_owner
+  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
