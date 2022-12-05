@@ -207,25 +207,28 @@ const SideNav = () => {
         <ul className="relative w-full flex flex-col gap-5">
           {home.map((section, sectionIndex) => {
             return (
-              <>
+              <div key={`section-${sectionIndex}`}>
                 {sectionIndex !== 0 && (
                   <div
                     className="h-px w-full bg-green-500"
                     key={`section-${sectionIndex}-border`}
                   ></div>
                 )}
-                <div className="flex flex-col gap-3" key={`section-${sectionIndex}`}>
+                <div className="flex flex-col gap-3">
                   {section.map((link) => {
                     if (!link.href) {
                       return (
-                        <span className="font-mono uppercase text-xs text-scale-900">
+                        <span
+                          key={link.label}
+                          className="font-mono uppercase text-xs text-scale-900"
+                        >
                           {link.label}
                         </span>
                       )
                     } else {
                       return (
-                        <Link href={link.href} passHref>
-                          <a key={link.label}>
+                        <Link href={link.href} passHref key={link.label}>
+                          <a>
                             <li
                               className={[
                                 'group flex items-center gap-3',
@@ -253,7 +256,7 @@ const SideNav = () => {
                     }
                   })}
                 </div>
-              </>
+              </div>
             )
           })}
         </ul>

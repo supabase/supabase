@@ -80,10 +80,11 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
             // console.log('1st type of link?', x.items && x.items.length > 0)
             // console.log()
             return (
-              <div key={x.name}>
+              <div key={x.url}>
                 {x.items && x.items.length > 0 ? (
-                  <>
+                  <div>
                     {x.items.map((subItem, subItemIndex) => {
+                      // console.log('subitem', { subItem })
                       // console.log('router', router)
                       //console.log('subitem url', subItem.url)
                       let subItemMenuOpen = false
@@ -144,7 +145,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                         </>
                       )
                     })}
-                  </>
+                  </div>
                 ) : (
                   <>
                     <li>
