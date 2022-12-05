@@ -37,18 +37,20 @@ export default function JSReference(props) {
 
   const slug = router.query.slug[0]
 
+  const isNewDocs = process.env.NEXT_PUBLIC_NEW_DOCS === 'true'
+
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
-    if (document && slug !== 'start') {
-      document.querySelector(`#${slug}`).scrollIntoView()
+    if (isNewDocs && document && slug !== 'start') {
+      document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
 
   /*
    * handle old ref pages
    */
-  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+  if (!isNewDocs) {
     return (
       // @ts-ignore
       <OldLayout meta={props.meta} toc={props.toc}>
@@ -292,13 +294,12 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
     slug = `docs/reference/javascript/${params.slug[0]}`
   }
 
-  let doc = getDocsBySlug(slug)
-  const content = await serialize(doc.content || '')
-
   /*
    * handle old ref pages
    */
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
+    let doc = getDocsBySlug(slug)
+    const content = await serialize(doc.content || '')
     return {
       props: {
         /*
