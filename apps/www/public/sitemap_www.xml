@@ -49,12 +49,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/blog/</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -104,6 +98,12 @@
 
   <url>
     <loc>https://supabase.com/nextjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
