@@ -13,7 +13,17 @@ import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import { SITE_ORIGIN } from '~/lib/constants'
 
+import styles from './launchWeek.module.css'
+
 const days = _days as WeekDayProps[]
+
+import { Badge } from '~/../../packages/ui'
+import Avatar from '~/components/Avatar'
+
+// TODO
+// check rss
+// change content storm content on hover/click
+// images on orbit
 
 export default function launchweek() {
   const { isDarkMode } = useTheme()
@@ -116,6 +126,41 @@ export default function launchweek() {
             )}
           ></div>
         </div>
+        <SectionContainer className="flex gap-6 min-h-[350px] !py-3">
+          <div
+            className={`flex-1 bg-[url('/images/launchweek/orbit.svg')] bg-contain bg-no-repeat ${styles.mask} grid grid-cols-5 bg-bottom`}
+          >
+            <Avatar img="shane-rice.png" caption="Shane" />
+            <Avatar img="shane-rice.png" caption="Shane" />
+            <Avatar img="shane-rice.png" caption="Shane" />
+            <Avatar img="shane-rice.png" caption="Shane" />
+            <Avatar img="shane-rice.png" caption="Shane" />
+          </div>
+          <div className="flex-1">
+            <Badge className="mb-6">Currently happening</Badge>
+            <h2 className="text-5xl dark:text-white mb-6">See creators using Supabase</h2>
+            <p className="text-slate-900 max-w-[80%] mb-16">
+              Description about Content Storm, something to tie it up with Launch Week. To find
+              learn more info about creators check our{' '}
+              <span className="text-brand-900">
+                <a rel="noopener" target="_blank" href="/blog">
+                  blog post.
+                </a>
+              </span>
+            </p>
+            <div className="lg:max-w-[50%]">
+              <h3 className="dark:text-white">Selected User PlaceHolder</h3>
+              <p className="dark:text-slate-900">
+                If needed this is a short description about the type of content this is linking to.
+              </p>
+              <p className="text-brand-900">
+                <a rel="noopener" target="_blank" href="/blog">
+                  Livestreaming Now
+                </a>
+              </p>
+            </div>
+          </div>
+        </SectionContainer>
       </DefaultLayout>
     </>
   )
