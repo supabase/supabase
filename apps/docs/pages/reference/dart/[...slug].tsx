@@ -67,7 +67,6 @@ export default function DartReference(props) {
         const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
 
         return (
-          <>
             <RefSubLayout.Section
               key={item.id}
               title={
@@ -154,11 +153,11 @@ export default function DartReference(props) {
                       {item.examples &&
                         item.examples.map((example, exampleIndex) => {
                           const exampleString = `
-import { createClient } from '@supabase/supabase-js'
+          import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-`
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          `
                           const currentExampleId = example.id
                           const staticExample = item.examples[exampleIndex]
 

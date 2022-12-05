@@ -758,7 +758,7 @@ functions:
           }).subscribe();
           ```
 
-  - id: remove-channnel
+  - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
     title: 'removeChannel()'
