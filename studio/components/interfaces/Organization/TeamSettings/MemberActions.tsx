@@ -5,7 +5,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Dropdown, IconTrash, IconMoreHorizontal } from 'ui'
 
 import { Member, Role } from 'types'
-import { useStore, useOrganizationDetail, useFlag, checkPermissions } from 'hooks'
+import { useStore, useOrganizationDetail, checkPermissions } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
@@ -27,7 +27,6 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const { rolesRemovable } = getRolesManagementPermissions(roles)
 
   const { app, ui } = useStore()
-  const enablePermissions = useFlag('enablePermissions')
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
 
   const [loading, setLoading] = useState(false)
@@ -37,9 +36,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const isPendingInviteAcceptance = member.invited_id
 
   const roleId = member.role_ids?.[0] ?? -1
-  const canRemoveMember = enablePermissions
-    ? rolesRemovable.includes((member?.role_ids ?? [-1])[0])
-    : true
+  const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
   const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites', {
     resource: { role_id: roleId },
   })
@@ -54,11 +51,9 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
       onAsyncConfirm: async () => {
         setLoading(true)
 
-        const response = enablePermissions
-          ? await delete_(`${API_URL}/organizations/${slug}/members/${member.gotrue_id}`)
-          : await delete_(`${API_URL}/organizations/${slug}/members/remove`, {
-              member_id: member.id,
-            })
+        const response = await delete_(
+          `${API_URL}/organizations/${slug}/members/${member.gotrue_id}`
+        )
 
         if (response.error) {
           ui.setNotification({
@@ -67,9 +62,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
           })
           setLoading(false)
         } else {
-          const updatedMembers = enablePermissions
-            ? members.filter((m) => m.gotrue_id !== member.gotrue_id)
-            : members.filter((m) => m.id !== member.id)
+          const updatedMembers = members.filter((m) => m.gotrue_id !== member.gotrue_id)
 
           mutateOrgMembers(updatedMembers)
           ui.setNotification({
@@ -117,7 +110,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: member.primary_email,
       owner_id: member.invited_id,
-      ...(enablePermissions ? { role_id: roleId } : {}),
+      role_id: roleId,
     })
 
     if (response.error) {
@@ -189,7 +182,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
         align="end"
         overlay={
           <>
-            {!enablePermissions && !isPendingInviteAcceptance && (
+            {!isPendingInviteAcceptance && (
               <>
                 <Dropdown.Item onClick={() => setOwnerTransferIsVisible(!ownerTransferIsVisible)}>
                   <div className="flex flex-col">
