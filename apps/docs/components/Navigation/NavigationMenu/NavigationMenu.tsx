@@ -144,7 +144,7 @@ const SideNav = () => {
     ],
     [
       {
-        label: 'Client Libraries Reference',
+        label: 'Client Library Reference',
       },
       {
         label: 'JavaScript Client',
@@ -210,7 +210,7 @@ const SideNav = () => {
               <>
                 {sectionIndex !== 0 && (
                   <div
-                    className="h-px w-full bg-green-500 mb-2"
+                    className="h-px w-full bg-green-500"
                     key={`section-${sectionIndex}-border`}
                   ></div>
                 )}
