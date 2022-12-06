@@ -244,7 +244,7 @@ An unenrollment flow provides a UI for users to manage and unenroll factors link
 Most applications do so via a factor management page where users can view and unlink selected factors.
 
 To unenroll a factor, a user simply needs to call `supabase.auth.mfa.unenroll()` with the id of the factor they wish to unenroll.
-For example, to unenroll the nil UUID we would call: `supabase.auth.mfa.unenroll({factorId: "00000000-0000-0000-0000-000000000000"})`.
+For example, we would call: `supabase.auth.mfa.unenroll({factorId: "d30fd651-184e-4748-a928-0a4b9be1d429"})` to unenroll a factor with ID `d30fd651-184e-4748-a928-0a4b9be1d429`.
 
 
 #### Example: React
@@ -534,7 +534,7 @@ create policy "Policy name."
        select
          case
            when created_at >= '2022-12-12T00:00:00Z' then array['aal2']
-           else array['aal1', 'aal2', NULL]
+           else array['aal1', 'aal2']
          end as aal
        from auth.users
        where auth.uid() = id));
@@ -545,8 +545,6 @@ create policy "Policy name."
   `aal2` for all other timestamps.
 - The `<@` operator is PostgreSQL's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
-- `NULL` appears because some JWTs originating from prior to the introduction
-  of MFA in Supabase Auth will not contain an `aal` claim.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
@@ -565,7 +563,7 @@ create policy "Policy name."
       select
           case
             when count(id) > 0 then array['aal2']
-            else array['aal1', 'aal2', NULL]
+            else array['aal1', 'aal2']
           end as aal
         from auth.mfa_factors
         where auth.uid() = user_id and status = 'verified'
@@ -577,8 +575,6 @@ create policy "Policy name."
 - Otherwise, it will accept both `aal1` and `aal2`.
 - The `<@` operator is PostgreSQL's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
-- `NULL` appears because some JWTs originating from prior to the introduction
-  of MFA in Supabase Auth will not contain an `aal` claim.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
