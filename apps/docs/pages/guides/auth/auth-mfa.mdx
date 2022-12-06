@@ -7,14 +7,6 @@ export const meta = {
     'Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.',
 }
 
-<Admonition type="note">
-
-Multi-Factor Authentication is in early access preview only. Although we
-believe it is production ready, APIs and some behavior may change based on
-feedback we receive in the preview period.
-
-</Admonition>
-
 Multi-factor authentication (MFA), sometimes called two-factor
 authentication (2FA), adds an additional layer of security to your
 application by verifying their identity through
@@ -460,7 +452,7 @@ create policy "Policy name."
        select
          case
            when created_at >= '2022-12-12T00:00:00Z' then array['aal2']
-           else array['aal1', 'aal2', NULL]
+           else array['aal1', 'aal2']
          end as aal
        from auth.users
        where auth.uid() = id));
@@ -471,8 +463,6 @@ create policy "Policy name."
   `aal2` for all other timestamps.
 - The `<@` operator is PostgreSQL's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
-- `NULL` appears because some JWTs originating from prior to the introduction
-  of MFA in Supabase Auth will not contain an `aal` claim.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
@@ -491,7 +481,7 @@ create policy "Policy name."
       select
           case
             when count(id) > 0 then array['aal2']
-            else array['aal1', 'aal2', NULL]
+            else array['aal1', 'aal2']
           end as aal
         from auth.mfa_factors
         where auth.uid() = user_id and status = 'verified'
@@ -503,8 +493,6 @@ create policy "Policy name."
 - Otherwise, it will accept both `aal1` and `aal2`.
 - The `<@` operator is PostgreSQL's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
-- `NULL` appears because some JWTs originating from prior to the introduction
-  of MFA in Supabase Auth will not contain an `aal` claim.
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
@@ -574,6 +562,16 @@ The TOTP QR code encodes a URI with the `otpauth` scheme. It was [initially
 introduced by Google
 Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format)
 but is now universally accepted by all authenticator apps.
+
+### How do I remove a factor?
+
+You can do this by calling the `supabase.auth.mfa.unenroll` method. When a
+factor is removed the user will get a downgraded AAL level for this and all
+other sessions. This information will not immediately propagate since it is
+encoded in JWTs. The default setting today is that a JWT refreshes every hour.
+If this is a security concern for your use case, make sure you reduce the
+refresh window to a smaller value. Most applications shouldn't worry about this
+too much, though.
 
 ### How do I check _when_ a user went through MFA?
 
