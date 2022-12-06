@@ -42,6 +42,7 @@ const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
   .flat(2)
 
 export default function JSReference(props) {
+  console.log('docs', props.docs)
   const router = useRouter()
 
   const slug = router.query.slug[0]
@@ -127,9 +128,7 @@ export default function JSReference(props) {
                   //   item.id
                   // }
                   id={item.id}
-                  slug={
-                    commonLibSpec.functions.find((commonItem) => commonItem.id === item.id).slug
-                  }
+                  slug={allFunctions.find((commonItem) => commonItem.id === item.id).slug}
                   scrollSpyHeader={true}
                 >
                   <RefSubLayout.Details>
@@ -213,8 +212,6 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                               const response = staticExample.response
                               const sql = staticExample?.data?.sql
                               const tables = staticExample?.data?.tables
-
-                              const [dataOpen, setDataOpen] = useState(false)
 
                               return (
                                 <Tabs.Panel

@@ -12,9 +12,8 @@ import Image from 'next/image'
 
 const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 
-const introItems = Object.values(clientLibsCommonSections.sections.intro.js.items)
-
-const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
+const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
+  const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
   const router = useRouter()
 
   const menu = NavItems[id]

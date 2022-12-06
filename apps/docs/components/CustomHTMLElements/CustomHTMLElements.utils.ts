@@ -82,8 +82,8 @@ export const highlightSelectedNavItem = (id: string) => {
   const navMenuItems = document.querySelectorAll('.function-link-item a')
 
   // find any currently active items and remove them
-  const currentActiveItem = document.querySelector('.function-link-list .text-brand-900')
-  currentActiveItem?.classList.remove('text-brand-900')
+  const currentActiveItems = document.querySelectorAll('.function-link-list .text-brand-900')
+  currentActiveItems.forEach((item) => item.classList.remove('text-brand-900'))
 
   // Add active class to the current item
   navMenuItems.forEach((item) => {
