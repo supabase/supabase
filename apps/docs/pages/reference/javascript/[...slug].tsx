@@ -63,6 +63,12 @@ export default function JSReference(props) {
 
   return (
     <>
+      <div>~~~Preamble pages~~~</div>
+      {props.docs
+        .filter((doc) => doc.initialMarkdownPage)
+        .map((item) => (
+          <p>{item.id}</p>
+        ))}
       <RefSubLayout>
         {jsSpec.functions.map((item, itemIndex) => {
           const hasTsRef = item['$ref'] || null
@@ -78,12 +84,6 @@ export default function JSReference(props) {
 
           return (
             <>
-              <div>Preamble pages</div>
-              {props.docs
-                .filter((doc) => doc.initialMarkdownPage)
-                .map((item) => (
-                  <p>{item.id}</p>
-                ))}
               <RefSubLayout.Section
                 key={item.id}
                 title={
@@ -270,11 +270,11 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  const initialMarkdownPages = ['typescript-support', 'release-notes']
+  const preamblePages = ['typescript-support', 'release-notes']
 
   const specPpages = jsSpec.functions.map((x) => x.id)
 
-  const pages = [...initialMarkdownPages, ...specPpages]
+  const pages = [...preamblePages, ...specPpages]
   console.log('hello?', { pages })
 
   /**
