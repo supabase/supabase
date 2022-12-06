@@ -57,14 +57,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
 
   const SideMenuTitle = ({ title }: { title: string }) => {
     return (
-      <span
-        className="
-    font-mono text-xs uppercase
-    text-scale-1200 font-medium
-    tracking-wider
-    mb-3
-    "
-      >
+      <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-3">
         {title}
       </span>
     )
@@ -105,7 +98,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
             <span>Back to Main Menu</span>
           </a>
         </Link>
-        {console.log(menu)}
+        {/* {console.log(menu)} */}
         {/* )} */}
         {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
         <div className="flex items-center gap-3 my-3">
@@ -123,6 +116,8 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
         </div>
         {/* )} */}
         <ul className="function-link-list">
+          toppy
+          <SideMenuTitle title="Get Started" />
           <Divider />
           <SideMenuTitle title="Database" />
           {/* {console.log({ clientLibsCommon })} */}
@@ -136,10 +131,8 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
                 </>
               )
             })}
-
           <Divider />
           <SideMenuTitle title="Auth" />
-
           {clientLibsCommon.functions
             .filter((x) => x.product === 'auth')
             .map((x, index) => {

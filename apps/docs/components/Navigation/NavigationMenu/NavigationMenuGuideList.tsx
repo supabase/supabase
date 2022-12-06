@@ -14,7 +14,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
 
   const menu = NavItems[id]
 
-  console.log(id, 'url is:', menu.url)
+  //console.log(id, 'url is:', menu.url)
 
   // get url
   const url = router.asPath
