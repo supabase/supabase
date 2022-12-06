@@ -1,0 +1,104 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import Link from 'next/link'
+import { IconPanel, Tabs } from 'ui'
+
+export const meta = {
+  id: 'getting-started',
+  title: 'Getting started',
+  description: 'Supabase features',
+}
+
+## hello world
+
+adsadsdsdsd
+
+adsdsdasdsd asdsddsdasd
+asdsddsdasd asdsddsdasd
+asdsddsdasdasdsddsdasd
+asdsddsdasdasdsddsdasd
+asdsddsdasdasdsddsdasd
+asdsddsdasdasdsddsdasd
+asdsddsdasd
+sa
+dashboardd
+asdsddsdasd
+asdsddsdasd
+
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="Framework" icon={<img className="m-0 w-4 h-4" src="/docs/img/icons/javascript-icon.svg"/>}>
+
+<div className="grid grid-cols-12 gap-10 not-prose py-8">
+  {frameworks.map((item) => (  
+    <Link href={`/${item.url}`} key={item.name} passHref>
+      <a className="col-span-6 lg:col-span-4 xl:col-span-3">
+        <IconPanel
+          title={item.name}
+          span="col-span-6"
+          icon={item.icon}
+          isDarkMode={item.isDarkMode}
+        >
+          {item.description}
+        </IconPanel>
+      </a>
+    </Link>
+))}
+
+</div>
+
+</TabPanel>
+
+<TabPanel id="js" label="CLI" icon={<img className="m-0 w-4 h-4" src="/docs/img/icons/javascript-icon.svg"/>}>
+</TabPanel>
+</Tabs>
+
+export const frameworks = [
+  {
+    name: 'ReactJS',
+    icon: '/docs/img/icons/react-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'NextJS',
+    icon: '/docs/img/icons/nextjs-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'NuxtJS',
+    icon: '/docs/img/icons/nuxt-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'Expo',
+    icon: '/docs/img/icons/expo-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'Remix',
+    icon: '/docs/img/icons/remix-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'SvelteKit',
+    icon: '/docs/img/icons/svelte-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'Angular',
+    icon: '/docs/img/icons/angular-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'Gatsby',
+    icon: '/docs/img/icons/gatsby-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

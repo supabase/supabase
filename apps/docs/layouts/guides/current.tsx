@@ -9,7 +9,13 @@ import useHash from '~/hooks/useHash'
 import { getPageType } from '~/lib/helpers'
 
 interface Props {
-  meta: { title: string; description?: string; hide_table_of_contents?: boolean }
+  meta: {
+    title: string
+    description?: string
+    hide_table_of_contents?: boolean
+    breadcrumb?: string
+    subtitle?: string
+  }
   children: any
   toc?: any
   currentPage: string
@@ -92,15 +98,20 @@ const Layout: FC<Props> = (props) => {
             active ? 'opacity-100 left-0' : 'opacity-0 left-6',
           ].join(' ')}
         >
-          <p className="text-brand-900 tracking-wider">Guides</p>
+          {props.meta.breadcrumb && (
+            <p className="text-brand-900 tracking-wider mb-3">{props.meta.breadcrumb}</p>
+          )}
           <article
             ref={articleRef}
             className={`${
               props.meta?.hide_table_of_contents || !hasTableOfContents ? '' : ''
             } prose dark:prose-dark max-w-none`}
           >
-            <h1>{props.meta.title}</h1>
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
+            <h1 className="mb-0">{props.meta.title}</h1>
+            {props.meta.subtitle && (
+              <h2 className="mt-3 text-xl text-scale-1100">{props.meta.subtitle}</h2>
+            )}
+            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-8"></div>
             <MDXProvider components={components}>{props.children}</MDXProvider>
           </article>
         </div>
