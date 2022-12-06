@@ -2,6 +2,7 @@ import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/Act
 import { useState } from 'react'
 import { Accordion, Checkbox, Form, Input, Listbox, SidePanel } from 'ui'
 import { Table, TableOption } from './types'
+import { makeValidateRequired } from './utils'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -73,11 +74,10 @@ const Option = ({ option }: { option: TableOption }) => {
     <Input
       key={option.name}
       id={option.name}
-      name={`options.${option.name}`}
+      name={option.name}
       label={option.label}
       placeholder={option.placeholder ?? ''}
       defaultValue={option.defaultValue ?? ''}
-      required={option.required ?? false}
     />
   )
 }
@@ -94,27 +94,30 @@ const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: OnSubmitFn }) 
   const initialValues = {
     table_name: '',
     columns: [],
-    options: Object.fromEntries(
-      table.options.map((option) => [option.name, option.defaultValue ?? ''])
-    ),
+    ...Object.fromEntries(table.options.map((option) => [option.name, option.defaultValue ?? ''])),
   }
+
+  const validate = makeValidateRequired([
+    ...table.options,
+    { name: 'table_name', required: true },
+    { name: 'columns', required: true },
+  ])
 
   return (
     <Form
       id="wrapper-table-editor-form"
       initialValues={initialValues}
-      //  validate={validate}
+      validate={validate}
       onSubmit={onSubmit}
       enableReinitialize={true}
     >
-      {() => (
+      {({ errors }: any) => (
         <div className="space-y-4">
           <Input
-            id="table-name"
+            id="table_name"
             name="table_name"
             label="Table name"
             descriptionText="The name of the local table table you will query after the wrapper is enabled."
-            required
           />
 
           {requiredOptions.map((option) => (
@@ -135,6 +138,12 @@ const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: OnSubmitFn }) 
                 />
               ))}
             </div>
+
+            {errors.columns && (
+              <p className="text-sm text-red-900 transition-all data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal">
+                {errors.columns}
+              </p>
+            )}
           </div>
 
           {optionalOptions.length > 0 && (
