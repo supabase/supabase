@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Octokit } from 'octokit'
+import { Octokit } from '@octokit/core'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import maintainers from '../data/maintainers.json'
