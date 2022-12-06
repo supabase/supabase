@@ -44,6 +44,13 @@ export const gettingstarted = {
     { name: 'Introduction', url: '/', items: [] },
     { name: 'Features', url: '/features', items: [] },
     { name: 'Architecture', url: '/architecture', items: [] },
+    {
+      name: 'Framework Quickstarts',
+      items: [
+        { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
+      ],
+    },
   ],
 }
 
