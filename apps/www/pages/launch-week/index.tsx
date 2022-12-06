@@ -208,10 +208,6 @@ export default function launchweek() {
                     ? `${creators[activeCreator].first_name} ${creators[activeCreator].last_name}`
                     : 'Dummy title'}
                 </h3>
-                <p className="text-slate-900">
-                  If needed this is a short description about the type of content this is linking
-                  to.
-                </p>
                 <p className="text-brand-900">
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
                     {creators[activeCreator].link_title}
