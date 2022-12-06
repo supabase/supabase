@@ -55,6 +55,7 @@ const components = {
     const linesToHighlight = parseNumericRange(props.lines ?? '')
     return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
   },
+  code: (props: any) => <CodeBlock {...props} />,
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
   inlineCode: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
 }

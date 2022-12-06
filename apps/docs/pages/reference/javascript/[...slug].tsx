@@ -19,6 +19,7 @@ import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 // @ts-expect-error
 import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
+import commonLibJson from '~/../../spec/common-client-libs-sections.json'
 
 import { Button, IconChevronRight, IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -66,20 +67,22 @@ export default function JSReference(props) {
       <RefSubLayout>
         <div>~~~Preamble pages~~~</div>
         {props.docs
-          .filter((doc) => doc.preamblePage)
+          .filter((doc) => doc.introPage)
           .map((item) => (
             <RefSubLayout.Section
               key={item.id}
-              title={item.title}
+              title={item.meta.title}
               id={item.id}
               slug={item.id}
               scrollSpyHeader={true}
             >
-              <RefSubLayout.Details></RefSubLayout.Details>
-              <MDXRemote {...item.content} components={components} />
+              <RefSubLayout.Details>
+                <MDXRemote {...item.content} components={components} />
+              </RefSubLayout.Details>
             </RefSubLayout.Section>
           ))}
       </RefSubLayout>
+
       <RefSubLayout>
         {jsSpec.functions.map((item, itemIndex) => {
           const hasTsRef = item['$ref'] || null
@@ -90,7 +93,7 @@ export default function JSReference(props) {
           const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
 
           // const introFileMarkdownContent =
-          console.log('props.docs', props.docs)
+          //console.log('props.docs', props.docs)
           // if (item.id !== 'db-modifiers-select') return <></>
 
           return (
@@ -281,11 +284,11 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  const preamblePages = ['typescript-support', 'release-notes']
-
+  // an array of ids of the intro sections for this library
+  const introPages = commonLibJson.sections.intro.js.items.map((item) => item.id)
   const specPpages = jsSpec.functions.map((x) => x.id)
 
-  const pages = [...preamblePages, ...specPpages]
+  const pages = [...introPages, ...specPpages]
 
   /**
    * Read all the markdown files that might have
@@ -316,7 +319,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
         title: x,
         // ...content,
         meta: data,
-        preamblePage: preamblePages.includes(x),
+        introPage: introPages.includes(x),
         content: content ? await serialize(content || '') : null,
       }
     })
