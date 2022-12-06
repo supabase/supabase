@@ -28,7 +28,7 @@ const Wrappers = () => {
               <h4 className="text-lg">Enabled wrappers</h4>
               <div className="grid grid-cols-1 gap-6 mb-4 md:grid-cols-2 xl:grid-cols-3">
                 {enabledWrappers.map((wrapper) => (
-                  <WrapperCard key={wrapper.name} wrapper={wrapper} />
+                  <WrapperCard key={wrapper.name} wrapper={wrapper} enabled={true} />
                 ))}
               </div>
             </div>
@@ -39,7 +39,7 @@ const Wrappers = () => {
               <h4 className="text-lg">Available wrappers</h4>
               <div className="grid grid-cols-1 gap-6 mb-4 md:grid-cols-2 xl:grid-cols-3">
                 {disabledWrappers.map((wrapper) => (
-                  <WrapperCard key={wrapper.name} wrapper={wrapper} />
+                  <WrapperCard key={wrapper.name} wrapper={wrapper} enabled={false} />
                 ))}
               </div>
             </div>

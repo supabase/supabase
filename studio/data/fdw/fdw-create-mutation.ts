@@ -138,7 +138,9 @@ export const useFDWCreateMutation = ({
 
   return useMutation<FDWCreateData, unknown, FDWCreateVariables>((vars) => createFDW(vars), {
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(sqlKeys.query(variables.projectRef, ['fdws']))
+      const { projectRef } = variables
+
+      await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws']))
 
       await onSuccess?.(data, variables, context)
     },
