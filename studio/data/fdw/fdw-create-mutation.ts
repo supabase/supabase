@@ -89,7 +89,8 @@ export function getFDWCreateSql({
         )
         server ${wrapper.server.name}
         options (
-          ${Object.entries(newTable.options)
+          ${Object.entries(newTable)
+            .filter(([key]) => key !== 'table_name' && key !== 'columns' && key !== 'index')
             .map(([key, value]) => `${key} '${value}'`)
             .join(',\n          ')}
         );

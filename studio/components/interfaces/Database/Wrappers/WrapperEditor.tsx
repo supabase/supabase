@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Button, Input, SidePanel } from 'ui'
+import { isEmpty } from 'lodash'
 
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useStore } from 'hooks'
 import { Wrapper } from './types'
+import { makeValidateRequired } from './utils'
 import WrapperTableEditor from './WrapperTableEditor'
 
 export type WrapperEditorProps = {
@@ -17,11 +19,7 @@ export type WrapperEditorProps = {
 const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
   const { ui } = useStore()
 
-  const validate = (values: any) => {
-    const errors: any = {}
-    if (values.schema === 'custom' && !values.name) errors.name = 'Required field'
-    return errors
-  }
+  const validate = makeValidateRequired(wrapper.server.options)
 
   const getInitialFormState = () =>
     Object.fromEntries(
@@ -29,6 +27,7 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
     )
 
   const [formState, setFormState] = useState(getInitialFormState)
+  const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
   const [newTables, setNewTables] = useState<any[]>([])
 
   const [isAddTableOpen, setIsAddTableOpen] = useState(false)
@@ -38,10 +37,28 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
     setIsAddTableOpen(false)
   }
 
+  const resetForm = () => {
+    setFormState(getInitialFormState())
+    setNewTables([])
+  }
+
+  const handleCancel = () => {
+    resetForm()
+    onCancel()
+  }
+
   const { project } = useProjectContext()
   const { mutateAsync: createFDW } = useFDWCreateMutation()
 
   const onSaveChanges = async (done: () => void) => {
+    // Validate form
+    const errors = validate(formState)
+    if (!isEmpty(errors)) {
+      setFormErrors(errors)
+      done()
+      return
+    }
+
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Creating foreign data wrapper...`,
@@ -56,15 +73,15 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
         newTables,
       })
 
-      // Reset state
-      setFormState(getInitialFormState())
-      setNewTables([])
+      resetForm()
 
       ui.setNotification({
         id: toastId,
         category: 'success',
         message: `Created foreign data wrapper successfully!`,
       })
+
+      onCancel()
     } catch (error: any) {
       ui.setNotification({
         id: toastId,
@@ -74,7 +91,6 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
     }
 
     done()
-    onCancel()
   }
 
   return (
@@ -88,14 +104,14 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
             <h5 className="text-sm text-scale-1200">{wrapper.label} Foreign Data Wrapper</h5>
           </div>
         }
-        className={`transition-all duration-100 ease-in`}
-        onCancel={onCancel}
+        className="transition-all duration-100 ease-in"
+        onCancel={handleCancel}
         onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
         customFooter={
           <ActionBar
             backButtonLabel="Cancel"
             applyButtonLabel="Save"
-            closePanel={onCancel}
+            closePanel={handleCancel}
             applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
           />
         }
@@ -119,9 +135,11 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
                   required={option.required ?? false}
                   layout="horizontal"
                   value={formState[option.name]}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setFormState((prev) => ({ ...prev, [option.name]: e.target.value }))
-                  }
+                    setFormErrors((prev) => ({ ...prev, [option.name]: '' }))
+                  }}
+                  error={formErrors[option.name]}
                 />
               ))}
 
