@@ -174,7 +174,7 @@ const SideNav = () => {
         label: 'Mangement API',
         icon: '/img/icons/api-icon',
         hasLightIcon: false,
-        href: '/reference/javascript/start',
+        href: '/reference/api/start',
         level: 'reference_javascript',
       },
       {
