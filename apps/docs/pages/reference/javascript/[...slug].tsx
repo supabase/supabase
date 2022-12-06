@@ -32,8 +32,8 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 import OldLayout from '~/layouts/Default'
 
-import * as Collapsible from '@radix-ui/react-collapsible'
-import * as Accordion from '@radix-ui/react-collapsible'
+import * as Accordion from '@radix-ui/react-accordion'
+import ReferenceDetailCollapse from '~/components/Reference/ReferenceDetailCollapse'
 
 export default function JSReference(props) {
   const router = useRouter()
@@ -190,62 +190,52 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                             const sql = staticExample?.data?.sql
                             const tables = staticExample?.data?.tables
 
+                            const [dataOpen, setDataOpen] = useState(false)
+
                             return (
                               <Tabs.Panel
                                 id={example.id}
                                 label={example.name}
                                 className="flex flex-col gap-3"
                               >
-                                <Accordion.Root className="transition-all ease-out flex flex-col">
-                                  <Accordion.Trigger asChild>
-                                    <button
-                                      className={[
-                                        'transition-all ease-out',
-                                        'h-8',
-                                        'bg-scale-300 data-open:bg-scale-500',
-                                        'border border-scale-500 w-full flex items-center gap-3 px-5',
-                                        'data-open:bg-yellow-900',
-                                        'rounded-tl rounded-tr',
-                                        'data-closed:rounded-bl data-closed:rounded-br',
-                                        'text-scale-1100 text-xs',
-                                      ].join(' ')}
-                                    >
-                                      <div className="data-open-parent:rotate-90 text-scale-900">
-                                        <IconChevronRight size={12} strokeWidth={2} />
-                                      </div>
-                                      Example data source
-                                    </button>
-                                  </Accordion.Trigger>
-                                  <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up">
-                                    {tables &&
-                                      tables.length > 0 &&
-                                      tables.map((table) => {
-                                        return (
-                                          <div className="bg-scale-300 border rounded prose max-w-none">
-                                            <div className="bg-scale-200 px-5 py-2">
-                                              <div className="flex gap-2 items-center">
-                                                <div className="text-brand-900">
-                                                  <IconDatabase size={16} />
+                                {((tables && tables.length > 0) || sql) && (
+                                  <ReferenceDetailCollapse
+                                    id={`${example.id}-${exampleIndex}-data`}
+                                    label="Example data source"
+                                    defaultOpen={false}
+                                  >
+                                    <>
+                                      {tables &&
+                                        tables.length > 0 &&
+                                        tables.map((table) => {
+                                          return (
+                                            <div className="bg-scale-300 border rounded prose max-w-none">
+                                              <div className="bg-scale-200 px-5 py-2">
+                                                <div className="flex gap-2 items-center">
+                                                  <div className="text-brand-900">
+                                                    <IconDatabase size={16} />
+                                                  </div>
+                                                  <h5 className="text-xs text-scale-1200">
+                                                    {table.name}
+                                                  </h5>
                                                 </div>
-                                                <h5 className="text-xs text-scale-1200">
-                                                  {table.name}
-                                                </h5>
                                               </div>
                                             </div>
-                                          </div>
-                                        )
-                                      })}
-                                    {sql && (
-                                      <CodeBlock
-                                        className="useless-code-block-class my-0 border border-scale-500 !rounded-tl-none !rounded-tr-none"
-                                        language="sql"
-                                        hideLineNumbers={true}
-                                      >
-                                        {sql}
-                                      </CodeBlock>
-                                    )}
-                                  </Accordion.Content>
-                                </Accordion.Root>
+                                          )
+                                        })}
+                                      {sql && (
+                                        <CodeBlock
+                                          className="useless-code-block-class my-0 border border-t-0 border-scale-500 !rounded-tl-none !rounded-tr-none"
+                                          language="sql"
+                                          hideLineNumbers={true}
+                                        >
+                                          {sql}
+                                        </CodeBlock>
+                                      )}
+                                    </>
+                                  </ReferenceDetailCollapse>
+                                )}
+
                                 <CodeBlock
                                   className="useless-code-block-class"
                                   language="js"
@@ -259,13 +249,22 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                         .replace('```', ''))}
                                 </CodeBlock>
                                 {response && (
-                                  <CodeBlock
-                                    className="useless-code-block-class"
-                                    language="json"
-                                    hideLineNumbers={true}
+                                  <ReferenceDetailCollapse
+                                    id={`${example.id}-${exampleIndex}-response`}
+                                    label="Example response"
+                                    defaultOpen={false}
                                   >
-                                    {response}
-                                  </CodeBlock>
+                                    <CodeBlock
+                                      className="useless-code-block-class"
+                                      language="js"
+                                      hideLineNumbers={true}
+                                    >
+                                      {response
+                                        .replace('```', '')
+                                        .replace('json', '')
+                                        .replace('```', '')}
+                                    </CodeBlock>
+                                  </ReferenceDetailCollapse>
                                 )}
                               </Tabs.Panel>
                             )
