@@ -195,13 +195,14 @@ export default function launchweek() {
             </Badge>
             <h2 className="text-4xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
-              We worked with Developers from around the world to create Supabase-related content and
-              publish everything on the same day, it's raining content ⛈{' '}
-              {/* <span className="text-brand-900">
-                <a rel="noopener" target="_blank" href="/blog">
-                  blog post.
-                </a>
-              </span> */}
+              We worked with +30 content creators from around the world to drop a mountain of
+              content simultaneously!
+              <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
+                <div className="text-brand-900 flex items-center">
+                  See all the content
+                  <IconExternalLink size="small" className="inline-block ml-1" />
+                </div>
+              </a>
             </p>
             {activeCreator !== null && (
               <div className="lg:max-w-[50%] min-h-[120px]">
