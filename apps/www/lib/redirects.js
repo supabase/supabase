@@ -558,11 +558,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/oss',
-    destination: '/docs/oss',
-  },
-  {
-    permanent: true,
     source: '/docs/reference/postgres/connection-strings',
     destination: '/docs/guides/database/connecting-to-postgres',
   },

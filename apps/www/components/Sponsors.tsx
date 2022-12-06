@@ -7,32 +7,32 @@ export default function Sponsors() {
     {
       tier_name: '$5,000 a month',
       heading: 'Enterprise: $5,000 per month',
-      transactions: sponsors.filter((x) => x.tier == '$5,000 a month'),
+      transactions: sponsors.filter((x: any) => x.tier == '$5,000 a month'),
     },
     {
       tier_name: '$2,500 a month',
       heading: 'Agency: $2,500 per month',
-      transactions: sponsors.filter((x) => x.tier == '$2,500 a month'),
+      transactions: sponsors.filter((x: any) => x.tier == '$2,500 a month'),
     },
     {
       tier_name: '$1,000 a month',
       heading: 'Startup: $1,000 per month',
-      transactions: sponsors.filter((x) => x.tier == '$1,000 a month'),
+      transactions: sponsors.filter((x: any) => x.tier == '$1,000 a month'),
     },
     {
       tier_name: '$49 a month',
       heading: 'Evangelist: $49 per month',
-      transactions: sponsors.filter((x) => x.tier == '$49 a month'),
+      transactions: sponsors.filter((x: any) => x.tier == '$49 a month'),
     },
     {
       tier_name: '$19 a month',
       heading: 'Supporter: $19 per month',
-      transactions: sponsors.filter((x) => x.tier == '$19 a month'),
+      transactions: sponsors.filter((x: any) => x.tier == '$19 a month'),
     },
     {
       tier_name: '$5 a month',
       heading: 'Contributor: $5 per month',
-      transactions: sponsors.filter((x) => x.tier == '$5 a month'),
+      transactions: sponsors.filter((x: any) => x.tier == '$5 a month'),
     },
   ]
 
@@ -44,7 +44,7 @@ export default function Sponsors() {
             <div key={index}>
               <h4 className="font-bold">{t.heading}</h4>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 pl-4">
-                {t.transactions.map((x, index) => (
+                {t.transactions.map((x: any, index: any) => (
                   <div className="" key={index}>
                     <a
                       className="flex items-center gap-4 shadow-none shrink-0"

@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Octokit } from '@octokit/core'
-import Layout from '~/layouts/Default'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import maintainers from '../data/maintainers.json'
-import { menuItems } from '~/components/Navigation/Navigation.constants'
-import GithubCard from '../components/GithubCard'
 import Sponsors from '../components/Sponsors'
 import Image from 'next/image'
 
-export default function Oss({ meta }) {
+export default function Oss() {
   const octokit = new Octokit()
 
   const [activePill, setActivePill] = useState('All')
   const [repos, setRepos] = useState([])
 
   const maintainerTags = maintainers
-    .reduce((acc, x) => acc.concat(x.tags), []) // get all tags
-    .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
-    .sort((a, b) => a.localeCompare(b)) // alphabetical
+    .reduce((acc: any, x: any) => acc.concat(x.tags), []) // get all tags
+    .filter((v: any, i: any, a: any) => a.indexOf(v) === i) // remove duplicates
+    .sort((a: any, b: any) => a.localeCompare(b)) // alphabetical
   const maintainerPills = ['All'].concat(maintainerTags)
 
   useEffect(() => {
@@ -29,46 +28,42 @@ export default function Oss({ meta }) {
       })
       setRepos(
         res.data
-          .filter((r) => !!r.stargazers_count)
-          .sort((a, b) => b.stargazers_count - a.stargazers_count)
+          .filter((r: any) => !!r.stargazers_count)
+          .sort((a: any, b: any) => b.stargazers_count - a.stargazers_count)
       )
     }
     fetchOctoData()
   }, [])
 
   return (
-    <Layout meta={meta} menuItems={menuItems['docs']} currentPage="docs">
-      <section className={'section-lg'}>
+    <DefaultLayout>
+      <div className="text-scale-1200 container mx-auto">
+      <SectionContainer>
         <div className="container">
-          <div className="flex items-center">
+        <div className="flex items-center mb-16">
             <div className="col">
-              <h1 className="mt-0">Open source</h1>
-              <p className="">
+              <h1 className="mb-10 text-4xl font-medium">Open source</h1>
+              <p className="max-w-xl">
                 Supabase is an open source company, supporting existing open source tools and
                 communities wherever possible.
               </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className={'section-lg'}>
-        <div className="container">
-          <h2 className="with-underline">Sponsors</h2>
+          <h2 className="mb-6 text-2xl font-medium">Sponsors</h2>
           <Sponsors />
         </div>
-      </section>
+      </SectionContainer>
 
-      <section>
+      <SectionContainer>
         <div className="">
-          <h2>Community Maintainers</h2>
+          <h2 className="mb-6 text-2xl font-medium">Community Maintainers</h2>
 
           <div className="overflow-auto md:max-w-none hidden sm:block">
             <ul className="flex 2xl:gap-4 items-center p-0">
               {maintainerPills.map((x) => (
                 <li
                   key={x}
-                  className={`mx-4 rounded-sm inline-block p-2 cursor-pointer hover:text-brand-800 ${
+                  className={`mx-4 rounded-t-lg inline-block p-2 cursor-pointer hover:text-brand-800 ${
                     activePill == x ? 'bg-gray-200 dark:bg-gray-400 text-brand-800' : ''
                   }`}
                   onClick={() => setActivePill(x)}
@@ -85,12 +80,12 @@ export default function Oss({ meta }) {
               .map((x, idx) => (
                 <div className="" key={idx}>
                   <a
-                    className="shadow-none flex gap-4"
+                    className="flex gap-4"
                     href={`https://github.com/${x.handle}`}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <div className="grow bg-gray-200 dark:bg-gray-400 p-4">
+                    <div className="grow bg-gray-200 dark:bg-gray-400 p-4 rounded-lg">
                       <div className="flex gap-4 shrink-0">
                         <Image
                           className="rounded-full my-0"
@@ -111,29 +106,34 @@ export default function Oss({ meta }) {
               ))}
           </div>
         </div>
-      </section>
+      </SectionContainer>
 
       {/* OSS */}
-      <section>
+      <SectionContainer>
         <div>
-          <h2>Repositories</h2>
+          <h2 className="mb-6 text-2xl font-medium">Repositories</h2>
           <div className="grid gap-4">
             {repos.length < 1 && <div></div>}
             {repos.length >= 1 &&
-              repos.map((props, idx) => (
-                <div className="bg-gray-200 dark:bg-gray-400 p-4" key={idx}>
-                  <GithubCard
-                    title={props.name}
-                    description={props.description}
-                    href={props.html_url}
-                    stars={props.stargazers_count}
-                    handle={props.full_name}
-                  />
+              repos.map((props: any, idx: any) => (
+                <div className="bg-gray-200 dark:bg-gray-400 p-4 rounded-lg" key={idx}>
+                  <a className="h-full" href={props.html_url}>
+                    <div className="card__body">
+                      <h4 className="uppercase my-2 font-semibold">{props.name}</h4>
+                      <span className="text-sm">{props.description}</span>
+                    </div>
+                    <hr className="my-2" />
+                    <div className="flex justify-between py-2 text-xs">
+                      <div>@{props.full_name}</div>
+                      <div>{props.stargazers_count} ★</div>
+                    </div>
+                  </a>
                 </div>
               ))}
           </div>
         </div>
-      </section>
-    </Layout>
+      </SectionContainer>
+      </div>
+    </DefaultLayout>
   )
 }
