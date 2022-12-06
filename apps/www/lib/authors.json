@@ -229,5 +229,12 @@
     "position": "Postgres Engineer",
     "author_url": "https://github.com/pashkinelfe",
     "author_image_url": "https://avatars.githubusercontent.com/u/63344111?v=4"
+   },
+   {
+    "author_id": "ramiro",
+    "author": "Ramiro Nunez Dosio",
+    "position": "Growth Marketer",
+    "author_url": "https://twitter.com/ramiro__nd",
+    "author_image_url": "https://avatars.githubusercontent.com/u/20600542?v=4"
   }
 ]
