@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Button, Input, SidePanel } from 'ui'
 import { isEmpty } from 'lodash'
+import { useState } from 'react'
+import { Button, IconDelete, IconEdit, IconTrash, IconTrash2, Input, SidePanel } from 'ui'
 
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -31,10 +31,23 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
   const [newTables, setNewTables] = useState<any[]>([])
 
   const [isAddTableOpen, setIsAddTableOpen] = useState(false)
+  const [editingTable, setEditingTable] = useState<any>(null)
 
   const onTableAdd = (values: any) => {
-    setNewTables((prev) => [...prev, values])
+    setNewTables((prev) => {
+      // if the new values have tableIndex, we are editing an existing table
+      if (values.tableIndex !== undefined) {
+        const tableIndex = values.tableIndex
+        const newTables = [...prev]
+        delete values.tableIndex
+        newTables[tableIndex] = values
+        return newTables
+      }
+
+      return [...prev, values]
+    })
     setIsAddTableOpen(false)
+    setEditingTable(null)
   }
 
   const resetForm = () => {
@@ -140,12 +153,44 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
                     setFormErrors((prev) => ({ ...prev, [option.name]: '' }))
                   }}
                   error={formErrors[option.name]}
+                  className="input-mono"
                 />
               ))}
 
-              {newTables.map((table, i) => (
-                <div key={i}>{table.table_name}</div>
-              ))}
+              {newTables.length > 0 && (
+                <div className="flex flex-col gap-4">
+                  <div className="block text-sm break-all text-scale-1100">Tables</div>
+
+                  {newTables.map((table, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between py-2 pl-4 pr-2 border rounded bg-scale-400 border-scale-600"
+                    >
+                      <div className="font-mono text-lg">{table.table_name}</div>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          icon={<IconEdit size="small" />}
+                          size="tiny"
+                          type="outline"
+                          onClick={() => {
+                            setEditingTable({ ...table, tableIndex: i })
+                            setIsAddTableOpen(true)
+                          }}
+                        />
+                        <Button
+                          icon={<IconTrash2 size="small" />}
+                          size="tiny"
+                          type="outline"
+                          onClick={() => {
+                            setNewTables((prev) => prev.filter((_, j) => j !== i))
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <Button type="default" onClick={() => setIsAddTableOpen(true)}>
                 Add table
@@ -158,8 +203,12 @@ const WrapperEditor = ({ visible, wrapper, onCancel }: WrapperEditorProps) => {
       <WrapperTableEditor
         visible={isAddTableOpen}
         tables={wrapper.tables}
-        onCancel={() => setIsAddTableOpen(false)}
+        onCancel={() => {
+          setEditingTable(null)
+          setIsAddTableOpen(false)
+        }}
         onSave={onTableAdd}
+        initialData={editingTable}
       />
     </>
   )
