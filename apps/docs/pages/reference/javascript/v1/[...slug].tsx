@@ -75,6 +75,7 @@ export default function JSReference(props) {
               title={item.title}
               id={item.id}
               slug={commonLibSpec.functions.find((commonItem) => commonItem.id === item.id).slug}
+              scrollSpyHeader={true}
             >
               <RefSubLayout.Details>
                 <>

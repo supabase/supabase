@@ -38,7 +38,7 @@ console.log({ generatedSpec })
 export default function Config() {
   return (
     <RefSubLayout>
-      <div className="flex my-16">
+      <div className="flex">
         <div className="w-full">
           <div className="grid gap-16">
             <h1 className="text-4xl">{generatedSpec.info.title}</h1>
