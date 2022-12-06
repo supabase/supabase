@@ -1,0 +1,136 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-image-resizing',
+  title: 'Storage Image Resizing',
+  description: 'Resize images with Storage',
+  sidebar_label: 'Image Transformation',
+}
+
+Storage offers the functionality to transform and resize images on the fly.
+Any image stored in your buckets can be transformed and optimized for fast delivery.
+
+To get started with image resizing you can pass a `transform` option to the functions you are currently using to interact with your objects.
+
+Image Resizing is enabled for PRO tiers and above
+
+### Get a public URL - With transformation options
+
+```ts
+storage.from('bucket').getPublicUrl('image.jpg', {
+    transform: {
+        width: 500,
+        height: 600,
+    }
+})
+```
+
+This will return the public URL with the formatted transformation parameters.
+Once visited you’ll be served with the resized image
+
+An example URL could look like this:
+`https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
+
+
+### Signing URLs - With transformation options
+
+You can sign the URLs for private buckets in the same way.
+If you are signing an image and you’d like to share a transformed version, you’ll need to provide the transform options to the signing URL function
+
+```ts
+storage.from('bucket').createSignedUrl('image.jpg', 60000, {
+    transform: {
+       width: 200,
+       height: 200,
+    }
+})
+```
+
+The transformation options are embedded into the token, they cannot be changed once signed.
+
+### Downloading Images
+
+We introduced 2 new recommended methods for downloading a file.
+`publicDownload` and `authenticatedDownload`
+
+These new methods allow you to add transformation options and be able to download a modified image instead of the original.
+
+Use `publicDownload` when downloading an object from a **public** bucket.
+Use `authenticatedDownload` when downloading an object from a **private** bucket.
+
+```ts
+// Download from a public bucket
+storage.from('bucket').publicDownload('image.jpg', {
+    transform: {
+         width: 800,
+         height: 300,
+    }
+})
+
+// Download from a private bucket
+storage.from('bucket').authenticatedDownload('image.jpg', {
+    transform: {
+         width: 800,
+         height: 300,
+    }
+})
+```
+
+The existing `download` method is deprecated but will still work.
+We recommend migrating to the new methods  `publicDownload` and `authenticatedDownload`
+
+as `download` will be removed in the next major release
+
+
+### Transformation options
+
+We currently support a few transformation options focusing on resizing & cropping.
+We have plans to increase the transformation type available in a later release.
+
+### Resizing
+
+You can use `width` and `height` parameters to resize the image to a specific dimension.
+
+Alternatively, you can omit one of the above parameters and the image will be resized and cropped maintaining the aspect ratio.
+
+### Modes
+
+You can use different resizing modes to fit your needs, each of them uses a different approach to resize the image:
+
+Use the `resize` parameter with one of the following values:
+
+- `cover` : resizes the image while keeping the aspect ratio to fill a given size and crops projecting parts. (default)
+
+- `contain` : resizes the image while keeping the aspect ratio to fit a given size.
+
+- `fill` : resizes the image without keeping the aspect ratio.
+
+### Limits
+
+Width / Height:
+
+- **type**: int
+- **min**: 1
+- **max**: 2500
+
+The image size cannot exceed 25MB
+The image resolution cannot exceed 50MP
+
+### Supported Image Format
+
+| Format | Extension | Source | Result |
+| -------|-----------|--------|--------|
+| PNG    | `png`     | Yes    | Yes    |
+| JPEG   | `jpg`     | Yes    | Yes    |
+| WebP   | `webp`    | Yes    | Yes    |
+| AVIF   | `avif`    | Yes    | Yes    |
+| GIF    | `gif`     | Yes    | Yes    |
+| ICO    | `ico`     | Yes    | Yes    |
+| SVG    | `svg`     | Yes    | Yes    |
+| HEIC   | `heic`    | Yes    | No     |
+| BMP    | `bmp`     | Yes    | Yes    |
+| TIFF   | `tiff`    | Yes    | Yes    |
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
