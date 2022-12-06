@@ -7,13 +7,6 @@ export const meta = {
     'Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.',
 }
 
-<Admonition type="note">
-
-Multi-Factor Authentication is in early access preview only. Although we
-believe it is production ready, APIs and some behavior may change based on
-feedback we receive in the preview period.
-
-</Admonition>
 
 Multi-factor authentication (MFA), sometimes called two-factor
 authentication (2FA), adds an additional layer of security to your
@@ -257,8 +250,8 @@ For example, to unenroll the nil UUID we would call: `supabase.auth.mfa.unenroll
 #### Example: React
 
 Below is an example that creates a new `UnenrollMFA` component that illustrates
-the important pieces of the MFA enrollment flow. Note that a user can only unenroll factors they own and they can only unenroll factors after
-first going through the MFA process and attaining the `aal2` level. Here are some points of note:
+the important pieces of the MFA enrollment flow. Note that users can only unenroll a factor after completing the enrollment flow and obtaining
+an `aal2` JWT claim.Here are some points of note:
 
 - When the component appears on screen, the `supabase.auth.mfa.listFactors()` API is
   called once to fetch all existing factors together with their details.
@@ -267,14 +260,15 @@ first going through the MFA process and attaining the `aal2` level. Here are som
   which creates a confirmation modal.
 
 <Admonition type="note">
-A user can only unenroll a factor after completing the enrollment flow and obtaining
-an `aal2` JWT claim.
+Unenrolling a factor will downgrade the assurance level from `aal2` to `aal1` only after the refresh interval has lapsed.
+For an immediate downgrade from `aal2` to `aal1` after enrolling one will need to manually call `refreshSession()`
 </Admonition>
 
 ```tsx
 /**
  * UnenrollMFA shows a simple table with the list of factors together with a button to unenroll.
- * When a user types in the factorId of the factor that they wish to unenroll
+ * When a user types in the factorId of the factor that they wish to unenroll and clicks unenroll
+ * the corresponding factor will be unenrolled.
  */
 export function UnenrollMFA() {
   const [factorId, setFactorId] = useState('')
