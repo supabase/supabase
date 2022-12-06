@@ -7,20 +7,23 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import { checkPermissions, useStore } from 'hooks'
 import { Wrapper } from './types'
 import WrapperEditor from './WrapperEditor'
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export type WrapperCardProps = {
   wrapper: Wrapper
+  enabled?: boolean
 }
 
-const WrapperCard = ({ wrapper }: WrapperCardProps) => {
+const WrapperCard = ({ wrapper, enabled = false }: WrapperCardProps) => {
+  const { project } = useProjectContext()
   const { ui } = useStore()
-
-  const isOn = false
-  const [loading, setLoading] = useState(false)
 
   const canUpdateWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const [isEditorVisible, setIsEditorVisible] = useState(false)
+
+  const { mutateAsync: deleteFDW, isLoading } = useFDWDeleteMutation()
 
   async function enableWrapper() {
     setIsEditorVisible(true)
@@ -29,29 +32,19 @@ const WrapperCard = ({ wrapper }: WrapperCardProps) => {
   async function disableWrapper() {
     confirmAlert({
       title: 'Confirm to disable wrapper',
-      message: `Are you sure you want to turn OFF "${wrapper.name}" wrapper?`,
+      message: `Are you sure you want to turn OFF "${wrapper.name}" wrapper? This will also delete ALL tables created with this wrapper.`,
       onAsyncConfirm: async () => {
         try {
-          setLoading(true)
-          // const response: any = await meta.wrappers.del(wrapper.name)
-          // if (response.error) {
-          //   throw response.error
-          // } else {
-          //   ui.setNotification({
-          //     category: 'success',
-          //     message: `${wrapper.name.toUpperCase()} is off.`,
-          //   })
-          // }
+          await deleteFDW({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            name: wrapper.name,
+          })
         } catch (error: any) {
           ui.setNotification({
             category: 'error',
-            message: `Toggle ${wrapper.name.toUpperCase()} failed: ${error.message}`,
+            message: `Disabling ${wrapper.name} failed: ${error.message}`,
           })
-        } finally {
-          // Need to reload them because the delete function
-          // removes the wrapper from the store
-          // meta.wrappers.load()
-          setLoading(false)
         }
       },
     })
@@ -77,14 +70,14 @@ const WrapperCard = ({ wrapper }: WrapperCardProps) => {
           >
             {wrapper.label}
           </h3>
-          {loading ? (
+          {isLoading ? (
             <IconLoader className="animate-spin" size={16} />
           ) : (
             <Toggle
               size="tiny"
-              checked={isOn}
+              checked={enabled}
               disabled={!canUpdateWrappers}
-              onChange={() => (isOn ? disableWrapper() : enableWrapper())}
+              onChange={() => (enabled ? disableWrapper() : enableWrapper())}
             />
           )}
         </div>
