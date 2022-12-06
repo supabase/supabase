@@ -243,8 +243,8 @@ export function EnrollMFA({
 An unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts.
 Most applications do so via a factor management page where users can view and unlink selected factors.
 
-To unenroll a factor, a user simply needs to call `supabase.auth.mfa.unenroll()` with the id of the factor they wish to unenroll.
-For example, to unenroll the nil UUID we would call: `supabase.auth.mfa.unenroll({factorId: "00000000-0000-0000-0000-000000000000"})`.
+When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID of the factor.
+For example, to unenroll the nil UUID, call `supabase.auth.mfa.unenroll({factorId: "00000000-0000-0000-0000-000000000000"})`.
 
 
 #### Example: React
