@@ -13,7 +13,9 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
   const { isDarkMode } = useTheme()
 
   const menu = NavItems[id]
-  console.log({ menu })
+
+  console.log(id, 'url is:', menu.url)
+
   // get url
   const url = router.asPath
   // remove the end of the url if a deep link
@@ -57,33 +59,39 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
             </a>
           </Link>
 
-          <div
-            className="flex items-center gap-3 my-3
+          <Link href={menu.url ?? ''} passHref>
+            <a>
+              <div
+                className="flex items-center gap-3 my-3
 
         invisible md:visible"
-          >
-            {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
+              >
+                {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
 
-            <Image
-              alt={menu.icon}
-              width={15}
-              height={15}
-              src={
-                `${router.basePath}` +
-                `/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`
-              }
-            />
-            {/* </div> */}
-            <span
-              className={[
-                ' ',
-                !menu.title && 'capitalize',
-                id === router.pathname ? 'text-brand-900' : 'hover:text-brand-900 text-scale-1200',
-              ].join(' ')}
-            >
-              {menu.title ?? currentLevel}
-            </span>
-          </div>
+                <Image
+                  alt={menu.icon}
+                  width={15}
+                  height={15}
+                  src={
+                    `${router.basePath}` +
+                    `/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`
+                  }
+                />
+                {/* </div> */}
+                <span
+                  className={[
+                    ' ',
+                    !menu.title && 'capitalize',
+                    menu.url === router.pathname
+                      ? 'text-brand-900'
+                      : 'hover:text-brand-900 text-scale-1200',
+                  ].join(' ')}
+                >
+                  {menu.title ?? currentLevel}
+                </span>
+              </div>
+            </a>
+          </Link>
 
           {menu.items.map((x, index) => {
             // console.log('1st type of link?', x.items && x.items.length > 0)

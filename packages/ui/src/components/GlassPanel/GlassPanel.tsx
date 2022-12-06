@@ -75,7 +75,7 @@ const GlassPanel = ({
         ].join(' ')}
       >
         <div className="flex items-center gap-3">
-          {typeof icon === 'string' ? (
+          {icon && typeof icon === 'string' ? (
             <IconBackground>
               <img
                 className="w-5"
@@ -83,7 +83,7 @@ const GlassPanel = ({
               />
             </IconBackground>
           ) : (
-            <IconBackground>{icon}</IconBackground>
+            icon && <IconBackground>{icon}</IconBackground>
           )}
           <h5 className="text-base text-scale-1200">{title}</h5>
         </div>
