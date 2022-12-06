@@ -41,7 +41,6 @@ export default async function gen(inputFileName: string, outputDir: string) {
     try {
       // get the slug from common-client-libs.yml
       //const slug = slugify(pageSpec.id)
-      console.log(pageSpec.id)
       const slug = commonDocSpec.functions.find((fn) => fn.id === pageSpec.id).slug
       const hasTsRef = pageSpec['$ref'] || null
       const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, definition)
