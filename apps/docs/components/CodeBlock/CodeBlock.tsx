@@ -65,7 +65,7 @@ const CodeBlock: FC<Props> = ({
   const showLineNumbers = !hideLineNumbers
 
   return (
-    <div className="relative my-2 max-w-[90vw] md:max-w-none overflow-auto">
+    <div className="relative max-w-[90vw] md:max-w-none overflow-auto">
       {title && (
         <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
           {title.replace(/%20/g, ' ')}
@@ -80,6 +80,7 @@ const CodeBlock: FC<Props> = ({
             'code-block border p-4 w-full !my-0 !bg-scale-300',
             `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
             `${!showLineNumbers ? 'pl-6' : ''}`,
+            className,
           ].join(' ')}
           customStyle={{
             fontSize: large ? 18 : 13,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import { TabsContext } from './TabsContext'
 
 import * as TabsPrimitive from '@radix-ui/react-tabs'
@@ -10,8 +10,7 @@ import { useRouter } from 'next/router'
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface TabsProps {
-  type?: 'pills' | 'underlined' | 'cards'
-  children: any
+  type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -26,7 +25,11 @@ interface TabsProps {
   listClassNames?: string
 }
 
-function Tabs({
+interface TabsSubComponents {
+  Panel: React.FC<PanelProps>
+}
+
+const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   children,
   defaultActiveId,
   activeId,
@@ -39,8 +42,8 @@ function Tabs({
   addOnBefore,
   addOnAfter,
   listClassNames,
-}: TabsProps) {
-  const [activeTab, setActiveTab] = useState(
+}) => {
+  const [activeTab, setActiveTab] = React.useState(
     defaultActiveId
       ? defaultActiveId
       : // if no defaultActiveId is set use the first panel
@@ -123,13 +126,13 @@ function Tabs({
 }
 
 interface PanelProps {
-  children?: React.ReactNode
   id: string
   label?: string
   icon?: React.ReactNode
+  className?: string
 }
 
-export function Panel({ children, id }: PanelProps) {
+export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 
   return (
@@ -137,7 +140,7 @@ export function Panel({ children, id }: PanelProps) {
       {({ activeId }) => {
         const active = activeId === id
         return (
-          <TabsPrimitive.Content value={id} className={__styles.content}>
+          <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
             {children}
           </TabsPrimitive.Content>
         )
