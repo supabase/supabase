@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useFlag, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 
@@ -24,16 +24,8 @@ const GeneralSettings = observer(() => {
 
   const formId = 'org-general-settings'
   const initialValues = { name: PageState.organization.name }
-
-  const enablePermissions = useFlag('enablePermissions')
-
-  const canUpdateOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
-    : ui.selectedOrganization?.is_owner
-
-  const canDeleteOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
-    : ui.selectedOrganization?.is_owner
+  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {

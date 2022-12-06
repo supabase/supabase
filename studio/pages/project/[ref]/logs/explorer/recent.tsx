@@ -5,7 +5,6 @@ import { Button, IconClock } from 'ui'
 import { useStore } from 'hooks'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import { LogSqlSnippets, NextPageWithLayout } from 'types'
@@ -23,7 +22,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
-      <LogsExplorerHeader />
+      <LogsExplorerHeader subtitle="Recent Queries" />
       {recent.length > 0 && (
         <Table
           head={
