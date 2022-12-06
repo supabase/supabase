@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { observer } from 'mobx-react-lite'
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconExternalLink } from 'ui'
@@ -27,9 +28,10 @@ const VaultToggle: FC<Props> = () => {
     setIsEnabling(true)
 
     const { error: createSchemaError } = await meta.query(
-      `create schema if not exists ${vaultExtension.schema}`
+      `create schema if not exists ${vaultExtension.schema ?? 'vault'};`
     )
     if (createSchemaError) {
+      setIsEnabling(false)
       return ui.setNotification({
         error: createSchemaError,
         category: 'error',
@@ -38,7 +40,7 @@ const VaultToggle: FC<Props> = () => {
     }
 
     const { error: createExtensionError } = await meta.extensions.create({
-      schema: vaultExtension.schema,
+      schema: vaultExtension.schema ?? 'vault',
       name: vaultExtension.name,
       version: vaultExtension.default_version,
       cascade: true,
@@ -88,6 +90,7 @@ const VaultToggle: FC<Props> = () => {
               <Tooltip.Trigger>
                 <Button
                   type="primary"
+                  loading={isEnabling}
                   disabled={isEnabling || !canToggleVault}
                   onClick={() => onEnableVault()}
                 >
@@ -117,4 +120,4 @@ const VaultToggle: FC<Props> = () => {
   )
 }
 
-export default VaultToggle
+export default observer(VaultToggle)

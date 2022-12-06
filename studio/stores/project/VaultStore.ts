@@ -76,7 +76,7 @@ export default class VaultStore implements IVaultStore {
 
     const secretsQuery = new Query()
       .from('secrets', 'vault')
-      .select('id,name,description,secret,key_id,created_at')
+      .select('id,name,description,secret,key_id,created_at,updated_at')
       .toSql()
     const secrets = await this.rootStore.meta.query(secretsQuery)
     if (!secrets.error) vault.secrets = secrets
@@ -167,7 +167,7 @@ export default class VaultStore implements IVaultStore {
   async updateSecret(id: string, payload: Partial<VaultSecret>) {
     const query = new Query()
       .from('decrypted_secrets', 'vault')
-      .update(payload, { returning: true })
+      .update({ ...payload, updated_at: new Date().toISOString() }, { returning: true })
       .match({ id })
       .toSql()
     const res = await this.rootStore.meta.query(query)
