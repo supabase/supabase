@@ -1,9 +1,23 @@
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { wrappers } from './data'
 import WrapperCard from './WrapperCard'
 
 const Wrappers = () => {
-  const enabledWrappers: any[] = []
-  const disabledWrappers = wrappers
+  const { project } = useProjectContext()
+  const { data, isLoading } = useFDWsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const enabledWrapperNamesSet = new Set(data?.result.map((fdw) => fdw.name))
+
+  const enabledWrappers = wrappers.filter((wrapper) =>
+    enabledWrapperNamesSet.has(wrapper.server.name)
+  )
+  const disabledWrappers = wrappers.filter(
+    (wrapper) => !enabledWrapperNamesSet.has(wrapper.server.name)
+  )
 
   return (
     <>
