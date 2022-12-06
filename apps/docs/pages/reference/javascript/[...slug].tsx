@@ -32,6 +32,7 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import OldLayout from '~/layouts/Default'
 
 import * as Accordion from '@radix-ui/react-accordion'
+import ReferenceDetailCollapse from '~/components/Reference/ReferenceDetailCollapse'
 
 export default function JSReference(props) {
   const router = useRouter()
@@ -90,6 +91,7 @@ export default function JSReference(props) {
 
           // const introFileMarkdownContent =
           console.log('props.docs', props.docs)
+
           // if (item.id !== 'db-modifiers-select') return <></>
 
           return (
@@ -194,33 +196,13 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                 label={example.name}
                                 className="flex flex-col gap-3"
                               >
-                                <Accordion.Root
-                                  className="AccordionRoot"
-                                  type="single"
-                                  defaultValue={`${example.id}-data`}
-                                  collapsible
-                                >
-                                  <Accordion.Item value={`${example.id}-data`}>
-                                    <Accordion.Trigger asChild>
-                                      <button
-                                        className={[
-                                          'transition-all ease-out',
-                                          'h-8',
-                                          'bg-scale-300 data-open:bg-scale-500',
-                                          'border border-scale-500 w-full flex items-center gap-3 px-5',
-                                          'data-open:bg-yellow-900',
-                                          'rounded-tl rounded-tr',
-                                          'data-closed:rounded-bl data-closed:rounded-br',
-                                          'text-scale-1100 text-xs',
-                                        ].join(' ')}
-                                      >
-                                        <div className="data-open-parent:rotate-90 text-scale-900">
-                                          <IconChevronRight size={12} strokeWidth={2} />
-                                        </div>
-                                        Example data source
-                                      </button>
-                                    </Accordion.Trigger>
-                                    <Accordion.Content>
+                                {((tables && tables.length > 0) || sql) && (
+                                  <ReferenceDetailCollapse
+                                    id={`${example.id}-${exampleIndex}-data`}
+                                    label="Example data source"
+                                    defaultOpen={false}
+                                  >
+                                    <>
                                       {tables &&
                                         tables.length > 0 &&
                                         tables.map((table) => {
@@ -241,16 +223,17 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                         })}
                                       {sql && (
                                         <CodeBlock
-                                          className="useless-code-block-class my-0 border border-scale-500 !rounded-tl-none !rounded-tr-none"
+                                          className="useless-code-block-class my-0 border border-t-0 border-scale-500 !rounded-tl-none !rounded-tr-none"
                                           language="sql"
                                           hideLineNumbers={true}
                                         >
                                           {sql}
                                         </CodeBlock>
                                       )}
-                                    </Accordion.Content>
-                                  </Accordion.Item>
-                                </Accordion.Root>
+                                    </>
+                                  </ReferenceDetailCollapse>
+                                )}
+
                                 <CodeBlock
                                   className="useless-code-block-class"
                                   language="js"
@@ -264,18 +247,22 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                         .replace('```', ''))}
                                 </CodeBlock>
                                 {response && (
-                                  <CodeBlock
-                                    className="useless-code-block-class"
-                                    language="js"
-                                    hideLineNumbers={true}
+                                  <ReferenceDetailCollapse
+                                    id={`${example.id}-${exampleIndex}-response`}
+                                    label="Example response"
+                                    defaultOpen={false}
                                   >
-                                    {exampleString +
-                                      (example.code &&
-                                        example.code
-                                          .replace('```', '')
-                                          .replace('js', '')
-                                          .replace('```', ''))}
-                                  </CodeBlock>
+                                    <CodeBlock
+                                      className="useless-code-block-class"
+                                      language="js"
+                                      hideLineNumbers={true}
+                                    >
+                                      {response
+                                        .replace('```', '')
+                                        .replace('json', '')
+                                        .replace('```', '')}
+                                    </CodeBlock>
+                                  </ReferenceDetailCollapse>
                                 )}
                               </Tabs.Panel>
                             )
