@@ -204,59 +204,61 @@ const SideNav = () => {
           // level !== 'home' && 'opacity-0 invisible'
         ].join(' ')}
       >
-        <ul className="relative w-full flex flex-col gap-5">
+        <ul className="relative w-full flex flex-col gap-4">
           {home.map((section, sectionIndex) => {
             return (
-              <div key={`section-${sectionIndex}`}>
+              <>
                 {sectionIndex !== 0 && (
                   <div
-                    className="h-px w-full bg-green-500"
+                    className="h-px w-full bg-green-500 mb-2"
                     key={`section-${sectionIndex}-border`}
                   ></div>
                 )}
-                <div className="flex flex-col gap-3">
-                  {section.map((link) => {
-                    if (!link.href) {
-                      return (
-                        <span
-                          key={link.label}
-                          className="font-mono uppercase text-xs text-scale-900"
-                        >
-                          {link.label}
-                        </span>
-                      )
-                    } else {
-                      return (
-                        <Link href={link.href} passHref key={link.label}>
-                          <a>
-                            <li
-                              className={[
-                                'group flex items-center gap-3',
-                                'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
-                              ].join(' ')}
-                            >
-                              <Image
-                                alt={link.label}
-                                src={`${router.basePath}${
-                                  Object.hasOwn(link, 'hasLightIcon') && !link.hasLightIcon
-                                    ? link.icon
-                                    : isDarkMode
-                                    ? link.icon
-                                    : `${link.icon}-light`
-                                }${!link.icon.includes('png') ? '.svg' : ''}`}
-                                width={17}
-                                height={17}
-                                className="opacity-75 w-4 h-4 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
-                              />
-                              {link.label}
-                            </li>
-                          </a>
-                        </Link>
-                      )
-                    }
-                  })}
+                <div key={`section-${sectionIndex}`}>
+                  <div className="flex flex-col gap-3">
+                    {section.map((link) => {
+                      if (!link.href) {
+                        return (
+                          <span
+                            key={link.label}
+                            className="font-mono uppercase text-xs text-scale-900"
+                          >
+                            {link.label}
+                          </span>
+                        )
+                      } else {
+                        return (
+                          <Link href={link.href} passHref key={link.label}>
+                            <a>
+                              <li
+                                className={[
+                                  'group flex items-center gap-3',
+                                  'text-base transition-all duration-150 text-scale-1200 hover:text-brand-900 hover:cursor-pointer ',
+                                ].join(' ')}
+                              >
+                                <Image
+                                  alt={link.label}
+                                  src={`${router.basePath}${
+                                    Object.hasOwn(link, 'hasLightIcon') && !link.hasLightIcon
+                                      ? link.icon
+                                      : isDarkMode
+                                      ? link.icon
+                                      : `${link.icon}-light`
+                                  }${!link.icon.includes('png') ? '.svg' : ''}`}
+                                  width={17}
+                                  height={17}
+                                  className="opacity-75 w-4 h-4 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
+                                />
+                                {link.label}
+                              </li>
+                            </a>
+                          </Link>
+                        )
+                      }
+                    })}
+                  </div>
                 </div>
-              </div>
+              </>
             )
           })}
         </ul>
