@@ -35,36 +35,43 @@
         "items": [
           {
             "id": "select",
-            "title": "Fetching data",
+            "title": "Fetching data: select()",
             "slug": "select",
             "product": "database",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
             "id": "insert",
-            "title": "Insert data",
+            "title": "Insert data: insert()",
             "slug": "insert",
             "product": "database",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
             "id": "update",
-            "title": "Update data",
+            "title": "Update data: update()",
             "slug": "update",
             "product": "database",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
             "id": "upsert",
-            "title": "Upsert data",
+            "title": "Upsert data: upsert()",
             "slug": "upsert",
             "product": "database",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
             "id": "delete",
-            "title": "Delete data",
+            "title": "Delete data: delete()",
             "slug": "delete",
+            "product": "database",
+            "libs": ["js", "js_v1", "dart", "dart_v0"]
+          },
+          {
+            "id": "rpc",
+            "title": "Postgres functions: rpc()",
+            "slug": "rpc",
             "product": "database",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
@@ -349,21 +356,14 @@
             "title": "Sign in",
             "slug": "auth-signin",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
-          },
-          {
-            "id": "set-auth",
-            "title": "setAuth()",
-            "slug": "auth-setauth",
-            "product": "auth",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js_v1", "dart", "dart_v0"]
           },
           {
             "id": "send-mobile-otp",
             "title": "sendMobileOTP()",
             "slug": "auth-api-sendmobileotp",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js_v1", "dart", "dart_v0"]
           },
           {
             "id": "sign-in-with-password",
@@ -401,18 +401,39 @@
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
+            "id": "current-session",
+            "title": "currentSession()",
+            "slug": "auth-currentsession",
+            "product": "auth",
+            "libs": ["dart", "dart_v0"]
+          },
+          {
+            "id": "current-user",
+            "title": "currentUser()",
+            "slug": "auth-currentuser",
+            "product": "auth",
+            "libs": ["dart", "dart_v0"]
+          },
+          {
             "id": "get-session",
             "title": "getSession()",
             "slug": "auth-getsession",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v1"]
+          },
+          {
+            "id": "refresh-session",
+            "title": "refreshSession()",
+            "slug": "auth-refreshsession",
+            "product": "auth",
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "get-user",
             "title": "getUser()",
             "slug": "auth-getuser",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
             "id": "update-user",
@@ -426,19 +447,20 @@
             "title": "setSession()",
             "slug": "auth-setsession",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v1"]
           },
-          {
-            "id": "refresh-session",
-            "title": "refreshSession()",
-            "slug": "auth-refreshsession",
-            "product": "auth",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
-          },
+
           {
             "id": "on-auth-state-change",
             "title": "onAuthStateChange()",
             "slug": "auth-onauthstatechange",
+            "product": "auth",
+            "libs": ["js", "js_v1", "dart", "dart_v0"]
+          },
+          {
+            "id": "reset-password-for-email",
+            "title": "resetPasswordForEmail()",
+            "slug": "auth-resetpasswordforemail",
             "product": "auth",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           }
@@ -452,63 +474,63 @@
             "title": "Overview",
             "slug": "supabase-auth-admin-api",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
             "id": "get-user-by-id",
             "title": "getUserById()",
             "slug": "auth-admin-getuserbyid",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
             "id": "list-users",
             "title": "listUsers()",
             "slug": "auth-admin-listusers",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
             "id": "create-user",
             "title": "createUser()",
             "slug": "auth-admin-createuser",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
             "id": "delete-user",
             "title": "deleteUser()",
             "slug": "auth-admin-deleteuser",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
             "id": "invite-user-by-email",
             "title": "inviteUserByEmail()",
             "slug": "auth-admin-inviteuserbyemail",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
-            "id": "auth-reset-password-for-email",
+            "id": "reset-password-for-email",
             "title": "resetPasswordForEmail()",
             "slug": "auth-admin-resetpasswordforemail",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "generate-link",
             "title": "generateLink()",
             "slug": "auth-admin-generatelink",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           },
           {
             "id": "update-user-by-id",
             "title": "updateUserById()",
             "slug": "auth-admin-updateuserbyid",
             "product": "auth-admin",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js2", "js_v1"]
           }
         ]
       },
@@ -532,7 +554,7 @@
             "title": "stream()",
             "slug": "stream",
             "product": "realtime",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["dart", "dart_v0"]
           },
           {
             "id": "subscribe",
@@ -546,29 +568,23 @@
             "title": "removeSubscription()",
             "slug": "removesubscription",
             "product": "realtime",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["dart", "dart_v0"]
           },
           {
             "id": "remove-all-subscriptions",
             "title": "removeallsubscriptions()",
             "slug": "removeallsubscriptions",
             "product": "realtime",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["dart", "dart_v0"]
           },
           {
             "id": "get-subscriptions",
             "title": "getSubscriptions()",
             "slug": "getsubscriptions",
             "product": "realtime",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["dart", "dart_v0"]
           },
-          {
-            "id": "get-channels",
-            "title": "getChannels()",
-            "slug": "getchannels",
-            "product": "realtime",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
-          },
+
           {
             "id": "remove-channel",
             "title": "removeChannel()",
@@ -582,6 +598,13 @@
             "slug": "removeallchannels",
             "product": "realtime",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
+          },
+          {
+            "id": "get-channels",
+            "title": "getChannels()",
+            "slug": "getchannels",
+            "product": "realtime",
+            "libs": ["js2", "js_v1", "dart", "dart_v0"]
           }
         ]
       },
@@ -589,9 +612,9 @@
         "title": "Storage",
         "items": [
           {
-            "id": "list-buckets",
-            "title": "listBuckets()",
-            "slug": "storage-listbuckets",
+            "id": "create-bucket",
+            "title": "createBucket()",
+            "slug": "storage-createbucket",
             "product": "storage",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
@@ -603,16 +626,9 @@
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
-            "id": "create-bucket",
-            "title": "createBucket()",
-            "slug": "storage-createbucket",
-            "product": "storage",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
-          },
-          {
-            "id": "empty-bucket",
-            "title": "emptyBucket()",
-            "slug": "storage-emptybucket",
+            "id": "list-buckets",
+            "title": "listBuckets()",
+            "slug": "storage-listbuckets",
             "product": "storage",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
@@ -631,9 +647,30 @@
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
+            "id": "empty-bucket",
+            "title": "emptyBucket()",
+            "slug": "storage-emptybucket",
+            "product": "storage",
+            "libs": ["js", "js_v1", "dart", "dart_v0"]
+          },
+          {
             "id": "from-upload",
             "title": "from.upload()",
             "slug": "storage-from-upload",
+            "product": "storage",
+            "libs": ["js", "js_v1", "dart", "dart_v0"]
+          },
+          {
+            "id": "from-download",
+            "title": "from.download()",
+            "slug": "storage-from-download",
+            "product": "storage",
+            "libs": ["js", "js_v1", "dart", "dart_v0"]
+          },
+          {
+            "id": "from-list",
+            "title": "from.list()",
+            "slug": "storage-from-list",
             "product": "storage",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
@@ -659,6 +696,13 @@
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           },
           {
+            "id": "from-remove",
+            "title": "from.remove()",
+            "slug": "storage-from-remove",
+            "product": "storage",
+            "libs": ["js", "js_v1", "dart", "dart_v0"]
+          },
+          {
             "id": "from-create-signed-url",
             "title": "from.createSignedUrl()",
             "slug": "storage-from-createsignedurl",
@@ -676,27 +720,6 @@
             "id": "from-get-public-url",
             "title": "from.getPublicUrl()",
             "slug": "storage-from-getpublicurl",
-            "product": "storage",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
-          },
-          {
-            "id": "from-download",
-            "title": "from.download()",
-            "slug": "storage-from-download",
-            "product": "storage",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
-          },
-          {
-            "id": "from-remove",
-            "title": "from.remove()",
-            "slug": "storage-from-remove",
-            "product": "storage",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
-          },
-          {
-            "id": "from-list",
-            "title": "from.list()",
-            "slug": "storage-from-list",
             "product": "storage",
             "libs": ["js", "js_v1", "dart", "dart_v0"]
           }

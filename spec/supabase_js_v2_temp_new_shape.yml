@@ -550,7 +550,7 @@ functions:
           const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
           ```
 
-  - id: auth-reset-password-for-email
+  - id: reset-password-for-email
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
