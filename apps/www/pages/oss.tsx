@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Octokit } from '@octokit/core'
+import { Octokit } from 'octokit'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import maintainers from '../data/maintainers.json'
@@ -10,7 +10,7 @@ export default function Oss() {
   const octokit = new Octokit()
 
   const [activePill, setActivePill] = useState('All')
-  const [repos, setRepos] = useState([])
+  const [repos, setRepos] = useState([{}])
 
   const maintainerTags = maintainers
     .reduce((acc: any, x: any) => acc.concat(x.tags), []) // get all tags
@@ -20,17 +20,13 @@ export default function Oss() {
 
   useEffect(() => {
     async function fetchOctoData() {
-      let res = await octokit.request('GET /orgs/{org}/repos', {
+      const res = await octokit.request('GET /orgs/{org}/repos', {
         org: 'supabase',
         type: 'public',
         per_page: 6,
         page: 1,
       })
-      setRepos(
-        res.data
-          .filter((r: any) => !!r.stargazers_count)
-          .sort((a: any, b: any) => b.stargazers_count - a.stargazers_count)
-      )
+      setRepos(res.data)
     }
     fetchOctoData()
   }, [])
