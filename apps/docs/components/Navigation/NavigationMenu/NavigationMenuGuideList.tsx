@@ -5,12 +5,15 @@ import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
 import * as Accordion from '@radix-ui/react-accordion'
 import { useEffect } from 'react'
+import Image from 'next/image'
+import { useTheme } from 'common/Providers'
 
 const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
   const router = useRouter()
+  const { isDarkMode } = useTheme()
 
   const menu = NavItems[id]
-
+  console.log({ menu })
   // get url
   const url = router.asPath
   // remove the end of the url if a deep link
@@ -60,12 +63,18 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
         invisible md:visible"
           >
             {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
-            <img
-              src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
-              className="w-5 rounded"
+
+            <Image
+              alt={menu.icon}
+              width={15}
+              height={15}
+              src={
+                `${router.basePath}` +
+                `/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`
+              }
             />
             {/* </div> */}
-            <h2
+            <span
               className={[
                 ' ',
                 !menu.title && 'capitalize',
@@ -73,7 +82,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
               ].join(' ')}
             >
               {menu.title ?? currentLevel}
-            </h2>
+            </span>
           </div>
 
           {menu.items.map((x, index) => {
