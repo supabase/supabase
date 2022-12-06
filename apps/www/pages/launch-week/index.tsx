@@ -204,7 +204,7 @@ export default function launchweek() {
               </span> */}
             </p>
             {activeCreator !== null && (
-              <div className="lg:max-w-[50%] min-h-[100px]">
+              <div className="lg:max-w-[50%] min-h-[120px]">
                 <h3 className="dark:text-white">
                   {activeCreator !== null
                     ? `${creators[activeCreator].first_name} ${creators[activeCreator].last_name}`
@@ -212,9 +212,9 @@ export default function launchweek() {
                 </h3>
                 <p className="text-brand-900">
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
-                    {creators[activeCreator].link_title}
                     <span>
-                      <IconExternalLink size="small" />
+                      {creators[activeCreator].link_title}
+                      <IconExternalLink size="small" className="inline-block ml-2" />
                     </span>
                   </a>
                 </p>
