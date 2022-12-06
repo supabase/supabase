@@ -145,9 +145,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
                   <SideMenuTitle title="Database" />
 
                   {toplevelItems.map((item) => (
-                    <li>
-                      <FunctionLink {...item} library={menu.title} />
-                    </li>
+                    <FunctionLink {...item} library={menu.title} />
                   ))}
 
                   <div className="ml-2 mt-4">

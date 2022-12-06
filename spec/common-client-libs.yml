@@ -344,7 +344,7 @@ functions:
     slug: auth-admin-inviteuserbyemail
     product: 'auth-admin'
 
-  - id: auth-reset-password-for-email
+  - id: reset-password-for-email
     title: resetPasswordForEmail()
     slug: auth-admin-resetpasswordforemail
     product: 'auth-admin'
