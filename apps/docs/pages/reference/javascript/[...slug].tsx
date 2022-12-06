@@ -67,7 +67,7 @@ export default function JSReference(props) {
       {props.docs
         .filter((doc) => doc.initialMarkdownPage)
         .map((item) => (
-          <p>{item.id}</p>
+          <MDXRemote {...item.content} components={components} />
         ))}
       <RefSubLayout>
         {jsSpec.functions.map((item, itemIndex) => {
@@ -275,7 +275,6 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
   const specPpages = jsSpec.functions.map((x) => x.id)
 
   const pages = [...preamblePages, ...specPpages]
-  console.log('hello?', { pages })
 
   /**
    * Read all the markdown files that might have
@@ -306,7 +305,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
         title: x,
         // ...content,
         meta: data,
-        initialMarkdownPage: initialMarkdownPages.includes(x),
+        initialMarkdownPage: preamblePages.includes(x),
         content: content ? await serialize(content || '') : null,
       }
     })
