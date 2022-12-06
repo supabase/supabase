@@ -126,9 +126,6 @@ Explore our Airwallex products in detail, designed to give you control in how an
 
 })}
 
-</div>
-
-  <div className="grid grid-cols-12 gap-6 not-prose my-16">
     {platform.map((product) => {
       return (
         <Link
@@ -152,33 +149,33 @@ Explore our Airwallex products in detail, designed to give you control in how an
 
 <div>
 
-<div className="max-w-xl">
+  <div className="max-w-xl">
 
-### Supabase APIs
+    ### Supabase APIs
 
-Explore our Airwallex products in detail, designed to give you control in how and when you convert currencies, make payments and manage your accounts.
+    Explore our Airwallex products in detail, designed to give you control in how and when you convert currencies, make payments and manage your accounts.
 
-</div>
+  </div>
 
-<div className="grid grid-cols-12 gap-6 not-prose">
-  {apis.map((product) => {
-    return (
-      <Link
-        href={`/${product.href}`}
-        key={product.title}
-        passHref
-      >
-        <a className={product.span ?? 'col-span-12 lg:col-span-4'}>
-          <GlassPanel {...product} background={false}>
-            {product.description}
-          </GlassPanel>
-        </a>
-      </Link>
-    )
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {apis.map((product) => {
+      return (
+        <Link
+          href={`/${product.href}`}
+          key={product.title}
+          passHref
+        >
+          <a className={product.span ?? 'col-span-12 lg:col-span-4'}>
+            <GlassPanel {...product} background={false}>
+              {product.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
 
 })}
 
-</div>
+  </div>
 </div>
 
 {/* end of container */}

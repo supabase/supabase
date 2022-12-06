@@ -40,6 +40,7 @@ const GlassPanel = ({
     <div
       className={[
         'relative',
+        'h-full',
         'group',
         'cursor-pointer',
         'overflow-hidden',
@@ -69,7 +70,7 @@ const GlassPanel = ({
       <div
         className={[
           'px-8 pb-8 relative',
-          'flex flex-col',
+          'flex flex-col h-full',
           icon ? 'gap-6' : 'gap-2',
           !header ? 'pt-8' : '',
         ].join(' ')}
@@ -88,7 +89,7 @@ const GlassPanel = ({
           <h5 className="text-base text-scale-1200">{title}</h5>
         </div>
 
-        {children && <span className="text-sm text-scale-1100">{children}</span>}
+        {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
         {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
       </div>
     </div>
