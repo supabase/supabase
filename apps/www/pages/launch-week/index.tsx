@@ -98,7 +98,7 @@ export default function launchweek() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col !pb-24 items-center lg:pt-32 gap-32">
+        <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-32">
           <div
             className={classNames(
               styleUtils.appear,
