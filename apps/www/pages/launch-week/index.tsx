@@ -15,10 +15,10 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import { Badge } from '~/../../packages/ui'
 
 const constellation = [
-  [60, 15],
-  [13, 23],
-  [42, 27],
-  [68, 30],
+  [60, 8],
+  [13, 20],
+  [42, 24],
+  [68, 27],
   [23, 42],
   [52, 52],
   [0, 55],
@@ -167,7 +167,7 @@ export default function launchweek() {
             {creators.map((creator: any, index: number) => {
               return (
                 <div
-                  className={`justify-self-center absolute`}
+                  className={`justify-self-center absolute overflow-visible`}
                   onMouseEnter={() => {
                     setActiveCreator(index)
                   }}
@@ -193,15 +193,16 @@ export default function launchweek() {
             </Badge>
             <h2 className="text-4xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 max-w-[80%] mb-16">
-              We worked with Developers from around the world to create Supabase-related content and publish everything on the same day, it's raining content ⛈{' '}
-              <span className="text-brand-900">
+              We worked with Developers from around the world to create Supabase-related content and
+              publish everything on the same day, it's raining content ⛈{' '}
+              {/* <span className="text-brand-900">
                 <a rel="noopener" target="_blank" href="/blog">
                   blog post.
                 </a>
-              </span>
+              </span> */}
             </p>
             {activeCreator !== null && (
-              <div className="lg:max-w-[50%]">
+              <div className="lg:max-w-[50%] min-h-[100px]">
                 <h3 className="dark:text-white">
                   {activeCreator !== null
                     ? `${creators[activeCreator].first_name} ${creators[activeCreator].last_name}`
