@@ -63,12 +63,23 @@ export default function JSReference(props) {
 
   return (
     <>
-      <div>~~~Preamble pages~~~</div>
-      {props.docs
-        .filter((doc) => doc.preamblePage)
-        .map((item) => (
-          <MDXRemote {...item.content} components={components} />
-        ))}
+      <RefSubLayout>
+        <div>~~~Preamble pages~~~</div>
+        {props.docs
+          .filter((doc) => doc.preamblePage)
+          .map((item) => (
+            <RefSubLayout.Section
+              key={item.id}
+              title={item.title}
+              id={item.id}
+              slug={item.id}
+              scrollSpyHeader={true}
+            >
+              <RefSubLayout.Details></RefSubLayout.Details>
+              <MDXRemote {...item.content} components={components} />
+            </RefSubLayout.Section>
+          ))}
+      </RefSubLayout>
       <RefSubLayout>
         {jsSpec.functions.map((item, itemIndex) => {
           const hasTsRef = item['$ref'] || null
