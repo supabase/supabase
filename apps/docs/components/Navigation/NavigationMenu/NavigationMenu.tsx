@@ -210,7 +210,7 @@ const SideNav = () => {
               <>
                 {sectionIndex !== 0 && (
                   <div
-                    className="h-px w-full bg-green-500"
+                    className="h-px w-full bg-blackA-300 dark:bg-whiteA-300"
                     key={`section-${sectionIndex}-border`}
                   ></div>
                 )}
