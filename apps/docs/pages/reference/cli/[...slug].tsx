@@ -55,7 +55,7 @@ export default function Config(props) {
 
   return (
     <RefSubLayout>
-      <div className="flex my-16">
+      <div className="flex">
         <div className="w-full">
           <div className="grid gap-16">
             <h1 className="text-4xl">{cliSpec.info.title}</h1>
@@ -70,6 +70,7 @@ export default function Config(props) {
                   title={'$ ' + command.title}
                   id={command.id}
                   monoFont={true}
+                  scrollSpyHeader={false}
                 >
                   <RefSubLayout.Details>
                     <div className="grid ref-container" id={command.id}>
