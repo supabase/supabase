@@ -458,7 +458,7 @@ export const realtime = {
       name: 'Channels',
       url: undefined,
       items: [
-        { name: 'Postgres CDC', url: '/guides/realtime/postgres-cdc', items: [] },
+        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
     },
