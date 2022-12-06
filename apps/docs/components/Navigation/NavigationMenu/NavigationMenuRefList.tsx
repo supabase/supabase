@@ -71,7 +71,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id }) => {
   }
 
   const Divider = () => {
-    return <div className="h-px w-full bg-green-500 my-3"></div>
+    return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
   }
 
   return (

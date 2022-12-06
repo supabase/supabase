@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import fs from 'fs'
 import toc from 'markdown-toc'
@@ -20,7 +20,7 @@ import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { typ
 // @ts-expect-error
 import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
 
-import { IconDatabase, Tabs } from 'ui'
+import { Button, IconChevronRight, IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import { useRouter } from 'next/router'
@@ -30,6 +30,9 @@ import Options from '~/components/Options'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 import OldLayout from '~/layouts/Default'
+
+import * as Collapsible from '@radix-ui/react-collapsible'
+import * as Accordion from '@radix-ui/react-collapsible'
 
 export default function JSReference(props) {
   const router = useRouter()
@@ -67,6 +70,8 @@ export default function JSReference(props) {
 
         const functionMarkdownContent = props?.docs[itemIndex]?.content
         const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
+
+        // if (item.id !== 'db-modifiers-select') return <></>
 
         return (
           <>
@@ -143,8 +148,8 @@ export default function JSReference(props) {
                   <>
                     <Tabs
                       defaultActiveId={item.examples[0].id}
-                      size="small"
-                      type="underlined"
+                      size="tiny"
+                      type="rounded-pills"
                       scrollable
                     >
                       {item.examples &&
@@ -162,33 +167,64 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                           const sql = staticExample?.data?.sql
                           const tables = staticExample?.data?.tables
 
+                          const [dataOpen, setDataOpen] = useState(false)
+
                           return (
-                            <Tabs.Panel id={example.id} label={example.name}>
-                              {tables &&
-                                tables.length > 0 &&
-                                tables.map((table) => {
-                                  return (
-                                    <div className="bg-scale-300 border rounded prose max-w-none">
-                                      <div className="bg-scale-200 px-5 py-2">
-                                        <div className="flex gap-2 items-center">
-                                          <div className="text-brand-900">
-                                            <IconDatabase size={16} />
-                                          </div>
-                                          <h5 className="text-xs text-scale-1200">{table.name}</h5>
-                                        </div>
-                                      </div>
+                            <Tabs.Panel
+                              id={example.id}
+                              label={example.name}
+                              className="flex flex-col gap-3"
+                            >
+                              <Accordion.Root className="transition-all ease-out flex flex-col">
+                                <Accordion.Trigger asChild>
+                                  <button
+                                    className={[
+                                      'transition-all ease-out',
+                                      'h-8',
+                                      'bg-scale-300 data-open:bg-scale-500',
+                                      'border border-scale-500 w-full flex items-center gap-3 px-5',
+                                      'data-open:bg-yellow-900',
+                                      'rounded-tl rounded-tr',
+                                      'data-closed:rounded-bl data-closed:rounded-br',
+                                      'text-scale-1100 text-xs',
+                                    ].join(' ')}
+                                  >
+                                    <div className="data-open-parent:rotate-90 text-scale-900">
+                                      <IconChevronRight size={12} strokeWidth={2} />
                                     </div>
-                                  )
-                                })}
-                              {sql && (
-                                <CodeBlock
-                                  className="useless-code-block-class"
-                                  language="sql"
-                                  hideLineNumbers={true}
-                                >
-                                  {sql}
-                                </CodeBlock>
-                              )}
+                                    Example data source
+                                  </button>
+                                </Accordion.Trigger>
+                                <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up">
+                                  {tables &&
+                                    tables.length > 0 &&
+                                    tables.map((table) => {
+                                      return (
+                                        <div className="bg-scale-300 border rounded prose max-w-none">
+                                          <div className="bg-scale-200 px-5 py-2">
+                                            <div className="flex gap-2 items-center">
+                                              <div className="text-brand-900">
+                                                <IconDatabase size={16} />
+                                              </div>
+                                              <h5 className="text-xs text-scale-1200">
+                                                {table.name}
+                                              </h5>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )
+                                    })}
+                                  {sql && (
+                                    <CodeBlock
+                                      className="useless-code-block-class my-0 border border-scale-500 !rounded-tl-none !rounded-tr-none"
+                                      language="sql"
+                                      hideLineNumbers={true}
+                                    >
+                                      {sql}
+                                    </CodeBlock>
+                                  )}
+                                </Accordion.Content>
+                              </Accordion.Root>
                               <CodeBlock
                                 className="useless-code-block-class"
                                 language="js"

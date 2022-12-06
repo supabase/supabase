@@ -379,8 +379,9 @@ export const auth = {
 export const database = {
   icon: 'database',
   label: 'Database',
+  url: '/guides/database',
   items: [
-    { name: 'Overview', url: '/guides/database', items: [] },
+    { name: 'Overview', url: '/guides/database/overview', items: [] },
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
     { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
     { name: 'Database Functions', url: '/guides/database/functions', items: [] },
@@ -440,6 +441,7 @@ export const database = {
 export const functions = {
   icon: 'functions',
   label: 'Edge Functions',
+  url: '/guides/functions',
   items: [
     { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
@@ -458,6 +460,7 @@ export const functions = {
 export const realtime = {
   icon: 'realtime',
   label: 'Realtime',
+  url: '/guides/realtime',
   items: [
     { name: 'Overview', url: '/guides/realtime', items: [] },
     { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
@@ -475,6 +478,7 @@ export const realtime = {
 export const storage = {
   icon: 'storage',
   label: 'Storage',
+  url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage', items: [] },
     { name: 'CDN', url: '/guides/storage-cdn', items: [] },
@@ -484,6 +488,7 @@ export const storage = {
 export const platform = {
   icon: 'platform',
   label: 'Platform',
+  url: '/guides/platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
     { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
@@ -503,6 +508,7 @@ export const platform = {
 
 export const selfHosting = {
   label: 'Self Hosting',
+  url: '/guides/self-hosting',
   items: [
     { name: 'Overview', url: '/guides/hosting/overview', items: [] },
     { name: 'Docker', url: '/guides/hosting/docker', items: [] },
@@ -511,6 +517,7 @@ export const selfHosting = {
 
 export const migrate = {
   label: 'Migrate to Supabase',
+  url: '/guides/migrate',
   items: [
     { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth', items: [] },
     { name: 'Firestore Data', url: '/guides/migrations/firestore-data', items: [] },
@@ -522,6 +529,7 @@ export const migrate = {
 export const integrations = {
   icon: 'integrations',
   label: 'Integrations',
+  url: '/guides/integrations',
   items: [
     {
       name: 'Auth',
@@ -624,6 +632,7 @@ export const reference = {
 export const reference_javascript = {
   icon: '/img/icons/javascript-icon.svg',
   title: 'javascript',
+  url: '/guides/reference/javascript',
   parent: '/reference',
   items: [
     {
@@ -644,6 +653,7 @@ export const reference_javascript = {
 export const reference_dart = {
   icon: '/img/icons/dart-icon.svg',
   title: 'dart',
+  url: '/guides/reference/dart',
   parent: '/reference',
   items: [
     {
@@ -664,6 +674,7 @@ export const reference_dart = {
 export const reference_cli = {
   icon: '/img/icons/cli-icon.svg',
   title: 'Supabase CLI',
+  url: '/guides/reference/cli',
   parent: '/',
   items: [
     {
