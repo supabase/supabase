@@ -98,7 +98,8 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
       </div>
       <div className="flex items-center justify-end w-[25%] space-x-4">
         <p className="text-sm text-scale-1100">
-          Added on {dayjs(secret.created_at).format('MMM D, YYYY')}
+          {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
+          {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
         <Dropdown
           side="bottom"

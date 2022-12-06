@@ -14,7 +14,7 @@ interface Props {}
 const SecretsManagement: FC<Props> = ({}) => {
   const { vault } = useStore()
   const [searchValue, setSearchValue] = useState<string>('')
-  const [selectedSort, setSelectedSort] = useState<'created_at' | 'name'>('created_at')
+  const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
   const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<any>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
@@ -28,8 +28,8 @@ const SecretsManagement: FC<Props> = ({}) => {
         )
       : vault.listSecrets()
   ).sort((a: any, b: any) => {
-    if (selectedSort === 'created_at') {
-      return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
+    if (selectedSort === 'updated_at') {
+      return Number(new Date(a.updated_at)) - Number(new Date(b.updated_at))
     } else {
       return a[selectedSort] > b[selectedSort] ? 1 : -1
     }
@@ -51,12 +51,12 @@ const SecretsManagement: FC<Props> = ({}) => {
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
-                  id="created_at"
+                  id="updated_at"
                   className="max-w-[180px]"
-                  value="created_at"
-                  label="Sort by created at"
+                  value="updated_at"
+                  label="Sort by updated at"
                 >
-                  Created at
+                  Updated at
                 </Listbox.Option>
                 <Listbox.Option
                   id="name"
