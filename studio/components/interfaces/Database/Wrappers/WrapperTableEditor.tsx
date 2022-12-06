@@ -1,5 +1,5 @@
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Accordion, Checkbox, Form, Input, Listbox, SidePanel } from 'ui'
 import { Table, TableOption } from './types'
 import { makeValidateRequired } from './utils'
@@ -10,18 +10,37 @@ export type WrapperTableEditorProps = {
   onSave: (values: any) => void
 
   tables: Table[]
+  initialData: any
 }
 
 type OnSubmitFn = (values: any, { resetForm }: { resetForm: () => void }) => void
 
-const WrapperTableEditor = ({ visible, onCancel, onSave, tables }: WrapperTableEditorProps) => {
+const WrapperTableEditor = ({
+  visible,
+  onCancel,
+  onSave,
+  tables,
+  initialData,
+}: WrapperTableEditorProps) => {
   const [selectedTableIndex, setSelectedTableIndex] = useState<string>('')
 
+  useEffect(() => {
+    if (initialData) {
+      setSelectedTableIndex(String(initialData.index))
+    }
+  }, [initialData])
+
   const selectedTable = selectedTableIndex === '' ? undefined : tables[parseInt(selectedTableIndex)]
+
+  const handleCancel = () => {
+    setSelectedTableIndex('')
+    onCancel()
+  }
 
   const onSubmit: OnSubmitFn = (values, { resetForm }) => {
     onSave({ ...values, index: parseInt(selectedTableIndex) })
     resetForm()
+    setSelectedTableIndex('')
   }
 
   return (
@@ -29,14 +48,14 @@ const WrapperTableEditor = ({ visible, onCancel, onSave, tables }: WrapperTableE
       key="WrapperTableEditor"
       size="medium"
       visible={visible}
-      onCancel={onCancel}
+      onCancel={handleCancel}
       header={<span>Edit foreign table</span>}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
           applyButtonLabel="Save"
           formId="wrapper-table-editor-form"
-          closePanel={onCancel}
+          closePanel={handleCancel}
         />
       }
     >
@@ -60,7 +79,9 @@ const WrapperTableEditor = ({ visible, onCancel, onSave, tables }: WrapperTableE
             })}
           </Listbox>
 
-          {selectedTable && <TableForm table={selectedTable} onSubmit={onSubmit} />}
+          {selectedTable && (
+            <TableForm table={selectedTable} onSubmit={onSubmit} initialData={initialData} />
+          )}
         </div>
       </SidePanel.Content>
     </SidePanel>
@@ -78,11 +99,20 @@ const Option = ({ option }: { option: TableOption }) => {
       label={option.label}
       placeholder={option.placeholder ?? ''}
       defaultValue={option.defaultValue ?? ''}
+      className="input-mono"
     />
   )
 }
 
-const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: OnSubmitFn }) => {
+const TableForm = ({
+  table,
+  onSubmit,
+  initialData,
+}: {
+  table: Table
+  onSubmit: OnSubmitFn
+  initialData: any
+}) => {
   const requiredOptions =
     table.options.filter((option) => option.editable && option.required && !option.defaultValue) ??
     []
@@ -91,7 +121,7 @@ const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: OnSubmitFn }) 
       (option) => option.editable && (!option.required || option.defaultValue)
     ) ?? []
 
-  const initialValues = {
+  const initialValues = initialData ?? {
     table_name: '',
     columns: [],
     ...Object.fromEntries(table.options.map((option) => [option.name, option.defaultValue ?? ''])),
@@ -111,13 +141,14 @@ const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: OnSubmitFn }) 
       onSubmit={onSubmit}
       enableReinitialize={true}
     >
-      {({ errors }: any) => (
+      {({ errors, touched, values }: any) => (
         <div className="space-y-4">
           <Input
             id="table_name"
             name="table_name"
             label="Table name"
             descriptionText="The name of the local table table you will query after the wrapper is enabled."
+            className="input-mono"
           />
 
           {requiredOptions.map((option) => (
@@ -134,12 +165,13 @@ const TableForm = ({ table, onSubmit }: { table: Table; onSubmit: OnSubmitFn }) 
                   id={column.name}
                   name="columns"
                   value={column.name}
+                  checked={values.columns.includes(column.name)}
                   label={`${column.name} (${column.type})`}
                 />
               ))}
             </div>
 
-            {errors.columns && (
+            {touched.columns && errors.columns && (
               <p className="text-sm text-red-900 transition-all data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal">
                 {errors.columns}
               </p>
