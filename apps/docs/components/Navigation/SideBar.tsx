@@ -145,7 +145,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                         <Accordion.Item value={section.name}>
                           <Accordion.Trigger className="flex items-center space-x-2 px-4 py-1.5">
                             <IconChevronRight
-                              className="transition text-scale-1000 data-open-parent:rotate-90"
+                              className="transition text-scale-1000 data-open-parent:rotate-270"
                               size={14}
                               strokeWidth={2}
                             />
