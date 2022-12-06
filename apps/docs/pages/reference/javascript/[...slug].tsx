@@ -61,214 +61,244 @@ export default function JSReference(props) {
   }
 
   return (
-    <RefSubLayout>
-      {jsSpec.functions.map((item, itemIndex) => {
-        const hasTsRef = item['$ref'] || null
-        const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
-        const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
-
-        const functionMarkdownContent = props?.docs[itemIndex]?.content
-        const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
-
-        // if (item.id !== 'db-modifiers-select') return <></>
-
-        return (
-          <>
+    <>
+      <RefSubLayout>
+        <div>~~~Preamble pages~~~</div>
+        {props.docs
+          .filter((doc) => doc.preamblePage)
+          .map((item) => (
             <RefSubLayout.Section
               key={item.id}
-              title={
-                examples.functions[itemIndex].title ??
-                examples.functions[itemIndex].id ??
-                item.name ??
-                item.id
-              }
+              title={item.title}
               id={item.id}
-              slug={commonLibSpec.functions.find((commonItem) => commonItem.id === item.id).slug}
+              slug={item.id}
               scrollSpyHeader={true}
             >
-              <RefSubLayout.Details>
-                <>
-                  <header className={['mb-16'].join(' ')}>
-                    {shortText && <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>}
-                  </header>
+              <RefSubLayout.Details></RefSubLayout.Details>
+              <MDXRemote {...item.content} components={components} />
+            </RefSubLayout.Section>
+          ))}
+      </RefSubLayout>
+      <RefSubLayout>
+        {jsSpec.functions.map((item, itemIndex) => {
+          const hasTsRef = item['$ref'] || null
+          const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
+          const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
 
-                  {item.description && (
-                    <div className="prose">
-                      <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
-                    </div>
-                  )}
-                  {functionMarkdownContent && (
-                    <div className="prose">
-                      <MDXRemote {...functionMarkdownContent} components={components} />
-                    </div>
-                  )}
-                  {item.notes && (
-                    <div className="prose">
-                      <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
-                    </div>
-                  )}
-                  {/* // parameters */}
-                  {parameters && (
-                    <div className="not-prose mt-12">
-                      <h5 className="mb-3 text-base text-scale-1200">Parameters</h5>
-                      <ul className="">
-                        {parameters.map((param) => {
-                          // grab override params from yaml file
-                          const overrideParams = item.overrideParams
+          const functionMarkdownContent = props?.docs[itemIndex]?.content
+          const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
 
-                          // params from the yaml file can override the params from parameters if it matches the name
-                          const overide = overrideParams?.filter((x) => {
-                            return param.name === x.name
-                          })
+          // const introFileMarkdownContent =
+          console.log('props.docs', props.docs)
+          // if (item.id !== 'db-modifiers-select') return <></>
 
-                          const paramItem = overide?.length > 0 ? overide[0] : param
-
-                          return (
-                            <Param {...paramItem}>
-                              {paramItem.subContent && (
-                                <div className="mt-3">
-                                  <Options>
-                                    {param.subContent.map((param) => {
-                                      return <Options.Option {...param} />
-                                    })}
-                                  </Options>
-                                </div>
-                              )}
-                            </Param>
-                          )
-                        })}
-                      </ul>
-                    </div>
-                  )}
-                </>
-              </RefSubLayout.Details>
-              <RefSubLayout.Examples>
-                {item.examples && (
+          return (
+            <>
+              <RefSubLayout.Section
+                key={item.id}
+                title={
+                  examples.functions[itemIndex].title ??
+                  examples.functions[itemIndex].id ??
+                  item.name ??
+                  item.id
+                }
+                id={item.id}
+                slug={commonLibSpec.functions.find((commonItem) => commonItem.id === item.id).slug}
+                scrollSpyHeader={true}
+              >
+                <RefSubLayout.Details>
                   <>
-                    <Tabs
-                      defaultActiveId={item.examples[0].id}
-                      size="tiny"
-                      type="rounded-pills"
-                      scrollable
-                    >
-                      {item.examples &&
-                        item.examples.map((example, exampleIndex) => {
-                          const exampleString = `
+                    <header className={['mb-16'].join(' ')}>
+                      {shortText && <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>}
+                    </header>
+
+                    {item.description && (
+                      <div className="prose">
+                        <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
+                      </div>
+                    )}
+                    {functionMarkdownContent && (
+                      <div className="prose">
+                        <MDXRemote {...functionMarkdownContent} components={components} />
+                      </div>
+                    )}
+                    {item.notes && (
+                      <div className="prose">
+                        <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
+                      </div>
+                    )}
+                    {/* // parameters */}
+                    {parameters && (
+                      <div className="not-prose mt-12">
+                        <h5 className="mb-3 text-base text-scale-1200">Parameters</h5>
+                        <ul className="">
+                          {parameters.map((param) => {
+                            // grab override params from yaml file
+                            const overrideParams = item.overrideParams
+
+                            // params from the yaml file can override the params from parameters if it matches the name
+                            const overide = overrideParams?.filter((x) => {
+                              return param.name === x.name
+                            })
+
+                            const paramItem = overide?.length > 0 ? overide[0] : param
+
+                            return (
+                              <Param {...paramItem}>
+                                {paramItem.subContent && (
+                                  <div className="mt-3">
+                                    <Options>
+                                      {param.subContent.map((param) => {
+                                        return <Options.Option {...param} />
+                                      })}
+                                    </Options>
+                                  </div>
+                                )}
+                              </Param>
+                            )
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                </RefSubLayout.Details>
+                <RefSubLayout.Examples>
+                  {item.examples && (
+                    <>
+                      <Tabs
+                        defaultActiveId={item.examples[0].id}
+                        size="tiny"
+                        type="rounded-pills"
+                        scrollable
+                      >
+                        {item.examples &&
+                          item.examples.map((example, exampleIndex) => {
+                            const exampleString = `
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 `
-                          const currentExampleId = example.id
-                          const staticExample = item.examples[exampleIndex]
+                            const currentExampleId = example.id
+                            const staticExample = item.examples[exampleIndex]
 
-                          const response = staticExample.response
-                          const sql = staticExample?.data?.sql
-                          const tables = staticExample?.data?.tables
+                            const response = staticExample.response
+                            const sql = staticExample?.data?.sql
+                            const tables = staticExample?.data?.tables
 
-                          const [dataOpen, setDataOpen] = useState(false)
+                            const [dataOpen, setDataOpen] = useState(false)
 
-                          return (
-                            <Tabs.Panel
-                              id={example.id}
-                              label={example.name}
-                              className="flex flex-col gap-3"
-                            >
-                              <Accordion.Root
-                                className="AccordionRoot"
-                                type="single"
-                                defaultValue={`${example.id}-data`}
-                                collapsible
+                            return (
+                              <Tabs.Panel
+                                id={example.id}
+                                label={example.name}
+                                className="flex flex-col gap-3"
                               >
-                                <Accordion.Item value={`${example.id}-data`}>
-                                  <Accordion.Trigger asChild>
-                                    <button
-                                      className={[
-                                        'transition-all ease-out',
-                                        'h-8',
-                                        'bg-scale-300 data-open:bg-scale-500',
-                                        'border border-scale-500 w-full flex items-center gap-3 px-5',
-                                        'data-open:bg-yellow-900',
-                                        'rounded-tl rounded-tr',
-                                        'data-closed:rounded-bl data-closed:rounded-br',
-                                        'text-scale-1100 text-xs',
-                                      ].join(' ')}
-                                    >
-                                      <div className="data-open-parent:rotate-90 text-scale-900">
-                                        <IconChevronRight size={12} strokeWidth={2} />
-                                      </div>
-                                      Example data source
-                                    </button>
-                                  </Accordion.Trigger>
-                                  <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up">
-                                    {tables &&
-                                      tables.length > 0 &&
-                                      tables.map((table) => {
-                                        return (
-                                          <div className="bg-scale-300 border rounded prose max-w-none">
-                                            <div className="bg-scale-200 px-5 py-2">
-                                              <div className="flex gap-2 items-center">
-                                                <div className="text-brand-900">
-                                                  <IconDatabase size={16} />
+                                <Accordion.Root
+                                  className="AccordionRoot"
+                                  type="single"
+                                  defaultValue={`${example.id}-data`}
+                                  collapsible
+                                >
+                                  <Accordion.Item value={`${example.id}-data`}>
+                                    <Accordion.Trigger asChild>
+                                      <button
+                                        className={[
+                                          'transition-all ease-out',
+                                          'h-8',
+                                          'bg-scale-300 data-open:bg-scale-500',
+                                          'border border-scale-500 w-full flex items-center gap-3 px-5',
+                                          'data-open:bg-yellow-900',
+                                          'rounded-tl rounded-tr',
+                                          'data-closed:rounded-bl data-closed:rounded-br',
+                                          'text-scale-1100 text-xs',
+                                        ].join(' ')}
+                                      >
+                                        <div className="data-open-parent:rotate-90 text-scale-900">
+                                          <IconChevronRight size={12} strokeWidth={2} />
+                                        </div>
+                                        Example data source
+                                      </button>
+                                    </Accordion.Trigger>
+                                    <Accordion.Content>
+                                      {tables &&
+                                        tables.length > 0 &&
+                                        tables.map((table) => {
+                                          return (
+                                            <div className="bg-scale-300 border rounded prose max-w-none">
+                                              <div className="bg-scale-200 px-5 py-2">
+                                                <div className="flex gap-2 items-center">
+                                                  <div className="text-brand-900">
+                                                    <IconDatabase size={16} />
+                                                  </div>
+                                                  <h5 className="text-xs text-scale-1200">
+                                                    {table.name}
+                                                  </h5>
                                                 </div>
-                                                <h5 className="text-xs text-scale-1200">
-                                                  {table.name}
-                                                </h5>
                                               </div>
                                             </div>
-                                          </div>
-                                        )
-                                      })}
-                                    {sql && (
-                                      <CodeBlock
-                                        className="useless-code-block-class my-0 border border-scale-500 !rounded-tl-none !rounded-tr-none"
-                                        language="sql"
-                                        hideLineNumbers={true}
-                                      >
-                                        {sql}
-                                      </CodeBlock>
-                                    )}
-                                  </Accordion.Content>
-                                </Accordion.Item>
-                              </Accordion.Root>
-                              <CodeBlock
-                                className="useless-code-block-class"
-                                language="js"
-                                hideLineNumbers={true}
-                              >
-                                {exampleString +
-                                  (example.code &&
-                                    example.code
-                                      .replace('```', '')
-                                      .replace('js', '')
-                                      .replace('```', ''))}
-                              </CodeBlock>
-                              {response && (
+                                          )
+                                        })}
+                                      {sql && (
+                                        <CodeBlock
+                                          className="useless-code-block-class my-0 border border-scale-500 !rounded-tl-none !rounded-tr-none"
+                                          language="sql"
+                                          hideLineNumbers={true}
+                                        >
+                                          {sql}
+                                        </CodeBlock>
+                                      )}
+                                    </Accordion.Content>
+                                  </Accordion.Item>
+                                </Accordion.Root>
                                 <CodeBlock
                                   className="useless-code-block-class"
-                                  language="json"
+                                  language="js"
                                   hideLineNumbers={true}
                                 >
-                                  {response}
+                                  {exampleString +
+                                    (example.code &&
+                                      example.code
+                                        .replace('```', '')
+                                        .replace('js', '')
+                                        .replace('```', ''))}
                                 </CodeBlock>
-                              )}
-                            </Tabs.Panel>
-                          )
-                        })}
-                    </Tabs>
-                  </>
-                )}
-              </RefSubLayout.Examples>
-            </RefSubLayout.Section>
-          </>
-        )
-      })}
-    </RefSubLayout>
+                                {response && (
+                                  <CodeBlock
+                                    className="useless-code-block-class"
+                                    language="js"
+                                    hideLineNumbers={true}
+                                  >
+                                    {exampleString +
+                                      (example.code &&
+                                        example.code
+                                          .replace('```', '')
+                                          .replace('js', '')
+                                          .replace('```', ''))}
+                                  </CodeBlock>
+                                )}
+                              </Tabs.Panel>
+                            )
+                          })}
+                      </Tabs>
+                    </>
+                  )}
+                </RefSubLayout.Examples>
+              </RefSubLayout.Section>
+            </>
+          )
+        })}
+      </RefSubLayout>
+    </>
   )
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  const pages = jsSpec.functions.map((x) => x.id)
+  const preamblePages = ['typescript-support', 'release-notes']
+
+  const specPpages = jsSpec.functions.map((x) => x.id)
+
+  const pages = [...preamblePages, ...specPpages]
 
   /**
    * Read all the markdown files that might have
@@ -299,6 +329,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
         title: x,
         // ...content,
         meta: data,
+        preamblePage: preamblePages.includes(x),
         content: content ? await serialize(content || '') : null,
       }
     })
