@@ -1,6 +1,5 @@
 import { NextSeo } from 'next-seo'
 import _days from '~/components/LaunchWeek/days.json'
-import { WeekDayProps } from '~/components/LaunchWeek/types'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
@@ -13,28 +12,19 @@ import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import { SITE_ORIGIN } from '~/lib/constants'
 
-import styles from './launchWeek.module.css'
-
-const days = _days as WeekDayProps[]
-
 import { Badge } from '~/../../packages/ui'
-import Avatar from '~/components/Avatar'
 
-// TODO
-// planet description on hover
-// links for each user
 const constellation = [
-  [10, 10],
-  [13, 27],
-  [50, 15],
-  [80, 28],
-  [8, 58],
-  [32, 38],
-  [30, 79],
-  [63, 75],
-  [82, 55],
-  [45, 62],
-  [20, 64],
+  [60, 15],
+  [13, 23],
+  [42, 27],
+  [68, 30],
+  [23, 42],
+  [52, 52],
+  [0, 55],
+  [33, 65],
+  [66, 70],
+  [55, 82],
 ]
 
 export default function launchweek() {
@@ -187,7 +177,7 @@ export default function launchweek() {
                   }}
                 >
                   <div className="relative group">
-                    <div className="absolute -inset-0.5 bg-brand-1100 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-md transition duration-500"></div>
+                    <div className="absolute -inset-0.5 bg-brand-1100 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
                     <img
                       className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
                       src={creator.profile_picture}
@@ -201,7 +191,7 @@ export default function launchweek() {
             <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#39617D94] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1A7A4C]">
               Currently happening
             </Badge>
-            <h2 className="text-5xl dark:text-white mb-6">See creators using Supabase</h2>
+            <h2 className="text-4xl dark:text-white mb-2">See creators using Supabase</h2>
             <p className="text-slate-900 max-w-[80%] mb-16">
               Description about Content Storm, something to tie it up with Launch Week. To find
               learn more info about creators check our{' '}
@@ -211,27 +201,24 @@ export default function launchweek() {
                 </a>
               </span>
             </p>
-            <div className="lg:max-w-[50%]">
-              <h3 className="dark:text-white">
-                {activeCreator !== null ? `${creators[activeCreator].first_name}` : 'Dummy tytle'}
-              </h3>
-              <p className="text-slate-900">
-                If needed this is a short description about the type of content this is linking to.
-              </p>
-              <p className="text-brand-900">
-                <a
-                  rel="noopener"
-                  target="_blank"
-                  href={
-                    creators.length > 0 && activeCreator !== null
-                      ? creators[activeCreator].link
-                      : 'https://supabase.com/blog'
-                  }
-                >
-                  Visit
-                </a>
-              </p>
-            </div>
+            {activeCreator !== null && (
+              <div className="lg:max-w-[50%]">
+                <h3 className="dark:text-white">
+                  {activeCreator !== null
+                    ? `${creators[activeCreator].first_name} ${creators[activeCreator].last_name}`
+                    : 'Dummy title'}
+                </h3>
+                <p className="text-slate-900">
+                  If needed this is a short description about the type of content this is linking
+                  to.
+                </p>
+                <p className="text-brand-900">
+                  <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
+                    {creators[activeCreator].link_title}
+                  </a>
+                </p>
+              </div>
+            )}
           </div>
         </SectionContainer>
       </DefaultLayout>
