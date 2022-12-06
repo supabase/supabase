@@ -65,7 +65,7 @@ export default function JSReference(props) {
     <>
       <div>~~~Preamble pages~~~</div>
       {props.docs
-        .filter((doc) => doc.initialMarkdownPage)
+        .filter((doc) => doc.preamblePage)
         .map((item) => (
           <MDXRemote {...item.content} components={components} />
         ))}
@@ -305,7 +305,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
         title: x,
         // ...content,
         meta: data,
-        initialMarkdownPage: preamblePages.includes(x),
+        preamblePage: preamblePages.includes(x),
         content: content ? await serialize(content || '') : null,
       }
     })
