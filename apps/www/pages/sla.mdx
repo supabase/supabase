@@ -1,8 +1,19 @@
-import Layout from '~/layouts/DefaultGuideLayout'
+import Layout from '../layouts/Layout'
 
 export const meta = {
   title: 'Service Level Agreement',
+  description: 'Supabase Service Level Agreement',
 }
+
+export const Section = ({ children }) => (
+  <div className='m-10'>
+    {children}
+  </div>
+)
+
+<Section>
+
+# Service Level Agreement
 
 The following Service Level Agreement, which is incorporated into and forms part of the Subscription Agreement between Supabase, Inc. ("Supabase") and Customer (the "Agreement"), will apply to the Services for Enterprise Customers specified in an Order Form during the applicable Subscription Term:
 
@@ -88,6 +99,6 @@ An Information request about Supabase or feature request.
 
 Business hours are from 6am to 6pm (local time), except where otherwise stated.
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+</Section>
 
-export default Page
+export default (context) => <Layout meta={meta} children={context.children} context={context} />
