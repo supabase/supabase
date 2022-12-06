@@ -26,7 +26,7 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
     >
       <div className="flex space-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex w-full items-center justify-between">
+        <div className="flex w-full items-center justify-between space-x-32">
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>

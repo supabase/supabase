@@ -71,12 +71,11 @@ const PaymentSummaryPanel: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
-  const isOwner = ui.selectedOrganization?.is_owner
 
-  const enablePermissions = useFlag('enablePermissions')
-  const canUpdatePaymentMethods = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.payment_methods')
-    : isOwner
+  const canUpdatePaymentMethods = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.payment_methods'
+  )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
@@ -311,9 +310,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                       ].join(' ')}
                     >
                       <span className="text-xs text-scale-1200">
-                        {enablePermissions
-                          ? 'You need additional permissions to add new payment methods to this organization'
-                          : 'Only organization owners can add new payment methods'}
+                        You need additional permissions to add new payment methods to this
+                        organization
                       </span>
                     </div>
                   </Tooltip.Content>
