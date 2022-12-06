@@ -35,7 +35,7 @@ We are in the process of migrating this repository to monorepo, using [Turborepo
 
 Eventually, all the apps will be run using [Turborepo](https://turborepo.org/docs), which will significantly improve the developer workflow.
 
-If you are working on the ([docs site](https://supabase.com/docs)), please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
+If you are working on the ([docs site](https://supabase.com/docs)), please refer to this developers guide.(https://supabase.com/docs/guides/cli/local-development).
 
 ### Fork the repository
 
