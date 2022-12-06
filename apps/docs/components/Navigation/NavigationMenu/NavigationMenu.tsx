@@ -276,9 +276,24 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
 
       {/* reference level */}
-      <NavigationMenuRefList id={'reference_javascript'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuRefList id={'reference_dart'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuCliList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuRefList
+        id={'reference_javascript'}
+        currentLevel={level}
+        setLevel={setLevel}
+        lib="js"
+      />
+      <NavigationMenuRefList
+        id={'reference_dart'}
+        currentLevel={level}
+        setLevel={setLevel}
+        lib="dart"
+      />
+      <NavigationMenuCliList
+        id={'reference_cli'}
+        currentLevel={level}
+        setLevel={setLevel}
+        lib="cli"
+      />
     </div>
   )
 }
