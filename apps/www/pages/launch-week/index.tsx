@@ -12,7 +12,7 @@ import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import { SITE_ORIGIN } from '~/lib/constants'
 
-import { Badge } from '~/../../packages/ui'
+import { Badge, IconExternalLink } from '~/../../packages/ui'
 
 const constellation = [
   [60, 8],
@@ -178,21 +178,23 @@ export default function launchweek() {
                 >
                   <div className="relative group">
                     <div className="absolute -inset-0.5 bg-brand-1100 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
-                    <img
-                      className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
-                      src={creator.profile_picture}
-                    />
+                    <a href={creator.link} target="_blank" rel="noopener">
+                      <img
+                        className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
+                        src={creator.profile_picture}
+                      />
+                    </a>
                   </div>
                 </div>
               )
             })}
           </div>
           <div className="flex-1">
-            <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#39617D94] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1A7A4C]">
+            <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
               Currently happening
             </Badge>
             <h2 className="text-4xl dark:text-white mb-2">The Supabase Content Storm</h2>
-            <p className="text-slate-900 max-w-[80%] mb-16">
+            <p className="text-slate-900 md:max-w-[80%] mb-16">
               We worked with Developers from around the world to create Supabase-related content and
               publish everything on the same day, it's raining content ⛈{' '}
               {/* <span className="text-brand-900">
@@ -206,11 +208,14 @@ export default function launchweek() {
                 <h3 className="dark:text-white">
                   {activeCreator !== null
                     ? `${creators[activeCreator].first_name} ${creators[activeCreator].last_name}`
-                    : 'Dummy title'}
+                    : 'Title'}
                 </h3>
                 <p className="text-brand-900">
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
                     {creators[activeCreator].link_title}
+                    <span>
+                      <IconExternalLink size="small" />
+                    </span>
                   </a>
                 </p>
               </div>
