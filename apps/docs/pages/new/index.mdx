@@ -1,92 +1,184 @@
 import Layout from '~/layouts/DefaultLayout'
 import Link from 'next/link'
-import { GlassPanel } from 'ui'
+import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
 
 export const meta = {
   title: 'Supabase Docs',
   description: 'All the information to integrate supabase',
+  subtitle:
+    'Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text',
 }
 
-Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text
+<h2 className="text-base max-w-xl m-0">
+  Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah
+  i am test text
+</h2>
 
-adsdasd
-Hello danny
+{/* start container */}
 
-<div className="border rounded p-12">
+<div className="flex flex-col gap-12 my-12">
 
-In this 25-minute guide, we'll be building a collaborative user managment app using NextJS and Supabase.
-As users add and move rectangles in a canvas, changes will be automatically synced and persisted, allowing for a canvas that updates in real-time across clients.
-Users will also be able to see other users selections, and undo and redo actions.
+<div className="-space-y-px">
+  <div className="
+    border border-scale-400 px-12 pb-8 pt-2 relative overflow-hidden 
+    grid grid-cols-12
+    rounded-tl-xl
+    rounded-tr-xl
+    ">
 
+    <div className="col-span-7 flex flex-col gap-6">
+      <img className="absolute right-0 top-0 w-[500px]" src="/docs/img/cards/dark.png" />
+
+        <div>
+
+          ### Quick Start
+
+          Discover how to go from no database to an app making queries in just a few minutes.
+
+          <div className="font-mono uppercase text-xs mb-2">What you will learn</div>
+
+          <div className="flex flex-col">
+            <div className="flex flex-row items-center gap-3">
+              <div className="text-brand-900">
+                <IconChevronRight size={14} strokeWidth={1.5} />
+              </div>
+              <span className="text-scale-1200">Setting up Supabase project and app</span>
+            </div>
+            <div className="flex flex-row items-center gap-3">
+              <div className="text-brand-900">
+                <IconChevronRight size={14} strokeWidth={1.5} />
+              </div>
+              <span className="text-scale-1200">Adding some sample data into your project</span>
+            </div>
+            <div className="flex flex-row items-center gap-3">
+              <div className="text-brand-900">
+                <IconChevronRight size={14} strokeWidth={1.5} />
+              </div>
+              <span className="text-scale-1200">Select() from your new database table</span>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="hidden">
+            <Button size="small">Get started</Button>
+            </div>
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
+              <IconPanel title="ReactJS" icon="/docs/img/icons/react-icon" />
+              <IconPanel title="NextJS" icon="/docs/img/icons/nextjs-icon" />
+              <IconPanel title="Flutter" icon="/docs/img/icons/flutter-icon" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  <div
+    className="
+    border
+    relative
+    px-12 h-20
+    rounded-bl-xl
+    rounded-br-xl
+    border-scale-400
+    overflow-hidden
+    min-w-full"
+  >
+    <img
+      className="z-0 absolute left-12 top-3 lg:top-1 mt-auto mb-auto w-[64px] lg:w-[96px]"
+      src="/docs/img/cards/tutorials-small.svg"
+    />
+    <img
+      className="z-0 absolute -left-32 -bottom-48 w-[320px]"
+      src="/docs/img/purple-glow-dark.png"
+    />
+    <div className="z-10 ml-[96px] lg:ml-[128px] flex flex-col items-start justify-center lg:justify-start lg:flex-row lg:items-center lg:gap-3 h-full">
+      <h2 className="text-sm lg:text-base text-scale-1200 m-0">Ready to make a full working app?</h2>
+      <p className="text-sm lg:text-base text-scale-1100 m-0">Follow our step by step <Link href="/docs/guides/tutorials"><a className="m-0">tutorials</a></Link></p>
+    </div>
+  </div>
 </div>
 
-In this 25-minute guide, we'll be building a collaborative user managment app using NextJS and Supabase.
-As users add and move rectangles in a canvas, changes will be automatically synced and persisted, allowing for a canvas that updates in real-time across clients.
-Users will also be able to see other users selections, and undo and redo actions.
+<div>
+  <div className="max-w-xl">
 
-hello world
+### Supabase Product Documentation
 
-<div className="grid grid-cols-12 gap-6 not-prose">
-  {products.map((product) => {
-    return (
-      <Link
-        href={`${product.href}`}
-        key={product.title}
-        passHref
-      >
-        <a className={product.span ?? 'col-span-4'}>
-          <GlassPanel {...product} background={true}>
-            {product.description}
-          </GlassPanel>
-        </a>
-      </Link>
-    )
+Explore our Airwallex products in detail, designed to give you control in how and when you convert currencies, make payments and manage your accounts.
+
+  </div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {products.map((product) => {
+      return (
+        <Link
+          href={`${product.href}`}
+          key={product.title}
+          passHref
+        >
+          <a className={product.span ?? 'col-span-12 md:col-span-4'}>
+            <GlassPanel {...product} background={true} showIconBg={true} showLink={true}>
+              {product.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
 
 })}
 
-</div>
-
-### Supabase APIs
-
-<div className="grid grid-cols-12 gap-6 not-prose my-16">
-  {apis.map((product) => {
-    return (
-      <Link
-        href={`/${product.href}`}
-        key={product.title}
-        passHref
-      >
-        <a className={product.span ?? 'col-span-4'}>
-          <GlassPanel {...product} background={false}>
-            {product.description}
-          </GlassPanel>
-        </a>
-      </Link>
-    )
+    {platform.map((product) => {
+      return (
+        <Link
+          href={`/${product.href}`}
+          key={product.title}
+          passHref
+        >
+          <a className={'col-span-12 md:col-span-6'}>
+            <GlassPanel {...product} background={false} showIconBg={true}>
+              {product.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
 
 })}
 
+  </div>
+
 </div>
 
-### Platform Resources
+<div>
 
-<div className="grid grid-cols-12 gap-6 not-prose my-16">
-  {platform.map((product) => {
-    return (
-      <Link
-        href={`/${product.href}`}
-        key={product.title}
-        passHref
-      >
-        <a className={product.span ?? 'col-span-4'}>
-          <GlassPanel {...product} background={false}>
-            {product.description}
-          </GlassPanel>
-        </a>
-      </Link>
-    )
+  <div className="max-w-xl">
+
+    ### Supabase APIs
+
+    Explore our Airwallex products in detail, designed to give you control in how and when you convert currencies, make payments and manage your accounts.
+
+  </div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {apis.map((product) => {
+      return (
+        <Link
+          href={`/${product.href}`}
+          key={product.title}
+          passHref
+        >
+          <a className={product.span ?? 'col-span-12 lg:col-span-4'}>
+            <GlassPanel {...product} background={false}>
+              {product.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
 
 })}
+
+  </div>
+</div>
+
+{/* end of container */}
 
 </div>
 
@@ -97,7 +189,7 @@ export const products = [
     hasLightIcon: true,
     href: '/guides/database',
     description: 'Social Login allows the user to sign into a third party website instead of.',
-    span: 'col-span-6',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Auth',
@@ -107,7 +199,7 @@ export const products = [
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
-    span: 'col-span-6',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Storage',
@@ -140,6 +232,42 @@ Social Login allows the user to sign into a third party website instead of creat
 
 export const apis = [
   {
+    title: 'Javascript Client Library',
+    icon: '/docs/img/icons/javascript-icon',
+    hasLightIcon: true,
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Flutter Client Library',
+    icon: '/docs/img/icons/flutter-icon',
+    hasLightIcon: true,
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Managment API',
+    icon: '/docs/img/icons/api-icon',
+    hasLightIcon: true,
+    href: 'auth',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Supabase CLI',
+    icon: '/docs/img/icons/cli-icon',
+    hasLightIcon: true,
+    href: 'storage',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
     title: 'Severless APIs',
     icon: '/docs/img/icons/menu/reference',
     hasLightIcon: true,
@@ -149,19 +277,10 @@ Social Login allows the user to sign into a third party website instead of creat
   `,
   },
   {
-    title: 'Managment API',
-    icon: '/docs/img/icons/menu/reference',
+    title: 'Self Hosting Server',
+    icon: '/docs/img/icons/menu/platform',
     hasLightIcon: true,
-    href: 'auth',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
-  },
-  {
-    title: 'Client libraries',
-    icon: '/docs/img/icons/menu/reference',
-    hasLightIcon: true,
-    href: 'storage',
+    href: 'database',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
@@ -171,14 +290,14 @@ Social Login allows the user to sign into a third party website instead of creat
 export const platform = [
   {
     header: '/docs/img/cards/sample-card-header-3.svg',
-    title: 'Dashboard guides',
-    icon: '/docs/img/icons/menu/reference',
+    title: 'Platform guides',
+    icon: '/docs/img/icons/menu/platform',
     hasLightIcon: true,
     href: 'database',
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
-    span: 'col-span-6',
+    span: 'col-span-12 lg:col-span-6',
   },
   {
     header: '/docs/img/cards/sample-card-header-2.svg',
@@ -189,18 +308,7 @@ Social Login allows the user to sign into a third party website instead of creat
     description: `
 Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
   `,
-    span: 'col-span-6',
-  },
-  {
-    header: '/docs/img/cards/sample-card-header-4.svg',
-    title: 'Glossary',
-    icon: '/docs/img/icons/menu/reference',
-    hasLightIcon: true,
-    href: 'storage',
-    description: `
-  Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-    `,
-    span: 'col-span-6',
+    span: 'col-span-12 lg:col-span-6',
   },
 ]
 

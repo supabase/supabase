@@ -8,6 +8,8 @@ import { useTheme } from 'common/Providers'
 import RefSwitcher from '~/components/Navigation/RefSwitcher'
 import { useEffect, useState } from 'react'
 
+import FooterHelpCallout from '~/components/FooterHelpCallout'
+
 const SiteRefLayout = ({ children }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
@@ -183,7 +185,11 @@ const SiteRefLayout = ({ children }) => {
               </div>
               <div className="grow px-5 max-w-7xl mx-auto py-16">
                 {children}
-                <hr className="border-scale-400  mt-32"></hr>
+
+                <div className="mt-32">
+                  <FooterHelpCallout />
+                </div>
+                <hr className="border-scale-400  mt-8"></hr>
                 <div className="flex flex-row gap-3 mt-6">
                   <span className="text-xs text-scale-900">Supabase 2022</span>
                   <span className="text-xs text-scale-900">—</span>
