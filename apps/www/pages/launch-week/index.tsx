@@ -191,10 +191,9 @@ export default function launchweek() {
             <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#39617D94] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1A7A4C]">
               Currently happening
             </Badge>
-            <h2 className="text-4xl dark:text-white mb-2">See creators using Supabase</h2>
+            <h2 className="text-4xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 max-w-[80%] mb-16">
-              Description about Content Storm, something to tie it up with Launch Week. To find
-              learn more info about creators check our{' '}
+              We worked with Developers from around the world to create Supabase-related content and publish everything on the same day, it's raining content ⛈{' '}
               <span className="text-brand-900">
                 <a rel="noopener" target="_blank" href="/blog">
                   blog post.
