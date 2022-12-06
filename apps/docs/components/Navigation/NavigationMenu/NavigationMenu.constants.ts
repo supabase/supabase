@@ -37,7 +37,7 @@ export const REFERENCES: References = {
 }
 
 export const gettingstarted = {
-  icon: '/img/icons/menu/getting-started.svg',
+  icon: 'getting-started',
   title: 'Getting started',
   label: 'Overview',
   items: [
@@ -48,7 +48,7 @@ export const gettingstarted = {
 }
 
 export const tutorials = {
-  icon: '/img/icons/menu/tutorials.svg',
+  icon: 'tutorials',
   label: 'Quickstarts',
   items: [
     {
@@ -275,7 +275,7 @@ export const PhoneLoginsItems = [
 ]
 
 export const auth = {
-  icon: '/img/icons/menu/auth.svg',
+  icon: 'auth',
   label: 'Auth',
   items: [
     {
@@ -358,19 +358,19 @@ export const auth = {
       name: 'API Reference',
       level: 'integrations',
       items: [],
-      icon: '/img/icons/menu/reference.svg',
+      icon: 'reference',
     },
     {
       name: 'Integrations',
       level: 'reference',
       items: [],
-      icon: '/img/icons/menu/integrations.svg',
+      icon: 'integrations',
     },
   ],
 }
 
 export const database = {
-  icon: '/img/icons/menu/database.svg',
+  icon: 'database',
   label: 'Database',
   items: [
     { name: 'Overview', url: '/guides/database', items: [] },
@@ -431,7 +431,7 @@ export const database = {
 }
 
 export const functions = {
-  icon: '/img/icons/menu/functions.svg',
+  icon: 'functions',
   label: 'Edge Functions',
   items: [
     { name: 'Overview', url: '/guides/functions', items: [] },
@@ -449,7 +449,7 @@ export const functions = {
 }
 
 export const realtime = {
-  icon: '/img/icons/menu/realtime.svg',
+  icon: 'realtime',
   label: 'Realtime',
   items: [
     { name: 'Overview', url: '/guides/realtime', items: [] },
@@ -466,7 +466,7 @@ export const realtime = {
 }
 
 export const storage = {
-  icon: '/img/icons/menu/storage.svg',
+  icon: 'storage',
   label: 'Storage',
   items: [
     { name: 'Overview', url: '/guides/storage', items: [] },
@@ -475,7 +475,7 @@ export const storage = {
 }
 
 export const platform = {
-  icon: '/img/icons/menu/platform.svg',
+  icon: 'platform',
   label: 'Platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
@@ -513,7 +513,7 @@ export const migrate = {
 }
 
 export const integrations = {
-  icon: '/img/icons/menu/integrations.svg',
+  icon: 'integrations',
   label: 'Integrations',
   items: [
     {
@@ -566,7 +566,7 @@ export const integrations = {
 
 export const reference = {
   title: 'API Reference',
-  icon: '/img/icons/menu/reference.svg',
+  icon: 'reference',
   items: [
     {
       name: 'Client libraries',
