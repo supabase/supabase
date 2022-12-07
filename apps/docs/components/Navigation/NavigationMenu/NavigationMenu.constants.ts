@@ -446,6 +446,8 @@ export const functions = {
     { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
+    { name: 'Best practises', url: '/guides/functions/best-practises', items: [] },
+    { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     {
       name: 'Examples',
       url: '/guides/functions/examples',
@@ -503,6 +505,68 @@ export const platform = {
     { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
     { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
     { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+  ],
+}
+export const resources = {
+  icon: 'resources',
+  label: 'Resources',
+  url: '/guides/resources',
+  items: [
+    { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
+    {
+      name: 'Migrating to Supabase',
+      url: '/guides/resources/migrating-to-supabase',
+      items: [
+        {
+          name: 'Firebase Auth',
+          url: '/guides/resources/migrating-to-supabase/firebase-auth',
+          items: [],
+        },
+        {
+          name: 'Firebase Data',
+          url: '/guides/resources/migrating-to-supabase/firebase-data',
+          items: [],
+        },
+        {
+          name: 'Firebase Storage',
+          url: '/guides/resources/migrating-to-supabase/firebase-storage',
+          items: [],
+        },
+        {
+          name: 'Heroku',
+          url: '/guides/resources/migrating-to-supabase/heroku',
+          items: [],
+        },
+      ],
+    },
+    {
+      name: 'Supabase CLI',
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/resources/supabase-cli',
+          items: [],
+        },
+        {
+          name: 'Local Development',
+          url: '/guides/resources/supabase-cli/local-development',
+          items: [],
+        },
+        {
+          name: 'Managing Environments',
+          url: '/guides/resources/supabase-cli/managing-environments',
+          items: [],
+        },
+      ],
+    },
+    {
+      name: 'Self Hosting',
+      items: [
+        { name: 'Overview', url: '/guides/resources/self-hosting', items: [] },
+        { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
+      ],
+    },
   ],
 }
 

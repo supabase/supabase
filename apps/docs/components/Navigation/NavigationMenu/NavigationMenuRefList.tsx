@@ -1,34 +1,38 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { IconChevronLeft, IconCommand, IconSearch } from 'ui'
+import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
-// @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
-// @ts-expect-error
-import clientLibsCommon from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
-import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
-import { SearchButton } from '~/components/DocSearch'
+
 import Image from 'next/image'
+import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 
 const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 
-const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
+const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib, libSpec }) => {
   const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
   const router = useRouter()
 
   const menu = NavItems[id]
-  let functions = jsSpec.functions
+  let functions = libSpec.functions
+
+  console.log(id, functions)
+  console.log(id, libSpec.info.id, libSpec.info.description)
 
   functions = functions.map((func) => {
+    // console.log(currentLevel, 'func', func.title)
     let data = {
       ...func,
     }
     data = {
       ...data,
-      ...clientLibsCommon.functions.filter((x) => {
-        return x.id === func.id
-      })[0],
+      ...Object.values(clientLibsCommonSections.sections.functions)
+        .map((fn: any) => fn.items)
+        .flat(2)
+        .filter((x) => {
+          return x.id === func.id
+        })[0],
     }
+
     return data
   })
 
