@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
@@ -8,15 +8,15 @@ import NoPermission from 'components/ui/NoPermission'
 import { generateLogsMenu } from './LogsMenu.utils'
 import ProductMenu from 'components/ui/ProductMenu'
 
-interface Props {
-  subtitle?: ReactNode
-  children?: ReactNode
+interface LogsLayoutProps {
+  title?: string
 }
 
-const LogsLayout: FC<Props> = ({ subtitle, children }) => {
+const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
   const { ui } = useStore()
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  const pathArr = router.pathname.split('/')
+  const page = pathArr[pathArr.length - 1]
 
   const project = ui.selectedProject
 
@@ -34,6 +34,7 @@ const LogsLayout: FC<Props> = ({ subtitle, children }) => {
 
   return (
     <BaseLayout
+      title={title}
       product="Logs"
       productMenu={<ProductMenu page={page} menu={generateLogsMenu(project)} />}
     >

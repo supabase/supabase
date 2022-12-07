@@ -120,8 +120,23 @@
             "required": false,
             "in": "query",
             "schema": { "type": "boolean" }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateFunctionBody" } },
+            "application/vnd.denoland.eszip": {
+              "schema": { "$ref": "#/components/schemas/CreateFunctionBody" }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "",
@@ -184,12 +199,6 @@
         "description": "Retrieves a function with the specified slug and project.",
         "parameters": [
           {
-            "name": "include_body",
-            "required": false,
-            "in": "query",
-            "schema": { "type": "boolean" }
-          },
-          {
             "name": "ref",
             "required": true,
             "in": "path",
@@ -250,8 +259,23 @@
             "required": false,
             "in": "query",
             "schema": { "type": "boolean" }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateFunctionBody" } },
+            "application/vnd.denoland.eszip": {
+              "schema": { "$ref": "#/components/schemas/UpdateFunctionBody" }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -289,6 +313,36 @@
           "200": { "description": "" },
           "403": { "description": "" },
           "500": { "description": "Failed to delete function with given slug" }
+        },
+        "tags": ["projects"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}/body": {
+      "get": {
+        "operationId": "getFunctionBody",
+        "summary": "Retrieve a function body",
+        "description": "Retrieves a function body for the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve function body with given slug" }
         },
         "tags": ["projects"],
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
@@ -683,6 +737,72 @@
         "tags": ["network bans (beta)"],
         "security": [{ "bearer": [] }]
       }
+    },
+    "/v1/projects/{ref}/network-restrictions": {
+      "get": {
+        "operationId": "getNetworkRestrictions",
+        "summary": "Gets project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's network restrictions" }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions/apply": {
+      "post": {
+        "operationId": "applyNetworkRestrictions",
+        "summary": "Updates project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NetworkRestrictionsRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project network restrictions" }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [{ "bearer": [] }]
+      }
     }
   },
   "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
@@ -694,6 +814,11 @@
   "components": {
     "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
     "schemas": {
+      "DatabaseResponse": {
+        "type": "object",
+        "properties": { "host": { "type": "string" }, "version": { "type": "string" } },
+        "required": ["host", "version"]
+      },
       "ProjectResponse": {
         "type": "object",
         "properties": {
@@ -701,7 +826,8 @@
           "organization_id": { "type": "string" },
           "name": { "type": "string" },
           "region": { "type": "string" },
-          "created_at": { "type": "string" }
+          "created_at": { "type": "string" },
+          "database": { "$ref": "#/components/schemas/DatabaseResponse" }
         },
         "required": ["id", "organization_id", "name", "region", "created_at"]
       },
@@ -723,6 +849,7 @@
               "ap-southeast-2",
               "eu-west-1",
               "eu-west-2",
+              "eu-west-3",
               "eu-central-1",
               "ca-central-1",
               "ap-south-1",
@@ -743,6 +870,16 @@
         "properties": { "name": { "type": "string" } },
         "required": ["name"]
       },
+      "CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
+          "name": { "type": "string" },
+          "body": { "type": "string" },
+          "verify_jwt": { "type": "boolean" }
+        },
+        "required": ["slug", "name", "body"]
+      },
       "FunctionResponse": {
         "type": "object",
         "properties": {
@@ -753,7 +890,8 @@
           "version": { "type": "number" },
           "created_at": { "type": "number" },
           "updated_at": { "type": "number" },
-          "verify_jwt": { "type": "boolean" }
+          "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
@@ -768,9 +906,18 @@
           "created_at": { "type": "number" },
           "updated_at": { "type": "number" },
           "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" },
           "body": { "type": "string" }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "UpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "body": { "type": "string" },
+          "verify_jwt": { "type": "boolean" }
+        }
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -829,6 +976,20 @@
         "type": "object",
         "properties": { "ipv4_addresses": { "type": "array", "items": { "type": "string" } } },
         "required": ["ipv4_addresses"]
+      },
+      "NetworkRestrictionsRequest": {
+        "type": "object",
+        "properties": { "dbAllowedCidrs": { "type": "array", "items": { "type": "string" } } },
+        "required": ["dbAllowedCidrs"]
+      },
+      "NetworkRestrictionsResponse": {
+        "type": "object",
+        "properties": {
+          "entitlement": { "enum": ["disallowed", "allowed"], "type": "string" },
+          "config": { "$ref": "#/components/schemas/NetworkRestrictionsRequest" },
+          "status": { "enum": ["stored", "applied"], "type": "string" }
+        },
+        "required": ["entitlement", "config", "status"]
       }
     }
   }

@@ -1,3 +1,5 @@
+// [Terry] Also need to look at getPageType() in ./lib/helpers
+// to set a menu to a page
 import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
 import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
 import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
@@ -5,6 +7,7 @@ import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
 import SupabaseCLINav from 'data/nav/supabase-cli'
 import SupabaseAPINav from 'data/nav/supabase-api'
 import AuthServerNav from 'data/nav/auth-server'
+import RealtimeServerNav from 'data/nav/realtime-server'
 import StorageServerNav from 'data/nav/storage-server'
 
 import { NavMenu, References } from './Navigation.types'
@@ -126,6 +129,11 @@ export const menuItems: NavMenu = {
             { name: 'Overview', url: '/guides/auth/auth-helpers', items: [] },
             { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
             { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
+            {
+              name: 'Next.js Server Components',
+              url: '/guides/auth/auth-helpers/nextjs-server-components',
+              items: [],
+            },
             { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
             { name: 'Remix', url: '/guides/auth/auth-helpers/remix', items: [] },
           ],
@@ -162,7 +170,7 @@ export const menuItems: NavMenu = {
         { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
         { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
         { name: 'Database Functions', url: '/guides/database/functions', items: [] },
-        { name: 'Database Webhooks', url: '/guides/database/database-webhooks', items: [] },
+        { name: 'Database Webhooks', url: '/guides/database/webhooks', items: [] },
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
         { name: 'Database Testing', url: '/guides/database/testing', items: [] },
         {
@@ -218,8 +226,9 @@ export const menuItems: NavMenu = {
       label: 'Edge Functions',
       items: [
         { name: 'Overview', url: '/guides/functions', items: [] },
+        { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
         { name: 'Auth', url: '/guides/functions/auth', items: [] },
-        { name: 'Examples', url: '/guides/functions/examples', items: [] },
+        { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
         { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
       ],
     },
@@ -228,7 +237,7 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Overview', url: '/guides/realtime', items: [] },
         { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-        { name: 'Postgres CDC', url: '/guides/realtime/postgres-cdc', items: [] },
+        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
     },
@@ -236,13 +245,16 @@ export const menuItems: NavMenu = {
       label: 'Storage',
       items: [
         { name: 'Overview', url: '/guides/storage', items: [] },
-        { name: 'CDN', url: '/guides/storage-cdn', items: [] },
+        { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
+        { name: 'Access Control', url: '/guides/storage/access-control', items: [] },
+        { name: 'CDN', url: '/guides/storage/cdn', items: [] },
       ],
     },
     {
       label: 'Platform',
       items: [
         { name: 'Overview', url: '/guides/hosting/platform', items: [] },
+        { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
@@ -298,11 +310,13 @@ export const menuItems: NavMenu = {
           name: 'Developer Tools',
           url: undefined,
           items: [
+            { name: 'Estuary', url: '/guides/integrations/estuary', items: [] },
             { name: 'pgMustard', url: '/guides/integrations/pgmustard', items: [] },
             { name: 'Prisma', url: '/guides/integrations/prisma', items: [] },
             { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
             { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
             { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
+            { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
           ],
         },
         {
@@ -315,6 +329,7 @@ export const menuItems: NavMenu = {
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
+            { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
           ],
         },
       ],
@@ -335,6 +350,7 @@ export const menuItems: NavMenu = {
       label: 'Self-hosting',
       items: [
         { name: 'Auth Server', url: '/reference/auth', items: [] },
+        { name: 'Realtime Server', url: '/reference/realtime', items: [] },
         { name: 'Storage Server', url: '/reference/storage', items: [] },
       ],
     },
@@ -346,5 +362,6 @@ export const menuItems: NavMenu = {
   'reference/cli': SupabaseCLINav,
   'reference/api': SupabaseAPINav,
   'reference/auth': AuthServerNav,
+  'reference/realtime': RealtimeServerNav,
   'reference/storage': StorageServerNav,
 }

@@ -16,13 +16,17 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - id: meta
         uses: docker/metadata-action@v4
         with:
           images: |
             supabase/studio
-            public.ecr.aws/t3w2s2c9/studio
+            public.ecr.aws/supabase/studio
+            ghcr.io/supabase/studio
           flavor: |
             latest=false
           tags: |
@@ -49,10 +53,18 @@ jobs:
           username: ${{ secrets.PROD_ACCESS_KEY_ID }}
           password: ${{ secrets.PROD_SECRET_ACCESS_KEY }}
 
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: docker/build-push-action@v3
         with:
           push: true
-          context: '{{defaultContext}}:studio'
+          context: '{{defaultContext}}'
+          file: studio/Dockerfile
           target: production
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
