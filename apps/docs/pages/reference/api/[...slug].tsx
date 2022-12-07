@@ -7,6 +7,7 @@ import { Tabs } from '~/../../packages/ui'
 import components from '~/components/index'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
+import toc from 'markdown-toc'
 
 // @ts-ignore
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -212,7 +213,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
    *  - important notes regarding implementation
    */
   const allMarkdownDocs = await Promise.all(
-    pages.map(async (x, i) => {
+    pages.map(async (x: any, i) => {
       const pathName = `docs/ref/api/${x}.mdx`
 
       function checkFileExists(x) {
