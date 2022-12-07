@@ -196,7 +196,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
               const activeAccordianItem = useMenuActiveRefId()
               let active = false
 
-              console.log('render link id', props.id)
+              //console.log('render link id', props.id)
 
               const isFilter = filterIds.includes(activeAccordianItem)
               const isModifier = modifierIds.includes(activeAccordianItem)
