@@ -5334,6 +5334,44 @@ pages:
             .download('folder/avatar1.png')
           ```
 
+  storage.from.publicDownload():
+    title: 'from.publicDownload()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.publicDownload'
+    notes: |
+      - RLS policy permissions required1:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - name: Download file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .publicDownload('folder/avatar1.png')
+          ```
+
+  storage.from.authenticatedDownload():
+    title: 'from.authenticatedDownload()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.authenticatedDownload'
+    notes: |
+      - RLS policy permissions required1:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - name: Download file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .authenticatedDownload('folder/avatar1.png')
+          ```
+
   storage.from.remove():
     title: 'from.remove()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'

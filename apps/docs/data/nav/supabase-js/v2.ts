@@ -145,6 +145,16 @@ const Nav = [
       { name: 'emptyBucket()', url: '/reference/javascript/storage-emptybucket', items: [] },
       { name: 'from.upload()', url: '/reference/javascript/storage-from-upload', items: [] },
       { name: 'from.download()', url: '/reference/javascript/storage-from-download', items: [] },
+      {
+        name: 'from.publicDownload()',
+        url: '/reference/javascript/storage-from-publicdownload',
+        items: [],
+      },
+      {
+        name: 'from.authenticatedDownload()',
+        url: '/reference/javascript/storage-from-authenticateddownload',
+        items: [],
+      },
       { name: 'from.list()', url: '/reference/javascript/storage-from-list', items: [] },
       { name: 'from.update()', url: '/reference/javascript/storage-from-update', items: [] },
       { name: 'from.move()', url: '/reference/javascript/storage-from-move', items: [] },
