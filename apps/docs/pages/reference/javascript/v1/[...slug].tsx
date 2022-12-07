@@ -16,7 +16,7 @@ import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
 // @ts-ignore
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 
-import ReferenceDetailCollapse from '~/components/reference/ReferenceDetailCollapse'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
@@ -210,7 +210,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                   className="flex flex-col gap-3"
                                 >
                                   {((tables && tables.length > 0) || sql) && (
-                                    <ReferenceDetailCollapse
+                                    <RefDetailCollapse
                                       id={`${example.id}-${exampleIndex}-data`}
                                       label="Example data source"
                                       defaultOpen={false}
@@ -244,7 +244,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                           </CodeBlock>
                                         )}
                                       </>
-                                    </ReferenceDetailCollapse>
+                                    </RefDetailCollapse>
                                   )}
 
                                   <CodeBlock
@@ -260,7 +260,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                           .replace('```', ''))}
                                   </CodeBlock>
                                   {response && (
-                                    <ReferenceDetailCollapse
+                                    <RefDetailCollapse
                                       id={`${example.id}-${exampleIndex}-response`}
                                       label="Example response"
                                       defaultOpen={false}
@@ -275,7 +275,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                           .replace('json', '')
                                           .replace('```', '')}
                                       </CodeBlock>
-                                    </ReferenceDetailCollapse>
+                                    </RefDetailCollapse>
                                   )}
                                 </Tabs.Panel>
                               )

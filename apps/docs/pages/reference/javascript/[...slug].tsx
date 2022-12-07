@@ -32,7 +32,7 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import OldLayout from '~/layouts/Default'
 
 import * as Accordion from '@radix-ui/react-accordion'
-import ReferenceDetailCollapse from '~/components/reference/ReferenceDetailCollapse'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 
@@ -40,7 +40,7 @@ const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
   .map((fn: any) => fn.items)
   .flat(2)
 
-console.log('allFunctions', allFunctions)
+//console.log('allFunctions', allFunctions)
 
 interface ICommonFunc {
   id: string
@@ -159,7 +159,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                         className="flex flex-col gap-3"
                       >
                         {((tables && tables.length > 0) || sql) && (
-                          <ReferenceDetailCollapse
+                          <RefDetailCollapse
                             id={`${example.id}-${exampleIndex}-data`}
                             label="Example data source"
                             defaultOpen={false}
@@ -191,7 +191,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                 </CodeBlock>
                               )}
                             </>
-                          </ReferenceDetailCollapse>
+                          </RefDetailCollapse>
                         )}
 
                         <CodeBlock
@@ -204,7 +204,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                               example.code.replace('```', '').replace('js', '').replace('```', ''))}
                         </CodeBlock>
                         {response && (
-                          <ReferenceDetailCollapse
+                          <RefDetailCollapse
                             id={`${example.id}-${exampleIndex}-response`}
                             label="Example response"
                             defaultOpen={false}
@@ -216,7 +216,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                             >
                               {response.replace('```', '').replace('json', '').replace('```', '')}
                             </CodeBlock>
-                          </ReferenceDetailCollapse>
+                          </RefDetailCollapse>
                         )}
                       </Tabs.Panel>
                     )

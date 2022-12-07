@@ -2,7 +2,7 @@ import * as Accordion from '@radix-ui/react-accordion'
 import React from 'react'
 import { IconChevronRight } from '~/../../packages/ui'
 
-const ReferenceDetailCollapse: React.FC<{ id: string; label: string; defaultOpen?: boolean }> = ({
+const RefDetailCollapse: React.FC<{ id: string; label: string; defaultOpen?: boolean }> = ({
   defaultOpen = true,
   ...props
 }) => {
@@ -41,4 +41,4 @@ const ReferenceDetailCollapse: React.FC<{ id: string; label: string; defaultOpen
   )
 }
 
-export default ReferenceDetailCollapse
+export default RefDetailCollapse

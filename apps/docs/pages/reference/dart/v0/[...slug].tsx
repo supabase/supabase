@@ -10,7 +10,7 @@ import components from '~/components/index'
 import { getAllDocs, getDocsBySlug } from '~/lib/docs'
 
 import ReactMarkdown from 'react-markdown'
-import ReferenceDetailCollapse from '~/components/reference/ReferenceDetailCollapse'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 
 // @ts-ignore
 import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
@@ -209,7 +209,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                   className="flex flex-col gap-3"
                                 >
                                   {((tables && tables.length > 0) || sql) && (
-                                    <ReferenceDetailCollapse
+                                    <RefDetailCollapse
                                       id={`${example.id}-${exampleIndex}-data`}
                                       label="Example data source"
                                       defaultOpen={false}
@@ -243,7 +243,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                           </CodeBlock>
                                         )}
                                       </>
-                                    </ReferenceDetailCollapse>
+                                    </RefDetailCollapse>
                                   )}
 
                                   <CodeBlock
@@ -259,7 +259,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                           .replace('```', ''))}
                                   </CodeBlock>
                                   {response && (
-                                    <ReferenceDetailCollapse
+                                    <RefDetailCollapse
                                       id={`${example.id}-${exampleIndex}-response`}
                                       label="Example response"
                                       defaultOpen={false}
@@ -274,7 +274,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                           .replace('json', '')
                                           .replace('```', '')}
                                       </CodeBlock>
-                                    </ReferenceDetailCollapse>
+                                    </RefDetailCollapse>
                                   )}
                                 </Tabs.Panel>
                               )
