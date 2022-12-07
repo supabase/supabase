@@ -23,7 +23,7 @@ interface Props {
   sidePanelKey?: 'row' | 'column' | 'table'
   /** Toggles if we're duplicating a table */
   isDuplicating: boolean
-  /** Selected entities if we're editting a row, column or table */
+  /** Selected entities if we're editing a row, column or table */
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable

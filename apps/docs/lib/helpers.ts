@@ -20,6 +20,8 @@ export function getPageType(asPath: string) {
     page = 'reference/cli'
   } else if (asPath.includes('/reference/auth')) {
     page = 'reference/auth'
+  } else if (asPath.includes('/reference/realtime')) {
+    page = 'reference/realtime'
   } else if (asPath.includes('/reference/storage')) {
     page = 'reference/storage'
   } else if (asPath.includes('/reference')) {

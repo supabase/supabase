@@ -42,10 +42,7 @@ const ResetDbPassword: FC<any> = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
 
-  const enablePermissions = useFlag('enablePermissions')
-  const canResetDbPassword = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'projects')
-    : ui.selectedOrganization?.is_owner
+  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
@@ -351,7 +348,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
             }
           >
             <Panel.Content>
-              <Tabs type="underlined">
+              <Tabs type="underlined" size="small">
                 {/* @ts-ignore */}
                 <Tabs.Panel id="psql" label="PSQL">
                   <Input copy readOnly disabled value={psqlConnString} />

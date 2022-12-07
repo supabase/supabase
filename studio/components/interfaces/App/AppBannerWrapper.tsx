@@ -7,7 +7,7 @@ const AppBannerWrapper: FC = ({ children }) => {
   const ongoingIncident = useFlag('ongoingIncident')
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="min-h-full flex flex-col">
       {ongoingIncident && (
         <Link href="https://status.supabase.com">
           <a target="_blank">
@@ -21,6 +21,7 @@ const AppBannerWrapper: FC = ({ children }) => {
           </a>
         </Link>
       )}
+
       {children}
     </div>
   )
