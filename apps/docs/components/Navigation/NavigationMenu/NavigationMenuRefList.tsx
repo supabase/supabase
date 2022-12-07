@@ -213,12 +213,18 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
 
               if (
                 (isFilter && !isModifier && props.id === 'using-filters') ||
-                activeAccordianItem === 'using-filters'
+                (activeAccordianItem === 'using-filters' &&
+                  !isModifier &&
+                  !isFilter &&
+                  props.id === 'using-filters')
               ) {
                 active = true
               } else if (
                 (isModifier && !isFilter && props.id === 'using-modifiers') ||
-                activeAccordianItem === 'using-modifiers'
+                (activeAccordianItem === 'using-modifiers' &&
+                  !isFilter &&
+                  !isModifier &&
+                  props.id === 'using-modifiers')
               ) {
                 active = true
               } else {
