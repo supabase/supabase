@@ -12,6 +12,16 @@ import Image from 'next/image'
 
 const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 
+// Get only the functions with references in the current librarry
+// ie: if the lib === dart, only get the dart functions
+const allCurrentFunctions = allFunctions
+  .map((fn: any) => {
+    if (fn.items.flat().find((item) => item.libs.includes('dart'))) return fn
+  })
+  .filter((item) => item)
+
+console.log({ allCurrentFunctions })
+
 const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
   const router = useRouter()
@@ -129,8 +139,8 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
           ))}
 
           <Divider />
-          {console.log(allFunctions)}
-          {allFunctions.map((fn: any) => {
+
+          {allCurrentFunctions.map((fn: any) => {
             const toplevelItems = fn.items.filter((item) => !item.parent)
             toplevelItems.map((item) => <li>{item.title}</li>)
 
