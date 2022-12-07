@@ -1,12 +1,12 @@
+import { partition } from 'lodash'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { Collapsible, Form, IconCheck, IconLoader, Toggle } from 'ui'
 import { wrappers } from './data'
 import WrapperCard from './WrapperCard'
-import Image from 'next/image'
 import WrapperRow from './WrapperRow'
 import { useState } from 'react'
+import { Wrapper } from './types'
 
 const Wrappers = () => {
   const { project } = useProjectContext()
@@ -17,25 +17,24 @@ const Wrappers = () => {
   const [open, setOpen] = useState<string>('')
 
   const enabledWrapperNamesSet = new Set(data?.result.map((fdw) => fdw.name))
-
-  const enabledWrappers = wrappers.filter((wrapper) =>
+  // const enabledWrapperNamesSet = new Set(['stripe_server'])
+  const [enabledWrappers, disabledWrappers] = partition(wrappers, (wrapper: Wrapper) =>
     enabledWrapperNamesSet.has(wrapper.server.name)
-  )
-  const disabledWrappers = wrappers.filter(
-    (wrapper) => !enabledWrapperNamesSet.has(wrapper.server.name)
   )
 
   return (
-    <>
+    <div>
       <FormHeader
         title="Foreign Data Wrappers"
-        description="Connect your database to external systems. Query your data warehouse directly from your database, or query third-party APIs using SQL."
+        description="Connect your database to external systems. Query your data warehouse directly from your database, or third-party APIs using SQL."
       />
+
       <div>
         {wrappers.map((wrapper) => {
           return (
             <WrapperRow
               wrapper={wrapper}
+              isEnabled={enabledWrapperNamesSet.has(wrapper.server.name)}
               isOpen={open === wrapper.name}
               onOpen={(wrapperName) => {
                 if (open !== wrapperName) setOpen(wrapperName)
@@ -46,7 +45,8 @@ const Wrappers = () => {
         })}
       </div>
 
-      <div className="space-y-4">
+      {/* [Joshen TODO] Once above is working, can remove below */}
+      <div className="space-y-4 mt-20">
         <div className="w-full space-y-12">
           {enabledWrappers.length > 0 && (
             <div className="space-y-4">
@@ -71,7 +71,7 @@ const Wrappers = () => {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

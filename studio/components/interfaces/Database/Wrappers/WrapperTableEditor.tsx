@@ -99,7 +99,6 @@ const Option = ({ option }: { option: TableOption }) => {
       label={option.label}
       placeholder={option.placeholder ?? ''}
       defaultValue={option.defaultValue ?? ''}
-      className="input-mono"
     />
   )
 }
@@ -148,7 +147,6 @@ const TableForm = ({
             name="table_name"
             label="Table name"
             descriptionText="The name of the local table table you will query after the wrapper is enabled."
-            className="input-mono"
           />
 
           {requiredOptions.map((option) => (

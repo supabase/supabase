@@ -12,6 +12,7 @@ export type ServerOption = {
   label: string
   required: boolean
   encrypted: boolean
+  hidden: boolean
   defaultValue?: string
 }
 
@@ -31,6 +32,7 @@ export type TableOption = {
 
 export type Table = {
   label: string
+  description?: string
   availableColumns: AvailableColumn[]
   options: TableOption[]
 }
