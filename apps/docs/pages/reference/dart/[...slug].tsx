@@ -180,7 +180,7 @@ export default function DartReference(props) {
                     </>
                   </RefSubLayout.Details>
                   <RefSubLayout.Examples>
-                    {item.examples.length && (
+                    {item.examples && item.examples.length > 0 && (
                       <>
                         <Tabs
                           defaultActiveId={item.examples[0].id}
