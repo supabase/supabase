@@ -6,8 +6,11 @@ import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
+import { useTheme } from '~/components/Providers'
 
 export default function TicketHome() {
+  const { isDarkMode } = useTheme()
+
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
@@ -28,6 +31,10 @@ export default function TicketHome() {
     })
   }, [])
 
+  useEffect(() => {
+    document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
+  }, [isDarkMode])
+
   return (
     <>
       <NextSeo
@@ -43,17 +50,20 @@ export default function TicketHome() {
           ],
         }}
       />
-      <div className="launch-week-gradientBg"></div>
       <DefaultLayout>
-        <SectionContainer className="flex flex-col gap-8 !pb-0 md:gap-16 lg:gap-16">
-          <img
-            src="/images/launchweek/launchweek-logo--light.svg"
-            className="md:40 w-28 dark:hidden lg:w-48"
-          />
-          <img
-            src="/images/launchweek/launchweek-logo--dark.svg"
-            className="md:40 hidden w-28 dark:block lg:w-48"
-          />
+        <SectionContainer className="flex flex-col gap-16">
+          <div className="flex flex-col gap-3 items-center justify-center xl:justify-start">
+            <img
+              src="/images/launchweek/launchweek-logo--light.svg"
+              className="flex w-40 dark:hidden lg:w-80"
+            />
+            <img
+              src="/images/launchweek/launchweek-logo--dark.svg"
+              className="hidden w-40 dark:flex lg:w-80"
+            />
+            <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
+          </div>
+
           <TicketContainer
             supabase={supabase}
             session={session}

@@ -33,23 +33,17 @@ export default function Conf({
         setPageState,
       }}
     >
-      <ConfContainer>
-        {pageState === 'registration' && !sharePage ? (
-          <>
-            {/* <Hero /> */}
-            <Form />
-            {/* <LearnMore /> */}
-          </>
-        ) : (
-          <Ticket
-            username={userData.username}
-            name={userData.name}
-            ticketNumber={userData.ticketNumber}
-            sharePage={sharePage}
-            golden={userData.golden}
-          />
-        )}
-      </ConfContainer>
+      {pageState === 'registration' && !sharePage ? (
+        <Form align={defaultPageState === 'registration' ? 'Center' : 'Left'} />
+      ) : (
+        <Ticket
+          username={userData.username}
+          name={userData.name}
+          ticketNumber={userData.ticketNumber}
+          sharePage={sharePage}
+          golden={userData.golden}
+        />
+      )}
     </ConfDataContext.Provider>
   )
 }
