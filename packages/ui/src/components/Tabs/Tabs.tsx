@@ -23,6 +23,7 @@ interface TabsProps {
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
   listClassNames?: string
+  children: PanelPropsProps[]
 }
 
 interface TabsSubComponents {
@@ -30,7 +31,6 @@ interface TabsSubComponents {
 }
 
 const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
-  children,
   defaultActiveId,
   activeId,
   type = 'pills',
@@ -42,6 +42,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   addOnBefore,
   addOnAfter,
   listClassNames,
+  children,
 }) => {
   const [activeTab, setActiveTab] = React.useState(
     defaultActiveId
@@ -86,7 +87,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
     <TabsPrimitive.Root defaultValue={defaultActiveId} value={active} className={__styles.base}>
       <TabsPrimitive.List className={listClasses.join(' ')}>
         {addOnBefore}
-        {children.map((tab: any) => {
+        {children.map((tab) => {
           const activeMatch = active === tab.props.id
 
           const triggerClasses = [__styles[type].base, __styles.size[size]]
@@ -123,6 +124,11 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
       <TabsContext.Provider value={{ activeId: active }}>{children}</TabsContext.Provider>
     </TabsPrimitive.Root>
   )
+}
+
+// bit of a hack because we map over the JSX in the parent component
+interface PanelPropsProps {
+  props: PanelProps
 }
 
 interface PanelProps {
