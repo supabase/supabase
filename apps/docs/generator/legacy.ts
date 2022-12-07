@@ -43,8 +43,6 @@ export default async function gen(inputFileName: string, outputDir: string) {
   pages.forEach(async (pageSpec: OpenRef.Page) => {
     try {
       // get the slug from common-client-libs.yml
-      //const slug = slugify(pageSpec.id)
-
       const slug = commonDocSpecJson.sections.functions
         .find((fn) => fn.items.find((item) => item.id === pageSpec.id))
         ?.items.find((item) => item.id === pageSpec.id).slug

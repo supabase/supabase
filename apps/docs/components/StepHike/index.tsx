@@ -12,7 +12,7 @@ const StepHike = ({ children, title }) => {
   if (!children) throw 'StepHike component requires <StepHike.Step> children'
 
   const steps = children.filter((x) => {
-    console.log('child stuff', x)
+    //console.log('child stuff', x)
     return x.type.name === 'Step'
   })
 
@@ -82,10 +82,10 @@ const StepHike = ({ children, title }) => {
 
       {/* <div
         className="sticky w-full top-[128px] bottom-[64px] z-10 p-5 rounded-lg
-      
+
       flex gap-3 items-center
       backdrop-blur-lg backdrop-filter bg-white-1200 dark:bg-whiteA-300
-      
+
       h-[60px]
       not-prose
       "
@@ -174,11 +174,11 @@ const Step = ({ children, title, step }) => {
               <div
                 ref={ref}
                 className="sticky w-full top-[64px] z-10 p-5 rounded-lg
-      
+
       flex gap-3 items-center
       backdrop-blur-lg backdrop-filter bg-white-1200 dark:bg-whiteA-300
-      
-      
+
+
       border-b border-l border-r border-scale-600 border-t
 
       h-[60px]
