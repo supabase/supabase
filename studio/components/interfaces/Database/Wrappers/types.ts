@@ -1,5 +1,6 @@
 export type Wrapper = {
   name: string
+  icon: string
   extensionName: string
   label: string
   server: Server

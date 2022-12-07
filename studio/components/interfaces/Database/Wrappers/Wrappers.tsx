@@ -1,4 +1,5 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormHeader } from 'components/ui/Forms'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { wrappers } from './data'
 import WrapperCard from './WrapperCard'
@@ -21,7 +22,11 @@ const Wrappers = () => {
 
   return (
     <>
-      <div className="p-4 space-y-4">
+      <FormHeader
+        title="Foreign Data Wrappers"
+        description="Connect your database to external systems. Query your data warehouse directly from your database, or query third-party APIs using SQL."
+      />
+      <div className="space-y-4">
         <div className="w-full space-y-12">
           {enabledWrappers.length > 0 && (
             <div className="space-y-4">

@@ -3,6 +3,7 @@ import { Wrapper } from './types'
 export const wrappers: Wrapper[] = [
   {
     name: 'stripe_wrapper',
+    icon: '/img/icons/stripe-icon.svg',
     extensionName: 'StripeFdw',
     label: 'Stripe',
     server: {
@@ -49,6 +50,7 @@ export const wrappers: Wrapper[] = [
   },
   {
     name: 'firebase_wrapper',
+    icon: '/img/icons/firebase-icon.svg',
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
     server: {

@@ -9,6 +9,7 @@ import { Wrapper } from './types'
 import WrapperEditor from './WrapperEditor'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Image from 'next/image'
 
 export type WrapperCardProps = {
   wrapper: Wrapper
@@ -61,15 +62,18 @@ const WrapperCard = ({ wrapper, enabled = false }: WrapperCardProps) => {
         <div
           className={[
             'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
-            'flex border-b p-4 px-6 dark:border-panel-border-dark',
+            'flex justify-between border-b p-4 px-6 dark:border-panel-border-dark',
           ].join(' ')}
         >
-          <h3
-            title={wrapper.label}
-            className="flex-1 h-5 m-0 text-base uppercase truncate text-scale-1200"
-          >
-            {wrapper.label}
-          </h3>
+          <div className="flex items-center space-x-3">
+            <Image src={wrapper.icon} height={20} width={20} />
+            <h3
+              title={wrapper.label}
+              className="flex-1 h-5 m-0 text-base uppercase truncate text-scale-1200 capitalize"
+            >
+              {wrapper.label}
+            </h3>
+          </div>
           {isLoading ? (
             <IconLoader className="animate-spin" size={16} />
           ) : (
