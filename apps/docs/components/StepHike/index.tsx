@@ -6,7 +6,7 @@ import { StepHikeContext } from './StepHikeContext'
 const StepHike = ({ children, title }) => {
   const [activeStep, setActiveStep] = useState(undefined)
 
-  console.log('step hike children', children)
+  //console.log('step hike children', children)
 
   // check if there are any children
   if (!children) throw 'StepHike component requires <StepHike.Step> children'

@@ -220,7 +220,7 @@ export type enrichedOperation = OpenAPIV3.OperationObject & {
 export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
   const specLayout = spec.tags || []
   const operations: enrichedOperation[] = []
-  console.log('im v3ing')
+
   Object.entries(spec.paths).forEach(([key, val]) => {
     const fullPath = `${apiUrl}${key}`
 

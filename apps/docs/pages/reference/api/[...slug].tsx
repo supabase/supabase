@@ -34,7 +34,7 @@ export type ApiParameter = {
 // @ts-ignore
 const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
 
-console.log({ generatedSpec })
+//console.log({ generatedSpec })
 export default function Config() {
   return (
     <RefSubLayout>
