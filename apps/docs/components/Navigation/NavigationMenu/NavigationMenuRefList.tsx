@@ -129,15 +129,19 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
           ))}
 
           <Divider />
-
+          {console.log(allFunctions)}
           {allFunctions.map((fn: any) => {
             const toplevelItems = fn.items.filter((item) => !item.parent)
             toplevelItems.map((item) => <li>{item.title}</li>)
 
             // Database has Filters and Modifiers sub-items
             if (fn.title === 'Database') {
-              const filters = fn.items.filter((item) => item.parent === 'filters')
-              const modifiers = fn.items.filter((item) => item.parent === 'modifiers')
+              const filters = fn.items.filter(
+                (item) => item.parent === 'filters' && item.libs.includes(lib)
+              )
+              const modifiers = fn.items.filter(
+                (item) => item.parent === 'modifiers' && item.libs.includes(lib)
+              )
 
               return (
                 <>
@@ -169,9 +173,11 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
                 <>
                   <Divider />
                   <SideMenuTitle title={fn.title} />
-                  {fn.items.map((item) => (
-                    <FunctionLink {...item} library={menu.title} />
-                  ))}
+                  {fn.items
+                    .filter((item) => item.libs.includes(lib))
+                    .map((item) => (
+                      <FunctionLink {...item} library={menu.title} />
+                    ))}
                 </>
               )
             }
