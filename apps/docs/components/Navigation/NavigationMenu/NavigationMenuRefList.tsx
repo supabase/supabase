@@ -64,7 +64,7 @@ const Divider = () => {
   return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
 }
 
-const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib, libSpec }) => {
+const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   const router = useRouter()
   // const { activeRefItem } = useNavigationMenuContext()
   // const [activeAccordianItem, setActiveAccordianItem] = useState('')
