@@ -14,6 +14,7 @@ export const wrappers: Wrapper[] = [
           label: 'Stripe Secret Key',
           required: true,
           encrypted: true,
+          hidden: true,
         },
         {
           name: 'api_url',
@@ -21,12 +22,14 @@ export const wrappers: Wrapper[] = [
           defaultValue: 'https://api.stripe.com/v1',
           required: false,
           encrypted: false,
+          hidden: false,
         },
       ],
     },
     tables: [
       {
         label: 'Balance',
+        description: 'Shows the balance currently on your Stripe account',
         availableColumns: [
           {
             name: 'amount',
@@ -61,12 +64,14 @@ export const wrappers: Wrapper[] = [
           label: 'Project ID',
           required: true,
           encrypted: false,
+          hidden: false,
         },
         {
           name: 'sa_key_id',
           label: 'Service Account Key',
           required: true,
           encrypted: true,
+          hidden: true,
         },
       ],
     },

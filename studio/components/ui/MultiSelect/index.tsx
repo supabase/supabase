@@ -112,7 +112,7 @@ export default function MultiSelect({
 
   return (
     <div className={`form-group ${disabled ? 'pointer-events-none opacity-50' : ''}`}>
-      {label && <label>{label}</label>}
+      {label && <label className="!w-full">{label}</label>}
       <div
         className={[
           'form-control form-control--multi-select',

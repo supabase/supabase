@@ -11,6 +11,8 @@ import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Image from 'next/image'
 
+// [Joshen TODO]  No longer used, can remove after WrapperRow is working
+
 export type WrapperCardProps = {
   wrapper: Wrapper
   enabled?: boolean

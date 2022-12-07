@@ -10,6 +10,8 @@ import { Wrapper } from './types'
 import { makeValidateRequired } from './utils'
 import WrapperTableEditor from './WrapperTableEditor'
 
+// [Joshen TODO]  No longer used, can remove after WrapperRow is working
+
 export type WrapperEditorProps = {
   visible: boolean
   wrapper: Wrapper
