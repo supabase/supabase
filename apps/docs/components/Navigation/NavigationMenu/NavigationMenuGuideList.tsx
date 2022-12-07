@@ -122,7 +122,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                           )}
                           <Accordion.Item key={subItem.label} value={subItem.url}>
                             <li key={subItem.name}>
-                              <Link href={`/${subItem.url}`} passHref>
+                              <Link href={`${subItem.url}`} passHref>
                                 <a
                                   className={[
                                     'cursor-pointer transition text-sm',
@@ -141,7 +141,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                                 {subItem.items.map((subSubItem, subSubItemIndex) => {
                                   return (
                                     <li key={subItem.name}>
-                                      <Link href={`/${subSubItem.url}`} passHref>
+                                      <Link href={`${subSubItem.url}`} passHref>
                                         <a
                                           className={[
                                             'cursor-pointer transition text-sm',
@@ -166,7 +166,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
                 ) : (
                   <>
                     <li>
-                      <Link href={`/${x.url}`} passHref>
+                      <Link href={`${x.url}`} passHref>
                         <a
                           className={[
                             'cursor-pointer transition text-sm',
@@ -197,7 +197,7 @@ const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
             return (
               <div key={x.name}>
                 <li>
-                  <Link href={`/${x.href}`} passHref>
+                  <Link href={`${x.href}`} passHref>
                     <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
                       {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
                       {x.name}

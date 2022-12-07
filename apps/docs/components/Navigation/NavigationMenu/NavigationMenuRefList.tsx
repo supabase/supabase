@@ -91,7 +91,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   const path = useWindowLocation()
 
   useEffect(() => {
-    console.log('path', path)
+    //console.log('path', path)
   }, [path])
 
   // console.log('firstLevelRoute', firstLevelRoute)
@@ -271,7 +271,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
           return (
             <div key={x.name}>
               <li>
-                <Link href={`/${x.href}`} passHref>
+                <Link href={`${x.href}`} passHref>
                   <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
                     {x.icon && (
                       <Image

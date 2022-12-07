@@ -10,17 +10,17 @@ const useWindowLocation = (): Location | void => {
   }
 
   useEffect(() => {
-    console.log('HOOK USEEFFECT FOR WINDOWWW')
+    //console.log('HOOK USEEFFECT FOR WINDOWWW')
     if (!isMounted) return
-    console.log('I AM MOUNTED')
+    //console.log('I AM MOUNTED')
 
     if (!location) {
       setWindowLocation(window.location)
     }
 
     const handler = () => {
-      console.log('handlinggg...')
-      console.log(window.location)
+      //console.log('handlinggg...')
+      //console.log(window.location)
       setWindowLocation(window.location)
     }
 
@@ -32,7 +32,7 @@ const useWindowLocation = (): Location | void => {
   }, [isMounted])
 
   useEffect(() => {
-    console.log('location, in hook useffect', location)
+    // console.log('location, in hook useffect', location)
   }, [location])
 
   return location
