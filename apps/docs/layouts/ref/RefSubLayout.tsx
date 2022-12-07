@@ -18,6 +18,7 @@ type RefSubLayoutSubComponents = {
 
 type StickyHeader = {
   id: string
+  slug?: string
   title?: string
   monoFont?: boolean
   scrollSpyHeader?: boolean // whether or not the header updates the url on scroll
@@ -36,6 +37,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 }
 
 const Section: FC<ISectionContainer> = (props) => {
+  console.log({ props })
   return (
     <article key={props.id}>
       <StickyHeader {...props} />
@@ -57,7 +59,7 @@ const StickyHeader: FC<StickyHeader> = (props) => {
   return (
     <h2
       ref={ref}
-      id={props.id}
+      id={props.slug}
       className={[
         'text-xl font-medium text-scale-1200 mb-8 scroll-mt-24',
         props.monoFont && 'font-mono',
