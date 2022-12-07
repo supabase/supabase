@@ -295,6 +295,7 @@ If you try to submit a form with the action `?/createPost` without a valid sessi
 import type { Actions } from './$types'
 import { invalid, redirect } from '@sveltejs/kit'
 import { getSupabase } from '@supabase/auth-helpers-sveltekit'
+import { AuthApiError } from '@supabase/supabase-js'
 
 export const actions: Actions = {
   signin: async (event) => {
