@@ -12,6 +12,7 @@ interface ISectionContainer {
   monoFont?: boolean
   slug: string
   scrollSpyHeader?: boolean
+  singleColumn?: boolean
 }
 
 type RefSubLayoutSubComponents = {
@@ -37,9 +38,20 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 const Section: FC<ISectionContainer> = (props) => {
   // console.log({ props })
   return (
-    <article key={props.id} className="py-16 lg:py-32">
+    <article
+      key={props.id}
+      className={`${
+        props.singleColumn ? 'prose dark:prose-dark py-16 lg:py-32 ' : 'py-16 lg:py-32'
+      }`}
+    >
       <StickyHeader {...props} />
-      <div className="grid lg:grid-cols-2 ref-container gap-16">{props.children}</div>
+      <div
+        className={`ref-container gap-16 ${
+          !props.singleColumn ? 'grid lg:grid-cols-2' : 'ref-container--full-width lg:max-w-3xl'
+        }`}
+      >
+        {props.children}
+      </div>
     </article>
   )
 }
