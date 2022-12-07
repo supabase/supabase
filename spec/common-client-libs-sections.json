@@ -103,7 +103,7 @@
           },
           {
             "id": "eq",
-            "title": "Filter rows where column is equal to a value",
+            "title": "Column is equal to a value",
             "slug": "eq",
             "product": "database",
             "parent": "filters",
@@ -111,7 +111,7 @@
           },
           {
             "id": "neq",
-            "title": "Filter rows where column is not equal to a value",
+            "title": "Column is not equal to a value",
             "slug": "neq",
             "product": "database",
             "parent": "filters",
@@ -119,7 +119,7 @@
           },
           {
             "id": "gt",
-            "title": "Filter rows where column is greater than a value",
+            "title": "Column is greater than a value",
             "slug": "gt",
             "product": "database",
             "parent": "filters",
@@ -127,7 +127,7 @@
           },
           {
             "id": "gte",
-            "title": "Filter rows where column is greater than or equal to a value",
+            "title": "Column is greater than or equal to a value",
             "slug": "gte",
             "product": "database",
             "parent": "filters",
@@ -135,7 +135,7 @@
           },
           {
             "id": "lt",
-            "title": "Filter rows where column is less than a value",
+            "title": "Column is less than a value",
             "slug": "lt",
             "product": "database",
             "parent": "filters",
@@ -143,7 +143,7 @@
           },
           {
             "id": "lte",
-            "title": "Filter rows where column is less than or equal to a value",
+            "title": "Column is less than or equal to a value",
             "slug": "lte",
             "product": "database",
             "parent": "filters",
@@ -151,7 +151,7 @@
           },
           {
             "id": "like",
-            "title": "Filter rows where column matches a pattern",
+            "title": "Column matches a pattern",
             "slug": "like",
             "product": "database",
             "parent": "filters",
@@ -159,7 +159,7 @@
           },
           {
             "id": "ilike",
-            "title": "Filter rows where column matches a case-insensitive pattern",
+            "title": "Column matches a case-insensitive pattern",
             "slug": "ilike",
             "product": "database",
             "parent": "filters",
@@ -167,7 +167,7 @@
           },
           {
             "id": "is",
-            "title": "Filter rows where column is a value",
+            "title": "Column is a value",
             "slug": "is",
             "product": "database",
             "parent": "filters",
@@ -175,7 +175,7 @@
           },
           {
             "id": "in",
-            "title": "Filter rows where column is in an array",
+            "title": "Column is in an array",
             "slug": "in",
             "product": "database",
             "parent": "filters",
@@ -183,7 +183,7 @@
           },
           {
             "id": "contains",
-            "title": "Filter rows where column contains every element in a value",
+            "title": "Column contains every element in a value",
             "slug": "contains",
             "product": "database",
             "parent": "filters",
@@ -191,7 +191,7 @@
           },
           {
             "id": "contained-by",
-            "title": "Filter rows contained by value",
+            "title": "Contained by value",
             "slug": "containedby",
             "product": "database",
             "parent": "filters",
@@ -199,7 +199,7 @@
           },
           {
             "id": "range-gt",
-            "title": "Filter rows greater than a range",
+            "title": "Greater than a range",
             "slug": "rangegt",
             "product": "database",
             "parent": "filters",
@@ -207,7 +207,7 @@
           },
           {
             "id": "range-gte",
-            "title": "Filter rows greater than or equal to a range",
+            "title": "Greater than or equal to a range",
             "slug": "rangegte",
             "product": "database",
             "parent": "filters",
@@ -215,7 +215,7 @@
           },
           {
             "id": "range-lt",
-            "title": "Filter rows less than a range",
+            "title": "Less than a range",
             "slug": "rangelt",
             "product": "database",
             "parent": "filters",
@@ -223,7 +223,7 @@
           },
           {
             "id": "range-lte",
-            "title": "Filter rows less than or equal to a range",
+            "title": "Less than or equal to a range",
             "slug": "rangelte",
             "product": "database",
             "parent": "filters",
@@ -231,7 +231,7 @@
           },
           {
             "id": "range-adjacent",
-            "title": "Filter rows mutually exclusive to a range",
+            "title": "Mutually exclusive to a range",
             "slug": "rangeadjacent",
             "product": "database",
             "parent": "filters",
@@ -239,7 +239,7 @@
           },
           {
             "id": "overlaps",
-            "title": "Filter rows with a common element",
+            "title": "With a common element",
             "slug": "overlaps",
             "product": "database",
             "parent": "filters",
@@ -247,7 +247,7 @@
           },
           {
             "id": "text-search",
-            "title": "Filter rows matching a string",
+            "title": "Match a string",
             "slug": "textsearch",
             "product": "database",
             "parent": "filters",
@@ -255,7 +255,7 @@
           },
           {
             "id": "match",
-            "title": "Filter rows matching an associated value",
+            "title": "Match an associated value",
             "slug": "match",
             "product": "database",
             "parent": "filters",
@@ -263,7 +263,7 @@
           },
           {
             "id": "not",
-            "title": "Return rows that don't satisfy the filter",
+            "title": "Don't match the filter",
             "slug": "not",
             "product": "database",
             "parent": "filters",
@@ -271,7 +271,7 @@
           },
           {
             "id": "or",
-            "title": "Return rows matching at least one filter",
+            "title": "Match at least one filter",
             "slug": "or",
             "product": "database",
             "parent": "filters",
@@ -279,7 +279,7 @@
           },
           {
             "id": "filter",
-            "title": "Return rows that satisfy the filter",
+            "title": "Match the filter",
             "slug": "filter",
             "product": "database",
             "parent": "filters",
@@ -295,7 +295,7 @@
           },
           {
             "id": "db-modifiers-select",
-            "title": "Select the query result",
+            "title": "Select the query",
             "slug": "db-modifiers-select",
             "product": "database",
             "parent": "modifiers",
@@ -303,7 +303,7 @@
           },
           {
             "id": "order",
-            "title": "Order the query result",
+            "title": "Order the query",
             "slug": "order",
             "product": "database",
             "parent": "modifiers",
@@ -311,7 +311,7 @@
           },
           {
             "id": "limit",
-            "title": "limit the query result",
+            "title": "Limit the query",
             "slug": "limit",
             "product": "database",
             "parent": "modifiers",
@@ -319,7 +319,7 @@
           },
           {
             "id": "range",
-            "title": "Limit the query result to a range",
+            "title": "Limit the query to a range",
             "slug": "range",
             "product": "database",
             "parent": "modifiers",
@@ -335,7 +335,7 @@
           },
           {
             "id": "single",
-            "title": "Retrieve the query result as one row",
+            "title": "Retrieve the query as one row",
             "slug": "single",
             "product": "database",
             "parent": "modifiers",
@@ -343,7 +343,7 @@
           },
           {
             "id": "maybe-single",
-            "title": "Retrieve the query result as zero to one rows",
+            "title": "Retrieve the query as 0-1 rows",
             "slug": "maybesingle",
             "product": "database",
             "parent": "modifiers",
@@ -351,7 +351,7 @@
           },
           {
             "id": "csv",
-            "title": "Retrieve the query result as a CSV string",
+            "title": "Retrieve the query as a CSV string",
             "slug": "db-csv",
             "product": "database",
             "parent": "modifiers",
