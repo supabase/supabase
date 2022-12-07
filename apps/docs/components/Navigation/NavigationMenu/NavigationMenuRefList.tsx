@@ -64,7 +64,7 @@ const Divider = () => {
   return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
 }
 
-const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
+const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib, libSpec }) => {
   const router = useRouter()
   // const { activeRefItem } = useNavigationMenuContext()
   // const [activeAccordianItem, setActiveAccordianItem] = useState('')
@@ -182,7 +182,8 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
 
         <ul className="function-link-list">
           {introItems.map((item) => (
-            <FunctionLink {...item} library={menu.title} />
+            // @ts-ignore
+            <FunctionLink library={menu.title} {...item} />
           ))}
 
           <Divider />
