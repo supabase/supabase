@@ -59,6 +59,25 @@ const App = () => (
 )
 ```
 
+### Social Providers
+
+The Auth component also supports login with [offical social providers](../../auth#providers).
+
+```js lines=10 title=/src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    appearance={{ theme: ThemeSupa }}
+    providers={['google', 'facebook', 'twitter']} 
+  />
+)
+```
+
 ## Customization
 
 There are several ways to customize Auth UI:
