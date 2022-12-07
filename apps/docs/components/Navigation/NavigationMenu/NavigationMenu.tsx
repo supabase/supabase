@@ -2,10 +2,11 @@ import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, memo } from 'react'
 import NavigationMenuCliList from './NavigationMenuCliList'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import { NavigationMenuContextProvider } from './NavigationMenu.Context'
 
 // @ts-expect-error
 import jsSpecNEW from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
@@ -305,4 +306,4 @@ const SideNav = () => {
   )
 }
 
-export default SideNav
+export default memo(SideNav)
