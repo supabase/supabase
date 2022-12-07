@@ -1575,4 +1575,9 @@ module.exports = [
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/cdn',
+    destination: '/docs/guides/storage/smart-cdn',
+  },
 ]
