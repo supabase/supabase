@@ -98,192 +98,193 @@
             "title": "Using filters",
             "slug": "using-filters",
             "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "eq",
-            "title": "Column is equal to a value",
-            "slug": "eq",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "neq",
-            "title": "Column is not equal to a value",
-            "slug": "neq",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "gt",
-            "title": "Column is greater than a value",
-            "slug": "gt",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "gte",
-            "title": "Column is greater than or equal to a value",
-            "slug": "gte",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "lt",
-            "title": "Column is less than a value",
-            "slug": "lt",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "lte",
-            "title": "Column is less than or equal to a value",
-            "slug": "lte",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "like",
-            "title": "Column matches a pattern",
-            "slug": "like",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "ilike",
-            "title": "Column matches a case-insensitive pattern",
-            "slug": "ilike",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "is",
-            "title": "Column is a value",
-            "slug": "is",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "in",
-            "title": "Column is in an array",
-            "slug": "in",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "contains",
-            "title": "Column contains every element in a value",
-            "slug": "contains",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "contained-by",
-            "title": "Contained by value",
-            "slug": "containedby",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "range-gt",
-            "title": "Greater than a range",
-            "slug": "rangegt",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "range-gte",
-            "title": "Greater than or equal to a range",
-            "slug": "rangegte",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "range-lt",
-            "title": "Less than a range",
-            "slug": "rangelt",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "range-lte",
-            "title": "Less than or equal to a range",
-            "slug": "rangelte",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "range-adjacent",
-            "title": "Mutually exclusive to a range",
-            "slug": "rangeadjacent",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "overlaps",
-            "title": "With a common element",
-            "slug": "overlaps",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "text-search",
-            "title": "Match a string",
-            "slug": "textsearch",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "match",
-            "title": "Match an associated value",
-            "slug": "match",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "not",
-            "title": "Don't match the filter",
-            "slug": "not",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "or",
-            "title": "Match at least one filter",
-            "slug": "or",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "filter",
-            "title": "Match the filter",
-            "slug": "filter",
-            "product": "database",
-            "parent": "filters",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"],
+            "items": [
+              {
+                "id": "eq",
+                "title": "Column is equal to a value",
+                "slug": "eq",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "neq",
+                "title": "Column is not equal to a value",
+                "slug": "neq",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "gt",
+                "title": "Column is greater than a value",
+                "slug": "gt",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "gte",
+                "title": "Column is greater than or equal to a value",
+                "slug": "gte",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "lt",
+                "title": "Column is less than a value",
+                "slug": "lt",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "lte",
+                "title": "Column is less than or equal to a value",
+                "slug": "lte",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "like",
+                "title": "Column matches a pattern",
+                "slug": "like",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "ilike",
+                "title": "Column matches a case-insensitive pattern",
+                "slug": "ilike",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "is",
+                "title": "Column is a value",
+                "slug": "is",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "in",
+                "title": "Column is in an array",
+                "slug": "in",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "contains",
+                "title": "Column contains every element in a value",
+                "slug": "contains",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "contained-by",
+                "title": "Contained by value",
+                "slug": "containedby",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "range-gt",
+                "title": "Greater than a range",
+                "slug": "rangegt",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "range-gte",
+                "title": "Greater than or equal to a range",
+                "slug": "rangegte",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "range-lt",
+                "title": "Less than a range",
+                "slug": "rangelt",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "range-lte",
+                "title": "Less than or equal to a range",
+                "slug": "rangelte",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "range-adjacent",
+                "title": "Mutually exclusive to a range",
+                "slug": "rangeadjacent",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "overlaps",
+                "title": "With a common element",
+                "slug": "overlaps",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "text-search",
+                "title": "Match a string",
+                "slug": "textsearch",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "match",
+                "title": "Match an associated value",
+                "slug": "match",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "not",
+                "title": "Don't match the filter",
+                "slug": "not",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "or",
+                "title": "Match at least one filter",
+                "slug": "or",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "filter",
+                "title": "Match the filter",
+                "slug": "filter",
+                "product": "database",
+                "parent": "filters",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              }
+            ]
           },
           {
             "id": "using-modifiers",
@@ -291,71 +292,73 @@
             "slug": "using-modifiers",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "db-modifiers-select",
-            "title": "Select the query",
-            "slug": "db-modifiers-select",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4"]
-          },
-          {
-            "id": "order",
-            "title": "Order the query",
-            "slug": "order",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "limit",
-            "title": "Limit the query",
-            "slug": "limit",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "range",
-            "title": "Limit the query to a range",
-            "slug": "range",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "abort-signal",
-            "title": "Set an abort signal",
-            "slug": "db-abortsignal",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4"]
-          },
-          {
-            "id": "single",
-            "title": "Retrieve the query as one row",
-            "slug": "single",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4", "dart", "dart_v0"]
-          },
-          {
-            "id": "maybe-single",
-            "title": "Retrieve the query as 0-1 rows",
-            "slug": "maybesingle",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4"]
-          },
-          {
-            "id": "csv",
-            "title": "Retrieve the query as a CSV string",
-            "slug": "db-csv",
-            "product": "database",
-            "parent": "modifiers",
-            "libs": ["js", "js_v4"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"],
+            "items": [
+              {
+                "id": "db-modifiers-select",
+                "title": "Select the query",
+                "slug": "db-modifiers-select",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4"]
+              },
+              {
+                "id": "order",
+                "title": "Order the query",
+                "slug": "order",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "limit",
+                "title": "Limit the query",
+                "slug": "limit",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "range",
+                "title": "Limit the query to a range",
+                "slug": "range",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "abort-signal",
+                "title": "Set an abort signal",
+                "slug": "db-abortsignal",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4"]
+              },
+              {
+                "id": "single",
+                "title": "Retrieve the query as one row",
+                "slug": "single",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4", "dart", "dart_v0"]
+              },
+              {
+                "id": "maybe-single",
+                "title": "Retrieve the query as 0-1 rows",
+                "slug": "maybesingle",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4"]
+              },
+              {
+                "id": "csv",
+                "title": "Retrieve the query as a CSV string",
+                "slug": "db-csv",
+                "product": "database",
+                "parent": "modifiers",
+                "libs": ["js", "js_v4"]
+              }
+            ]
           }
         ]
       },

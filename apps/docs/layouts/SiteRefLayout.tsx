@@ -6,9 +6,10 @@ import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 import { useTheme } from 'common/Providers'
 
 import RefSwitcher from '~/components/Navigation/RefSwitcher'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, memo } from 'react'
 
 import FooterHelpCallout from '~/components/FooterHelpCallout'
+import { NavigationMenuContextProvider } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 
 const SiteRefLayout = ({ children }) => {
   const router = useRouter()
@@ -16,12 +17,14 @@ const SiteRefLayout = ({ children }) => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  useEffect(() => {
-    setMobileMenuOpen(false)
-  }, [router.asPath])
+  // const [activeRefItem, setActiveRefItem] = useState('')
+
+  // useEffect(() => {
+  //   setMobileMenuOpen(false)
+  // }, [router.asPath])
 
   return (
-    <>
+    <NavigationMenuContextProvider activeRefItem={''} setActiveRefItem={() => {}}>
       <main>
         {/* <img
           src={`${router.basePath}/img/gradient-bg.png`}
@@ -218,7 +221,7 @@ const SiteRefLayout = ({ children }) => {
           </div>
         </div>
       </main>
-    </>
+    </NavigationMenuContextProvider>
   )
 }
 
