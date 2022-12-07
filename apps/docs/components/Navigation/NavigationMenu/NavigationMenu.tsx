@@ -291,7 +291,6 @@ const SideNav = () => {
         currentLevel={level}
         setLevel={setLevel}
         lib="js"
-        libSpec={jsSpecNEW}
       />
       <NavigationMenuRefList
         key={'reference-dart-menu'}
@@ -299,7 +298,6 @@ const SideNav = () => {
         currentLevel={level}
         setLevel={setLevel}
         lib="dart"
-        libSpec={dartSpecNEW}
       />
       <NavigationMenuCliList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
     </div>
