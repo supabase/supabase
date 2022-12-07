@@ -1,6 +1,6 @@
 import { NextSeo } from 'next-seo'
 
-import _days from '~/components/LaunchWeek/days.json'
+import _days from '~/components/LaunchWeek/lw6_days.json'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
@@ -13,9 +13,9 @@ import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import { SITE_ORIGIN } from '~/lib/constants'
 import { Accordion, Badge, IconExternalLink } from 'ui'
+import { WeekDayProps } from '~/components/LaunchWeek/types'
 
-// import { Badge, IconExternalLink } from '~/../../packages/ui'
-
+const days = _days as WeekDayProps[]
 const constellation = [
   [60, 8],
   [13, 20],
@@ -31,7 +31,7 @@ const constellation = [
 
 export default function launchweek() {
   const { isDarkMode } = useTheme()
-
+  console.log(_days)
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
 
@@ -113,17 +113,14 @@ export default function launchweek() {
     }
   }
 
-  const AccordionHeader = ({ date }: any) => {
+  const AccordionHeader = ({ date, day }: any) => {
     //todo coming soon check
-
-    console.log(date)
-    const [weekday, month, day] = dayFormat(date.release_date)
     return (
       <div className="flex flex-1">
         <div className="flex gap-4 min-w-[320px]">
-          <Badge>Coming Soon</Badge>
+          <Badge className="!bg-transparent !py-1 !px-4">Coming Soon</Badge>
           <span className="text-scale-900 text-sm">
-            {weekday} | {day} {month} 2022
+            {day} ・ {date}
           </span>
         </div>
         <span className="text-scale-1200">{date.title}</span>
@@ -131,16 +128,6 @@ export default function launchweek() {
     )
   }
 
-  const dayFormat = (timestamp: string) => {
-    const day = new Intl.DateTimeFormat('en-US', {
-      weekday: 'long',
-      month: 'short',
-      day: 'numeric',
-    }).format(new Date(timestamp))
-    return day.split(/[\s,]+/)
-  }
-
-  console.log(days)
   return (
     <>
       <NextSeo
@@ -225,30 +212,24 @@ export default function launchweek() {
                 bordered={false}
                 chevronAlign="right"
               >
-                {days.length > 0 &&
-                  days.map((day: any, index) => {
-                    console.log(dayFormat(day.release_date))
-                    return (
-                      <div className="border-b pb-3" key={day.id}>
-                        <Accordion.Item header={<AccordionHeader date={day} />} id={`day-${index}`}>
-                          <div className="h-[400px] flex">
-                            <div
-                              className={`flex-1 border rounded-xl border-gray-900 h-full bg-no-repeat bg-[center_top_200px] bg-contain bg-${
-                                day.steps.one ? `[url('${day.steps.one.bgUrl}')]` : 'red-900'
-                              } `}
-                            >
-                              TEST ONE CUBE
-                              <div>wat</div>
-                              <div>keep trying</div>
-                            </div>
-                            <div className="flex-1 bg-green-900 border rounded-xl border-gray-900 h-full">
-                              TEST TWO CUBES
-                            </div>
-                          </div>
-                        </Accordion.Item>
+                <div className="border-b pb-3">
+                  <Accordion.Item
+                    header={<AccordionHeader date={_days[0].date} day={_days[0].dd} />}
+                    className="h-[79px]"
+                    id={_days[0].d.toString()}
+                  >
+                    <div className="h-[400px] flex">
+                      <div
+                        className={`flex-1 border rounded-xl border-[] h-full bg-no-repeat bg-[center_top_200px] bg-contain bg-red-900`}
+                      >
+                        {_days[0].title}
                       </div>
-                    )
-                  })}
+                      <div className="flex-1 bg-green-900 border rounded-xl border-gray-900 h-full">
+                        TEST TWO CUBES
+                      </div>
+                    </div>
+                  </Accordion.Item>
+                </div>
               </Accordion>
             </SectionContainer>
           )}
