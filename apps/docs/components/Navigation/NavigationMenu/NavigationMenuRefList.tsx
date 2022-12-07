@@ -143,18 +143,6 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
         currentLevel !== id ? 'opacity-0 invisible absolute' : '',
       ].join(' ')}
     >
-      <Accordion.Root collapsible key={id} type="single">
-        <Accordion.Item value={'1'}>
-          <Accordion.AccordionTrigger>
-            <button>open</button>
-          </Accordion.AccordionTrigger>
-
-          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            <h1 className="text-4xl text-indigo-900">hello world</h1>
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion.Root>
-
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
         {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
         <Link href="/" passHref>
@@ -214,12 +202,18 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
 
               if (
                 (isFilter && !isModifier && props.id === 'using-filters') ||
-                activeAccordianItem === 'using-filters'
+                (activeAccordianItem === 'using-filters' &&
+                  !isModifier &&
+                  !isFilter &&
+                  props.id === 'using-filters')
               ) {
                 active = true
               } else if (
                 (isModifier && !isFilter && props.id === 'using-modifiers') ||
-                activeAccordianItem === 'using-modifiers'
+                (activeAccordianItem === 'using-modifiers' &&
+                  !isFilter &&
+                  !isModifier &&
+                  props.id === 'using-modifiers')
               ) {
                 active = true
               } else {
