@@ -19,8 +19,6 @@ import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
 import dartSpec from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
 
-// @ts-expect-error
-import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
 import commonLibJson from '~/../../spec/common-client-libs-sections.json'
 import { IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'

@@ -21,8 +21,6 @@ import ReferenceDetailCollapse from '~/components/reference/ReferenceDetailColla
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
 
-// @ts-expect-error
-import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
 import commonLibJson from '~/../../spec/common-client-libs-sections.json'
 import { IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
