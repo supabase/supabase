@@ -193,7 +193,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
         {/* )} */}
 
         <ul className="function-link-list">
-          {introItems.map((item) => (
+          {introItems.map((item: any) => (
             <FunctionLink {...item} library={menu.title} />
           ))}
 
