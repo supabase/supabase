@@ -80,7 +80,7 @@ export default function JSReference(props) {
               key={item.id}
               title={item.meta.title}
               id={item.id}
-              slug={item.id}
+              slug={item.slug}
               scrollSpyHeader={true}
             >
               <RefSubLayout.Details>
