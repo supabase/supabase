@@ -7,7 +7,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/storage-caching',
-    destination: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
   },
   {
     permanent: true,
@@ -1559,6 +1559,11 @@ module.exports = [
     permanent: true,
     source: '/forgot-password',
     destination: 'https://app.supabase.com/forgot-password',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
   },
   {
     permanent: true,
