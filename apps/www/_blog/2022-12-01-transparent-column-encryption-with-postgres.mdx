@@ -153,7 +153,7 @@ Notice also how there is a `DEFAULT` value for the `key_id`. In a way, this give
 
 ### One Key ID per Row with Nonce Support
 
-The default cryptographic algorithm for the above approach uses a _nonceless_ encryption algorithm called `[crypto_aead_det_xchacha20()](https://github.com/jedisct1/libsodium-xchacha20-siv)`. This algorithm has the advantage that it does not require nonce values, the disadvantage is that duplicate plaintexts will produce duplicate ciphertexts.
+The default cryptographic algorithm for the above approach uses a _nonceless_ encryption algorithm called [`crypto_aead_det_xchacha20()`](https://github.com/jedisct1/libsodium-xchacha20-siv). This algorithm has the advantage that it does not require nonce values, the disadvantage is that duplicate plaintexts will produce duplicate ciphertexts.
 
 Nonces are some extra cryptographic context that is used in many cryptographic algorithms to produce different ciphertexts, even if the plaintexts are the same. The nonce does not have to be secret, but it _does_ have to be unique. **pgsodium** comes with a useful function `pgsodium.crypto_aead_det_noncegen()` that will generate a cryptographically secure nonce for you, and in almost all cases it's best to use that function unless you know specifically what you are doing. In password hashing approaches, this is often similar to how a “salt” value is used to deduplicate password hashes.
 
