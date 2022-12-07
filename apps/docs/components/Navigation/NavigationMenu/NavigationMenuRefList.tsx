@@ -8,33 +8,19 @@ import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.j
 
 const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 
-const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib, libSpec }) => {
+const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
+  // Get only the functions with references in the current librarry
+  // ie: if the lib === dart, only get the dart functions
+  const allCurrentFunctions = allFunctions
+    .map((fn: any) => {
+      if (fn.items.flat().find((item) => item.libs.includes(lib))) return fn
+    })
+    .filter((item) => item)
+
   const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
   const router = useRouter()
 
   const menu = NavItems[id]
-  let functions = libSpec.functions
-
-  console.log(id, functions)
-  console.log(id, libSpec.info.id, libSpec.info.description)
-
-  functions = functions.map((func) => {
-    // console.log(currentLevel, 'func', func.title)
-    let data = {
-      ...func,
-    }
-    data = {
-      ...data,
-      ...Object.values(clientLibsCommonSections.sections.functions)
-        .map((fn: any) => fn.items)
-        .flat(2)
-        .filter((x) => {
-          return x.id === func.id
-        })[0],
-    }
-
-    return data
-  })
 
   const FunctionLink = ({
     title,
@@ -134,14 +120,18 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib, libSpec }) => 
 
           <Divider />
 
-          {allFunctions.map((fn: any) => {
+          {allCurrentFunctions.map((fn: any) => {
             const toplevelItems = fn.items.filter((item) => !item.parent)
             toplevelItems.map((item) => <li>{item.title}</li>)
 
             // Database has Filters and Modifiers sub-items
             if (fn.title === 'Database') {
-              const filters = fn.items.filter((item) => item.parent === 'filters')
-              const modifiers = fn.items.filter((item) => item.parent === 'modifiers')
+              const filters = fn.items.filter(
+                (item) => item.parent === 'filters' && item.libs.includes(lib)
+              )
+              const modifiers = fn.items.filter(
+                (item) => item.parent === 'modifiers' && item.libs.includes(lib)
+              )
 
               return (
                 <>
@@ -173,9 +163,11 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib, libSpec }) => 
                 <>
                   <Divider />
                   <SideMenuTitle title={fn.title} />
-                  {fn.items.map((item) => (
-                    <FunctionLink {...item} library={menu.title} />
-                  ))}
+                  {fn.items
+                    .filter((item) => item.libs.includes(lib))
+                    .map((item) => (
+                      <FunctionLink {...item} library={menu.title} />
+                    ))}
                 </>
               )
             }

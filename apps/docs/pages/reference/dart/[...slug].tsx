@@ -40,7 +40,7 @@ const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
   .flat(2)
 
 export default function DartReference(props) {
-  console.log('docs', props.docs)
+  //console.log('docs', props.docs)
   const router = useRouter()
   const slug = router.query.slug[0]
 
