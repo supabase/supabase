@@ -3,7 +3,7 @@
     "title": "Docs Updated",
     "shipped": true,
     "date": "12 Dec 2022",
-    "description": "Docs description ",
+    "description": "Supabase Docs",
     "d": 1,
     "dd": "Monday",
     "youtube_id": "OpPOaJI_Z28",
@@ -30,13 +30,15 @@
     ]
   },
   {
-    "title": "supabase-js v2",
+    "title": "Image Processing: Resize V2 + CDN",
     "shipped": true,
-    "date": "16th Aug 2022",
-    "description": "Today we're releasing supabase-js v2, which focuses on “quality-of-life” improvements for developers.",
+    "date": "13 Dec 2022",
+    "description": "Image Processing",
     "d": 2,
     "dd": "Tuesday",
     "youtube_id": "iqZlPtl_b-I",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
     "articles": [
       {
         "title": "supabase-js v2 Release Candidate",
@@ -58,13 +60,15 @@
     ]
   },
   {
-    "title": "Security",
+    "title": "Supabase Vault Release",
     "shipped": true,
-    "date": "17th Aug 2022",
-    "description": "An update on the ongoing security improvements of Supabase.",
+    "date": "14 Dec 2022",
+    "description": "Vault Release",
     "d": 3,
     "dd": "Wednesday",
     "youtube_id": "6bGQotxisoY",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
     "announcements": [
       {
         "title": "Supabase is now SOC2 compliant",
@@ -99,13 +103,15 @@
     ]
   },
   {
-    "title": "Realtime: Multiplayer Edition",
+    "title": "Multi-factor Authentication",
     "shipped": true,
-    "date": "18th Aug 2022",
-    "description": "Announcing the general availability of Realtime's Broadcast and Presence.",
+    "date": "15 Dec 2022",
+    "description": "Multi-factor Authentication",
     "d": 4,
     "dd": "Thursday",
     "youtube_id": "CGZr5tybW18",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
     "articles": [
       {
         "title": "Realtime: Multiplayer Edition",
@@ -137,12 +143,52 @@
     ]
   },
   {
-    "title": "Community and One more thing...",
+    "title": "Supabase Wrappers - FDW Framework",
+    "shipped": true,
+    "date": "16 Dec 2022",
+    "description": "Supabase Wrappers",
+    "d": 5,
+    "dd": "Friday",
+    "youtube_id": "CGZr5tybW18",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "articles": [
+      {
+        "title": "Realtime: Multiplayer Edition",
+        "url": "/blog/supabase-realtime-multiplayer-general-availability",
+        "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
+        "products": [
+          {
+            "title": "Realtime Overview",
+            "url": "/docs/guides/realtime",
+            "description": "Realtime Overview"
+          },
+          {
+            "title": "Broadcast Guide",
+            "url": "/docs/guides/realtime/broadcast",
+            "description": "Guide on how to use Broadcast feature"
+          },
+          {
+            "title": "Presence Guide",
+            "url": "/docs/guides/realtime/presence",
+            "description": "Guide on how to use Presence feature"
+          },
+          {
+            "title": "Postgres Changes Guide",
+            "url": "/docs/guides/realtime/postgres-changes",
+            "description": "Guide on how to use Postgres Changes feature"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "One more thing",
     "shipped": true,
     "date": "19th Aug 2022",
     "description": "We finish Launch Week 5 with an update on the community and some more product updates.",
-    "d": 5,
-    "dd": "Friday",
+    "d": 6,
+    "dd": "Saturday",
     "youtube_id": "s9UePQjLT0U",
     "articles": [
       {
