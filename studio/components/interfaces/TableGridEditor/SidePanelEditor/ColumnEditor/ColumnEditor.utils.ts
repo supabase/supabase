@@ -17,11 +17,11 @@ const isSQLExpression = (input: string) => {
     return true
   }
 
-  const openParanthesisIndex = input.indexOf('(')
-  const closeParanthesisIndex = input.indexOf(')')
+  const openParenthesisIndex = input.indexOf('(')
+  const closeParenthesisIndex = input.indexOf(')')
 
   const hasSpaces = input.indexOf(' ') >= 0
-  if (!hasSpaces && openParanthesisIndex >= 0 && closeParanthesisIndex > openParanthesisIndex) {
+  if (!hasSpaces && openParenthesisIndex >= 0 && closeParenthesisIndex > openParenthesisIndex) {
     return true
   }
 
