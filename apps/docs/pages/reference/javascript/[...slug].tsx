@@ -17,8 +17,7 @@ import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
-// @ts-expect-error
-import commonLibSpec from '~/../../spec/common-client-libs.yml' assert { type: 'yml' }
+
 import commonLibJson from '~/../../spec/common-client-libs-sections.json'
 
 import { Button, IconChevronRight, IconDatabase, Tabs } from 'ui'
