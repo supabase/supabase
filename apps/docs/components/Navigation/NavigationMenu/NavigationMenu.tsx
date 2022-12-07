@@ -7,6 +7,11 @@ import NavigationMenuCliList from './NavigationMenuCliList'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
+// @ts-expect-error
+import jsSpecNEW from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+// @ts-expect-error
+import dartSpecNEW from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
+
 const SideNav = () => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
@@ -44,6 +49,9 @@ const SideNav = () => {
       case url.includes(`/docs/guides/platform`) ||
         (url.includes(`/docs/guides/hosting/platform`) && url):
         setLevel('platform')
+        break
+      case url.includes(`/docs/guides/resources`) && url:
+        setLevel('resources')
         break
       case url.includes(`/docs/reference/javascript`) && url:
         setLevel('reference_javascript')
@@ -123,12 +131,6 @@ const SideNav = () => {
       },
     ],
     [
-      // {
-      //   label: 'API Reference',
-      //   icon: '/img/icons/menu/reference',
-      //   href: '/reference',
-      //   level: 'reference',
-      // },
       {
         label: 'Platform',
         icon: '/img/icons/menu/platform',
@@ -140,6 +142,12 @@ const SideNav = () => {
         icon: '/img/icons/menu/integrations',
         href: '/guides/integrations',
         level: 'integrations',
+      },
+      {
+        label: 'Resources',
+        icon: '/img/icons/menu/platform',
+        href: '/guides/resources',
+        level: 'resources',
       },
     ],
     [
@@ -274,19 +282,23 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
-
+      <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
       {/* reference level */}
       <NavigationMenuRefList
+        key={'reference-js-menu'}
         id={'reference_javascript'}
         currentLevel={level}
         setLevel={setLevel}
         lib="js"
+        libSpec={jsSpecNEW}
       />
       <NavigationMenuRefList
+        key={'reference-dart-menu'}
         id={'reference_dart'}
         currentLevel={level}
         setLevel={setLevel}
         lib="dart"
+        libSpec={dartSpecNEW}
       />
       <NavigationMenuCliList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
     </div>
