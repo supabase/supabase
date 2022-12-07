@@ -43,12 +43,14 @@ This renders the Auth component without any styling.
 We recommend using one of the predefined themes to style the UI.
 Import the theme you want to use and pass it to the `appearence.theme` prop.
 
-```js lines=4,11 title=/src/index.js
+```js lines=4,13 title=/src/index.js
 import {
   Auth,
   // Import predefined theme
   ThemeSupa,
 } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
