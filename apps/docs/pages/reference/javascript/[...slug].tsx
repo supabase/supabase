@@ -82,10 +82,9 @@ export default function JSReference(props) {
               id={item.id}
               slug={item.id}
               scrollSpyHeader={true}
+              singleColumn={true}
             >
-              <RefSubLayout.Details>
-                <MDXRemote {...item.content} components={components} />
-              </RefSubLayout.Details>
+              <MDXRemote {...item.content} components={components} />
             </RefSubLayout.Section>
           ))}
       </RefSubLayout>
