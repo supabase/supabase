@@ -33,7 +33,7 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import OldLayout from '~/layouts/Default'
 
 import * as Accordion from '@radix-ui/react-accordion'
-import ReferenceDetailCollapse from '~/components/Reference/ReferenceDetailCollapse'
+import ReferenceDetailCollapse from '~/components/reference/ReferenceDetailCollapse'
 
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 
