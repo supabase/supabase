@@ -190,7 +190,7 @@ functions:
           const { error } = await supabase.auth.signOut()
           ```
 
-  - id: get-session
+  - id: session
     title: 'session()'
     $ref: '@supabase/gotrue-js.GoTrueClient.session'
     examples:
@@ -202,7 +202,7 @@ functions:
           const session = supabase.auth.session()
           ```
 
-  - id: get-user
+  - id: user
     title: 'user()'
     $ref: '@supabase/gotrue-js.GoTrueClient.user'
     notes: |
@@ -216,7 +216,7 @@ functions:
           const user = supabase.auth.user()
           ```
 
-  - id: update
+  - id: auth-update
     title: 'update()'
     $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
@@ -497,7 +497,7 @@ functions:
             .sendMobileOTP('12345879')
           ```
 
-  - id: auth-reset-password-for-email
+  - id: reset-password-for-email
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |

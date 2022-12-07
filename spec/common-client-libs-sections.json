@@ -99,7 +99,7 @@
             "slug": "using-filters",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "eq",
@@ -107,7 +107,7 @@
             "slug": "eq",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "neq",
@@ -115,7 +115,7 @@
             "slug": "neq",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "gt",
@@ -123,7 +123,7 @@
             "slug": "gt",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "gte",
@@ -131,7 +131,7 @@
             "slug": "gte",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "lt",
@@ -139,7 +139,7 @@
             "slug": "lt",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "lte",
@@ -147,7 +147,7 @@
             "slug": "lte",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "like",
@@ -155,7 +155,7 @@
             "slug": "like",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "ilike",
@@ -163,7 +163,7 @@
             "slug": "ilike",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "is",
@@ -171,7 +171,7 @@
             "slug": "is",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "in",
@@ -179,7 +179,7 @@
             "slug": "in",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "contains",
@@ -187,7 +187,7 @@
             "slug": "contains",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "contained-by",
@@ -195,7 +195,7 @@
             "slug": "containedby",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "range-gt",
@@ -203,7 +203,7 @@
             "slug": "rangegt",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "range-gte",
@@ -211,7 +211,7 @@
             "slug": "rangegte",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "range-lt",
@@ -219,7 +219,7 @@
             "slug": "rangelt",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "range-lte",
@@ -227,7 +227,7 @@
             "slug": "rangelte",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "range-adjacent",
@@ -235,7 +235,7 @@
             "slug": "rangeadjacent",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "overlaps",
@@ -243,7 +243,7 @@
             "slug": "overlaps",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "text-search",
@@ -251,7 +251,7 @@
             "slug": "textsearch",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "match",
@@ -259,7 +259,7 @@
             "slug": "match",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "not",
@@ -267,7 +267,7 @@
             "slug": "not",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "or",
@@ -275,7 +275,7 @@
             "slug": "or",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "filter",
@@ -283,7 +283,7 @@
             "slug": "filter",
             "product": "database",
             "parent": "filters",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "using-modifiers",
@@ -291,7 +291,7 @@
             "slug": "using-modifiers",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "db-modifiers-select",
@@ -299,7 +299,7 @@
             "slug": "db-modifiers-select",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "order",
@@ -307,7 +307,7 @@
             "slug": "order",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "limit",
@@ -315,7 +315,7 @@
             "slug": "limit",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "range",
@@ -323,7 +323,7 @@
             "slug": "range",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "abort-signal",
@@ -331,7 +331,7 @@
             "slug": "db-abortsignal",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "single",
@@ -339,7 +339,7 @@
             "slug": "single",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart", "dart_v0"]
+            "libs": ["js", "js_v4", "dart", "dart_v0"]
           },
           {
             "id": "maybe-single",
@@ -347,7 +347,7 @@
             "slug": "maybesingle",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "csv",
@@ -355,7 +355,7 @@
             "slug": "db-csv",
             "product": "database",
             "parent": "modifiers",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           }
         ]
       },
@@ -381,71 +381,84 @@
             "title": "signInWithProvider()",
             "slug": "auth-signinwithprovider",
             "product": "auth",
-            "libs": ["js_v1", "dart_v0"]
+            "libs": ["js_v4", "dart_v0"]
           },
           {
             "id": "send-mobile-otp",
             "title": "sendMobileOTP()",
             "slug": "auth-api-sendmobileotp",
             "product": "auth",
-            "libs": ["js_v1", "dart_v8"]
+            "libs": ["js_v1"]
           },
           {
             "id": "sign-in-with-password",
             "title": "Sign in with password",
             "slug": "auth-signinwithpassword",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "sign-in-with-otp",
             "title": "Sign in with OTP",
             "slug": "auth-signinwithotp",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "sign-in-with-oauth",
             "title": "Sign in with 0auth",
             "slug": "auth-signinwithoauth",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "sign-out",
             "title": "signOut()",
             "slug": "auth-signout",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "session",
             "title": "session()",
             "slug": "auth-session",
             "product": "auth",
-            "libs": ["dart_v8"]
+            "libs": ["js_v4"]
           },
           {
             "id": "auth-update",
             "title": "update()",
             "slug": "auth-update",
             "product": "auth",
-            "libs": ["dart_v8"]
+            "libs": ["js_v1"]
           },
-
+          {
+            "id": "set-auth",
+            "title": "setAuth()",
+            "slug": "auth-setauth",
+            "product": "auth",
+            "libs": ["js_v1"]
+          },
           {
             "id": "user",
             "title": "user()",
             "slug": "auth-user",
             "product": "auth",
-            "libs": ["dart_v8"]
+            "libs": ["js_v1"]
+          },
+          {
+            "id": "session",
+            "title": "session()",
+            "slug": "auth-session",
+            "product": "auth",
+            "libs": ["js_v1"]
           },
           {
             "id": "verify-otp",
             "title": "verifyOtp()",
             "slug": "auth-verifyotp",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "current-session",
@@ -466,35 +479,35 @@
             "title": "getSession()",
             "slug": "auth-getsession",
             "product": "auth",
-            "libs": ["js", "js_v1"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "refresh-session",
             "title": "refreshSession()",
             "slug": "auth-refreshsession",
             "product": "auth",
-            "libs": ["js", "js_v1"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "get-user",
             "title": "getUser()",
             "slug": "auth-getuser",
             "product": "auth",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "update-user",
             "title": "updateUser()",
             "slug": "auth-updateuser",
             "product": "auth",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "set-session",
             "title": "setSession()",
             "slug": "auth-setsession",
             "product": "auth",
-            "libs": ["js", "js_v1"]
+            "libs": ["js", "js_v4"]
           },
 
           {
@@ -521,63 +534,63 @@
             "title": "Overview",
             "slug": "supabase-auth-admin-api",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "get-user-by-id",
             "title": "getUserById()",
             "slug": "auth-admin-getuserbyid",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "list-users",
             "title": "listUsers()",
             "slug": "auth-admin-listusers",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "create-user",
             "title": "createUser()",
             "slug": "auth-admin-createuser",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "delete-user",
             "title": "deleteUser()",
             "slug": "auth-admin-deleteuser",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "invite-user-by-email",
             "title": "inviteUserByEmail()",
             "slug": "auth-admin-inviteuserbyemail",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "reset-password-for-email",
             "title": "resetPasswordForEmail()",
             "slug": "auth-admin-resetpasswordforemail",
             "product": "auth-admin",
-            "libs": ["js", "js_v1"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "generate-link",
             "title": "generateLink()",
             "slug": "auth-admin-generatelink",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v4"]
           },
           {
             "id": "update-user-by-id",
             "title": "updateUserById()",
             "slug": "auth-admin-updateuserbyid",
             "product": "auth-admin",
-            "libs": ["js2", "js_v1"]
+            "libs": ["js", "js_v1"]
           }
         ]
       },
@@ -615,21 +628,21 @@
             "title": "removeSubscription()",
             "slug": "removesubscription",
             "product": "realtime",
-            "libs": ["dart_v8"]
+            "libs": ["dart_v0", "js_v1"]
           },
           {
             "id": "remove-all-subscriptions",
             "title": "removeallsubscriptions()",
             "slug": "removeallsubscriptions",
             "product": "realtime",
-            "libs": ["dart_v8"]
+            "libs": ["js_v1"]
           },
           {
             "id": "get-subscriptions",
             "title": "getSubscriptions()",
             "slug": "getsubscriptions",
             "product": "realtime",
-            "libs": ["dart_v0"]
+            "libs": ["js_v1"]
           },
 
           {
@@ -637,21 +650,21 @@
             "title": "removeChannel()",
             "slug": "removechannel",
             "product": "realtime",
-            "libs": ["js", "js_v1", "dart", "dart_v8"]
+            "libs": ["js", "js_v4", "dart"]
           },
           {
             "id": "remove-all-channels",
             "title": "removeAllChannels()",
             "slug": "removeallchannels",
             "product": "realtime",
-            "libs": ["js", "js_v1", "dart", "dart_v8"]
+            "libs": ["js", "js_v4", "dart"]
           },
           {
             "id": "get-channels",
             "title": "getChannels()",
             "slug": "getchannels",
             "product": "realtime",
-            "libs": ["js2", "js_v1", "dart", "dart_v8"]
+            "libs": ["js2", "js_v4", "dart"]
           }
         ]
       },
@@ -740,7 +753,7 @@
             "title": "from.copy()",
             "slug": "storage-from-copy",
             "product": "storage",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "from-remove",
@@ -761,7 +774,7 @@
             "title": "from.createSignedUrls()",
             "slug": "storage-from-createsignedurls",
             "product": "storage",
-            "libs": ["js", "js_v1", "dart_v8"]
+            "libs": ["js", "js_v1"]
           },
           {
             "id": "from-get-public-url",
