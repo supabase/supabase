@@ -3,19 +3,19 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'realtime',
   title: 'Realtime',
-  description: 'Supabase Realtime with Broadcast, Presence, and Postgres CDC.',
+  description: 'Supabase Realtime with Broadcast, Presence, and Postgres Changes.',
   sidebar_label: 'Overview',
 }
 
 Supabase provides a globally distributed cluster of [Realtime](https://github.com/supabase/realtime) servers that enable the following functionality:
 
 - [Broadcast](#broadcast): Send ephemeral messages from client to clients with low latency.
-- [Presence](#presence): Track and synchrononize shared state between clients.
-- [Postgres CDC](#postgres-cdc): Listen to Postgres database changes and send them to authorized clients.
+- [Presence](#presence): Track and synchronize shared state between clients.
+- [Postgres Changes](#postgres-changes): Listen to Postgres database changes and send them to authorized clients.
 
 A [channel](https://hexdocs.pm/phoenix/channels.html) is the basic building block of Realtime and narrows the scope of data flow to subscribed clients. You can think of a channel as a chatroom where participants are able to see who's online and send and receive messages; similar to a Discord or Slack channel.
 
-All clients can connect to a channel and take advantage of the built-in features, Broadcast and Presence, while extenstions, like Postgres CDC, must be enabled prior to use.
+All clients can connect to a channel and take advantage of the built-in features, Broadcast and Presence, while extenstions, like Postgres Changes, must be enabled prior to use.
 
 ## Broadcast
 
@@ -37,9 +37,9 @@ Clients are free to come-and-go as they please, and as long as they are all subs
 
 The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
 
-## Postgres CDC
+## Postgres Changes
 
-Postgres Change Data Capture (CDC) enables you to listen to database changes and have them broadcast to authorized clients based on [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies.
+Postgres Changes enable you to listen to database changes and have them broadcast to authorized clients based on [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies.
 
 This works by Realtime polling your database's logical replication slot for changes, passing those changes to the [apply_rls](https://github.com/supabase/walrus#reading-wal) SQL function to determine which clients have permission, and then using Broadcast to send those changes to clients.
 

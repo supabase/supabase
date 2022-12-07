@@ -88,7 +88,7 @@ const CustomDomainsConfigureHostname = ({ projectRef }: CustomDomainsConfigureHo
                 </div>
               }
             >
-              <FormSection header={<FormSectionLabel>Add a Custom Domain</FormSectionLabel>}>
+              <FormSection header={<FormSectionLabel>Add a custom domain</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
                   <Input
                     id="domain"
