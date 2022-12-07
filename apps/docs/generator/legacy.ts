@@ -17,7 +17,10 @@ import { uniqBy } from 'lodash'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 
-const commonDocSpec = yaml.load(fs.readFileSync('../../spec/common-client-libs.yml', 'utf8'))
+const commonDocSpecJson = JSON.parse(
+  fs.readFileSync('../../spec/common-client-libs-sections.json', 'utf8')
+)
+
 export default async function gen(inputFileName: string, outputDir: string) {
   const docSpec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
   const defRef = docSpec.info.definition ? fs.readFileSync(docSpec.info.definition, 'utf8') : '{}'
@@ -41,7 +44,11 @@ export default async function gen(inputFileName: string, outputDir: string) {
     try {
       // get the slug from common-client-libs.yml
       //const slug = slugify(pageSpec.id)
-      const slug = commonDocSpec.functions.find((fn) => fn.id === pageSpec.id).slug
+
+      const slug = commonDocSpecJson.sections.functions
+        .find((fn) => fn.items.find((item) => item.id === pageSpec.id))
+        ?.items.find((item) => item.id === pageSpec.id).slug
+
       const hasTsRef = pageSpec['$ref'] || null
       const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, definition)
       if (hasTsRef && !tsDefinition) throw new Error('Definition not found: ' + hasTsRef)
