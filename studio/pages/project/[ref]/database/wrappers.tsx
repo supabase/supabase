@@ -16,6 +16,12 @@ const DatabaseWrappers: NextPageWithLayout = () => {
   return <Wrappers />
 }
 
-DatabaseWrappers.getLayout = (page) => <DatabaseLayout title="Wrappers">{page}</DatabaseLayout>
+DatabaseWrappers.getLayout = (page) => (
+  <DatabaseLayout title="Wrappers">
+    <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
+      {page}
+    </div>
+  </DatabaseLayout>
+)
 
 export default observer(DatabaseWrappers)
