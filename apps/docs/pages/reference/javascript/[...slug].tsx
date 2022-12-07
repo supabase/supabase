@@ -80,7 +80,7 @@ export default function JSReference(props) {
               key={item.id}
               title={item.meta.title}
               id={item.id}
-              slug={item.slug}
+              slug={item.id}
               scrollSpyHeader={true}
             >
               <RefSubLayout.Details>
@@ -108,11 +108,7 @@ export default function JSReference(props) {
             // const introFileMarkdownContent =
             //console.log('props.docs', props.docs)
             // if (item.id !== 'db-modifiers-select') return <></>
-            console.log(
-              'hi',
-              item.id,
-              examples.functions.find((fn) => fn.id === item.id)
-            )
+
             return (
               <>
                 <RefSubLayout.Section
@@ -128,7 +124,7 @@ export default function JSReference(props) {
                   //   item.id
                   // }
                   id={item.id}
-                  slug={allFunctions.find((commonItem) => commonItem.id === item.id).slug}
+                  slug={allFunctions.find((fn) => fn.id === item.id).slug}
                   scrollSpyHeader={true}
                 >
                   <RefSubLayout.Details>
