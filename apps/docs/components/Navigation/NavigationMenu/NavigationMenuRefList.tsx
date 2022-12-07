@@ -14,15 +14,14 @@ const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 
 // Get only the functions with references in the current librarry
 // ie: if the lib === dart, only get the dart functions
-const allCurrentFunctions = allFunctions
-  .map((fn: any) => {
-    if (fn.items.flat().find((item) => item.libs.includes('dart'))) return fn
-  })
-  .filter((item) => item)
-
-console.log({ allCurrentFunctions })
 
 const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
+  const allCurrentFunctions = allFunctions
+    .map((fn: any) => {
+      if (fn.items.flat().find((item) => item.libs.includes(lib))) return fn
+    })
+    .filter((item) => item)
+
   const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
   const router = useRouter()
 
