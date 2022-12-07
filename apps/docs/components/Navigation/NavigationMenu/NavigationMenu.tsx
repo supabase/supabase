@@ -288,12 +288,7 @@ const SideNav = () => {
         setLevel={setLevel}
         lib="dart"
       />
-      <NavigationMenuCliList
-        id={'reference_cli'}
-        currentLevel={level}
-        setLevel={setLevel}
-        lib="cli"
-      />
+      <NavigationMenuCliList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
     </div>
   )
 }
