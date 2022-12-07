@@ -2,13 +2,75 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
+import * as Accordion from '@radix-ui/react-accordion'
 
 import Image from 'next/image'
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
+import { useEffect, useState, memo } from 'react'
+import useWindowLocation from '~/hooks/useWindowLocation'
+import { useNavigationMenuContext } from './NavigationMenu.Context'
+import { find } from 'lodash'
+import { useMenuActiveRefId } from '~/hooks/useMenuState'
 
 const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 
+const FunctionLink = ({
+  title,
+  id,
+  icon,
+  product,
+  library,
+  slug,
+}: {
+  title: string
+  name?: string
+  id: string
+  icon?: string
+  product?: string
+  library: string
+  slug: string
+}) => {
+  const router = useRouter()
+  // const { activeRefItem } = useNavigationMenuContext()
+  const activeAccordianItem = useMenuActiveRefId()
+
+  const active = activeAccordianItem === id
+  return (
+    <li key={id} className="function-link-item">
+      <Link href={`/reference/${library}/${slug}`} passHref>
+        <a
+          className={[
+            'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
+            active ? 'text-brand-900' : 'text-scale-1000',
+          ].join(' ')}
+        >
+          {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
+          {title}
+        </a>
+      </Link>
+    </li>
+  )
+}
+
+const SideMenuTitle = ({ title }: { title: string }) => {
+  return (
+    <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-3">
+      {title}
+    </span>
+  )
+}
+
+const Divider = () => {
+  return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
+}
+
 const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
+  const router = useRouter()
+  // const { activeRefItem } = useNavigationMenuContext()
+  // const [activeAccordianItem, setActiveAccordianItem] = useState('')
+
+  // const activeRefItem = useMenuActiveRefId()
+
   // Get only the functions with references in the current librarry
   // ie: if the lib === dart, only get the dart functions
   const allCurrentFunctions = allFunctions
@@ -18,49 +80,53 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
     .filter((item) => item)
 
   const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
-  const router = useRouter()
 
   const menu = NavItems[id]
 
-  const FunctionLink = ({
-    title,
-    id,
-    icon,
-    product,
-    library,
-    slug,
-  }: {
-    title: string
-    name?: string
-    id: string
-    icon?: string
-    product?: string
-    library: string
-    slug: string
-  }) => {
-    return (
-      <li key={id} className="function-link-item text-scale-1000">
-        <Link href={`/reference/${library}/${slug}`} passHref>
-          <a className="cursor-pointer transition text-sm hover:text-brand-900 flex gap-3">
-            {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
-            {title}
-          </a>
-        </Link>
-      </li>
-    )
-  }
+  const url = router.asPath
 
-  const SideMenuTitle = ({ title }: { title: string }) => {
-    return (
-      <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-3">
-        {title}
-      </span>
-    )
-  }
+  const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
 
-  const Divider = () => {
-    return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
-  }
+  const path = useWindowLocation()
+
+  useEffect(() => {
+    console.log('path', path)
+  }, [path])
+
+  // console.log('firstLevelRoute', firstLevelRoute)
+
+  // console.log('allFunctions', allFunctions)
+
+  const databaseFunctions = find(allFunctions, { title: 'Database' }).items
+
+  const filterIds = find(databaseFunctions, {
+    id: 'using-filters',
+  }).items.map((x) => x.id)
+
+  const modifierIds = find(databaseFunctions, {
+    id: 'using-modifiers',
+  }).items.map((x) => x.id)
+
+  // console.log(filterIds, modifierIds)
+
+  // console.log(filterIds.includes(activeRefItem) ? 'test IS FILTER' : 'test NOT FIlTER')
+
+  // useEffect(() => {
+  //   console.log('activeAccordianItem in USEEFFECT', activeAccordianItem)
+
+  //   if (filterIds.includes(activeRefItem) || activeRefItem === 'using-filters') {
+  //     console.log('FILTERS')
+  //     setActiveAccordianItem('using-filters')
+  //   } else if (modifierIds.includes(activeRefItem) || activeRefItem === 'using-modifiers') {
+  //     console.log('MODIFIERS')
+  //     setActiveAccordianItem('using-modifiers')
+  //   } else {
+  //     setActiveAccordianItem('')
+  //   }
+  // }, [activeRefItem])
+
+  // console.log('filterIds', filterIds)
+  // console.log('modifierIds', modifierIds)
 
   return (
     <div
@@ -76,6 +142,18 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
         currentLevel !== id ? 'opacity-0 invisible absolute' : '',
       ].join(' ')}
     >
+      <Accordion.Root collapsible key={id} type="single">
+        <Accordion.Item value={'1'}>
+          <Accordion.AccordionTrigger>
+            <button>open</button>
+          </Accordion.AccordionTrigger>
+
+          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
+            <h1 className="text-4xl text-indigo-900">hello world</h1>
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>
+
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
         {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
         <Link href="/" passHref>
@@ -124,53 +202,65 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
             const toplevelItems = fn.items.filter((item) => !item.parent)
             toplevelItems.map((item) => <li>{item.title}</li>)
 
-            // Database has Filters and Modifiers sub-items
-            if (fn.title === 'Database') {
-              const filters = fn.items.filter(
-                (item) => item.parent === 'filters' && item.libs.includes(lib)
-              )
-              const modifiers = fn.items.filter(
-                (item) => item.parent === 'modifiers' && item.libs.includes(lib)
-              )
+            const RenderLink = (props) => {
+              const activeAccordianItem = useMenuActiveRefId()
+              let active = false
+
+              console.log('render link id', props.id)
+
+              const isFilter = filterIds.includes(activeAccordianItem)
+              const isModifier = modifierIds.includes(activeAccordianItem)
+
+              if (
+                (isFilter && !isModifier && props.id === 'using-filters') ||
+                activeAccordianItem === 'using-filters'
+              ) {
+                active = true
+              } else if (
+                (isModifier && !isFilter && props.id === 'using-modifiers') ||
+                activeAccordianItem === 'using-modifiers'
+              ) {
+                active = true
+              } else {
+                active = false
+              }
 
               return (
-                <>
-                  <SideMenuTitle title="Database" />
-
-                  {toplevelItems.map((item) => (
-                    <FunctionLink {...item} library={menu.title} />
-                  ))}
-
-                  <div className="ml-2 mt-4">
-                    <SideMenuTitle title="Filters" />
-                    {filters.map((item) => (
-                      <FunctionLink {...item} library={menu.title} />
-                    ))}
-                  </div>
-
-                  <div className="ml-2 mt-4">
-                    <SideMenuTitle title="Modifiers" />
-                    {modifiers.map((item) => (
-                      <FunctionLink {...item} library={menu.title} />
-                    ))}
-                  </div>
-                </>
-              )
-            } else {
-              // Only database has subitems (Filters & Modifiers)
-              // so output the rest directly
-              return (
-                <>
-                  <Divider />
-                  <SideMenuTitle title={fn.title} />
-                  {fn.items
-                    .filter((item) => item.libs.includes(lib))
-                    .map((item) => (
-                      <FunctionLink {...item} library={menu.title} />
-                    ))}
-                </>
+                <Accordion.Root
+                  collapsible
+                  key={props.id + 'accordian-root-for-func'}
+                  type="single"
+                  value={active ? props.id : ''}
+                >
+                  <Accordion.Item key={props.id + '-accordian-item'} value={props.id}>
+                    <FunctionLink {...props} library={props.library} />
+                    <Accordion.Content
+                      key={props.id + '-sub-items-accordion-container'}
+                      className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2"
+                    >
+                      {props.items &&
+                        props.items
+                          .filter((item) => item.libs.includes(lib))
+                          .map((item) => {
+                            return <FunctionLink {...item} library={menu.title} />
+                          })}
+                    </Accordion.Content>
+                  </Accordion.Item>
+                </Accordion.Root>
               )
             }
+
+            return (
+              <>
+                <Divider />
+                <SideMenuTitle title={fn.title} />
+                {fn.items
+                  .filter((item) => item.libs.includes(lib))
+                  .map((item) => (
+                    <RenderLink {...item} library={menu.title} />
+                  ))}
+              </>
+            )
           })}
         </ul>
         {menu.extras && (
@@ -207,4 +297,4 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   )
 }
 
-export default NavigationMenuRefList
+export default memo(NavigationMenuRefList)
