@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { NextSeo } from 'next-seo'
 
 import _days from '~/components/LaunchWeek/lw6_days.json'
@@ -37,8 +39,6 @@ export default function launchweek() {
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
-
-  const [days, setDays] = useState([])
 
   const [session, setSession] = useState<Session | null>(null)
   const [creators, setCreators] = useState<any>([])
@@ -100,6 +100,28 @@ export default function launchweek() {
     )
   }
 
+  const SectionButtons = (links) => {
+    return (
+      <div className="flex gap-2">
+        <a>
+          <div className="flex items-center bg-slate-600 rounded-full text-sm py-2 pl-3 pr-2">
+            Blog post
+            <div className="bg-slate-900 rounded-full inline-block p-1 ml-2">
+              <IconExternalLink className="text-brand-900 w-3 h-3" />
+            </div>
+          </div>
+        </a>
+        <a>
+          <div className="flex items-center bg-slate-600 rounded-full text-sm py-2 pl-3 pr-2">
+            Docs
+            <div className="bg-slate-900 rounded-full inline-block p-1 ml-2">
+              <IconExternalLink className="text-brand-900 w-3 h-3" />
+            </div>
+          </div>
+        </a>
+      </div>
+    )
+  }
   return (
     <>
       <NextSeo
@@ -187,23 +209,20 @@ export default function launchweek() {
                 <div className="border-b pb-3">
                   <Accordion.Item
                     header={
-                      <AccordionHeader
-                        date={_days[0].date}
-                        day={_days[0].dd}
-                        title={_days[0].title}
-                      />
+                      <AccordionHeader date={days[0].date} day={days[0].dd} title={days[0].title} />
                     }
                     className="h-[79px]"
-                    id={_days[0].d.toString()}
+                    id={days[0].d.toString()}
                   >
                     <div className="h-[400px] flex">
                       <div
-                        className={`flex-1 border rounded-xl h-full bg-no-repeat bg-[right_20%_top_50px] bg-contain bg-[url('/images/launchweek/docs-update-bg.png')] p-14 text-2xl`}
+                        className={`flex flex-col flex-1 justify-between border rounded-xl h-full bg-no-repeat bg-[right_20%_top_50px] bg-contain bg-[url('/images/launchweek/docs-update-bg.png')] p-14 text-2xl`}
                       >
-                        <div className="flex ">
-                          <span>{_days[0].description}</span>
+                        <div className="flex">
+                          <span>{days[0].description}</span>
                           <Badge className="ml-4">Redesigned</Badge>
                         </div>
+                        <SectionButtons />
                       </div>
                     </div>
                   </Accordion.Item>
@@ -211,21 +230,94 @@ export default function launchweek() {
                 <div className="border-b pb-3">
                   <Accordion.Item
                     header={
-                      <AccordionHeader
-                        date={_days[1].date}
-                        day={_days[1].dd}
-                        title={_days[1].title}
-                      />
+                      <AccordionHeader date={days[1].date} day={days[1].dd} title={days[1].title} />
                     }
                     className="h-[79px]"
-                    id={_days[1].d.toString()}
+                    id={days[1].d.toString()}
+                  >
+                    <div className="h-[400px] flex gap-5">
+                      <div
+                        className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_28px_top_35px]`}
+                      >
+                        <div className="flex">
+                          <span>{days[1].steps[0].title}</span>
+                          <Badge className="ml-4">New</Badge>
+                        </div>
+                      </div>
+                      <div
+                        className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[center_bottom]`}
+                      >
+                        <div className="flex">
+                          <span>{days[1].steps[1].title}</span>
+                          <Badge className="ml-4">New</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </Accordion.Item>
+                </div>
+                <div className="border-b pb-3">
+                  <Accordion.Item
+                    header={
+                      <AccordionHeader date={days[2].date} day={days[2].dd} title={days[2].title} />
+                    }
+                    className="h-[79px]"
+                    id={days[2].d.toString()}
                   >
                     <div className="h-[400px] flex gap-5">
                       <div
                         className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                       >
                         <div className="flex">
-                          <span>{_days[1].description}</span>
+                          <span>{days[2].steps[0].title}</span>
+                          <Badge className="ml-4">New</Badge>
+                        </div>
+                      </div>
+                      <div
+                        className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg.png')] bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
+                      >
+                        {/* inset 0px 130px 50px -52px #121f1e; */}
+                        <div className="flex">
+                          <span>{days[2].steps[1].title}</span>
+                          <Badge className="ml-4">New</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </Accordion.Item>
+                </div>
+                <div className="border-b pb-3">
+                  <Accordion.Item
+                    header={
+                      <AccordionHeader date={days[3].date} day={days[3].dd} title={days[3].title} />
+                    }
+                    className="h-[79px]"
+                    id={days[3].d.toString()}
+                  >
+                    <div className="h-[400px] flex gap-5">
+                      <div
+                        className={`flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%]`}
+                      >
+                        <div className="flex">
+                          <span>{days[3].description}</span>
+                          <Badge className="ml-4">New</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </Accordion.Item>
+                </div>
+                <div className="border-b pb-3">
+                  <Accordion.Item
+                    header={
+                      <AccordionHeader date={days[4].date} day={days[4].dd} title={days[4].title} />
+                    }
+                    className="h-[79px]"
+                    id={days[4].d.toString()}
+                  >
+                    <div className="h-[400px] flex gap-5">
+                      <div
+                        className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
+                      >
+                        <div className="flex">
+                          <span>{days[4].description}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
@@ -233,93 +325,7 @@ export default function launchweek() {
                         className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                       >
                         <div className="flex">
-                          <span>{_days[1].description}</span>
-                          <Badge className="ml-4">New</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </Accordion.Item>
-                </div>
-                <div className="border-b pb-3">
-                  <Accordion.Item
-                    header={
-                      <AccordionHeader
-                        date={_days[2].date}
-                        day={_days[2].dd}
-                        title={_days[2].title}
-                      />
-                    }
-                    className="h-[79px]"
-                    id={_days[2].d.toString()}
-                  >
-                    <div className="h-[400px] flex gap-5">
-                      <div
-                        className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
-                      >
-                        <div className="flex">
-                          <span>{_days[2].description}</span>
-                          <Badge className="ml-4">New</Badge>
-                        </div>
-                      </div>
-                      <div
-                        className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
-                      >
-                        <div className="flex">
-                          <span>{_days[2].description}</span>
-                          <Badge className="ml-4">New</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </Accordion.Item>
-                </div>
-                <div className="border-b pb-3">
-                  <Accordion.Item
-                    header={
-                      <AccordionHeader
-                        date={_days[3].date}
-                        day={_days[3].dd}
-                        title={_days[3].title}
-                      />
-                    }
-                    className="h-[79px]"
-                    id={_days[3].d.toString()}
-                  >
-                    <div className="h-[400px] flex gap-5">
-                      <div className={`flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}>
-                        <div className="flex">
-                          <span>{_days[3].description}</span>
-                          <Badge className="ml-4">New</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </Accordion.Item>
-                </div>
-                <div className="border-b pb-3">
-                  <Accordion.Item
-                    header={
-                      <AccordionHeader
-                        date={_days[4].date}
-                        day={_days[4].dd}
-                        title={_days[4].title}
-                      />
-                    }
-                    className="h-[79px]"
-                    id={_days[4].d.toString()}
-                  >
-                    <div className="h-[400px] flex gap-5">
-                      <div
-                        className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
-                      >
-                        <div className="flex">
-                          <span>{_days[4].description}</span>
-                          <Badge className="ml-4">New</Badge>
-                        </div>
-                      </div>
-                      <div
-                        className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
-                      >
-                        <div className="flex">
-                          <span>{_days[4].description}</span>
+                          <span>{days[4].description}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>

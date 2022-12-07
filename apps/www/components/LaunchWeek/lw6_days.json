@@ -39,23 +39,20 @@
     "youtube_id": "iqZlPtl_b-I",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "articles": [
+    "steps": [
       {
-        "title": "supabase-js v2 Release Candidate",
-        "url": "/blog/supabase-js-v2",
-        "description": "First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.",
-        "products": [
-          {
-            "title": "Supabase.js v2 Docs",
-            "url": "/docs/reference/javascript/installing",
-            "description": "Updated documentation for supabase-js"
-          },
-          {
-            "title": "Typescript support",
-            "url": "/docs/reference/javascript/typescript-support",
-            "description": "Using types generated directly from your database."
-          }
-        ]
+        "title": "Image Processing",
+        "url": "/blog",
+        "docs": "/docs",
+        "isNew": true,
+        "description": ""
+      },
+      {
+        "title": "CDN Caching",
+        "description": "Faster asset delivery, now even faster.",
+        "url": "/blog",
+        "docs": "/docs",
+        "isNew": true
       }
     ]
   },
@@ -69,36 +66,20 @@
     "youtube_id": "6bGQotxisoY",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "announcements": [
+    "steps": [
       {
-        "title": "Supabase is now SOC2 compliant",
-        "url": "Something",
-        "description": "Outline of the community changes",
-        "type": "soc2"
-      }
-    ],
-    "articles": [
+        "title": "Vault Release",
+        "url": "/blog",
+        "docs": "/docs",
+        "isNew": true,
+        "description": ""
+      },
       {
-        "title": "Supabase is SOC2 compliant",
-        "url": "/blog/supabase-soc2",
-        "description": "Supabase is now SOC2 Type 1 compliant. Let’s dig into what that means, and explain the process we went through to get there. If you’re building a SaaS product, this blog post should provide a rough guide to getting your SOC2 certification.",
-        "products": [
-          {
-            "title": "Security portal",
-            "url": "https://security.supabase.com/",
-            "description": "Monitor security at Supabase."
-          },
-          {
-            "title": "SOC 2 Document",
-            "url": "https://security.supabase.com/",
-            "description": "Request the SOC 2 Type I document through the Security Portal."
-          },
-          {
-            "title": "DPA Document",
-            "url": "https://security.supabase.com/",
-            "description": "Request Data Processing Agreement document through the Security Portal."
-          }
-        ]
+        "title": "Transparent Column Encryption",
+        "description": "Faster asset delivery, now even faster.",
+        "url": "/blog",
+        "docs": "/docs",
+        "isNew": true
       }
     ]
   },
