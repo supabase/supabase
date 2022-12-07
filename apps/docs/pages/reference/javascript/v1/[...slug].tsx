@@ -16,6 +16,8 @@ import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
 // @ts-ignore
 import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
 
+import ReferenceDetailCollapse from '~/components/reference/ReferenceDetailCollapse'
+
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
 

@@ -10,7 +10,7 @@ import components from '~/components/index'
 import { getAllDocs, getDocsBySlug } from '~/lib/docs'
 
 import ReactMarkdown from 'react-markdown'
-
+import ReferenceDetailCollapse from '~/components/reference/ReferenceDetailCollapse'
 // @ts-ignore
 import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-ignore
@@ -180,7 +180,7 @@ export default function DartReference(props) {
                     </>
                   </RefSubLayout.Details>
                   <RefSubLayout.Examples>
-                    {item.examples && (
+                    {item.examples.length && (
                       <>
                         <Tabs
                           defaultActiveId={item.examples[0].id}
