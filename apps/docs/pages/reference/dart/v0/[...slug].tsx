@@ -76,7 +76,7 @@ export default function DartReference(props) {
               key={item.id}
               title={item.meta.title}
               id={item.id}
-              slug={item.slug}
+              slug={item.id}
               scrollSpyHeader={true}
             >
               <RefSubLayout.Details>
