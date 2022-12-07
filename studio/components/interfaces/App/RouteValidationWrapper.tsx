@@ -18,9 +18,9 @@ const RouteValidationWrapper: FC = ({ children }) => {
   /**
    * Array of urls/routes that should be ignored
    */
-  const excemptUrls: string[] = [
+  const exemptUrls: string[] = [
     // project creation route, allows the page to self determine it's own route, it will redirect to the first org
-    // or prompt the user to create an organaization
+    // or prompt the user to create an organization
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
     '/join',
@@ -33,11 +33,11 @@ const RouteValidationWrapper: FC = ({ children }) => {
    * @returns a boolean
    */
   function isExceptUrl() {
-    return excemptUrls.includes(router?.pathname)
+    return exemptUrls.includes(router?.pathname)
   }
 
   useEffect(() => {
-    // check if current route is excempted from route validation check
+    // check if current route is exempted from route validation check
     if (isExceptUrl()) return
 
     if (orgsInitialized && orgSlug) {
@@ -54,7 +54,7 @@ const RouteValidationWrapper: FC = ({ children }) => {
   }, [orgsInitialized])
 
   useEffect(() => {
-    // check if current route is excempted from route validation check
+    // check if current route is exempted from route validation check
     if (isExceptUrl()) return
 
     if (projectsInitialized && projectRef) {

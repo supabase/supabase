@@ -35,7 +35,7 @@ class Realtime extends Hooks {
 
   @feature(FEATURE.REALTIME)
   @severity(Severity.BLOCKER)
-  @description('When you subscrive to realtime, you have to receive updates')
+  @description('When you subscribe to realtime, you have to receive updates')
   @timeout(60000)
   @test
   async '[skip-stage] receive event when connected to realtime'() {
