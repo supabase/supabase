@@ -11,6 +11,7 @@ const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   // Get only the functions with references in the current librarry
   // ie: if the lib === dart, only get the dart functions
+
   const allCurrentFunctions = allFunctions
     .map((fn: any) => {
       if (fn.items.flat().find((item) => item.libs.includes(lib))) return fn
@@ -163,11 +164,9 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
                 <>
                   <Divider />
                   <SideMenuTitle title={fn.title} />
-                  {fn.items
-                    .filter((item) => item.libs.includes(lib))
-                    .map((item) => (
-                      <FunctionLink {...item} library={menu.title} />
-                    ))}
+                  {fn.items.map((item) =>
+                    item.libs.includes(lib) ? <FunctionLink {...item} library={menu.title} /> : ''
+                  )}
                 </>
               )
             }
