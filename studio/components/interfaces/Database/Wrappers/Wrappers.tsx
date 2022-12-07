@@ -1,8 +1,12 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { Collapsible, Form, IconCheck, IconLoader, Toggle } from 'ui'
 import { wrappers } from './data'
 import WrapperCard from './WrapperCard'
+import Image from 'next/image'
+import WrapperRow from './WrapperRow'
+import { useState } from 'react'
 
 const Wrappers = () => {
   const { project } = useProjectContext()
@@ -10,6 +14,7 @@ const Wrappers = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const [open, setOpen] = useState<string>('')
 
   const enabledWrapperNamesSet = new Set(data?.result.map((fdw) => fdw.name))
 
@@ -26,6 +31,21 @@ const Wrappers = () => {
         title="Foreign Data Wrappers"
         description="Connect your database to external systems. Query your data warehouse directly from your database, or query third-party APIs using SQL."
       />
+      <div>
+        {wrappers.map((wrapper) => {
+          return (
+            <WrapperRow
+              wrapper={wrapper}
+              isOpen={open === wrapper.name}
+              onOpen={(wrapperName) => {
+                if (open !== wrapperName) setOpen(wrapperName)
+                else setOpen('')
+              }}
+            />
+          )
+        })}
+      </div>
+
       <div className="space-y-4">
         <div className="w-full space-y-12">
           {enabledWrappers.length > 0 && (
