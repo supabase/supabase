@@ -244,6 +244,21 @@ functions:
     slug: auth-signup
     product: 'auth'
 
+  - id: sign-in
+    title: 'Sign in an existing user'
+    slug: auth-signin
+    product: 'auth'
+
+  - id: set-auth
+    title: 'Update the access token'
+    slug: auth-setauth
+    product: 'auth'
+
+  - id: send-mobile-otp
+    title: 'Send a one-time passcode'
+    slug: auth-api-sendmobileotp
+    product: 'auth'
+
   - id: sign-in-with-password
     title: 'Sign in a user'
     slug: auth-signinwithpassword
@@ -299,7 +314,7 @@ functions:
     slug: auth-onauthstatechange
     product: 'auth'
 
-  - id: auth-reset-password-for-email
+  - id: reset-password-for-email
     title: 'Send a password reset request'
     slug: auth-resetpasswordforemail
     product: 'auth'
@@ -349,9 +364,29 @@ functions:
     slug: invoke
     product: 'functions'
 
+  - id: stream
+    title: stream()
+    slug: stream
+    product: 'realtime'
+
   - id: subscribe
     title: 'Subscribe to database changes'
     slug: subscribe
+    product: 'realtime'
+
+  - id: remove-subscription
+    title: 'Remove a subscription'
+    slug: removesubscription
+    product: 'realtime'
+
+  - id: remove-all-subscriptions
+    title: 'Remove all subscriptions'
+    slug: removeallsubscriptions
+    product: 'realtime'
+
+  - id: get-subscriptions
+    title: 'Retrieve subscriptions'
+    slug: getsubscriptions
     product: 'realtime'
 
   - id: get-channels

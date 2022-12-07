@@ -55,7 +55,7 @@ export default function Config(props) {
 
   return (
     <RefSubLayout>
-      <div className="flex my-16">
+      <div className="flex">
         <div className="w-full">
           <div className="grid gap-16">
             <h1 className="text-4xl">{cliSpec.info.title}</h1>
@@ -65,7 +65,13 @@ export default function Config(props) {
           <div className="grid gap-32 mx-auto max-w-5xl mt-24">
             {cliSpec.commands.map((command: Command, commandIndex) => {
               return (
-                <RefSubLayout.Section title={'$ ' + command.title} id={command.id} monoFont={true}>
+                <RefSubLayout.Section
+                  slug={command.id}
+                  title={'$ ' + command.title}
+                  id={command.id}
+                  monoFont={true}
+                  scrollSpyHeader={false}
+                >
                   <RefSubLayout.Details>
                     <div className="grid ref-container" id={command.id}>
                       <div className="border-b pb-8" key={command.id}>
@@ -147,9 +153,9 @@ export default function Config(props) {
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
   let slug
   if (params.slug.length > 1) {
-    slug = `docs/${params.slug.join('/')}`
+    slug = `docs/reference/cli/${params.slug.join('/')}`
   } else {
-    slug = `docs/${params.slug[0]}`
+    slug = `docs/reference/cli/${params.slug[0]}`
   }
 
   let doc = getDocsBySlug(slug)

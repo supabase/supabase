@@ -203,7 +203,29 @@ functions:
 
           final error = res.error;
           ```
+  - id: session
+    title: session()
+    description: |
+      Returns the session data, if there is an active session.
+    examples:
+      - name: Get the session data
+        isSpotlight: true
+        dart: |
+          ```dart
+          final session = supabase.auth.session();
+          ```
 
+  - id: user
+    title: user()
+    description: |
+      Returns the user data, if there is a logged in user.
+    examples:
+      - name: Get the logged in user
+        isSpotlight: true
+        dart: |
+          ```dart
+          final user = supabase.auth.user();
+          ```
   - id: get-session
     title: getSession()
     description: |
@@ -216,7 +238,6 @@ functions:
           ```dart
           final session = supabase.auth.session();
           ```
-
   - id: get-user
     title: currentUser
     description: |
@@ -265,7 +286,7 @@ functions:
           });
           ```
 
-  - id: auth-reset-password-for-email
+  - id: reset-password-for-email
     title: Reset Password (Email)
     description: |
       Sends a reset request to an email address.
@@ -518,16 +539,15 @@ functions:
           ```
 
   - id: update
+    title: 'Modify data: update()'
     description: |
       Performs an UPDATE on the table.
-    title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
     examples:
-      - id: updating-your-data
-        name: Updating your data
+      - name: Updating your data
         isSpotlight: true
-        code: |
+        dart: |
           ```dart
           final res = await supabase
             .from('cities')
@@ -535,14 +555,13 @@ functions:
             .match({ 'name': 'Auckland' })
             .execute();
           ```
-      - id: updating-json-data
-        name: Updating JSON data
+      - name: Updating JSON data
         description: |
           Postgres offers a
           [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
           for working with JSON data. Right now it is only possible to update an entire JSON document,
           but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
-        code: |
+        dart: |
           ```dart
           final res = await supabase
             .from('users')

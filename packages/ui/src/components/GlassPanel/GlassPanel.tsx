@@ -1,6 +1,5 @@
-import React from 'react'
-import { Item } from '../Accordion/Accordion'
 import { useTheme } from 'common/Providers'
+import * as React from 'react'
 
 interface Props {
   title: string
@@ -11,6 +10,10 @@ interface Props {
   background?: boolean
   img?: string
   hasLightIcon?: boolean
+
+  showLink?: boolean
+
+  showIconBg?: boolean
 }
 
 const GlassPanel = ({
@@ -22,13 +25,22 @@ const GlassPanel = ({
   background = true,
   img,
   hasLightIcon,
+  showLink = false,
+  showIconBg = false,
 }: Props) => {
   const { isDarkMode } = useTheme()
+
+  const IconBackground: React.FC = (props) => (
+    <div className={showIconBg && 'bg-green-600 w-8 h-8 flex items-center justify-center rounded'}>
+      {props.children}
+    </div>
+  )
 
   return (
     <div
       className={[
         'relative',
+        'h-full',
         'group',
         'cursor-pointer',
         'overflow-hidden',
@@ -58,29 +70,27 @@ const GlassPanel = ({
       <div
         className={[
           'px-8 pb-8 relative',
-          'flex flex-col',
+          'flex flex-col h-full',
           icon ? 'gap-6' : 'gap-2',
           !header ? 'pt-8' : '',
         ].join(' ')}
       >
         <div className="flex items-center gap-3">
-          {typeof icon === 'string' ? (
-            <div className="bg-green-600 w-8 h-8 flex items-center justify-center rounded">
+          {icon && typeof icon === 'string' ? (
+            <IconBackground>
               <img
-                className="bg-green-600 w-5"
-                src={`/docs/img/icons/menu/${icon}${
-                  hasLightIcon && !isDarkMode ? '-light' : ''
-                }.svg`}
+                className="w-5"
+                src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
               />
-            </div>
+            </IconBackground>
           ) : (
-            icon
+            icon && <IconBackground>{icon}</IconBackground>
           )}
           <h5 className="text-base text-scale-1200">{title}</h5>
         </div>
 
-        {children && <span className="text-sm text-scale-1100">{children}</span>}
-        <span className="text-brand-900 justify-end text-sm">Learn more</span>
+        {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
+        {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

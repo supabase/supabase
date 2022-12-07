@@ -381,12 +381,40 @@ export default {
         border-scale-1200 
       `,
     },
+    'rounded-pills': {
+      list: 'flex space-x-2',
+      base: ` 
+        relative 
+        cursor-pointer 
+        flex 
+        items-center 
+        space-x-2
+        text-center 
+        transition
+        shadow-sm
+        rounded-full
+        focus:outline-none 
+        focus-visible:ring 
+        focus-visible:ring-scale-700
+        focus-visible:border-scale-900
+        `,
+      inactive: `
+        bg-scale-400 hover:bg-scale-500
+        hover:border-scale-900
+        text-scale-900 hover:text-scale-1200
+      `,
+      active: `
+        bg-scale-1200
+        text-scale-200
+        border-scale-1200 
+      `,
+    },
     block: 'w-full flex items-center justify-center',
     size: {
       ...default__padding_and_text,
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
-    content: `focus:outline-none focus:ring text-scale-900`,
+    content: `focus:outline-none transition-height`,
   },
 
   /*
