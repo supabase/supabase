@@ -1111,6 +1111,25 @@
                     "type": "integer",
                     "minimum": 1,
                     "example": 60000
+                  },
+                  "transform": {
+                    "type": "object",
+                    "properties": {
+                      "height": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 100
+                      },
+                      "width": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 100
+                      },
+                      "resize": {
+                        "type": "string",
+                        "enum": ["cover", "contain", "fill"]
+                      }
+                    }
                   }
                 },
                 "required": ["expiresIn"]
@@ -1685,6 +1704,132 @@
         }
       }
     },
+    "/object/info/authenticated/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Retrieve object info",
+        "tags": ["object"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/info/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Retrieve object info",
+        "tags": ["deprecated"],
+        "description": "use HEAD /object/authenticated/{bucketName} instead",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/object/copy": {
       "post": {
         "summary": "Copies an object",
@@ -1857,114 +2002,6 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "string"
-                    },
-                    "error": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["statusCode", "error", "message"],
-                  "title": "errorSchema"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/render/authenticated/{bucketName}/{wildcard}": {
-      "get": {
-        "summary": "Render an authenticated image with the given transformations",
-        "tags": ["object"],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "example": "avatars"
-            },
-            "example": "avatars",
-            "in": "path",
-            "name": "bucketName",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string",
-              "example": "folder/cat.png"
-            },
-            "example": "folder/cat.png",
-            "in": "path",
-            "name": "*",
-            "required": true
-          }
-        ],
-        "responses": {
-          "4XX": {
-            "description": "Error response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Error response",
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "string"
-                    },
-                    "error": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["statusCode", "error", "message"],
-                  "title": "errorSchema"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/render/public/{bucketName}/{wildcard}": {
-      "get": {
-        "summary": "Render a public image with the given transformations",
-        "tags": ["object"],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "example": "avatars"
-            },
-            "example": "avatars",
-            "in": "path",
-            "name": "bucketName",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string",
-              "example": "folder/cat.png"
-            },
-            "example": "folder/cat.png",
-            "in": "path",
-            "name": "*",
-            "required": true
-          }
-        ],
-        "responses": {
-          "4XX": {
-            "description": "Error response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
