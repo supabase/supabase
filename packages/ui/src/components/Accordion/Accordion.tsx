@@ -113,9 +113,10 @@ interface ItemProps {
   header: React.ReactNode
   id: string
   icon?: React.ReactNode
+  disabled?: boolean
 }
 
-export function Item({ children, className, header, id, icon }: ItemProps) {
+export function Item({ children, className, header, id, icon, disabled }: ItemProps) {
   const __styles = styleHandler('accordion')
   // const [open, setOpen] = useState(false)
 
@@ -136,7 +137,11 @@ export function Item({ children, className, header, id, icon }: ItemProps) {
   // console.log('currentItems', currentItems)
 
   return (
-    <RadixAccordion.Item value={id} className={__styles.variants[type].container}>
+    <RadixAccordion.Item
+      value={id}
+      className={__styles.variants[type].container}
+      disabled={disabled}
+    >
       <RadixAccordion.Trigger className={triggerClasses.join(' ')}>
         {header}
         <IconChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />

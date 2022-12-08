@@ -1,7 +1,7 @@
 [
   {
     "title": "Docs Updated",
-    "shipped": false,
+    "shipped": true,
     "date": "12 Dec 2022",
     "description": "Supabase Docs",
     "d": 1,
@@ -21,7 +21,7 @@
   },
   {
     "title": "Image Processing: Resize V2 + CDN",
-    "shipped": false,
+    "shipped": true,
     "date": "13 Dec 2022",
     "description": "Image Processing",
     "d": 2,
@@ -48,7 +48,7 @@
   },
   {
     "title": "Supabase Vault Release",
-    "shipped": false,
+    "shipped": true,
     "date": "14 Dec 2022",
     "description": "Vault Release",
     "d": 3,
@@ -75,7 +75,7 @@
   },
   {
     "title": "Multi-factor Authentication",
-    "shipped": false,
+    "shipped": true,
     "date": "15 Dec 2022",
     "description": "Multi-factor Authentication",
     "d": 4,
@@ -95,7 +95,7 @@
   },
   {
     "title": "Supabase Wrappers - FDW Framework",
-    "shipped": false,
+    "shipped": true,
     "date": "16 Dec 2022",
     "description": "Supabase Wrappers",
     "d": 5,
@@ -122,7 +122,7 @@
   },
   {
     "title": "One more thing",
-    "shipped": false,
+    "shipped": true,
     "date": "19th Aug 2022",
     "description": "We finish Launch Week 5 with an update on the community and some more product updates.",
     "d": 6,

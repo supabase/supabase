@@ -220,6 +220,7 @@ export default function launchweek() {
                       shipped={day1.shipped}
                     />
                   }
+                  disabled={!day1.shipped}
                   className="h-[79px]"
                   id={day1.d.toString()}
                 >
@@ -248,12 +249,13 @@ export default function launchweek() {
                       shipped={day2.shipped}
                     />
                   }
+                  disabled={!day2.shipped}
                   className="h-[79px]"
                   id={day2.d.toString()}
                 >
-                  <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                     <div
-                      className={`flex-1 flex flex-col justify-between basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_28px_top_35px] bg-contain`}
+                      className={`flex-1 flex flex-col justify-between basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_28px_top_35px] bg-contain`}
                     >
                       <div className="flex items-center">
                         <div>{day2.steps[0].title}</div>
@@ -264,7 +266,7 @@ export default function launchweek() {
                       <SectionButtons docs={day2.steps[0].docs} blog={day2.steps[0].blog} />
                     </div>
                     <div
-                      className={`flex-1 flex flex-col items-center justify-between basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[center_bottom]`}
+                      className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[center_bottom]`}
                     >
                       <div className="flex flex-col items-center gap-2 min-w-[300px]">
                         <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
@@ -288,12 +290,13 @@ export default function launchweek() {
                       shipped={day3.shipped}
                     />
                   }
+                  disabled={!day3.shipped}
                   className="h-[79px]"
                   id={day3.d.toString()}
                 >
-                  <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                     <div
-                      className={`flex flex-col justify-between flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
+                      className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                     >
                       <div className="flex items-center">
                         <span>{day3.steps[0].title}</span>
@@ -304,7 +307,7 @@ export default function launchweek() {
                       <SectionButtons docs={day3.steps[0].docs} blog={day3.steps[0].blog} />
                     </div>
                     <div
-                      className={`flex-1 flex flex-col items-center justify-between basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg.png')] bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
+                      className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg.png')] bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
                     >
                       {/* inset 0px 130px 50px -52px #121f1e; */}
                       <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -328,6 +331,7 @@ export default function launchweek() {
                       shipped={day4.shipped}
                     />
                   }
+                  disabled={!day4.shipped}
                   className="h-[79px]"
                   id={day4.d.toString()}
                 >
@@ -356,12 +360,13 @@ export default function launchweek() {
                       shipped={day5.shipped}
                     />
                   }
+                  disabled={!day5.shipped}
                   className="h-[79px]"
                   id={day5.d.toString()}
                 >
-                  <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                     <div
-                      className={`flex flex-col justify-between flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg.svg')] bg-contain bg-[right]`}
+                      className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg.svg')] bg-contain bg-[right]`}
                     >
                       <div className="flex items-center">
                         <span>{day5.steps[0].title}</span>
@@ -372,7 +377,7 @@ export default function launchweek() {
                       <SectionButtons docs={day5.steps[0].docs} blog={day5.steps[0].blog} />
                     </div>
                     <div
-                      className={`flex-1 flex flex-col items-center justify-between basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
+                      className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                     >
                       <div className="flex flex-col items-center gap-2 min-w-[300px]">
                         <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
