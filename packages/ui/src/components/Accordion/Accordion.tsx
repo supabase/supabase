@@ -135,8 +135,8 @@ export function Item({ children, className, header, id, icon, disabled }: ItemPr
   let chevronClasses = [__styles.chevron.base, __styles.chevron.align[chevronAlign]]
 
   // console.log('currentItems', currentItems)
-  if (open) {
-    chevronClasses.push('rotate-180')
+  if (!open) {
+    chevronClasses.unshift('!rotate-180')
   }
 
   return (

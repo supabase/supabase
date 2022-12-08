@@ -302,7 +302,7 @@ export default function launchweek() {
                         className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg-light.png')] dark:bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[center_bottom] bg-contain`}
                       >
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                          <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
+                          <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
                             New
                           </Badge>
                           <span>{day2.steps[1].title}</span>
@@ -344,7 +344,7 @@ export default function launchweek() {
                       >
                         {/* inset 0px 130px 50px -52px #121f1e; */}
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                          <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
+                          <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
                             New
                           </Badge>
                           <span className="text-center">{day3.steps[1].title}</span>
@@ -410,10 +410,10 @@ export default function launchweek() {
                         <SectionButtons docs={day5.steps[0].docs} blog={day5.steps[0].blog} />
                       </div>
                       <div
-                        className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
+                        className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/pitr-bg-light.png')] dark:bg-[url('/images/launchweek/pitr-bg.png')] bg-cover bg-[center_center]`}
                       >
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                          <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
+                          <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
                             New
                           </Badge>
                           <span>{day5.steps[1].title}</span>
