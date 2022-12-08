@@ -88,7 +88,7 @@ export default function launchweek() {
 
   const AccordionHeader = ({ date, day, title, shipped }: any) => {
     return (
-      <div className="flex flex-1">
+      <div className="flex flex-1 flex-col sm:flex-row">
         <div className="flex gap-4 min-w-[320px]">
           <Badge className="!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973] h-fit">
             {shipped ? 'Shipped' : 'Coming Soon'}
@@ -97,7 +97,7 @@ export default function launchweek() {
             {day} ・ {date}
           </span>
         </div>
-        <span className="text-scale-1200">{title}</span>
+        <span className="text-scale-1200 mt-3 sm:mt-0">{title}</span>
       </div>
     )
   }
