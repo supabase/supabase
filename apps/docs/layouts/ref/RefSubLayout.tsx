@@ -96,7 +96,7 @@ const StickyHeader: FC<StickyHeader> = (props) => {
       id={props.slug}
       data-ref-id={props.id}
       className={[
-        'text-x2l font-medium text-scale-1200 mb-8 scroll-mt-24',
+        'text-2xl font-medium text-scale-1200 mb-8 scroll-mt-24',
         props.monoFont && 'font-mono',
       ].join(' ')}
     >
