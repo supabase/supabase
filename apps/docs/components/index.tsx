@@ -19,6 +19,7 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
+import React from 'react'
 
 const components = {
   Admonition,
@@ -57,7 +58,7 @@ const components = {
   },
   code: (props: any) => <CodeBlock {...props} />,
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
-  inlineCode: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
+  inlineCode: (props: { children: string }) => <InlineCodeTag {...props} />,
 }
 
 export default components

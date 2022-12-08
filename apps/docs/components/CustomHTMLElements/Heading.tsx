@@ -13,7 +13,11 @@ import { useInView } from 'react-intersection-observer'
  * of our page, it will not be counted as visible.
  */
 
-const Heading = ({ tag, children }) => {
+interface Props {
+  tag: string
+}
+
+const Heading: React.FC<Props> = ({ tag, children }) => {
   const HeadingTag = `${tag}` as any
   const anchor = getAnchor(children)
   const link = `#${anchor}`
