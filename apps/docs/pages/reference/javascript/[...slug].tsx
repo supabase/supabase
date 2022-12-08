@@ -20,3 +20,7 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 export function getStaticPaths() {
   return handleRefGetStaticPaths()
 }
+
+export const config = {
+  unstable_includeFiles: ['node_modules/**/shiki/**/*.json'],
+}
