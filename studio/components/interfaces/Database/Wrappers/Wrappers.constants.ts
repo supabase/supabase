@@ -6,6 +6,7 @@ export const wrappers: Wrapper[] = [
     icon: '/img/icons/stripe-icon.svg',
     extensionName: 'StripeFdw',
     label: 'Stripe',
+    docsUrl: 'https://supabase.github.io/wrappers/stripe/',
     server: {
       name: 'stripe_server',
       options: [
@@ -56,6 +57,7 @@ export const wrappers: Wrapper[] = [
     icon: '/img/icons/firebase-icon.svg',
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
+    docsUrl: 'https://supabase.github.io/wrappers/firebase/',
     server: {
       name: 'firebase_server',
       options: [
