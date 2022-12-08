@@ -196,11 +196,22 @@ const SiteRefLayout = ({ children }) => {
                 <div className="flex flex-row gap-3 mt-6">
                   <span className="text-xs text-scale-900">Supabase 2022</span>
                   <span className="text-xs text-scale-900">—</span>
-                  <a className="text-xs text-scale-800">Contributing</a>
-                  <a className="text-xs text-scale-800">Author Styleguide</a>
-                  <a className="text-xs text-scale-800">Changelog</a>
-                  <a className="text-xs text-scale-800">Opensource</a>
-                  <a className="text-xs text-scale-800">Supasquad</a>
+                  <Link href="/handbook/contributing">
+                    <a className="text-xs text-scale-800 hover:underline">Contributing</a>
+                  </Link>
+                  <Link href="https://supabase.com/changelog">
+                    <a className="text-xs text-scale-800 hover:underline">Changelog</a>
+                  </Link>
+
+                  <Link href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md">
+                    <a className="text-xs text-scale-800 hover:underline">Author Styleguide</a>
+                  </Link>
+                  <Link href="https://supabase.com/docs/oss">
+                    <a className="text-xs text-scale-800 hover:underline">Open Source</a>
+                  </Link>
+                  <Link href="https://supabase.com/docs/handbook/supasquad">
+                    <a className="text-xs text-scale-800 hover:underline">Supasquad</a>
+                  </Link>
                 </div>
               </div>
 
