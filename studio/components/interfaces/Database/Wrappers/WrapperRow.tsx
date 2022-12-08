@@ -11,14 +11,18 @@ import {
   IconTrash,
   IconEye,
   IconEyeOff,
+  IconCheckCircle,
 } from 'ui'
 
 import { useStore } from 'hooks'
 import { Wrapper } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import WrapperTableEditor from './WrapperTableEditor'
+import InformationBox from 'components/ui/InformationBox'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 interface Props {
   wrapper: Wrapper
@@ -36,6 +40,7 @@ const WrapperRow: FC<Props> = ({ wrapper, isEnabled, isOpen, onOpen }) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
   const { mutateAsync: createFDW } = useFDWCreateMutation()
+  const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isEditingTable, setIsEditingTable] = useState(false)
@@ -65,7 +70,7 @@ const WrapperRow: FC<Props> = ({ wrapper, isEnabled, isOpen, onOpen }) => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async () => {
+  const onSaveWrapper = async () => {
     const validate = makeValidateRequired(wrapper.server.options)
     const errors: any = validate(formState)
     if (!isEmpty(errors)) {
@@ -96,6 +101,28 @@ const WrapperRow: FC<Props> = ({ wrapper, isEnabled, isOpen, onOpen }) => {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const onDeleteWrapper = () => {
+    confirmAlert({
+      title: `Confirm to disable ${wrapper.label} wrapper`,
+      message: `Are you sure you want to disable the ${wrapper.label} wrapper? This will also remove all tables created with this wrapper.`,
+      onAsyncConfirm: async () => {
+        try {
+          await deleteFDW({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            name: wrapper.name,
+          })
+        } catch (error: any) {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Disabling ${wrapper.name} failed: ${error.message}`,
+          })
+        }
+      },
+    })
   }
 
   return (
@@ -152,112 +179,144 @@ const WrapperRow: FC<Props> = ({ wrapper, isEnabled, isOpen, onOpen }) => {
             </div>
           </button>
         </Collapsible.Trigger>
-        <Collapsible.Content>
-          <div className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300">
-            <div className="max-w-lg mx-auto space-y-6 my-6">
-              {wrapper.server.options.map((option) => {
-                const [showHidden, setShowHidden] = useState(option.hidden)
-                return (
-                  <Input
-                    key={option.name}
-                    id={option.name}
-                    name={option.name}
-                    label={option.label}
-                    defaultValue={option.defaultValue ?? ''}
-                    required={option.required ?? false}
-                    value={formState[option.name]}
-                    onChange={(e) => {
-                      setFormState((prev) => ({ ...prev, [option.name]: e.target.value }))
-                      setFormErrors((prev) => ({ ...prev, [option.name]: '' }))
-                    }}
-                    error={formErrors[option.name]}
-                    className="input-mono"
-                    type={!option.hidden ? 'text' : showHidden ? 'text' : 'password'}
-                    actions={
-                      option.hidden ? (
-                        <div className="mr-1 flex items-center justify-center">
-                          <Button
-                            type="default"
-                            icon={showHidden ? <IconEye /> : <IconEyeOff />}
-                            onClick={() => setShowHidden(!showHidden)}
-                          />
-                        </div>
-                      ) : null
-                    }
-                  />
-                )
-              })}
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p>Foreign Tables</p>
-                    <Button type="default" onClick={() => setIsEditingTable(true)}>
-                      Add table
-                    </Button>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {newTables.length === 0 && (
-                    <div className="border border-scale-600 px-4 py-4 rounded-md flex items-center justify-center">
-                      <p className="text-sm text-scale-1000">
-                        Add foreign tables to query from after the wrapper is enabled
-                      </p>
-                    </div>
-                  )}
-                  {newTables.map((table, i) => (
-                    <div className="border border-scale-600 px-4 py-2 rounded-md space-y-1 flex items-center justify-between">
-                      <div>
-                        <p>{table.table_name}</p>
-                        <p className="text-sm text-scale-1100">
-                          {wrapper.tables[table.index].label}: {table.columns.join(', ')}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          type="default"
-                          className="px-1"
-                          icon={<IconEdit />}
-                          onClick={() => {
-                            setIsEditingTable(true)
-                            setSelectedTableToEdit({ ...table, tableIndex: i })
-                          }}
-                        />
-                        <Button
-                          type="default"
-                          className="px-1"
-                          icon={<IconTrash />}
-                          onClick={() => {
-                            setNewTables((prev) => prev.filter((_, j) => j !== i))
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+        {isEnabled ? (
+          <Collapsible.Content>
+            <div className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300">
+              <div className="max-w-lg mx-auto space-y-6 my-6">
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconCheckCircle strokeWidth={1.5} className="text-brand-900" />}
+                  title={`${wrapper.label} foreign data wrapper is currently enabled`}
+                  description="If you'd like to edit this wrapper, you'll need to disable the wrapper first and create it again with any updated configuration."
+                />
                 <div className="flex items-center justify-end !mt-8">
-                  {/* [Joshen] Thinking if we need to add a disclaimer here that users cannot edit wrappers */}
                   <div className="flex items-center space-x-3">
                     <Button
                       type="default"
-                      htmlType="reset"
-                      onClick={() => {
-                        onOpen('')
-                        setNewTables([])
-                        setFormState(getInitialFormState)
-                      }}
-                      disabled={isSubmitting}
+                      loading={isSubmitting}
+                      disabled={noChanges}
+                      onClick={() => onDeleteWrapper()}
                     >
-                      Cancel
-                    </Button>
-                    <Button loading={isSubmitting} disabled={noChanges} onClick={() => onSubmit()}>
-                      Save
+                      Disable wrapper
                     </Button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Collapsible.Content>
+          </Collapsible.Content>
+        ) : (
+          <Collapsible.Content>
+            <div className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300">
+              <div className="max-w-lg mx-auto space-y-6 my-6">
+                {wrapper.server.options.map((option) => {
+                  const [showHidden, setShowHidden] = useState(option.hidden)
+                  return (
+                    <Input
+                      key={option.name}
+                      id={option.name}
+                      name={option.name}
+                      label={option.label}
+                      defaultValue={option.defaultValue ?? ''}
+                      required={option.required ?? false}
+                      value={formState[option.name]}
+                      onChange={(e) => {
+                        setFormState((prev) => ({ ...prev, [option.name]: e.target.value }))
+                        setFormErrors((prev) => ({ ...prev, [option.name]: '' }))
+                      }}
+                      error={formErrors[option.name]}
+                      className="input-mono"
+                      type={!option.hidden ? 'text' : showHidden ? 'text' : 'password'}
+                      actions={
+                        option.hidden ? (
+                          <div className="mr-1 flex items-center justify-center">
+                            <Button
+                              type="default"
+                              icon={showHidden ? <IconEye /> : <IconEyeOff />}
+                              onClick={() => setShowHidden(!showHidden)}
+                            />
+                          </div>
+                        ) : null
+                      }
+                    />
+                  )
+                })}
+                <div className="space-y-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-scale-1100">Foreign Tables</p>
+                      <Button type="default" onClick={() => setIsEditingTable(true)}>
+                        Add table
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {newTables.length === 0 && (
+                      <div className="border border-scale-600 px-4 py-4 rounded-md flex items-center justify-center">
+                        <p className="text-sm text-scale-1000">
+                          Add foreign tables to query from after the wrapper is enabled
+                        </p>
+                      </div>
+                    )}
+                    {newTables.map((table, i) => (
+                      <div className="border border-scale-600 px-4 py-2 rounded-md space-y-1 flex items-center justify-between">
+                        <div>
+                          <p className="text-sm">{table.table_name}</p>
+                          <p className="text-sm text-scale-1000">
+                            {wrapper.tables[table.index].label}: {table.columns.join(', ')}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            type="default"
+                            className="px-1"
+                            icon={<IconEdit />}
+                            onClick={() => {
+                              setIsEditingTable(true)
+                              setSelectedTableToEdit({ ...table, tableIndex: i })
+                            }}
+                          />
+                          <Button
+                            type="default"
+                            className="px-1"
+                            icon={<IconTrash />}
+                            onClick={() => {
+                              setNewTables((prev) => prev.filter((_, j) => j !== i))
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-end !mt-8">
+                    {/* [Joshen] Thinking if we need to add a disclaimer here that users cannot edit wrappers */}
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        type="default"
+                        htmlType="reset"
+                        onClick={() => {
+                          onOpen('')
+                          setNewTables([])
+                          setFormState(getInitialFormState)
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        loading={isSubmitting}
+                        disabled={noChanges}
+                        onClick={() => onSaveWrapper()}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Collapsible.Content>
+        )}
       </Collapsible>
       <WrapperTableEditor
         visible={isEditingTable}
