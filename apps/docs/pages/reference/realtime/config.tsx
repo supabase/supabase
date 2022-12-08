@@ -1,3 +1,9 @@
+import fs from 'fs'
+import matter from 'gray-matter'
+import components from '~/components/index'
+import { MDXRemote } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
+
 // @ts-expect-error
 import specFile from '~/../../spec/realtime_v0_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
@@ -7,7 +13,7 @@ import ReactMarkdown from 'react-markdown'
 // Parameters are grouped on the page by tag
 const TAGS = ['general', 'database']
 
-export default function Config() {
+export default function Config(props) {
   return (
     <div>
       <div className="flex my-16">
@@ -15,6 +21,13 @@ export default function Config() {
           <h1 className="text-4xl mb-16">{specFile.info.title} Configuration</h1>
           <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
           <div>
+            <div>
+              {props.docs
+                .filter((doc) => doc.introPage)
+                .map((item) => (
+                  <MDXRemote {...item.content} components={components} />
+                ))}
+            </div>
             {TAGS.map((tag) =>
               specFile.parameters
                 .filter((param: Parameter) => param.tags[0] === tag)
@@ -66,4 +79,37 @@ export default function Config() {
       </div>
     </div>
   )
+}
+export async function getServerSideProps() {
+  // an array of ids of the intro sections for this library
+  const introPages = ['realtime']
+
+  const pages = [...introPages]
+
+  // Grab custom markdown intro page files
+  const allMarkdownDocs = await Promise.all(
+    pages.map(async (x: any, i) => {
+      const pathName = `docs/ref/realtime/${x}.mdx`
+
+      const markdownExists = fs.existsSync(pathName)
+
+      const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
+      const { data, content } = matter(fileContents)
+
+      return {
+        id: x,
+        title: x,
+        // ...content,
+        meta: data,
+        introPage: introPages.includes(x),
+        content: content ? await serialize(content || '') : null,
+      }
+    })
+  )
+
+  return {
+    props: {
+      docs: allMarkdownDocs,
+    },
+  }
 }
