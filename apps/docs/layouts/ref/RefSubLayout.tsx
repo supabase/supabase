@@ -55,7 +55,7 @@ const Section: FC<ISectionContainer> = (props) => {
     <article
       key={props.id}
       className={`${
-        props.singleColumn ? 'prose dark:prose-dark py-16 lg:py-32 ' : 'py-16 lg:py-32'
+        props.singleColumn ? 'prose dark:prose-dark py-16 lg:py-32 w-full' : 'py-16 lg:py-32 w-full'
       }`}
     >
       <StickyHeader {...props} />
