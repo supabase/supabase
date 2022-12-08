@@ -17,6 +17,8 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import { Accordion, Badge, IconExternalLink } from 'ui'
 import { WeekDayProps } from '~/components/LaunchWeek/types'
 
+import styles from './launchWeek.module.css'
+
 const days = _days as WeekDayProps[]
 const constellation = [
   [60, 8],
@@ -427,6 +429,72 @@ export default function launchweek() {
             </SectionContainer>
           </>
         )}
+        <SectionContainer className="!pt-0 !pb-40">
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
+            <div className="grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-16 basis-2/3">
+              <div className="flex flex-col">
+                <h3 className="text-lg text-black dark:text-white mb-2">Prizes</h3>
+                <p className="text-slate-900 w-[90%] lg:w-[80%]">
+                  There are 5 categories to win, there will be prizes for a winner and a runner-up
+                  prize for each category.
+                </p>
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-lg text-black dark:text-white mb-2">Community</h3>
+                <p className="text-slate-900 w-[90%] lg:w-[80%]">
+                  If you need help or advice when building, find other people to join your team, or
+                  if you just want to chill and watch people build, come and join us!
+                </p>
+              </div>
+              <div className="flex flex-col">
+                <div className="flex flex-col">
+                  <h3 className="text-lg text-black dark:text-white mb-2">Judges</h3>
+                  <p className="text-slate-900 w-[90%] lg:w-[80%]">
+                    We have assembled an All Star Judging Panel, one of which is{' '}
+                    <a
+                      href="https://twitter.com/swyx"
+                      target="_blank"
+                      rel="nooper noreferrer"
+                      className="text-brand-900"
+                    >
+                      @swyx
+                    </a>{' '}
+                    Shawn Wang.
+                  </p>
+                </div>
+              </div>
+              <div className={'flex flex-col'}>
+                <h3 className="text-lg text-black dark:text-white mb-2">Submision</h3>
+                <p className="text-slate-900 w-[90%] lg:w-[80%]">
+                  Submit your project through madewithsupabase.com. All submissions must be open
+                  source and publically available. Submissions close Sunday 21st Aug 23:59 (PT).
+                </p>
+              </div>
+            </div>
+            <div className={classNames(styles.community, 'flex basis-1/3 flex-col px-5')}>
+              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit self-end">
+                <h3 className="text-black dark:text-white">Made with Supabase</h3>
+                <p className="text-slate-1000 text-xs">Short description of project</p>
+              </div>
+              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit">
+                <h3 className="text-black dark:text-white">Made with Supabase</h3>
+                <p className="text-slate-1000 text-xs">Short description of project</p>
+              </div>
+              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit self-end">
+                <h3 className="text-black dark:text-white">Made with Supabase</h3>
+                <p className="text-slate-1000 text-xs">Short description of project</p>
+              </div>
+              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit">
+                <h3 className="text-black dark:text-white">Made with Supabase</h3>
+                <p className="text-slate-1000 text-xs">Short description of project</p>
+              </div>
+              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit self-end">
+                <h3 className="text-black dark:text-white">Made with Supabase</h3>
+                <p className="text-slate-1000 text-xs">Short description of project</p>
+              </div>
+            </div>
+          </div>
+        </SectionContainer>
         <SectionContainer
           className={classNames(
             'flex gap-6 min-h-[350px] !py-3 mb-11 flex-col-reverse md:flex-row',
@@ -494,55 +562,6 @@ export default function launchweek() {
                 </p>
               </div>
             )}
-          </div>
-        </SectionContainer>
-        <SectionContainer className="!pt-0">
-          <div className="flex">
-            <div className="grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-16">
-              <div className="flex flex-col">
-                <h3 className="text-lg text-black dark:text-white mb-2">Prizes</h3>
-                <p className="text-slate-900 w-[70%]">
-                  There are 5 categories to win, there will be prizes for a winner and a runner-up
-                  prize for each category.
-                </p>
-              </div>
-              <div className="flex flex-col">
-                <h3 className="text-lg text-black dark:text-white mb-2">Community</h3>
-                <p className="text-slate-900 w-[70%]">
-                  If you need help or advice when building, find other people to join your team, or
-                  if you just want to chill and watch people build, come and join us!
-                </p>
-              </div>
-              <div className="flex flex-col">
-                <div className="flex flex-col">
-                  <h3 className="text-lg text-black dark:text-white mb-2">Judges</h3>
-                  <p className="text-slate-900 w-[70%]">
-                    We have assembled an All Star Judging Panel, one of which is{' '}
-                    <a
-                      href="https://twitter.com/swyx"
-                      target="_blank"
-                      rel="nooper noreferrer"
-                      className="text-brand-900"
-                    >
-                      @swyx
-                    </a>{' '}
-                    Shawn Wang.
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <h3 className="text-lg text-black dark:text-white mb-2">Submision</h3>
-                <p className="text-slate-900 w-[70%]">
-                  Submit your project through madewithsupabase.com. All submissions must be open
-                  source and publically available. Submissions close Sunday 21st Aug 23:59 (PT).
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-16 basis-1/3"></div>
-            <div>
-              <div className="flex basis-1/3">Community</div>
-            </div>
           </div>
         </SectionContainer>
       </DefaultLayout>
