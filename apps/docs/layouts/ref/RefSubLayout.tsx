@@ -40,6 +40,7 @@ interface IEducationSection {
   monoFont?: boolean
   slug: string
   scrollSpyHeader?: boolean
+  hideTitle?: boolean
 }
 interface ISectionDetails {}
 interface ISectionExamples {}
@@ -120,12 +121,11 @@ const EducationRow: FC<IEducationRow> = (props) => {
   return <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">{props.children}</div>
 }
 
-const EducationSection: FC<IEducationSection> = (props) => {
+const EducationSection: FC<IEducationSection> = ({ hideTitle = false, ...props }) => {
   // console.log({ props })
   return (
     <article key={props.id} className={`${'prose dark:prose-dark max-w-none py-16 lg:py-32'}`}>
-      <StickyHeader {...props} />
-
+      {!hideTitle && <StickyHeader {...props} />}
       {props.children}
     </article>
   )

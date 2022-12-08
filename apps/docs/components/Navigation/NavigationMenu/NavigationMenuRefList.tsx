@@ -1,19 +1,17 @@
+import * as Accordion from '@radix-ui/react-accordion'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
-import * as Accordion from '@radix-ui/react-accordion'
 
-import Image from 'next/image'
-import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
-import { useEffect, useState, memo } from 'react'
-import useWindowLocation from '~/hooks/useWindowLocation'
-import { useNavigationMenuContext } from './NavigationMenu.Context'
 import { find } from 'lodash'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import Image from 'next/image'
+import { memo } from 'react'
+import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import RevVersionDropdown from '~/components/RefVersionDropdown'
+import { useMenuActiveRefId } from '~/hooks/useMenuState'
 
-const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
+const allFunctions = clientLibsCommonSections
 
 const FunctionLink = ({
   title,
@@ -69,12 +67,12 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   const router = useRouter()
 
   const allCurrentFunctions = allFunctions
-    .map((fn: any) => {
-      if (fn.items.flat().find((item) => item.libs.includes(lib))) return fn
-    })
-    .filter((item) => item)
+  // .map((fn: any) => {
+  //   if (fn.items.flat().find((item) => item.libs.includes(lib))) return fn
+  // })
+  // .filter((item) => item)
 
-  const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
+  // const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
 
   const menu = NavItems[id]
 
@@ -87,6 +85,12 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   const modifierIds = find(databaseFunctions, {
     id: 'using-modifiers',
   }).items.map((x) => x.id)
+
+  // return (
+  //   <>
+  //     <h1>something</h1>
+  //   </>
+  // )
 
   return (
     <div
@@ -141,14 +145,14 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
         {/* )} */}
 
         <ul className="function-link-list">
-          {introItems.map((item) => (
+          {/* {introItems.map((item) => (
             // @ts-ignore
             <FunctionLink library={menu.title} {...item} />
-          ))}
+          ))} */}
 
           {allCurrentFunctions.map((fn: any) => {
-            const toplevelItems = fn.items.filter((item) => !item.parent)
-            toplevelItems.map((item) => <li>{item.title}</li>)
+            // const toplevelItems = fn.items.filter((item) => !item.parent)
+            // toplevelItems.map((item) => <li>{item.title}</li>)
 
             const RenderLink = (props) => {
               const activeAccordianItem = useMenuActiveRefId()
@@ -204,17 +208,30 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
               )
             }
 
-            return (
-              <>
-                <Divider />
-                <SideMenuTitle title={fn.title} />
-                {fn.items
-                  .filter((item) => item.libs.includes(lib))
-                  .map((item) => (
-                    <RenderLink {...item} library={menu.title} />
-                  ))}
-              </>
-            )
+            // handle subtitles with subitems
+            if (!fn.id) {
+              return (
+                <>
+                  <Divider />
+                  <SideMenuTitle title={fn.title} />
+                  {fn.items &&
+                    fn.items
+                      .filter((item) => item.libs.includes(lib))
+                      .map((item) => <RenderLink {...item} library={menu.title} />)}
+                </>
+              )
+            } else {
+              // handle normal links
+              return (
+                <>
+                  <RenderLink {...fn} library={menu.title} />
+                  {fn.items &&
+                    fn.items
+                      .filter((item) => item.libs.includes(lib))
+                      .map((item) => <RenderLink {...item} library={menu.title} />)}
+                </>
+              )
+            }
           })}
         </ul>
         {menu.extras && (
