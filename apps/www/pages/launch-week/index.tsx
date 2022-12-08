@@ -432,6 +432,21 @@ export default function launchweek() {
           </>
         )}
         <SectionContainer className="!pt-0 !pb-40">
+          <div className="flex flex-col items-center mb-32">
+            <h1 className="text-black dark:text-white text-5xl text-center mb-9">
+              Community Spotlight
+            </h1>
+            <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973] w-fit after:bg-white">
+              Happening all week
+            </Badge>
+          </div>
+          <div className="flex flex-col mb-16">
+            <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackaton</h2>
+            <p className="text-slate-900 w-[80%] lg:w-[50%]">
+              The Supabase Team will be taking part in the Hackathon and you'll find us live
+              building in our discord all week. For more info check the blog post.
+            </p>
+          </div>
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
             <div className="grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-16 basis-2/3">
               <div className="flex flex-col">
