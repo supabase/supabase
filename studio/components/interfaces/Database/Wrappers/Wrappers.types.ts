@@ -1,5 +1,7 @@
 export type Wrapper = {
   name: string
+  handlerName: string
+  validatorName: string
   icon: string
   extensionName: string
   label: string

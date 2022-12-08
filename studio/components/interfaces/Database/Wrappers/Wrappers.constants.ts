@@ -3,6 +3,8 @@ import { Wrapper } from './Wrappers.types'
 export const wrappers: Wrapper[] = [
   {
     name: 'stripe_wrapper',
+    handlerName: 'stripe_fdw_handler',
+    validatorName: 'stripe_fdw_validator',
     icon: '/img/icons/stripe-icon.svg',
     extensionName: 'StripeFdw',
     label: 'Stripe',
@@ -54,6 +56,8 @@ export const wrappers: Wrapper[] = [
   },
   {
     name: 'firebase_wrapper',
+    handlerName: 'firebase_fdw_handler',
+    validatorName: 'firebase_fdw_validator',
     icon: '/img/icons/firebase-icon.svg',
     extensionName: 'FirebaseFdw',
     label: 'Firebase',

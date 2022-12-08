@@ -20,11 +20,8 @@ export function getFDWCreateSql({
 }: Pick<FDWCreateVariables, 'wrapper' | 'formState' | 'newTables'>) {
   const createWrapperSql = /* SQL */ `
     create foreign data wrapper ${wrapper.name}
-    handler wrappers_handler
-    validator wrappers_validator
-    options (
-      wrapper '${wrapper.extensionName}'
-    );
+    handler ${wrapper.handlerName}
+    validator ${wrapper.validatorName};
   `
 
   const encryptedOptions = wrapper.server.options.filter((option) => option.encrypted)
