@@ -213,8 +213,8 @@ export default function launchweek() {
                     <div className="bg-[url('/images/launchweek/ant.png')] h-[42px] w-[42px] ml-[-10px]"></div>
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
-                    <span className="text-black dark:text-white mr-2">How we launch</span>
-                    <span className="text-slate-900">Who we hire at Supabase</span>
+                    <span className="text-black dark:text-white mr-2">Who we hire at Supabase</span>
+                    <span className="text-slate-900">Fireside chat with founders</span>
                   </div>
                 </div>
                 <div className="flex gap-2 z-10">
