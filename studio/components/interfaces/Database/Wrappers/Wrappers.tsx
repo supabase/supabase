@@ -7,16 +7,15 @@ import { FormHeader } from 'components/ui/Forms'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const Wrappers = () => {
+  const [open, setOpen] = useState<string>('')
   const { project } = useProjectContext()
   const { data, isLoading } = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [open, setOpen] = useState<string>('')
+  const enabledWrapperNamesSet = new Set(data?.result.map((fdw) => fdw.name))
 
   console.log('useFDWQuery', { data })
-
-  const enabledWrapperNamesSet = new Set(data?.result.map((fdw) => fdw.name))
 
   return (
     <div>
@@ -30,6 +29,7 @@ const Wrappers = () => {
           return (
             <WrapperRow
               wrapper={wrapper}
+              isLoading={isLoading}
               isEnabled={enabledWrapperNamesSet.has(wrapper.server.name)}
               isOpen={open === wrapper.name}
               onOpen={(wrapperName) => {

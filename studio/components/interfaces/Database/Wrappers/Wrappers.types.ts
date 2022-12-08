@@ -5,6 +5,7 @@ export type Wrapper = {
   label: string
   server: Server
   tables: Table[]
+  docsUrl: string
 }
 
 export type ServerOption = {
