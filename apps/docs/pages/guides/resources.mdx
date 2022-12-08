@@ -1,0 +1,186 @@
+import Layout from '~/layouts/DefaultLayout'
+import Link from 'next/link'
+import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
+
+export const meta = {
+  id: 'resources',
+  title: 'Resources',
+  description: 'Resources for getting started building with Supabase.',
+  sidebar_label: 'Overview',
+}
+
+<h2 className="text-base max-w-xl m-0">Everything you need to get up and running with Supabase</h2>
+
+<div className="flex flex-col gap-12 my-12">
+
+<div>
+  <div className="max-w-xl">
+
+### Migrating
+
+Moving to Supabase to Firebase or Heroku is easy. We provide the guides and tools to help you do it fast.
+
+  </div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {products.map((product) => {
+      return (
+        <Link
+          href={`${product.href}`}
+          key={product.title}
+          passHref
+        >
+          <a className={product.span ?? 'col-span-12 md:col-span-4'}>
+            <GlassPanel {...product} background={true} showIconBg={true} showLink={true}>
+              {product.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+<div className="grid gap-16 md:grid-cols-2">
+
+  <div>
+
+    ### Supabase CLI
+
+    Feel more at home on the command line? The Supabase CLI lets you develop your project locally and deploy to the Supabase Platform. The Supabase CLI can also help you manage your Supabase projects. You can handle database migrations, CI/CD workflows, and generate types from your database schema, all from the comfort of your Terminal.
+
+[Learn more](/docs/guides/resources/supabase-cli)
+
+  </div>
+
+  <div>
+
+    ### Self-hosted Supabase
+
+    We're happy to host your next big thing, but we also make it easy to host Supabase on your own. We use Docker to help make setup as painless as possible.
+
+[Learn more](/docs/guides/resources/supabase-cli)
+
+  </div>
+
+</div>
+
+{/* end of container */}
+
+</div>
+
+export const products = [
+  {
+    title: 'Firebase Auth',
+    icon: '/docs/img/icons/menu/auth',
+    hasLightIcon: true,
+    href: '/guides/auth',
+    description: 'Move all your users from Firebase Auth to Supabase.',
+    span: 'col-span-12 md:col-span-4',
+  },
+  {
+    title: 'Firebase Data',
+    icon: '/docs/img/icons/menu/database',
+    hasLightIcon: true,
+    href: '/guides/database',
+    description: 'Move all your app data from Firebase to Supabase.',
+    span: 'col-span-12 md:col-span-4',
+  },
+  {
+    title: 'Firebase Storage',
+    icon: '/docs/img/icons/menu/storage',
+    hasLightIcon: true,
+    href: '/guides/storage',
+    description: 'Move all your files from Firebase to Supabase.',
+    span: 'col-span-12 md:col-span-4',
+  },
+]
+
+export const apis = [
+  {
+    title: 'Javascript Client Library',
+    icon: '/docs/img/icons/javascript-icon',
+    hasLightIcon: true,
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Flutter Client Library',
+    icon: '/docs/img/icons/flutter-icon',
+    hasLightIcon: true,
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Managment API',
+    icon: '/docs/img/icons/api-icon',
+    hasLightIcon: true,
+    href: 'auth',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Supabase CLI',
+    icon: '/docs/img/icons/cli-icon',
+    hasLightIcon: true,
+    href: 'storage',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Severless APIs',
+    icon: '/docs/img/icons/menu/reference',
+    hasLightIcon: true,
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+  {
+    title: 'Self Hosting Server',
+    icon: '/docs/img/icons/menu/platform',
+    hasLightIcon: true,
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+  },
+]
+
+export const platform = [
+  {
+    header: '/docs/img/cards/sample-card-header-3.svg',
+    title: 'Platform guides',
+    icon: '/docs/img/icons/menu/platform',
+    hasLightIcon: true,
+    href: 'database',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-12 lg:col-span-6',
+  },
+  {
+    header: '/docs/img/cards/sample-card-header-2.svg',
+    title: 'Integrations',
+    icon: '/docs/img/icons/menu/integrations',
+    hasLightIcon: true,
+    href: 'auth',
+    description: `
+Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
+  `,
+    span: 'col-span-12 lg:col-span-6',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
