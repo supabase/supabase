@@ -1,12 +1,10 @@
-import { partition } from 'lodash'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms'
+import { useState } from 'react'
+
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { wrappers } from './Wrappers.constants'
-import WrapperCard from './WrapperCard'
 import WrapperRow from './WrapperRow'
-import { useState } from 'react'
-import { Wrapper } from './Wrappers.types'
+import { FormHeader } from 'components/ui/Forms'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const Wrappers = () => {
   const { project } = useProjectContext()
@@ -16,11 +14,9 @@ const Wrappers = () => {
   })
   const [open, setOpen] = useState<string>('')
 
+  console.log('useFDWQuery', { data })
+
   const enabledWrapperNamesSet = new Set(data?.result.map((fdw) => fdw.name))
-  // const enabledWrapperNamesSet = new Set(['stripe_server'])
-  const [enabledWrappers, disabledWrappers] = partition(wrappers, (wrapper: Wrapper) =>
-    enabledWrapperNamesSet.has(wrapper.server.name)
-  )
 
   return (
     <div>
@@ -46,7 +42,7 @@ const Wrappers = () => {
       </div>
 
       {/* [Joshen TODO] Once above is working, can remove below */}
-      <div className="space-y-4 mt-20">
+      {/* <div className="space-y-4 mt-20">
         <div className="w-full space-y-12">
           {enabledWrappers.length > 0 && (
             <div className="space-y-4">
@@ -70,7 +66,7 @@ const Wrappers = () => {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

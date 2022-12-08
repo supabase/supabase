@@ -101,6 +101,8 @@ export function getFDWCreateSql({
   const sql = /* SQL */ `
     begin;
 
+    create extension if not exists wrappers;
+
     ${createWrapperSql}
 
     ${createEncryptedKeysSql}
