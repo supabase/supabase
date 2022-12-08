@@ -1,4 +1,4 @@
-import { Badge, Dropdown } from 'ui'
+import { Badge, Dropdown, IconChevronDown } from 'ui'
 import { useRouter } from 'next/router'
 import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
 
@@ -34,7 +34,7 @@ const RevVersionDropdown = () => {
           {versions.map((version, index) => (
             <Dropdown.Item key={version} onClick={() => onSelectVersion(version)}>
               <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
-                Version {version}
+                Version {version}.0
               </span>
               <Dropdown.RightSlot>
                 {index === 0 && <Badge size="small">Latest</Badge>}
@@ -44,33 +44,24 @@ const RevVersionDropdown = () => {
         </>
       }
     >
-      <div className="w-24">
-        <div
-          className="
-              flex
-              group
-              items-center
-              justify-between
-              bg-scaleA-200
-              border
-              transition
-              hover:border-scale-600
-              hover:bg-scaleA-300
-              border-scale-500 pl-1.5 pr-1.5 w-full h-[32px] rounded
-              font-mono
-              rounded-tl-none
-              rounded-bl-none
-              "
-        >
-          <div>
-            <span className="flex items-center gap-2   text-scale-900 text-xs group-hover:text-scale-1200 transition">
-              <span>version</span>
-              <span className="text-scale-1200 text-sm group-hover:text-scale-1200 transition">
-                {currentVersion}
-              </span>
-            </span>
-          </div>
-        </div>
+      <div
+        className="
+          group
+          justify-between
+          bg-scaleA-200
+          border
+          hover:border-scale-600
+          hover:bg-scaleA-300
+          border-scale-500 px-2 h-[32px] rounded
+          font-mono
+          flex items-center gap-1 text-scale-900 text-xs group-hover:text-scale-1200 transition
+          "
+      >
+        {/* <span>version</span> */}
+        <span className="text-scale-1200 text-sm group-hover:text-scale-1200 transition">
+          {currentVersion}.0
+        </span>
+        <IconChevronDown size={14} strokeWidth={2} />
       </div>
     </Dropdown>
   )
