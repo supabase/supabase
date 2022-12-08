@@ -20,7 +20,7 @@ import ProjectSetup from './MDX/project_setup.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
 import React from 'react'
-// import RefSubLayout from '~/layout/ref/RefSubLayout'
+import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { CH } from '@code-hike/mdx/components'
 
 const components = {
@@ -60,7 +60,7 @@ const components = {
   // },
   // mono: (props: any) => <code className="text-sm">{props.children}</code>,
   // inlineCode: (props: { children: string }) => <InlineCodeTag {...props} />,
-  // RefSubLayout:
+  RefSubLayout,
   CH,
   // code: (props: any) => <CodeBlock {...props} />,
 }

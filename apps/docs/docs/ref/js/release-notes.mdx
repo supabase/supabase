@@ -1,152 +1,259 @@
 ---
 id: release-notes
-title: Release Notes
+title: Release Notes 2.0.0
 ---
 
 Supabase.js v2 release notes.
 
-## 2.0.0
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-Install the latest with `npm install @supabase/supabase-js`.
+    Install the latest version of @supabase/supabase-js
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+    
+    ```bash Terminal
+      npm install @supabase/supabase-js
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### Explicit constructor options
 
-All client specific options within the constructor are keyed to the library: [PR](https://github.com/supabase/supabase-js/pull/458):
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-```jsx
-const supabase = createClient(apiURL, apiKey, {
-  db: {
-    schema: 'public',
-  },
-  auth: {
-    storage: AsyncStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-  realtime: {
-    channels,
-    endpoint,
-  },
-  global: {
-    fetch: customFetch,
-    headers: DEFAULT_HEADERS,
-  },
-})
-```
+    All client specific options within the constructor are keyed to the library.
+
+    See [PR](https://github.com/supabase/supabase-js/pull/458):
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+    
+    ```jsx
+      const supabase = createClient(apiURL, apiKey, {
+        db: {
+          schema: 'public',
+        },
+        auth: {
+          storage: AsyncStorage,
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true,
+        },
+        realtime: {
+          channels,
+          endpoint,
+        },
+        global: {
+          fetch: customFetch,
+          headers: DEFAULT_HEADERS,
+        },
+      })
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### Typescript support
 
-The libraries now support typescript.
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-```ts
-// v2 - definitions are injected in `createClient()`
-import type { Database } from './DatabaseDefinitions'
-const supabase = createClient<Database>(SUPABASE_URL, ANON_KEY)
-const { data } = await supabase.from('messages').select().match({ id: 1 })
+    The libraries now support typescript.
 
-// v1 -- previously definitions were injected in the `from()` method
-supabase.from<Definitions['Message']>('messages').select('*')
-```
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
-Types can be generated via the CLI:
+      <CH.Code>
 
-```bash
-supabase start
-supabase gen types typescript --local > DatabaseDefinitions.ts
-```
+      ```ts v1.0
+        // previously definitions were injected in the `from()` method
+        supabase.from<Definitions['Message']>('messages').select('\*')
+      ```
+
+      ---
+
+      ```ts v2.0
+        import type { Database } from './DatabaseDefinitions'
+
+        // definitions are injected in `createClient()`
+        const supabase = createClient<Database>(SUPABASE_URL, ANON_KEY)
+
+        const { data } = await supabase.from('messages').select().match({ id: 1 })
+      ```
+
+    </CH.Code>
+
+  </RefSubLayout.Examples>
+  <RefSubLayout.Details>
+
+    Types can be generated via the CLI:
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```bash Terminal
+    supabase start
+    supabase gen types typescript --local > DatabaseDefinitions.ts
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### Data operations return minimal
 
-`.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end, e.g.:
+    `.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
 
-```sql
-const { data, error } = await supabase
-    .from('my_table')
-    .delete()
-    .eq('id', 1)
-    .select()
-```
+    Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end, e.g.:
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```sql
+    const { data, error } = await supabase
+        .from('my_table')
+        .delete()
+        .eq('id', 1)
+        .select()
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### New ordering defaults
 
-`.order()` now defaults to Postgres’s default: [PR](https://github.com/supabase/postgrest-js/pull/283).
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-Previously `nullsFirst` defaults to `false` , meaning `null`s are ordered last. This is bad for performance if e.g. the column uses an index with `NULLS FIRST` (which is the default direction for indexes).
+    `.order()` now defaults to Postgres’s default: [PR](https://github.com/supabase/postgrest-js/pull/283).
+
+    Previously `nullsFirst` defaults to `false` , meaning `null`s are ordered last. This is bad for performance if e.g. the column uses an index with `NULLS FIRST` (which is the default direction for indexes).
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### Cookies and localstorage namespace
 
-Storage key name in the Auth library has changed to include project reference which means that existing websites that had their JWT expiry set to a longer time could find their users logged out with this upgrade.
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-```jsx
-const defaultStorageKey = `sb-${new URL(this.authUrl).hostname.split('.')[0]}-auth-token`
-```
+    Storage key name in the Auth library has changed to include project reference which means that existing websites that had their JWT expiry set to a longer time could find their users logged out with this upgrade.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```jsx
+    const defaultStorageKey = `sb-${new URL(this.authUrl).hostname.split('.')[0]}-auth-token`
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### New Auth Types
 
-Typescript typings have been reworked. `Session` interface now guarantees that it will always have an `access_token`, `refresh_token` and `user`
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-```jsx
-interface Session {
-    provider_token?: string | null
-    access_token: string
-    expires_in?: number
-    expires_at?: number
-    refresh_token: string
-    token_type: string
-    user: User
-}
-```
+    Typescript typings have been reworked. `Session` interface now guarantees that it will always have an `access_token`, `refresh_token` and `user`
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```jsx ./types.ts
+    interface Session {
+      provider_token?: string | null
+      access_token: string
+      expires_in?: number
+      expires_at?: number
+      refresh_token: string
+      token_type: string
+      user: User
+    }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### New Auth methods
 
-We're removing the `signIn()` method in favor of more explicit function signatures:
-`signInWithPassword()`, `signInWithOtp()`, and `signInWithOtp()`.
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-```ts
-// v2
-const { data } = await supabase.auth.signInWithPassword({
-  email: 'hello@example',
-  password: 'pass',
-})
-// v1
-const { data } = await supabase.auth.signIn({
-  email: 'hello@example',
-  password: 'pass',
-})
-```
+    We're removing the `signIn()` method in favor of more explicit function signatures:
+    `signInWithPassword()`, `signInWithOtp()`, and `signInWithOtp()`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <CH.Code>
+
+      ```ts v1.0
+        const { data } = await supabase.auth.signIn({
+          email: 'hello@example',
+          password: 'pass',
+        })
+      ```
+      ---
+
+      ```ts v2.0
+        const { data } = await supabase.auth.signInWithPassword({
+          email: 'hello@example',
+          password: 'pass',
+        })
+      ```
+
+    </CH.Code>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### New Realtime methods
 
-There is a new `channel()` method in the Realtime library, which will be used for our Multiplayer updates.
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
-```ts
-supabase
-  .channel('any_string_you_want')
-  .on('presence', { event: 'track' }, (payload) => {
-    console.log(payload)
-  })
-  .subscribe()
+    There is a new `channel()` method in the Realtime library, which will be used for our Multiplayer updates.
 
-supabase
-  .channel('any_string_you_want')
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'movies',
-    },
-    (payload) => {
-      console.log(payload)
-    }
-  )
-  .subscribe()
-```
+    We will deprecate the `.from().on().subscribe()` method previosuly used for listening to postgres changes.
 
-We will deprecate the `.from().on().subscribe()` method previosuly used for listening to postgres changes.
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```ts
+    supabase
+      .channel('any_string_you_want')
+      .on('presence', { event: 'track' }, (payload) => {
+        console.log(payload)
+      })
+      .subscribe()
+
+    supabase
+      .channel('any_string_you_want')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'movies',
+        },
+        (payload) => {
+          console.log(payload)
+        }
+      )
+      .subscribe()
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
 
 ### Deprecated setAuth()
 

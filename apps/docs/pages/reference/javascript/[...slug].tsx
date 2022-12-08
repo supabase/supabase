@@ -270,16 +270,15 @@ export default function JSReference(props) {
         {props.docs
           .filter((doc) => doc.introPage)
           .map((item) => (
-            <RefSubLayout.Section
+            <RefSubLayout.EducationSection
               key={item.id}
               title={item.meta.title}
               id={item.id}
               slug={item.id}
               scrollSpyHeader={true}
-              singleColumn={true}
             >
               <MDXRemote {...item.content} components={components} />
-            </RefSubLayout.Section>
+            </RefSubLayout.EducationSection>
           ))}
         {/* jsSpec.functions.map((item, itemIndex) => { */}
         {props.docs
