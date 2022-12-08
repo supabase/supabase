@@ -1,6 +1,7 @@
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import MultiSelect from 'components/ui/MultiSelect'
 import { useEffect, useState } from 'react'
-import { Accordion, Checkbox, Form, Input, Listbox, SidePanel } from 'ui'
+import { Form, Input, Listbox, SidePanel } from 'ui'
 import { Table, TableOption } from './types'
 import { makeValidateRequired } from './utils'
 
@@ -72,8 +73,16 @@ const WrapperTableEditor = ({
 
             {tables.map((table, i) => {
               return (
-                <Listbox.Option key={String(i)} value={String(i)} label={table.label}>
-                  <div className="flex items-center gap-2">{table.label}</div>
+                <Listbox.Option
+                  className="group"
+                  key={String(i)}
+                  value={String(i)}
+                  label={table.label}
+                >
+                  <div className="space-y-1">
+                    <p>{table.label}</p>
+                    <p className="opacity-50">{table.description}</p>
+                  </div>
                 </Listbox.Option>
               )
             })}
@@ -122,7 +131,7 @@ const TableForm = ({
 
   const initialValues = initialData ?? {
     table_name: '',
-    columns: [],
+    columns: table.availableColumns.map((column) => column.name),
     ...Object.fromEntries(table.options.map((option) => [option.name, option.defaultValue ?? ''])),
   }
 
@@ -140,62 +149,46 @@ const TableForm = ({
       onSubmit={onSubmit}
       enableReinitialize={true}
     >
-      {({ errors, touched, values }: any) => (
-        <div className="space-y-4">
-          <Input
-            id="table_name"
-            name="table_name"
-            label="Table name"
-            descriptionText="The name of the local table table you will query after the wrapper is enabled."
-          />
+      {({ errors, values, resetForm }: any) => {
+        return (
+          <div className="space-y-4">
+            <Input
+              id="table_name"
+              name="table_name"
+              label="Table name"
+              descriptionText="You can query from this table after the wrapper is enabled."
+            />
 
-          {requiredOptions.map((option) => (
-            <Option key={option.name} option={option} />
-          ))}
+            {requiredOptions.map((option) => (
+              <Option key={option.name} option={option} />
+            ))}
 
-          <div className="space-y-2">
-            <label className="block text-sm break-all text-scale-1100">Columns</label>
+            <MultiSelect
+              label="Columns"
+              options={table.availableColumns.map((column) => {
+                return {
+                  id: column.name,
+                  value: column.name,
+                  name: column.name,
+                  description: column.type,
+                  disabled: false,
+                }
+              })}
+              error={errors.columns}
+              value={values.columns}
+              placeholder="Select at least one column"
+              searchPlaceholder="Search for a column"
+              onChange={(columns) => {
+                resetForm({ values: { ...values, columns } })
+              }}
+            />
 
-            <div>
-              {table.availableColumns.map((column, k) => (
-                <Checkbox
-                  key={k}
-                  id={column.name}
-                  name="columns"
-                  value={column.name}
-                  checked={values.columns.includes(column.name)}
-                  label={`${column.name} (${column.type})`}
-                />
-              ))}
-            </div>
-
-            {touched.columns && errors.columns && (
-              <p className="text-sm text-red-900 transition-all data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal">
-                {errors.columns}
-              </p>
-            )}
+            {optionalOptions.map((option) => (
+              <Option key={option.name} option={option} />
+            ))}
           </div>
-
-          {optionalOptions.length > 0 && (
-            <Accordion
-              className="text-sm"
-              justified={false}
-              openBehaviour="multiple"
-              type="default"
-              chevronAlign="left"
-              size="small"
-              bordered={false}
-              iconPosition="left"
-            >
-              <Accordion.Item id="1" header="Optional Fields">
-                {optionalOptions.map((option) => (
-                  <Option key={option.name} option={option} />
-                ))}
-              </Accordion.Item>
-            </Accordion>
-          )}
-        </div>
-      )}
+        )
+      }}
     </Form>
   )
 }

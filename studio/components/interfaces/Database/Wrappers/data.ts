@@ -78,6 +78,7 @@ export const wrappers: Wrapper[] = [
     tables: [
       {
         label: 'Users',
+        description: 'Shows your Firebase users',
         availableColumns: [
           {
             name: 'local_id',
@@ -110,6 +111,7 @@ export const wrappers: Wrapper[] = [
       },
       {
         label: 'Firestore Collection',
+        description: 'Map to a Firestore collection',
         availableColumns: [
           {
             name: 'name',
