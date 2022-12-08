@@ -49,6 +49,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/auth</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -67,18 +73,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/auth</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/launch-week/ticket-image</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -91,19 +85,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/legal/dpa</loc>
+    <loc>https://supabase.com/launch-week/ticket-image</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/legal/soc2</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/nextjs</loc>
+    <loc>https://supabase.com/storage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -115,7 +103,19 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/storage</loc>
+    <loc>https://supabase.com/nextjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/legal/dpa</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/legal/soc2</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -922,6 +922,18 @@
 
   <url>
     <loc>https://supabase.com/blog/transparent-column-encryption-with-postgres</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/the-supabase-content-storm</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-beta-november-2022</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
