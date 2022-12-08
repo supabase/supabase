@@ -2,9 +2,9 @@ import { MDXRemote } from 'next-mdx-remote'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
-import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
+import typeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
 // @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
 import components from '~/components'
 import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
@@ -57,12 +57,7 @@ export default function JSReference(props) {
 
           default:
             return (
-              <RefFunctionSection
-                funcData={x}
-                commonFuncData={x}
-                libSpec={jsSpec}
-                typeSpec={jsTypeSpec}
-              />
+              <RefFunctionSection funcData={x} commonFuncData={x} spec={spec} typeSpec={typeSpec} />
             )
             break
         }
