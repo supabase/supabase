@@ -119,6 +119,11 @@ const Nav = [
         items: [],
       },
       {
+        name: 'from.createSignedUrls()',
+        url: '/reference/dart/storage-from-createsignedurls',
+        items: [],
+      },
+      {
         name: 'from.getPublicUrl()',
         url: '/reference/dart/storage-from-getpublicurl',
         items: [],

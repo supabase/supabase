@@ -129,6 +129,11 @@ export const menuItems: NavMenu = {
             { name: 'Overview', url: '/guides/auth/auth-helpers', items: [] },
             { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
             { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
+            {
+              name: 'Next.js Server Components',
+              url: '/guides/auth/auth-helpers/nextjs-server-components',
+              items: [],
+            },
             { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
             { name: 'Remix', url: '/guides/auth/auth-helpers/remix', items: [] },
           ],
@@ -221,8 +226,9 @@ export const menuItems: NavMenu = {
       label: 'Edge Functions',
       items: [
         { name: 'Overview', url: '/guides/functions', items: [] },
+        { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
         { name: 'Auth', url: '/guides/functions/auth', items: [] },
-        { name: 'Examples', url: '/guides/functions/examples', items: [] },
+        { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
         { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
       ],
     },
@@ -231,7 +237,7 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Overview', url: '/guides/realtime', items: [] },
         { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-        { name: 'Postgres CDC', url: '/guides/realtime/postgres-cdc', items: [] },
+        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
     },
@@ -239,7 +245,9 @@ export const menuItems: NavMenu = {
       label: 'Storage',
       items: [
         { name: 'Overview', url: '/guides/storage', items: [] },
-        { name: 'CDN', url: '/guides/storage-cdn', items: [] },
+        { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
+        { name: 'Access Control', url: '/guides/storage/access-control', items: [] },
+        { name: 'CDN', url: '/guides/storage/cdn', items: [] },
       ],
     },
     {
@@ -302,11 +310,13 @@ export const menuItems: NavMenu = {
           name: 'Developer Tools',
           url: undefined,
           items: [
+            { name: 'Estuary', url: '/guides/integrations/estuary', items: [] },
             { name: 'pgMustard', url: '/guides/integrations/pgmustard', items: [] },
             { name: 'Prisma', url: '/guides/integrations/prisma', items: [] },
             { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
             { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
             { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
+            { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
           ],
         },
         {

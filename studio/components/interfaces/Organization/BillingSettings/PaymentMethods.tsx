@@ -46,15 +46,14 @@ const PaymentMethods: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false)
 
-  const enablePermissions = useFlag('enablePermissions')
-
   const canReadPaymentMethods = checkPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )
-  const canUpdatePaymentMethods = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.payment_methods')
-    : isOwner
+  const canUpdatePaymentMethods = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.payment_methods'
+  )
 
   const onConfirmMakeDefaultPaymentMethod = async () => {
     try {
@@ -120,9 +119,7 @@ const PaymentMethods: FC<Props> = ({
                 <div className="flex w-full justify-between">
                   {!canUpdatePaymentMethods ? (
                     <p className="text-sm text-scale-1000">
-                      {enablePermissions
-                        ? "You need additional permissions to manage this organization's payment methods"
-                        : 'Only organization owners can update payment methods'}
+                      You need additional permissions to manage this organization's payment methods
                     </p>
                   ) : (
                     <div />

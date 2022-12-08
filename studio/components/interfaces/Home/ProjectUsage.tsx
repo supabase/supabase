@@ -51,9 +51,9 @@ const ProjectUsage: FC<Props> = ({}) => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/database/api-logs?te=${paddedTimestamp}`)
+      router.push(`/project/${ref}/logs/edge-logs?te=${paddedTimestamp}`)
     } else {
-      router.push(`/project/${ref}/database/api-logs?te=${timestamp}`)
+      router.push(`/project/${ref}/logs/edge-logs?te=${timestamp}`)
     }
   }
 

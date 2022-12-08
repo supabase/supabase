@@ -137,7 +137,7 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
         } else {
           const rowIdxs = Array.from(selectedRows) as number[]
           const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-          const { error } = state.rowService!.delete(rows)
+          const { error } = await state.rowService!.delete(rows)
           if (error) {
             if (state.onError) state.onError(error)
           } else {

@@ -35,7 +35,7 @@ import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEd
 import RolesStore, { IRolesStore } from './RolesStore'
 import PoliciesStore from './PoliciesStore'
 import TriggersStore from './TriggersStore'
-import PublicationStore, { IPublicationStore } from './PublicationStore'
+import PublicationStore from './PublicationStore'
 import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
@@ -58,7 +58,7 @@ export interface IMetaStore {
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
   extensions: IPostgresMetaInterface<any>
-  publications: IPublicationStore
+  publications: IPostgresMetaInterface<any>
   types: IPostgresMetaInterface<any>
 
   projectRef?: string
@@ -288,15 +288,21 @@ export default class MetaStore implements IMetaStore {
   }
 
   async updateTableRealtime(table: PostgresTable, enable: boolean) {
+    let publicationUpdateError
     const publications = this.publications.list()
     const publicTables = this.tables.list((table: PostgresTable) => table.schema === 'public')
 
-    const realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
+    let realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
     if (realtimePublication === undefined) {
-      return this.rootStore.ui.setNotification({
-        category: 'error',
-        message: `Unable to update realtime for ${table.name}: Missing publication`,
+      const { data: publication, error: publicationCreateError } = await this.publications.create({
+        name: 'supabase_realtime',
+        publish_insert: true,
+        publish_update: true,
+        publish_delete: true,
+        tables: []
       })
+      if (publicationCreateError) throw publicationCreateError
+      realtimePublication = publication
     }
 
     const { id, tables: publicationTables } = realtimePublication
@@ -309,7 +315,8 @@ export default class MetaStore implements IMetaStore {
         : publicTables
             .filter((t: any) => t.id !== table.id)
             .map((t: any) => `${t.schema}.${t.name}`)
-      await this.publications.recreate(id, realtimeTables)
+      const { error } =  await this.publications.update(id, { tables: realtimeTables })
+      publicationUpdateError = error
     } else {
       const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
 
@@ -329,9 +336,11 @@ export default class MetaStore implements IMetaStore {
       if (realtimeTables === null) return
 
       const payload = { id, tables: realtimeTables }
-      const { error: publicationsUpdateError } = await this.publications.update(id, payload)
-      if (publicationsUpdateError) throw publicationsUpdateError
+      const { error } = await this.publications.update(id, payload)
+      publicationUpdateError = error
     }
+
+    if (publicationUpdateError) throw publicationUpdateError
   }
 
   async createColumn(

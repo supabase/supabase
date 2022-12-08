@@ -7,7 +7,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/storage-caching',
-    destination: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
   },
   {
     permanent: true,
@@ -1320,8 +1320,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/postgres-changes',
-    destination: '/docs/guides/realtime/postgres-cdc',
+    source: '/docs/guides/realtime/postgres-cdc',
+    destination: '/docs/guides/realtime/postgres-changes',
   },
   {
     permanent: true,
@@ -1539,5 +1539,40 @@ module.exports = [
     permanent: true,
     source: '/docs/going-into-prod',
     destination: '/docs/guides/platform/going-into-prod',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/disk-usage',
+    destination: '/docs/guides/platform/database-usage',
+  },
+  {
+    permanent: true,
+    source: '/sign-in',
+    destination: 'https://app.supabase.com/sign-in',
+  },
+  {
+    permanent: true,
+    source: '/sign-up',
+    destination: 'https://app.supabase.com/sign-up',
+  },
+  {
+    permanent: true,
+    source: '/forgot-password',
+    destination: 'https://app.supabase.com/forgot-password',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples',
+    destination: '/docs/guides/functions',
+  },
+  {
+    permanent: true,
+    source: '/projects',
+    destination: 'https://app.supabase.com/projects',
   },
 ]

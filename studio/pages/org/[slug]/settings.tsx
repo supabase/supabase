@@ -160,7 +160,7 @@ const OrganizationSettings: NextPageWithLayout = () => {
           <h1 className="text-3xl">{organization?.name || 'Organization'} settings</h1>
         </section>
         <nav className="">
-          <Tabs onChange={(id: string) => handleChangeTab(id)} type="underlined">
+          <Tabs size="small" onChange={(id: string) => handleChangeTab(id)} type="underlined">
             <Tabs.Panel id="GENERAL" label="General" />
             <Tabs.Panel id="TEAM" label="Team" />
             <Tabs.Panel id="BILLING" label="Billing" />
