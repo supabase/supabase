@@ -67,13 +67,6 @@ const Divider = () => {
 
 const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   const router = useRouter()
-  // const { activeRefItem } = useNavigationMenuContext()
-  // const [activeAccordianItem, setActiveAccordianItem] = useState('')
-
-  // const activeRefItem = useMenuActiveRefId()
-
-  // Get only the functions with references in the current librarry
-  // ie: if the lib === dart, only get the dart functions
 
   const allCurrentFunctions = allFunctions
     .map((fn: any) => {
@@ -85,20 +78,6 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
 
   const menu = NavItems[id]
 
-  const url = router.asPath
-
-  const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
-
-  const path = useWindowLocation()
-
-  useEffect(() => {
-    //console.log('path', path)
-  }, [path])
-
-  // console.log('firstLevelRoute', firstLevelRoute)
-
-  // console.log('allFunctions', allFunctions)
-
   const databaseFunctions = find(allFunctions, { title: 'Database' }).items
 
   const filterIds = find(databaseFunctions, {
@@ -108,27 +87,6 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
   const modifierIds = find(databaseFunctions, {
     id: 'using-modifiers',
   }).items.map((x) => x.id)
-
-  // console.log(filterIds, modifierIds)
-
-  // console.log(filterIds.includes(activeRefItem) ? 'test IS FILTER' : 'test NOT FIlTER')
-
-  // useEffect(() => {
-  //   console.log('activeAccordianItem in USEEFFECT', activeAccordianItem)
-
-  //   if (filterIds.includes(activeRefItem) || activeRefItem === 'using-filters') {
-  //     console.log('FILTERS')
-  //     setActiveAccordianItem('using-filters')
-  //   } else if (modifierIds.includes(activeRefItem) || activeRefItem === 'using-modifiers') {
-  //     console.log('MODIFIERS')
-  //     setActiveAccordianItem('using-modifiers')
-  //   } else {
-  //     setActiveAccordianItem('')
-  //   }
-  // }, [activeRefItem])
-
-  // console.log('filterIds', filterIds)
-  // console.log('modifierIds', modifierIds)
 
   return (
     <div
