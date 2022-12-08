@@ -61,7 +61,6 @@ const VaultToggle: FC<Props> = () => {
 
   return (
     <div>
-      <FormHeader title="Vault" description="Application level encryption for your project" />
       <div
         className="px-12 py-12 w-full bg-scale-200 border border-scale-500 rounded bg-no-repeat"
         style={{

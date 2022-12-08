@@ -7,6 +7,7 @@ import { useParams, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
 import { VaultToggle, SecretsManagement } from 'components/interfaces/Settings/Vault'
+import { FormHeader } from 'components/ui/Forms'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
@@ -18,8 +19,9 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
   }, [])
 
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
-      <VaultToggle />
+    <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
+      <FormHeader title="Vault" description="Application level encryption for your project" />
+      {/* <VaultToggle /> */}
 
       <Tabs
         size="small"
