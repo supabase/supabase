@@ -188,8 +188,6 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
             <FunctionLink library={menu.title} {...item} />
           ))}
 
-          <Divider />
-
           {allCurrentFunctions.map((fn: any) => {
             const toplevelItems = fn.items.filter((item) => !item.parent)
             toplevelItems.map((item) => <li>{item.title}</li>)
