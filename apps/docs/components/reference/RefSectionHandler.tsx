@@ -6,12 +6,16 @@ import components from '~/components'
 import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
 import OldLayout from '~/layouts/Default'
+import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import CliCommandSection from './CLICommandSection'
 
 interface Props {
   sections: any[] // to do
   spec: any // to do
   typeSpec: any // to do
   pageProps: any // to do, from staticProps
+
+  type: 'client-lib' | 'cli' | 'api'
 }
 
 const RefSectionHandler = (props) => {
@@ -41,27 +45,35 @@ const RefSectionHandler = (props) => {
     )
   }
 
-  return props.sections.map((x) => {
-    switch (x.isFunc) {
-      case false:
-        const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
-        console.log(markdownData)
+  return (
+    <RefSubLayout>
+      {props.sections.map((x) => {
+        switch (x.isFunc) {
+          case false:
+            const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
+            console.log(markdownData)
 
-        return <RefEducationSection item={x} markdownContent={markdownData} />
-        break
+            return <RefEducationSection item={x} markdownContent={markdownData} />
+            break
 
-      default:
-        return (
-          <RefFunctionSection
-            funcData={x}
-            commonFuncData={x}
-            spec={props.spec}
-            typeSpec={props.typeSpec}
-          />
-        )
-        break
-    }
-  })
+          default:
+            if (props.type === 'cli') {
+              return <CliCommandSection funcData={x} commonFuncData={x} spec={props.spec} />
+            } else {
+              return (
+                <RefFunctionSection
+                  funcData={x}
+                  commonFuncData={x}
+                  spec={props.spec}
+                  typeSpec={props.typeSpec}
+                />
+              )
+            }
+            break
+        }
+      })}
+    </RefSubLayout>
+  )
 }
 
 export default RefSectionHandler
