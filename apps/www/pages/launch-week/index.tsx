@@ -127,6 +127,8 @@ export default function launchweek() {
     )
   }
   const [day1, day2, day3, day4, day5] = days
+
+  console.log(isDarkMode)
   return (
     <>
       <NextSeo
@@ -471,24 +473,29 @@ export default function launchweek() {
                 </p>
               </div>
             </div>
-            <div className={classNames(styles.community, 'flex basis-1/3 flex-col px-5')}>
-              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit self-end">
+            <div
+              className={classNames(
+                isDarkMode ? styles.dark_community : styles.community,
+                'flex basis-1/3 flex-col px-5'
+              )}
+            >
+              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit self-end">
                 <h3 className="text-black dark:text-white">Made with Supabase</h3>
                 <p className="text-slate-1000 text-xs">Short description of project</p>
               </div>
-              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit">
+              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit">
                 <h3 className="text-black dark:text-white">Made with Supabase</h3>
                 <p className="text-slate-1000 text-xs">Short description of project</p>
               </div>
-              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit self-end">
+              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit self-end">
                 <h3 className="text-black dark:text-white">Made with Supabase</h3>
                 <p className="text-slate-1000 text-xs">Short description of project</p>
               </div>
-              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit">
+              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit">
                 <h3 className="text-black dark:text-white">Made with Supabase</h3>
                 <p className="text-slate-1000 text-xs">Short description of project</p>
               </div>
-              <div className="border border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-[#121212] w-fit self-end">
+              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit self-end">
                 <h3 className="text-black dark:text-white">Made with Supabase</h3>
                 <p className="text-slate-1000 text-xs">Short description of project</p>
               </div>
