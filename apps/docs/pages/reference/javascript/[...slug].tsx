@@ -22,7 +22,7 @@ export function getStaticPaths() {
 }
 
 export const config = {
-  // test
+  // test - force again
   unstable_includeFiles: [
     'node_modules/.pnpm/**/shiki/**/*.json',
     'node_modules/**/shiki/**/*.json',
