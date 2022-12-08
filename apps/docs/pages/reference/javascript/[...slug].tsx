@@ -373,7 +373,17 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
    */
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
     let doc = getDocsBySlug(slug)
-    const content = await serialize(doc.content || '')
+    const content = await serialize(doc.content ?? '', {
+      // MDX's available options, see the MDX docs for more info.
+      // https://mdxjs.com/packages/mdx/#compilefile-options
+      mdxOptions: {
+        remarkPlugins: [
+          [remarkCodeHike, { autoImport: false, codeHikeTheme, showCopyButton: true }],
+        ],
+        useDynamicImport: true,
+      },
+      // Indicates whether or not to parse the frontmatter from the mdx source
+    })
     return {
       props: {
         /*
