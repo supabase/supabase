@@ -7,9 +7,6 @@ import toc from 'markdown-toc'
 
 import { getDocsBySlug } from '~/lib/docs'
 
-// @ts-ignore
-// @ts-ignore
-
 async function generateOldRefMarkdown(slug) {
   let doc = getDocsBySlug(slug)
   const content = await serialize(doc.content ?? '', {
