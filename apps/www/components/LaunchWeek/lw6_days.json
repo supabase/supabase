@@ -9,23 +9,13 @@
     "youtube_id": "OpPOaJI_Z28",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "articles": [
+    "steps": [
       {
-        "title": "Supabase CLI v1 and Management API Beta",
-        "url": "/blog/supabase-cli-v1-and-admin-api-beta",
-        "description": "Read our blog post outlining the new CLI and Management API.",
-        "products": [
-          {
-            "title": "CLI Docs",
-            "url": "/docs/reference/cli",
-            "description": "Learn how to install the CLI"
-          },
-          {
-            "title": "Management API Docs",
-            "url": "/docs/reference/api",
-            "description": "Learn how to use the new Management API"
-          }
-        ]
+        "title": "Supabase Docs",
+        "blog": "/blog",
+        "docs": "/docs",
+        "isNew": true,
+        "description": ""
       }
     ]
   },
@@ -42,7 +32,7 @@
     "steps": [
       {
         "title": "Image Processing",
-        "url": "/blog",
+        "blog": "/blog",
         "docs": "/docs",
         "isNew": true,
         "description": ""
@@ -50,7 +40,7 @@
       {
         "title": "CDN Caching",
         "description": "Faster asset delivery, now even faster.",
-        "url": "/blog",
+        "blog": "/blog",
         "docs": "/docs",
         "isNew": true
       }
@@ -69,7 +59,7 @@
     "steps": [
       {
         "title": "Vault Release",
-        "url": "/blog",
+        "blog": "/blog",
         "docs": "/docs",
         "isNew": true,
         "description": ""
@@ -77,7 +67,7 @@
       {
         "title": "Transparent Column Encryption",
         "description": "Faster asset delivery, now even faster.",
-        "url": "/blog",
+        "blog": "/blog",
         "docs": "/docs",
         "isNew": true
       }
@@ -96,7 +86,7 @@
     "steps": [
       {
         "title": "Multi-factor Authentication",
-        "url": "/blog",
+        "blog": "/blog",
         "docs": "/docs",
         "isNew": false,
         "description": ""
@@ -116,7 +106,7 @@
     "steps": [
       {
         "title": "Supabase Wrappers",
-        "url": "/blog",
+        "blog": "/blog",
         "docs": "/docs",
         "isNew": true,
         "description": "Connect Postgres to external systems with Postgres Foreign Data Wrappers"
@@ -124,7 +114,7 @@
       {
         "title": "Point-in-time recovery",
         "description": "Faster asset delivery, now even faster.",
-        "url": "/blog",
+        "blog": "/blog",
         "docs": "/docs",
         "isNew": true
       }

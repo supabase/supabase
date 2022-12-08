@@ -102,28 +102,29 @@ export default function launchweek() {
     )
   }
 
-  const SectionButtons = (links) => {
+  const SectionButtons = ({ blog, docs }) => {
     return (
       <div className="flex gap-2">
-        <a>
-          <div className="flex items-center bg-slate-600 rounded-full text-sm py-2 pl-3 pr-2">
+        <a href={blog} target="_blank" rel="noopener">
+          <div className="flex items-center bg-[#1a1a1a] rounded-full text-sm py-2 pl-3 pr-2">
             Blog post
-            <div className="bg-slate-900 rounded-full inline-block p-1 ml-2">
-              <IconExternalLink className="text-brand-900 w-3 h-3" />
+            <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+              <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
             </div>
           </div>
         </a>
-        <a>
-          <div className="flex items-center bg-slate-600 rounded-full text-sm py-2 pl-3 pr-2">
+        <a href={docs} target="_blank" rel="noopener">
+          <div className="flex items-center bg-[#1a1a1a] rounded-full text-sm py-2 pl-3 pr-2">
             Docs
-            <div className="bg-slate-900 rounded-full inline-block p-1 ml-2">
-              <IconExternalLink className="text-brand-900 w-3 h-3" />
+            <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+              <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
             </div>
           </div>
         </a>
       </div>
     )
   }
+  const [day1, day2, day3, day4, day5] = days
   return (
     <>
       <NextSeo
@@ -212,24 +213,24 @@ export default function launchweek() {
                   <Accordion.Item
                     header={
                       <AccordionHeader
-                        date={days[0].date}
-                        day={days[0].dd}
-                        title={days[0].title}
-                        shipped={days[0].shipped}
+                        date={day1.date}
+                        day={day1.dd}
+                        title={day1.title}
+                        shipped={day1.shipped}
                       />
                     }
                     className="h-[79px]"
-                    id={days[0].d.toString()}
+                    id={day1.d.toString()}
                   >
                     <div className="h-[400px] flex">
                       <div
                         className={`flex flex-col flex-1 justify-between border rounded-xl h-full bg-no-repeat bg-[right_20%_top_50px] bg-contain bg-[url('/images/launchweek/docs-update-bg.png')] p-14 text-2xl`}
                       >
                         <div className="flex">
-                          <span>{days[0].description}</span>
+                          <span>{day1.description}</span>
                           <Badge className="ml-4">Redesigned</Badge>
                         </div>
-                        <SectionButtons />
+                        <SectionButtons docs={day1.steps[0].docs} blog={day1.steps[0].blog} />
                       </div>
                     </div>
                   </Accordion.Item>
@@ -238,21 +239,21 @@ export default function launchweek() {
                   <Accordion.Item
                     header={
                       <AccordionHeader
-                        date={days[1].date}
-                        day={days[1].dd}
-                        title={days[1].title}
-                        shipped={days[1].shipped}
+                        date={day2.date}
+                        day={day2.dd}
+                        title={day2.title}
+                        shipped={day2.shipped}
                       />
                     }
                     className="h-[79px]"
-                    id={days[1].d.toString()}
+                    id={day2.d.toString()}
                   >
                     <div className="h-[400px] flex gap-5">
                       <div
                         className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_28px_top_35px]`}
                       >
                         <div className="flex">
-                          <span>{days[1].steps[0].title}</span>
+                          <span>{day2.steps[0].title}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
@@ -260,7 +261,7 @@ export default function launchweek() {
                         className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[center_bottom]`}
                       >
                         <div className="flex">
-                          <span>{days[1].steps[1].title}</span>
+                          <span>{day2.steps[1].title}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
@@ -271,21 +272,21 @@ export default function launchweek() {
                   <Accordion.Item
                     header={
                       <AccordionHeader
-                        date={days[2].date}
-                        day={days[2].dd}
-                        title={days[2].title}
-                        shipped={days[2].shipped}
+                        date={day3.date}
+                        day={day3.dd}
+                        title={day3.title}
+                        shipped={day3.shipped}
                       />
                     }
                     className="h-[79px]"
-                    id={days[2].d.toString()}
+                    id={day3.d.toString()}
                   >
                     <div className="h-[400px] flex gap-5">
                       <div
                         className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                       >
                         <div className="flex">
-                          <span>{days[2].steps[0].title}</span>
+                          <span>{day3.steps[0].title}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
@@ -294,7 +295,7 @@ export default function launchweek() {
                       >
                         {/* inset 0px 130px 50px -52px #121f1e; */}
                         <div className="flex">
-                          <span>{days[2].steps[1].title}</span>
+                          <span>{day3.steps[1].title}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
@@ -305,21 +306,21 @@ export default function launchweek() {
                   <Accordion.Item
                     header={
                       <AccordionHeader
-                        date={days[3].date}
-                        day={days[3].dd}
-                        title={days[3].title}
-                        shipped={days[3].shipped}
+                        date={day4.date}
+                        day={day4.dd}
+                        title={day4.title}
+                        shipped={day4.shipped}
                       />
                     }
                     className="h-[79px]"
-                    id={days[3].d.toString()}
+                    id={day4.d.toString()}
                   >
                     <div className="h-[400px] flex gap-5">
                       <div
                         className={`flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%]`}
                       >
                         <div className="flex">
-                          <span>{days[3].steps[0].title}</span>
+                          <span>{day4.steps[0].title}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
@@ -330,21 +331,21 @@ export default function launchweek() {
                   <Accordion.Item
                     header={
                       <AccordionHeader
-                        date={days[4].date}
-                        day={days[4].dd}
-                        title={days[4].title}
-                        shipped={days[4].shipped}
+                        date={day5.date}
+                        day={day5.dd}
+                        title={day5.title}
+                        shipped={day5.shipped}
                       />
                     }
                     className="h-[79px]"
-                    id={days[4].d.toString()}
+                    id={day5.d.toString()}
                   >
                     <div className="h-[400px] flex gap-5">
                       <div
                         className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg.svg')] bg-contain bg-[right]`}
                       >
                         <div className="flex">
-                          <span>{days[4].steps[0].title}</span>
+                          <span>{day5.steps[0].title}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
@@ -352,7 +353,7 @@ export default function launchweek() {
                         className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                       >
                         <div className="flex">
-                          <span>{days[4].steps[1].title}</span>
+                          <span>{day5.steps[1].title}</span>
                           <Badge className="ml-4">New</Badge>
                         </div>
                       </div>
