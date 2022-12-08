@@ -214,12 +214,12 @@ export default function launchweek() {
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">How we launch</span>
-                    <span className="text-slate-900">Fireside chat with founders</span>
+                    <span className="text-slate-900">Who we hire at Supabase</span>
                   </div>
                 </div>
                 <div className="flex gap-2 z-10">
                   <a href={'/blog'} target="_blank" rel="noopener">
-                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] rounded-full text-sm py-2 pl-3 pr-2 min-w-[130px]">
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[130px]">
                       Watch video
                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                         <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
@@ -227,7 +227,7 @@ export default function launchweek() {
                     </div>
                   </a>
                   <a href={'/docs'} target="_blank" rel="noopener">
-                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
                       Read blogpost
                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                         <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
@@ -441,7 +441,7 @@ export default function launchweek() {
             </Badge>
           </div>
           <div className="flex flex-col mb-16">
-            <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackaton</h2>
+            <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackathon</h2>
             <p className="text-slate-900 w-[80%] lg:w-[50%]">
               The Supabase Team will be taking part in the Hackathon and you'll find us live
               building in our discord all week. For more info check the blog post.
@@ -457,34 +457,43 @@ export default function launchweek() {
                 </p>
               </div>
               <div className="flex flex-col">
-                <h3 className="text-lg text-black dark:text-white mb-2">Community</h3>
+                <h3 className="text-lg text-black dark:text-white mb-2">Judges</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
-                  If you need help or advice when building, find other people to join your team, or
-                  if you just want to chill and watch people build, come and join us!
+                  We have assembled an All Star Judging Panel, including the difficult-to-bribe (but
+                  always fair){' '}
+                  <a
+                    href="https://twitter.com/swyx"
+                    target="_blank"
+                    rel="nooper noreferrer"
+                    className="text-brand-900"
+                  >
+                    @swyx
+                  </a>{' '}
+                  Shawn Wang.
                 </p>
               </div>
               <div className="flex flex-col">
                 <div className="flex flex-col">
-                  <h3 className="text-lg text-black dark:text-white mb-2">Judges</h3>
+                  <h3 className="text-lg text-black dark:text-white mb-2">Community</h3>
                   <p className="text-slate-900 w-[90%] lg:w-[80%]">
-                    We have assembled an All Star Judging Panel, one of which is{' '}
-                    <a
-                      href="https://twitter.com/swyx"
-                      target="_blank"
-                      rel="nooper noreferrer"
-                      className="text-brand-900"
-                    >
-                      @swyx
-                    </a>{' '}
-                    Shawn Wang.
+                    If you need help or advice when building, find other people to join your team,
+                    or if you just want to chill and watch people build, come and join us!
                   </p>
                 </div>
               </div>
               <div className={'flex flex-col'}>
                 <h3 className="text-lg text-black dark:text-white mb-2">Submision</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
-                  Submit your project through madewithsupabase.com. All submissions must be open
-                  source and publically available. Submissions close Sunday 21st Aug 23:59 (PT).
+                  Submit your project through{' '}
+                  <a
+                    className="text-brand-900"
+                    href="https://www.madewithsupabase.com"
+                    target="_blank"
+                  >
+                    madewithsupabase.com
+                  </a>
+                  . All submissions must be open source and publically available. Submissions close
+                  Sunday 18th Dec 23:59 hs PT.
                 </p>
               </div>
             </div>
@@ -554,7 +563,7 @@ export default function launchweek() {
           </div>
           <div className="flex-1">
             <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
-              Currently happening
+              Live
             </Badge>
             <h2 className="text-4xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
@@ -574,6 +583,9 @@ export default function launchweek() {
                     ? `${creators[activeCreator].first_name} ${creators[activeCreator].last_name}`
                     : 'Title'}
                 </h3>
+                {activeCreator !== null && (
+                  <p className="text-slate-900 ">{creators[activeCreator].description}</p>
+                )}
                 <p className="text-brand-900">
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
                     <span>
