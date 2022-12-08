@@ -118,7 +118,7 @@ interface ItemProps {
 
 export function Item({ children, className, header, id, icon, disabled }: ItemProps) {
   const __styles = styleHandler('accordion')
-  // const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)
 
   const {
     type,
@@ -135,12 +135,19 @@ export function Item({ children, className, header, id, icon, disabled }: ItemPr
   let chevronClasses = [__styles.chevron.base, __styles.chevron.align[chevronAlign]]
 
   // console.log('currentItems', currentItems)
+  console.log(chevronClasses)
+  if (open) {
+    chevronClasses.push('rotate-180')
+  }
 
   return (
     <RadixAccordion.Item
       value={id}
       className={__styles.variants[type].container}
       disabled={disabled}
+      onClick={() => {
+        setOpen(!open)
+      }}
     >
       <RadixAccordion.Trigger className={triggerClasses.join(' ')}>
         {header}
