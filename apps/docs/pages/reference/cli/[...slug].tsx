@@ -1,26 +1,15 @@
-import fs from 'fs'
-import matter from 'gray-matter'
 // @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands_new_shape.yaml' assert { type: 'yml' }
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import Options from '~/components/Options'
-import Param from '~/components/Params'
-import RefSubLayout from '~/layouts/ref/RefSubLayout'
-import { getAllDocs, getDocsBySlug } from '~/lib/docs'
 
-import toc from 'markdown-toc'
-import { serialize } from 'next-mdx-remote/serialize'
-
-import components from '~/components/index'
 import { MDXRemote } from 'next-mdx-remote'
+import components from '~/components/index'
 import OldLayout from '~/layouts/Default'
 import { flattenSections } from '~/lib/helpers'
 
 import cliCommonSections from '~/../../spec/common-cli-sections.json' assert { type: 'json' }
-import CliCommandSection from '~/components/reference/CLICommandSection'
+import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
-import RefSectionHandler from '~/components/reference/RefSectionHandler'
 
 const sections = flattenSections(cliCommonSections)
 

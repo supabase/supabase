@@ -4,7 +4,8 @@ import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
 
 import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from '~/codeHikeTheme.js'
+// import codeHikeTheme from '~/codeHikeTheme.js'
+import theme from 'shiki/themes/solarized-dark.json'
 
 async function generateRefMarkdown(sections, slug) {
   let markdownContent = []
@@ -45,7 +46,7 @@ async function generateRefMarkdown(sections, slug) {
               // MDX's available options, see the MDX docs for more info.
               // https://mdxjs.com/packages/mdx/#compilefile-options
               mdxOptions: {
-                remarkPlugins: [[remarkCodeHike, { autoImport: false, codeHikeTheme }]],
+                remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
                 useDynamicImport: true,
               },
               // Indicates whether or not to parse the frontmatter from the mdx source
