@@ -381,7 +381,7 @@ export const database = {
   label: 'Database',
   url: '/guides/database',
   items: [
-    { name: 'Overview', url: '/guides/database/overview', items: [] },
+    { name: 'Overview', url: '/guides/database', items: [] },
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
     { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
     { name: 'Database Functions', url: '/guides/database/functions', items: [] },
@@ -446,7 +446,7 @@ export const functions = {
     { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
-    { name: 'Best practises', url: '/guides/functions/best-practises', items: [] },
+    { name: 'Best practices', url: '/guides/functions/best-practices', items: [] },
     { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     {
       name: 'Examples',
@@ -620,11 +620,14 @@ export const integrations = {
       name: 'Developer Tools',
       url: undefined,
       items: [
+        { name: 'Estuary', url: '/guides/integrations/estuary', items: [] },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard', items: [] },
         { name: 'Prisma', url: '/guides/integrations/prisma', items: [] },
         { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
         { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
         { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
+        { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
+        { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
       ],
     },
     {
