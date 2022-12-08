@@ -26,5 +26,8 @@ export const config = {
     'node_modules/.pnpm/**/shiki/**/*.json',
     'node_modules/**/shiki/**/*.json',
     'node_modules/.npm/shiki/**/*.json',
+    '/var/task/node_modules/shiki/languages/abap.tmLanguage.json',
+    'node_modules/shiki/languages/abap.tmLanguage.json',
+    'node_modules/shiki/**/*.json',
   ],
 }
