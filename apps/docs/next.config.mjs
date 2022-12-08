@@ -25,7 +25,7 @@ const withMDX = nextMdx({
         remarkCodeHike,
         {
           theme: codeHikeTheme,
-          autoImport: true,
+          autoImport: false,
           lineNumbers: true,
           showCopyButton: true,
         },

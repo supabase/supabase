@@ -6,7 +6,7 @@ import toc from 'markdown-toc'
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import components from '~/components/index'
+import components from '~/components'
 import { getAllDocs, getDocsBySlug } from '~/lib/docs'
 
 import ReactMarkdown from 'react-markdown'
@@ -35,6 +35,11 @@ import * as Accordion from '@radix-ui/react-accordion'
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
+
+import remarkGfm from 'remark-gfm'
+import rehypeSlug from 'rehype-slug'
+import { remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from '~/codeHikeTheme.js'
 
 const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
   .map((fn: any) => fn.items)
@@ -337,7 +342,17 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
         // ...content,
         meta: data,
         introPage: introPages.includes(x),
-        content: content ? await serialize(content || '') : null,
+        content: content
+          ? await serialize(content ?? '', {
+              // MDX's available options, see the MDX docs for more info.
+              // https://mdxjs.com/packages/mdx/#compilefile-options
+              mdxOptions: {
+                remarkPlugins: [[remarkCodeHike, { autoImport: false, codeHikeTheme }]],
+                useDynamicImport: true,
+              },
+              // Indicates whether or not to parse the frontmatter from the mdx source
+            })
+          : null,
       }
     })
   )
@@ -392,4 +407,8 @@ export function getStaticPaths() {
     }),
     fallback: 'blocking',
   }
+}
+
+export const config = {
+  unstable_includeFiles: ['node_modules/**/shiki/**/*.json'],
 }
