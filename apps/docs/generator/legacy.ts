@@ -16,10 +16,13 @@ import { TsDoc, OpenRef } from './legacy/definitions'
 import { uniqBy } from 'lodash'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
+import { flattenSections } from '../lib/helpers'
 
 const commonDocSpecJson = JSON.parse(
   fs.readFileSync('../../spec/common-client-libs-sections.json', 'utf8')
 )
+
+const flattenedCommonDocSpecJson = flattenSections(commonDocSpecJson)
 
 export default async function gen(inputFileName: string, outputDir: string) {
   const docSpec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
@@ -43,9 +46,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
   pages.forEach(async (pageSpec: OpenRef.Page) => {
     try {
       // get the slug from common-client-libs.yml
-      const slug = commonDocSpecJson.sections.functions
-        .find((fn) => fn.items.find((item) => item.id === pageSpec.id))
-        ?.items.find((item) => item.id === pageSpec.id).slug
+      const slug = flattenedCommonDocSpecJson.find((item) => item.id === pageSpec.id).slug
 
       const hasTsRef = pageSpec['$ref'] || null
       const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, definition)
