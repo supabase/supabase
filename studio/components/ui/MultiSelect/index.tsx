@@ -8,6 +8,7 @@ export interface MultiSelectOption {
   id: string | number
   value: string
   name: string
+  description?: string
   disabled: boolean
 }
 
@@ -166,7 +167,12 @@ export default function MultiSelect({
                         `${active ? ' dark:bg-green-600 dark:bg-opacity-25' : ''}`,
                       ].join(' ')}
                     >
-                      <span>{option.name}</span>
+                      <div className="flex items-center space-x-2">
+                        <p>{option.name}</p>
+                        {option.description !== undefined && (
+                          <p className="opacity-50">{option.description}</p>
+                        )}
+                      </div>
                       {active && (
                         <IconCheck
                           size={16}
