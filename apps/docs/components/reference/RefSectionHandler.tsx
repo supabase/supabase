@@ -51,7 +51,6 @@ const RefSectionHandler = (props) => {
         switch (x.isFunc) {
           case false:
             const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
-            console.log(markdownData)
 
             return <RefEducationSection item={x} markdownContent={markdownData} />
             break
