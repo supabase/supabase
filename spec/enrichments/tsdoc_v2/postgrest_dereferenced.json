@@ -1321,7 +1321,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestClient.ts",
-              "line": 64,
+              "line": 59,
               "character": 2
             }
           ],
@@ -1401,6 +1401,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Perform a query on a table or a view."
+              },
               "typeParameter": [
                 {
                   "id": 31,
@@ -1432,6 +1435,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The table or view name to query\n"
+                  },
                   "type": {
                     "type": "reference",
                     "id": 31,
@@ -1464,6 +1470,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Perform a query on a table or a view."
+              },
               "parameters": [
                 {
                   "id": 35,
@@ -1471,6 +1480,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The table or view name to query\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -3186,7 +3198,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 216,
+              "line": 209,
               "character": 2
             }
           ],
@@ -3311,6 +3323,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for jsonb, array, and range columns. Match only rows where\nevery element appearing in `column` is contained by `value`."
+              },
               "parameters": [
                 {
                   "id": 213,
@@ -3318,6 +3333,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The jsonb, array, or range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -3329,6 +3347,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The jsonb, array, or range value to filter with\n"
+                  },
                   "type": {
                     "type": "union",
                     "types": [
@@ -3397,7 +3418,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 189,
+              "line": 182,
               "character": 2
             }
           ],
@@ -3522,6 +3543,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for jsonb, array, and range columns. Match only rows where\n`column` contains every element appearing in `value`."
+              },
               "parameters": [
                 {
                   "id": 205,
@@ -3529,6 +3553,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The jsonb, array, or range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -3540,6 +3567,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The jsonb, array, or range value to filter with\n"
+                  },
                   "type": {
                     "type": "union",
                     "types": [
@@ -3663,7 +3693,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 41,
+              "line": 33,
               "character": 2
             }
           ],
@@ -3761,6 +3791,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` is equal to `value`.",
+                "text": "To check if the value of `column` is NULL, you should use `.is()` instead.\n"
+              },
               "parameters": [
                 {
                   "id": 125,
@@ -3768,6 +3802,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -3779,6 +3816,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -4090,7 +4130,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 441,
+              "line": 428,
               "character": 2
             }
           ],
@@ -4286,6 +4326,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows which satisfy the filter. This is an escape hatch - you\nshould use the specific filter methods wherever possible.",
+                "text": "Unlike most filters, `opearator` and `value` are used as-is and need to\nfollow [PostgREST\nsyntax](https://postgrest.org/en/stable/api.html#operators). You also need\nto make sure they are properly sanitized.\n"
+              },
               "parameters": [
                 {
                   "id": 308,
@@ -4293,6 +4337,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -4304,6 +4351,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The operator to filter with, following PostgREST syntax"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -4315,6 +4365,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with, following PostgREST syntax\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -4422,7 +4475,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 67,
+              "line": 61,
               "character": 2
             }
           ],
@@ -4519,6 +4572,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` is greater than `value`."
+              },
               "parameters": [
                 {
                   "id": 141,
@@ -4526,6 +4582,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -4537,6 +4596,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -4577,7 +4639,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 80,
+              "line": 74,
               "character": 2
             }
           ],
@@ -4674,6 +4736,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` is greater than or equal to `value`."
+              },
               "parameters": [
                 {
                   "id": 149,
@@ -4681,6 +4746,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -4692,6 +4760,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -4732,7 +4803,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 132,
+              "line": 126,
               "character": 2
             }
           ],
@@ -4820,6 +4891,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` matches `pattern` case-insensitively."
+              },
               "parameters": [
                 {
                   "id": 181,
@@ -4827,6 +4901,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -4838,6 +4915,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The pattern to match with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -4878,7 +4958,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 167,
+              "line": 161,
               "character": 2
             }
           ],
@@ -4978,6 +5058,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` is included in the `values` array."
+              },
               "parameters": [
                 {
                   "id": 197,
@@ -4985,6 +5068,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -4996,6 +5082,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The values array to filter with\n"
+                  },
                   "type": {
                     "type": "array",
                     "elementType": {
@@ -5039,7 +5128,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 151,
+              "line": 139,
               "character": 2
             }
           ],
@@ -5195,6 +5284,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` IS `value`.",
+                "text": "For non-boolean columns, this is only relevant for checking if the value of\n`column` is NULL by setting `value` to `null`.\n\nFor boolean columns, you can also set `value` to `true` or `false` and it\nwill behave the same way as `.eq()`.\n"
+              },
               "parameters": [
                 {
                   "id": 189,
@@ -5202,6 +5295,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -5213,6 +5309,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with\n"
+                  },
                   "type": {
                     "type": "union",
                     "types": [
@@ -5262,7 +5361,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 119,
+              "line": 113,
               "character": 2
             }
           ],
@@ -5350,6 +5449,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` matches `pattern` case-sensitively."
+              },
               "parameters": [
                 {
                   "id": 173,
@@ -5357,6 +5459,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -5368,6 +5473,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The pattern to match with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -5536,7 +5644,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 93,
+              "line": 87,
               "character": 2
             }
           ],
@@ -5633,6 +5741,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` is less than `value`."
+              },
               "parameters": [
                 {
                   "id": 157,
@@ -5640,6 +5751,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -5651,6 +5765,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -5691,7 +5808,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 106,
+              "line": 100,
               "character": 2
             }
           ],
@@ -5788,6 +5905,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` is less than or equal to `value`."
+              },
               "parameters": [
                 {
                   "id": 165,
@@ -5795,6 +5915,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -5806,6 +5929,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -5846,7 +5972,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 376,
+              "line": 369,
               "character": 2
             }
           ],
@@ -5940,6 +6066,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where each column in `query` keys is equal to its\nassociated value. Shorthand for multiple `.eq()`s."
+              },
               "parameters": [
                 {
                   "id": 284,
@@ -5947,6 +6076,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The object to filter with, with column names as keys mapped\nto their filter values\n"
+                  },
                   "type": {
                     "type": "reference",
                     "typeArguments": [
@@ -6056,7 +6188,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 54,
+              "line": 48,
               "character": 2
             }
           ],
@@ -6153,6 +6285,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows where `column` is not equal to `value`."
+              },
               "parameters": [
                 {
                   "id": 133,
@@ -6160,6 +6295,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -6171,6 +6309,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -6211,7 +6352,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 398,
+              "line": 385,
               "character": 2
             }
           ],
@@ -6323,6 +6464,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Match only rows which doesn't satisfy the filter.",
+                "text": "Unlike most filters, `opearator` and `value` are used as-is and need to\nfollow [PostgREST\nsyntax](https://postgrest.org/en/stable/api.html#operators). You also need\nto make sure they are properly sanitized.\n"
+              },
               "parameters": [
                 {
                   "id": 292,
@@ -6330,6 +6475,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -6341,6 +6489,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The operator to be negated to filter with, following\nPostgREST syntax"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -6352,6 +6503,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The value to filter with, following PostgREST syntax\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "unknown"
@@ -6508,7 +6662,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 65,
+              "line": 49,
               "character": 2
             }
           ],
@@ -6587,7 +6741,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 67,
+                              "line": 51,
                               "character": 16
                             }
                           ],
@@ -6610,7 +6764,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 67,
+                              "line": 51,
                               "character": 59
                             }
                           ],
@@ -6633,7 +6787,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 67,
+                              "line": 51,
                               "character": 37
                             }
                           ],
@@ -6688,6 +6842,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Order the query result by `column`.",
+                "text": "You can call this method multiple times to order by multiple columns.\n\nYou can order foreign tables, but it doesn't affect the ordering of the\ncurrent table.\n"
+              },
               "parameters": [
                 {
                   "id": 326,
@@ -6695,6 +6853,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to order by"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -6707,6 +6868,9 @@
                   "kindString": "Parameter",
                   "flags": {
                     "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Named parameters"
                   },
                   "type": {
                     "type": "reflection",
@@ -6725,10 +6889,13 @@
                           "flags": {
                             "isOptional": true
                           },
+                          "comment": {
+                            "shortText": "If `true`, the result will be in ascending order"
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 71,
+                              "line": 55,
                               "character": 16
                             }
                           ],
@@ -6743,10 +6910,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "comment": {
+                            "shortText": "Set this to order a foreign table by foreign\ncolumns\n"
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 71,
+                              "line": 55,
                               "character": 59
                             }
                           ],
@@ -6763,10 +6933,13 @@
                           "flags": {
                             "isOptional": true
                           },
+                          "comment": {
+                            "shortText": "If `true`, `null`s appear first. If `false`,\n`null`s appear last."
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 71,
+                              "line": 55,
                               "character": 37
                             }
                           ],
@@ -6831,7 +7004,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 315,
+              "line": 308,
               "character": 2
             }
           ],
@@ -6940,6 +7113,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for array and range columns. Match only rows where\n`column` and `value` have an element in common."
+              },
               "parameters": [
                 {
                   "id": 261,
@@ -6947,6 +7123,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The array or range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -6958,6 +7137,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The array or range value to filter with\n"
+                  },
                   "type": {
                     "type": "union",
                     "types": [
@@ -7152,7 +7334,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 301,
+              "line": 293,
               "character": 2
             }
           ],
@@ -7240,6 +7422,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for range columns. Match only rows where `column` is\nmutually exclusive to `range` and there can be no element between the two\nranges."
+              },
               "parameters": [
                 {
                   "id": 253,
@@ -7247,6 +7432,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7258,6 +7446,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7298,7 +7489,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 242,
+              "line": 235,
               "character": 2
             }
           ],
@@ -7386,6 +7577,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for range columns. Match only rows where every element in\n`column` is greater than any element in `range`."
+              },
               "parameters": [
                 {
                   "id": 221,
@@ -7393,6 +7587,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7404,6 +7601,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7444,7 +7644,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 257,
+              "line": 249,
               "character": 2
             }
           ],
@@ -7532,6 +7732,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for range columns. Match only rows where every element in\n`column` is either contained in `range` or greater than any element in\n`range`."
+              },
               "parameters": [
                 {
                   "id": 229,
@@ -7539,6 +7742,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7550,6 +7756,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7590,7 +7799,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 271,
+              "line": 264,
               "character": 2
             }
           ],
@@ -7678,6 +7887,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for range columns. Match only rows where every element in\n`column` is less than any element in `range`."
+              },
               "parameters": [
                 {
                   "id": 237,
@@ -7685,6 +7897,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7696,6 +7911,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7736,7 +7954,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 286,
+              "line": 278,
               "character": 2
             }
           ],
@@ -7824,6 +8042,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for range columns. Match only rows where every element in\n`column` is either contained in `range` or less than any element in\n`range`."
+              },
               "parameters": [
                 {
                   "id": 245,
@@ -7831,6 +8052,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -7842,6 +8066,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The range to filter with\n"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -8192,7 +8419,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestFilterBuilder.ts",
-              "line": 341,
+              "line": 331,
               "character": 2
             }
           ],
@@ -8284,7 +8511,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestFilterBuilder.ts",
-                              "line": 344,
+                              "line": 334,
                               "character": 16
                             }
                           ],
@@ -8307,7 +8534,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestFilterBuilder.ts",
-                              "line": 344,
+                              "line": 334,
                               "character": 33
                             }
                           ],
@@ -8370,6 +8597,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Only relevant for text and tsvector columns. Match only rows where\n`column` matches the query string in `query`."
+              },
               "parameters": [
                 {
                   "id": 273,
@@ -8377,6 +8607,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The text or tsvector column to filter on"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -8388,6 +8621,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The query text to match with"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -8400,6 +8636,9 @@
                   "kindString": "Parameter",
                   "flags": {
                     "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Named parameters"
                   },
                   "type": {
                     "type": "reflection",
@@ -8418,10 +8657,13 @@
                           "flags": {
                             "isOptional": true
                           },
+                          "comment": {
+                            "shortText": "The text search configuration to use"
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestFilterBuilder.ts",
-                              "line": 349,
+                              "line": 339,
                               "character": 16
                             }
                           ],
@@ -8438,10 +8680,13 @@
                           "flags": {
                             "isOptional": true
                           },
+                          "comment": {
+                            "shortText": "Change how the `query` text is interpreted\n"
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestFilterBuilder.ts",
-                              "line": 349,
+                              "line": 339,
                               "character": 33
                             }
                           ],
@@ -12079,7 +12324,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 65,
+              "line": 49,
               "character": 2
             }
           ],
@@ -12158,7 +12403,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 67,
+                              "line": 51,
                               "character": 16
                             }
                           ],
@@ -12181,7 +12426,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 67,
+                              "line": 51,
                               "character": 59
                             }
                           ],
@@ -12204,7 +12449,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 67,
+                              "line": 51,
                               "character": 37
                             }
                           ],
@@ -12254,6 +12499,10 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Order the query result by `column`.",
+                "text": "You can call this method multiple times to order by multiple columns.\n\nYou can order foreign tables, but it doesn't affect the ordering of the\ncurrent table.\n"
+              },
               "parameters": [
                 {
                   "id": 423,
@@ -12261,6 +12510,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "The column to order by"
+                  },
                   "type": {
                     "type": "intrinsic",
                     "name": "string"
@@ -12273,6 +12525,9 @@
                   "kindString": "Parameter",
                   "flags": {
                     "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Named parameters"
                   },
                   "type": {
                     "type": "reflection",
@@ -12291,10 +12546,13 @@
                           "flags": {
                             "isOptional": true
                           },
+                          "comment": {
+                            "shortText": "If `true`, the result will be in ascending order"
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 71,
+                              "line": 55,
                               "character": 16
                             }
                           ],
@@ -12309,10 +12567,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "comment": {
+                            "shortText": "Set this to order a foreign table by foreign\ncolumns\n"
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 71,
+                              "line": 55,
                               "character": 59
                             }
                           ],
@@ -12329,10 +12590,13 @@
                           "flags": {
                             "isOptional": true
                           },
+                          "comment": {
+                            "shortText": "If `true`, `null`s appear first. If `false`,\n`null`s appear last."
+                          },
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 71,
+                              "line": 55,
                               "character": 37
                             }
                           ],
