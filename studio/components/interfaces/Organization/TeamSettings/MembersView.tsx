@@ -126,13 +126,17 @@ const MembersView = () => {
                               <span className="flex rounded-full border-2 border-border-secondary-light p-2 dark:border-border-secondary-dark">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
-                            ) : (
+                            ) : x.username.indexOf('@') < 0 ? (
                               <Image
                                 src={`https://github.com/${x.username}.png?size=80`}
                                 width="40"
                                 height="40"
                                 className="rounded-full border"
                               />
+                            ) : (
+                              <span className="flex rounded-full border-2 border-border-secondary-light p-2 dark:border-border-secondary-dark">
+                                <IconUser size={20} strokeWidth={2} />
+                              </span>
                             )}
                           </div>
                           <div>
