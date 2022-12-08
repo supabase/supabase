@@ -32,3 +32,68 @@ export function getPageType(asPath: string) {
 
   return page
 }
+
+export function flattenSections(sections) {
+  var a = []
+  for (var i = 0; i < sections.length; i++) {
+    if (sections[i].id) {
+      // only push a section that has an id
+      // these are reserved for sidebar subtitles
+      a.push(sections[i])
+    }
+    if (sections[i].items) {
+      // if there are subitems, loop through
+      a = a.concat(flattenSections(sections[i].items))
+    }
+  }
+  return a
+}
+
+export async function RefMarkdownCompiler(sections) {
+  /**
+   * Read all the markdown files that might have
+   *  - custom text
+   *  - call outs
+   *  - important notes regarding implementation
+   */
+  await Promise.all(
+    sections.map(async (x, i) => {
+      if (!x.id) return null
+
+      const pathName = `docs/ref/js/${x.id}.mdx`
+
+      function checkFileExists(x) {
+        if (fs.existsSync(x)) {
+          return true
+        } else {
+          return false
+        }
+      }
+
+      const markdownExists = checkFileExists(pathName)
+
+      if (!markdownExists) return null
+
+      const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
+      const { data, content } = matter(fileContents)
+
+      markdownContent.push({
+        id: x.id,
+        title: x.title,
+        meta: data,
+        // introPage: introPages.includes(x),
+        content: content
+          ? await serialize(content ?? '', {
+              // MDX's available options, see the MDX docs for more info.
+              // https://mdxjs.com/packages/mdx/#compilefile-options
+              mdxOptions: {
+                remarkPlugins: [[remarkCodeHike, { autoImport: false, codeHikeTheme }]],
+                useDynamicImport: true,
+              },
+              // Indicates whether or not to parse the frontmatter from the mdx source
+            })
+          : null,
+      })
+    })
+  )
+}

@@ -1,54 +1,33 @@
-import { useEffect } from 'react'
-
-import fs from 'fs'
-import toc from 'markdown-toc'
-
-import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
-import components from '~/components/index'
-import { getAllDocs, getDocsBySlug } from '~/lib/docs'
-
-import ReactMarkdown from 'react-markdown'
-
-// @ts-ignore
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import jsTypeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
-// @ts-ignore
-import examples from '~/../../spec/examples/examples.yml' assert { type: 'yml' }
-
-import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
-
 // @ts-expect-error
 import jsSpec from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
-
-import commonLibJson from '~/../../spec/common-client-libs-sections.json'
-import { IconDatabase, Tabs } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-
-import { useRouter } from 'next/router'
-import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-import Param from '~/components/Params'
-import Options from '~/components/Options'
-import RefSubLayout from '~/layouts/ref/RefSubLayout'
-
+import components from '~/components'
+import RefEducationSection from '~/components/reference/RefEducationSection'
+import RefFunctionSection from '~/components/reference/RefFunctionSection'
 import OldLayout from '~/layouts/Default'
+import { getAllDocs } from '~/lib/docs'
+import { flattenSections } from '~/lib/helpers'
+import generateOldRefMarkdown from '~/lib/mdx/generateOldRefMarkdown'
+import generateRefMarkdown from '~/lib/mdx/generateRefMarkdown'
 
-import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
+const sections = flattenSections(clientLibsCommonSections)
 
-const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
-  .map((fn: any) => fn.items)
-  .flat(2)
-
-export default function DartReference(props) {
-  console.log('docs', props.docs)
+export default function JSReference(props) {
+  // console.log('docs', props.docs)
   const router = useRouter()
+
   const slug = router.query.slug[0]
 
   const isNewDocs = process.env.NEXT_PUBLIC_NEW_DOCS === 'true'
 
+  // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
+  // find the #sign-up element and scroll to that
   useEffect(() => {
     if (isNewDocs && document && slug !== 'start') {
-      // re-enable this when the new yaml shape file is moved into this branch
       document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
@@ -67,276 +46,35 @@ export default function DartReference(props) {
 
   return (
     <>
-      <RefSubLayout>
-        <div>~~~Preamble pages~~~</div>
-        {props.docs
-          .filter((doc) => doc.introPage)
-          .map((item) => (
-            <RefSubLayout.Section
-              key={item.id}
-              title={item.meta.title}
-              id={item.id}
-              slug={item.id}
-              scrollSpyHeader={true}
-              singleColumn={true}
-            >
-              <MDXRemote {...item.content} components={components} />
-            </RefSubLayout.Section>
-          ))}
-      </RefSubLayout>
-      <hr />
-      <RefSubLayout>
-        {/* jsSpec.functions.map((item, itemIndex) => { */}
-        {props.docs
-          .filter((doc) => !doc.introPage)
-          .map((doc, itemIndex) => {
-            const item = jsSpec.functions.find((x) => x.id === doc.id)
-            const hasTsRef = item['$ref'] || null
-            const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, jsTypeSpec)
-            const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
-            // const functionMarkdownContent = props?.docs[itemIndex]?.content
-            //   ? props?.docs[itemIndex]?.content
-            //   : null
-            const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
+      {sections.map((x) => {
+        switch (x.isFunc) {
+          case false:
+            const markdownData = props.docs.find((doc) => doc.id === x.id)
+            console.log(markdownData)
 
-            // const introFileMarkdownContent =
-            //console.log('props.docs', props.docs)
-            // if (item.id !== 'db-modifiers-select') return <></>
+            return <RefEducationSection item={x} markdownContent={markdownData} />
+            break
 
+          default:
             return (
-              <>
-                <RefSubLayout.Section
-                  key={item.id}
-                  title={item.title}
-                  // examples.functions[itemIndex] doesn't pull the right title
-                  // and the ids don't match up, so we can't select that way
-                  // removing for now
-                  // title={
-                  //   examples.functions[itemIndex].title ??
-                  //   examples.functions[itemIndex].id ??
-                  //   item.name ??
-                  //   item.id
-                  // }
-                  id={item.id}
-                  slug={allFunctions.find((commonItem) => commonItem.id === item.id).slug}
-                  scrollSpyHeader={true}
-                >
-                  <RefSubLayout.Details>
-                    <>
-                      <header className={['mb-16'].join(' ')}>
-                        {shortText && (
-                          <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>
-                        )}
-                      </header>
-
-                      {item.description && (
-                        <div className="prose">
-                          <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
-                        </div>
-                      )}
-                      {/* {functionMarkdownContent && (
-                        <div className="prose">
-                          <MDXRemote {...functionMarkdownContent} components={components} />
-                        </div>
-                      )} */}
-                      {item.notes && (
-                        <div className="prose">
-                          <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
-                        </div>
-                      )}
-                      {/* // parameters */}
-                      {parameters && (
-                        <div className="not-prose mt-12">
-                          <h5 className="mb-3 text-base text-scale-1200">Parameters</h5>
-                          <ul className="">
-                            {parameters.map((param) => {
-                              // grab override params from yaml file
-                              const overrideParams = item.overrideParams
-
-                              // params from the yaml file can override the params from parameters if it matches the name
-                              const overide = overrideParams?.filter((x) => {
-                                return param.name === x.name
-                              })
-
-                              const paramItem = overide?.length > 0 ? overide[0] : param
-
-                              return (
-                                <Param {...paramItem}>
-                                  {paramItem.subContent && (
-                                    <div className="mt-3">
-                                      <Options>
-                                        {param.subContent.map((param) => {
-                                          return <Options.Option {...param} />
-                                        })}
-                                      </Options>
-                                    </div>
-                                  )}
-                                </Param>
-                              )
-                            })}
-                          </ul>
-                        </div>
-                      )}
-                    </>
-                  </RefSubLayout.Details>
-                  <RefSubLayout.Examples>
-                    {item.examples && (
-                      <>
-                        <Tabs
-                          defaultActiveId={item.examples[0].id}
-                          size="tiny"
-                          type="rounded-pills"
-                          scrollable
-                        >
-                          {item.examples &&
-                            item.examples.map((example, exampleIndex) => {
-                              const exampleString = `
-import { createClient } from '@supabase/supabase-js'
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-`
-                              const currentExampleId = example.id
-                              const staticExample = item.examples[exampleIndex]
-
-                              const response = staticExample.response
-                              const sql = staticExample?.data?.sql
-                              const tables = staticExample?.data?.tables
-
-                              return (
-                                <Tabs.Panel
-                                  id={example.id}
-                                  label={example.name}
-                                  className="flex flex-col gap-3"
-                                >
-                                  {((tables && tables.length > 0) || sql) && (
-                                    <RefDetailCollapse
-                                      id={`${example.id}-${exampleIndex}-data`}
-                                      label="Example data source"
-                                      defaultOpen={false}
-                                    >
-                                      <>
-                                        {tables &&
-                                          tables.length > 0 &&
-                                          tables.map((table) => {
-                                            return (
-                                              <div className="bg-scale-300 border rounded prose max-w-none">
-                                                <div className="bg-scale-200 px-5 py-2">
-                                                  <div className="flex gap-2 items-center">
-                                                    <div className="text-brand-900">
-                                                      <IconDatabase size={16} />
-                                                    </div>
-                                                    <h5 className="text-xs text-scale-1200">
-                                                      {table.name}
-                                                    </h5>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            )
-                                          })}
-                                        {sql && (
-                                          <CodeBlock
-                                            className="useless-code-block-class my-0 border border-t-0 border-scale-500 !rounded-tl-none !rounded-tr-none"
-                                            language="sql"
-                                            hideLineNumbers={true}
-                                          >
-                                            {sql}
-                                          </CodeBlock>
-                                        )}
-                                      </>
-                                    </RefDetailCollapse>
-                                  )}
-
-                                  <CodeBlock
-                                    className="useless-code-block-class"
-                                    language="js"
-                                    hideLineNumbers={true}
-                                  >
-                                    {exampleString +
-                                      (example.code &&
-                                        example.code
-                                          .replace('```', '')
-                                          .replace('js', '')
-                                          .replace('```', ''))}
-                                  </CodeBlock>
-                                  {response && (
-                                    <RefDetailCollapse
-                                      id={`${example.id}-${exampleIndex}-response`}
-                                      label="Example response"
-                                      defaultOpen={false}
-                                    >
-                                      <CodeBlock
-                                        className="useless-code-block-class"
-                                        language="js"
-                                        hideLineNumbers={true}
-                                      >
-                                        {response
-                                          .replace('```', '')
-                                          .replace('json', '')
-                                          .replace('```', '')}
-                                      </CodeBlock>
-                                    </RefDetailCollapse>
-                                  )}
-                                </Tabs.Panel>
-                              )
-                            })}
-                        </Tabs>
-                      </>
-                    )}
-                  </RefSubLayout.Examples>
-                </RefSubLayout.Section>
-              </>
+              <RefFunctionSection
+                funcData={x}
+                commonFuncData={x}
+                libSpec={jsSpec}
+                typeSpec={jsTypeSpec}
+              />
             )
-          })}
-      </RefSubLayout>
+            break
+        }
+      })}
     </>
   )
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  // an array of ids of the intro sections for this library
-  const introPages = commonLibJson.sections.intro['js_v1'].items.map((item) => item.id)
+  let markdownContent = await generateRefMarkdown(sections, '/js/v1')
 
-  const specPpages = allFunctions.filter((fn) => fn.libs.includes('js_v1')).map((x) => x.id)
-
-  const pages = [...introPages, ...specPpages]
-
-  /**
-   * Read all the markdown files that might have
-   *  - custom text
-   *  - call outs
-   *  - important notes regarding implementation
-   */
-  const allMarkdownDocs = await Promise.all(
-    pages.map(async (x, i) => {
-      const pathName = `docs/ref/js/v1/${x}.mdx`
-
-      function checkFileExists(x) {
-        // console.log('checking this ', x)
-        if (fs.existsSync(x)) {
-          return true
-        } else {
-          return false
-        }
-      }
-
-      const markdownExists = checkFileExists(pathName)
-
-      console.log(x, 'markdownExists', markdownExists)
-
-      const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
-      const { data, content } = matter(fileContents)
-
-      return {
-        id: x,
-        title: x,
-        // ...content,
-        meta: data,
-        introPage: introPages.includes(x),
-        content: content ? await serialize(content || '') : null,
-      }
-    })
-  )
+  console.log(markdownContent)
 
   /*
    * old content generation
@@ -345,31 +83,20 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
   let slug
   if (params.slug.length > 1) {
-    slug = `docs/reference/dart/${params.slug.join('/')}`
+    slug = `docs/reference/javascript/v1/${params.slug.join('/')}`
   } else {
-    slug = `docs/reference/dart/${params.slug[0]}`
+    slug = `docs/reference/javascript/v1/${params.slug[0]}`
   }
 
   /*
    * handle old ref pages
    */
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'false') {
-    let doc = getDocsBySlug(slug)
-    const content = await serialize(doc.content || '')
-    return {
-      props: {
-        /*
-         * old reference docs are below
-         */
-        ...doc,
-        content,
-        toc: toc(doc.content, { maxdepth: 1, firsth1: false }),
-      },
-    }
+    return await generateOldRefMarkdown(slug)
   } else {
     return {
       props: {
-        docs: allMarkdownDocs,
+        docs: markdownContent,
       },
     }
   }
@@ -388,4 +115,8 @@ export function getStaticPaths() {
     }),
     fallback: 'blocking',
   }
+}
+
+export const config = {
+  unstable_includeFiles: ['node_modules/**/shiki/**/*.json'],
 }
