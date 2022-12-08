@@ -253,24 +253,27 @@ export default function launchweek() {
                 >
                   <div className="h-[400px] flex gap-5">
                     <div
-                      className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_28px_top_35px]`}
+                      className={`flex-1 flex flex-col justify-between basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_28px_top_35px]`}
                     >
                       <div className="flex items-center">
-                        <span>{day2.steps[0].title}</span>
+                        <div>{day2.steps[0].title}</div>
                         <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#1a7a4ca1] border-[#598973]">
                           New
                         </Badge>
                       </div>
+                      <SectionButtons docs={day2.steps[0].docs} blog={day2.steps[0].blog} />
                     </div>
                     <div
-                      className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[center_bottom]`}
+                      className={`flex-1 flex flex-col items-center justify-between basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[center_bottom]`}
                     >
-                      <div className="flex items-center">
-                        <span>{day2.steps[1].title}</span>
+                      <div className="flex flex-col items-center gap-2">
                         <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#1a7a4ca1] border-[#598973]">
                           New
                         </Badge>
+                        <span>{day2.steps[1].title}</span>
+                        <p className="text-sm text-slate-900">{day2.steps[1].description}</p>
                       </div>
+                      <SectionButtons docs={day2.steps[1].docs} blog={day2.steps[1].blog} />
                     </div>
                   </div>
                 </Accordion.Item>
@@ -290,7 +293,7 @@ export default function launchweek() {
                 >
                   <div className="h-[400px] flex gap-5">
                     <div
-                      className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
+                      className={`flex flex-col justify-between flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                     >
                       <div className="flex items-center">
                         <span>{day3.steps[0].title}</span>
@@ -298,17 +301,19 @@ export default function launchweek() {
                           New
                         </Badge>
                       </div>
+                      <SectionButtons docs={day3.steps[0].docs} blog={day3.steps[0].blog} />
                     </div>
                     <div
-                      className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg.png')] bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
+                      className={`flex-1 flex flex-col items-center justify-between basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg.png')] bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
                     >
                       {/* inset 0px 130px 50px -52px #121f1e; */}
-                      <div className="flex items-center">
-                        <span>{day3.steps[1].title}</span>
+                      <div className="flex flex-col items-center gap-2">
                         <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#1a7a4ca1] border-[#598973]">
                           New
                         </Badge>
+                        <span>{day3.steps[1].title}</span>
                       </div>
+                      <SectionButtons docs={day3.steps[1].docs} blog={day3.steps[1].blog} />
                     </div>
                   </div>
                 </Accordion.Item>
@@ -328,7 +333,7 @@ export default function launchweek() {
                 >
                   <div className="h-[400px] flex gap-5">
                     <div
-                      className={`flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%]`}
+                      className={`flex flex-col justify-between flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%]`}
                     >
                       <div className="flex items-center">
                         <span>{day4.steps[0].title}</span>
@@ -336,6 +341,7 @@ export default function launchweek() {
                           Updated
                         </Badge>
                       </div>
+                      <SectionButtons docs={day4.steps[0].docs} blog={day4.steps[0].blog} />
                     </div>
                   </div>
                 </Accordion.Item>
@@ -355,7 +361,7 @@ export default function launchweek() {
                 >
                   <div className="h-[400px] flex gap-5">
                     <div
-                      className={`flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg.svg')] bg-contain bg-[right]`}
+                      className={`flex flex-col justify-between flex-1 basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg.svg')] bg-contain bg-[right]`}
                     >
                       <div className="flex items-center">
                         <span>{day5.steps[0].title}</span>
@@ -363,16 +369,18 @@ export default function launchweek() {
                           New
                         </Badge>
                       </div>
+                      <SectionButtons docs={day5.steps[0].docs} blog={day5.steps[0].blog} />
                     </div>
                     <div
-                      className={`flex-1 basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
+                      className={`flex-1 flex flex-col items-center justify-between basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl`}
                     >
-                      <div className="flex items-center">
-                        <span>{day5.steps[1].title}</span>
+                      <div className="flex flex-col items-center gap-2">
                         <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#1a7a4ca1] border-[#598973]">
                           New
                         </Badge>
+                        <span>{day5.steps[1].title}</span>
                       </div>
+                      <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
                     </div>
                   </div>
                 </Accordion.Item>
