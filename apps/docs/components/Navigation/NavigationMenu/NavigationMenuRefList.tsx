@@ -11,6 +11,7 @@ import useWindowLocation from '~/hooks/useWindowLocation'
 import { useNavigationMenuContext } from './NavigationMenu.Context'
 import { find } from 'lodash'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import RevVersionDropdown from '~/components/RefVersionDropdown'
 
 const allFunctions = Object.values(clientLibsCommonSections.sections.functions)
 
@@ -170,13 +171,14 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
             src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
             className="rounded"
           />
-          <h2
+          <span
             className={['font-mono text-sm text-brand-1200 ', !menu.title && 'capitalize'].join(
               ' '
             )}
           >
             {menu.title}
-          </h2>
+          </span>
+          <RevVersionDropdown />
         </div>
         {/* )} */}
 
