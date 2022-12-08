@@ -7,8 +7,6 @@ import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
-import * as shiki from 'shiki'
-
 const sections = flattenSections(clientLibsCommonSections)
 
 export default function JSReference(props) {
@@ -16,10 +14,6 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  const forceShiki = await shiki.getHighlighter({
-    theme: 'github-light',
-  })
-
   return handleRefStaticProps(sections, params, '/js', '/javascript')
 }
 
@@ -28,6 +22,7 @@ export function getStaticPaths() {
 }
 
 export const config = {
+  // test - force again
   unstable_includeFiles: [
     'node_modules/.pnpm/**/shiki/**/*.json',
     'node_modules/**/shiki/**/*.json',
