@@ -567,8 +567,8 @@ export default function launchweek() {
             </Badge>
             <h2 className="text-4xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
-              We worked with +30 content creators from around the world to drop a mountain of
-              content simultaneously!
+              We worked with more than 30 content creators from around the world to drop a mountain
+              of content simultaneously!
               <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
                 <div className="text-brand-900 flex items-center">
                   See all the content
