@@ -329,7 +329,7 @@ export default function launchweek() {
                   >
                     <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                       <div
-                        className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-contain bg-[url('/images/launchweek/vault-bg-light.png')] dark:bg-[url('/images/launchweek/vault-bg.png')] bg-[center_bottom] bg-contain`}
+                        className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-contain bg-[url('/images/launchweek/vault-bg-light.png')] dark:bg-[url('/images/launchweek/vault-bg.png')] bg-[center_bottom]`}
                       >
                         <div className="flex items-center">
                           <span>{day3.steps[0].title}</span>
@@ -340,7 +340,7 @@ export default function launchweek() {
                         <SectionButtons docs={day3.steps[0].docs} blog={day3.steps[0].blog} />
                       </div>
                       <div
-                        className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg-light.png')] dark:bg-[url('/images/launchweek/encryption-bg.png')] bg-contain bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
+                        className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg-light.png')] dark:bg-[url('/images/launchweek/encryption-bg.svg')] bg-contain bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
                       >
                         {/* inset 0px 130px 50px -52px #121f1e; */}
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -370,7 +370,7 @@ export default function launchweek() {
                   >
                     <div className="h-[400px] flex gap-5">
                       <div
-                        className={`flex flex-col justify-between flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%]`}
+                        className={`flex flex-col justify-between flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/mfa-bg-light.png')] dark:bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%] bg-contain`}
                       >
                         <div className="flex items-center">
                           <span>{day4.steps[0].title}</span>
@@ -399,7 +399,7 @@ export default function launchweek() {
                   >
                     <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                       <div
-                        className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg.svg')] bg-contain bg-[right]`}
+                        className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg-light.png')] dark:bg-[url('/images/launchweek/wrappers-bg.png')] bg-contain bg-[right]`}
                       >
                         <div className="flex items-center">
                           <span>{day5.steps[0].title}</span>
