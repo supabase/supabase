@@ -4,7 +4,10 @@ import components from '~/components'
 
 const RefEducationSection = (props) => {
   // gracefully reject pages we can't render
-  if (!props.markdownContent) return <></>
+  if (!props.markdownContent) {
+    console.log(props.item.id)
+    return <div></div>
+  }
 
   return (
     <RefSubLayout.EducationSection
