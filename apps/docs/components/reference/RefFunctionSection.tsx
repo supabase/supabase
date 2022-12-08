@@ -22,12 +22,12 @@ interface ICommonFunc {
 interface IRefFunctionSection {
   funcData: any
   commonFuncData: ICommonFunc
-  libSpec: any
-  typeSpec: any
+  spec: any
+  typeSpec?: any
 }
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
-  const item = props.libSpec.functions.find((x: any) => x.id === props.funcData.id)
+  const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
 
   // gracefully return nothing if function does not exist
   if (!item) return <></>
@@ -38,9 +38,11 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
 
   // console.log(item)
   const hasTsRef = item['$ref'] || null
-  const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, props.typeSpec)
-  const parameters = hasTsRef ? generateParameters(tsDefinition) : ''
-  const shortText = hasTsRef ? tsDefinition.signatures[0].comment.shortText : ''
+
+  const tsDefinition =
+    hasTsRef && props.typeSpec ? extractTsDocNode(hasTsRef, props.typeSpec) : null
+  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : ''
+  const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment.shortText : ''
 
   return (
     <>
