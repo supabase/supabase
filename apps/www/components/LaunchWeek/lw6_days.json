@@ -1,7 +1,7 @@
 [
   {
     "title": "Docs Updated",
-    "shipped": true,
+    "shipped": false,
     "date": "12 Dec 2022",
     "description": "Supabase Docs",
     "d": 1,
@@ -31,7 +31,7 @@
   },
   {
     "title": "Image Processing: Resize V2 + CDN",
-    "shipped": true,
+    "shipped": false,
     "date": "13 Dec 2022",
     "description": "Image Processing",
     "d": 2,
@@ -58,7 +58,7 @@
   },
   {
     "title": "Supabase Vault Release",
-    "shipped": true,
+    "shipped": false,
     "date": "14 Dec 2022",
     "description": "Vault Release",
     "d": 3,
@@ -85,7 +85,7 @@
   },
   {
     "title": "Multi-factor Authentication",
-    "shipped": true,
+    "shipped": false,
     "date": "15 Dec 2022",
     "description": "Multi-factor Authentication",
     "d": 4,
@@ -93,39 +93,19 @@
     "youtube_id": "CGZr5tybW18",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "articles": [
+    "steps": [
       {
-        "title": "Realtime: Multiplayer Edition",
-        "url": "/blog/supabase-realtime-multiplayer-general-availability",
-        "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
-        "products": [
-          {
-            "title": "Realtime Overview",
-            "url": "/docs/guides/realtime",
-            "description": "Realtime Overview"
-          },
-          {
-            "title": "Broadcast Guide",
-            "url": "/docs/guides/realtime/broadcast",
-            "description": "Guide on how to use Broadcast feature"
-          },
-          {
-            "title": "Presence Guide",
-            "url": "/docs/guides/realtime/presence",
-            "description": "Guide on how to use Presence feature"
-          },
-          {
-            "title": "Postgres Changes Guide",
-            "url": "/docs/guides/realtime/postgres-changes",
-            "description": "Guide on how to use Postgres Changes feature"
-          }
-        ]
+        "title": "Multi-factor Authentication",
+        "url": "/blog",
+        "docs": "/docs",
+        "isNew": false,
+        "description": ""
       }
     ]
   },
   {
     "title": "Supabase Wrappers - FDW Framework",
-    "shipped": true,
+    "shipped": false,
     "date": "16 Dec 2022",
     "description": "Supabase Wrappers",
     "d": 5,
@@ -133,39 +113,26 @@
     "youtube_id": "CGZr5tybW18",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "articles": [
+    "steps": [
       {
-        "title": "Realtime: Multiplayer Edition",
-        "url": "/blog/supabase-realtime-multiplayer-general-availability",
-        "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
-        "products": [
-          {
-            "title": "Realtime Overview",
-            "url": "/docs/guides/realtime",
-            "description": "Realtime Overview"
-          },
-          {
-            "title": "Broadcast Guide",
-            "url": "/docs/guides/realtime/broadcast",
-            "description": "Guide on how to use Broadcast feature"
-          },
-          {
-            "title": "Presence Guide",
-            "url": "/docs/guides/realtime/presence",
-            "description": "Guide on how to use Presence feature"
-          },
-          {
-            "title": "Postgres Changes Guide",
-            "url": "/docs/guides/realtime/postgres-changes",
-            "description": "Guide on how to use Postgres Changes feature"
-          }
-        ]
+        "title": "Supabase Wrappers",
+        "url": "/blog",
+        "docs": "/docs",
+        "isNew": true,
+        "description": "Connect Postgres to external systems with Postgres Foreign Data Wrappers"
+      },
+      {
+        "title": "Point-in-time recovery",
+        "description": "Faster asset delivery, now even faster.",
+        "url": "/blog",
+        "docs": "/docs",
+        "isNew": true
       }
     ]
   },
   {
     "title": "One more thing",
-    "shipped": true,
+    "shipped": false,
     "date": "19th Aug 2022",
     "description": "We finish Launch Week 5 with an update on the community and some more product updates.",
     "d": 6,

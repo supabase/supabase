@@ -1,3 +1,25 @@
 .mask {
   mask-image: radial-gradient(black, transparent);
 }
+
+.badge {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: linear-gradient(orange, violet);
+  background-clip: padding-box;
+  padding: 10px;
+  /* just to show box-shadow still works fine */
+}
+
+.badge::after {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: -4px;
+  right: -4px;
+  background: linear-gradient(red, blue);
+  content: '';
+  z-index: -1;
+  border-radius: 16px;
+}
