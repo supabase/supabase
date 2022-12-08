@@ -104,9 +104,9 @@ export default function launchweek() {
 
   const SectionButtons = ({ blog, docs }) => {
     return (
-      <div className="flex gap-2">
+      <div className="flex gap-2 z-10">
         <a href={blog} target="_blank" rel="noopener">
-          <div className="flex items-center bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] rounded-full text-sm py-2 pl-3 pr-2">
+          <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] rounded-full text-sm py-2 pl-3 pr-2">
             Blog post
             <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
               <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
@@ -114,7 +114,7 @@ export default function launchweek() {
           </div>
         </a>
         <a href={docs} target="_blank" rel="noopener">
-          <div className="flex items-center bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] rounded-full text-sm py-2 pl-3 pr-2">
+          <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] rounded-full text-sm py-2 pl-3 pr-2">
             Docs
             <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
               <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
