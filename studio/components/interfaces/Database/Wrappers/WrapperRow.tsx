@@ -67,7 +67,7 @@ const WrapperRow: FC<Props> = ({ wrapper, isEnabled, isOpen, onOpen }) => {
 
   const onSubmit = async () => {
     const validate = makeValidateRequired(wrapper.server.options)
-    const errors = validate(formState)
+    const errors: any = validate(formState)
     if (!isEmpty(errors)) {
       setFormErrors(errors)
       return
