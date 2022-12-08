@@ -126,6 +126,8 @@ const CodeBlock: FC<Props> = ({
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >
+              {/* // 
+              @ts-ignore */}
               <CopyToClipboard text={value || children}>
                 <Button
                   type="default"

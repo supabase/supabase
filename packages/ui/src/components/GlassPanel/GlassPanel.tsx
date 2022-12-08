@@ -31,7 +31,9 @@ const GlassPanel = ({
   const { isDarkMode } = useTheme()
 
   const IconBackground: React.FC = (props) => (
-    <div className={showIconBg && 'bg-green-600 w-8 h-8 flex items-center justify-center rounded'}>
+    <div
+      className={showIconBg ? 'bg-green-600 w-8 h-8 flex items-center justify-center rounded' : ''}
+    >
       {props.children}
     </div>
   )
