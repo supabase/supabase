@@ -176,7 +176,7 @@ export default function Config(props) {
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
   // an array of ids of the intro sections for this library
-  const introPages = ['cli', 'release-notes']
+  const introPages = ['cli']
   const specPpages = cliSpec.commands
 
   const pages = [...introPages, ...specPpages]
