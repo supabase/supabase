@@ -1111,6 +1111,25 @@
                     "type": "integer",
                     "minimum": 1,
                     "example": 60000
+                  },
+                  "transform": {
+                    "type": "object",
+                    "properties": {
+                      "height": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 100
+                      },
+                      "width": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 100
+                      },
+                      "resize": {
+                        "type": "string",
+                        "enum": ["cover", "contain", "fill"]
+                      }
+                    }
                   }
                 },
                 "required": ["expiresIn"]

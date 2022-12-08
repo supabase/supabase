@@ -293,8 +293,63 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "",
@@ -326,6 +381,9 @@
                       "type": "number"
                     },
                     "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
                       "type": "boolean"
                     }
                   },
@@ -418,6 +476,9 @@
                       },
                       "verify_jwt": {
                         "type": "boolean"
+                      },
+                      "import_map": {
+                        "type": "boolean"
                       }
                     },
                     "required": [
@@ -466,14 +527,6 @@
         "summary": "Retrieve a function",
         "description": "Retrieves a function with the specified slug and project.",
         "parameters": [
-          {
-            "name": "include_body",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
           {
             "name": "ref",
             "required": true,
@@ -527,6 +580,9 @@
                       "type": "number"
                     },
                     "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
                       "type": "boolean"
                     },
                     "body": {
@@ -614,8 +670,53 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -647,6 +748,9 @@
                       "type": "number"
                     },
                     "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
                       "type": "boolean"
                     }
                   },
@@ -717,6 +821,57 @@
           },
           "500": {
             "description": "Failed to delete function with given slug"
+          }
+        },
+        "tags": ["projects"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}/body": {
+      "get": {
+        "operationId": "getFunctionBody",
+        "summary": "Retrieve a function body",
+        "description": "Retrieves a function body for the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function body with given slug"
           }
         },
         "tags": ["projects"],
@@ -1479,6 +1634,157 @@
           }
         ]
       }
+    },
+    "/v1/projects/{ref}/network-restrictions": {
+      "get": {
+        "operationId": "getNetworkRestrictions",
+        "summary": "Gets project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entitlement": {
+                      "enum": ["disallowed", "allowed"],
+                      "type": "string"
+                    },
+                    "config": {
+                      "type": "object",
+                      "properties": {
+                        "dbAllowedCidrs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["dbAllowedCidrs"]
+                    },
+                    "status": {
+                      "enum": ["stored", "applied"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["entitlement", "config", "status"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's network restrictions"
+          }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions/apply": {
+      "post": {
+        "operationId": "applyNetworkRestrictions",
+        "summary": "Updates project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbAllowedCidrs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["dbAllowedCidrs"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entitlement": {
+                      "enum": ["disallowed", "allowed"],
+                      "type": "string"
+                    },
+                    "config": {
+                      "type": "object",
+                      "properties": {
+                        "dbAllowedCidrs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["dbAllowedCidrs"]
+                    },
+                    "status": {
+                      "enum": ["stored", "applied"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["entitlement", "config", "status"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project network restrictions"
+          }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -1613,6 +1919,25 @@
         },
         "required": ["name"]
       },
+      "CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "/^[A-Za-z0-9_-]+$/"
+          },
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        },
+        "required": ["slug", "name", "body"]
+      },
       "FunctionResponse": {
         "type": "object",
         "properties": {
@@ -1639,6 +1964,9 @@
             "type": "number"
           },
           "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
             "type": "boolean"
           }
         },
@@ -1672,11 +2000,28 @@
           "verify_jwt": {
             "type": "boolean"
           },
+          "import_map": {
+            "type": "boolean"
+          },
           "body": {
             "type": "string"
           }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "UpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        }
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -1775,6 +2120,44 @@
           }
         },
         "required": ["ipv4_addresses"]
+      },
+      "NetworkRestrictionsRequest": {
+        "type": "object",
+        "properties": {
+          "dbAllowedCidrs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["dbAllowedCidrs"]
+      },
+      "NetworkRestrictionsResponse": {
+        "type": "object",
+        "properties": {
+          "entitlement": {
+            "enum": ["disallowed", "allowed"],
+            "type": "string"
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "dbAllowedCidrs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["dbAllowedCidrs"]
+          },
+          "status": {
+            "enum": ["stored", "applied"],
+            "type": "string"
+          }
+        },
+        "required": ["entitlement", "config", "status"]
       }
     }
   }
