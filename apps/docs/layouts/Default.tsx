@@ -12,8 +12,8 @@ interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
   children: any
   toc?: any
-  menuItems: any
-  currentPage: string
+  menuItems?: any
+  currentPage?: string
 }
 
 const Layout: FC<Props> = ({ meta, children, toc }) => {

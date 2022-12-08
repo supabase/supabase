@@ -18,7 +18,7 @@ interface Props {
   }
   children: any
   toc?: any
-  currentPage: string
+  currentPage?: string
 }
 
 const Layout: FC<Props> = (props) => {
