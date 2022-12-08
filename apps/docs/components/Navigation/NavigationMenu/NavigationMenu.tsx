@@ -87,7 +87,7 @@ const SideNav = () => {
         level: 'home',
       },
       {
-        label: 'Getting started',
+        label: 'Getting Started',
         icon: '/img/icons/menu/getting-started',
         href: '/getting-started',
         level: 'gettingstarted',
@@ -156,7 +156,7 @@ const SideNav = () => {
         label: 'Client Library Reference',
       },
       {
-        label: 'JavaScript Client',
+        label: 'JavaScript',
         icon: '/img/icons/javascript-icon',
         hasLightIcon: false,
         href: '/reference/javascript/start',
@@ -170,7 +170,7 @@ const SideNav = () => {
       //   level: 'reference_javascript',
       // },
       {
-        label: 'Dart Client Library',
+        label: 'Flutter',
         icon: '/img/icons/dart-icon',
         hasLightIcon: false,
         href: '/reference/dart/start',
@@ -180,21 +180,21 @@ const SideNav = () => {
         label: 'Tools Reference',
       },
       {
-        label: 'Mangement API',
+        label: 'Management API',
         icon: '/img/icons/api-icon',
         hasLightIcon: false,
         href: '/reference/api/start',
         level: 'reference_javascript',
       },
       {
-        label: 'CLI',
+        label: 'Supabase CLI',
         icon: '/img/icons/cli-icon',
         hasLightIcon: false,
         href: '/reference/cli/start',
         level: 'reference_javascript',
       },
       {
-        label: 'Self hosting server',
+        label: 'Self-Hosting Server',
         icon: '/img/icons/menu/platform',
         href: '/reference/javascript/start',
         level: 'reference_javascript',
