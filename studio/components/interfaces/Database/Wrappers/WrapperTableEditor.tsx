@@ -2,8 +2,8 @@ import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/Act
 import MultiSelect from 'components/ui/MultiSelect'
 import { useEffect, useState } from 'react'
 import { Form, Input, Listbox, SidePanel } from 'ui'
-import { Table, TableOption } from './types'
-import { makeValidateRequired } from './utils'
+import { Table, TableOption } from './Wrappers.types'
+import { makeValidateRequired } from './Wrappers.utils'
 
 export type WrapperTableEditorProps = {
   visible: boolean

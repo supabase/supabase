@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { AvailableColumn, Wrapper } from 'components/interfaces/Database/Wrappers/types'
+import { AvailableColumn, Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 

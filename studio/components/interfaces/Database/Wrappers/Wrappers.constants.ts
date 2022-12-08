@@ -1,4 +1,4 @@
-import { Wrapper } from './types'
+import { Wrapper } from './Wrappers.types'
 
 export const wrappers: Wrapper[] = [
   {

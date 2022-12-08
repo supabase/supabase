@@ -14,8 +14,8 @@ import {
 } from 'ui'
 
 import { useStore } from 'hooks'
-import { Wrapper } from './types'
-import { makeValidateRequired } from './utils'
+import { Wrapper } from './Wrappers.types'
+import { makeValidateRequired } from './Wrappers.utils'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import WrapperTableEditor from './WrapperTableEditor'
