@@ -6,8 +6,8 @@ import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/Act
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useStore } from 'hooks'
-import { Wrapper } from './types'
-import { makeValidateRequired } from './utils'
+import { Wrapper } from './Wrappers.types'
+import { makeValidateRequired } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
 
 // [Joshen TODO]  No longer used, can remove after WrapperRow is working

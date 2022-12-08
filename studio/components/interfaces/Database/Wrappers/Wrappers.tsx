@@ -2,11 +2,11 @@ import { partition } from 'lodash'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { wrappers } from './data'
+import { wrappers } from './Wrappers.constants'
 import WrapperCard from './WrapperCard'
 import WrapperRow from './WrapperRow'
 import { useState } from 'react'
-import { Wrapper } from './types'
+import { Wrapper } from './Wrappers.types'
 
 const Wrappers = () => {
   const { project } = useProjectContext()

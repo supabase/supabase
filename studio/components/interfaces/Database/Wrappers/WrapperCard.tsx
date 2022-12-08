@@ -5,7 +5,7 @@ import { IconLoader, Toggle } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { checkPermissions, useStore } from 'hooks'
-import { Wrapper } from './types'
+import { Wrapper } from './Wrappers.types'
 import WrapperEditor from './WrapperEditor'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
