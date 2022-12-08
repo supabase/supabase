@@ -28,7 +28,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     function handleRouteChange(url: string) {
       // telemetry(url)
     }
-
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
