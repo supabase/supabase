@@ -474,17 +474,8 @@ export default function launchweek() {
               <div className="flex flex-col">
                 <h3 className="text-lg text-black dark:text-white mb-2">Judges</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
-                  We have assembled an All Star Judging Panel, including the difficult-to-bribe (but
-                  always fair){' '}
-                  <a
-                    href="https://twitter.com/swyx"
-                    target="_blank"
-                    rel="nooper noreferrer"
-                    className="text-brand-900"
-                  >
-                    @swyx
-                  </a>{' '}
-                  Shawn Wang.
+                  The Supabase team will judge all the categories except the Best Edge Functions
+                  Project, which will be judged by our friends at Deno.
                 </p>
               </div>
               <div className="flex flex-col">
