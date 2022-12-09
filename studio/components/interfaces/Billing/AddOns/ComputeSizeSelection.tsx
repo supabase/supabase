@@ -75,7 +75,9 @@ const ComputeSizeSelection: FC<Props> = ({
             label="Need a larger add on?"
             description="Reach out to us - we've got you covered!"
             optionalLabel={
-              <Link href={`/support/new?ref=${projectRef}&category=sales`}>
+              <Link
+                href={`/support/new?ref=${projectRef}&category=sales&subject=Enquiry%20for%20larger%20compute%20size`}
+              >
                 <a>
                   <Button>Contact us</Button>
                 </a>
