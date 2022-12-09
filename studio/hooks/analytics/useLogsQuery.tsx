@@ -12,6 +12,7 @@ export interface LogsQueryData {
   params: LogsEndpointParams
   isLoading: boolean
   logData: LogData[]
+  data?: never
   error: string | Object | null
 }
 export interface LogsQueryHandlers {

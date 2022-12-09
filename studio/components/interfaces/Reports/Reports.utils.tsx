@@ -1,12 +1,12 @@
 import { IconRefreshCw } from '@supabase/ui'
-import useDbQuery, { DbQueryData, DbQueryHandler } from 'hooks/analytics/useDbQuery'
+import useDbQuery from 'hooks/analytics/useDbQuery'
 import useLogsQuery, { LogsQueryData, LogsQueryHandlers } from 'hooks/analytics/useLogsQuery'
 import React from 'react'
 import { Button } from 'ui'
 import { DatePickerToFrom } from '../Settings/Logs'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { DEFAULT_QUERY_PARAMS, REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
-import { PresetConfig } from './Reports.types'
+import { DbQueryData, DbQueryHandler, PresetConfig } from './Reports.types'
 
 /**
  * Converts a query params string to an object
@@ -16,7 +16,7 @@ export const queryParamsToObject = (params: string) => {
 }
 
 // generate hooks based on preset config
-type PresetHookResult = [LogsQueryData, LogsQueryHandlers]
+type PresetHookResult = [LogsQueryData | DbQueryData, LogsQueryHandlers | DbQueryHandler]
 type PresetHooks = Record<keyof PresetConfig['queries'], () => PresetHookResult>
 export const hooksFactory = (projectRef: string, config: PresetConfig) => {
   const hooks: PresetHooks = Object.entries(config.queries).reduce(

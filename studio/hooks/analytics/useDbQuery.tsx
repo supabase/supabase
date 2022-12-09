@@ -1,37 +1,33 @@
 import { DEFAULT_QUERY_PARAMS } from 'components/interfaces/Reports/Reports.constants'
-import { BaseReportParams, PresetSql } from 'components/interfaces/Reports/Reports.types'
+import {
+  BaseReportParams,
+  DbQueryData,
+  DbQueryHandler,
+  MetaQueryResponse,
+  PresetSql,
+} from 'components/interfaces/Reports/Reports.types'
 import { useStore } from 'hooks'
 import useSWR from 'swr'
-import { ResponseError } from 'types'
 
-type QueryResponse = any | { error: ResponseError }
-export interface DbQueryData<T = unknown[]> {
-  data: T
-  params?: never
-  logData?: never
-  isLoading: boolean
-  error: string
-}
-export interface DbQueryHandler {
-  runQuery: () => void
-  setParams?: never
-  changeQuery?: never
-}
-type UseDbQuery<T = unknown[]> = (sql: PresetSql, params?: BaseReportParams) => [DbQueryData<T>, DbQueryHandler]
+type UseDbQuery = (sql: PresetSql, params?: BaseReportParams) => [DbQueryData, DbQueryHandler]
 const useDbQuery: UseDbQuery = (sql, params = DEFAULT_QUERY_PARAMS) => {
   const { meta } = useStore()
 
   const resolvedSql = typeof sql === 'function' ? sql(params) : sql
-
+  console.log('useDbQuery', 'sql', resolvedSql)
   const {
     data,
     error: swrError,
     isValidating: isLoading,
     mutate,
-  } = useSWR<QueryResponse>(resolvedSql, meta.query, { revalidateOnFocus: false })
+  } = useSWR<MetaQueryResponse>(resolvedSql, async () => await meta.query(resolvedSql), {
+    revalidateOnFocus: false,
+  })
+  console.log('useDbQuery', 'data', data)
+  console.log('useDbQuery', 'isLoading', isLoading)
 
-  const error = swrError || data?.error
-  return [{ error, data, isLoading }, { runQuery: () => mutate() }]
+  const error = swrError || (typeof data === 'object' ? data?.error : '')
+  return [{ error, data, isLoading, params }, { runQuery: () => mutate() }]
 }
 
 export default useDbQuery
