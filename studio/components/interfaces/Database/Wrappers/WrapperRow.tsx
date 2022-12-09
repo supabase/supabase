@@ -234,7 +234,9 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                     <InformationBox
                       hideCollapse
                       defaultVisibility
-                      icon={<IconCheckCircle strokeWidth={1.5} className="text-brand-900" />}
+                      icon={
+                        <IconCheckCircle strokeWidth={1.5} size={18} className="text-brand-900" />
+                      }
                       title={`${wrapper.label} foreign data wrapper is currently enabled`}
                       description="If you'd like to edit this wrapper, you'll need to disable the wrapper first and create it again with any updated configuration."
                     />

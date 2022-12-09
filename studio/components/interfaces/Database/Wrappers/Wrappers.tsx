@@ -10,6 +10,7 @@ import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { WRAPPERS } from './Wrappers.constants'
 import WrapperRow from './WrapperRow'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Image from 'next/image'
 
 const Wrappers = () => {
   const { ui, meta } = useStore()
@@ -149,7 +150,14 @@ const Wrappers = () => {
           >
             <div className="w-3/5 space-y-8">
               <div className="space-y-2">
-                <h4 className="text-lg">Supabase Wrappers</h4>
+                <div className="flex items-center space-x-2">
+                  {ui.isDarkTheme ? (
+                    <Image src="/img/wrappers-icon-dark.svg" width={24} height={24} />
+                  ) : (
+                    <Image src="/img/wrappers-icon-light.svg" width={24} height={24} />
+                  )}
+                  <h4 className="text-lg">Supabase Wrappers</h4>
+                </div>
                 <p className="text-sm text-scale-1100">
                   Supabase Wrappers is a framework for building Postgres Foreign Data Wrappers (FDW)
                   which connect Postgres to external systems. Query your data warehouse or
