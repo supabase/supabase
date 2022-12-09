@@ -41,9 +41,6 @@ export const gettingstarted = {
   title: 'Getting started',
   label: 'Overview',
   items: [
-    { name: 'Introduction', url: '/', items: [] },
-    { name: 'Features', url: '/features', items: [] },
-    { name: 'Architecture', url: '/architecture', items: [] },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -493,6 +490,7 @@ export const platform = {
   url: '/guides/platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
+    { name: 'Architecture', url: '/architecture', items: [] },
     { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
     { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
     { name: 'Logging', url: '/guides/platform/logs', items: [] },
@@ -513,6 +511,7 @@ export const resources = {
   url: '/guides/resources',
   items: [
     { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Features', url: '/features', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
