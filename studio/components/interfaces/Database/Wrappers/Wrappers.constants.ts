@@ -1,6 +1,6 @@
 import { Wrapper } from './Wrappers.types'
 
-export const wrappers: Wrapper[] = [
+export const WRAPPERS: Wrapper[] = [
   {
     name: 'stripe_wrapper',
     handlerName: 'stripe_fdw_handler',

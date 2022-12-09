@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Form, Input, Listbox, SidePanel } from 'ui'
+import { Form, IconDatabase, Input, Listbox, SidePanel, Modal, IconPlus } from 'ui'
+import { useStore } from 'hooks'
 import { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import MultiSelect from 'components/ui/MultiSelect'
@@ -39,7 +40,12 @@ const WrapperTableEditor = ({
   }
 
   const onSubmit: OnSubmitFn = (values, { resetForm }) => {
-    onSave({ ...values, index: parseInt(selectedTableIndex) })
+    onSave({
+      ...values,
+      index: parseInt(selectedTableIndex),
+      schema_name: values.schema === 'custom' ? values.schema_name : values.schema,
+      is_new_schema: values.schema === 'custom',
+    })
     resetForm()
     setSelectedTableIndex('')
   }
@@ -121,6 +127,9 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
+  const { meta } = useStore()
+  const schemas = meta.schemas.list()
+
   const requiredOptions =
     table.options.filter((option) => option.editable && option.required && !option.defaultValue) ??
     []
@@ -133,6 +142,8 @@ const TableForm = ({
     table_name: '',
     columns: table.availableColumns.map((column) => column.name),
     ...Object.fromEntries(table.options.map((option) => [option.name, option.defaultValue ?? ''])),
+    schema: 'public',
+    schema_name: '',
   }
 
   const validate = makeValidateRequired([
@@ -152,17 +163,44 @@ const TableForm = ({
       {({ errors, values, resetForm }: any) => {
         return (
           <div className="space-y-4">
+            <Listbox size="small" name="schema" label="Select a schema for the foreign table">
+              <Listbox.Option
+                key="custom"
+                id="custom"
+                label={`Create a new schema`}
+                value="custom"
+                addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+              >
+                Create a new schema
+              </Listbox.Option>
+              <Modal.Separator />
+              {/* @ts-ignore */}
+              {schemas.map((schema: PostgresSchema) => {
+                return (
+                  <Listbox.Option
+                    key={schema.id}
+                    id={schema.name}
+                    label={schema.name}
+                    value={schema.name}
+                    addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                  >
+                    {schema.name}
+                  </Listbox.Option>
+                )
+              })}
+            </Listbox>
+            {values.schema === 'custom' && (
+              <Input id="schema_name" name="schema_name" label="Schema name" />
+            )}
             <Input
               id="table_name"
               name="table_name"
               label="Table name"
               descriptionText="You can query from this table after the wrapper is enabled."
             />
-
             {requiredOptions.map((option) => (
               <Option key={option.name} option={option} />
             ))}
-
             <MultiSelect
               label="Columns"
               options={table.availableColumns.map((column) => {
@@ -182,7 +220,6 @@ const TableForm = ({
                 resetForm({ values: { ...values, columns } })
               }}
             />
-
             {optionalOptions.map((option) => (
               <Option key={option.name} option={option} />
             ))}

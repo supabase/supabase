@@ -7,9 +7,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { wrappers } from './Wrappers.constants'
+import { WRAPPERS } from './Wrappers.constants'
 import WrapperRow from './WrapperRow'
-import { FormHeader } from 'components/ui/Forms'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const Wrappers = () => {
@@ -77,14 +76,51 @@ const Wrappers = () => {
 
   return (
     <div>
-      <FormHeader
-        title="Foreign Data Wrappers"
-        description="Query your data warehouse directly from your database, or third-party APIs using SQL."
-      />
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h3 className="text-scale-1200 mb-2 text-xl">Foreign Data Wrappers</h3>
+          <div className="text-scale-900 text-sm">
+            Query your data warehouse directly from your database, or third-party APIs using SQL.
+          </div>
+        </div>
+        {/* [Joshen TODO] For when we support multiple instances per wrapper */}
+        {/* <div>
+          <Dropdown
+            side="bottom"
+            align="end"
+            size="small"
+            overlay={
+              <>
+                {WRAPPERS.map((wrapper, idx) => (
+                  <>
+                    <Dropdown.Item
+                      key={wrapper.name}
+                      icon={
+                        <Image
+                          src={wrapper.icon}
+                          width={20}
+                          height={20}
+                          alt={`${wrapper.name} wrapper icon`}
+                        />
+                      }
+                      onClick={() => {}}
+                    >
+                      {wrapper.label}
+                    </Dropdown.Item>
+                    {idx !== WRAPPERS.length - 1 && <Dropdown.Separator />}
+                  </>
+                ))}
+              </>
+            }
+          >
+            <Button type="primary">Add wrapper</Button>
+          </Dropdown>
+        </div> */}
+      </div>
 
       {isWrappersEnabled ? (
         <div>
-          {wrappers.map((wrapper) => {
+          {WRAPPERS.map((wrapper) => {
             return (
               <WrapperRow
                 wrapper={wrapper}
