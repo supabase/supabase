@@ -237,7 +237,8 @@ function BlogPostPage(props: any) {
                           src={props.blog.youtubeHero}
                           frameBorder="0"
                           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                          allowfullscreen
+                          // @ts-expect-error
+                          allowfullscreen={true}
                         ></iframe>
                       ) : (
                         props.blog.thumb && (
