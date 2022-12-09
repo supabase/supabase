@@ -596,6 +596,7 @@ export const integrations = {
   url: '/guides/integrations',
   items: [
     { name: 'Overview', url: '/guides/integrations', items: [] },
+    { name: 'See All Integrations', url: 'https://supabase.com/partners/integrations', items: [] },
     {
       name: 'Auth',
       url: undefined,
