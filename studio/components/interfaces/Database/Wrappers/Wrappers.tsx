@@ -10,6 +10,7 @@ import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { WRAPPERS } from './Wrappers.constants'
 import WrapperRow from './WrapperRow'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Image from 'next/image'
 
 const Wrappers = () => {
   const { ui, meta } = useStore()
