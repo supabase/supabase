@@ -153,7 +153,7 @@ const Wrappers = () => {
                 <p className="text-sm text-scale-1100">
                   Supabase Wrappers is a framework for building Postgres Foreign Data Wrappers (FDW)
                   which connect Postgres to external systems. Query your data warehouse or
-                  third-party APIs directly from your database
+                  third-party APIs directly from your database.
                 </p>
               </div>
               <div className="flex items-center space-x-2">
