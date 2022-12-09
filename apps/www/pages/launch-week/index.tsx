@@ -217,11 +217,11 @@ export default function launchweek() {
                   </div>
                 </div>
                 <div className="flex gap-2 z-10">
-                  <a href={'/blog'} target="_blank" rel="noopener">
+                  <a href={'https://youtu.be/-BG9XptyCKI'} target="_blank" rel="noopener">
                     <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[130px]">
                       Watch video
                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                        <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
+                        <img src="/images/launchweek/video-icon.svg" className="w-3 h-3"></img>
                       </div>
                     </div>
                   </a>
@@ -229,7 +229,7 @@ export default function launchweek() {
                     <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
                       Read blogpost
                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                        <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
+                        <img src="/images/launchweek/blog-icon.svg" className="w-3 h-3"></img>
                       </div>
                     </div>
                   </a>
@@ -502,13 +502,13 @@ export default function launchweek() {
                   Submit your project through{' '}
                   <a
                     className="text-brand-900"
-                    href="https://www.madewithsupabase.com"
+                    href="https://www.madewithsupabase.com/launch-week-6"
                     target="_blank"
                   >
                     madewithsupabase.com
                   </a>
                   . All submissions must be open source and publically available. Submissions close
-                  Sunday 18th Dec 23:59 hs PT.
+                  Monday 19th Dec 00:01 AM PT.
                 </p>
               </div>
             </div>
