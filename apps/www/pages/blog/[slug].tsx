@@ -227,17 +227,31 @@ function BlogPostPage(props: any) {
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
-                  {props.blog.thumb && (
-                    <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
-                      <Image
-                        src={'/images/blog/' + props.blog.thumb}
-                        layout="fill"
-                        objectFit="cover"
-                      />
+                  <article>
+                    <div className={['prose prose-docs'].join(' ')}>
+                      {props.blog.youtubeHero ? (
+                        <iframe
+                          className="w-full"
+                          width="700"
+                          height="350"
+                          src={props.blog.youtubeHero}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                          allowfullscreen
+                        ></iframe>
+                      ) : (
+                        props.blog.thumb && (
+                          <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
+                            <Image
+                              src={'/images/blog/' + props.blog.thumb}
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
+                        )
+                      )}
+                      <MDXRemote {...content} components={mdxComponents()} />
                     </div>
-                  )}
-                  <article className={['prose prose-docs'].join(' ')}>
-                    <MDXRemote {...content} components={mdxComponents()} />
                   </article>
                   <div className="py-16">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
