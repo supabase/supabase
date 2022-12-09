@@ -3,7 +3,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
@@ -12,11 +12,13 @@ import InformationBox from 'components/ui/InformationBox'
 import { DatabaseAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
+import { StripeSubscription } from '../Subscription/Subscription.types'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
 interface Props {
   isRefreshingPreview: boolean
+  currentSubscription?: StripeSubscription
   subscriptionPreview?: SubscriptionPreview
 
   currentPlan: any
@@ -24,6 +26,7 @@ interface Props {
     computeSize: DatabaseAddon
     pitrDuration: DatabaseAddon
     customDomains: DatabaseAddon
+    supportPlan?: DatabaseAddon
   }
 
   selectedPlan?: any
@@ -53,6 +56,7 @@ interface Props {
 const PaymentSummaryPanel: FC<Props> = ({
   isRefreshingPreview,
   isSpendCapEnabled,
+  currentSubscription,
   subscriptionPreview,
 
   currentPlan,
@@ -154,7 +158,9 @@ const PaymentSummaryPanel: FC<Props> = ({
         {/* Add on details */}
         {projectRegion !== 'af-south-1' && (
           <div className="space-y-1">
-            <p className="text-sm">Selected add-ons</p>
+            <p className="text-sm text-scale-1100">Selected add-ons</p>
+
+            {/* Compute size */}
             <div className="flex items-center justify-between">
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
@@ -164,7 +170,12 @@ const PaymentSummaryPanel: FC<Props> = ({
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
               >
-                ${(getProductPrice(currentAddons.computeSize).unit_amount / 100).toFixed(2)}
+                $
+                {(
+                  ((currentSubscription?.addons ?? []).find(
+                    (addon) => addon.prod_id === currentAddons.computeSize.id
+                  )?.unit_amount ?? 0) / 100
+                ).toFixed(2)}
               </p>
             </div>
             {isChangingComputeSize && (
@@ -175,6 +186,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
+
+            {/* PITR Duration */}
             {currentAddons.pitrDuration?.id !== undefined && (
               <div className="flex items-center justify-between">
                 <p
@@ -189,7 +202,12 @@ const PaymentSummaryPanel: FC<Props> = ({
                     isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  ${(getProductPrice(currentAddons.pitrDuration).unit_amount / 100).toFixed(2)}
+                  $
+                  {(
+                    ((currentSubscription?.addons ?? []).find(
+                      (addon) => addon.prod_id === currentAddons.pitrDuration.id
+                    )?.unit_amount ?? 0) / 100
+                  ).toFixed(2)}
                 </p>
               </div>
             )}
@@ -201,6 +219,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
+
+            {/* Custom Domains */}
             {currentAddons.customDomains?.id !== undefined && (
               <div className="flex items-center justify-between">
                 <p
@@ -215,7 +235,12 @@ const PaymentSummaryPanel: FC<Props> = ({
                     isChangingCustomDomains ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  ${(getProductPrice(currentAddons.customDomains).unit_amount / 100).toFixed(2)}
+                  $
+                  {(
+                    ((currentSubscription?.addons ?? []).find(
+                      (addon) => addon.prod_id === currentAddons.customDomains.id
+                    )?.unit_amount ?? 0) / 100
+                  ).toFixed(2)}
                 </p>
               </div>
             )}
@@ -224,6 +249,21 @@ const PaymentSummaryPanel: FC<Props> = ({
                 <p className="text-sm">{selectedAddons.customDomains?.name}</p>
                 <p className="text-sm">
                   ${(getProductPrice(selectedAddons.customDomains).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+
+            {/* Support Plan */}
+            {currentAddons.supportPlan !== undefined && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{currentAddons.supportPlan?.name}</p>
+                <p className="text-sm">
+                  $
+                  {(
+                    ((currentSubscription?.addons ?? []).find(
+                      (addon) => addon.prod_id === currentAddons.supportPlan?.id
+                    )?.unit_amount ?? 0) / 100
+                  ).toFixed(2)}
                 </p>
               </div>
             )}

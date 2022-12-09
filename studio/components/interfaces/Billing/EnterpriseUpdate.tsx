@@ -55,8 +55,6 @@ const EnterpriseUpdate: FC<Props> = ({
   const customDomainOptions = formatCustomDomainOptions(addons)
   const currentAddons = getCurrentAddons(currentSubscription, addons)
 
-  console.log({ currentAddons })
-
   // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
   // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
   // of unnecessary state management on this complex page.
@@ -248,6 +246,7 @@ const EnterpriseUpdate: FC<Props> = ({
             isSpendCapEnabled={true}
             isSubmitting={isSubmitting}
             isRefreshingPreview={isRefreshingPreview}
+            currentSubscription={currentSubscription}
             subscriptionPreview={subscriptionPreview}
             // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}
