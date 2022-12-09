@@ -225,7 +225,7 @@ export default function launchweek() {
                       </div>
                     </div>
                   </a>
-                  <a href={'/docs'} target="_blank" rel="noopener">
+                  <a href={'/blog/who-we-hire'} target="_blank" rel="noopener">
                     <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
                       Read blogpost
                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
@@ -534,7 +534,7 @@ export default function launchweek() {
                 </div>
               </a>
               <a
-                href="https://github.com/psteinroe/supabase-cache-helpers"
+                href="https://github.com/pheralb/superui"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -548,7 +548,7 @@ export default function launchweek() {
                 </div>
               </a>
               <a
-                href="https://github.com/psteinroe/supabase-cache-helpers"
+                href="https://github.com/Myzel394/quid_faciam_hodie"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="self-end"
@@ -562,11 +562,7 @@ export default function launchweek() {
                   <p className="text-slate-1000 text-xs">Winner Best Flutter Project</p>
                 </div>
               </a>
-              <a
-                href="https://github.com/psteinroe/supabase-cache-helpers"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://github.com/laznic/hotdogs" target="_blank" rel="noopener noreferrer">
                 <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
@@ -577,7 +573,7 @@ export default function launchweek() {
                 </div>
               </a>
               <a
-                href="https://github.com/psteinroe/supabase-cache-helpers"
+                href="https://github.com/vvidday/repo-watch"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="self-end"
