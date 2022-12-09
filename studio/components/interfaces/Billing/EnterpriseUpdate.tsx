@@ -67,6 +67,11 @@ const EnterpriseUpdate: FC<Props> = ({
   const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
     currentAddons.customDomains
   )
+  // [Joshen TODO] Future - We may need to also include any add ons outside of
+  // compute size, pitr, custom domain and support plan, although we dont have any now
+  const nonChangeableAddons = [currentAddons.supportPlan].filter(
+    (x) => x !== undefined
+  ) as DatabaseAddon[]
 
   // [Joshen] Scaffolded here
   const selectedAddons = {
@@ -87,7 +92,7 @@ const EnterpriseUpdate: FC<Props> = ({
 
   useEffect(() => {
     getSubscriptionPreview()
-  }, [selectedComputeSize, selectedPITRDuration])
+  }, [selectedComputeSize, selectedPITRDuration, selectedCustomDomainOption])
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
@@ -100,8 +105,10 @@ const EnterpriseUpdate: FC<Props> = ({
     // Only allow add-ons changing
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
         selectedAddons,
+        nonChangeableAddons,
         selectedPaymentMethodId,
         projectRegion
       ),
@@ -124,8 +131,10 @@ const EnterpriseUpdate: FC<Props> = ({
   const onConfirmPayment = async () => {
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
         selectedAddons,
+        nonChangeableAddons,
         selectedPaymentMethodId,
         projectRegion
       ),

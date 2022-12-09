@@ -88,6 +88,12 @@ const ProUpgrade: FC<Props> = ({
     currentAddons.customDomains
   )
 
+  // [Joshen TODO] Future - We may need to also include any add ons outside of
+  // compute size, pitr, custom domain and support plan, although we dont have any now
+  const nonChangeableAddons = [currentAddons.supportPlan].filter(
+    (x) => x !== undefined
+  ) as DatabaseAddon[]
+
   // [Joshen] Scaffolded here
   const selectedAddons = {
     computeSize: selectedComputeSize,
@@ -122,8 +128,10 @@ const ProUpgrade: FC<Props> = ({
     if (!selectedTier) return
 
     const payload = formSubscriptionUpdatePayload(
+      currentSubscription,
       selectedTier,
       selectedAddons,
+      nonChangeableAddons,
       selectedPaymentMethodId,
       projectRegion
     )
@@ -142,8 +150,10 @@ const ProUpgrade: FC<Props> = ({
 
   const onConfirmPayment = async () => {
     const payload = formSubscriptionUpdatePayload(
+      currentSubscription,
       selectedTier,
       selectedAddons,
+      nonChangeableAddons,
       selectedPaymentMethodId,
       projectRegion
     )
