@@ -1,0 +1,194 @@
+[
+  {
+    "title": "Introduction",
+    "id": "introduction",
+    "slug": "introduction",
+    "isFunc": false
+  },
+  {
+    "title": "Projects",
+    "items": [
+      {
+        "id": "list-all-projects",
+        "title": "List all projects",
+        "slug": "list-all-projects",
+        "isFunc": true
+      },
+      {
+        "id": "create-a-project",
+        "title": "Create a project",
+        "slug": "create-a-project",
+        "isFunc": true
+      },
+      {
+        "id": "list-all-organizations",
+        "title": "List all organizations",
+        "slug": "list-all-organizations",
+        "isFunc": true
+      },
+      {
+        "id": "create-an-organization",
+        "title": "Create an organization",
+        "slug": "create-an-organization",
+        "isFunc": true
+      }
+    ]
+  },
+  {
+    "title": "Secrets",
+    "items": [
+      {
+        "id": "list-all-secrets",
+        "title": "List all secrets",
+        "slug": "list-all-secrets",
+        "isFunc": true
+      },
+      {
+        "id": "bulk-create-secrets",
+        "title": "Bulk create secrets",
+        "slug": "bulk-create-secrets",
+        "isFunc": true
+      },
+      {
+        "id": "bulk-delete-secrets",
+        "title": "Bulk delete secrets",
+        "slug": "bulk-delete-secrets",
+        "isFunc": true
+      }
+    ]
+  },
+  {
+    "title": "Typescript",
+    "items": [
+      {
+        "id": "generate-typescript-types",
+        "title": "Generate TypeScript types",
+        "slug": "generate-typescript-types",
+        "isFunc": true
+      }
+    ]
+  },
+  {
+    "title": "Functions",
+    "items": [
+      {
+        "id": "create-a-function",
+        "title": "Create a function",
+        "slug": "create-a-function",
+        "isFunc": true
+      },
+      {
+        "id": "list-all-functions",
+        "title": "List all functions",
+        "slug": "list-all-functions",
+        "isFunc": true
+      },
+      {
+        "id": "retrieve-a-function",
+        "title": "Retrieve a function",
+        "slug": "retrieve-a-function",
+        "isFunc": true
+      },
+      {
+        "id": "update-a-function",
+        "title": "Update a function",
+        "slug": "update-a-function",
+        "isFunc": true
+      },
+      {
+        "id": "delete-a-function",
+        "title": "Delete a function",
+        "slug": "delete-a-function",
+        "isFunc": true
+      },
+      {
+        "id": "retrieve-a-function-body",
+        "title": "Retrieve a function body",
+        "slug": "retrieve-a-function-body",
+        "isFunc": true
+      }
+    ]
+  },
+
+  {
+    "title": "Hostname",
+    "items": [
+      {
+        "id": "gets-projects-custom-hostname-config",
+        "title": "Gets project's custom hostname config",
+        "slug": "gets-projects-custom-hostname-config",
+        "isFunc": true
+      },
+      {
+        "id": "deletes-a-projects-custom-hostname-configuration",
+        "title": "Deletes a project's custom hostname configuration",
+        "slug": "deletes-a-projects-custom-hostname-configuration",
+        "isFunc": true
+      },
+      {
+        "id": "updates-projects-custom-hostname-configuration",
+        "title": "Updates project's custom hostname configuration",
+        "slug": "updates-projects-custom-hostname-configuration",
+        "isFunc": true
+      },
+      {
+        "id": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
+        "title": "Attempts to verify the DNS configuration for project's custom hostname configuration",
+        "slug": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
+        "isFunc": true
+      },
+      {
+        "id": "activates-a-custom-hostname-for-a-project",
+        "title": "Activates a custom hostname for a project.",
+        "slug": "activates-a-custom-hostname-for-a-project",
+        "isFunc": true
+      }
+    ]
+  },
+  {
+    "title": "pgsodium",
+    "items": [
+      {
+        "id": "gets-projects-pgsodium-config",
+        "title": "Gets project's pgsodium config",
+        "slug": "gets-projects-pgsodium-config",
+        "isFunc": true
+      },
+      {
+        "id": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
+        "title": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "slug": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
+        "isFunc": true
+      }
+    ]
+  },
+  {
+    "title": "Network",
+    "items": [
+      {
+        "id": "gets-projects-network-bans",
+        "title": "Gets project's network bans",
+        "slug": "gets-projects-network-bans",
+        "isFunc": true
+      },
+      {
+        "id": "remove-network-bans",
+        "title": "Remove network bans.",
+        "slug": "remove-network-bans",
+        "isFunc": true
+      },
+      {
+        "id": "gets-projects-network-restrictions",
+        "title": "Gets project's network restrictions",
+        "slug": "gets-projects-network-restrictions",
+        "isFunc": true
+      },
+      {
+        "id": "updates-projects-network-restrictions",
+        "title": "Updates project's network restrictions",
+        "slug": "updates-projects-network-restrictions",
+        "isFunc": true
+      }
+    ]
+  }
+]

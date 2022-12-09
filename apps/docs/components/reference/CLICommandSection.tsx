@@ -50,11 +50,12 @@ const CliCommandSection = (props) => {
 
   return (
     <RefSubLayout.Section
+      key={command.id}
       slug={command.id}
       title={'$ ' + command.title}
       id={command.id}
       monoFont={true}
-      scrollSpyHeader={false}
+      scrollSpyHeader={true}
     >
       <RefSubLayout.Details>
         <div className="grid ref-container" id={command.id}>

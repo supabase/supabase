@@ -12,6 +12,20 @@ import { NavigationMenuContextProvider } from './NavigationMenu.Context'
 import jsSpecNEW from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 // @ts-expect-error
 import dartSpecNEW from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
+import apiSpecRaw from '~/../../spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
+
+import libCommonSections from '~/../../spec/common-client-libs-sections.json'
+import cliCommonSections from '~/../../spec/common-cli-sections.json'
+import apiCommonSections from '~/../../spec/common-api-sections.json'
+
+// import { gen_v3 } from '~/lib/refGenerator/helpers'
+
+export type RefIdOptions =
+  | 'reference_javascript'
+  | 'reference_dart'
+  | 'reference_cli'
+  | 'reference_api'
+export type RefKeyOptions = 'javascript' | 'dart' | 'cli' | 'api'
 
 const SideNav = () => {
   const router = useRouter()
@@ -62,6 +76,9 @@ const SideNav = () => {
         break
       case url.includes(`/docs/reference/cli`) && url:
         setLevel('reference_cli')
+        break
+      case url.includes(`/docs/reference/api`) && url:
+        setLevel('reference_api')
         break
 
       default:
@@ -202,6 +219,11 @@ const SideNav = () => {
     ],
   ]
 
+  // generate Open API specs
+
+  // @ts-ignore
+  // const apiSpec = gen_v3(apiSpecRaw, 'wat', { apiUrl: 'apiv0' })
+
   return (
     <div className="flex relative">
       {/* // main menu */}
@@ -289,17 +311,30 @@ const SideNav = () => {
         key={'reference-js-menu'}
         id={'reference_javascript'}
         currentLevel={level}
-        setLevel={setLevel}
-        lib="js"
+        commonSections={libCommonSections}
+        lib="javascript"
       />
       <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart'}
         currentLevel={level}
-        setLevel={setLevel}
+        commonSections={libCommonSections}
         lib="dart"
       />
-      <NavigationMenuCliList id={'reference_cli'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuRefList
+        key={'reference-cli-menu'}
+        id={'reference_cli'}
+        currentLevel={level}
+        commonSections={cliCommonSections}
+        lib="cli"
+      />
+      <NavigationMenuRefList
+        key={'reference-api-menu'}
+        id={'reference_api'}
+        currentLevel={level}
+        commonSections={apiCommonSections}
+        lib="api"
+      />
     </div>
   )
 }

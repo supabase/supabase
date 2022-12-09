@@ -758,6 +758,26 @@ export const reference_cli = {
     },
   ],
 }
+export const reference_api = {
+  icon: '/img/icons/api-icon.svg',
+  title: 'Mangement API',
+  url: '/guides/reference/api',
+  parent: '/reference',
+  items: [
+    {
+      name: 'Getting Started',
+      items: [
+        {
+          name: 'fake link',
+          href: '/reference/javascript/start',
+          level: 'reference_javascript',
+          items: [],
+          icon: '/img/icons/javascript.svg',
+        },
+      ],
+    },
+  ],
+}
 
 // export const reference: [
 //   {
