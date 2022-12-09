@@ -448,17 +448,27 @@ export default function launchweek() {
             </Badge>
             <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackathon</h2>
             <p className="text-slate-900 w-[80%] lg:w-[50%]">
-              The Supabase Team will be taking part in the Hackathon and you'll find us live
-              building in our discord all week. For more info check the blog post.
+              The traditional parallel Hackathon is back! Build a new open source project with
+              Supabase and you can win $1500 in GitHub sponsorships and a coveted Supabase Darkmode
+              Keyboard! For more info check the{' '}
+              <a
+                href="https://supabase.com/blog/launch-week-6-hackathon"
+                target="_blank"
+                rel="nooper noreferrer"
+                className="text-brand-900"
+              >
+                blog post
+              </a>
+              .
             </p>
           </div>
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
-            <div className="sm:grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-7 sm:gap-y-16 basis-2/3 flex flex-col">
+            <div className="sm:grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-7 sm:gap-y-10 basis-2/3 flex flex-col">
               <div className="flex flex-col">
                 <h3 className="text-lg text-black dark:text-white mb-2">Prizes</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
-                  There are 5 categories to win, there will be prizes for a winner and a runner-up
-                  prize for each category.
+                  There are 5 categories to win, with prizes for winners and runner-ups of each
+                  category. Each team member gets a prize.
                 </p>
               </div>
               <div className="flex flex-col">
@@ -484,10 +494,19 @@ export default function launchweek() {
                     If you need help or advice when building, find other people to join your team,
                     or if you just want to chill and watch people build, come and join us!
                   </p>
+                  <div></div>
+                  <a
+                    href="https://discord.supabase.com/"
+                    rel="noopener noreferrer"
+                    className="text-brand-900 flex items-center"
+                    target="_blank"
+                  >
+                    Join our Discord <IconExternalLink size="small" className="inline-block ml-2" />
+                  </a>
                 </div>
               </div>
               <div className={'flex flex-col'}>
-                <h3 className="text-lg text-black dark:text-white mb-2">Submision</h3>
+                <h3 className="text-lg text-black dark:text-white mb-2">Submission</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
                   Submit your project through{' '}
                   <a
@@ -533,7 +552,7 @@ export default function launchweek() {
         </SectionContainer>
         <SectionContainer
           className={classNames(
-            'flex gap-6 min-h-[350px] !py-3 mb-11 flex-col-reverse md:flex-row',
+            'flex gap-6 min-h-[350px] !py-3 mb-11 flex-col-reverse md:flex-row mt-24',
             styleUtils.appear,
             styleUtils['appear-third']
           )}
