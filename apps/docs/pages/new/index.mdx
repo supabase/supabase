@@ -4,12 +4,15 @@ import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
 
 export const meta = {
   title: 'Supabase Docs',
-  description: 'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
+  description:
+    'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
   subtitle: 'Supabase Developer Documentation and API Reference',
 }
 
 <h2 className="text-base max-w-xl m-0">
-  Supabase is an open source Firebase alternative providing all the backend features you need to build a product. Choose a quickstart for an overview or dive straight into the different products and APIs.
+  Supabase is an open source Firebase alternative providing all the backend features you need to
+  build a product. Choose a quickstart for an overview or dive straight into the different products
+  and APIs.
 </h2>
 
 {/* start container */}
@@ -61,9 +64,21 @@ export const meta = {
             <Button size="small">Get started</Button>
             </div>
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
-              <IconPanel title="ReactJS" icon="/docs/img/icons/react-icon" />
+              <Link href={`/getting-started/quickstarts/reactjs`} passHref>
+                <a className="no-underline">
+                  <IconPanel title="ReactJS" icon="/docs/img/icons/react-icon" />
+                </a>
+              </Link>
+              <Link href={`/getting-started/quickstarts/nextjs`} passHref>
+                <a className="no-underline">
               <IconPanel title="NextJS" icon="/docs/img/icons/nextjs-icon" />
+              </a>
+              </Link>
+              <Link href={`/getting-started/quickstarts/flutter`} passHref>
+                <a className="no-underline">
               <IconPanel title="Flutter" icon="/docs/img/icons/flutter-icon" />
+              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -182,7 +197,8 @@ export const products = [
     icon: '/docs/img/icons/menu/database',
     hasLightIcon: true,
     href: '/guides/database',
-    description: 'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
+    description:
+      'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
     span: 'col-span-12 md:col-span-6',
   },
   {
@@ -190,7 +206,8 @@ export const products = [
     icon: '/docs/img/icons/menu/auth',
     hasLightIcon: true,
     href: '/guides/auth',
-    description: 'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
+    description:
+      'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
     span: 'col-span-12 md:col-span-6',
   },
   {
@@ -198,21 +215,24 @@ export const products = [
     icon: '/docs/img/icons/menu/storage',
     hasLightIcon: true,
     href: '/guides/storage',
-    description: 'Store, organize, transform, and serve large files—fully integrated with your Postgres database with Row Level Security access policies.',
+    description:
+      'Store, organize, transform, and serve large files—fully integrated with your Postgres database with Row Level Security access policies.',
   },
   {
     title: 'Realtime',
     icon: '/docs/img/icons/menu/realtime',
     hasLightIcon: true,
     href: '/guides/realtime',
-    description: 'Listen to database changes, store and sync user states across clients, broadcast data to clients subscribed to a channel, and more.',
+    description:
+      'Listen to database changes, store and sync user states across clients, broadcast data to clients subscribed to a channel, and more.',
   },
   {
     title: 'Edge Functions',
     icon: '/docs/img/icons/menu/functions',
     hasLightIcon: true,
     href: '/guides/functions',
-    description: 'Globally distributed, server-side functions to execute your code closest to your users for the lowest latency.',
+    description:
+      'Globally distributed, server-side functions to execute your code closest to your users for the lowest latency.',
   },
 ]
 
@@ -243,14 +263,16 @@ export const apis = [
     icon: '/docs/img/icons/cli-icon',
     hasLightIcon: true,
     href: 'reference/cli',
-    description: 'Use the Supabase CLI to develop your project locally, manage database migrations, and deploy to the Supabase Platform or self-host.',
+    description:
+      'Use the Supabase CLI to develop your project locally, manage database migrations, and deploy to the Supabase Platform or self-host.',
   },
   {
     title: 'Serverless APIs',
     icon: '/docs/img/icons/menu/reference',
     hasLightIcon: true,
     href: 'guides/api',
-    description: 'Instantly generate REST, GraphQL, and Realtime APIs directly from your database schema.',
+    description:
+      'Instantly generate REST, GraphQL, and Realtime APIs directly from your database schema.',
   },
   {
     title: 'Self-Hosting Server',
@@ -268,7 +290,8 @@ export const platform = [
     icon: '/docs/img/icons/menu/platform',
     hasLightIcon: true,
     href: 'guides/hosting/platform',
-    description: 'Learn more about the tools and services powering the Supabase Platform, available add-ons, and how to customize the platform for your needs.',
+    description:
+      'Learn more about the tools and services powering the Supabase Platform, available add-ons, and how to customize the platform for your needs.',
     span: 'col-span-12 lg:col-span-6',
   },
   {
