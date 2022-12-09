@@ -144,7 +144,7 @@ export default function launchweek() {
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-32">
+        <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
           <div
             className={classNames(
               styleUtils.appear,
@@ -430,8 +430,8 @@ export default function launchweek() {
             </SectionContainer>
           </>
         )}
-        <SectionContainer className="!pt-0 !pb-40">
-          <div className="flex flex-col items-center mb-32">
+        <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
+          <div className="flex flex-col items-center mb-16 lg:mb-32">
             <h1 className="text-black dark:text-white text-5xl text-center mb-9">
               Community Spotlight
             </h1>
@@ -447,7 +447,7 @@ export default function launchweek() {
             </p>
           </div>
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
-            <div className="grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-16 basis-2/3">
+            <div className="sm:grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-7 sm:gap-y-16 basis-2/3 flex flex-col">
               <div className="flex flex-col">
                 <h3 className="text-lg text-black dark:text-white mb-2">Prizes</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
