@@ -104,7 +104,7 @@ async function bot(request: Request) {
 
       const { data: updatedChallenge, error: updateError } = await supabaseAdminClient
         .from('discord_promise_challenge')
-        .update({ submission, resolved: true })
+        .update({ submission, resolved: true, updated_at: new Date().toISOString() })
         .match({ user_id: user.id, resolved: false })
         .select('promise')
         .single()
