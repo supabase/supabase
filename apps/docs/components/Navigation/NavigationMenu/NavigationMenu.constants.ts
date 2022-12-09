@@ -567,28 +567,25 @@ export const resources = {
       ],
     },
     {
-      name: 'Self-Hosting Auth',
+      name: 'Auth Server',
       items: [
-        { name: 'Auth Server', url: '/docs/reference/auth', items: [] },
-        { name: 'Configuration', url: '/docs/reference/auth/config', items: [] },
-        { name: 'Release Notes', url: '/docs/reference/auth/release-notes', items: [] },
+        { name: 'Auth Server', url: '/reference/auth', items: [] },
+        { name: 'Configuration', url: '/reference/auth/config', items: [] },
       ],
     },
     {
-      name: 'Self-Hosting Realtime',
+      name: 'Realtime Server',
       items: [
-        { name: 'Realtime Server', url: '/docs/reference/realtime', items: [] },
-        { name: 'Configuration', url: '/docs/reference/realtime/config', items: [] },
-        { name: 'Release Notes', url: '/docs/reference/realtime/release-notes', items: [] },
+        { name: 'Realtime Server', url: '/reference/realtime', items: [] },
+        { name: 'Configuration', url: '/reference/realtime/config', items: [] },
       ],
     },
     {
-      name: 'Self-Hosting Storage',
+      name: 'Storage Server',
       items: [
-        { name: 'Storage Server', url: '/docs/reference/storage', items: [] },
-        { name: 'Usage', url: '/docs/reference/storage/usage', items: [] },
-        { name: 'Configuration', url: '/docs/reference/storage/config', items: [] },
-        { name: 'Release Notes', url: '/docs/reference/storage/release-notes', items: [] },
+        { name: 'Storage Server', url: '/reference/storage', items: [] },
+        { name: 'Usage', url: '/reference/storage/usage', items: [] },
+        { name: 'Configuration', url: '/reference/storage/config', items: [] },
       ],
     },
   ],
