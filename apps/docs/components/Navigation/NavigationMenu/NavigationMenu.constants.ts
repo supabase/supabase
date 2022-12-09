@@ -778,6 +778,27 @@ export const reference_api = {
   ],
 }
 
+export const reference_self_hosting_server = {
+  icon: '/img/icons/self-hosting.svg',
+  title: 'Self Hosting Server',
+  url: '/guides/reference/api',
+  parent: '/reference',
+  items: [
+    {
+      name: 'Getting Started',
+      items: [
+        {
+          name: 'fake link',
+          href: '/reference/javascript/start',
+          level: 'reference_javascript',
+          items: [],
+          icon: '/img/icons/javascript.svg',
+        },
+      ],
+    },
+  ],
+}
+
 // export const reference: [
 //   {
 //     label: 'Official'

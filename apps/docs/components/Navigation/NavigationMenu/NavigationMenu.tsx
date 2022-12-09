@@ -25,7 +25,8 @@ export type RefIdOptions =
   | 'reference_dart'
   | 'reference_cli'
   | 'reference_api'
-export type RefKeyOptions = 'javascript' | 'dart' | 'cli' | 'api'
+  | 'reference_self_hosting_server'
+export type RefKeyOptions = 'javascript' | 'dart' | 'cli' | 'api' | 'self-hosting-server'
 
 const SideNav = () => {
   const router = useRouter()
@@ -79,6 +80,9 @@ const SideNav = () => {
         break
       case url.includes(`/docs/reference/api`) && url:
         setLevel('reference_api')
+        break
+      case url.includes(`/docs/reference/self-hosting-server`) && url:
+        setLevel('reference_self_hosting_server')
         break
 
       default:
@@ -213,8 +217,8 @@ const SideNav = () => {
       {
         label: 'Self-Hosting Server',
         icon: '/img/icons/menu/platform',
-        href: '/reference/javascript/start',
-        level: 'reference_javascript',
+        href: '/reference/self-hosting-server/start',
+        level: 'reference_self_hosting_server',
       },
     ],
   ]
@@ -334,6 +338,13 @@ const SideNav = () => {
         currentLevel={level}
         commonSections={apiCommonSections}
         lib="api"
+      />
+      <NavigationMenuRefList
+        key={'reference-self-hosting-server-menu'}
+        id={'reference_self_hosting_server'}
+        currentLevel={level}
+        commonSections={apiCommonSections}
+        lib="self-hosting-server"
       />
     </div>
   )
