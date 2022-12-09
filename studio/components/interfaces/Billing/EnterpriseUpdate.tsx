@@ -25,6 +25,7 @@ import {
 } from './'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
+import SupportPlan from './AddOns/SupportPlan'
 
 interface Props {
   products: { tiers: any[]; addons: DatabaseAddon[] }
@@ -53,6 +54,8 @@ const EnterpriseUpdate: FC<Props> = ({
   const pitrDurationOptions = formatPITROptions(addons)
   const customDomainOptions = formatCustomDomainOptions(addons)
   const currentAddons = getCurrentAddons(currentSubscription, addons)
+
+  console.log({ currentAddons })
 
   // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
   // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
@@ -199,6 +202,12 @@ const EnterpriseUpdate: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
+                    {currentAddons.supportPlan !== undefined && (
+                      <>
+                        <Divider light />
+                        <SupportPlan currentOption={currentAddons.supportPlan} />
+                      </>
+                    )}
                     {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
                       <>
                         <Divider light />

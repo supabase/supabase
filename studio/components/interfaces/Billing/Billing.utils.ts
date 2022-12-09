@@ -61,10 +61,17 @@ export const formSubscriptionUpdatePayload = (
 export const getCurrentAddons = (
   currentSubscription: StripeSubscription,
   addons: DatabaseAddon[]
-) => {
+): {
+  computeSize: DatabaseAddon
+  pitrDuration: DatabaseAddon
+  customDomains: DatabaseAddon
+  supportPlan?: DatabaseAddon
+} => {
   const computeSizes = formatComputeSizes(addons)
   const pitrDurationOptions = formatPITROptions(addons)
   const customDomainOptions = formatCustomDomainOptions(addons)
+
+  console.log({ currentSubscription })
 
   const computeSize =
     computeSizes.find((option: any) => {
@@ -79,10 +86,10 @@ export const getCurrentAddons = (
 
   const pitrDuration =
     pitrDurationOptions.find((option: any) => {
-      const subscriptionComputeSize = currentSubscription?.addons.find((addon) =>
+      const subscriptionPitrDuration = currentSubscription?.addons.find((addon) =>
         addon.supabase_prod_id.includes('_pitr_')
       )
-      return option.id === subscriptionComputeSize?.prod_id
+      return option.id === subscriptionPitrDuration?.prod_id
     }) ||
     (pitrDurationOptions.find(
       (option: any) => option.metadata.supabase_prod_id === 'addon_pitr_0days'
@@ -90,14 +97,21 @@ export const getCurrentAddons = (
 
   const customDomains =
     customDomainOptions.find((option: any) => {
-      const subscriptionComputeSize = currentSubscription?.addons.find((addon) =>
+      const subscriptionCustomDomain = currentSubscription?.addons.find((addon) =>
         addon.supabase_prod_id.includes('_custom_domains')
       )
-      return option.id === subscriptionComputeSize?.prod_id
+      return option.id === subscriptionCustomDomain?.prod_id
     }) ||
     (customDomainOptions.find(
-      (option: any) => option.metadata.supabase_prod_id === 'addon__custom_domains_disabled'
+      (option: any) => option.metadata.supabase_prod_id === 'addon_custom_domains_disabled'
     ) as DatabaseAddon)
 
-  return { computeSize, pitrDuration, customDomains }
+  const supportPlan = addons.find((option: any) => {
+    const subscriptionSupportPlan = currentSubscription?.addons.find((addon) =>
+      addon.supabase_prod_id.includes('_support_')
+    )
+    return option.id === subscriptionSupportPlan?.prod_id
+  })
+
+  return { computeSize, pitrDuration, customDomains, supportPlan }
 }
