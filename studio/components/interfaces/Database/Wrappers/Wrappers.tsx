@@ -138,11 +138,13 @@ const Wrappers = () => {
       ) : (
         <div>
           <div
-            className="w-full px-12 py-12 bg-no-repeat border rounded bg-scale-200 border-scale-500"
+            className="px-12 py-12 w-full bg-white dark:bg-scale-200 border border-scale-500 rounded bg-no-repeat"
             style={{
               backgroundSize: '45%',
-              backgroundPosition: '112% 50%',
-              backgroundImage: 'url("/img/vault.png")',
+              backgroundPosition: '105% 40%',
+              backgroundImage: ui.isDarkTheme
+                ? 'url("/img/wrappers-dark.png")'
+                : 'url("/img/wrappers-light.png")',
             }}
           >
             <div className="w-3/5 space-y-8">
@@ -151,7 +153,7 @@ const Wrappers = () => {
                 <p className="text-sm text-scale-1100">
                   Supabase Wrappers is a framework for building Postgres Foreign Data Wrappers (FDW)
                   which connect Postgres to external systems. Query your data warehouse or
-                  third-party APIs directly from your database
+                  third-party APIs directly from your database.
                 </p>
               </div>
               <div className="flex items-center space-x-2">
