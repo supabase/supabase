@@ -49,28 +49,35 @@ const RefSectionHandler = (props) => {
   return (
     <RefSubLayout>
       {props.sections.map((x) => {
-        switch (x.isFunc) {
-          case false:
+        switch (x.type) {
+          case 'markdown':
             const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
 
             return <RefEducationSection item={x} markdownContent={markdownData} />
             break
-
+          case 'function':
+            return (
+              <RefFunctionSection
+                funcData={x}
+                commonFuncData={x}
+                spec={props.spec}
+                typeSpec={props.typeSpec}
+              />
+            )
+          case 'cli-command':
+            return <CliCommandSection funcData={x} commonFuncData={x} spec={props.spec} />
+            break
+          case 'operation':
+            return <ApiOperationSection funcData={x} commonFuncData={x} spec={props.spec} />
           default:
-            if (props.type === 'cli') {
-              return <CliCommandSection funcData={x} commonFuncData={x} spec={props.spec} />
-            } else if (props.type === 'api') {
-              return <ApiOperationSection funcData={x} commonFuncData={x} spec={props.spec} />
-            } else {
-              return (
-                <RefFunctionSection
-                  funcData={x}
-                  commonFuncData={x}
-                  spec={props.spec}
-                  typeSpec={props.typeSpec}
-                />
-              )
-            }
+            return (
+              <RefFunctionSection
+                funcData={x}
+                commonFuncData={x}
+                spec={props.spec}
+                typeSpec={props.typeSpec}
+              />
+            )
             break
         }
       })}

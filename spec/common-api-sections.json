@@ -3,7 +3,7 @@
     "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
-    "isFunc": false
+    "type": "markdown"
   },
   {
     "title": "Projects",
@@ -12,25 +12,25 @@
         "id": "list-all-projects",
         "title": "List all projects",
         "slug": "list-all-projects",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "create-a-project",
         "title": "Create a project",
         "slug": "create-a-project",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "list-all-organizations",
         "title": "List all organizations",
         "slug": "list-all-organizations",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "create-an-organization",
         "title": "Create an organization",
         "slug": "create-an-organization",
-        "isFunc": true
+        "type": "operation"
       }
     ]
   },
@@ -41,19 +41,19 @@
         "id": "list-all-secrets",
         "title": "List all secrets",
         "slug": "list-all-secrets",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "bulk-create-secrets",
         "title": "Bulk create secrets",
         "slug": "bulk-create-secrets",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "bulk-delete-secrets",
         "title": "Bulk delete secrets",
         "slug": "bulk-delete-secrets",
-        "isFunc": true
+        "type": "operation"
       }
     ]
   },
@@ -64,7 +64,7 @@
         "id": "generate-typescript-types",
         "title": "Generate TypeScript types",
         "slug": "generate-typescript-types",
-        "isFunc": true
+        "type": "operation"
       }
     ]
   },
@@ -75,37 +75,37 @@
         "id": "create-a-function",
         "title": "Create a function",
         "slug": "create-a-function",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "list-all-functions",
         "title": "List all functions",
         "slug": "list-all-functions",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "retrieve-a-function",
         "title": "Retrieve a function",
         "slug": "retrieve-a-function",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "update-a-function",
         "title": "Update a function",
         "slug": "update-a-function",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "delete-a-function",
         "title": "Delete a function",
         "slug": "delete-a-function",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "retrieve-a-function-body",
         "title": "Retrieve a function body",
         "slug": "retrieve-a-function-body",
-        "isFunc": true
+        "type": "operation"
       }
     ]
   },
@@ -117,31 +117,31 @@
         "id": "gets-projects-custom-hostname-config",
         "title": "Gets project's custom hostname config",
         "slug": "gets-projects-custom-hostname-config",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "deletes-a-projects-custom-hostname-configuration",
         "title": "Deletes a project's custom hostname configuration",
         "slug": "deletes-a-projects-custom-hostname-configuration",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "updates-projects-custom-hostname-configuration",
         "title": "Updates project's custom hostname configuration",
         "slug": "updates-projects-custom-hostname-configuration",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
         "title": "Attempts to verify the DNS configuration for project's custom hostname configuration",
         "slug": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "activates-a-custom-hostname-for-a-project",
         "title": "Activates a custom hostname for a project.",
         "slug": "activates-a-custom-hostname-for-a-project",
-        "isFunc": true
+        "type": "operation"
       }
     ]
   },
@@ -152,13 +152,13 @@
         "id": "gets-projects-pgsodium-config",
         "title": "Gets project's pgsodium config",
         "slug": "gets-projects-pgsodium-config",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
         "title": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "slug": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
-        "isFunc": true
+        "type": "operation"
       }
     ]
   },
@@ -169,25 +169,25 @@
         "id": "gets-projects-network-bans",
         "title": "Gets project's network bans",
         "slug": "gets-projects-network-bans",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "remove-network-bans",
         "title": "Remove network bans.",
         "slug": "remove-network-bans",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "gets-projects-network-restrictions",
         "title": "Gets project's network restrictions",
         "slug": "gets-projects-network-restrictions",
-        "isFunc": true
+        "type": "operation"
       },
       {
         "id": "updates-projects-network-restrictions",
         "title": "Updates project's network restrictions",
         "slug": "updates-projects-network-restrictions",
-        "isFunc": true
+        "type": "operation"
       }
     ]
   }
