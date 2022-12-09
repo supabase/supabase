@@ -555,7 +555,7 @@ export const resources = {
         },
         {
           name: 'Managing Environments',
-          url: '/guides/resources/supabase-cli/managing-environments',
+          url: '/guides/cli/managing-environments',
           items: [],
         },
       ],
