@@ -18,6 +18,11 @@ export function getFDWCreateSql({
   formState,
   newTables,
 }: Pick<FDWCreateVariables, 'wrapper' | 'formState' | 'newTables'>) {
+  const newSchemasSql = newTables
+    .filter((table) => table.is_new_schema)
+    .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
+    .join('\n')
+
   const createWrapperSql = /* SQL */ `
     create foreign data wrapper ${wrapper.name}
     handler ${wrapper.handlerName}
@@ -81,13 +86,19 @@ export function getFDWCreateSql({
         .filter(Boolean)
 
       return /* SQL */ `
-        create foreign table ${newTable.table_name} (
+        create foreign table ${newTable.schema_name}.${newTable.table_name} (
           ${columns.map((column) => `${column.name} ${column.type}`).join(',\n          ')}
         )
         server ${wrapper.server.name}
         options (
           ${Object.entries(newTable)
-            .filter(([key]) => key !== 'table_name' && key !== 'columns' && key !== 'index')
+            .filter(
+              ([key]) =>
+                key !== 'table_name' &&
+                key !== 'schema_name' &&
+                key !== 'columns' &&
+                key !== 'index'
+            )
             .map(([key, value]) => `${key} '${value}'`)
             .join(',\n          ')}
         );
@@ -98,7 +109,7 @@ export function getFDWCreateSql({
   const sql = /* SQL */ `
     begin;
 
-    create extension if not exists wrappers;
+    ${newSchemasSql}
 
     ${createWrapperSql}
 
