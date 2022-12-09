@@ -515,7 +515,7 @@ export const resources = {
     { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
-      name: 'Migrating to Supabase',
+      name: 'Migrate to Supabase',
       url: '/guides/resources/migrating-to-supabase',
       items: [
         {
@@ -561,7 +561,7 @@ export const resources = {
       ],
     },
     {
-      name: 'Self Hosting',
+      name: 'Self-Hosting',
       items: [
         { name: 'Overview', url: '/guides/resources/self-hosting', items: [] },
         { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
@@ -571,7 +571,7 @@ export const resources = {
 }
 
 export const selfHosting = {
-  label: 'Self Hosting',
+  label: 'Self-Hosting',
   url: '/guides/self-hosting',
   items: [
     { name: 'Overview', url: '/guides/hosting/overview', items: [] },
@@ -838,7 +838,7 @@ export const references = [
     ],
   },
   {
-    label: 'Self Hosting',
+    label: 'Self-Hosting',
     items: [
       {
         label: 'Auth server',
