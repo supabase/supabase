@@ -41,7 +41,7 @@ const PITRDurationSelection: FC<Props> = ({
         <p className="text-sm text-scale-1100">
           Restore your database from a specific point in time
         </p>
-        {canUsePITR && (
+        {canUsePITR && !currentPitrDuration?.isLocked && (
           <div className="mt-2">
             <InformationBox
               icon={<IconAlertCircle strokeWidth={2} />}
@@ -72,6 +72,29 @@ const PITRDurationSelection: FC<Props> = ({
           }
           icon={<IconAlertCircle strokeWidth={2} />}
         />
+      ) : currentPitrDuration?.isLocked ? (
+        <div
+          className={[
+            'flex items-center justify-between block w-full rounded px-4 py-3',
+            'border border-scale-600 bg-scale-100 dark:border-scale-500 dark:bg-scale-400',
+          ].join(' ')}
+        >
+          <div className="space-y-3">
+            <h5 className="text-sm text-scale-1200">
+              Your project currently has {currentPitrDuration.name}
+            </h5>
+            <p className="text-sm text-scale-1100">
+              If you would like to change your PITR duration, do reach out to us
+            </p>
+          </div>
+          <div className="">
+            <Link href={`/support/new?ref=${ref}&category=sales&subject=Change%20PITR%20duration`}>
+              <a>
+                <Button>Contact us</Button>
+              </a>
+            </Link>
+          </div>
+        </div>
       ) : (
         <Radio.Group type="cards" className="billing-compute-radio">
           {pitrDurationOptions.map((option: any) => {

@@ -1,3 +1,4 @@
+import { add } from 'lodash'
 import { DatabaseAddon } from './AddOns/AddOns.types'
 import {
   formatComputeSizes,
@@ -58,6 +59,26 @@ export const formSubscriptionUpdatePayload = (
   }
 }
 
+const findAddon = (
+  subscription: StripeSubscription,
+  addons: DatabaseAddon[],
+  key: string,
+  defaultKey: string
+): DatabaseAddon => {
+  const product = addons.find((option) => {
+    const subscriptionAddon = subscription.addons.find((addon) =>
+      addon.supabase_prod_id.includes(key)
+    )
+    return option.id === subscriptionAddon?.prod_id
+  })
+  if (product === undefined) {
+    return addons.find((addon) => addon.metadata.supabase_prod_id === defaultKey) as DatabaseAddon
+  } else {
+    const subscriptionAddon = subscription.addons.find((addon) => addon.prod_id === product.id)
+    return { ...product, isLocked: subscriptionAddon?.unit_amount === 0 }
+  }
+}
+
 export const getCurrentAddons = (
   currentSubscription: StripeSubscription,
   addons: DatabaseAddon[]
@@ -71,42 +92,26 @@ export const getCurrentAddons = (
   const pitrDurationOptions = formatPITROptions(addons)
   const customDomainOptions = formatCustomDomainOptions(addons)
 
-  console.log({ currentSubscription })
+  const computeSize = findAddon(
+    currentSubscription,
+    computeSizes,
+    '_instance_',
+    'addon_instance_micro'
+  )
+  const pitrDuration = findAddon(
+    currentSubscription,
+    pitrDurationOptions,
+    '_pitr_',
+    'addon_pitr_0days'
+  )
+  const customDomains = findAddon(
+    currentSubscription,
+    customDomainOptions,
+    '_custom_domains',
+    'addon_custom_domains_disabled'
+  )
 
-  const computeSize =
-    computeSizes.find((option: any) => {
-      const subscriptionComputeSize = currentSubscription?.addons.find((addon) =>
-        addon.supabase_prod_id.includes('_instance_')
-      )
-      return option.id === subscriptionComputeSize?.prod_id
-    }) ||
-    (computeSizes.find(
-      (option: any) => option.metadata.supabase_prod_id === 'addon_instance_micro'
-    ) as DatabaseAddon)
-
-  const pitrDuration =
-    pitrDurationOptions.find((option: any) => {
-      const subscriptionPitrDuration = currentSubscription?.addons.find((addon) =>
-        addon.supabase_prod_id.includes('_pitr_')
-      )
-      return option.id === subscriptionPitrDuration?.prod_id
-    }) ||
-    (pitrDurationOptions.find(
-      (option: any) => option.metadata.supabase_prod_id === 'addon_pitr_0days'
-    ) as DatabaseAddon)
-
-  const customDomains =
-    customDomainOptions.find((option: any) => {
-      const subscriptionCustomDomain = currentSubscription?.addons.find((addon) =>
-        addon.supabase_prod_id.includes('_custom_domains')
-      )
-      return option.id === subscriptionCustomDomain?.prod_id
-    }) ||
-    (customDomainOptions.find(
-      (option: any) => option.metadata.supabase_prod_id === 'addon_custom_domains_disabled'
-    ) as DatabaseAddon)
-
-  const supportPlan = addons.find((option: any) => {
+  const supportPlan = addons.find((option) => {
     const subscriptionSupportPlan = currentSubscription?.addons.find((addon) =>
       addon.supabase_prod_id.includes('_support_')
     )
