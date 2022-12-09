@@ -41,9 +41,6 @@ export const gettingstarted = {
   title: 'Getting started',
   label: 'Overview',
   items: [
-    { name: 'Introduction', url: '/', items: [] },
-    { name: 'Features', url: '/features', items: [] },
-    { name: 'Architecture', url: '/architecture', items: [] },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -385,7 +382,7 @@ export const database = {
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
     { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
     { name: 'Database Functions', url: '/guides/database/functions', items: [] },
-    { name: 'Database Webhooks', url: '/guides/database/database-webhooks', items: [] },
+    { name: 'Database Webhooks', url: '/guides/database/webhooks', items: [] },
     { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
     { name: 'Database Testing', url: '/guides/database/testing', items: [] },
     {
@@ -446,7 +443,7 @@ export const functions = {
     { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
-    { name: 'Best practices', url: '/guides/functions/best-practices', items: [] },
+    { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
     { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     {
       name: 'Examples',
@@ -483,7 +480,7 @@ export const storage = {
   url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage', items: [] },
-    { name: 'CDN', url: '/guides/storage-cdn', items: [] },
+    { name: 'CDN', url: '/guides/storage/cdn', items: [] },
   ],
 }
 
@@ -493,12 +490,13 @@ export const platform = {
   url: '/guides/platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
+    { name: 'Architecture', url: '/architecture', items: [] },
     { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
     { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
     { name: 'Logging', url: '/guides/platform/logs', items: [] },
     { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
     {
-      name: 'Migrating and upgrading',
+      name: 'Migrating and Upgrading',
       url: '/guides/platform/migrating-and-upgrading-projects',
       items: [],
     },
@@ -513,6 +511,7 @@ export const resources = {
   url: '/guides/resources',
   items: [
     { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Features', url: '/features', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -626,8 +625,8 @@ export const integrations = {
         { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
         { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
         { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
-        { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
         { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
+        { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
       ],
     },
     {
