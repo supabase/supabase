@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { Button, IconExternalLink } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresExtension } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -37,7 +36,7 @@ const Wrappers = () => {
   const canToggleWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
   const onEnableWrappers = async () => {
-    if (wrappersExtension === undefined) return
+    if (wrappersExtension === undefined || vaultExtension === undefined) return
     setIsEnabling(true)
 
     const requiredExtensions = await Promise.all([
@@ -103,7 +102,7 @@ const Wrappers = () => {
       ) : (
         <div>
           <div
-            className="px-12 py-12 w-full bg-scale-200 border border-scale-500 rounded bg-no-repeat"
+            className="w-full px-12 py-12 bg-no-repeat border rounded bg-scale-200 border-scale-500"
             style={{
               backgroundSize: '45%',
               backgroundPosition: '112% 50%',
