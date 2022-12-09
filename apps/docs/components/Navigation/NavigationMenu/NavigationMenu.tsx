@@ -147,7 +147,7 @@ const SideNav = () => {
       {
         label: 'Integrations',
         icon: '/img/icons/menu/integrations',
-        href: '/guides/integrations',
+        href: 'https://supabase.com/partners/integrations',
         level: 'integrations',
       },
     ],
