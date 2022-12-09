@@ -128,7 +128,6 @@ export default function launchweek() {
   }
   const [day1, day2, day3, day4, day5] = days
 
-  console.log(isDarkMode)
   return (
     <>
       <NextSeo
@@ -165,7 +164,7 @@ export default function launchweek() {
             </div>
             <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
           </div>
-          {!process.env.NEXT_PUBLIC_LW_STARTED && (
+          {process.env.NEXT_PUBLIC_LW_STARTED && (
             <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
               <TicketContainer
                 supabase={supabase}
@@ -570,7 +569,7 @@ export default function launchweek() {
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!
               <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
-                <div className="text-brand-900 flex items-center">
+                <div className="text-brand-900 flex items-center mt-2">
                   See all the content
                   <IconExternalLink size="small" className="inline-block ml-1" />
                 </div>
@@ -586,7 +585,7 @@ export default function launchweek() {
                 {activeCreator !== null && (
                   <p className="text-slate-900 ">{creators[activeCreator].description}</p>
                 )}
-                <p className="text-brand-900">
+                <p className="text-brand-900 mt-1">
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
                     <span>
                       {creators[activeCreator].link_title}
