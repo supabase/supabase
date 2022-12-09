@@ -518,26 +518,79 @@ export default function launchweek() {
                 'flex basis-1/3 flex-col px-5'
               )}
             >
-              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit self-end">
-                <h3 className="text-black dark:text-white">Made with Supabase</h3>
-                <p className="text-slate-1000 text-xs">Short description of project</p>
-              </div>
-              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit">
-                <h3 className="text-black dark:text-white">Made with Supabase</h3>
-                <p className="text-slate-1000 text-xs">Short description of project</p>
-              </div>
-              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit self-end">
-                <h3 className="text-black dark:text-white">Made with Supabase</h3>
-                <p className="text-slate-1000 text-xs">Short description of project</p>
-              </div>
-              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit">
-                <h3 className="text-black dark:text-white">Made with Supabase</h3>
-                <p className="text-slate-1000 text-xs">Short description of project</p>
-              </div>
-              <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl px-5 py-4 mb-4 bg-white dark:bg-[#121212] w-fit self-end">
-                <h3 className="text-black dark:text-white">Made with Supabase</h3>
-                <p className="text-slate-1000 text-xs">Short description of project</p>
-              </div>
+              <a
+                href="https://github.com/psteinroe/supabase-cache-helpers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-end"
+              >
+                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                  <img
+                    src="/images/launchweek/link.svg"
+                    className="absolute top-[10px] right-[10px] text-brand-900"
+                  ></img>
+                  <h3 className="text-black dark:text-white">Supabase Cache Helpers</h3>
+                  <p className="text-slate-1000 text-xs">Previous Best Overall Project Winner</p>
+                </div>
+              </a>
+              <a
+                href="https://github.com/psteinroe/supabase-cache-helpers"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                  <img
+                    src="/images/launchweek/link.svg"
+                    className="absolute top-[10px] right-[10px] text-brand-900"
+                  ></img>
+                  <h3 className="text-black dark:text-white">Super UI</h3>
+                  <p className="text-slate-1000 text-xs">Previous Best Overall Project Runner Up</p>
+                </div>
+              </a>
+              <a
+                href="https://github.com/psteinroe/supabase-cache-helpers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-end"
+              >
+                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                  <img
+                    src="/images/launchweek/link.svg"
+                    className="absolute top-[10px] right-[10px] text-brand-900"
+                  ></img>
+                  <h3 className="text-black dark:text-white">Quid Faciam Hodie?</h3>
+                  <p className="text-slate-1000 text-xs">Winner Best Flutter Project</p>
+                </div>
+              </a>
+              <a
+                href="https://github.com/psteinroe/supabase-cache-helpers"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                  <img
+                    src="/images/launchweek/link.svg"
+                    className="absolute top-[10px] right-[10px] text-brand-900"
+                  ></img>
+                  <h3 className="text-black dark:text-white">That Hot Dog Game</h3>
+                  <p className="text-slate-1000 text-xs">Previous Winner: Most Fun/Interesting</p>
+                </div>
+              </a>
+              <a
+                href="https://github.com/psteinroe/supabase-cache-helpers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-end"
+              >
+                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                  <img
+                    src="/images/launchweek/link.svg"
+                    className="absolute top-[10px] right-[10px] text-brand-900"
+                  ></img>
+                  <h3 className="text-black dark:text-white">RepoWatch</h3>
+                  <p className="text-slate-1000 text-xs">Previous Winner Best Realtime Project</p>
+                </div>
+              </a>
             </div>
           </div>
         </SectionContainer>
