@@ -1,4 +1,4 @@
-import { Step } from 'next-seo/lib/types'
+//import { Step } from 'next-seo/lib/types'
 import React, { FC } from 'react'
 
 interface IStep {
@@ -59,8 +59,8 @@ const Step: FC<IStep> = ({ children, title, step }) => {
       >
         <div className="flex items-center gap-6">
           <div
-            className="border bg-white dark:bg-scale-400 
-          border-scale-600 flex items-center justify-center rounded-full 
+            className="border bg-white dark:bg-scale-400
+          border-scale-600 flex items-center justify-center rounded-full
           w-6 h-6 text-xs text-scale-1200 font-normal font-mono
           dropshadow-sm
           "

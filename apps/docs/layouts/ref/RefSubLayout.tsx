@@ -3,7 +3,6 @@ import { FC } from 'react'
 import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { useRouter } from 'next/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
-import { route } from 'next/dist/server/router'
 import { menuState } from '~/hooks/useMenuState'
 
 interface ISectionContainer {
