@@ -564,31 +564,31 @@ export const resources = {
       items: [
         { name: 'Overview', url: '/guides/resources/self-hosting', items: [] },
         { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
-        {
-          name: 'Auth Server',
-          items: [
-            { name: 'Overview', url: '/docs/reference/auth', items: [] },
-            { name: 'Configuration', url: '/docs/reference/auth/config', items: [] },
-            { name: 'Release Notes', url: '/docs/reference/auth/release-notes', items: [] },
-          ],
-        },
-        {
-          name: 'Realtime Server',
-          items: [
-            { name: 'Overview', url: '/docs/reference/realtime', items: [] },
-            { name: 'Configuration', url: '/docs/reference/realtime/config', items: [] },
-            { name: 'Release Notes', url: '/docs/reference/realtime/release-notes', items: [] },
-          ],
-        },
-        {
-          name: 'Storage Server',
-          items: [
-            { name: 'Overview', url: '/docs/reference/storage', items: [] },
-            { name: 'Usage', url: '/docs/reference/storage/usage', items: [] },
-            { name: 'Configuration', url: '/docs/reference/storage/config', items: [] },
-            { name: 'Release Notes', url: '/docs/reference/storage/release-notes', items: [] },
-          ],
-        },
+      ],
+    },
+    {
+      name: 'Self-Hosting Auth',
+      items: [
+        { name: 'Auth Server', url: '/docs/reference/auth', items: [] },
+        { name: 'Configuration', url: '/docs/reference/auth/config', items: [] },
+        { name: 'Release Notes', url: '/docs/reference/auth/release-notes', items: [] },
+      ],
+    },
+    {
+      name: 'Self-Hosting Realtime',
+      items: [
+        { name: 'Realtime Server', url: '/docs/reference/realtime', items: [] },
+        { name: 'Configuration', url: '/docs/reference/realtime/config', items: [] },
+        { name: 'Release Notes', url: '/docs/reference/realtime/release-notes', items: [] },
+      ],
+    },
+    {
+      name: 'Self-Hosting Storage',
+      items: [
+        { name: 'Storage Server', url: '/docs/reference/storage', items: [] },
+        { name: 'Usage', url: '/docs/reference/storage/usage', items: [] },
+        { name: 'Configuration', url: '/docs/reference/storage/config', items: [] },
+        { name: 'Release Notes', url: '/docs/reference/storage/release-notes', items: [] },
       ],
     },
   ],
