@@ -43,7 +43,7 @@ const CustomDomainSelection: FC<Props> = ({
         >
           <div className="space-y-3">
             <h5 className="text-sm text-scale-1200">
-              Your project currently has custom domains enabled
+              Your project currently has custom domains included
             </h5>
             <p className="text-sm text-scale-1100">
               If you would like to disable custom domains, do reach out to us

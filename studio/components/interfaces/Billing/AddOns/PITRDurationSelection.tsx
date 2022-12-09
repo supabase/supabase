@@ -81,7 +81,7 @@ const PITRDurationSelection: FC<Props> = ({
         >
           <div className="space-y-3">
             <h5 className="text-sm text-scale-1200">
-              Your project currently has {currentPitrDuration.name}
+              Your project currently has {currentPitrDuration.name} included
             </h5>
             <p className="text-sm text-scale-1100">
               If you would like to change your PITR duration, do reach out to us
