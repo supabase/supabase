@@ -382,7 +382,7 @@ export const database = {
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
     { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
     { name: 'Database Functions', url: '/guides/database/functions', items: [] },
-    { name: 'Database Webhooks', url: '/guides/database/database/webhooks', items: [] },
+    { name: 'Database Webhooks', url: '/guides/database/webhooks', items: [] },
     { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
     { name: 'Database Testing', url: '/guides/database/testing', items: [] },
     {
