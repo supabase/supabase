@@ -81,7 +81,7 @@ export default function Oss() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <div className="grow bg-gray-200 dark:bg-gray-400 p-4 rounded-lg">
+                      <div className="grow bg-gray-300 dark:bg-gray-400 p-4 rounded-lg">
                         <div className="flex gap-4 shrink-0">
                           <Image
                             className="rounded-full my-0"
@@ -112,7 +112,7 @@ export default function Oss() {
               {repos.length < 1 && <div></div>}
               {repos.length >= 1 &&
                 repos.map((props: any, idx: any) => (
-                  <div className="bg-gray-200 dark:bg-gray-400 p-4 rounded-lg" key={idx}>
+                  <div className="bg-gray-300 dark:bg-gray-400 p-4 rounded-lg" key={idx}>
                     <a className="h-full" href={props.html_url}>
                       <div className="card__body">
                         <h4 className="uppercase my-2 font-semibold">{props.name}</h4>
