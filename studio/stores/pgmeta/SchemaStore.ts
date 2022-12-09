@@ -10,7 +10,7 @@ export interface ISchemaStore extends IPostgresMetaInterface<PostgresSchema> {
   loadViews: (schema: string) => Promise<any | { error: ResponseError }>
 }
 export default class SchemaStore extends PostgresMetaInterface<PostgresSchema> {
-  views: SchemaView[]
+  views: SchemaView[] = []
 
   constructor(
     rootStore: IRootStore,
