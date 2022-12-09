@@ -18,6 +18,7 @@ import { Accordion, Badge, IconExternalLink } from 'ui'
 import { WeekDayProps } from '~/components/LaunchWeek/types'
 
 import styles from './launchWeek.module.css'
+import Image from 'next/image'
 
 const days = _days as WeekDayProps[]
 const constellation = [
@@ -205,11 +206,15 @@ export default function launchweek() {
         {process.env.NEXT_PUBLIC_LW_STARTED && (
           <>
             <SectionContainer className="!pt-0 ">
-              <div className="border rounded-2xl border-slate-400 text-sm px-5 py-7 flex flex-col sm:flex-row justify-between items-center">
+              <div className="border rounded-2xl border-slate-400 text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex">
-                    <div className="bg-[url('/images/launchweek/copple.png')] h-[42px] w-[42px] z-10 bg-contain"></div>
-                    <div className="bg-[url('/images/launchweek/ant.png')] h-[42px] w-[42px] ml-[-10px] bg-contain"></div>
+                    <Image
+                      src="/images/launchweek/antcopple.png"
+                      className="rounded-xl w-32 h-32"
+                      width={128}
+                      height={72}
+                    ></Image>
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">Who we hire at Supabase</span>
