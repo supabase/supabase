@@ -33,7 +33,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   if (!item) return <></>
 
   if (item && !item['$ref']) {
-    console.warn('🚩 issue with $ref in:', item.id)
+    //console.warn('🚩 issue with $ref in:', item.id)
   }
 
   // console.log(item)
