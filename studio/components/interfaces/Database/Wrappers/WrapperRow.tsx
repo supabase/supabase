@@ -132,7 +132,6 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
         category: 'success',
         message: `Successfully created ${wrapper.label} foreign data wrapper`,
       })
-      onOpen('')
       setNewTables([])
       setFormState(getInitialFormState)
     } catch (error: any) {
@@ -296,7 +295,9 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                         {newTables.map((table, i) => (
                           <div className="border border-scale-600 px-4 py-2 rounded-md space-y-1 flex items-center justify-between">
                             <div>
-                              <p className="text-sm">{table.table_name}</p>
+                              <p className="text-sm">
+                                {table.schema_name}.{table.table_name}
+                              </p>
                               <p className="text-sm text-scale-1000">
                                 {wrapper.tables[table.index].label}: {table.columns.join(', ')}
                               </p>
