@@ -385,7 +385,7 @@ export const database = {
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
     { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
     { name: 'Database Functions', url: '/guides/database/functions', items: [] },
-    { name: 'Database Webhooks', url: '/guides/database/database-webhooks', items: [] },
+    { name: 'Database Webhooks', url: '/guides/database/database/webhooks', items: [] },
     { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
     { name: 'Database Testing', url: '/guides/database/testing', items: [] },
     {
@@ -446,7 +446,7 @@ export const functions = {
     { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
-    { name: 'Best practices', url: '/guides/functions/best-practices', items: [] },
+    { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
     { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     {
       name: 'Examples',
@@ -483,7 +483,7 @@ export const storage = {
   url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage', items: [] },
-    { name: 'CDN', url: '/guides/storage-cdn', items: [] },
+    { name: 'CDN', url: '/guides/storage/cdn', items: [] },
   ],
 }
 
@@ -498,7 +498,7 @@ export const platform = {
     { name: 'Logging', url: '/guides/platform/logs', items: [] },
     { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
     {
-      name: 'Migrating and upgrading',
+      name: 'Migrating and Upgrading',
       url: '/guides/platform/migrating-and-upgrading-projects',
       items: [],
     },
@@ -626,8 +626,8 @@ export const integrations = {
         { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
         { name: 'Snaplet', url: '/guides/integrations/snaplet', items: [] },
         { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
-        { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
         { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
+        { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
       ],
     },
     {
