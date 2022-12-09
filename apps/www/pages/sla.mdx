@@ -1,17 +1,12 @@
 import Layout from '../layouts/Layout'
+import SectionContainer from '../components/Layouts/SectionContainer'
 
 export const meta = {
   title: 'Service Level Agreement',
   description: 'Supabase Service Level Agreement',
 }
 
-export const Section = ({ children }) => (
-  <div className='m-10'>
-    {children}
-  </div>
-)
-
-<Section>
+<SectionContainer>
 
 # Service Level Agreement
 
@@ -99,6 +94,6 @@ An Information request about Supabase or feature request.
 
 Business hours are from 6am to 6pm (local time), except where otherwise stated.
 
-</Section>
+</SectionContainer>
 
 export default (context) => <Layout meta={meta} children={context.children} context={context} />
