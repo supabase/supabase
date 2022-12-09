@@ -1,12 +1,11 @@
 import { FC, useState } from 'react'
 import { IconXCircle } from '~/../../packages/ui'
-import { AcceptedValue } from '~/pages/reference/cli/[...slug]'
 
 interface IOptions {
   name?: string
 }
 
-type IOption = AcceptedValue | any
+type IOption = any
 
 type OptionsSubComponents = {
   Option: IOption

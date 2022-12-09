@@ -1,11 +1,10 @@
 import { FC } from 'react'
-import { Flag } from '~/pages/reference/cli/[...slug]'
 
-type IParamProps = Flag | any
+type IParamProps = any
 
 const Param: FC<IParamProps> = (paramItem) => {
   return (
-    <div className="border-t border-b py-5 flex flex-col gap-3">
+    <li className="border-t border-b py-5 flex flex-col gap-3">
       <div className="flex gap-3 items-center">
         <span className="text-sm text-scale-1200 font-mono font-medium">
           {paramItem.name ?? 'no-name'}
@@ -23,7 +22,7 @@ const Param: FC<IParamProps> = (paramItem) => {
       </div>
       <p className="text-sm text-scale-1000 m-0">{paramItem.description ?? 'nodescription'}</p>
       {paramItem.children}
-    </div>
+    </li>
   )
 }
 

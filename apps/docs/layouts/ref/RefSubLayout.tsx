@@ -54,9 +54,10 @@ const Section: FC<ISectionContainer> = (props) => {
   return (
     <article
       key={props.id}
-      className={`${
-        props.singleColumn ? 'prose dark:prose-dark py-16 lg:py-32 w-full' : 'py-16 lg:py-32 w-full'
-      }`}
+      className={[
+        props.singleColumn ? 'prose dark:prose-dark w-full' : 'w-full',
+        'py-16 lg:py-32 first:pt-8 last:pb-8',
+      ].join(' ')}
     >
       <StickyHeader {...props} />
       <div
@@ -124,7 +125,10 @@ const EducationRow: FC<IEducationRow> = (props) => {
 const EducationSection: FC<IEducationSection> = ({ hideTitle = false, ...props }) => {
   // console.log({ props })
   return (
-    <article key={props.id} className={`${'prose dark:prose-dark max-w-none py-16 lg:py-32'}`}>
+    <article
+      key={props.id}
+      className={'prose dark:prose-dark max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
+    >
       {!hideTitle && <StickyHeader {...props} />}
       {props.children}
     </article>

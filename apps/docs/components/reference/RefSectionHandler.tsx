@@ -7,6 +7,7 @@ import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
 import OldLayout from '~/layouts/Default'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
 
 interface Props {
@@ -58,6 +59,8 @@ const RefSectionHandler = (props) => {
           default:
             if (props.type === 'cli') {
               return <CliCommandSection funcData={x} commonFuncData={x} spec={props.spec} />
+            } else if (props.type === 'api') {
+              return <ApiOperationSection funcData={x} commonFuncData={x} spec={props.spec} />
             } else {
               return (
                 <RefFunctionSection

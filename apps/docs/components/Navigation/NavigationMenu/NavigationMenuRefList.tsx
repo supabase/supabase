@@ -7,17 +7,17 @@ import * as NavItems from './NavigationMenu.constants'
 import { find } from 'lodash'
 import Image from 'next/image'
 import { memo } from 'react'
-import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
+
+// import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
+
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
-
-const allFunctions = clientLibsCommonSections
+import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
 const FunctionLink = ({
   title,
   id,
   icon,
-  product,
   library,
   slug,
 }: {
@@ -30,7 +30,6 @@ const FunctionLink = ({
   slug: string
 }) => {
   const router = useRouter()
-  // const { activeRefItem } = useNavigationMenuContext()
   const activeAccordianItem = useMenuActiveRefId()
 
   const active = activeAccordianItem === id
@@ -63,34 +62,56 @@ const Divider = () => {
   return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
 }
 
-const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
+interface INavigationMenuRefList {
+  currentLevel: string
+
+  id: RefIdOptions
+  lib: RefKeyOptions
+  commonSections: any[] // to do type up
+}
+
+const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
+  currentLevel,
+
+  id,
+  lib,
+  commonSections,
+}) => {
   const router = useRouter()
 
-  const allCurrentFunctions = allFunctions
-  // .map((fn: any) => {
-  //   if (fn.items.flat().find((item) => item.libs.includes(lib))) return fn
-  // })
-  // .filter((item) => item)
+  let sections = commonSections
 
-  // const introItems = Object.values(clientLibsCommonSections.sections.intro[lib].items)
+  // console.log('sections', sections)
+  if (!sections) console.error('no common sections imported')
 
   const menu = NavItems[id]
 
-  const databaseFunctions = find(allFunctions, { title: 'Database' }).items
+  const databaseFunctions = find(sections, { title: 'Database' })
+    ? find(sections, { title: 'Database' }).items
+    : []
 
-  const filterIds = find(databaseFunctions, {
-    id: 'using-filters',
-  }).items.map((x) => x.id)
+  const filterIds =
+    databaseFunctions.length > 0
+      ? find(databaseFunctions, {
+          id: 'using-filters',
+        }) &&
+        find(databaseFunctions, {
+          id: 'using-filters',
+        }).items.map((x) => x.id)
+      : []
 
-  const modifierIds = find(databaseFunctions, {
-    id: 'using-modifiers',
-  }).items.map((x) => x.id)
+  const modifierIds =
+    databaseFunctions.length > 0
+      ? find(databaseFunctions, {
+          id: 'using-modifiers',
+        }) &&
+        find(databaseFunctions, {
+          id: 'using-modifiers',
+        }).items.map((x) => x.id)
+      : []
 
-  // return (
-  //   <>
-  //     <h1>something</h1>
-  //   </>
-  // )
+  // console.log(filterIds)
+  // console.log(modifierIds)
 
   return (
     <div
@@ -107,7 +128,6 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
-        {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
         <Link href="/" passHref>
           <a
             className={[
@@ -123,8 +143,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
             <span>Back to Main Menu</span>
           </a>
         </Link>
-        {/* )} */}
-        {/* {process.env.NEXT_PUBLIC_EXPERIMENTAL_REF !== 'true' && ( */}
+
         <div className="flex items-center gap-3 my-3">
           <Image
             alt={id}
@@ -145,23 +164,15 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
         {/* )} */}
 
         <ul className="function-link-list">
-          {/* {introItems.map((item) => (
-            // @ts-ignore
-            <FunctionLink library={menu.title} {...item} />
-          ))} */}
-
-          {allCurrentFunctions.map((fn: any) => {
-            // const toplevelItems = fn.items.filter((item) => !item.parent)
-            // toplevelItems.map((item) => <li>{item.title}</li>)
-
+          {sections.map((fn: any) => {
             const RenderLink = (props) => {
               const activeAccordianItem = useMenuActiveRefId()
               let active = false
 
-              //console.log('render link id', props.id)
-
-              const isFilter = filterIds.includes(activeAccordianItem)
-              const isModifier = modifierIds.includes(activeAccordianItem)
+              const isFilter =
+                filterIds && filterIds.length > 0 && filterIds.includes(activeAccordianItem)
+              const isModifier =
+                modifierIds && modifierIds.length > 0 && modifierIds.includes(activeAccordianItem)
 
               if (
                 (isFilter && !isModifier && props.id === 'using-filters') ||
@@ -191,17 +202,15 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
                   value={active ? props.id : ''}
                 >
                   <Accordion.Item key={props.id + '-accordian-item'} value={props.id}>
-                    <FunctionLink {...props} library={props.library} />
+                    <FunctionLink {...props} library={lib} />
                     <Accordion.Content
                       key={props.id + '-sub-items-accordion-container'}
                       className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2"
                     >
                       {props.items &&
-                        props.items
-                          .filter((item) => item.libs.includes(lib))
-                          .map((item) => {
-                            return <FunctionLink {...item} library={menu.title} />
-                          })}
+                        props.items.map((item) => {
+                          return <FunctionLink {...item} library={lib} />
+                        })}
                     </Accordion.Content>
                   </Accordion.Item>
                 </Accordion.Root>
@@ -216,7 +225,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
                   <SideMenuTitle title={fn.title} />
                   {fn.items &&
                     fn.items
-                      .filter((item) => item.libs.includes(lib))
+                      // .filter((item) => item.libs.includes(lib))
                       .map((item) => <RenderLink {...item} library={menu.title} />)}
                 </>
               )
@@ -227,14 +236,14 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
                   <RenderLink {...fn} library={menu.title} />
                   {fn.items &&
                     fn.items
-                      .filter((item) => item.libs.includes(lib))
+                      // .filter((item) => item.libs.includes(lib))
                       .map((item) => <RenderLink {...item} library={menu.title} />)}
                 </>
               )
             }
           })}
         </ul>
-        {menu.extras && (
+        {/* {menu.extras && (
           <>
             <Divider />{' '}
             <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-2">
@@ -262,7 +271,7 @@ const NavigationMenuRefList = ({ currentLevel, setLevel, id, lib }) => {
               </li>
             </div>
           )
-        })}
+        })} */}
       </div>
     </div>
   )
