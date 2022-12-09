@@ -37,13 +37,13 @@ export default function Sponsors() {
   ]
 
   return (
-    <div>
+    <div className="mt-8">
       {tiers.map(
         (t, index) =>
           !!t.transactions.length && (
-            <div key={index}>
-              <h4 className="font-bold">{t.heading}</h4>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 pl-4">
+            <div key={index} className="mt-8">
+              <h4 className="font-bold mt-2">{t.heading}</h4>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 pl-4 mt-4">
                 {t.transactions.map((x: any, index: any) => (
                   <div className="" key={index}>
                     <a
