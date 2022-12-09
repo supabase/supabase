@@ -4,10 +4,8 @@ import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconExternalLink } from 'ui'
 
-import { FormHeader } from 'components/ui/Forms'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useStore } from 'hooks'
-import { PostgresExtension } from '@supabase/postgres-meta'
 
 interface Props {}
 
@@ -15,13 +13,7 @@ const VaultToggle: FC<Props> = () => {
   const { meta, ui } = useStore()
   const [isEnabling, setIsEnabling] = useState(false)
   const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
-
-  const [vaultExtension] = meta.extensions.list(
-    (ext: PostgresExtension) => ext.name.toLowerCase() === 'supabase_vault'
-  )
-
-  // [Joshen TODO] Need to put this logic correctly once i can toggle vault extension
-  const isEnabled = vaultExtension?.installed_version !== null
+  const vaultExtension = meta.extensions.byId('supabase_vault')
 
   const onEnableVault = async () => {
     if (vaultExtension === undefined) return
@@ -51,6 +43,7 @@ const VaultToggle: FC<Props> = () => {
         category: 'error',
         message: `Failed to enable Vault for your project: ${createExtensionError.message}`,
       })
+      setIsEnabling(false)
     } else {
       ui.setNotification({
         category: 'success',
@@ -62,11 +55,13 @@ const VaultToggle: FC<Props> = () => {
   return (
     <div>
       <div
-        className="px-12 py-12 w-full bg-scale-200 border border-scale-500 rounded bg-no-repeat"
+        className="px-12 py-12 w-full bg-white dark:bg-scale-200 border border-scale-500 rounded bg-no-repeat"
         style={{
-          backgroundSize: '45%',
-          backgroundPosition: '112% 50%',
-          backgroundImage: 'url("/img/vault.png")',
+          backgroundSize: '40%',
+          backgroundPosition: '100% 24%',
+          backgroundImage: ui.isDarkTheme
+            ? 'url("/img/vault-dark.png")'
+            : 'url("/img/vault-light.png")',
         }}
       >
         <div className="w-3/5 space-y-8">
