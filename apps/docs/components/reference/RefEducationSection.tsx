@@ -5,7 +5,7 @@ import components from '~/components'
 const RefEducationSection = (props) => {
   // gracefully reject pages we can't render
   if (!props.markdownContent) {
-    console.log(props.item.id)
+    //console.log(props.item.id)
     return <div></div>
   }
 
