@@ -46,9 +46,12 @@ export const formSubscriptionUpdatePayload = (
     region === 'af-south-1'
       ? []
       : [
-          computeSize.prices[0].id,
-          pitrDuration?.prices?.[0].id,
-          customDomains?.prices?.[0].id,
+          computeSize.prices.find((price) => price.id === computeSize.metadata.default_price_id)
+            ?.id,
+          pitrDuration.prices.find((price) => price.id === pitrDuration.metadata.default_price_id)
+            ?.id,
+          customDomains.prices.find((price) => price.id === customDomains.metadata.default_price_id)
+            ?.id,
         ].filter((x) => x !== undefined)
   const proration_date = Math.floor(Date.now() / 1000)
   return {
