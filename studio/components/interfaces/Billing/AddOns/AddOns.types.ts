@@ -8,6 +8,8 @@ export interface DatabaseAddon {
     default_price_id?: string
     supabase_prod_id: string
   }
+  // UI specific, do not allow changes if add on has a $0 price to it
+  isLocked?: boolean
 }
 
 export interface AddonPrice {
