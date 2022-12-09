@@ -362,6 +362,7 @@ test('bug: nav to explorer preserves newlines', async () => {
   await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent('\n')))
 })
 test('filters alter generated query', async () => {
+  jest.setTimeout(10000)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   userEvent.click(await screen.findByRole('button', { name: 'Status' }))
   userEvent.click(await screen.findByText(/500 error codes/))
@@ -391,9 +392,10 @@ test('filters alter generated query', async () => {
 
   await waitFor(() => {
     // counts are adjusted
-    expect(get).not.toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/))
+    expect(get).not.toHaveBeenCalledWith(
+      expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/)
+    )
     expect(get).toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+400.+499/))
-
 
     expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
     expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
