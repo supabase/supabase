@@ -362,7 +362,6 @@ test('bug: nav to explorer preserves newlines', async () => {
   await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent('\n')))
 })
 test('filters alter generated query', async () => {
-  jest.setTimeout(10000)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   userEvent.click(await screen.findByRole('button', { name: 'Status' }))
   userEvent.click(await screen.findByText(/500 error codes/))
