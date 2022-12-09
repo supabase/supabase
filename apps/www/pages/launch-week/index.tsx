@@ -208,8 +208,8 @@ export default function launchweek() {
               <div className="border rounded-2xl border-slate-400 text-sm px-5 py-7 flex flex-col sm:flex-row justify-between items-center">
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex">
-                    <div className="bg-[url('/images/launchweek/copple.png')] h-[42px] w-[42px] z-10"></div>
-                    <div className="bg-[url('/images/launchweek/ant.png')] h-[42px] w-[42px] ml-[-10px]"></div>
+                    <div className="bg-[url('/images/launchweek/copple.png')] h-[42px] w-[42px] z-10 bg-contain"></div>
+                    <div className="bg-[url('/images/launchweek/ant.png')] h-[42px] w-[42px] ml-[-10px] bg-contain"></div>
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">Who we hire at Supabase</span>
@@ -580,7 +580,7 @@ export default function launchweek() {
             <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
               Live
             </Badge>
-            <h2 className="text-4xl dark:text-white mb-2">The Supabase Content Storm</h2>
+            <h2 className="text-3xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!
