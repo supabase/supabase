@@ -1,14 +1,16 @@
+import Link from 'next/link'
 import { FC } from 'react'
-import { Badge, Radio } from 'ui'
+import { Badge, Button, Radio } from 'ui'
 
-import { useStore, useFlag } from 'hooks'
+import { useFlag, useParams } from 'hooks'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import { DatabaseAddon } from './AddOns.types'
 
 interface Props {
-  options: any[]
-  currentOption?: any
-  selectedOption: any
+  options: DatabaseAddon[]
+  currentOption?: DatabaseAddon
+  selectedOption: DatabaseAddon
   onSelectOption: (option: any) => void
 }
 
@@ -18,7 +20,9 @@ const CustomDomainSelection: FC<Props> = ({
   selectedOption,
   onSelectOption,
 }) => {
+  const { ref } = useParams()
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
   return (
     <div className="space-y-4">
       <div>
@@ -30,6 +34,31 @@ const CustomDomainSelection: FC<Props> = ({
       </div>
       {addonUpdateDisabled ? (
         <DisabledWarningDueToIncident title="Updating database add-ons is currently disabled" />
+      ) : currentOption?.isLocked ? (
+        <div
+          className={[
+            'flex items-center justify-between block w-full rounded px-4 py-3',
+            'border border-scale-600 bg-scale-100 dark:border-scale-500 dark:bg-scale-400',
+          ].join(' ')}
+        >
+          <div className="space-y-3">
+            <h5 className="text-sm text-scale-1200">
+              Your project currently has custom domains enabled
+            </h5>
+            <p className="text-sm text-scale-1100">
+              If you would like to disable custom domains, do reach out to us
+            </p>
+          </div>
+          <div className="">
+            <Link
+              href={`/support/new?ref=${ref}&category=sales&subject=Disable%20custom%20domains%20`}
+            >
+              <a>
+                <Button>Contact us</Button>
+              </a>
+            </Link>
+          </div>
+        </div>
       ) : (
         <Radio.Group type="cards" className="billing-compute-radio">
           {options.map((option: any) => {
