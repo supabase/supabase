@@ -25,31 +25,46 @@ const Wrappers = () => {
   const [open, setOpen] = useState<string>('')
   const [isEnabling, setIsEnabling] = useState<boolean>(false)
 
-  const [wrappersExtension] = meta.extensions.list(
-    (ext: PostgresExtension) => ext.name.toLowerCase() === 'wrappers'
-  )
-  const isWrappersEnabled = wrappersExtension.installed_version !== null
+  const wrappersExtension = meta.extensions.byId('wrappers')
+  const vaultExtension = meta.extensions.byId('supabase_vault')
+
+  const isWrappersEnabled =
+    wrappersExtension !== undefined &&
+    wrappersExtension?.installed_version !== null &&
+    vaultExtension !== undefined &&
+    vaultExtension?.installed_version !== null
+
   const canToggleWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
-
-  console.log('useFDWQuery', { data })
-
-  console.log(wrappersExtension)
 
   const onEnableWrappers = async () => {
     if (wrappersExtension === undefined) return
     setIsEnabling(true)
 
-    const { error: createExtensionError } = await meta.extensions.create({
-      schema: wrappersExtension.schema ?? 'extensions',
-      name: wrappersExtension.name,
-      version: wrappersExtension.default_version,
-      cascade: true,
-    })
-    if (createExtensionError) {
+    const requiredExtensions = await Promise.all([
+      await meta.extensions.create({
+        schema: wrappersExtension.schema ?? 'extensions',
+        name: wrappersExtension.name,
+        version: wrappersExtension.default_version,
+        cascade: true,
+      }),
+      await meta.extensions.create({
+        schema: vaultExtension.schema ?? 'vault',
+        name: vaultExtension.name,
+        version: vaultExtension.default_version,
+        cascade: true,
+      }),
+    ])
+    const errors = requiredExtensions.filter(
+      (res) => res.error && !res.error.message.includes('already exists')
+    )
+
+    if (errors.length > 0) {
       ui.setNotification({
-        error: createExtensionError,
+        error: errors,
         category: 'error',
-        message: `Failed to enable Wrappers for your project: ${createExtensionError.message}`,
+        message: `Failed to enable Wrappers for your project: ${errors
+          .map((x) => x.message)
+          .join(', ')}`,
       })
     } else {
       ui.setNotification({
@@ -57,6 +72,7 @@ const Wrappers = () => {
         message: 'Wrappers is now enabled for your project!',
       })
     }
+
     setIsEnabling(false)
   }
 
@@ -143,33 +159,6 @@ const Wrappers = () => {
           </div>
         </div>
       )}
-
-      {/* [Joshen TODO] Once above is working, can remove below */}
-      {/* <div className="space-y-4 mt-20">
-        <div className="w-full space-y-12">
-          {enabledWrappers.length > 0 && (
-            <div className="space-y-4">
-              <h4 className="text-lg">Enabled wrappers</h4>
-              <div className="grid grid-cols-1 gap-6 mb-4 md:grid-cols-2 xl:grid-cols-3">
-                {enabledWrappers.map((wrapper) => (
-                  <WrapperCard key={wrapper.name} wrapper={wrapper} enabled={true} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {disabledWrappers.length > 0 && (
-            <div className="space-y-4">
-              <h4 className="text-lg">Available wrappers</h4>
-              <div className="grid grid-cols-1 gap-6 mb-4 md:grid-cols-2 xl:grid-cols-3">
-                {disabledWrappers.map((wrapper) => (
-                  <WrapperCard key={wrapper.name} wrapper={wrapper} enabled={false} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div> */}
     </div>
   )
 }

@@ -85,8 +85,8 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
 
-  const [formState, setFormState] = useState(getInitialFormState)
   const [newTables, setNewTables] = useState<any[]>([])
+  const [formState, setFormState] = useState(getInitialFormState)
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
   // [Joshen TODO] Fix this logic
@@ -112,6 +112,8 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
   const onSaveWrapper = async () => {
     const validate = makeValidateRequired(wrapper.server.options)
     const errors: any = validate(formState)
+    if (newTables.length === 0) errors.tables = 'Please add at least one table'
+
     if (!isEmpty(errors)) {
       setFormErrors(errors)
       return
@@ -131,6 +133,8 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
         message: `Successfully created ${wrapper.label} foreign data wrapper`,
       })
       onOpen('')
+      setNewTables([])
+      setFormState(getInitialFormState)
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -318,6 +322,9 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                             </div>
                           </div>
                         ))}
+                        {newTables.length === 0 && formErrors.tables && (
+                          <p className="text-red-900 text-sm">{formErrors.tables}</p>
+                        )}
                       </div>
                       <div className="flex items-center justify-between !mt-8">
                         <Link href={wrapper.docsUrl}>
