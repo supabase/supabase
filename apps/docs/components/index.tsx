@@ -43,7 +43,6 @@ const components = {
   ),
   Tabs,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}
