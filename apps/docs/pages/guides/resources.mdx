@@ -16,9 +16,7 @@ export const meta = {
 <div>
   <div className="max-w-xl">
 
-### Migrating
-
-Moving to Supabase to Firebase or Heroku is easy. We provide the guides and tools to help you do it fast.
+### Migrate to Supabase
 
   </div>
 
@@ -50,7 +48,7 @@ Moving to Supabase to Firebase or Heroku is easy. We provide the guides and tool
 
     ### Supabase CLI
 
-    Feel more at home on the command line? The Supabase CLI lets you develop your project locally and deploy to the Supabase Platform. The Supabase CLI can also help you manage your Supabase projects. You can handle database migrations, CI/CD workflows, and generate types from your database schema, all from the comfort of your Terminal.
+    Develop your project locally and deploy to the Supabase Platform. The Supabase CLI can also help you manage your Supabase projects, handle database migrations, CI/CD workflows, and generate types from your database schema, all from the comfort of your Terminal.
 
 [Learn more](/docs/guides/resources/supabase-cli)
 
@@ -58,11 +56,11 @@ Moving to Supabase to Firebase or Heroku is easy. We provide the guides and tool
 
   <div>
 
-    ### Self-hosted Supabase
+    ### Self-Hosting Supabase
 
     We're happy to host your next big thing, but we also make it easy to host Supabase on your own. We use Docker to help make setup as painless as possible.
 
-[Learn more](/docs/guides/resources/supabase-cli)
+[Learn more](/docs/guides/resources/self-hosting)
 
   </div>
 
@@ -77,24 +75,32 @@ export const products = [
     title: 'Firebase Auth',
     icon: '/docs/img/icons/menu/auth',
     hasLightIcon: true,
-    href: '/guides/auth',
-    description: 'Move all your users from Firebase Auth to Supabase.',
+    href: '/guides/migrations/firebase-auth',
+    description: 'Move your auth users from a Firebase project to a Supabase project.',
     span: 'col-span-12 md:col-span-4',
   },
   {
     title: 'Firebase Data',
     icon: '/docs/img/icons/menu/database',
     hasLightIcon: true,
-    href: '/guides/database',
-    description: 'Move all your app data from Firebase to Supabase.',
+    href: '/guides/migrations/firestore-data',
+    description: 'Migrate the contents of a Firestore collection to a single PostgreSQL table.',
     span: 'col-span-12 md:col-span-4',
   },
   {
     title: 'Firebase Storage',
     icon: '/docs/img/icons/menu/storage',
     hasLightIcon: true,
-    href: '/guides/storage',
-    description: 'Move all your files from Firebase to Supabase.',
+    href: '/guides/migrations/firebase-storage',
+    description: 'Convert your Firebase Storage files to Supabase Storage.',
+    span: 'col-span-12 md:col-span-4',
+  },
+  {
+    title: 'Heroku',
+    icon: '/docs/img/icons/menu/database',
+    hasLightIcon: true,
+    href: '/guides/migrations/heroku',
+    description: 'Migrate your Heroku Postgres database to Supabase.',
     span: 'col-span-12 md:col-span-4',
   },
 ]
