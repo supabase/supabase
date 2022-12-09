@@ -2,7 +2,7 @@ import { useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Input, IconSearch } from 'ui'
 
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
@@ -21,10 +21,8 @@ const TeamSettings = observer(() => {
   const slug = ui.selectedOrganization?.slug ?? ''
   const isOwner = ui.selectedOrganization?.is_owner
 
-  const enablePermissions = useFlag('enablePermissions')
   const [isLeaving, setIsLeaving] = useState(false)
-
-  const canAddMembers = enablePermissions ? rolesAddable.length > 0 : isOwner
+  const canAddMembers = rolesAddable.length > 0
 
   function onFilterMemberChange(e: any) {
     PageState.membersFilterString = e.target.value

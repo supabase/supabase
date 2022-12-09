@@ -7,7 +7,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/storage-caching',
-    destination: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
   },
   {
     permanent: true,
@@ -1562,7 +1562,17 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
+  },
+  {
+    permanent: true,
+    source: '/projects',
+    destination: 'https://app.supabase.com/projects',
   },
 ]
