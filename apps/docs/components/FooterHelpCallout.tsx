@@ -4,7 +4,7 @@ const FooterHelpCallout = () => {
       <h5 className="text-sm m-0 text-scale-1100">Need some help?</h5>
       <p className="m-0 text-sm text-scale-900">
         Not to worry, we are here to help with our specialist engineers. You can submit a support
-        ticket via our <a href="https://app.supabase.com/support/new">dashboard</a>.
+        ticket through the <a href="https://app.supabase.com/support/new">Dashboard</a>.
       </p>
     </div>
   )

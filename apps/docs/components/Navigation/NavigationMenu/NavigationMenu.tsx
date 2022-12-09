@@ -35,17 +35,14 @@ const SideNav = () => {
       case url.includes(`/docs/guides/auth`) && url:
         setLevel('auth')
         break
-      case url.includes(`/docs/guides/storage`) && url:
-        setLevel('storage')
+      case url.includes(`/docs/guides/functions`) && url:
+        setLevel('functions')
         break
       case url.includes(`/docs/guides/realtime`) && url:
         setLevel('realtime')
         break
-      case url.includes(`/docs/guides/functions`) && url:
-        setLevel('functions')
-        break
-      case url.includes(`/docs/guides/integrations`) && url:
-        setLevel('integrations')
+      case url.includes(`/docs/guides/storage`) && url:
+        setLevel('storage')
         break
       case url.includes(`/docs/guides/platform`) ||
         (url.includes(`/docs/guides/hosting/platform`) && url):
@@ -53,6 +50,9 @@ const SideNav = () => {
         break
       case url.includes(`/docs/guides/resources`) && url:
         setLevel('resources')
+        break
+      case url.includes(`/docs/guides/integrations`) && url:
+        setLevel('integrations')
         break
       case url.includes(`/docs/reference/javascript`) && url:
         setLevel('reference_javascript')
@@ -87,7 +87,7 @@ const SideNav = () => {
         level: 'home',
       },
       {
-        label: 'Getting started',
+        label: 'Getting Started',
         icon: '/img/icons/menu/getting-started',
         href: '/getting-started',
         level: 'gettingstarted',
@@ -113,10 +113,10 @@ const SideNav = () => {
         level: 'auth',
       },
       {
-        label: 'Storage',
-        icon: '/img/icons/menu/storage',
-        href: '/guides/storage',
-        level: 'storage',
+        label: 'Edge Functions',
+        icon: '/img/icons/menu/functions',
+        href: '/guides/functions',
+        level: 'functions',
       },
       {
         label: 'Realtime',
@@ -125,10 +125,10 @@ const SideNav = () => {
         level: 'realtime',
       },
       {
-        label: 'Edge Functions',
-        icon: '/img/icons/menu/functions',
-        href: '/guides/functions',
-        level: 'functions',
+        label: 'Storage',
+        icon: '/img/icons/menu/storage',
+        href: '/guides/storage',
+        level: 'storage',
       },
     ],
     [
@@ -139,16 +139,16 @@ const SideNav = () => {
         level: 'platform',
       },
       {
-        label: 'Integrations',
-        icon: '/img/icons/menu/integrations',
-        href: '/guides/integrations',
-        level: 'integrations',
-      },
-      {
         label: 'Resources',
         icon: '/img/icons/menu/platform',
         href: '/guides/resources',
         level: 'resources',
+      },
+      {
+        label: 'Integrations',
+        icon: '/img/icons/menu/integrations',
+        href: '/guides/integrations',
+        level: 'integrations',
       },
     ],
     [
@@ -156,7 +156,7 @@ const SideNav = () => {
         label: 'Client Library Reference',
       },
       {
-        label: 'JavaScript Client',
+        label: 'JavaScript',
         icon: '/img/icons/javascript-icon',
         hasLightIcon: false,
         href: '/reference/javascript/start',
@@ -170,7 +170,7 @@ const SideNav = () => {
       //   level: 'reference_javascript',
       // },
       {
-        label: 'Dart Client Library',
+        label: 'Flutter',
         icon: '/img/icons/dart-icon',
         hasLightIcon: false,
         href: '/reference/dart/start',
@@ -180,21 +180,21 @@ const SideNav = () => {
         label: 'Tools Reference',
       },
       {
-        label: 'Mangement API',
+        label: 'Management API',
         icon: '/img/icons/api-icon',
         hasLightIcon: false,
         href: '/reference/api/start',
         level: 'reference_javascript',
       },
       {
-        label: 'CLI',
+        label: 'Supabase CLI',
         icon: '/img/icons/cli-icon',
         hasLightIcon: false,
         href: '/reference/cli/start',
         level: 'reference_javascript',
       },
       {
-        label: 'Self hosting server',
+        label: 'Self-Hosting Server',
         icon: '/img/icons/menu/platform',
         href: '/reference/javascript/start',
         level: 'reference_javascript',
@@ -277,13 +277,13 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'tutorials'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'database'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'auth'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'storage'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'realtime'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'functions'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'realtime'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'storage'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
       {/* reference level */}
       <NavigationMenuRefList
         key={'reference-js-menu'}
