@@ -1,13 +1,30 @@
+import { ResponseError } from 'types'
+import { LogsEndpointParams } from '../Settings/Logs'
+import { DEFAULT_QUERY_PARAMS } from './Reports.constants'
+
 export enum Presets {
   API_OVERVIEW = 'overview',
   API_BOTS = 'api_bots',
   AUTH = 'auth',
 }
 
-export interface BaseReportParams {
-  iso_timestamp_start: string
-  iso_timestamp_end: string
+export interface QueryDataBase {
+  isLoading: boolean
+  error: string
 }
+export interface DbQueryData<T = any> extends QueryDataBase {
+  data: T[]
+  params: BaseReportParams
+  logData?: never
+}
+export interface DbQueryHandler {
+  runQuery: () => void
+  setParams?: never
+  changeQuery?: never
+}
+export type MetaQueryResponse = any & { error: ResponseError }
+
+export type BaseReportParams = typeof DEFAULT_QUERY_PARAMS & { sql?: string } & unknown
 
 export type VariableSql = string | ((params: BaseReportParams) => string)
 

@@ -177,6 +177,20 @@ order by
   timestamp
 `,
       },
+      cumulativeUsers: {
+        queryType: 'db',
+        sql: `
+select 
+date_trunc('day', u.created_at) as timestamp,
+count(u.id) as count
+from auth.users as u
+where u.confirmed_at is not null
+group by 
+  timestamp
+order by
+  timestamp desc
+        `,
+      },
       newUsers: {
         queryType: 'logs',
         sql: `

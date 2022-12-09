@@ -2,6 +2,7 @@ import { Button, Dropdown, IconMoreVertical } from 'ui'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import Panel from 'components/ui/Panel'
 import { useRouter } from 'next/router'
+import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 
 export interface ReportWidgetProps<T = any> {
@@ -10,7 +11,7 @@ export interface ReportWidgetProps<T = any> {
   description: string
   className?: string
   renderer: (props: ReportWidgetProps) => React.ReactNode
-  params: LogsEndpointParams
+  params: BaseReportParams | LogsEndpointParams
   isLoading: boolean
 }
 
@@ -34,7 +35,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                     router.push({
                       pathname: `/project/${ref}/logs/explorer`,
                       query: {
-                        q: props.params.sql,
+                        q: props.params?.sql,
                         its: props.params.iso_timestamp_start,
                         ite: props.params.iso_timestamp_end,
                       },
