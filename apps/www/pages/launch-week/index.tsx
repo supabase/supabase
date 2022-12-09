@@ -91,7 +91,7 @@ export default function launchweek() {
   const AccordionHeader = ({ date, day, title, shipped }: any) => {
     return (
       <div className="flex flex-1 flex-col sm:flex-row">
-        <div className="flex gap-4 min-w-[320px]">
+        <div className="flex gap-4 min-w-[320px] items-center">
           <Badge className="!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973] h-fit">
             {shipped ? 'Shipped' : 'Coming Soon'}
           </Badge>
@@ -442,15 +442,10 @@ export default function launchweek() {
           </>
         )}
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
-          <div className="flex flex-col items-center mb-16 lg:mb-32">
-            <h1 className="text-black dark:text-white text-5xl text-center mb-9">
-              Community Spotlight
-            </h1>
-            <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973] w-fit after:bg-white">
+          <div className="flex flex-col mb-16">
+            <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973] w-fit after:bg-white mb-4">
               Happening all week
             </Badge>
-          </div>
-          <div className="flex flex-col mb-16">
             <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackathon</h2>
             <p className="text-slate-900 w-[80%] lg:w-[50%]">
               The Supabase Team will be taking part in the Hackathon and you'll find us live

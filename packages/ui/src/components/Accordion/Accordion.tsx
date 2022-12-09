@@ -135,7 +135,7 @@ export function Item({ children, className, header, id, icon, disabled }: ItemPr
   let chevronClasses = [__styles.chevron.base, __styles.chevron.align[chevronAlign]]
 
   // console.log('currentItems', currentItems)
-  if (open) {
+  if (open && !disabled) {
     chevronClasses.unshift('!rotate-180')
   }
 
@@ -150,7 +150,9 @@ export function Item({ children, className, header, id, icon, disabled }: ItemPr
     >
       <RadixAccordion.Trigger className={triggerClasses.join(' ')}>
         {header}
-        <IconChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />
+        {!disabled && (
+          <IconChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />
+        )}
       </RadixAccordion.Trigger>
       <RadixAccordion.Content className={__styles.variants[type].content}>
         <div className={__styles.variants[type].panel}>{children}</div>
