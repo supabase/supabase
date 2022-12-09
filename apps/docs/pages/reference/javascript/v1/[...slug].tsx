@@ -14,7 +14,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/js/v1', '/javascript/v1')
+  return handleRefStaticProps(sections, params, '/javascript/v1', '/javascript/v1')
 }
 
 export function getStaticPaths() {

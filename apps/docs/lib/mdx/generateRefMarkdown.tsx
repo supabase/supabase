@@ -45,10 +45,10 @@ async function generateRefMarkdown(sections, slug) {
           ? await serialize(content ?? '', {
               // MDX's available options, see the MDX docs for more info.
               // https://mdxjs.com/packages/mdx/#compilefile-options
-              mdxOptions: {
-                remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
-                useDynamicImport: true,
-              },
+              // mdxOptions: {
+              //   remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
+              //   useDynamicImport: true,
+              // },
               // Indicates whether or not to parse the frontmatter from the mdx source
             })
           : null,

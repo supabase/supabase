@@ -1,6 +1,6 @@
 [
   {
-    "title": "introduction",
+    "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
     "isFunc": false
@@ -12,67 +12,67 @@
         "id": "supabase-test",
         "title": "supabase test",
         "slug": "supabase-test",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-test-db",
         "title": "supabase test db",
         "slug": "supabase-test-db",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-stop",
         "title": "supabase stop",
         "slug": "supabase-stop",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-status",
         "title": "supabase status",
         "slug": "supabase-status",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-start",
         "title": "supabase start",
         "slug": "supabase-start",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-login",
         "title": "supabase login",
         "slug": "supabase-login",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-link",
         "title": "supabase link",
         "slug": "supabase-link",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-init",
         "title": "supabase init",
         "slug": "supabase-init",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-gen",
         "title": "supabase gen",
         "slug": "supabase-gen",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-gen-types",
         "title": "supabase gen types",
         "slug": "supabase-gen-types",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-gen-types-typescript",
         "title": "supabase gen types typescript",
         "slug": "supabase-gen-types-typescript",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
@@ -83,25 +83,25 @@
         "id": "supabase-secrets",
         "title": "supabase secrets",
         "slug": "supabase-secrets",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-secrets-unset",
         "title": "supabase secrets unset",
         "slug": "supabase-secrets-unset",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-secrets-set",
         "title": "supabase secrets set",
         "slug": "supabase-secrets-set",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-secrets-list",
         "title": "supabase secrets list",
         "slug": "supabase-secrets-list",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
@@ -112,19 +112,19 @@
         "id": "supabase-projects",
         "title": "supabase projects",
         "slug": "supabase-projects",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-projects-list",
         "title": "supabase projects list",
         "slug": "supabase-projects-list",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-projects-create",
         "title": "supabase projects create",
         "slug": "supabase-projects-create",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
@@ -135,13 +135,13 @@
         "id": "supabase-orgs",
         "title": "supabase orgs",
         "slug": "supabase-orgs",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-orgs-list",
         "title": "supabase orgs list",
         "slug": "supabase-orgs-list",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
@@ -152,19 +152,19 @@
         "id": "supabase-migration",
         "title": "supabase migration",
         "slug": "supabase-migration",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-migration-new",
         "title": "supabase migration new",
         "slug": "supabase-migration-new",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-migration-list",
         "title": "supabase migration list",
         "slug": "supabase-migration-list",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
@@ -175,31 +175,31 @@
         "id": "supabase-functions",
         "title": "supabase functions",
         "slug": "supabase-functions",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-functions-serve",
         "title": "supabase functions serve",
         "slug": "supabase-functions-serve",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-functions-new",
         "title": "supabase functions new",
         "slug": "supabase-functions-new",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-functions-deploy",
         "title": "supabase functions deploy",
         "slug": "supabase-functions-deploy",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-functions-delete",
         "title": "supabase functions delete",
         "slug": "supabase-functions-delete",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
@@ -210,85 +210,85 @@
         "id": "supabase-domains",
         "title": "supabase domains",
         "slug": "supabase-domains",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-domains-reverify",
         "title": "supabase domains reverify",
         "slug": "supabase-domains-reverify",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-domains-get",
         "title": "supabase domains get",
         "slug": "supabase-domains-get",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-domains-delete",
         "title": "supabase domains delete",
         "slug": "supabase-domains-delete",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-domains-create",
         "title": "supabase domains create",
         "slug": "supabase-domains-create",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-domains-activate",
         "title": "supabase domains activate",
         "slug": "supabase-domains-activate",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
   {
     "title": "Database",
     "items": [
-      { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "isFunc": true },
+      { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "type": "cli-command" },
       {
         "id": "supabase-db-reset",
         "title": "supabase db reset",
         "slug": "supabase-db-reset",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-db-remote",
         "title": "supabase db remote",
         "slug": "supabase-db-remote",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-db-remote-commit",
         "title": "supabase db remote commit",
         "slug": "supabase-db-remote-commit",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-db-remote-changes",
         "title": "supabase db remote changes",
         "slug": "supabase-db-remote-changes",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-db-push",
         "title": "supabase db push",
         "slug": "supabase-db-push",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-db-lint",
         "title": "supabase db lint",
         "slug": "supabase-db-lint",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-db-diff",
         "title": "supabase db diff",
         "slug": "supabase-db-diff",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   },
@@ -299,31 +299,31 @@
         "id": "supabase-completion",
         "title": "supabase completion",
         "slug": "supabase-completion",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-completion-zsh",
         "title": "supabase completion zsh",
         "slug": "supabase-completion-zsh",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-completion-powershell",
         "title": "supabase completion powershell",
         "slug": "supabase-completion-powershell",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-completion-fish",
         "title": "supabase completion fish",
         "slug": "supabase-completion-fish",
-        "isFunc": true
+        "type": "cli-command"
       },
       {
         "id": "supabase-completion-bash",
         "title": "supabase completion bash",
         "slug": "supabase-completion-bash",
-        "isFunc": true
+        "type": "cli-command"
       }
     ]
   }
