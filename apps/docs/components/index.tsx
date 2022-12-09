@@ -21,7 +21,7 @@ import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
 import React from 'react'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
-import { CH } from '@code-hike/mdx/components'
+// import { CH } from '@code-hike/mdx/components'
 
 const components = {
   Admonition,
@@ -54,15 +54,15 @@ const components = {
       {props.children}
     </Heading>
   ),
-  // pre: (props: any) => {
-  //   const linesToHighlight = parseNumericRange(props.lines ?? '')
-  //   return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
-  // },
-  // mono: (props: any) => <code className="text-sm">{props.children}</code>,
+  pre: (props: any) => {
+    const linesToHighlight = parseNumericRange(props.lines ?? '')
+    return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
+  },
+  mono: (props: any) => <code className="text-sm">{props.children}</code>,
   inlineCode: (props: { children: string }) => <InlineCodeTag {...props} />,
   RefSubLayout,
-  CH,
-  // code: (props: any) => <CodeBlock {...props} />,
+  // CH,
+  code: (props: any) => <CodeBlock {...props} />,
 }
 
 export default components
