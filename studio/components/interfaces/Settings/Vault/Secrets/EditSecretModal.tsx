@@ -48,7 +48,21 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
     if (values.description !== selectedSecret.description) payload.description = values.description
     if (values.secret !== secretValue) payload.secret = values.secret
     if (selectedKeyId !== selectedSecret.key_id) {
-      payload.key_id = selectedKeyId
+      let encryptionKeyId = selectedKeyId
+      if (values.keyId === 'create-new') {
+        const addKeyRes = await vault.addKey(values.keyName || undefined)
+        if (addKeyRes.error) {
+          return ui.setNotification({
+            error: addKeyRes.error,
+            category: 'error',
+            message: `Failed to create new key: ${addKeyRes.error.message}`,
+          })
+        } else {
+          encryptionKeyId = addKeyRes[0].id
+        }
+      }
+
+      payload.key_id = encryptionKeyId
       payload.secret = values.secret
     }
 
@@ -139,10 +153,10 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content>
-                <div className="py-4">
+                <div className="py-4 space-y-4">
                   <EncryptionKeySelector
                     id="keyId"
-                    nameId="keyDescription"
+                    nameId="keyName"
                     label="Select a key to encrypt your secret with"
                     labelOptional="Optional"
                     selectedKeyId={selectedKeyId}
