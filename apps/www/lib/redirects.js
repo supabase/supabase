@@ -1575,4 +1575,9 @@ module.exports = [
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/integrations',
+    destination: '/docs/guides/integrations',
+  },
 ]
