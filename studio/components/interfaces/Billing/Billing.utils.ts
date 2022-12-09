@@ -7,6 +7,7 @@ import {
 } from './AddOns/AddOns.utils'
 import { StripeSubscription } from './Subscription/Subscription.types'
 
+// Retrieve the price based on the default price id of the product
 export const getProductPrice = (product: any) => {
   const defaultPriceId = product.metadata?.default_price_id
   const price =
@@ -14,6 +15,18 @@ export const getProductPrice = (product: any) => {
       ? product.prices.find((price: any) => price.id === defaultPriceId)
       : product.prices[0]
   return price
+}
+
+// Products can have multiple prices, this is to get the correct one based on the subscription
+const getProductPriceId = (
+  currentSubscription: StripeSubscription,
+  product: any
+): string | undefined => {
+  const existingAddon = currentSubscription.addons.find((addon) => addon.prod_id === product.id)
+  const existingAddonPriceId = product.prices.find(
+    (price: any) => price.unit_amount === existingAddon?.unit_amount
+  )
+  return existingAddonPriceId?.id || getProductPrice(product)?.id
 }
 
 export const validateSubscriptionUpdatePayload = (selectedAddons: {
@@ -31,31 +44,38 @@ export const validateSubscriptionUpdatePayload = (selectedAddons: {
 }
 
 export const formSubscriptionUpdatePayload = (
+  currentSubscription: StripeSubscription,
   selectedTier: any,
   selectedAddons: {
     computeSize: DatabaseAddon
     pitrDuration: DatabaseAddon
     customDomains: DatabaseAddon
   },
+  nonChangeableAddons: DatabaseAddon[],
   selectedPaymentMethod: string,
   region: string
 ) => {
   const { computeSize, pitrDuration, customDomains } = selectedAddons
-  const defaultPrice = selectedTier ? getProductPrice(selectedTier) : undefined
+
+  const computeSizePriceId = getProductPriceId(currentSubscription, computeSize)
+  const pitrAddonPriceId = getProductPriceId(currentSubscription, pitrDuration)
+  const customDomainPriceId = getProductPriceId(currentSubscription, customDomains)
+  const tierPriceId = selectedTier ? getProductPrice(selectedTier) : undefined
+
+  const nonChangeablePriceIds = nonChangeableAddons.map((addon) =>
+    getProductPriceId(currentSubscription, addon)
+  )
+
   const addons =
     region === 'af-south-1'
       ? []
-      : [
-          computeSize.prices.find((price) => price.id === computeSize.metadata.default_price_id)
-            ?.id,
-          pitrDuration.prices.find((price) => price.id === pitrDuration.metadata.default_price_id)
-            ?.id,
-          customDomains.prices.find((price) => price.id === customDomains.metadata.default_price_id)
-            ?.id,
-        ].filter((x) => x !== undefined)
+      : [computeSizePriceId, pitrAddonPriceId, customDomainPriceId]
+          .concat(nonChangeablePriceIds)
+          .filter((x) => x !== undefined)
   const proration_date = Math.floor(Date.now() / 1000)
+
   return {
-    ...(defaultPrice && { tier: defaultPrice.id }),
+    ...(tierPriceId && { tier: tierPriceId.id }),
     addons,
     proration_date,
     payment_method: selectedPaymentMethod,
