@@ -67,8 +67,6 @@ Supabase.js v2 release notes.
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
 
-      <CH.Code>
-
       ```ts v1.0
         // previously definitions were injected in the `from()` method
         supabase.from<Definitions['Message']>('messages').select('\*')
@@ -84,8 +82,6 @@ Supabase.js v2 release notes.
 
         const { data } = await supabase.from('messages').select().match({ id: 1 })
       ```
-
-    </CH.Code>
 
   </RefSubLayout.Examples>
   <RefSubLayout.Details>
@@ -194,8 +190,6 @@ Supabase.js v2 release notes.
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
 
-    <CH.Code>
-
       ```ts v1.0
         const { data } = await supabase.auth.signIn({
           email: 'hello@example',
@@ -210,8 +204,6 @@ Supabase.js v2 release notes.
           password: 'pass',
         })
       ```
-
-    </CH.Code>
 
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
