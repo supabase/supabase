@@ -35,7 +35,7 @@ const Wrappers = () => {
   const canToggleWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
   const onEnableWrappers = async () => {
-    if (wrappersExtension === undefined) return
+    if (wrappersExtension === undefined || vaultExtension === undefined) return
     setIsEnabling(true)
 
     const requiredExtensions = await Promise.all([
