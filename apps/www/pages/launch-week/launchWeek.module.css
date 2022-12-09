@@ -1,3 +1,11 @@
 .mask {
   mask-image: radial-gradient(black, transparent);
 }
+
+.dark_community {
+  background-image: radial-gradient(closest-side at 50% 50%, #132121, #132121db, #121212);
+}
+
+.community {
+  background-image: radial-gradient(closest-side at 50% 50%, #d9eeef, #dbeef0, white);
+}
