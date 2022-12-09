@@ -28,6 +28,7 @@ import {
   formatPITROptions,
 } from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
+import SupportPlan from './AddOns/SupportPlan'
 
 // Do not allow compute size changes for af-south-1
 
@@ -242,6 +243,12 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
+                    {currentAddons.supportPlan !== undefined && (
+                      <>
+                        <Divider light />
+                        <SupportPlan currentOption={currentAddons.supportPlan} />
+                      </>
+                    )}
                     {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
                       <>
                         <Divider light />
