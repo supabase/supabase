@@ -56,7 +56,7 @@
     "lodash": "^4.17.21",
     "markdown-toc": "^1.2.0",
     "mdx-mermaid": "2.0.0-rc3",
-    "next": "12.1.0",
+    "next": "12.2.0",
     "next-compose-plugins": "^2.2.1",
     "next-mdx-remote": "^4.1.0",
     "next-mdx-toc": "^0.1.3",
