@@ -193,7 +193,7 @@ const SideNav = () => {
       {
         label: 'Auth',
         icon: '/img/icons/menu/auth',
-        href: '/guides/auth',
+        href: '/guides/auth/overview',
         level: 'auth',
       },
       {
