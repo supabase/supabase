@@ -569,21 +569,21 @@ export const resources = {
     {
       name: 'Auth Server',
       items: [
-        { name: 'Auth Server', url: '/reference/auth', items: [] },
+        { name: 'Overview', url: '/guides/resources/auth', items: [] },
         { name: 'Configuration', url: '/reference/auth/config', items: [] },
       ],
     },
     {
       name: 'Realtime Server',
       items: [
-        { name: 'Realtime Server', url: '/reference/realtime', items: [] },
+        { name: 'Overview', url: '/guides/resources/realtime', items: [] },
         { name: 'Configuration', url: '/reference/realtime/config', items: [] },
       ],
     },
     {
       name: 'Storage Server',
       items: [
-        { name: 'Storage Server', url: '/reference/storage', items: [] },
+        { name: 'Overview', url: '/guides/resources/storage', items: [] },
         { name: 'Usage', url: '/reference/storage/usage', items: [] },
         { name: 'Configuration', url: '/reference/storage/config', items: [] },
       ],
