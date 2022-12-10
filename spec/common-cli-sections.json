@@ -3,7 +3,8 @@
     "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
-    "isFunc": false
+    "isFunc": false,
+    "type": "markdown"
   },
   {
     "title": "general",
