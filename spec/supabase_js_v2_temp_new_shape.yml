@@ -453,6 +453,87 @@ functions:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
+  - id: mfa-enroll
+    title: 'mfa.enroll()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
+    notes: |
+      - Currently, `totp` is the only supported `factorType`.
+      - To generate a QR code containing the `totp` secret, 
+      - To verify the factor next, see `auth.mfa.challengeAndVerify()`.
+      - To generate a QR code for the `totp` secret in nextjs, you can do the following:
+      ```html
+      <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
+      ```
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a Time-based One time password (TOTP) factor
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.enroll({ 
+            factorType: 'totp' 
+          })
+          ```
+  - id: mfa-challenge
+    title: 'mfa.challenge()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.challenge'
+    examples:
+      - id: create-mfa-challenge
+        name: Creates a challenge for a factor
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({ 
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225'
+          })
+          ```
+  - id: mfa-verify
+    title: 'mfa.verify()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.verify'
+    examples:
+      - id: verify-challenge
+        name: Verifies a challenge for a factor
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.verify({ 
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            challengeId: '11111111-1111-1111-1111-111111111111', 
+            code: '123456'
+          })
+          ```
+  - id: mfa-challenge-and-verify
+    title: 'mfa.challengeAndVerify()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
+    notes: |
+      - Combines `mfa.challenge()` and `mfa.verify()` in 1 step
+    examples:
+      - id: challenge-and-verify
+        name: Creates and verifies a challenge for a factor
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15', 
+            code: '123456'
+          })
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+    notes: |
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` typically refers to having the 1st factor of authentication such as an email and password or oauth sign-in while `aal2` refers to the 2nd factor of authentication such as Time-based one-time-password (TOTP).
+    examples:
+      - id: get-aal
+        name: Get the AAL details of a session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+          const { currentLevel, nextLevel, currentAuthenticationMethods } = data
+          ```
   - id: admin-api
     title: 'Overview'
     notes: |
@@ -732,7 +813,31 @@ functions:
             { phone_confirm: true }
           )
           ```
-
+  - id: mfa-list-factors
+    title: 'mfa.listFactors()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
+    examples:
+      - id: list-factors
+        name: List all factors associated to a user
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.mfa.listFactors()
+          ```
+  - id: mfa-delete-factor
+    title: 'mfa.deleteFactor()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
+    examples:
+      - id: delete-factor
+        name: Deletes a factor associated to a user
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.mfa.deleteFactor({ 
+            id: '034f5b5e-845a-4759-8b9a-bafc42b009c9',
+            userId: '3ebe6175-a808-4f9f-a279-0032caabacf2',
+          }) 
+          ```
   - id: select
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
