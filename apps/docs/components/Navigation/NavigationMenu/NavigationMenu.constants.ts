@@ -154,6 +154,18 @@ export const cli = {
 
 export const SocialLoginItems = [
   {
+    name: 'Google',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/social-login/auth-google',
+    items: [],
+  },
+  {
+    name: 'Facebook',
+    icon: '/docs/img/icons/facebook-icon',
+    url: '/guides/auth/social-login/auth-facebook',
+    items: [],
+  },
+  {
     name: 'Apple',
     icon: '/docs/img/icons/apple-icon',
     url: '/guides/auth/social-login/auth-apple',
@@ -166,21 +178,9 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Bitbucket',
-    icon: '/docs/img/icons/bitbucket-icon',
-    url: '/guides/auth/social-login/auth-bitbucket',
-    items: [],
-  },
-  {
-    name: 'Discord',
-    icon: '/docs/img/icons/discord-icon',
-    url: '/guides/auth/social-login/auth-discord',
-    items: [],
-  },
-  {
-    name: 'Facebook',
-    icon: '/docs/img/icons/facebook-icon',
-    url: '/guides/auth/social-login/auth-facebook',
+    name: 'Twitter',
+    icon: '/docs/img/icons/twitter-icon',
+    url: '/guides/auth/social-login/auth-twitter',
     items: [],
   },
   {
@@ -197,9 +197,15 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Google',
-    icon: '/docs/img/icons/google-icon',
-    url: '/guides/auth/social-login/auth-google',
+    name: 'Bitbucket',
+    icon: '/docs/img/icons/bitbucket-icon',
+    url: '/guides/auth/social-login/auth-bitbucket',
+    items: [],
+  },
+  {
+    name: 'Discord',
+    icon: '/docs/img/icons/discord-icon',
+    url: '/guides/auth/social-login/auth-discord',
     items: [],
   },
   {
@@ -236,12 +242,6 @@ export const SocialLoginItems = [
     name: 'Twitch',
     icon: '/docs/img/icons/twitch-icon',
     url: '/guides/auth/social-login/auth-twitch',
-    items: [],
-  },
-  {
-    name: 'Twitter',
-    icon: '/docs/img/icons/twitter-icon',
-    url: '/guides/auth/social-login/auth-twitter',
     items: [],
   },
   {
