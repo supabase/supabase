@@ -8,6 +8,7 @@ import styles from './form.module.css'
 import useEmailQueryParam from '~/components/LaunchWeek/Ticket/hooks/use-email-query-param'
 import { IconLoader } from '~/../../packages/ui'
 // import Captcha, { useCaptcha } from './captcha'
+import Script from 'next/script'
 
 type FormState = 'default' | 'loading' | 'error'
 
@@ -77,25 +78,11 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   }, [session])
 
   async function register(email: string, token?: string): Promise<ConfUser> {
-    const { error } = await supabase!.from('lw6_tickets').insert({ email })
-    if (error) {
-      // console.log({ error })
-      return {
-        id: 'new',
-        ticketNumber: 1234,
-        name: '',
-        username: '',
-        golden: false,
-      }
-    }
-    const { data } = await supabase!.from('lw6_tickets_golden').select('*').limit(1).single()
-    return {
-      id: data?.id ?? 'new',
-      ticketNumber: data?.ticketNumber ?? 1234,
-      name: data?.name ?? '',
-      username: data?.username ?? '',
-      golden: data?.golden ?? false,
-    }
+    const { data, error } = await supabase.functions.invoke('cloudflare-turnstile', {
+      body: { email, token },
+    })
+    if (error) throw error
+    return data
   }
 
   const handleRegister = useCallback(
@@ -134,15 +121,19 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault()
+      const formData = new FormData(e.target as HTMLFormElement)
+      const turnstileRes = formData.get('cf-turnstile-response') as string
 
       if (formState === 'default') {
         setFormState('loading')
 
-        if (isCaptchaEnabled) {
-          // return executeCaptcha()
+        if (!turnstileRes) {
+          setErrorMsg('Something went wrong. Please try again!')
+          setFormState('error')
+          return
         }
 
-        return handleRegister()
+        return handleRegister(turnstileRes)
       } else {
         setFormState('default')
       }
@@ -161,82 +152,87 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   useEmailQueryParam('email', setEmail)
 
   return (
-    <div className="flex flex-col gap-8">
-      <div
-        className={cn(
-          styleUtils['appear-fifth'],
-          'flex flex-col gap-2 items-center xl:items-start',
-          align === 'Left' ? 'text-center xl:text-left' : 'text-center'
-        )}
-      >
-        <p className="text-scale-1000 text-base max-w-[420px]">
-          Register to get your ticket and stay tuned all week for daily announcements
-        </p>
-      </div>
-      {formState === 'error' ? (
+    <>
+      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
+
+      <div className="flex flex-col gap-8">
         <div
-          className={cn(styles.form, {
-            [styles['share-page']]: sharePage,
-          })}
+          className={cn(
+            styleUtils['appear-fifth'],
+            'flex flex-col gap-2 items-center xl:items-start',
+            align === 'Left' ? 'text-center xl:text-left' : 'text-center'
+          )}
         >
-          <div className={styles['form-row']}>
-            <div className={cn(styles['input-label'], styles.error)}>
-              <div className={cn(styles.input, styles['input-text'])}>{errorMsg}</div>
-              <button
-                type="button"
-                className={cn(styles.submit, styles.register, styles.error)}
-                onClick={onTryAgainClick}
-              >
-                Try Again
-              </button>
+          <p className="text-scale-1000 text-base max-w-[420px]">
+            Register to get your ticket and stay tuned all week for daily announcements
+          </p>
+        </div>
+        {formState === 'error' ? (
+          <div
+            className={cn(styles.form, {
+              [styles['share-page']]: sharePage,
+            })}
+          >
+            <div className={styles['form-row']}>
+              <div className={cn(styles['input-label'], styles.error)}>
+                <div className={cn(styles.input, styles['input-text'])}>{errorMsg}</div>
+                <button
+                  type="button"
+                  className={cn(styles.submit, styles.register, styles.error)}
+                  onClick={onTryAgainClick}
+                >
+                  Try Again
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <form
-          className="relative mx-auto xl:mx-0 w-full md:w-auto md:min-w-[320px] md:max-w-[420px]"
-          onSubmit={onSubmit}
-        >
-          <input
-            className={`
+        ) : (
+          <form
+            className="relative mx-auto xl:mx-0 w-full md:w-auto md:min-w-[320px] md:max-w-[420px]"
+            onSubmit={onSubmit}
+          >
+            <input
+              className={`
               transition-all
               border border-scale-300 bg-scaleA-200 h-10
               focus:border-scale-500 focus:ring-scaleA-300
               text-scale-1200 text-base rounded-full w-full px-5
             `}
-            type="email"
-            autoComplete="email"
-            id="email-input-field"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            placeholder="Enter email"
-            aria-label="Your email address"
-            required
-          />
-          <button
-            type="submit"
-            className={[
-              'transition-all',
-              'absolute bg-scale-300 text-scale-1200 border border-scale-600 text-sm hover:bg-scale-400',
-              'rounded-full px-4',
-              'focus:invalid:border-scale-500 focus:invalid:ring-scaleA-300',
-              'absolute right-1 my-auto h-8 top-0 bottom-0',
-            ].join(' ')}
-            disabled={formState === 'loading'}
-          >
-            {formState === 'loading' ? (
-              <div className="flex items-center gap-2">
-                <IconLoader size={14} className="animate-spin" /> Registering
-              </div>
-            ) : (
-              'Register'
-            )}
-          </button>
-          {/* <Captcha ref={captchaRef} onVerify={handleRegister} /> */}
-        </form>
-      )}
-    </div>
+              type="email"
+              autoComplete="email"
+              id="email-input-field"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder="Enter email"
+              aria-label="Your email address"
+              required
+            />
+            <button
+              type="submit"
+              className={[
+                'transition-all',
+                'absolute bg-scale-300 text-scale-1200 border border-scale-600 text-sm hover:bg-scale-400',
+                'rounded-full px-4',
+                'focus:invalid:border-scale-500 focus:invalid:ring-scaleA-300',
+                'absolute right-1 my-auto h-8 top-0 bottom-0',
+              ].join(' ')}
+              disabled={formState === 'loading'}
+            >
+              {formState === 'loading' ? (
+                <div className="flex items-center gap-2">
+                  <IconLoader size={14} className="animate-spin" /> Registering
+                </div>
+              ) : (
+                'Register'
+              )}
+            </button>
+            {/* Cloudflare Turnstile */}
+            <div className="cf-turnstile" data-sitekey="0x4AAAAAAABi5LXXIuEfWl3T"></div>
+          </form>
+        )}
+      </div>
+    </>
   )
 }
