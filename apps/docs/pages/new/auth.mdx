@@ -9,7 +9,7 @@ export const meta = {
   title: 'Auth',
 }
 
-## Learn how to use Supabase Auth to handle authentication and authorization of your users blah blah i am test text
+## Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.
 
 ### Popular Guides
 
@@ -23,7 +23,7 @@ export const meta = {
       >
         <a className={item.span ?? 'col-span-4'}>
           <GlassPanel
-            title="Social Login"
+            title={item.title}
             header="/docs/img/cards/sample-card-header-4.svg"
             span="col-span-6"
             background={false}
@@ -39,48 +39,36 @@ export const meta = {
 
 export const topArticles = [
   {
-    title: 'Database',
+    title: 'Enable Captcha Protection',
     header: '/docs/img/cards/sample-card-header-4.svg',
-    href: '/auth/auth-login',
-    description: 'Social Login allows the user to sign into a third party website instead of.',
+    href: '/guides/auth/auth-captcha',
+    description: 'Keep your platform safe from bots and malicious scripts by implementing hCaptcha.',
     span: 'col-span-6',
   },
   {
-    title: 'Auth',
+    title: 'Auth Helpers',
     header: '/docs/img/cards/sample-card-header-4.svg',
-    icon: 'auth',
-    href: '/auth/auth-login',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
+    href: '/guides/auth/auth-helpers',
+    description: 'A collection of framework-specific utilities for implementing Supabase Auth.',
     span: 'col-span-6',
   },
   {
-    title: 'Storage',
+    title: 'Email Login',
     header: '/docs/img/cards/sample-card-header-4.svg',
-    icon: 'storage',
-    href: '/auth/auth-login',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
+    href: '/guides/auth/auth-email',
+    description: 'Learn how to add an email and password login flow to your platform.',
   },
   {
-    title: 'Realtime',
+    title: 'Passwordless Login',
     header: '/docs/img/cards/sample-card-header-4.svg',
-    icon: 'realtime',
-    href: '/auth/auth-login',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
+    href: '/guides/auth/passwordless-login',
+    description: 'Learn how to add a login flow so your users can access your platform through SMS or without a password.',
   },
   {
-    title: 'Edge Functions',
+    title: 'Social Login',
     header: '/docs/img/cards/sample-card-header-4.svg',
-    icon: 'functions',
-    href: '/auth/auth-login',
-    description: `
-Social Login allows the user to sign into a third party website instead of creating a new account specifically for that website.
-  `,
+    href: '/guides/auth/social-login',
+    description: 'Learn how to add a login flow so your users can access your platform through social providers like Apple, Facebook, or Google.',
   },
 ]
 
