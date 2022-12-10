@@ -306,6 +306,7 @@ const ProUpgrade: FC<Props> = ({
             // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}
             currentAddons={currentAddons}
+            currentSubscription={currentSubscription}
             // Selected subscription configuration based on UI
             selectedPlan={selectedTier}
             selectedAddons={selectedAddons}
