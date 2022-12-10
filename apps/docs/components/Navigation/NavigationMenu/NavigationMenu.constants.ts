@@ -616,6 +616,7 @@ export const integrations = {
   label: 'Integrations',
   url: '/guides/integrations',
   items: [
+    { name: 'Overview', url: '/guides/integrations/integrations', items: [] },
     {
       name: 'Auth',
       url: undefined,
@@ -663,7 +664,6 @@ export const integrations = {
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
       ],
     },
-    { name: 'Supabase Marketplace', url: '/guides/integrations/integrations', items: [] },
   ],
 }
 
