@@ -6,8 +6,6 @@ import { memo, useEffect, useState } from 'react'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
-import apiCommonSections from '~/../../spec/common-api-sections.json'
-
 // @ts-expect-error
 import spec_js_v2 from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
 // @ts-expect-error
@@ -16,6 +14,15 @@ import spec_js_v1 from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert {
 import spec_dart_v1 from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
 // @ts-expect-error
 import spec_dart_v0 from '~/../../spec/supabase_dart_v0_temp_new_shape.yml' assert { type: 'yml' }
+
+// import { gen_v3 } from '~/lib/refGenerator/helpers'
+import libCommonSections from '~/../../spec/common-client-libs-sections.json'
+import apiCommonSections from '~/../../spec/common-api-sections.json'
+import cliCommonSections from '~/../../spec/common-cli-sections.json'
+import authServerCommonSections from '~/../../spec/common-self-hosting-auth-sections.json'
+import storageServerCommonSections from '~/../../spec/common-self-hosting-storage-sections.json'
+import realtimeServerCommonSections from '~/../../spec/common-self-hosting-realtime-sections.json'
+import { flattenSections } from '~/lib/helpers'
 
 // Filter libCommonSections for just the relevant sections in the current library
 function generateAllowedClientLibKeys(sections, spec) {
@@ -38,12 +45,6 @@ function generateAllowedClientLibKeys(sections, spec) {
   return final
 }
 
-// import { gen_v3 } from '~/lib/refGenerator/helpers'
-import cliCommonSections from '~/../../spec/common-cli-sections.json'
-import libCommonSections from '~/../../spec/common-client-libs-sections.json'
-import authServerCommonSections from '~/../../spec/common-self-hosting-auth-sections.json'
-import { flattenSections } from '~/lib/helpers'
-
 export type RefIdOptions =
   | 'reference_javascript_v1'
   | 'reference_javascript_v2'
@@ -52,8 +53,17 @@ export type RefIdOptions =
   | 'reference_cli'
   | 'reference_api'
   | 'reference_self_hosting_auth'
+  | 'reference_self_hosting_storage'
+  | 'reference_self_hosting_realtime'
 
-export type RefKeyOptions = 'javascript' | 'dart' | 'cli' | 'api' | 'self-hosting-auth'
+export type RefKeyOptions =
+  | 'javascript'
+  | 'dart'
+  | 'cli'
+  | 'api'
+  | 'self-hosting-auth'
+  | 'self-hosting-storage'
+  | 'self-hosting-realtime'
 
 const SideNav = () => {
   const router = useRouter()
@@ -130,6 +140,12 @@ const SideNav = () => {
         break
       case url.includes(`/docs/reference/self-hosting-auth`) && url:
         setLevel('reference_self_hosting_auth')
+        break
+      case url.includes(`/docs/reference/self-hosting-storage`) && url:
+        setLevel('reference_self_hosting_storage')
+        break
+      case url.includes(`/docs/reference/self-hosting-realtime`) && url:
+        setLevel('reference_self_hosting_realtime')
         break
 
       default:
@@ -225,9 +241,9 @@ const SideNav = () => {
       },
       {
         label: 'JavaScript',
-        icon: '/img/icons/javascript-icon',
+        icon: '/img/icons/menu/reference-javascript',
         hasLightIcon: false,
-        href: '/reference/javascript/start',
+        href: '/reference/javascript/introduction',
         level: 'reference_javascript',
       },
       // {
@@ -239,9 +255,9 @@ const SideNav = () => {
       // },
       {
         label: 'Flutter',
-        icon: '/img/icons/dart-icon',
+        icon: '/img/icons/menu/reference-dart',
         hasLightIcon: false,
-        href: '/reference/dart/start',
+        href: '/reference/dart/introduction',
         level: 'reference_dart',
       },
       {
@@ -249,22 +265,37 @@ const SideNav = () => {
       },
       {
         label: 'Management API',
-        icon: '/img/icons/api-icon',
+        icon: '/img/icons/menu/api',
         hasLightIcon: false,
-        href: '/reference/api/start',
+        href: '/reference/api/introduction',
         level: 'reference_javascript',
       },
       {
         label: 'Supabase CLI',
-        icon: '/img/icons/cli-icon',
+        icon: '/img/icons/menu/cli',
         hasLightIcon: false,
-        href: '/reference/cli/start',
+        href: '/reference/cli/introduction',
         level: 'reference_javascript',
       },
       {
-        label: 'Self-Hosting Auth',
-        icon: '/img/icons/menu/platform',
-        href: '/reference/self-hosting-auth/start',
+        label: 'Self Hosting reference',
+      },
+      {
+        label: 'Self-hosting Auth',
+        icon: '/img/icons/menu/reference-auth',
+        href: '/reference/self-hosting-auth/introduction',
+        level: 'reference_self_hosting_auth',
+      },
+      {
+        label: 'Self-hosting Storage',
+        icon: '/img/icons/menu/reference-storage',
+        href: '/reference/self-hosting-storage/introduction',
+        level: 'reference_self_hosting_auth',
+      },
+      {
+        label: 'Self-hosting Realtime',
+        icon: '/img/icons/menu/reference-realtime',
+        href: '/reference/self-hosting-realtime/introduction',
         level: 'reference_self_hosting_auth',
       },
     ],
@@ -357,8 +388,7 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
-      {/* reference level */}
-
+      {/* // Client Libs */}
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v1'}
@@ -391,6 +421,7 @@ const SideNav = () => {
         lib="dart"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v1)}
       />
+      {/* // Tools */}
       <NavigationMenuRefList
         key={'reference-cli-menu'}
         id={'reference_cli'}
@@ -405,11 +436,26 @@ const SideNav = () => {
         commonSections={apiCommonSections}
         lib="api"
       />
+      {/* // Self Hosting Server */}
       <NavigationMenuRefList
         key={'reference-self-hosting-auth-menu'}
         id={'reference_self_hosting_auth'}
         currentLevel={level}
         commonSections={authServerCommonSections}
+        lib="self-hosting-auth"
+      />
+      <NavigationMenuRefList
+        key={'reference-self-hosting-storage-menu'}
+        id={'reference_self_hosting_storage'}
+        currentLevel={level}
+        commonSections={storageServerCommonSections}
+        lib="self-hosting-storage"
+      />
+      <NavigationMenuRefList
+        key={'reference-self-hosting-realtime-menu'}
+        id={'reference_self_hosting_realtime'}
+        currentLevel={level}
+        commonSections={realtimeServerCommonSections}
         lib="self-hosting-auth"
       />
     </div>
