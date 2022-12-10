@@ -18,6 +18,23 @@ import libCommonSections from '~/../../spec/common-client-libs-sections.json'
 import cliCommonSections from '~/../../spec/common-cli-sections.json'
 import apiCommonSections from '~/../../spec/common-api-sections.json'
 
+// Filter libCommonSections for just the relevant sections in the current library
+function filterByLib(sections, lib) {
+  // Filter parent sections first
+  const libSections = sections.filter((section) => section.libs.includes(lib))
+
+  // Map over the parents and filter for items that include the current lib
+  return libSections.map((section) => {
+    const items = section.items ? section.items.filter((item) => item.libs.includes(lib)) : []
+    return {
+      ...section,
+      items,
+    }
+  })
+}
+const dart0 = filterByLib(libCommonSections, 'dart_v0')
+console.log('dart0', dart0)
+
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 export type RefIdOptions =
@@ -26,12 +43,26 @@ export type RefIdOptions =
   | 'reference_cli'
   | 'reference_api'
   | 'reference_self_hosting_server'
+
 export type RefKeyOptions = 'javascript' | 'dart' | 'cli' | 'api' | 'self-hosting-server'
 
 const SideNav = () => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
   const [level, setLevel] = useState('home')
+
+  //console.log('router', router.asPath)
+
+  let version = ''
+  if (router.asPath.includes('v1')) {
+    version = '_v1'
+  }
+
+  if (router.asPath.includes('v0')) {
+    version = '_v0'
+  }
+  //console.log({ version })
+  //console.log(`dart${version ?? version}`)
 
   function handleRouteChange(url: string) {
     switch (url) {
@@ -311,18 +342,20 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
       {/* reference level */}
+
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript'}
         currentLevel={level}
-        commonSections={libCommonSections}
+        commonSections={filterByLib(libCommonSections, `js${version ?? version}`)}
         lib="javascript"
       />
+
       <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart'}
         currentLevel={level}
-        commonSections={libCommonSections}
+        commonSections={filterByLib(libCommonSections, `dart${version ?? version}`)}
         lib="dart"
       />
       <NavigationMenuRefList

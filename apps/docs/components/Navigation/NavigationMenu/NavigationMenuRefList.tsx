@@ -42,7 +42,7 @@ const FunctionLink = ({
             active ? 'text-brand-900' : 'text-scale-1000',
           ].join(' ')}
         >
-          {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
+          {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
           {title}
         </a>
       </Link>
@@ -72,7 +72,6 @@ interface INavigationMenuRefList {
 
 const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   currentLevel,
-
   id,
   lib,
   commonSections,
@@ -209,7 +208,13 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                     >
                       {props.items &&
                         props.items.map((item) => {
-                          return <FunctionLink {...item} library={lib} />
+                          if (item.libs.includes('js_v1')) {
+                            return (
+                              <>
+                                a<FunctionLink {...item} library={lib} />b
+                              </>
+                            )
+                          }
                         })}
                     </Accordion.Content>
                   </Accordion.Item>
@@ -225,18 +230,19 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                   <SideMenuTitle title={fn.title} />
                   {fn.items &&
                     fn.items
-                      // .filter((item) => item.libs.includes(lib))
+                      //.filter((item) => item.libs && item.libs.includes(lib))
                       .map((item) => <RenderLink {...item} library={menu.title} />)}
                 </>
               )
             } else {
               // handle normal links
+
               return (
                 <>
                   <RenderLink {...fn} library={menu.title} />
                   {fn.items &&
                     fn.items
-                      // .filter((item) => item.libs.includes(lib))
+                      //.filter((item) => item.libs.includes(lib))
                       .map((item) => <RenderLink {...item} library={menu.title} />)}
                 </>
               )
