@@ -210,6 +210,12 @@ export const METRICS = [
     category: METRIC_CATEGORIES.API_STORAGE,
   },
   {
+    key: 'total_storage_image_render_count',
+    label: 'Storage Image Renders',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+  {
     key: 'total_storage_requests',
     label: 'Storage Requests',
     provider: 'daily-stats',

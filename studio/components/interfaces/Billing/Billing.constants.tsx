@@ -69,6 +69,13 @@ export const USAGE_BASED_PRODUCTS = [
         units: 'bytes',
         costPerUnit: 0.09,
       },
+      {
+        key: 'storage_image_render_count',
+        attribute: 'total_storage_image_render_count',
+        title: 'Storage Image Renders',
+        units: 'absolute',
+        costPerUnit: 0.005,
+      },
     ],
   },
   {
