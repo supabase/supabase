@@ -733,61 +733,33 @@ export const reference_cli = {
   title: 'Supabase CLI',
   url: '/guides/reference/cli',
   parent: '/',
-  items: [
-    {
-      name: 'Getting Started',
-      items: [
-        {
-          name: 'fake link',
-          href: '/reference/javascript/start',
-          level: 'reference_javascript',
-          items: [],
-          icon: '/img/icons/javascript.svg',
-        },
-      ],
-    },
-  ],
 }
 export const reference_api = {
   icon: '/img/icons/api-icon.svg',
   title: 'Management API',
   url: '/guides/reference/api',
   parent: '/reference',
-  items: [
-    {
-      name: 'Getting Started',
-      items: [
-        {
-          name: 'fake link',
-          href: '/reference/javascript/start',
-          level: 'reference_javascript',
-          items: [],
-          icon: '/img/icons/javascript.svg',
-        },
-      ],
-    },
-  ],
 }
 
 export const reference_self_hosting_auth = {
-  icon: '/img/icons/menu/auth-icon.svg',
+  icon: '/img/icons/menu/reference-auth.svg',
   title: 'Self Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
-  items: [
-    {
-      name: 'Getting Started',
-      items: [
-        {
-          name: 'fake link',
-          href: '/reference/javascript/start',
-          level: 'reference_javascript',
-          items: [],
-          icon: '/img/icons/javascript.svg',
-        },
-      ],
-    },
-  ],
+}
+
+export const reference_self_hosting_storage = {
+  icon: '/img/icons/menu/reference-storage.svg',
+  title: 'Self Hosting Storage',
+  url: '/guides/reference/self-hosting/auth',
+  parent: '/reference',
+}
+
+export const reference_self_hosting_realtime = {
+  icon: '/img/icons/menu/reference-auth.svg',
+  title: 'Self Hosting Realtime',
+  url: '/guides/reference/self-hosting/auth',
+  parent: '/reference',
 }
 
 // export const reference: [

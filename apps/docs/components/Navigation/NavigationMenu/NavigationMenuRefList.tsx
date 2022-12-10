@@ -158,11 +158,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
             src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
             className="rounded"
           />
-          <span
-            className={['font-mono text-sm text-brand-1200 ', !menu.title && 'capitalize'].join(
-              ' '
-            )}
-          >
+          <span className={['text-base text-brand-1200 ', !menu.title && 'capitalize'].join(' ')}>
             {menu.title}
           </span>
           <RevVersionDropdown />
@@ -173,8 +169,13 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
           {sections.map((fn: any) => {
             //
             // check if the link is allowed to be displayed
-            function isFuncNotInLibraryOrVersion(id) {
-              if (id && allowedClientKeys && !allowedClientKeys.includes(id)) {
+            function isFuncNotInLibraryOrVersion(id, type) {
+              if (
+                id &&
+                allowedClientKeys &&
+                !allowedClientKeys.includes(id) &&
+                type !== 'markdown'
+              ) {
                 /*
                  * Remove this menu link from side bar, as it does not exist for either
                  * this language, or for this lib version
@@ -187,7 +188,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
             }
 
             // run allow check
-            if (isFuncNotInLibraryOrVersion(fn.id)) {
+            if (isFuncNotInLibraryOrVersion(fn.id, fn.type)) {
               return <></>
             }
 
@@ -238,7 +239,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                           if (item.libs.includes('js_v1')) {
                             return (
                               <>
-                                a<FunctionLink {...item} library={lib} />b
+                                <FunctionLink {...item} library={lib} />b
                               </>
                             )
                           }
@@ -260,7 +261,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                       //.filter((item) => item.libs && item.libs.includes(lib))
                       .map((item) => {
                         // run allow check
-                        if (isFuncNotInLibraryOrVersion(item.id)) return <></>
+                        if (isFuncNotInLibraryOrVersion(item.id, item.type)) return <></>
                         return <RenderLink {...item} library={menu.title} />
                       })}
                 </>

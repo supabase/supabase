@@ -12,6 +12,7 @@ interface ISectionContainer {
   slug: string
   scrollSpyHeader?: boolean
   singleColumn?: boolean
+  icon?: string
 }
 
 type RefSubLayoutSubComponents = {
@@ -28,6 +29,7 @@ type StickyHeader = {
   title?: string
   monoFont?: boolean
   scrollSpyHeader?: boolean // whether or not the header updates the url on scroll
+  icon?: string
 }
 
 type RefSubLayoutType = {}
@@ -40,6 +42,7 @@ interface IEducationSection {
   slug: string
   scrollSpyHeader?: boolean
   hideTitle?: boolean
+  icon?: string
 }
 interface ISectionDetails {}
 interface ISectionExamples {}
@@ -70,7 +73,7 @@ const Section: FC<ISectionContainer> = (props) => {
   )
 }
 
-const StickyHeader: FC<StickyHeader> = (props) => {
+const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   const router = useRouter()
   const { setActiveRefItem } = useNavigationMenuContext()
 
@@ -91,17 +94,25 @@ const StickyHeader: FC<StickyHeader> = (props) => {
   })
 
   return (
-    <h2
-      ref={ref}
-      id={props.slug}
-      data-ref-id={props.id}
-      className={[
-        'text-2xl font-medium text-scale-1200 mb-8 scroll-mt-24',
-        props.monoFont && 'font-mono',
-      ].join(' ')}
-    >
-      {props.title && <span className="max-w-xl">{props.title}</span>}
-    </h2>
+    <div className={['flex items-center gap-3 not-prose', icon && 'mb-8'].join(' ')}>
+      {icon && (
+        <div className="w-8 h-8 bg-brand-500 rounded flex items-center justify-center">
+          <img className="w-6 h-6" src={`${icon}.svg`} />
+        </div>
+      )}
+      <h2
+        ref={ref}
+        id={props.slug}
+        data-ref-id={props.id}
+        className={[
+          'text-2xl font-medium text-scale-1200 scroll-mt-24',
+          !icon && 'mb-8',
+          props.monoFont && 'font-mono',
+        ].join(' ')}
+      >
+        {props.title && <span className="max-w-xl">{props.title}</span>}
+      </h2>
+    </div>
   )
 }
 
@@ -121,14 +132,14 @@ const EducationRow: FC<IEducationRow> = (props) => {
   return <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">{props.children}</div>
 }
 
-const EducationSection: FC<IEducationSection> = ({ hideTitle = false, ...props }) => {
+const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {
   // console.log({ props })
   return (
     <article
       key={props.id}
       className={'prose dark:prose-dark max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
     >
-      {!hideTitle && <StickyHeader {...props} />}
+      {!hideTitle && <StickyHeader {...props} icon={icon} />}
       {props.children}
     </article>
   )

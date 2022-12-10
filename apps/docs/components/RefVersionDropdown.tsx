@@ -23,6 +23,10 @@ const RevVersionDropdown = () => {
     }
   }
 
+  if (!versions || versions.length === 0) {
+    return <></>
+  }
+
   return (
     <Dropdown
       size="small"
