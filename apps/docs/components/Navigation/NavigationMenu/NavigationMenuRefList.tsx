@@ -96,6 +96,8 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
     ? find(sections, { title: 'Database' }).items
     : []
 
+  // console.log('databaseFunctions', databaseFunctions)
+
   const filterIds =
     databaseFunctions.length > 0
       ? find(databaseFunctions, {
@@ -166,7 +168,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         {/* )} */}
 
         <ul className="function-link-list">
-          {sections.map((fn: any) => {
+          {sections.map((fn: any, fnIndex) => {
             //
             // check if the link is allowed to be displayed
             function isFuncNotInLibraryOrVersion(id, type) {
@@ -196,10 +198,15 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
               const activeAccordianItem = useMenuActiveRefId()
               let active = false
 
+              // console.log('activeAccordianItem', activeAccordianItem)
+
               const isFilter =
                 filterIds && filterIds.length > 0 && filterIds.includes(activeAccordianItem)
               const isModifier =
                 modifierIds && modifierIds.length > 0 && modifierIds.includes(activeAccordianItem)
+
+              // console.log('isFilter', props.id, isFilter)
+              // console.log('isModifier', props.id, isModifier)
 
               if (
                 (isFilter && !isModifier && props.id === 'using-filters') ||
@@ -221,10 +228,17 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                 active = false
               }
 
+              // if (props.id === 'using-filters') {
+              //   console.log('using-filters', active)
+              // }
+              // if (props.id === 'using-modifiers') {
+              //   console.log('using-modifiers', active)
+              // }
+
               return (
                 <Accordion.Root
                   collapsible
-                  key={props.id + 'accordian-root-for-func'}
+                  key={props.id + '-accordian-root-for-func-' + fnIndex}
                   type="single"
                   value={active ? props.id : ''}
                 >
@@ -236,13 +250,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                     >
                       {props.items &&
                         props.items.map((item) => {
-                          if (item.libs.includes('js_v1')) {
-                            return (
-                              <>
-                                <FunctionLink {...item} library={lib} />b
-                              </>
-                            )
-                          }
+                          return <FunctionLink {...item} library={lib} />
                         })}
                     </Accordion.Content>
                   </Accordion.Item>
@@ -315,4 +323,4 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   )
 }
 
-export default memo(NavigationMenuRefList)
+export default NavigationMenuRefList
