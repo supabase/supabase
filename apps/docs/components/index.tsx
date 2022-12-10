@@ -22,6 +22,7 @@ import InlineCodeTag from './CustomHTMLElements/InlineCode'
 import React from 'react'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { CH } from '@code-hike/mdx/components'
+import RefHeaderSection from './reference/RefHeaderSection'
 
 const components = {
   Admonition,
@@ -62,6 +63,7 @@ const components = {
   RefSubLayout,
   CH,
   code: (props: any) => <CodeBlock {...props} />,
+  RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
 }
 
 export default components
