@@ -96,6 +96,10 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
     ? find(sections, { title: 'Database' }).items
     : []
 
+  const authFunctions = find(sections, { title: 'Auth' })
+    ? find(sections, { title: 'Auth' }).items
+    : []
+
   // console.log('databaseFunctions', databaseFunctions)
 
   const filterIds =
@@ -115,6 +119,16 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }) &&
         find(databaseFunctions, {
           id: 'using-modifiers',
+        }).items.map((x) => x.id)
+      : []
+
+  const authServerIds =
+    databaseFunctions.length > 0
+      ? find(authFunctions, {
+          id: 'admin-api',
+        }) &&
+        find(authFunctions, {
+          id: 'admin-api',
         }).items.map((x) => x.id)
       : []
 
@@ -204,12 +218,16 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                 filterIds && filterIds.length > 0 && filterIds.includes(activeAccordianItem)
               const isModifier =
                 modifierIds && modifierIds.length > 0 && modifierIds.includes(activeAccordianItem)
+              const isAuthServer =
+                authServerIds &&
+                authServerIds.length > 0 &&
+                authServerIds.includes(activeAccordianItem)
 
               // console.log('isFilter', props.id, isFilter)
               // console.log('isModifier', props.id, isModifier)
 
               if (
-                (isFilter && !isModifier && props.id === 'using-filters') ||
+                (isFilter && !isModifier && !isAuthServer && props.id === 'using-filters') ||
                 (activeAccordianItem === 'using-filters' &&
                   !isModifier &&
                   !isFilter &&
@@ -217,11 +235,20 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
               ) {
                 active = true
               } else if (
-                (isModifier && !isFilter && props.id === 'using-modifiers') ||
+                (isModifier && !isFilter && !isAuthServer && props.id === 'using-modifiers') ||
                 (activeAccordianItem === 'using-modifiers' &&
                   !isFilter &&
                   !isModifier &&
                   props.id === 'using-modifiers')
+              ) {
+                active = true
+              } else if (
+                (isAuthServer && !isFilter && !isModifier && props.id === 'admin-api') ||
+                (activeAccordianItem === 'admin-api' &&
+                  !isFilter &&
+                  !isModifier &&
+                  !isAuthServer &&
+                  props.id === 'admin-api')
               ) {
                 active = true
               } else {
