@@ -85,28 +85,30 @@ const ApiOperationSection = (props) => {
             </div>
           )}
       </RefSubLayout.Details>
-      <RefSubLayout.Examples>
-        <h5 className="mb-3 text-base text-scale-1200">Responses</h5>
-        <Tabs
-          scrollable
-          size="small"
-          type="underlined"
-          defaultActiveId={operation.responseList[0].responseCode}
-        >
-          {operation.responseList.map((response: any) => (
-            <Tabs.Panel id={response.responseCode} label={response.responseCode}>
-              <p>{response.description}</p>
-              {response?.content && response?.content['application/json'] && (
-                <div className="mt-8">
-                  <CodeBlock language="bash" className="relative">
-                    {JSON.stringify(response.content['application/json'], null, 2)}
-                  </CodeBlock>
-                </div>
-              )}
-            </Tabs.Panel>
-          ))}
-        </Tabs>
-      </RefSubLayout.Examples>
+      {operation.responseList && operation.responseList.length > 0 && (
+        <RefSubLayout.Examples>
+          <h5 className="mb-3 text-base text-scale-1200">Responses</h5>
+          <Tabs
+            scrollable
+            size="small"
+            type="underlined"
+            defaultActiveId={operation.responseList[0].responseCode}
+          >
+            {operation.responseList.map((response: any) => (
+              <Tabs.Panel id={response.responseCode} label={response.responseCode}>
+                <p>{response.description}</p>
+                {response?.content && response?.content['application/json'] && (
+                  <div className="mt-8">
+                    <CodeBlock language="bash" className="relative">
+                      {JSON.stringify(response.content['application/json'], null, 2)}
+                    </CodeBlock>
+                  </div>
+                )}
+              </Tabs.Panel>
+            ))}
+          </Tabs>
+        </RefSubLayout.Examples>
+      )}
     </RefSubLayout.Section>
   )
 }

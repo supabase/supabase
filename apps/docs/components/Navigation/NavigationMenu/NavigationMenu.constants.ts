@@ -154,30 +154,6 @@ export const cli = {
 
 export const SocialLoginItems = [
   {
-    name: 'Google',
-    icon: '/docs/img/icons/google-icon',
-    url: '/guides/auth/social-login/auth-google',
-    items: [],
-  },
-  {
-    name: 'Facebook',
-    icon: '/docs/img/icons/facebook-icon',
-    url: '/guides/auth/social-login/auth-facebook',
-    items: [],
-  },
-  {
-    name: 'Twitter',
-    icon: '/docs/img/icons/twitter-icon',
-    url: '/guides/auth/social-login/auth-twitter',
-    items: [],
-  },
-  {
-    name: 'LinkedIn',
-    icon: '/docs/img/icons/linkedin-icon',
-    url: '/guides/auth/social-login/auth-linkedin',
-    items: [],
-  },
-  {
     name: 'Apple',
     icon: '/docs/img/icons/apple-icon',
     url: '/guides/auth/social-login/auth-apple',
@@ -187,6 +163,24 @@ export const SocialLoginItems = [
     name: 'Azure',
     icon: '/docs/img/icons/microsoft-icon',
     url: '/guides/auth/social-login/auth-azure',
+    items: [],
+  },
+  {
+    name: 'Bitbucket',
+    icon: '/docs/img/icons/bitbucket-icon',
+    url: '/guides/auth/social-login/auth-bitbucket',
+    items: [],
+  },
+  {
+    name: 'Discord',
+    icon: '/docs/img/icons/discord-icon',
+    url: '/guides/auth/social-login/auth-discord',
+    items: [],
+  },
+  {
+    name: 'Facebook',
+    icon: '/docs/img/icons/facebook-icon',
+    url: '/guides/auth/social-login/auth-facebook',
     items: [],
   },
   {
@@ -203,21 +197,21 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Bitbucket',
-    icon: '/docs/img/icons/bitbucket-icon',
-    url: '/guides/auth/social-login/auth-bitbucket',
-    items: [],
-  },
-  {
-    name: 'Discord',
-    icon: '/docs/img/icons/discord-icon',
-    url: '/guides/auth/social-login/auth-discord',
+    name: 'Google',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/social-login/auth-google',
     items: [],
   },
   {
     name: 'Keycloak',
     icon: '/docs/img/icons/keycloak-icon',
     url: '/guides/auth/social-login/auth-keycloak',
+    items: [],
+  },
+  {
+    name: 'LinkedIn',
+    icon: '/docs/img/icons/linkedin-icon',
+    url: '/guides/auth/social-login/auth-linkedin',
     items: [],
   },
   {
@@ -245,6 +239,12 @@ export const SocialLoginItems = [
     items: [],
   },
   {
+    name: 'Twitter',
+    icon: '/docs/img/icons/twitter-icon',
+    url: '/guides/auth/social-login/auth-twitter',
+    items: [],
+  },
+  {
     name: 'WorkOS',
     icon: '/docs/img/icons/workos-icon',
     url: '/guides/auth/social-login/auth-workos',
@@ -253,6 +253,13 @@ export const SocialLoginItems = [
 ]
 
 export const PhoneLoginsItems = [
+  {
+    name: 'MessageBird SMS login',
+    icon: '/docs/img/icons/messagebird-icon',
+    linkDescription: 'communication between businesses and their customers — across any channel.',
+    url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
+    items: [],
+  },
   {
     name: 'Twilio SMS login',
     icon: '/docs/img/icons/twilio-icon',
@@ -268,13 +275,6 @@ export const PhoneLoginsItems = [
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses',
     items: [],
     isDarkMode: true,
-  },
-  {
-    name: 'MessageBird SMS login',
-    icon: '/docs/img/icons/messagebird-icon',
-    linkDescription: 'communication between businesses and their customers — across any channel.',
-    url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
-    items: [],
   },
 ]
 
@@ -292,11 +292,6 @@ export const auth = {
       items: [
         { name: 'Email login', url: '/guides/auth/auth-email', items: [] },
         {
-          name: 'Social Login',
-          url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
-        },
-        {
           name: 'Passwordless login',
           url: '/guides/auth/passwordless-login',
           items: [
@@ -309,17 +304,22 @@ export const auth = {
             ...PhoneLoginsItems,
           ],
         },
+        {
+          name: 'Social Login',
+          url: '/guides/auth/social-login',
+          items: [...SocialLoginItems],
+        },
       ],
     },
     {
       name: 'Authorization',
       url: undefined,
       items: [
-        { name: 'Row Level Security', url: '/guides/auth/row-level-security', items: [] },
-        { name: 'Managing User Data', url: '/guides/auth/managing-user-data', items: [] },
         { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha', items: [] },
-        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering', items: [] },
+        { name: 'Managing User Data', url: '/guides/auth/managing-user-data', items: [] },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa', items: [] },
+        { name: 'Row Level Security', url: '/guides/auth/row-level-security', items: [] },
+        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering', items: [] },
       ],
     },
     {
@@ -329,8 +329,8 @@ export const auth = {
         { name: 'Overview', url: '/guides/auth/auth-helpers', items: [] },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
         { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
-        { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix', items: [] },
+        { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
       ],
     },
     {
@@ -355,20 +355,6 @@ export const auth = {
           items: [],
         },
       ],
-    },
-  ],
-  extras: [
-    {
-      name: 'API Reference',
-      level: 'integrations',
-      items: [],
-      icon: 'reference',
-    },
-    {
-      name: 'Integrations',
-      level: 'reference',
-      items: [],
-      icon: 'integrations',
     },
   ],
 }
@@ -493,7 +479,7 @@ export const platform = {
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
     { name: 'Architecture', url: '/architecture', items: [] },
-    { 
+    {
       name: 'Add-ons',
       url: undefined,
       items: [
@@ -501,7 +487,7 @@ export const platform = {
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
       ],
     },
-    { 
+    {
       name: 'Platform Management',
       url: undefined,
       items: [
@@ -520,9 +506,7 @@ export const platform = {
     {
       name: 'Go-live Checklist',
       url: undefined,
-      items: [
-        { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
-      ],
+      items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] }],
     },
   ],
 }
@@ -717,46 +701,31 @@ export const reference = {
   ],
 }
 
-export const reference_javascript = {
+export const reference_javascript_v1 = {
   icon: '/img/icons/javascript-icon.svg',
   title: 'javascript',
   url: '/guides/reference/javascript',
   parent: '/reference',
-  items: [
-    {
-      name: 'Getting Started',
-      items: [
-        {
-          name: 'fake link',
-          href: '/reference/javascript/start',
-          level: 'reference_javascript',
-          items: [],
-          icon: '/img/icons/javascript.svg',
-        },
-      ],
-    },
-  ],
 }
 
-export const reference_dart = {
+export const reference_javascript_v2 = {
+  icon: '/img/icons/javascript-icon.svg',
+  title: 'javascript',
+  url: '/guides/reference/javascript',
+  parent: '/reference',
+}
+
+export const reference_dart_v0 = {
   icon: '/img/icons/dart-icon.svg',
   title: 'dart',
   url: '/guides/reference/dart',
   parent: '/reference',
-  items: [
-    {
-      name: 'Getting Started',
-      items: [
-        {
-          name: 'fake link',
-          href: '/reference/dart/start',
-          level: 'reference_dart',
-          items: [],
-          icon: '/img/icons/dart.svg',
-        },
-      ],
-    },
-  ],
+}
+export const reference_dart_v1 = {
+  icon: '/img/icons/dart-icon.svg',
+  title: 'dart',
+  url: '/guides/reference/dart',
+  parent: '/reference',
 }
 
 export const reference_cli = {
@@ -800,10 +769,10 @@ export const reference_api = {
   ],
 }
 
-export const reference_self_hosting_server = {
-  icon: '/img/icons/self-hosting.svg',
-  title: 'Self Hosting Server',
-  url: '/guides/reference/api',
+export const reference_self_hosting_auth = {
+  icon: '/img/icons/menu/auth-icon.svg',
+  title: 'Self Hosting Auth',
+  url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
   items: [
     {
