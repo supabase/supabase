@@ -1,5 +1,4 @@
-import { add } from 'lodash'
-import { DatabaseAddon } from './AddOns/AddOns.types'
+import { SubscriptionAddon } from './AddOns/AddOns.types'
 import {
   formatComputeSizes,
   formatCustomDomainOptions,
@@ -30,9 +29,9 @@ const getProductPriceId = (
 }
 
 export const validateSubscriptionUpdatePayload = (selectedAddons: {
-  computeSize: DatabaseAddon
-  pitrDuration: DatabaseAddon
-  customDomains: DatabaseAddon
+  computeSize: SubscriptionAddon
+  pitrDuration: SubscriptionAddon
+  customDomains: SubscriptionAddon
 }) => {
   if (
     selectedAddons.pitrDuration?.id !== undefined &&
@@ -47,11 +46,11 @@ export const formSubscriptionUpdatePayload = (
   currentSubscription: StripeSubscription,
   selectedTier: any,
   selectedAddons: {
-    computeSize: DatabaseAddon
-    pitrDuration: DatabaseAddon
-    customDomains: DatabaseAddon
+    computeSize: SubscriptionAddon
+    pitrDuration: SubscriptionAddon
+    customDomains: SubscriptionAddon
   },
-  nonChangeableAddons: DatabaseAddon[],
+  nonChangeableAddons: SubscriptionAddon[],
   selectedPaymentMethod: string,
   region: string
 ) => {
@@ -84,10 +83,10 @@ export const formSubscriptionUpdatePayload = (
 
 const findAddon = (
   subscription: StripeSubscription,
-  addons: DatabaseAddon[],
+  addons: SubscriptionAddon[],
   key: string,
   defaultKey: string
-): DatabaseAddon => {
+): SubscriptionAddon => {
   const product = addons.find((option) => {
     const subscriptionAddon = subscription.addons.find((addon) =>
       addon.supabase_prod_id.includes(key)
@@ -95,7 +94,9 @@ const findAddon = (
     return option.id === subscriptionAddon?.prod_id
   })
   if (product === undefined) {
-    return addons.find((addon) => addon.metadata.supabase_prod_id === defaultKey) as DatabaseAddon
+    return addons.find(
+      (addon) => addon.metadata.supabase_prod_id === defaultKey
+    ) as SubscriptionAddon
   } else {
     const subscriptionAddon = subscription.addons.find((addon) => addon.prod_id === product.id)
     return { ...product, isLocked: subscriptionAddon?.unit_amount === 0 }
@@ -104,12 +105,12 @@ const findAddon = (
 
 export const getCurrentAddons = (
   currentSubscription: StripeSubscription,
-  addons: DatabaseAddon[]
+  addons: SubscriptionAddon[]
 ): {
-  computeSize: DatabaseAddon
-  pitrDuration: DatabaseAddon
-  customDomains: DatabaseAddon
-  supportPlan?: DatabaseAddon
+  computeSize: SubscriptionAddon
+  pitrDuration: SubscriptionAddon
+  customDomains: SubscriptionAddon
+  supportPlan?: SubscriptionAddon
 } => {
   const computeSizes = formatComputeSizes(addons)
   const pitrDurationOptions = formatPITROptions(addons)

@@ -1,4 +1,4 @@
-export interface DatabaseAddon {
+export interface SubscriptionAddon {
   id?: string
   name: string
   description?: string | null

@@ -5,12 +5,12 @@ import { Badge, Button, Radio } from 'ui'
 import { useFlag, useParams } from 'hooks'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
-import { DatabaseAddon } from './AddOns.types'
+import { SubscriptionAddon } from './AddOns.types'
 
 interface Props {
-  options: DatabaseAddon[]
-  currentOption?: DatabaseAddon
-  selectedOption: DatabaseAddon
+  options: SubscriptionAddon[]
+  currentOption?: SubscriptionAddon
+  selectedOption: SubscriptionAddon
   onSelectOption: (option: any) => void
 }
 
