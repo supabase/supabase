@@ -2,8 +2,8 @@
 title: 'pg_crdt - an experimental Postgres extension for Postgres'
 description: "Embedding Yjs and Automerge into Postgres for collaborative applications."
 author: paul_copplestone
-image: who-we-hire.jpg
-thumb: who-we-hire-cover.jpg
+image: crdt/crdt-blog.jpg
+thumb: crdt/crdt-blog.jpg
 tags:
   - launch-week
 date: '2022-12-09'
@@ -19,9 +19,7 @@ it took 30 minutes for someone to ask if we’d add CRDT support.
 
 Today we’re open-sourcing an EXPERIMENTAL extension for CRDTs: [pg_crdt](https://github.com/supabase/pg_crdt). There are [instructions](https://github.com/supabase/pg_crdt#installation) on how to test and run it locally in the README.
 
-It’s not released onto the Supabase platform, and it may never be released. It has a few limitations, it’s never been stress tested, and we’re still not sure if it’s the right approach. But it has promise, so we’re opening it up for feedback, ideas and comments.
-
-We’re considering many options for offline-sync/support, and CRDTs will undoubtedly factor in. This release will hopefully generate a healthy discussion about the various ways we can do it at Supabase.
+pg_crdt has not been released onto the Supabase platform (and it may never be). We’re considering many options for offline-sync/support and, while CRDTs will undoubtedly factor in, we’re not sure if this is the *right* approach. Hopefully this release generates a healthy discussion about the various ways we can do it at Supabase.
 
 ## What’s a CRDT?
 
@@ -49,13 +47,18 @@ The developer sitting next to her, let’s call him “Jonny”, does the same:
 fruit[0] = 'Mango' // the array is ['Mango', 'Banana', 'Orange']
 ```
 
-And now, since they are both developing on different machines, they push their changes to a remote server. When the updates land on the remote system, what will the value `fruit[0]` be? “Grape” or “Mango”?
+And now, since they are both developing on different machines, they push their changes to a remote server. When the updates land on the remote system, what will `fruit[0]` be? “Grape” or “Mango”?
 
 ![Array - which will be saved?](/images/blog/crdt/array.png)
 
-Since this is one of those *basic* arrays, the answer is that the fruit array that “arrives last” will be the one that is saved. If Jonny’s fruit array arrives first, it will be saved; and then after that Jenny’s fruit will arrive and overwrite Jonny’s changes. But therein lies the problem: Jonny was the last developer to change his array of fruit, shouldn’t his changes be the ones that are saved?
+Since this is one of those *basic* arrays, the answer is "the fruit array that arrives last”. 
 
-That’s what CRDTs solve. There is an “array CRDT” which, when merged, will always have the same result. It doesn’t matter if Jonny’s array arrives first, or if Jenny’s arrives first - every time you merge them they would be able to determine that the Jonny’s was the last change the fruit array. 
+1. If Jonny’s fruit array arrives first, it will be saved.
+2. After that, Jenny’s fruit arrived and overwrites Jonny’s changes. 
+
+But therein lies the problem: Jonny was the last developer to change his array of fruit, shouldn’t his changes be the ones that are saved?
+
+That’s one of the things that CRDTs solve. There is an “array CRDT” which, when merged, will always have the same result. It doesn’t matter if Jonny’s array arrives first, or if Jenny’s arrives first - every time you merge them they would be able to determine that the Jonny’s was the last change the fruit array. 
 
 How does it do that? Some sort of algorithm, but you can ask ChatGPT to explain that one.
 
