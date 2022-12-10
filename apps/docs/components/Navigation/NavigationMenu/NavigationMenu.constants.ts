@@ -493,20 +493,40 @@ export const platform = {
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
     { name: 'Architecture', url: '/architecture', items: [] },
-    { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
-    { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
-    { name: 'Logging', url: '/guides/platform/logs', items: [] },
-    { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
-    {
-      name: 'Migrating and Upgrading',
-      url: '/guides/platform/migrating-and-upgrading-projects',
-      items: [],
+    { 
+      name: 'Add-ons',
+      url: undefined,
+      items: [
+        { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
+        { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
+      ],
     },
-    { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
-    { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
-    { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+    { 
+      name: 'Platform Management',
+      url: undefined,
+      items: [
+        { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
+        { name: 'Logging', url: '/guides/platform/logs', items: [] },
+        { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
+        {
+          name: 'Migrating and Upgrading',
+          url: '/guides/platform/migrating-and-upgrading-projects',
+          items: [],
+        },
+        { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
+        { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+      ],
+    },
+    {
+      name: 'Go-live Checklist',
+      url: undefined,
+      items: [
+        { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+      ],
+    },
   ],
 }
+
 export const resources = {
   icon: 'resources',
   label: 'Resources',
