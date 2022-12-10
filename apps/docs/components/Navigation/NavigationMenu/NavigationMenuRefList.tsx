@@ -158,11 +158,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
             src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
             className="rounded"
           />
-          <span
-            className={['font-mono text-sm text-brand-1200 ', !menu.title && 'capitalize'].join(
-              ' '
-            )}
-          >
+          <span className={['text-base text-brand-1200 ', !menu.title && 'capitalize'].join(' ')}>
             {menu.title}
           </span>
           <RevVersionDropdown />
@@ -238,7 +234,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                           if (item.libs.includes('js_v1')) {
                             return (
                               <>
-                                a<FunctionLink {...item} library={lib} />b
+                                <FunctionLink {...item} library={lib} />b
                               </>
                             )
                           }
