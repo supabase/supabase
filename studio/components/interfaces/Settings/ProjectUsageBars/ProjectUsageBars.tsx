@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { Badge, IconAlertCircle, Loading } from 'ui'
+import { Badge, Button, IconAlertCircle, Loading } from 'ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -8,6 +8,8 @@ import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 interface Props {
   projectRef?: string
@@ -16,6 +18,7 @@ interface Props {
 const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const { usage, error, isLoading } = useProjectUsage(projectRef)
+  const router = useRouter()
 
   const projectHasNoLimits =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
@@ -57,6 +60,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   return featureUsage.usage / featureUsage.limit > 1
                 })
                 .some((x) => x === true)
+
             return (
               <div
                 key={product.title}
@@ -104,6 +108,51 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         const usageRatio = usageValue / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
                         const isExceeded = showUsageExceedMessage && usageRatio >= 1
+                        const isAvailableInPlan = featureUsage.available_in_plan
+
+                        let usageElement
+                        if (!isAvailableInPlan) {
+                          usageElement = (
+                            <div>
+                              <Link href={`/project/${projectRef}/settings/billing/update`}>
+                                <a className="underline">
+                                  <span>Upgrade to unlock</span>
+                                </a>
+                              </Link>
+                            </div>
+                          )
+                        } else if (showUsageExceedMessage) {
+                          usageElement = (
+                            <SparkBar
+                              type="horizontal"
+                              barClass={`${
+                                isExceeded
+                                  ? 'bg-red-900'
+                                  : isApproaching
+                                  ? 'bg-yellow-900'
+                                  : 'bg-brand-900'
+                              }`}
+                              value={usageValue}
+                              max={featureUsage.limit}
+                              labelBottom={
+                                feature.units === 'bytes'
+                                  ? formatBytes(usageValue)
+                                  : usageValue.toLocaleString()
+                              }
+                              labelTop={
+                                feature.units === 'bytes'
+                                  ? formatBytes(featureUsage.limit)
+                                  : featureUsage.limit.toLocaleString()
+                              }
+                            />
+                          )
+                        } else {
+                          usageElement = (
+                            <span>
+                              {feature.units === 'bytes' ? formatBytes(usageValue) : usageValue}
+                            </span>
+                          )
+                        }
 
                         return (
                           <tr
@@ -117,40 +166,15 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                               <>
                                 {showUsageExceedMessage && (
                                   <td className="hidden w-1/5 whitespace-nowrap p-3 text-sm text-scale-1200 lg:table-cell">
-                                    {(usageRatio * 100).toFixed(2)} %
+                                    {isAvailableInPlan ? (
+                                      <>{(usageRatio * 100).toFixed(2)} %</>
+                                    ) : (
+                                      <>-</>
+                                    )}
                                   </td>
                                 )}
                                 <td className="px-6 py-3 text-sm text-scale-1200">
-                                  {showUsageExceedMessage ? (
-                                    <SparkBar
-                                      type="horizontal"
-                                      barClass={`${
-                                        isExceeded
-                                          ? 'bg-red-900'
-                                          : isApproaching
-                                          ? 'bg-yellow-900'
-                                          : 'bg-brand-900'
-                                      }`}
-                                      value={usageValue}
-                                      max={featureUsage.limit}
-                                      labelBottom={
-                                        feature.units === 'bytes'
-                                          ? formatBytes(usageValue)
-                                          : usageValue.toLocaleString()
-                                      }
-                                      labelTop={
-                                        feature.units === 'bytes'
-                                          ? formatBytes(featureUsage.limit)
-                                          : featureUsage.limit.toLocaleString()
-                                      }
-                                    />
-                                  ) : (
-                                    <span>
-                                      {feature.units === 'bytes'
-                                        ? formatBytes(usageValue)
-                                        : usageValue}
-                                    </span>
-                                  )}
+                                  {usageElement}
                                 </td>
                               </>
                             )}
