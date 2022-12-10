@@ -111,35 +111,35 @@
   },
 
   {
-    "title": "Hostname",
+    "title": "Custom Hostname",
     "items": [
       {
         "id": "gets-projects-custom-hostname-config",
-        "title": "Gets project's custom hostname config",
+        "title": "Retrieve hostname configuration",
         "slug": "gets-projects-custom-hostname-config",
         "type": "operation"
       },
       {
         "id": "deletes-a-projects-custom-hostname-configuration",
-        "title": "Deletes a project's custom hostname configuration",
+        "title": "Delete hostname configuration",
         "slug": "deletes-a-projects-custom-hostname-configuration",
         "type": "operation"
       },
       {
         "id": "updates-projects-custom-hostname-configuration",
-        "title": "Updates project's custom hostname configuration",
+        "title": "Update hostname configuration",
         "slug": "updates-projects-custom-hostname-configuration",
         "type": "operation"
       },
       {
         "id": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
-        "title": "Attempts to verify the DNS configuration for project's custom hostname configuration",
+        "title": "Verify DNS configuration",
         "slug": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
         "type": "operation"
       },
       {
         "id": "activates-a-custom-hostname-for-a-project",
-        "title": "Activates a custom hostname for a project.",
+        "title": "Activate custom hostname",
         "slug": "activates-a-custom-hostname-for-a-project",
         "type": "operation"
       }
@@ -150,13 +150,13 @@
     "items": [
       {
         "id": "gets-projects-pgsodium-config",
-        "title": "Gets project's pgsodium config",
+        "title": "Retrieve pgsodium config",
         "slug": "gets-projects-pgsodium-config",
         "type": "operation"
       },
       {
         "id": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
-        "title": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "title": "Update pgsodium config",
         "slug": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
         "type": "operation"
       }
@@ -167,25 +167,25 @@
     "items": [
       {
         "id": "gets-projects-network-bans",
-        "title": "Gets project's network bans",
+        "title": "Retrieve network bans",
         "slug": "gets-projects-network-bans",
         "type": "operation"
       },
       {
         "id": "remove-network-bans",
-        "title": "Remove network bans.",
+        "title": "Delete network bans",
         "slug": "remove-network-bans",
         "type": "operation"
       },
       {
         "id": "gets-projects-network-restrictions",
-        "title": "Gets project's network restrictions",
+        "title": "Retrieve network restrictions",
         "slug": "gets-projects-network-restrictions",
         "type": "operation"
       },
       {
         "id": "updates-projects-network-restrictions",
-        "title": "Updates project's network restrictions",
+        "title": "Update network restrictions",
         "slug": "updates-projects-network-restrictions",
         "type": "operation"
       }
