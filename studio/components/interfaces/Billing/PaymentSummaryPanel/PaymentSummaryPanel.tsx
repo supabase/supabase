@@ -111,6 +111,15 @@ const PaymentSummaryPanel: FC<Props> = ({
     } else return plan.name
   }
 
+  const getAddonPriceFromSubscription = (
+    key: 'computeSize' | 'pitrDuration' | 'customDomains' | 'supportPlan'
+  ) => {
+    return (
+      ((currentSubscription?.addons ?? []).find((addon) => addon.prod_id === currentAddons[key]?.id)
+        ?.unit_amount ?? 0) / 100
+    ).toFixed(2)
+  }
+
   const validateOrder = () => {
     const error = validateSubscriptionUpdatePayload(selectedAddons)
     if (error) {
@@ -170,12 +179,7 @@ const PaymentSummaryPanel: FC<Props> = ({
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
               >
-                $
-                {(
-                  ((currentSubscription?.addons ?? []).find(
-                    (addon) => addon.prod_id === currentAddons.computeSize.id
-                  )?.unit_amount ?? 0) / 100
-                ).toFixed(2)}
+                ${getAddonPriceFromSubscription('computeSize')}
               </p>
             </div>
             {isChangingComputeSize && (
@@ -202,12 +206,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  $
-                  {(
-                    ((currentSubscription?.addons ?? []).find(
-                      (addon) => addon.prod_id === currentAddons.pitrDuration.id
-                    )?.unit_amount ?? 0) / 100
-                  ).toFixed(2)}
+                  ${getAddonPriceFromSubscription('pitrDuration')}
                 </p>
               </div>
             )}
@@ -235,12 +234,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     isChangingCustomDomains ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  $
-                  {(
-                    ((currentSubscription?.addons ?? []).find(
-                      (addon) => addon.prod_id === currentAddons.customDomains.id
-                    )?.unit_amount ?? 0) / 100
-                  ).toFixed(2)}
+                  ${getAddonPriceFromSubscription('customDomains')}
                 </p>
               </div>
             )}
@@ -257,14 +251,7 @@ const PaymentSummaryPanel: FC<Props> = ({
             {currentAddons.supportPlan !== undefined && (
               <div className="flex items-center justify-between">
                 <p className="text-sm">{currentAddons.supportPlan?.name}</p>
-                <p className="text-sm">
-                  $
-                  {(
-                    ((currentSubscription?.addons ?? []).find(
-                      (addon) => addon.prod_id === currentAddons.supportPlan?.id
-                    )?.unit_amount ?? 0) / 100
-                  ).toFixed(2)}
-                </p>
+                <p className="text-sm">${getAddonPriceFromSubscription('supportPlan')}</p>
               </div>
             )}
 
