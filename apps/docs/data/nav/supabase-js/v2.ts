@@ -42,6 +42,11 @@ const Nav = [
         url: '/reference/javascript/auth-resetpasswordforemail',
         items: [],
       },
+      {
+        name: 'enroll()',
+        url: '/reference/javascript/auth-mfa-enroll',
+        items: [],
+      },
     ],
   },
   {

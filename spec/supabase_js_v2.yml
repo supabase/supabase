@@ -421,6 +421,18 @@ pages:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
+  auth.mfa.enroll():
+    title: 'enroll()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
+    notes: |
+      - Enrolls a factor. To verify the factor, see `auth.mfa.challengeAndVerify()`.
+    examples:
+      - name: Enroll a TOTP factor
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = supabase.auth.mfa.enroll({ factorType: 'totp' })
+          ```
   Supabase Auth Admin Api:
     title: 'Overview'
     notes: |
