@@ -52,7 +52,7 @@ fruit[0] = 'Mango' // the array is ['Mango', 'Banana', 'Orange']
 
 And now, since they are both developing on different machines, they push their changes to a remote server. When the updates land on the remote system, what will the value `fruit[0]` be? “Grape” or “Mango”?
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6af14eb0-f88d-419a-b852-3b4964290635/Untitled.png)
+![Array - which will be saved?](/images/blog/crdt/array.png)
 
 Since this is one of those *basic* arrays, the answer is that the fruit array that “arrives last” will be the one that is saved. If Jonny’s fruit array arrives first, it will be saved; and then after that Jenny’s fruit will arrive and overwrite Jonny’s changes. But therein lies the problem: Jonny was the last developer to change his array of fruit, shouldn’t his changes be the ones that are saved?
 
@@ -118,11 +118,11 @@ Importantly, both Yjs and Automerge have *JavaScript* and Rust implementations, 
 
 An alternative approach for CRDT support in Supabase is to build support directly into Realtime and use it as an Authoritative server. In this scenario, Realtime would serialize the CRDT and save it to Postgres (probably as a `bytea` data type). Yjs has the concept of [Providers](https://github.com/yjs/yjs#providers) which would facilitate this. You can see the difference between the approaches in the diagram below - on the left, Realtime acts as the “middleman” for saving the CRDT in the database, whereas on the right the CRDT is pushed directly to the database, and Realtime receives updates from Postgres. (Note also that clients can send peer-to-peer updates.)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/3f1fa8ca-0c18-4e93-a1e1-d010f35e4b83/Untitled.png)
+![Realtime as an authority](/images/blog/crdt/authority.png)
 
-This might still be our best option, but it should not be our first attempt. If we make Realtime the authority, it strongly couples  developers to the Supabase infrastructure. By placing the CRDT into the database, it simplifies the architecture, allows for other companies to develop their own sync strategies, and provides the possibility to  update the database directly (for semi-realtime events like counters or page-views).
+This might still be our best option, but it should not be our first attempt. If we make Realtime the authority, it strongly couples developers to the Supabase infrastructure. By placing the CRDT into the database, it simplifies the architecture, enables other tools (like Debezium), and provides the possibility to update the database directly (for semi-realtime events like counters or page-views).
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ba19fff9-53a6-44e4-8c41-b4cd7d7ed8c0/Untitled.png)
+![External providers](/images/blog/crdt/semi-realtime.png)
 
 The Realtime engine seems like a great *compliment* for `pg_crdt`, but before we put it into production we need to solve a few (major) limitations.
 
