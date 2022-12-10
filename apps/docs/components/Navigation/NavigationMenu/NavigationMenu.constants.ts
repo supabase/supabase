@@ -480,6 +480,8 @@ export const storage = {
   url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage', items: [] },
+    { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
+    { name: 'Access Control', url: '/guides/storage/access-control', items: [] },
     { name: 'CDN', url: '/guides/storage/cdn', items: [] },
   ],
 }
