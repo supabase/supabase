@@ -43,8 +43,28 @@ const Nav = [
         items: [],
       },
       {
-        name: 'enroll()',
+        name: 'mfa.enroll()',
         url: '/reference/javascript/auth-mfa-enroll',
+        items: [],
+      },
+      {
+        name: 'mfa.challenge()',
+        url: '/reference/javascript/auth-mfa-challenge',
+        items: [],
+      },
+      {
+        name: 'mfa.verify()',
+        url: '/reference/javascript/auth-mfa-verify',
+        items: [],
+      },
+      {
+        name: 'mfa.challengeAndVerify()',
+        url: '/reference/javascript/auth-mfa-challengeandverify',
+        items: [],
+      },
+      {
+        name: 'mfa.getAuthenticatorAssuranceLevel()',
+        url: '/reference/javascript/auth-mfa-getauthenticatorassuranceLevel',
         items: [],
       },
     ],
@@ -66,6 +86,16 @@ const Nav = [
       {
         name: 'updateUserById()',
         url: '/reference/javascript/auth-admin-updateuserbyid',
+        items: [],
+      },
+      {
+        name: 'mfa.listFactors()',
+        url: '/reference/javascript/auth-admin-mfa-listfactors',
+        items: [],
+      },
+      {
+        name: 'mfa.deleteFactor()',
+        url: '/reference/javascript/auth-admin-mfa-deletefactor',
         items: [],
       },
     ],
