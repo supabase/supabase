@@ -19,6 +19,7 @@ interface Props {
   children: any
   toc?: any
   currentPage?: string
+  hideToc?: boolean
 }
 
 const Layout: FC<Props> = (props) => {
@@ -92,7 +93,7 @@ const Layout: FC<Props> = (props) => {
         <div
           className={[
             'relative',
-            'col-span-9',
+            !props.hideToc ? 'col-span-9' : 'col-span-12',
             'transition-all ease-out',
             'duration-100',
             active ? 'opacity-100 left-0' : 'opacity-0 left-6',
@@ -115,7 +116,7 @@ const Layout: FC<Props> = (props) => {
             <MDXProvider components={components}>{props.children}</MDXProvider>
           </article>
         </div>
-        {hasTableOfContents && !props.meta?.hide_table_of_contents && (
+        {!props.hideToc && hasTableOfContents && !props.meta?.hide_table_of_contents && (
           <div
             className={[
               'col-span-3',

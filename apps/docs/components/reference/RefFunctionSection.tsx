@@ -55,7 +55,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
       >
         <RefSubLayout.Details>
           <>
-            <header className={['mb-16'].join(' ')}>
+            <header className={['prose'].join(' ')}>
               {shortText && <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>}
             </header>
 
@@ -194,7 +194,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                         >
                           {exampleString +
                             (example.code &&
-                              example.code.replace('```', '').replace('js', '').replace('```', ''))}
+                              example.code.replace(/```/g, '').replace('js', '').replace('ts', ''))}
                         </CodeBlock>
                         {response && (
                           <RefDetailCollapse
@@ -207,7 +207,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                               language="js"
                               hideLineNumbers={true}
                             >
-                              {response.replace('```', '').replace('json', '').replace('```', '')}
+                              {response.replace(/```/g, '').replace('json', '')}
                             </CodeBlock>
                           </RefDetailCollapse>
                         )}

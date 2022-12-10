@@ -54,12 +54,12 @@ const components = {
       {props.children}
     </Heading>
   ),
-  pre: (props: any) => {
-    const linesToHighlight = parseNumericRange(props.lines ?? '')
-    return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
-  },
+  // pre: (props: any) => {
+  //   const linesToHighlight = parseNumericRange(props.lines ?? '')
+  //   return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
+  // },
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
-  inlineCode: (props: { children: string }) => <InlineCodeTag {...props} />,
+  // inlineCode: (props: { children: string }) => <InlineCodeTag {...props} />,
   RefSubLayout,
   CH,
   code: (props: any) => <CodeBlock {...props} />,

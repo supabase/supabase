@@ -193,7 +193,7 @@ const SideNav = () => {
       {
         label: 'Auth',
         icon: '/img/icons/menu/auth',
-        href: '/guides/auth',
+        href: '/guides/auth/overview',
         level: 'auth',
       },
       {
@@ -265,14 +265,14 @@ const SideNav = () => {
       },
       {
         label: 'Management API',
-        icon: '/img/icons/menu/api',
+        icon: '/img/icons/menu/reference-api',
         hasLightIcon: false,
         href: '/reference/api/introduction',
         level: 'reference_javascript',
       },
       {
         label: 'Supabase CLI',
-        icon: '/img/icons/menu/cli',
+        icon: '/img/icons/menu/reference-cli',
         hasLightIcon: false,
         href: '/reference/cli/introduction',
         level: 'reference_javascript',

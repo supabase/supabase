@@ -20,15 +20,3 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 export function getStaticPaths() {
   return handleRefGetStaticPaths()
 }
-
-export const config = {
-  // test - force again
-  unstable_includeFiles: [
-    'node_modules/.pnpm/**/shiki/**/*.json',
-    'node_modules/**/shiki/**/*.json',
-    'node_modules/.npm/shiki/**/*.json',
-    '/var/task/node_modules/shiki/languages/abap.tmLanguage.json',
-    'node_modules/shiki/languages/abap.tmLanguage.json',
-    'node_modules/shiki/**/*.json',
-  ],
-}
