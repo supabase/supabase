@@ -9,7 +9,7 @@ import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
-import { DatabaseAddon } from '../AddOns/AddOns.types'
+import { SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
@@ -23,17 +23,17 @@ interface Props {
 
   currentPlan: any
   currentAddons: {
-    computeSize: DatabaseAddon
-    pitrDuration: DatabaseAddon
-    customDomains: DatabaseAddon
-    supportPlan?: DatabaseAddon
+    computeSize: SubscriptionAddon
+    pitrDuration: SubscriptionAddon
+    customDomains: SubscriptionAddon
+    supportPlan?: SubscriptionAddon
   }
 
   selectedPlan?: any
   selectedAddons: {
-    computeSize: DatabaseAddon
-    pitrDuration: DatabaseAddon
-    customDomains: DatabaseAddon
+    computeSize: SubscriptionAddon
+    pitrDuration: SubscriptionAddon
+    customDomains: SubscriptionAddon
   }
 
   isSpendCapEnabled: boolean

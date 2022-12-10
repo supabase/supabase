@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { Badge, IconAlertCircle, Radio, Button } from 'ui'
 
 import { useFlag, useStore } from 'hooks'
-import { DatabaseAddon } from './AddOns.types'
+import { SubscriptionAddon } from './AddOns.types'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import InformationBox from 'components/ui/InformationBox'
@@ -11,9 +11,9 @@ import { getSemanticVersion } from './AddOns.utils'
 import Link from 'next/link'
 
 interface Props {
-  pitrDurationOptions: DatabaseAddon[]
-  currentPitrDuration?: DatabaseAddon
-  selectedPitrDuration?: DatabaseAddon
+  pitrDurationOptions: SubscriptionAddon[]
+  currentPitrDuration?: SubscriptionAddon
+  selectedPitrDuration?: SubscriptionAddon
   onSelectOption: (option: any) => void
 }
 

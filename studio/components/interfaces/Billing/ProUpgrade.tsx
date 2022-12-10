@@ -21,7 +21,7 @@ import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import UpdateSuccess from './UpdateSuccess'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
-import { DatabaseAddon } from './AddOns/AddOns.types'
+import { SubscriptionAddon } from './AddOns/AddOns.types'
 import {
   formatComputeSizes,
   formatCustomDomainOptions,
@@ -33,7 +33,7 @@ import SupportPlan from './AddOns/SupportPlan'
 // Do not allow compute size changes for af-south-1
 
 interface Props {
-  products: { tiers: any[]; addons: DatabaseAddon[] }
+  products: { tiers: any[]; addons: SubscriptionAddon[] }
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
@@ -78,13 +78,13 @@ const ProUpgrade: FC<Props> = ({
   // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
   // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
   // of unnecessary state management on this complex page.
-  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(
+  const [selectedComputeSize, setSelectedComputeSize] = useState<SubscriptionAddon>(
     currentAddons.computeSize
   )
-  const [selectedPITRDuration, setSelectedPITRDuration] = useState<DatabaseAddon>(
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<SubscriptionAddon>(
     currentAddons.pitrDuration
   )
-  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<SubscriptionAddon>(
     currentAddons.customDomains
   )
 
@@ -92,7 +92,7 @@ const ProUpgrade: FC<Props> = ({
   // compute size, pitr, custom domain and support plan, although we dont have any now
   const nonChangeableAddons = [currentAddons.supportPlan].filter(
     (x) => x !== undefined
-  ) as DatabaseAddon[]
+  ) as SubscriptionAddon[]
 
   // [Joshen] Scaffolded here
   const selectedAddons = {
