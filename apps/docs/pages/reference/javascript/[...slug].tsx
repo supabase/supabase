@@ -19,17 +19,4 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
 export function getStaticPaths() {
   return handleRefGetStaticPaths()
-
-  let docs = getAllDocs()
-
-  return {
-    paths: docs.map(() => {
-      return {
-        params: {
-          slug: docs.map((d) => d.slug),
-        },
-      }
-    }),
-    fallback: 'blocking',
-  }
 }
