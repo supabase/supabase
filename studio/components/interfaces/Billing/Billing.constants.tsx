@@ -72,7 +72,7 @@ export const USAGE_BASED_PRODUCTS = [
       {
         key: 'storage_image_render_count',
         attribute: 'total_storage_image_render_count',
-        title: 'Storage Image Renders',
+        title: 'Storage Images Transformed',
         units: 'absolute',
         costPerUnit: 0.005,
       },
