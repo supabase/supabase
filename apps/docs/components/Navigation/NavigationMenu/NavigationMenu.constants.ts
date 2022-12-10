@@ -759,7 +759,7 @@ export const reference_cli = {
 }
 export const reference_api = {
   icon: '/img/icons/api-icon.svg',
-  title: 'Mangement API',
+  title: 'Management API',
   url: '/guides/reference/api',
   parent: '/reference',
   items: [
