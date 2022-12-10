@@ -2,47 +2,60 @@ import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState, memo } from 'react'
-import NavigationMenuCliList from './NavigationMenuCliList'
+import { memo, useEffect, useState } from 'react'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
-import { NavigationMenuContextProvider } from './NavigationMenu.Context'
 
-// @ts-expect-error
-import jsSpecNEW from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
-// @ts-expect-error
-import dartSpecNEW from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
-import apiSpecRaw from '~/../../spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
-
-import libCommonSections from '~/../../spec/common-client-libs-sections.json'
-import cliCommonSections from '~/../../spec/common-cli-sections.json'
 import apiCommonSections from '~/../../spec/common-api-sections.json'
 
-// Filter libCommonSections for just the relevant sections in the current library
-function filterByLib(sections, lib) {
-  // Filter parent sections first
-  const libSections = sections.filter((section) => section.libs.includes(lib))
+// @ts-expect-error
+import spec_js_v2 from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+// @ts-expect-error
+import spec_js_v1 from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
+// @ts-expect-error
+import spec_dart_v1 from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
+// @ts-expect-error
+import spec_dart_v0 from '~/../../spec/supabase_dart_v0_temp_new_shape.yml' assert { type: 'yml' }
 
-  // Map over the parents and filter for items that include the current lib
-  return libSections.map((section) => {
-    const items = section.items ? section.items.filter((item) => item.libs.includes(lib)) : []
-    return {
-      ...section,
-      items,
+// Filter libCommonSections for just the relevant sections in the current library
+function generateAllowedClientLibKeys(sections, spec) {
+  // Filter parent sections first
+
+  const specIds = spec.functions.map((func) => {
+    return func.id
+  })
+
+  const newShape = flattenSections(sections).filter((section) => {
+    if (specIds.includes(section.id)) {
+      return section
     }
   })
+
+  const final = newShape.map((func) => {
+    return func.id
+  })
+
+  console.log('final', final)
+
+  return final
 }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
+import cliCommonSections from '~/../../spec/common-cli-sections.json'
+import libCommonSections from '~/../../spec/common-client-libs-sections.json'
+import authServerCommonSections from '~/../../spec/common-self-hosting-auth-sections.json'
+import { flattenSections } from '~/lib/helpers'
 
 export type RefIdOptions =
-  | 'reference_javascript'
-  | 'reference_dart'
+  | 'reference_javascript_v1'
+  | 'reference_javascript_v2'
+  | 'reference_dart_v0'
+  | 'reference_dart_v1'
   | 'reference_cli'
   | 'reference_api'
-  | 'reference_self_hosting_server'
+  | 'reference_self_hosting_auth'
 
-export type RefKeyOptions = 'javascript' | 'dart' | 'cli' | 'api' | 'self-hosting-server'
+export type RefKeyOptions = 'javascript' | 'dart' | 'cli' | 'api' | 'self-hosting-auth'
 
 const SideNav = () => {
   const router = useRouter()
@@ -52,6 +65,7 @@ const SideNav = () => {
   //console.log('router', router.asPath)
 
   let version = ''
+
   if (router.asPath.includes('v1')) {
     version = '_v1'
   }
@@ -98,11 +112,21 @@ const SideNav = () => {
       case url.includes(`/docs/guides/integrations`) && url:
         setLevel('integrations')
         break
-      case url.includes(`/docs/reference/javascript`) && url:
-        setLevel('reference_javascript')
+      // JS v1
+      case url.includes(`/docs/reference/javascript/v1`) && url:
+        setLevel('reference_javascript_v1')
         break
+      // JS v2 (latest)
+      case url.includes(`/docs/reference/javascript`) && url:
+        setLevel('reference_javascript_v2')
+        break
+      // dart v0
+      case url.includes(`/docs/reference/dart/v0`) && url:
+        setLevel('reference_dart_v0')
+        break
+      // dart v1 (latest)
       case url.includes(`/docs/reference/dart`) && url:
-        setLevel('reference_dart')
+        setLevel('reference_dart_v1')
         break
       case url.includes(`/docs/reference/cli`) && url:
         setLevel('reference_cli')
@@ -110,8 +134,8 @@ const SideNav = () => {
       case url.includes(`/docs/reference/api`) && url:
         setLevel('reference_api')
         break
-      case url.includes(`/docs/reference/self-hosting-server`) && url:
-        setLevel('reference_self_hosting_server')
+      case url.includes(`/docs/reference/self-hosting-auth`) && url:
+        setLevel('reference_self_hosting_auth')
         break
 
       default:
@@ -244,10 +268,10 @@ const SideNav = () => {
         level: 'reference_javascript',
       },
       {
-        label: 'Self-Hosting Server',
+        label: 'Self-Hosting Auth',
         icon: '/img/icons/menu/platform',
-        href: '/reference/self-hosting-server/start',
-        level: 'reference_self_hosting_server',
+        href: '/reference/self-hosting-auth/start',
+        level: 'reference_self_hosting_auth',
       },
     ],
   ]
@@ -343,18 +367,35 @@ const SideNav = () => {
 
       <NavigationMenuRefList
         key={'reference-js-menu'}
-        id={'reference_javascript'}
+        id={'reference_javascript_v1'}
         currentLevel={level}
-        commonSections={filterByLib(libCommonSections, `js${version ?? version}`)}
+        commonSections={libCommonSections}
         lib="javascript"
+        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v1)}
       />
-
+      <NavigationMenuRefList
+        key={'reference-js-menu'}
+        id={'reference_javascript_v2'}
+        currentLevel={level}
+        commonSections={libCommonSections}
+        lib="javascript"
+        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v2)}
+      />
       <NavigationMenuRefList
         key={'reference-dart-menu'}
-        id={'reference_dart'}
+        id={'reference_dart_v0'}
         currentLevel={level}
-        commonSections={filterByLib(libCommonSections, `dart${version ?? version}`)}
+        commonSections={libCommonSections}
         lib="dart"
+        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v0)}
+      />
+      <NavigationMenuRefList
+        key={'reference-dart-menu'}
+        id={'reference_dart_v1'}
+        currentLevel={level}
+        commonSections={libCommonSections}
+        lib="dart"
+        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v1)}
       />
       <NavigationMenuRefList
         key={'reference-cli-menu'}
@@ -371,11 +412,11 @@ const SideNav = () => {
         lib="api"
       />
       <NavigationMenuRefList
-        key={'reference-self-hosting-server-menu'}
-        id={'reference_self_hosting_server'}
+        key={'reference-self-hosting-auth-menu'}
+        id={'reference_self_hosting_auth'}
         currentLevel={level}
-        commonSections={apiCommonSections}
-        lib="self-hosting-server"
+        commonSections={authServerCommonSections}
+        lib="self-hosting-auth"
       />
     </div>
   )

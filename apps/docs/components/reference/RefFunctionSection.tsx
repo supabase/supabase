@@ -96,7 +96,19 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                           <div className="mt-3">
                             <Options>
                               {param.subContent.map((param) => {
-                                return <Options.Option {...param} />
+                                return (
+                                  <>
+                                    <Options.Option {...param}>
+                                      {param.subContent && (
+                                        <Options>
+                                          {param.subContent.map((param) => {
+                                            return <Options.Option {...param} />
+                                          })}
+                                        </Options>
+                                      )}
+                                    </Options.Option>
+                                  </>
+                                )
                               })}
                             </Options>
                           </div>

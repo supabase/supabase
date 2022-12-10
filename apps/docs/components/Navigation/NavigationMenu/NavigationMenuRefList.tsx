@@ -68,6 +68,10 @@ interface INavigationMenuRefList {
   id: RefIdOptions
   lib: RefKeyOptions
   commonSections: any[] // to do type up
+
+  // the keys of menu items that are allowed to be shown on the side menu
+  // if undefined, we show all the menu items
+  allowedClientKeys?: string[]
 }
 
 const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
@@ -75,6 +79,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   id,
   lib,
   commonSections,
+  allowedClientKeys,
 }) => {
   const router = useRouter()
 
@@ -82,6 +87,8 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
 
   // console.log('sections', sections)
   if (!sections) console.error('no common sections imported')
+
+  // console.log(id, 'sections in ref menu', sections)
 
   const menu = NavItems[id]
 
@@ -164,6 +171,26 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
 
         <ul className="function-link-list">
           {sections.map((fn: any) => {
+            //
+            // check if the link is allowed to be displayed
+            function isFuncNotInLibraryOrVersion(id) {
+              if (id && allowedClientKeys && !allowedClientKeys.includes(id)) {
+                /*
+                 * Remove this menu link from side bar, as it does not exist for either
+                 * this language, or for this lib version
+                 *
+                 * */
+                return true
+              } else {
+                return false
+              }
+            }
+
+            // run allow check
+            if (isFuncNotInLibraryOrVersion(fn.id)) {
+              return <></>
+            }
+
             const RenderLink = (props) => {
               const activeAccordianItem = useMenuActiveRefId()
               let active = false
@@ -231,7 +258,11 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                   {fn.items &&
                     fn.items
                       //.filter((item) => item.libs && item.libs.includes(lib))
-                      .map((item) => <RenderLink {...item} library={menu.title} />)}
+                      .map((item) => {
+                        // run allow check
+                        if (isFuncNotInLibraryOrVersion(item.id)) return <></>
+                        return <RenderLink {...item} library={menu.title} />
+                      })}
                 </>
               )
             } else {

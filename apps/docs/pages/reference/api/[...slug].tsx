@@ -11,8 +11,6 @@ const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
 
 const sections = flattenSections(apiCommonSections)
 
-console.log('sections', sections)
-
 export default function Config(props) {
   return <RefSectionHandler sections={sections} spec={generatedSpec} pageProps={props} type="api" />
 }
