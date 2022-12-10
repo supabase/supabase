@@ -35,8 +35,6 @@ function generateAllowedClientLibKeys(sections, spec) {
     return func.id
   })
 
-  console.log('final', final)
-
   return final
 }
 
@@ -62,8 +60,6 @@ const SideNav = () => {
   const { isDarkMode } = useTheme()
   const [level, setLevel] = useState('home')
 
-  //console.log('router', router.asPath)
-
   let version = ''
 
   if (router.asPath.includes('v1')) {
@@ -73,8 +69,6 @@ const SideNav = () => {
   if (router.asPath.includes('v0')) {
     version = '_v0'
   }
-  //console.log({ version })
-  //console.log(`dart${version ?? version}`)
 
   function handleRouteChange(url: string) {
     switch (url) {
