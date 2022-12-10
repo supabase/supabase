@@ -32,8 +32,6 @@ function filterByLib(sections, lib) {
     }
   })
 }
-const dart0 = filterByLib(libCommonSections, 'dart_v0')
-console.log('dart0', dart0)
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 
