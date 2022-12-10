@@ -88,22 +88,6 @@ The fastest way to get started with supabase and create-react-app is to use the 
 
     </StepHikeCompact.Details>
 
-    <StepHikeCompact.Code>
-
-     ```sql SQL_EDITOR
-      -- this creates the table
-      CREATE TABLE countries (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL
-      );
-      -- insert some sample data into new table
-      INSERT INTO countries (name) VALUES ('United States');
-      INSERT INTO countries (name) VALUES ('Canada');
-      INSERT INTO countries (name) VALUES ('Mexico');
-      ````
-
-    </StepHikeCompact.Code>
-
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={6}>
@@ -112,8 +96,8 @@ The fastest way to get started with supabase and create-react-app is to use the 
     You can select from the countries table in your Supabase server by doing the following:
 
     </StepHikeCompact.Details>
-
     <StepHikeCompact.Code>
+
 
       ```js src/index.js
         import { createClient } from '@supabase-js'
@@ -129,9 +113,8 @@ The fastest way to get started with supabase and create-react-app is to use the 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
-
 </StepHikeCompact>
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page
