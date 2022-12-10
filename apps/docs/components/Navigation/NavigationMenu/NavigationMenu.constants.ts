@@ -702,40 +702,40 @@ export const reference = {
 }
 
 export const reference_javascript_v1 = {
-  icon: '/img/icons/javascript-icon.svg',
+  icon: '/img/icons/menu/reference-javascript.svg',
   title: 'javascript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_javascript_v2 = {
-  icon: '/img/icons/javascript-icon.svg',
+  icon: '/img/icons/menu/reference-javascript.svg',
   title: 'javascript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_dart_v0 = {
-  icon: '/img/icons/dart-icon.svg',
+  icon: '/img/icons/menu/reference-dart.svg',
   title: 'dart',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 export const reference_dart_v1 = {
-  icon: '/img/icons/dart-icon.svg',
+  icon: '/img/icons/menu/reference-dart.svg',
   title: 'dart',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 
 export const reference_cli = {
-  icon: '/img/icons/cli-icon.svg',
+  icon: '/img/icons/menu/reference-cli.svg',
   title: 'Supabase CLI',
   url: '/guides/reference/cli',
   parent: '/',
 }
 export const reference_api = {
-  icon: '/img/icons/api-icon.svg',
+  icon: '/img/icons/menu/reference-api.svg',
   title: 'Management API',
   url: '/guides/reference/api',
   parent: '/reference',
