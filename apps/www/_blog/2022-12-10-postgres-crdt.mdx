@@ -64,9 +64,11 @@ How does it do that? Some sort of algorithm, but you can ask ChatGPT to explain 
 
 ## Offline philosophy
 
-Collaborative apps are becoming more prolific as legacy software is rebuilt within a browser environment. Collaboration is largely a data problem - how do we get one user’s changes (data) to merge with another user’s changes (data). As a database provider it’s natural fit for Supabase to provide the tooling for developers to build collaborative apps. 
+Collaborative apps are becoming more prolific as legacy software is rebuilt within a browser environment. 
 
-CRDTs seem like a great way to solve this. Before going too far down the “solution” rabbit hole at Supabase, we try to think about the long-term implications of adopting a certain technology. We’re pretty boring - we don’t like to make bets on technologies unless we think they will exist in 20 years.
+Collaboration is largely a data problem - how do we get one user’s changes (data) to merge with another user’s changes (data)? As a database provider it’s natural fit for Supabase to provide the tooling for developers to build collaborative apps. 
+
+Before going too far down the “solution” rabbit hole at Supabase, we try to think about the long-term implications of adopting any technology. We’re pretty boring - we don’t make bets on technologies unless we think they will exist in 20 years.
 
 I personally believe CRDTs are the future. For *some things*. If databases were invented today, I’m certain most of the effort would be spent developing CRDT databases or something with “offline algorithms” built-in. But tech is a real-world demonstration of the Lindy affect: the longer something has existed, the longer it’s likely to exist in the future. That’s why we bet on Postgres - with more than 30 years history, it’s here to stay.
 
