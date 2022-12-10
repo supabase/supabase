@@ -4,8 +4,6 @@ import generateRefMarkdown from '~/lib/mdx/generateRefMarkdown'
 async function handleRefStaticProps(sections, params, librarypath, urlPath) {
   let markdownContent = await generateRefMarkdown(sections, librarypath)
 
-  console.log(markdownContent)
-
   /*
    * old content generation
    * this is for grabbing to old markdown files

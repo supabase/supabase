@@ -17,6 +17,7 @@ const RefEducationSection = (props) => {
       id={props.item.id}
       slug={props.item.id}
       scrollSpyHeader={true}
+      icon={props.markdownContent.meta.icon}
     >
       <MDXRemote {...props.markdownContent.content} components={components} />
     </RefSubLayout.EducationSection>
