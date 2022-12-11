@@ -6,7 +6,7 @@ import isbot from 'isbot'
 export function middleware(request: NextRequest) {
   const specs = ['javascript', 'dart']
 
-  if (!isbot(request.headers.get('user-agent'))) {
+  if (isbot(request.headers.get('user-agent'))) {
     for (const lib of specs) {
       if (request.url.includes(`reference/${lib}`)) {
         const requestSlug = request.url.split('/').pop()
