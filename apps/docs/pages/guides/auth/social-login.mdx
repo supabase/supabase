@@ -6,34 +6,25 @@ import { SocialLoginItems } from '~/components/Navigation/NavigationMenu/Navigat
 export const meta = {
   title: 'Social Login',
   description: 'Logging in with social accounts',
-  subtitle: 'Implement Social Login in a heartbeat with Supabase and increase your registrations.',
 }
 
-## What is Social login?
-
-Social Login is Oauth, which is an open standard for authentication that allows users to log in to one website or application using their credentials from another website or application.
+Social Login (OAuth) is an open standard for authentication that allows users to log in to one website or application using their credentials from another website or application.
 It is a way for users to grant third-party applications access to their online accounts without sharing their passwords.
+OAuth is commonly used for things like logging in to a social media account from a third-party app. It is a secure and convenient way to authenticate users and share information between applications.
 
-Oauth is commonly used for things like logging in to a social media account from a third-party app. It is a secure and convenient way to authenticate users and share information between applications.
-
-## Why should I use Social login for my application?
+## Benefits
 
 There are several reasons why you might want to add social login to your applications:
 
-1. **Improved user experience**: Social login allows users to log in to your application using their existing social media accounts, which can be faster and more convenient than creating a new account from scratch. This can make it easier for users to access your application, which can improve their overall experience.
+1. **Improved user experience**: Users can register and log in to your application using their existing social media accounts, which can be faster and more convenient than creating a new account from scratch. This makes it easier for users to access your application, improving their overall experience.
 
-2. **Increased registration and conversion rates**: Social login can make it easier for users to register for and use your application, which can lead to increased registration and conversion rates. By making the registration process simpler and more convenient, you can attract more users and encourage them to take the desired actions within your application.
+2. **Better user engagement**: You can access additional data and insights about your users, such as their interests, demographics, and social connections. This can help you tailor your content and marketing efforts to better engage with your users and provide a more personalized experience.
 
-3. **Better user engagement**: By using social login, you can access additional data and insights about your users, such as their interests, demographics, and social connections. This can help you tailor your content and marketing efforts to better engage with your users and provide a more personalized experience.
+3. **Increased security**: Social login can improve the security of your application by leveraging the security measures and authentication protocols of the social media platforms that your users are logging in with. This can help protect against unauthorized access and account takeovers.
 
-4. **Increased security**: Social login can improve the security of your application by leveraging the security measures and authentication protocols of the social media platforms that your users are logging in with. This can help protect against unauthorized access and account takeovers.
+## Set up a social provider with Supabase Auth
 
-Overall, adding social login to your applications can improve the user experience, increase registration and conversion rates, enhance user engagement, and improve security.
-
-## Setting up a Social Provider app to use Supabase Social Auth
-
-You can follow each of these guides to implement Social 0Auth for any of these providers.
-If you've already set up your social provider you skip ahead and follow the implementation instructions [here](#how-to-add-social-0auth-to-your-application).
+Supabase supports a suite of social providers. Follow these guides to configure a social provider for your platform.
 
 <div className="grid grid-cols-12 gap-10 not-prose py-8">
   {SocialLoginItems.map((item) => (  
