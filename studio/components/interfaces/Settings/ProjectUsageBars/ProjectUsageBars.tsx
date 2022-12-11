@@ -9,7 +9,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
 
 interface Props {
   projectRef?: string
@@ -20,12 +19,22 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { usage, error, isLoading } = useProjectUsage(projectRef)
   const router = useRouter()
 
-  const projectHasNoLimits =
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const subscriptionTier = ui.selectedProject?.subscription_tier
 
-  const showUsageExceedMessage =
-    ui.selectedProject?.subscription_tier !== undefined && !projectHasNoLimits
+  const projectHasNoLimits =
+    subscriptionTier === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    subscriptionTier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
+  const showUsageExceedMessage = subscriptionTier !== undefined && !projectHasNoLimits
+
+  const planNames = {
+    [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
+    [PRICING_TIER_PRODUCT_IDS.PRO]: 'Pro',
+    [PRICING_TIER_PRODUCT_IDS.PAYG]: 'Pro',
+    [PRICING_TIER_PRODUCT_IDS.ENTERPRISE]: 'Enterprise',
+  }
+
+  const planName = subscriptionTier ? planNames[subscriptionTier] || 'current' : 'current'
 
   useEffect(() => {
     if (error) {
@@ -113,12 +122,16 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         let usageElement
                         if (!isAvailableInPlan) {
                           usageElement = (
-                            <div>
-                              <Link href={`/project/${projectRef}/settings/billing/update`}>
-                                <a className="underline">
-                                  <span>Upgrade to unlock</span>
-                                </a>
-                              </Link>
+                            <div className="flex justify-between">
+                              <span>Not included in {planName} tier</span>
+                              <Button
+                                size="tiny"
+                                onClick={() =>
+                                  router.push(`/project/${projectRef}/settings/billing/update`)
+                                }
+                              >
+                                Upgrade to Pro
+                              </Button>
                             </div>
                           )
                         } else if (showUsageExceedMessage) {
