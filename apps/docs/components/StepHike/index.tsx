@@ -1,18 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Button } from 'ui'
 import { StepHikeContext } from './StepHikeContext'
 
 const StepHike = ({ children, title }) => {
   const [activeStep, setActiveStep] = useState(undefined)
 
-  //console.log('step hike children', children)
-
   // check if there are any children
   if (!children) throw 'StepHike component requires <StepHike.Step> children'
 
   const steps = children.filter((x) => {
-    //console.log('child stuff', x)
     return x.type.name === 'Step'
   })
 
@@ -28,26 +24,6 @@ const StepHike = ({ children, title }) => {
     throw 'StepHike component needs at least 1 <StepHike.Step> child'
 
   // console.log('length of the steps filter', steps.length)
-
-  function handleNext() {
-    const nextStep: number = activeStep.step + 1
-    console.log(nextStep)
-
-    setActiveStep({
-      titleId: steps[nextStep].props.title.replaceAll(' ', '-').toLowerCase(),
-      step: nextStep,
-    })
-  }
-
-  function handlePrev() {
-    const nextStep: number = activeStep.step - 1
-    console.log(nextStep)
-
-    setActiveStep({
-      titleId: steps[nextStep].props.title.replaceAll(' ', '-').toLowerCase(),
-      step: nextStep,
-    })
-  }
 
   return (
     <div className="">
