@@ -290,13 +290,13 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
-        { name: 'Email login', url: '/guides/auth/auth-email', items: [] },
+        { name: 'Email Login', url: '/guides/auth/auth-email', items: [] },
         {
-          name: 'Passwordless login',
+          name: 'Passwordless Login',
           url: '/guides/auth/passwordless-login',
           items: [
             {
-              name: 'Magiclink login',
+              name: 'Magic Link Login',
               icon: '',
               url: '/guides/auth/passwordless-login/email-otp-magic-link',
               items: [],
