@@ -1,10 +1,31 @@
 import Layout from '~/layouts/DefaultLayout'
 import Link from 'next/link'
-import { GlassPanel } from 'ui'
+import { GlassPanel, IconPanel } from 'ui'
 
 export const meta = {
   title: 'Tutorials',
 }
+
+### Framework Quickstarts
+
+Discover how to set up a database to an app making queries in just a few minutes.
+
+<div className="grid grid-cols-12 gap-10 not-prose py-8">
+  {frameworks.map((item) => (  
+    <Link href={`/${item.url}`} key={item.name} passHref>
+      <a className="col-span-6 lg:col-span-4 xl:col-span-3">
+        <IconPanel
+          title={item.name}
+          span="col-span-6"
+          icon={item.icon}
+          isDarkMode={item.isDarkMode}
+        >
+          {item.description}
+        </IconPanel>
+      </a>
+    </Link>
+))}
+</div>
 
 ### Popular Guides
 
@@ -63,6 +84,24 @@ export const topArticles = [
     header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/tutorials/with-nuxt-3',
     description: 'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+  },
+]
+
+export const frameworks = [
+  {
+    name: 'ReactJS',
+    icon: '/docs/img/icons/react-icon',
+    url: '/getting-started/quickstarts/reactjs',
+  },
+  {
+    name: 'NextJS',
+    icon: '/docs/img/icons/nextjs-icon',
+    url: '/getting-started/quickstarts/nextjs',
+  },
+  {
+    name: 'NuxtJS',
+    icon: '/docs/img/icons/nuxt-icon',
+    url: '/getting-started/quickstarts/nuxtjs',
   },
 ]
 
