@@ -25,10 +25,6 @@ const ignoredFiles = [
   'pages/_app.tsx',
   'pages/_document.tsx',
   'pages/[...slug].tsx',
-  'pages/company/aup.md',
-  'pages/company/privacy.md',
-  'pages/company/sla.md',
-  'pages/company/terms.md',
   'pages/handbook/contributing.mdx',
   'pages/handbook/introduction.mdx',
   'pages/handbook/supasquad.mdx',
@@ -45,6 +41,7 @@ const nameMap = {
 }
 
 async function walk(dir) {
+  console.log('dir:', dir)
   let files = await fs.promises.readdir(dir)
   files = await Promise.all(
     files.map(async (file) => {
@@ -78,11 +75,13 @@ async function walk(dir) {
     )
     const index = client.initIndex(indexName)
 
-    const referencePages = await walk('docs')
-    const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
-    const allPages = guidePages.concat(referencePages)
+    //const referencePages = await walk('docs')
+    //const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
+    //const allPages = guidePages.concat(referencePages)
 
-    const searchObjects = allPages
+    const newAllpages = (await walk('docs')).filter((slug) => !ignoredFiles.includes(slug))
+
+    const searchObjects = newAllpages
       .map((slug) => {
         let id, title, description
         const fileContents = fs.readFileSync(slug, 'utf8')
