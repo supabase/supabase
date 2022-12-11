@@ -466,7 +466,7 @@ functions:
       ```
     examples:
       - id: enroll-totp-factor
-        name: Enroll a Time-based One time password (TOTP) factor
+        name: Enroll a time-based, one-time password (TOTP) factor
         isSpotlight: true
         js: |
           ```js
