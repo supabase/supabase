@@ -32,8 +32,12 @@ export const WRAPPERS: Wrapper[] = [
     tables: [
       {
         label: 'Balance',
-        description: 'Shows the balance currently on your Stripe account',
+        description: 'The balance currently on your Stripe account',
         availableColumns: [
+          {
+            name: 'balance_type',
+            type: 'text',
+          },
           {
             name: 'amount',
             type: 'bigint',
@@ -42,12 +46,359 @@ export const WRAPPERS: Wrapper[] = [
             name: 'currency',
             type: 'text',
           },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
         ],
         options: [
           {
             name: 'object',
             defaultValue: 'balance',
             editable: false,
+            required: true,
+          },
+        ],
+      },
+      {
+        label: 'Balance Transactions',
+        description: 'Transactions that have contributed to the balance on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'fee',
+            type: 'bigint',
+          },
+          {
+            name: 'net',
+            type: 'bigint',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'type',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'balance_transactions',
+            editable: false,
+            required: true,
+          },
+        ],
+      },
+      {
+        label: 'Charges',
+        description: 'Charges made on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'invoice',
+            type: 'text',
+          },
+          {
+            name: 'payment_intent',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'charges',
+            editable: false,
+            required: true,
+          },
+        ],
+      },
+      {
+        label: 'Customers',
+        description: 'Customers on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'name',
+            type: 'text',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'customers',
+            editable: false,
+            required: true,
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+          },
+        ],
+      },
+      {
+        label: 'Invoices',
+        description: 'Invoices on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'subscription',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'total',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'period_start',
+            type: 'timestamp',
+          },
+          {
+            name: 'period_end',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'invoices',
+            editable: false,
+            required: true,
+          },
+        ],
+      },
+      {
+        label: 'Payment Intents',
+        description: 'Payment Intents on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'amount',
+            type: 'bigint',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'payment_method',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'payment_intents',
+            editable: false,
+            required: true,
+          },
+        ],
+      },
+      {
+        label: 'Products',
+        description: 'Products on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'name',
+            type: 'text',
+          },
+          {
+            name: 'active',
+            type: 'bool',
+          },
+          {
+            name: 'default_price',
+            type: 'text',
+          },
+          {
+            name: 'description',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'products',
+            editable: false,
+            required: true,
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+          },
+        ],
+      },
+      {
+        label: 'Subscriptions',
+        description: 'Subscriptions on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'customer',
+            type: 'text',
+          },
+          {
+            name: 'currency',
+            type: 'text',
+          },
+          {
+            name: 'current_period_start',
+            type: 'timestamp',
+          },
+          {
+            name: 'current_period_end',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'subscriptions',
+            editable: false,
+            required: true,
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
             required: true,
           },
         ],
