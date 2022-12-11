@@ -7,13 +7,13 @@ import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
 // @ts-expect-error
-import spec_js_v2 from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+import spec_js_v2 from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_js_v1 from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
+import spec_js_v1 from '~/../../spec/supabase_js_v1.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_dart_v1 from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
+import spec_dart_v1 from '~/../../spec/supabase_dart_v1.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_dart_v0 from '~/../../spec/supabase_dart_v0_temp_new_shape.yml' assert { type: 'yml' }
+import spec_dart_v0 from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml' }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 import libCommonSections from '~/../../spec/common-client-libs-sections.json'
@@ -278,22 +278,22 @@ const SideNav = () => {
         level: 'reference_javascript',
       },
       {
-        label: 'Self Hosting reference',
+        label: 'Self-Hosting Reference',
       },
       {
-        label: 'Self-hosting Auth',
+        label: 'Self-Hosting Auth',
         icon: '/img/icons/menu/reference-auth',
         href: '/reference/self-hosting-auth/introduction',
         level: 'reference_self_hosting_auth',
       },
       {
-        label: 'Self-hosting Storage',
+        label: 'Self-Hosting Storage',
         icon: '/img/icons/menu/reference-storage',
         href: '/reference/self-hosting-storage/introduction',
         level: 'reference_self_hosting_auth',
       },
       {
-        label: 'Self-hosting Realtime',
+        label: 'Self-Hosting Realtime',
         icon: '/img/icons/menu/reference-realtime',
         href: '/reference/self-hosting-realtime/introduction',
         level: 'reference_self_hosting_auth',
@@ -377,17 +377,17 @@ const SideNav = () => {
         </ul>
       </div>
 
-      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'database'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'auth'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'functions'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'realtime'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'storage'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} />
+      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} />
+      <NavigationMenuGuideList id={'database'} currentLevel={level} />
+      <NavigationMenuGuideList id={'auth'} currentLevel={level} />
+      <NavigationMenuGuideList id={'functions'} currentLevel={level} />
+      <NavigationMenuGuideList id={'realtime'} currentLevel={level} />
+      <NavigationMenuGuideList id={'storage'} currentLevel={level} />
+      <NavigationMenuGuideList id={'platform'} currentLevel={level} />
+      <NavigationMenuGuideList id={'resources'} currentLevel={level} />
+      <NavigationMenuGuideList id={'integrations'} currentLevel={level} />
+      <NavigationMenuGuideList id={'reference'} currentLevel={level} />
       {/* // Client Libs */}
       <NavigationMenuRefList
         key={'reference-js-menu'}

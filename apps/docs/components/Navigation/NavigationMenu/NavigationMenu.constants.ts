@@ -38,14 +38,14 @@ export const REFERENCES: References = {
 
 export const gettingstarted = {
   icon: 'getting-started',
-  title: 'Getting started',
+  title: 'Getting Started',
   label: 'Overview',
   items: [
     {
       name: 'Framework Quickstarts',
       items: [
-        { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
+        { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
       ],
     },
   ],
@@ -56,8 +56,13 @@ export const tutorials = {
   label: 'Quickstarts',
   items: [
     {
-      name: 'Javascript',
+      name: 'Web apps',
       items: [
+        {
+          name: 'Next.js',
+          url: '/guides/tutorials/with-nextjs',
+          items: [],
+        },
         {
           name: 'React',
           url: '/guides/tutorials/with-react',
@@ -65,18 +70,18 @@ export const tutorials = {
           icon: '/img/icons/react-icon.svg',
         },
         {
-          name: 'Next.js',
-          url: '/guides/tutorials/with-nextjs',
-          items: [],
-        },
-        {
-          name: 'Angular',
-          url: '/guides/tutorials/with-angular',
+          name: 'Vue 3',
+          url: '/guides/tutorials/with-vue-3',
           items: [],
         },
         {
           name: 'Nuxt 3',
           url: '/guides/tutorials/with-nuxt-3',
+          items: [],
+        },
+        {
+          name: 'Angular',
+          url: '/guides/tutorials/with-angular',
           items: [],
         },
         {
@@ -99,15 +104,10 @@ export const tutorials = {
           url: '/guides/tutorials/with-sveltekit',
           items: [],
         },
-        {
-          name: 'Vue 3',
-          url: '/guides/tutorials/with-vue-3',
-          items: [],
-        },
       ],
     },
     {
-      name: 'Mobile based',
+      name: 'Mobile',
       items: [
         {
           name: 'Flutter',
@@ -125,11 +125,6 @@ export const tutorials = {
       name: 'Low code',
       items: [
         {
-          name: 'Ionic Angular',
-          url: '/guides/tutorials/with-ionic-angular',
-          items: [],
-        },
-        {
           name: 'Ionic React',
           url: '/guides/tutorials/with-ionic-react',
           items: [],
@@ -137,6 +132,11 @@ export const tutorials = {
         {
           name: 'Ionic Vue',
           url: '/guides/tutorials/with-ionic-vue',
+          items: [],
+        },
+        {
+          name: 'Ionic Angular',
+          url: '/guides/tutorials/with-ionic-angular',
           items: [],
         },
       ],
@@ -254,25 +254,25 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'MessageBird SMS login',
+    name: 'MessageBird SMS Login',
     icon: '/docs/img/icons/messagebird-icon',
-    linkDescription: 'communication between businesses and their customers — across any channel.',
+    linkDescription: 'Communication between businesses and their customers — across any channel.',
     url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     items: [],
   },
   {
-    name: 'Twilio SMS login',
+    name: 'Twilio SMS Login',
     icon: '/docs/img/icons/twilio-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
     items: [],
   },
   {
-    name: 'Vonage SMS login',
+    name: 'Vonage SMS Login',
     icon: '/docs/img/icons/vonage-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-vonage',
     linkDescription:
-      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses',
+      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     items: [],
     isDarkMode: true,
   },
@@ -290,13 +290,13 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
-        { name: 'Email login', url: '/guides/auth/auth-email', items: [] },
+        { name: 'Email Login', url: '/guides/auth/auth-email', items: [] },
         {
-          name: 'Passwordless login',
+          name: 'Passwordless Login',
           url: '/guides/auth/passwordless-login',
           items: [
             {
-              name: 'Magiclink login',
+              name: 'Magic Link Login',
               icon: '',
               url: '/guides/auth/passwordless-login/email-otp-magic-link',
               items: [],
