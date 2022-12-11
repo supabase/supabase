@@ -77,10 +77,10 @@ const Wrappers = () => {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-scale-1200 mb-2 text-xl">Foreign Data Wrappers</h3>
-          <div className="text-scale-900 text-sm">
+          <h3 className="mb-2 text-xl text-scale-1200">Foreign Data Wrappers</h3>
+          <div className="text-sm text-scale-900">
             Query your data warehouse directly from your database, or third-party APIs using SQL.
           </div>
         </div>
@@ -121,9 +121,10 @@ const Wrappers = () => {
 
       {isWrappersEnabled ? (
         <div>
-          {WRAPPERS.map((wrapper) => {
+          {WRAPPERS.map((wrapper, i) => {
             return (
               <WrapperRow
+                key={i}
                 wrapper={wrapper}
                 isLoading={isLoading}
                 isEnabled={enabledWrapperNamesSet.has(wrapper.server.name)}
@@ -139,7 +140,7 @@ const Wrappers = () => {
       ) : (
         <div>
           <div
-            className="px-12 py-12 w-full bg-white dark:bg-scale-200 border border-scale-500 rounded bg-no-repeat"
+            className="w-full px-12 py-12 bg-white bg-no-repeat border rounded dark:bg-scale-200 border-scale-500"
             style={{
               backgroundSize: '45%',
               backgroundPosition: '105% 40%',
