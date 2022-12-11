@@ -19,96 +19,101 @@ export const meta = {
 
 <div className="flex flex-col gap-12 my-12">
 
-<div className="-space-y-px">
+<div className="space-y-8">
+  
   <div className="
-    border border-scale-400 px-12 pb-8 pt-2 relative overflow-hidden 
+    border border-scale-400
+    relative overflow-hidden
     grid grid-cols-12
-    rounded-tl-xl
-    rounded-tr-xl
+    rounded-lg
+    px-8 md:px-12 py-5 md:py-12
     ">
+    <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
+      <img className="hidden lg:visible absolute right-0 top-0 w-[500px]" src="/docs/img/cards/dark.png" />
+      <div classNam="">
+        <h3 className="text-2xl m-0 mb-3">Getting Started</h3>
+        
+        Discover how to set up a database to an app making queries in just a few minutes.
 
-    <div className="col-span-7 flex flex-col gap-6">
-      <img className="absolute right-0 top-0 w-[500px]" src="/docs/img/cards/dark.png" />
+        <div className="font-mono uppercase text-xs mb-2">What you will learn</div>
 
-        <div>
-
-          ### Getting Started
-
-          Discover how to set up a database to an app making queries in just a few minutes.
-
-          <div className="font-mono uppercase text-xs mb-2">What you will learn</div>
-
-          <div className="flex flex-col">
-            <div className="flex flex-row items-center gap-3">
-              <div className="text-brand-900">
-                <IconChevronRight size={14} strokeWidth={1.5} />
-              </div>
-              <span className="text-scale-1200">Setting up a Supabase project and app</span>
+        <div className="flex flex-col">
+          <div className="flex flex-row items-center gap-3">
+            <div className="text-brand-900">
+              <IconChevronRight size={14} strokeWidth={1.5} />
             </div>
-            <div className="flex flex-row items-center gap-3">
-              <div className="text-brand-900">
-                <IconChevronRight size={14} strokeWidth={1.5} />
-              </div>
-              <span className="text-scale-1200">Adding some sample data to your project</span>
-            </div>
-            <div className="flex flex-row items-center gap-3">
-              <div className="text-brand-900">
-                <IconChevronRight size={14} strokeWidth={1.5} />
-              </div>
-              <span className="text-scale-1200">Select() from your new database table</span>
-            </div>
+            <span className="text-scale-1200">Setting up a Supabase project and app</span>
           </div>
+          <div className="flex flex-row items-center gap-3">
+            <div className="text-brand-900">
+              <IconChevronRight size={14} strokeWidth={1.5} />
+            </div>
+            <span className="text-scale-1200">Adding some sample data to your project</span>
+          </div>
+          <div className="flex flex-row items-center gap-3">
+            <div className="text-brand-900">
+              <IconChevronRight size={14} strokeWidth={1.5} />
+            </div>
+            <span className="text-scale-1200">Select() from your new database table</span>
+          </div>
+        </div>
 
-          <div className="mt-6">
-            <div className="hidden">
-            <Button size="small">Get started</Button>
-            </div>
-            <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
-              <Link href={`/getting-started/quickstarts/reactjs`} passHref>
-                <a className="no-underline">
-                  <IconPanel title="ReactJS" icon="/docs/img/icons/react-icon" />
-                </a>
-              </Link>
-              <Link href={`/getting-started/quickstarts/nextjs`} passHref>
-                <a className="no-underline">
-              <IconPanel title="NextJS" icon="/docs/img/icons/nextjs-icon" />
+        <div className="mt-6">
+          <div className="hidden">
+          <Button size="small">Get started</Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Link href={`/getting-started/quickstarts/reactjs`} passHref>
+              <a className="no-underline">
+                <IconPanel title="ReactJS" icon="/docs/img/icons/react-icon" />
               </a>
-              </Link>
-              <Link href={`/getting-started/quickstarts/nuxtjs`} passHref>
-                <a className="no-underline">
-              <IconPanel title="NuxtJS" icon="/docs/img/icons/nuxt-icon" />
-              </a>
-              </Link>
-            </div>
+            </Link>
+            <Link href={`/getting-started/quickstarts/nextjs`} passHref>
+              <a className="no-underline">
+            <IconPanel title="NextJS" icon="/docs/img/icons/nextjs-icon" />
+            </a>
+            </Link>
+            <Link href={`/getting-started/quickstarts/nuxtjs`} passHref>
+              <a className="no-underline">
+            <IconPanel title="NuxtJS" icon="/docs/img/icons/nuxt-icon" />
+            </a>
+            </Link>
           </div>
         </div>
       </div>
-
     </div>
 
+  </div>
   <div
     className="
-    border
-    relative
-    px-12 h-20
-    rounded-bl-xl
-    rounded-br-xl
-    border-scale-400
-    overflow-hidden
-    min-w-full"
+      border
+      relative
+      px-8 md:px-12 h-20
+      border-scale-400
+      overflow-hidden
+      min-w-full
+      rounded-lg
+      flex flex-row gap-6 items-center
+      "
   >
+
     <img
-      className="z-0 absolute left-12 top-3 lg:top-1 mt-auto mb-auto w-[64px] lg:w-[96px]"
+      className="w-[48px] lg:w-[64px]"
       src="/docs/img/cards/tutorials-small.svg"
     />
     <img
       className="z-0 absolute -left-32 -bottom-48 w-[320px]"
       src="/docs/img/purple-glow-dark.png"
     />
-    <div className="z-10 ml-[96px] lg:ml-[128px] flex flex-col items-start justify-center lg:justify-start lg:flex-row lg:items-center lg:gap-3 h-full">
+    <div className="
+      flex flex-col md:flex-row not-prose
+      h-full justify-center
+      md:items-center md:gap-3
+    ">
       <h2 className="text-sm lg:text-base text-scale-1200 m-0">Ready to make a fully working app?</h2>
-      <p className="text-sm lg:text-base text-scale-1100 m-0">Follow the step-by-step <Link href="/guides/tutorials"><a className="m-0">tutorials</a></Link>.</p>
+      <p className="text-sm lg:text-base text-scale-1100 m-0">Follow the step-by-step <Link href="/guides/tutorials"><a className="m-0 text-scale-1200 underline">tutorials</a></Link>.</p>
     </div>
+
   </div>
 </div>
 
