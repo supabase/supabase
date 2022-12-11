@@ -21,8 +21,8 @@ export const meta = {
           key={resource.title}
           passHref
         >
-          <a className={resource.span ?? 'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={true} showIconBg={true} showLink={true}>
+          <a className={'col-span-12 md:col-span-4'}>
+            <GlassPanel {...resource} background={true} showIconBg={true}>
               {resource.description}
             </GlassPanel>
           </a>
@@ -99,7 +99,6 @@ export const resources = [
     hasLightIcon: true,
     href: '/guides/resources/examples',
     description: 'Official GitHub examples, curated content from the community, and more.',
-    span: 'col-span-12 md:col-span-4',
   },
   {
     title: 'Features',
@@ -107,7 +106,6 @@ export const resources = [
     hasLightIcon: true,
     href: '/features',
     description: 'A non-exhaustive list of features that Supabase provides for every project.',
-    span: 'col-span-12 md:col-span-4',
   },
   {
     title: 'Glossary',
@@ -115,7 +113,6 @@ export const resources = [
     hasLightIcon: true,
     href: '/guides/resources/glossary',
     description: 'Definitions for terminology and acronyms used in the Supabase documentation.',
-    span: 'col-span-12 md:col-span-4',
   },
 ]
 
