@@ -6,63 +6,151 @@ export const meta = {
   title: 'Tutorials',
 }
 
-### Popular Guides
+### Webapps
 
 <div className="grid grid-cols-12 gap-6 not-prose">
-  {topArticles.map((item) => {
+  {webapps.map((item) => {
     return (
-      <Link
-        href={`/${item.href}`}
-        key={item.title}
-        passHref
-      >
-        <a className={item.span ?? 'col-span-4'}>
-          <GlassPanel
-            title={item.title}
-            header="/docs/img/cards/sample-card-header-4.svg"
-            span="col-span-6"
-            background={false}
-          >
+      <Link href={`/${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
             {item.description}
           </GlassPanel>
         </a>
       </Link>
-    )})}
-
+    )
+  })}
 </div>
 
-export const topArticles = [
+### Mobile
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  {mobile.map((item) => {
+    return (
+      <Link href={`/${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
+### Low code
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  {lowCode.map((item) => {
+    return (
+      <Link href={`/${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
+export const webapps = [
   {
     title: 'NextJS',
-    header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/tutorials/with-nextjs',
-    description: 'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
-    span: 'col-span-6',
+    description:
+      'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/nextjs-icon',
   },
   {
     title: 'React',
-    header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/tutorials/with-react',
-    description: 'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
-    span: 'col-span-6',
-  },
-  {
-    title: 'Flutter',
-    header: '/docs/img/cards/sample-card-header-4.svg',
-    href: '/guides/tutorials/with-flutter',
-    description: 'Learn how to build a user management app with Flutter and Supabase Database, Auth, and Storage functionality.',
+    description:
+      'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/react-icon',
   },
   {
     title: 'Vue 3',
-    header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/tutorials/with-vue-3',
-    description: 'Learn how to build a user management app with Vue 3 and Supabase Database, Auth, and Storage functionality.',
+    description:
+      'Learn how to build a user management app with Vue 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/vuejs-icon',
   },
   {
     title: 'Nuxt 3',
-    header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/tutorials/with-nuxt-3',
-    description: 'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/nuxt-icon',
+  },
+  {
+    title: 'Anglular',
+    href: '/guides/tutorials/with-angular',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/angular-icon',
+  },
+  {
+    title: 'RedwoodJS',
+    href: '/guides/tutorials/with-redwoodjs',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/redwood-icon',
+  },
+  {
+    title: 'Svelte',
+    href: '/guides/tutorials/with-svelte',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/svelte-icon',
+  },
+  {
+    title: 'SvelteKit',
+    href: '/guides/tutorials/with-sveltekit',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/svelte-icon',
+  },
+]
+
+export const mobile = [
+  {
+    title: 'Flutter',
+    href: '/guides/tutorials/with-flutter',
+    description:
+      'Learn how to build a user management app with Flutter and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/flutter-icon',
+  },
+  {
+    title: 'Expo',
+    href: '/guides/tutorials/with-expo',
+    description:
+      'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/expo-icon',
+  },
+]
+
+export const lowCode = [
+  {
+    title: 'Ionic React',
+    href: '/guides/tutorials/with-ionic-react',
+    description:
+      'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/ionic-icon',
+  },
+  {
+    title: 'Ionic Vue',
+    href: '/guides/tutorials/with-ionic-vue',
+    description:
+      'Learn how to build a user management app with Flutter and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/ionic-icon',
+  },
+  {
+    title: 'Ionic Angular',
+    href: '/guides/tutorials/with-ionic-angular',
+    description:
+      'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/ionic-icon',
   },
 ]
 

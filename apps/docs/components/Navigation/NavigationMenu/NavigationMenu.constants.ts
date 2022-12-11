@@ -57,8 +57,13 @@ export const tutorials = {
   label: 'Quickstarts',
   items: [
     {
-      name: 'Javascript',
+      name: 'Web apps',
       items: [
+        {
+          name: 'Next.js',
+          url: '/guides/tutorials/with-nextjs',
+          items: [],
+        },
         {
           name: 'React',
           url: '/guides/tutorials/with-react',
@@ -66,18 +71,18 @@ export const tutorials = {
           icon: '/img/icons/react-icon.svg',
         },
         {
-          name: 'Next.js',
-          url: '/guides/tutorials/with-nextjs',
-          items: [],
-        },
-        {
-          name: 'Angular',
-          url: '/guides/tutorials/with-angular',
+          name: 'Vue 3',
+          url: '/guides/tutorials/with-vue-3',
           items: [],
         },
         {
           name: 'Nuxt 3',
           url: '/guides/tutorials/with-nuxt-3',
+          items: [],
+        },
+        {
+          name: 'Angular',
+          url: '/guides/tutorials/with-angular',
           items: [],
         },
         {
@@ -100,15 +105,10 @@ export const tutorials = {
           url: '/guides/tutorials/with-sveltekit',
           items: [],
         },
-        {
-          name: 'Vue 3',
-          url: '/guides/tutorials/with-vue-3',
-          items: [],
-        },
       ],
     },
     {
-      name: 'Mobile-Based',
+      name: 'Mobile',
       items: [
         {
           name: 'Flutter',
@@ -123,13 +123,8 @@ export const tutorials = {
       ],
     },
     {
-      name: 'Low-Code',
+      name: 'Low code',
       items: [
-        {
-          name: 'Ionic Angular',
-          url: '/guides/tutorials/with-ionic-angular',
-          items: [],
-        },
         {
           name: 'Ionic React',
           url: '/guides/tutorials/with-ionic-react',
@@ -138,6 +133,11 @@ export const tutorials = {
         {
           name: 'Ionic Vue',
           url: '/guides/tutorials/with-ionic-vue',
+          items: [],
+        },
+        {
+          name: 'Ionic Angular',
+          url: '/guides/tutorials/with-ionic-angular',
           items: [],
         },
       ],
