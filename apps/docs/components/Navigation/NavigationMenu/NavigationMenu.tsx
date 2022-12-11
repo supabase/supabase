@@ -278,22 +278,22 @@ const SideNav = () => {
         level: 'reference_javascript',
       },
       {
-        label: 'Self Hosting reference',
+        label: 'Self-Hosting Reference',
       },
       {
-        label: 'Self-hosting Auth',
+        label: 'Self-Hosting Auth',
         icon: '/img/icons/menu/reference-auth',
         href: '/reference/self-hosting-auth/introduction',
         level: 'reference_self_hosting_auth',
       },
       {
-        label: 'Self-hosting Storage',
+        label: 'Self-Hosting Storage',
         icon: '/img/icons/menu/reference-storage',
         href: '/reference/self-hosting-storage/introduction',
         level: 'reference_self_hosting_auth',
       },
       {
-        label: 'Self-hosting Realtime',
+        label: 'Self-Hosting Realtime',
         icon: '/img/icons/menu/reference-realtime',
         href: '/reference/self-hosting-realtime/introduction',
         level: 'reference_self_hosting_auth',

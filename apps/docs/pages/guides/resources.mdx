@@ -11,25 +11,25 @@ export const meta = {
 
 <div className="flex flex-col gap-12 my-12">
 
-<div className="grid gap-16 md:grid-cols-2">
+<div>
 
-  <div>
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {resources.map((resource) => {
+      return (
+        <Link
+          href={`${resource.href}`}
+          key={resource.title}
+          passHref
+        >
+          <a className={'col-span-12 md:col-span-4'}>
+            <GlassPanel {...resource} background={true} showIconBg={true}>
+              {resource.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
 
-    ### Examples
-
-    Official GitHub examples, curated content from the community, and more.
-
-[View Examples](/docs/guides/resources/examples)
-
-  </div>
-
-  <div>
-
-    ### Glossary
-
-    Definitions for terminology and acronyms used in the Supabase documentation.
-
-[View Glossary](/docs/guides/resources/glossary)
+})}
 
   </div>
 
@@ -70,7 +70,7 @@ export const meta = {
 
     ### Supabase CLI
 
-    Develop your project locally and deploy to the Supabase Platform. The Supabase CLI can also help you manage your Supabase projects, handle database migrations, CI/CD workflows, and generate types from your database schema, all from the comfort of your Terminal.
+    Develop your project locally, manage your Supabase projects, handle database migrations, CI/CD workflows, and generate types from your database schema, all from the comfort of your Terminal.
 
 [Learn more](/docs/guides/resources/supabase-cli)
 
@@ -91,6 +91,30 @@ export const meta = {
 {/* end of container */}
 
 </div>
+
+export const resources = [
+  {
+    title: 'Examples',
+    icon: '/docs/img/icons/menu/resources',
+    hasLightIcon: true,
+    href: '/guides/resources/examples',
+    description: 'Official GitHub examples, curated content from the community, and more.',
+  },
+  {
+    title: 'Features',
+    icon: '/docs/img/icons/menu/resources',
+    hasLightIcon: true,
+    href: '/features',
+    description: 'A non-exhaustive list of features that Supabase provides for every project.',
+  },
+  {
+    title: 'Glossary',
+    icon: '/docs/img/icons/menu/resources',
+    hasLightIcon: true,
+    href: '/guides/resources/glossary',
+    description: 'Definitions for terminology and acronyms used in the Supabase documentation.',
+  },
+]
 
 export const products = [
   {

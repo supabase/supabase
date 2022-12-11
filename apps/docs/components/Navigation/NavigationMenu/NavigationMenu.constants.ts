@@ -38,7 +38,7 @@ export const REFERENCES: References = {
 
 export const gettingstarted = {
   icon: 'getting-started',
-  title: 'Getting started',
+  title: 'Getting Started',
   label: 'Overview',
   items: [
     {
@@ -46,6 +46,7 @@ export const gettingstarted = {
       items: [
         { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
+        { name: 'NuxtJS', url: '/getting-started/quickstarts/nuxtjs', items: [] },
       ],
     },
   ],
@@ -107,7 +108,7 @@ export const tutorials = {
       ],
     },
     {
-      name: 'Mobile based',
+      name: 'Mobile-Based',
       items: [
         {
           name: 'Flutter',
@@ -122,7 +123,7 @@ export const tutorials = {
       ],
     },
     {
-      name: 'Low code',
+      name: 'Low-Code',
       items: [
         {
           name: 'Ionic Angular',
@@ -254,25 +255,25 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'MessageBird SMS login',
+    name: 'MessageBird SMS Login',
     icon: '/docs/img/icons/messagebird-icon',
-    linkDescription: 'communication between businesses and their customers — across any channel.',
+    linkDescription: 'Communication between businesses and their customers — across any channel.',
     url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     items: [],
   },
   {
-    name: 'Twilio SMS login',
+    name: 'Twilio SMS Login',
     icon: '/docs/img/icons/twilio-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
     items: [],
   },
   {
-    name: 'Vonage SMS login',
+    name: 'Vonage SMS Login',
     icon: '/docs/img/icons/vonage-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-vonage',
     linkDescription:
-      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses',
+      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     items: [],
     isDarkMode: true,
   },
@@ -290,13 +291,13 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
-        { name: 'Email login', url: '/guides/auth/auth-email', items: [] },
+        { name: 'Email Login', url: '/guides/auth/auth-email', items: [] },
         {
-          name: 'Passwordless login',
+          name: 'Passwordless Login',
           url: '/guides/auth/passwordless-login',
           items: [
             {
-              name: 'Magiclink login',
+              name: 'Magic Link Login',
               icon: '',
               url: '/guides/auth/passwordless-login/email-otp-magic-link',
               items: [],
