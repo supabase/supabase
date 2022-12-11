@@ -156,13 +156,14 @@ services:
       - ./volumes/storage:/var/lib/storage
 
   imgproxy:
+    container_name: supabase-imgproxy
     image: darthsim/imgproxy:v3.11
-    volumes:
-    -   ./volumes/storage:/var/lib/storage
     environment:
-      - IMGPROXY_BIND=:5001
-      - IMGPROXY_LOCAL_FILESYSTEM_ROOT=/
-      - IMGPROXY_USE_ETAG=true
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+    volumes:
+      - ./volumes/storage:/var/lib/storage
 
   meta:
     container_name: supabase-meta
