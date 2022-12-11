@@ -254,25 +254,25 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'MessageBird SMS login',
+    name: 'MessageBird SMS Login',
     icon: '/docs/img/icons/messagebird-icon',
-    linkDescription: 'communication between businesses and their customers — across any channel.',
+    linkDescription: 'Communication between businesses and their customers — across any channel.',
     url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     items: [],
   },
   {
-    name: 'Twilio SMS login',
+    name: 'Twilio SMS Login',
     icon: '/docs/img/icons/twilio-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
     items: [],
   },
   {
-    name: 'Vonage SMS login',
+    name: 'Vonage SMS Login',
     icon: '/docs/img/icons/vonage-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-vonage',
     linkDescription:
-      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses',
+      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     items: [],
     isDarkMode: true,
   },
