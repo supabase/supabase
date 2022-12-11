@@ -1,7 +1,7 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-expect-error
-import spec from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_js_v1.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
@@ -26,7 +26,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/javascript', '/javascript')
+  return handleRefStaticProps(sections, params, '/javascript/v1', '/javascript/v1')
 }
 
 export function getStaticPaths() {
