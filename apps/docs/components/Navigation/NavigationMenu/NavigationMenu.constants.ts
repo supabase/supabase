@@ -46,6 +46,7 @@ export const gettingstarted = {
       items: [
         { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
+        { name: 'NuxtJS', url: '/getting-started/quickstarts/nuxtjs', items: [] },
       ],
     },
   ],
