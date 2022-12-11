@@ -38,7 +38,7 @@ export const REFERENCES: References = {
 
 export const gettingstarted = {
   icon: 'getting-started',
-  title: 'Getting started',
+  title: 'Getting Started',
   label: 'Overview',
   items: [
     {
@@ -107,7 +107,7 @@ export const tutorials = {
       ],
     },
     {
-      name: 'Mobile based',
+      name: 'Mobile-Based',
       items: [
         {
           name: 'Flutter',
@@ -122,7 +122,7 @@ export const tutorials = {
       ],
     },
     {
-      name: 'Low code',
+      name: 'Low-Code',
       items: [
         {
           name: 'Ionic Angular',
