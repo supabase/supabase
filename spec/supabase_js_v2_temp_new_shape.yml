@@ -479,7 +479,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challenge'
     examples:
       - id: create-mfa-challenge
-        name: Creates a challenge for a factor
+        name: Create a challenge for a factor
         isSpotlight: true
         js: |
           ```js
@@ -492,7 +492,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.verify'
     examples:
       - id: verify-challenge
-        name: Verifies a challenge for a factor
+        name: Verify a challenge for a factor
         isSpotlight: true
         js: |
           ```js
@@ -509,7 +509,7 @@ functions:
       - Combines `mfa.challenge()` and `mfa.verify()` in 1 step
     examples:
       - id: challenge-and-verify
-        name: Creates and verifies a challenge for a factor
+        name: Create and verify a challenge for a factor
         isSpotlight: true
         js: |
           ```js
@@ -524,7 +524,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
-      - In Supabase, having an AAL of `aal1` typically refers to having the 1st factor of authentication such as an email and password or oauth sign-in while `aal2` refers to the 2nd factor of authentication such as Time-based one-time-password (TOTP).
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
     examples:
       - id: get-aal
         name: Get the AAL details of a session
@@ -818,7 +818,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
-        name: List all factors associated to a user
+        name: List all factors for a user
         isSpotlight: true
         js: |
           ```js
@@ -829,7 +829,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
     examples:
       - id: delete-factor
-        name: Deletes a factor associated to a user
+        name: Delete a factor for a user
         isSpotlight: true
         js: |
           ```js
