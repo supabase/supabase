@@ -37,11 +37,14 @@ export function getFDWCreateSql({
     const value = formState[option.name] // TODO(alaister): escape '
 
     return /* SQL */ `
-      select pgsodium.create_key(name := '${key}');
+      select pgsodium.create_key(
+        name := '${key}'
+      );
 
-      insert into vault.secrets (secret, key_id) values (
-        '${value}',
-        (select id from pgsodium.valid_key where name = '${key}')
+      select vault.create_secret (
+        new_secret := '${value}',
+        new_name   := '${key}',
+        new_key_id := (select id from pgsodium.valid_key where name = '${key}')
       );
     `
   })
