@@ -130,7 +130,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.21.4
+    image: supabase/storage-api:v0.26.1
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -150,8 +150,19 @@ services:
       # TODO: https://github.com/supabase/storage-api/issues/55
       REGION: stub
       GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "true"
+      IMGPROXY_URL: http://imgproxy:5001
     volumes:
       - ./volumes/storage:/var/lib/storage
+
+  imgproxy:
+    image: darthsim/imgproxy
+    volumes:
+    -   ./volumes/storage:/var/lib/storage
+    environment:
+      - IMGPROXY_BIND=:5001
+      - IMGPROXY_LOCAL_FILESYSTEM_ROOT=/
+      - IMGPROXY_USE_ETAG=true
 
   meta:
     container_name: supabase-meta
