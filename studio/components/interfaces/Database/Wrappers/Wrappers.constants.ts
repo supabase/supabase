@@ -430,6 +430,15 @@ export const WRAPPERS: Wrapper[] = [
           encrypted: true,
           hidden: true,
         },
+        // NOTE(alaister): this is a valid option, but it may confuse the basic use case
+        // so I'm omitting it for now. We can add back once we make it's use clearer.
+        // {
+        //   name: 'access_token',
+        //   label: 'OAuth2 token to access Firebase',
+        //   required: false,
+        //   encrypted: false,
+        //   hidden: false,
+        // },
       ],
     },
     tables: [
@@ -438,7 +447,7 @@ export const WRAPPERS: Wrapper[] = [
         description: 'Shows your Firebase users',
         availableColumns: [
           {
-            name: 'local_id',
+            name: 'uid',
             type: 'text',
           },
           {
@@ -446,7 +455,11 @@ export const WRAPPERS: Wrapper[] = [
             type: 'text',
           },
           {
-            name: 'fields',
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
             type: 'jsonb',
           },
         ],
@@ -464,6 +477,13 @@ export const WRAPPERS: Wrapper[] = [
             editable: true,
             required: true,
           },
+          {
+            name: 'limit',
+            label: 'Limit',
+            defaultValue: '10000',
+            editable: true,
+            required: true,
+          },
         ],
       },
       {
@@ -475,16 +495,16 @@ export const WRAPPERS: Wrapper[] = [
             type: 'text',
           },
           {
-            name: 'fields',
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
             type: 'jsonb',
-          },
-          {
-            name: 'create_time',
-            type: 'timestamp',
-          },
-          {
-            name: 'update_time',
-            type: 'timestamp',
           },
         ],
         options: [
@@ -499,6 +519,13 @@ export const WRAPPERS: Wrapper[] = [
             name: 'base_url',
             label: 'Base URL',
             defaultValue: 'https://firestore.googleapis.com/v1beta1/projects',
+            editable: true,
+            required: true,
+          },
+          {
+            name: 'limit',
+            label: 'Limit',
+            defaultValue: '10000',
             editable: true,
             required: true,
           },
