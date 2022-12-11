@@ -170,12 +170,12 @@ const SideNav = () => {
         href: '/',
         level: 'home',
       },
-      {
-        label: 'Getting Started',
-        icon: '/img/icons/menu/getting-started',
-        href: '/getting-started',
-        level: 'gettingstarted',
-      },
+//    {
+//      label: 'Getting Started',
+//      icon: '/img/icons/menu/getting-started',
+//      href: '/getting-started',
+//      level: 'gettingstarted',
+//    },
       {
         label: 'Tutorials',
         icon: '/img/icons/menu/tutorials',

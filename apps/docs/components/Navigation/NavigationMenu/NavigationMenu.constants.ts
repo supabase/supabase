@@ -36,10 +36,24 @@ export const REFERENCES: References = {
   },
 }
 
-export const gettingstarted = {
-  icon: 'getting-started',
-  title: 'Getting Started',
-  label: 'Overview',
+// export const gettingstarted = {
+//   icon: 'getting-started',
+//   title: 'Getting Started',
+//   label: 'Overview',
+//   items: [
+//     {
+//       name: 'Framework Quickstarts',
+//       items: [
+//         { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
+//         { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
+//       ],
+//     },
+//   ],
+// }
+
+export const tutorials = {
+  icon: 'tutorials',
+  label: 'Tutorials',
   items: [
     {
       name: 'Framework Quickstarts',
@@ -48,13 +62,6 @@ export const gettingstarted = {
         { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
       ],
     },
-  ],
-}
-
-export const tutorials = {
-  icon: 'tutorials',
-  label: 'Quickstarts',
-  items: [
     {
       name: 'Javascript',
       items: [
