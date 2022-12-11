@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import Image from 'next/image'
 import { useTheme } from 'common/Providers'
 
-const NavigationMenuGuideList = ({ currentLevel, setLevel, id }) => {
+const NavigationMenuGuideList = ({ currentLevel, id }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 

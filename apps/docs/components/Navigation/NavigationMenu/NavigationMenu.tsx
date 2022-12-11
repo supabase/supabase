@@ -377,17 +377,17 @@ const SideNav = () => {
         </ul>
       </div>
 
-      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'database'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'auth'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'functions'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'realtime'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'storage'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} />
+      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} />
+      <NavigationMenuGuideList id={'database'} currentLevel={level} />
+      <NavigationMenuGuideList id={'auth'} currentLevel={level} />
+      <NavigationMenuGuideList id={'functions'} currentLevel={level} />
+      <NavigationMenuGuideList id={'realtime'} currentLevel={level} />
+      <NavigationMenuGuideList id={'storage'} currentLevel={level} />
+      <NavigationMenuGuideList id={'platform'} currentLevel={level} />
+      <NavigationMenuGuideList id={'resources'} currentLevel={level} />
+      <NavigationMenuGuideList id={'integrations'} currentLevel={level} />
+      <NavigationMenuGuideList id={'reference'} currentLevel={level} />
       {/* // Client Libs */}
       <NavigationMenuRefList
         key={'reference-js-menu'}
