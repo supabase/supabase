@@ -604,7 +604,7 @@
       },
       {
         "id": "mfa-challenge-and-verify",
-        "title": "Verify a challenge",
+        "title": "Create and verify a challenge",
         "slug": "auth-mfa-challengeandverify",
         "product": "auth",
         "type": "function",
