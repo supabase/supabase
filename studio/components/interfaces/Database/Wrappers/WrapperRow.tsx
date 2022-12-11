@@ -57,7 +57,7 @@ const InputField: FC<{ option: any; value: any; error: any; onChange: any }> = (
       type={!option.hidden ? 'text' : showHidden ? 'text' : 'password'}
       actions={
         option.hidden ? (
-          <div className="mr-1 flex items-center justify-center">
+          <div className="flex items-center justify-center mr-1">
             <Button
               type="default"
               icon={showHidden ? <IconEye /> : <IconEyeOff />}
@@ -154,7 +154,7 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
           await deleteFDW({
             projectRef: project?.ref,
             connectionString: project?.connectionString,
-            name: wrapper.name,
+            wrapper,
           })
         } catch (error: any) {
           ui.setNotification({
@@ -189,11 +189,11 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+            className="flex items-center justify-between w-full px-6 py-3 rounded group text-scale-1200"
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
-                className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
+                className="transition text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
               />
@@ -207,18 +207,18 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
             </div>
             <div className="flex items-center gap-3">
               {isLoading ? (
-                <div className="flex items-center gap-1 rounded-full py-1 px-1 text-xs">
+                <div className="flex items-center gap-1 px-1 py-1 text-xs rounded-full">
                   <IconLoader className="animate-spin" size={18} />
                 </div>
               ) : isEnabled ? (
-                <div className="flex items-center gap-1 rounded-full border border-brand-700 bg-brand-200 py-1 px-1 text-xs text-brand-900">
+                <div className="flex items-center gap-1 px-1 py-1 text-xs border rounded-full border-brand-700 bg-brand-200 text-brand-900">
                   <span className="rounded-full bg-brand-900 p-0.5 text-xs text-brand-200">
                     <IconCheck strokeWidth={2} size={12} />
                   </span>
                   <span className="px-1">Enabled</span>
                 </div>
               ) : (
-                <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-scale-900 dark:border-scale-700 dark:bg-scale-300">
+                <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-scale-900 dark:border-scale-700 dark:bg-scale-300">
                   Disabled
                 </div>
               )}
@@ -229,8 +229,8 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
           <>
             {isEnabled ? (
               <Collapsible.Content>
-                <div className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300">
-                  <div className="max-w-lg mx-auto space-y-6 my-6">
+                <div className="px-6 py-6 border-t group border-scale-500 bg-scale-100 text-scale-1200 dark:bg-scale-300">
+                  <div className="max-w-lg mx-auto my-6 space-y-6">
                     <InformationBox
                       hideCollapse
                       defaultVisibility
@@ -264,8 +264,8 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
               </Collapsible.Content>
             ) : (
               <Collapsible.Content>
-                <div className="group border-t border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300">
-                  <div className="max-w-lg mx-auto space-y-6 my-6">
+                <div className="px-6 py-6 border-t group border-scale-500 bg-scale-100 text-scale-1200 dark:bg-scale-300">
+                  <div className="max-w-lg mx-auto my-6 space-y-6">
                     {wrapper.server.options.map((option) => (
                       <InputField
                         option={option}
@@ -288,14 +288,14 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                       </div>
                       <div className="space-y-2">
                         {newTables.length === 0 && (
-                          <div className="border border-scale-600 px-4 py-4 rounded-md flex items-center justify-center">
+                          <div className="flex items-center justify-center px-4 py-4 border rounded-md border-scale-600">
                             <p className="text-sm text-scale-1000">
                               Add foreign tables to query from after the wrapper is enabled
                             </p>
                           </div>
                         )}
                         {newTables.map((table, i) => (
-                          <div className="border border-scale-600 px-4 py-2 rounded-md space-y-1 flex items-center justify-between">
+                          <div className="flex items-center justify-between px-4 py-2 space-y-1 border rounded-md border-scale-600">
                             <div>
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}
@@ -326,7 +326,7 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                           </div>
                         ))}
                         {newTables.length === 0 && formErrors.tables && (
-                          <p className="text-red-900 text-sm">{formErrors.tables}</p>
+                          <p className="text-sm text-red-900">{formErrors.tables}</p>
                         )}
                       </div>
                       <div className="flex items-center justify-between !mt-8">
