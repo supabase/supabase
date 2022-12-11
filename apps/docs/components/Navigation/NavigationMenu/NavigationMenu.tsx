@@ -85,9 +85,9 @@ const SideNav = () => {
       case `/docs`:
         setLevel('home')
         break
-      case url.includes(`/docs/getting-started`) && url:
-        setLevel('gettingstarted')
-        break
+//    case url.includes(`/docs/getting-started`) && url:
+//      setLevel('gettingstarted')
+//      break
       case url.includes(`/docs/guides/tutorials`) && url:
         setLevel('tutorials')
         break
@@ -377,7 +377,7 @@ const SideNav = () => {
         </ul>
       </div>
 
-      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} setLevel={setLevel} />
+{/*   <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} setLevel={setLevel} /> */}
       <NavigationMenuGuideList id={'tutorials'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'database'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'auth'} currentLevel={level} setLevel={setLevel} />
