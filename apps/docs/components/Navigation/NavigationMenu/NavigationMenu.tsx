@@ -7,13 +7,13 @@ import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
 // @ts-expect-error
-import spec_js_v2 from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+import spec_js_v2 from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_js_v1 from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
+import spec_js_v1 from '~/../../spec/supabase_js_v1.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_dart_v1 from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
+import spec_dart_v1 from '~/../../spec/supabase_dart_v1.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_dart_v0 from '~/../../spec/supabase_dart_v0_temp_new_shape.yml' assert { type: 'yml' }
+import spec_dart_v0 from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml' }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 import libCommonSections from '~/../../spec/common-client-libs-sections.json'
