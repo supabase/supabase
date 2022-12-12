@@ -1,0 +1,883 @@
+[
+  {
+    "title": "Introduction",
+    "id": "introduction",
+    "slug": "introduction",
+    "type": "markdown",
+    "libs": ["js", "js_v1", "dart", "dart_v0"]
+  },
+  {
+    "title": "Installing",
+    "id": "installing",
+    "slug": "installing",
+    "type": "markdown",
+    "libs": ["js", "js_v1", "dart", "dart_v0"]
+  },
+  {
+    "title": "Typescript Support",
+    "id": "typescript-support",
+    "slug": "typescript-support",
+    "type": "markdown",
+    "libs": ["js", "js_v1", "dart", "dart_v0"]
+  },
+  {
+    "title": "Database",
+    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "items": [
+      {
+        "id": "select",
+        "title": "Fetch data",
+        "slug": "select",
+        "product": "database",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "insert",
+        "title": "Insert data",
+        "slug": "insert",
+        "product": "database",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "update",
+        "title": "Update data",
+        "slug": "update",
+        "product": "database",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "upsert",
+        "title": "Upsert data",
+        "slug": "upsert",
+        "product": "database",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "delete",
+        "title": "Delete data",
+        "slug": "delete",
+        "product": "database",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "rpc",
+        "title": "Call a Postgres function",
+        "slug": "rpc",
+        "product": "database",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "tester",
+        "title": "literally a test",
+        "slug": "tester",
+        "product": "database",
+        "type": "function",
+        "libs": ["dart", "dart_v0"]
+      },
+      {
+        "id": "using-filters",
+        "isFunc": false,
+        "title": "Using filters",
+        "slug": "using-filters",
+        "product": "database",
+        "type": "function",
+        "libs": ["js", "dart", "dart_v0"],
+        "items": [
+          {
+            "id": "eq",
+            "title": "Column is equal to a value",
+            "slug": "eq",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "neq",
+            "title": "Column is not equal to a value",
+            "slug": "neq",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "gt",
+            "title": "Column is greater than a value",
+            "slug": "gt",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "gte",
+            "title": "Column is greater than or equal to a value",
+            "slug": "gte",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "lt",
+            "title": "Column is less than a value",
+            "slug": "lt",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "lte",
+            "title": "Column is less than or equal to a value",
+            "slug": "lte",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "like",
+            "title": "Column matches a pattern",
+            "slug": "like",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "ilike",
+            "title": "Column matches a case-insensitive pattern",
+            "slug": "ilike",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "is",
+            "title": "Column is a value",
+            "slug": "is",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "in",
+            "title": "Column is in an array",
+            "slug": "in",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "contains",
+            "title": "Column contains every element in a value",
+            "slug": "contains",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "contained-by",
+            "title": "Contained by value",
+            "slug": "containedby",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "range-gt",
+            "title": "Greater than a range",
+            "slug": "rangegt",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "range-gte",
+            "title": "Greater than or equal to a range",
+            "slug": "rangegte",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "range-lt",
+            "title": "Less than a range",
+            "slug": "rangelt",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "range-lte",
+            "title": "Less than or equal to a range",
+            "slug": "rangelte",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "range-adjacent",
+            "title": "Mutually exclusive to a range",
+            "slug": "rangeadjacent",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "overlaps",
+            "title": "With a common element",
+            "slug": "overlaps",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "text-search",
+            "title": "Match a string",
+            "slug": "textsearch",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "match",
+            "title": "Match an associated value",
+            "slug": "match",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "not",
+            "title": "Don't match the filter",
+            "slug": "not",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "or",
+            "title": "Match at least one filter",
+            "slug": "or",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "filter",
+            "title": "Match the filter",
+            "slug": "filter",
+            "product": "database",
+            "parent": "filters",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          }
+        ]
+      },
+      {
+        "id": "using-modifiers",
+        "isFunc": false,
+        "title": "Using Modifiers",
+        "slug": "using-modifiers",
+        "product": "database",
+        "parent": "modifiers",
+        "type": "function",
+        "libs": ["js", "dart", "dart_v0"],
+        "items": [
+          {
+            "id": "db-modifiers-select",
+            "title": "Select the query",
+            "slug": "db-modifiers-select",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js"]
+          },
+          {
+            "id": "order",
+            "title": "Order the query",
+            "slug": "order",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "limit",
+            "title": "Limit the query",
+            "slug": "limit",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "range",
+            "title": "Limit the query to a range",
+            "slug": "range",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "abort-signal",
+            "title": "Set an abort signal",
+            "slug": "db-abortsignal",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js"]
+          },
+          {
+            "id": "single",
+            "title": "Retrieve the query as one row",
+            "slug": "single",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js", "dart", "dart_v0"]
+          },
+          {
+            "id": "maybe-single",
+            "title": "Retrieve the query as 0-1 rows",
+            "slug": "maybesingle",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js"]
+          },
+          {
+            "id": "csv",
+            "title": "Retrieve the query as a CSV string",
+            "slug": "db-csv",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "libs": ["js"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Auth",
+    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "items": [
+      {
+        "id": "sign-up",
+        "title": "Create a new user",
+        "slug": "auth-signup",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "sign-in",
+        "title": "Sign in a user",
+        "slug": "auth-signin",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js_v1", "dart_v0"]
+      },
+      {
+        "id": "sign-in-with-provider",
+        "title": "Sign in a user through OAuth",
+        "slug": "auth-signinwithprovider",
+        "product": "auth",
+        "type": "function",
+        "libs": ["dart_v0"]
+      },
+      {
+        "id": "sign-in-with-password",
+        "title": "Sign in a user",
+        "slug": "auth-signinwithpassword",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
+        "id": "sign-in-with-otp",
+        "title": "Sign in a user through OTP",
+        "slug": "auth-signinwithotp",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
+        "id": "sign-in-with-oauth",
+        "title": "Sign in a user through OAuth",
+        "slug": "auth-signinwithoauth",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "dart"]
+      },
+      {
+        "id": "sign-out",
+        "title": "Sign out a user",
+        "slug": "auth-signout",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart"]
+      },
+      {
+        "id": "session",
+        "title": "Retrieve a session",
+        "slug": "auth-session",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+      {
+        "id": "auth-update",
+        "title": "Update a user",
+        "slug": "auth-update",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+      {
+        "id": "set-auth",
+        "title": "Update the access token",
+        "slug": "auth-setauth",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+      {
+        "id": "user",
+        "title": "Retrieve a user",
+        "slug": "auth-user",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+      {
+        "id": "session",
+        "title": "Retrieve a session",
+        "slug": "auth-session",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+      {
+        "id": "verify-otp",
+        "title": "Verify and log in through OTP",
+        "slug": "auth-verifyotp",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "dart"]
+      },
+      {
+        "id": "current-session",
+        "title": "Retrieve a session",
+        "slug": "auth-currentsession",
+        "product": "auth",
+        "type": "function",
+        "libs": ["dart"]
+      },
+      {
+        "id": "current-user",
+        "title": "Retrieve a user",
+        "slug": "auth-currentuser",
+        "product": "auth",
+        "type": "function",
+        "libs": ["dart"]
+      },
+      {
+        "id": "get-session",
+        "title": "Retrieve a session",
+        "slug": "auth-getsession",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
+        "id": "refresh-session",
+        "title": "Retrieve a new session",
+        "slug": "auth-refreshsession",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
+        "id": "get-user",
+        "title": "Retrieve a user",
+        "slug": "auth-getuser",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "update-user",
+        "title": "Update a user",
+        "slug": "auth-updateuser",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "dart"]
+      },
+      {
+        "id": "set-session",
+        "title": "Set the session data",
+        "slug": "auth-setsession",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js"]
+      },
+
+      {
+        "id": "on-auth-state-change",
+        "title": "Listen to auth events",
+        "slug": "auth-onauthstatechange",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "reset-password-for-email",
+        "title": "Send a password reset request",
+        "slug": "auth-resetpasswordforemail",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "admin-api",
+        "title": "Auth (server-only)",
+        "slug": "admin-api",
+        "libs": ["js", "js_v1"],
+        "type": "function",
+        "items": [
+          {
+            "id": "get-user-by-id",
+            "title": "Retrieve a user",
+            "slug": "auth-admin-getuserbyid",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js"]
+          },
+          {
+            "id": "list-users",
+            "title": "List all users",
+            "slug": "auth-admin-listusers",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js", "js_v1"]
+          },
+          {
+            "id": "create-user",
+            "title": "Create a user",
+            "slug": "auth-admin-createuser",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js", "js_v1"]
+          },
+          {
+            "id": "delete-user",
+            "title": "Delete a user",
+            "slug": "auth-admin-deleteuser",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js", "js_v1"]
+          },
+          {
+            "id": "invite-user-by-email",
+            "title": "Send an email invite link",
+            "slug": "auth-admin-inviteuserbyemail",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js", "js_v1"]
+          },
+          {
+            "id": "reset-password-for-email",
+            "title": "Send a password reset request",
+            "slug": "auth-admin-resetpasswordforemail",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js"]
+          },
+          {
+            "id": "generate-link",
+            "title": "Generate an email link",
+            "slug": "auth-admin-generatelink",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js"]
+          },
+          {
+            "id": "send-mobile-otp",
+            "title": "Send a one-time passcode",
+            "slug": "auth-api-sendmobileotp",
+            "product": "auth-server",
+            "type": "function",
+            "libs": ["js_v1"]
+          },
+          {
+            "id": "update-user-by-id",
+            "title": "Update a user",
+            "slug": "auth-admin-updateuserbyid",
+            "product": "auth-admin",
+            "type": "function",
+            "libs": ["js", "js_v1"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Functions",
+    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "items": [
+      {
+        "id": "invoke",
+        "title": "Invoke a function",
+        "slug": "auth-admin-invoke",
+        "product": "functions",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      }
+    ]
+  },
+  {
+    "title": "Realtime",
+    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "items": [
+      {
+        "id": "stream",
+        "title": "Listen to database changes",
+        "slug": "stream",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["dart", "dart_v0"]
+      },
+      {
+        "id": "subscribe",
+        "title": "Subscribe to database changes",
+        "slug": "subscribe",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "remove-subscription",
+        "title": "Remove a subscription",
+        "slug": "removesubscription",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["dart_v0", "js_v1"]
+      },
+      {
+        "id": "remove-all-subscriptions",
+        "title": "Remove all subscriptions",
+        "slug": "removeallsubscriptions",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+      {
+        "id": "get-subscriptions",
+        "title": "Retrieve subscriptions",
+        "slug": "getsubscriptions",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+
+      {
+        "id": "remove-channel",
+        "title": "Unsubscribe from a channel",
+        "slug": "removechannel",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["js", "dart"]
+      },
+      {
+        "id": "remove-all-channels",
+        "title": "Unsubscribe from all channels",
+        "slug": "removeallchannels",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["js", "dart"]
+      },
+      {
+        "id": "get-channels",
+        "title": "Retrieve all channels",
+        "slug": "getchannels",
+        "product": "realtime",
+        "type": "function",
+        "libs": ["js", "dart"]
+      }
+    ]
+  },
+  {
+    "title": "Storage",
+    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "items": [
+      {
+        "id": "create-bucket",
+        "title": "Create a bucket",
+        "slug": "storage-createbucket",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "get-bucket",
+        "title": "Retrieve a bucket",
+        "slug": "storage-getbucket",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "list-buckets",
+        "title": "List all buckets",
+        "slug": "storage-listbuckets",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "update-bucket",
+        "title": "Update a bucket",
+        "slug": "storage-updatebucket",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "delete-bucket",
+        "title": "Delete a bucket",
+        "slug": "storage-deletebucket",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "empty-bucket",
+        "title": "Empty a bucket",
+        "slug": "storage-emptybucket",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-upload",
+        "title": "Upload a file",
+        "slug": "storage-from-upload",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-download",
+        "title": "Download a file",
+        "slug": "storage-from-download",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-list",
+        "title": "List all files in a bucket",
+        "slug": "storage-from-list",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-update",
+        "title": "Replace an existing file",
+        "slug": "storage-from-update",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-move",
+        "title": "Move an existing file",
+        "slug": "storage-from-move",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-copy",
+        "title": "Copy an existing file",
+        "slug": "storage-from-copy",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "from-remove",
+        "title": "Delete files in a bucket",
+        "slug": "storage-from-remove",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-create-signed-url",
+        "title": "Create a signed URL",
+        "slug": "storage-from-createsignedurl",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      },
+      {
+        "id": "from-create-signed-urls",
+        "title": "Create signed URLs",
+        "slug": "storage-from-createsignedurls",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "from-get-public-url",
+        "title": "Retrieve an asset's URL",
+        "slug": "storage-from-getpublicurl",
+        "product": "storage",
+        "type": "function",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      }
+    ]
+  },
+  {
+    "title": "Misc",
+    "items": [
+      {
+        "title": "Release Notes",
+        "id": "release-notes",
+        "slug": "release-notes",
+        "isFunc": false,
+        "type": "markdown",
+        "libs": ["js", "js_v1", "dart", "dart_v0"]
+      }
+    ]
+  }
+]
