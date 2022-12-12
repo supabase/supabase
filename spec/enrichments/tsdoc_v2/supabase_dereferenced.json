@@ -5165,14 +5165,204 @@
             "type": "union",
             "types": [
               {
-                "type": "reference",
                 "id": 84,
-                "name": "GenericUpdatableView"
+                "name": "GenericUpdatableView",
+                "kind": 4194304,
+                "kindString": "Type alias",
+                "flags": {},
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 62,
+                    "character": 12
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 85,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 87,
+                        "name": "Insert",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 64,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      },
+                      {
+                        "id": 86,
+                        "name": "Row",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 63,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      },
+                      {
+                        "id": 88,
+                        "name": "Update",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 65,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [87, 86, 88]
+                      }
+                    ],
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 62,
+                        "character": 35
+                      }
+                    ]
+                  }
+                }
               },
               {
-                "type": "reference",
                 "id": 89,
-                "name": "GenericNonUpdatableView"
+                "name": "GenericNonUpdatableView",
+                "kind": 4194304,
+                "kindString": "Type alias",
+                "flags": {},
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 68,
+                    "character": 12
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 90,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 91,
+                        "name": "Row",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 69,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [91]
+                      }
+                    ],
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 68,
+                        "character": 38
+                      }
+                    ]
+                  }
+                }
               }
             ]
           }

@@ -1,0 +1,18 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import oldContent from '~/pages/guides/with-react.mdx'
+
+export const meta = {
+  id: 'with-react',
+  title: 'Quickstart: React',
+  description: 'Learn how to use Supabase in your React App.',
+  sidebar_label: 'React',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return oldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page
