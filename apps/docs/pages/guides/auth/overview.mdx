@@ -1,0 +1,18 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import OldContent from '~/pages/guides/auth.mdx'
+
+export const meta = {
+  id: 'auth',
+  title: 'Auth',
+  description: 'Use Supabase to Authenticate and Authorize your users.',
+  sidebar_label: 'Overview',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return OldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page

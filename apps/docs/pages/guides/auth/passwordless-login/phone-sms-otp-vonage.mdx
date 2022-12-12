@@ -1,0 +1,17 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import oldContent from '~/pages/guides/auth/auth-vonage.mdx'
+
+export const meta = {
+  id: 'auth-vonage',
+  title: 'Phone Auth with Vonage',
+  description: 'How to set up and use Mobile OTP with Vonage and Supabase.',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return oldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page

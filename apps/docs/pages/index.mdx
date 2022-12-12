@@ -1,10 +1,15 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import NewContent from '~/pages/new/index.mdx'
 
 export const meta = {
   id: 'introduction',
   title: 'Introduction',
   description: 'Introduction to Supabase',
-  hide_table_of_contents: true,
+  hide_table_of_contents: false,
+}
+
+export function CheckDoc() {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') return NewContent
 }
 
 Supabase is an open source Firebase alternative providing all the backend features you need to build a product.
@@ -14,7 +19,7 @@ You can use it completely, or just the features you need.
 
 ## Learn about features
 
-<div className="grid md:grid-cols-12 gap-4">
+<div className="grid md:grid-cols-12 gap-4 not-prose">
   <div className="col-span-4">
     <ButtonCard
       className="card"
@@ -86,7 +91,11 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
 
 <Frameworks />
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return NewContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
 
 export default Page
-
