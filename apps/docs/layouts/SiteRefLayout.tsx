@@ -21,7 +21,7 @@ const SiteRefLayout = ({ children }) => {
   const menuLevel = useMenuLevelId()
   const mobileMenuOpen = useMenuMobileOpen()
 
-  console.log('menuLevel', menuLevel)
+  //console.log('menuLevel', menuLevel)
 
   const levelsData = {
     home: {
