@@ -8,7 +8,6 @@ export const renderFailedMigrations = (
     count: number
   }>
 ) => {
-  console.log(props.data)
   const count = props.data.length === 0 ? 0: props?.data?.[0]?.count
   return <Statistic value={count} />
 }
