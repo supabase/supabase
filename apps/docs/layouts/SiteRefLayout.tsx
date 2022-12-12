@@ -196,11 +196,11 @@ const SiteRefLayout = ({ children }) => {
                       'top-0',
                       mobileMenuOpen && 'absolute',
                       'flex items-center h-[40px]',
-                      mobileMenuOpen ? 'gap-0 ml-8' : 'gap-3',
+                      mobileMenuOpen ? 'gap-0' : 'gap-3',
                     ].join(' ')}
                   >
                     <button
-                      className="mr-2"
+                      className={['mr-2', mobileMenuOpen && 'mt-0.5'].join(' ')}
                       onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
                     >
                       <div
@@ -256,7 +256,7 @@ const SiteRefLayout = ({ children }) => {
                     className={[
                       'transition-all ease-out duration-200',
                       'absolute left-0 right-0 h-screen',
-                      'px-5 pl-14 py-16',
+                      'px-5 pl-5 py-16',
                       'top-[0px]',
                       'bg-scale-200',
                       mobileMenuOpen
