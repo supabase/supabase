@@ -5,9 +5,51 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 23 Nov 2022 16:04:00 +0000</lastBuildDate>
+      <lastBuildDate>Fri, 09 Dec 2022 16:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/postgres-crdt</guid>
+  <title>pg_crdt - an experimental CRDT extension for Postgres</title>
+  <link>https://supabase.com/blog/postgres-crdt</link>
+  <description>Embedding Yjs and Automerge into Postgres for collaborative applications.</description>
+  <pubDate>Fri, 09 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/who-we-hire</guid>
+  <title>Who We Hire at Supabase</title>
+  <link>https://supabase.com/blog/who-we-hire</link>
+  <description>Traits we look for to maintain a culture of shipping fast and often</description>
+  <pubDate>Thu, 08 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-6-hackathon</guid>
+  <title>Launch Week 6 Hackathon</title>
+  <link>https://supabase.com/blog/launch-week-6-hackathon</link>
+  <description>Build an Open Source Project, Win $1500 and the Supabase Darkmode Keyboard</description>
+  <pubDate>Thu, 08 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-november-2022</guid>
+  <title>Supabase Beta November 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-november-2022</link>
+  <description>We are preparing everything for Launch Week 6, but we still had time to ship some goodies this month!</description>
+  <pubDate>Tue, 06 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/the-supabase-content-storm</guid>
+  <title>The Supabase Content Storm</title>
+  <link>https://supabase.com/blog/the-supabase-content-storm</link>
+  <description>We worked with +30 content creators to drop a mountain of content simultaneously.</description>
+  <pubDate>Mon, 05 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/transparent-column-encryption-with-postgres</guid>
+  <title>Transparent Column Encryption with Postgres</title>
+  <link>https://supabase.com/blog/transparent-column-encryption-with-postgres</link>
+  <description>Using pgsodium's Transparent Column Encryption to encrypt data and provide your users with row-level encryption.</description>
+  <pubDate>Wed, 30 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</guid>
   <title>SQL or NoSQL? Why not use both (with PostgreSQL)?</title>
   <link>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</link>
