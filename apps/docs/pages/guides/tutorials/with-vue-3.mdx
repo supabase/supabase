@@ -1,7 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/with-vue-3.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'with-vue-3',
+  title: 'Quickstart: Vue 3',
+  description: 'Learn how to use Supabase in your Vue 3 App.',
+  sidebar_label: 'Vue 3',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

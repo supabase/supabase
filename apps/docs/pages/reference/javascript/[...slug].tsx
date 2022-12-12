@@ -1,7 +1,7 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-expect-error
-import spec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
@@ -19,16 +19,4 @@ export async function getStaticProps({ params }: { params: { slug: string[] } })
 
 export function getStaticPaths() {
   return handleRefGetStaticPaths()
-}
-
-export const config = {
-  // test - force again
-  unstable_includeFiles: [
-    'node_modules/.pnpm/**/shiki/**/*.json',
-    'node_modules/**/shiki/**/*.json',
-    'node_modules/.npm/shiki/**/*.json',
-    '/var/task/node_modules/shiki/languages/abap.tmLanguage.json',
-    'node_modules/shiki/languages/abap.tmLanguage.json',
-    'node_modules/shiki/**/*.json',
-  ],
 }

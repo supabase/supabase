@@ -12,22 +12,40 @@ import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
+import { post } from '~/lib/fetchWrappers'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
 
-  // function telemetry(route: string) {
-  //   return post(`https://api.supabase.io/platform/telemetry/page`, {
-  //     referrer: document.referrer,
-  //     title: document.title,
-  //     route,
-  //   })
-  // }
+  function telemetry(route: string) {
+    return post(`https://api.supabase.io/platform/telemetry/page`, {
+      referrer: document.referrer,
+      title: document.title,
+      route,
+    })
+  }
 
   useEffect(() => {
     function handleRouteChange(url: string) {
-      // telemetry(url)
+      /*
+       * handle telemetry
+       */
+      telemetry(url)
+      /*
+       * handle "scroll to top" behaviour on route change
+       */
+      if (document) {
+        console.log('url', url)
+        // do not scroll to top for reference docs
+        if (!url.includes('reference/')) {
+          // scroll container div to top
+          const container = document.getElementById('docs-content-container')
+          container.scrollTop = 0
+        }
+      }
     }
+
+    function handlePagrScroll() {}
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {

@@ -6,7 +6,7 @@ import * as NavItems from './NavigationMenu.constants'
 
 import { find } from 'lodash'
 import Image from 'next/image'
-import { memo } from 'react'
+import { useTheme } from 'common/Providers'
 
 // import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
 
@@ -82,6 +82,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   allowedClientKeys,
 }) => {
   const router = useRouter()
+  const { isDarkMode } = useTheme()
 
   let sections = commonSections
 
@@ -95,6 +96,12 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   const databaseFunctions = find(sections, { title: 'Database' })
     ? find(sections, { title: 'Database' }).items
     : []
+
+  const authFunctions = find(sections, { title: 'Auth' })
+    ? find(sections, { title: 'Auth' }).items
+    : []
+
+  // console.log('databaseFunctions', databaseFunctions)
 
   const filterIds =
     databaseFunctions.length > 0
@@ -113,6 +120,16 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }) &&
         find(databaseFunctions, {
           id: 'using-modifiers',
+        }).items.map((x) => x.id)
+      : []
+
+  const authServerIds =
+    databaseFunctions.length > 0
+      ? find(authFunctions, {
+          id: 'admin-api',
+        }) &&
+        find(authFunctions, {
+          id: 'admin-api',
         }).items.map((x) => x.id)
       : []
 
@@ -155,7 +172,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
             alt={id}
             width={24}
             height={24}
-            src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            src={`${router.basePath}/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`}
             className="rounded"
           />
           <span className={['text-base text-brand-1200 ', !menu.title && 'capitalize'].join(' ')}>
@@ -166,7 +183,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         {/* )} */}
 
         <ul className="function-link-list">
-          {sections.map((fn: any) => {
+          {sections.map((fn: any, fnIndex) => {
             //
             // check if the link is allowed to be displayed
             function isFuncNotInLibraryOrVersion(id, type) {
@@ -196,13 +213,22 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
               const activeAccordianItem = useMenuActiveRefId()
               let active = false
 
+              // console.log('activeAccordianItem', activeAccordianItem)
+
               const isFilter =
                 filterIds && filterIds.length > 0 && filterIds.includes(activeAccordianItem)
               const isModifier =
                 modifierIds && modifierIds.length > 0 && modifierIds.includes(activeAccordianItem)
+              const isAuthServer =
+                authServerIds &&
+                authServerIds.length > 0 &&
+                authServerIds.includes(activeAccordianItem)
+
+              // console.log('isFilter', props.id, isFilter)
+              // console.log('isModifier', props.id, isModifier)
 
               if (
-                (isFilter && !isModifier && props.id === 'using-filters') ||
+                (isFilter && !isModifier && !isAuthServer && props.id === 'using-filters') ||
                 (activeAccordianItem === 'using-filters' &&
                   !isModifier &&
                   !isFilter &&
@@ -210,21 +236,37 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
               ) {
                 active = true
               } else if (
-                (isModifier && !isFilter && props.id === 'using-modifiers') ||
+                (isModifier && !isFilter && !isAuthServer && props.id === 'using-modifiers') ||
                 (activeAccordianItem === 'using-modifiers' &&
                   !isFilter &&
                   !isModifier &&
                   props.id === 'using-modifiers')
               ) {
                 active = true
+              } else if (
+                (isAuthServer && !isFilter && !isModifier && props.id === 'admin-api') ||
+                (activeAccordianItem === 'admin-api' &&
+                  !isFilter &&
+                  !isModifier &&
+                  !isAuthServer &&
+                  props.id === 'admin-api')
+              ) {
+                active = true
               } else {
                 active = false
               }
 
+              // if (props.id === 'using-filters') {
+              //   console.log('using-filters', active)
+              // }
+              // if (props.id === 'using-modifiers') {
+              //   console.log('using-modifiers', active)
+              // }
+
               return (
                 <Accordion.Root
                   collapsible
-                  key={props.id + 'accordian-root-for-func'}
+                  key={props.id + '-accordian-root-for-func-' + fnIndex}
                   type="single"
                   value={active ? props.id : ''}
                 >
@@ -236,13 +278,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                     >
                       {props.items &&
                         props.items.map((item) => {
-                          if (item.libs.includes('js_v1')) {
-                            return (
-                              <>
-                                <FunctionLink {...item} library={lib} />b
-                              </>
-                            )
-                          }
+                          return <FunctionLink {...item} library={lib} />
                         })}
                     </Accordion.Content>
                   </Accordion.Item>
@@ -315,4 +351,4 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   )
 }
 
-export default memo(NavigationMenuRefList)
+export default NavigationMenuRefList
