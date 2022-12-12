@@ -217,7 +217,7 @@ export default class VaultStore implements IVaultStore {
     if (!decryptedView) return []
 
     const encryptedColumns = await this.rootStore.meta.query(
-      "SELECT column_name as name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'decrypted_profiles' and column_name like 'decrypted_%'"
+      `SELECT column_name as name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'decrypted_${table}' and column_name like 'decrypted_%'`
     )
     if (!encryptedColumns.error) {
       return encryptedColumns.map((column: any) => column.name.split('decrypted_')[1])
