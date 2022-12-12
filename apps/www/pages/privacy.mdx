@@ -1,10 +1,16 @@
-import Layout from '~/layouts/DefaultGuideLayout'
+import Layout from '../layouts/Layout'
+import SectionContainer from '../components/Layouts/SectionContainer'
 
 export const meta = {
   title: 'Privacy Policy',
+  description: 'Supabase Privacy Policy',
 }
 
-_Last modified: 27 March 2021_
+<SectionContainer>
+
+# Privacy Policy
+
+_Last Modified: 27 March 2021_
 
 Thank you for your interest in Supabase, Inc., ("**_Supabase_**," "**_we_**", "**_our_**" or "**_us_**"). Supabase provides a suite of open source tools, stitched together to build a seamless developer experience. This Privacy Notice explains how information about you, that directly identifies you, or that makes you identifiable ("**_personal information_**") is collected, used and disclosed by Supabase in connection with our website at [supabase.com](https://supabase.com) (the "**_Site_**") and our services offered in connection with the Site (collectively with the Site, the "**_Service_**").
 
@@ -292,6 +298,6 @@ Some browsers also give you the option of downloading and installing extensions 
 | <p>a0:state</p><p></p>         | Strictly necessary | 2 Hours                                         | Authentication Purposes.                                                                                                                                                                                                                                                                                                                                      |
 | <p>youtube-nocookie</p><p></p> | Strictly necessary | Persistent                                      | <p>Privacy-enhanced cookie, essential for embedded videos. [Link.](https://support.google.com/youtube/answer/171780)</p><p><blockquote><small>Privacy Enhanced Mode allows you to embed YouTube videos without using cookies that track viewing behavior. This means no activity is collected to personalize the viewing experience.</small></blockquote></p> |
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+</SectionContainer>
 
-export default Page
+export default (context) => <Layout meta={meta} children={context.children} context={context} />
