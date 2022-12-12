@@ -21,6 +21,9 @@ const useDbQuery: UseDbQuery = (sql, params = DEFAULT_QUERY_PARAMS) => {
     mutate,
   } = useSWR<MetaQueryResponse>(resolvedSql, async () => await meta.query(resolvedSql), {
     revalidateOnFocus: false,
+    revalidateIfStale: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 2000,
   })
 
   const error = swrError || (typeof data === 'object' ? data?.error : '')
