@@ -65,7 +65,9 @@ const Layout: FC<Props> = (props) => {
   }, [])
 
   useEffect(() => {
+    // setTimeout(function () {
     setActive(true)
+    // }, 150)
   }, [])
 
   const hasTableOfContents = tocList.length > 0
@@ -92,9 +94,9 @@ const Layout: FC<Props> = (props) => {
           className={[
             'relative',
             !props.hideToc ? 'col-span-12 md:col-span-9' : 'col-span-12',
-            'transition ease-out',
-            'duration-50',
-            active ? 'opacity-100 left-0' : 'opacity-0 left-6',
+            'transition-all ease-out',
+            // 'duration-100',
+            // active ? 'opacity-100 left-0' : 'opacity-0 left-6',
           ].join(' ')}
         >
           {props.meta.breadcrumb && (
