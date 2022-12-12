@@ -77,35 +77,37 @@ const VaultToggle: FC<Props> = () => {
             </p>
           </div>
           {isNotAvailable ? (
-            <InformationBox
-              hideCollapse
-              defaultVisibility
-              icon={<IconAlertCircle strokeWidth={1.5} size={18} />}
-              title="Vault is not available for your project"
-              description={
-                <>
-                  <p className="mb-4">
-                    Do reach out to us if you're interested in having Vault for this project!
+            <div className="space-y-4">
+              <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
+                <div>
+                  {/* <IconAlertCircle className="text-scale-1100" strokeWidth={1.5} size={18} /> */}
+                  <p className="text-scale-1100 text-sm">
+                    Vault is not available for this project yet.
                   </p>
-                  <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                    <Link href="https://supabase.com/docs">
-                      <a target="_blank">
-                        <Button type="default" icon={<IconExternalLink />}>
-                          About Vault
-                        </Button>
-                      </a>
-                    </Link>
-                    <Link
-                      href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
-                    >
-                      <a target="_blank">
-                        <Button type="primary">Contact us</Button>
-                      </a>
-                    </Link>
-                  </div>
-                </>
-              }
-            />
+                  <p className="text-scale-1000 text-sm">
+                    Do reach out to us if you're interested!
+                  </p>
+                </div>
+                <div>
+                  <Link
+                    href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
+                  >
+                    <a target="_blank">
+                      <Button type="primary">Contact us</Button>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2 my-1 ml-[1px]">
+                <Link href="https://supabase.com/docs">
+                  <a target="_blank">
+                    <Button type="default" icon={<IconExternalLink />}>
+                      About Vault
+                    </Button>
+                  </a>
+                </Link>
+              </div>
+            </div>
           ) : (
             <div className="flex items-center space-x-2">
               <Link href="https://supabase.com/docs">
