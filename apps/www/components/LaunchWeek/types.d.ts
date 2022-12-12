@@ -18,6 +18,13 @@ export type Product = {
   description?: string
 }
 
+export type Step = {
+  title: string
+  url: string
+  docs: string
+  description?: string
+}
+
 export interface WeekDayProps {
   shipped: boolean
   title: string
@@ -32,4 +39,5 @@ export interface WeekDayProps {
   index: number
   shippingHasStarted?: boolean
   youtube_id?: string
+  steps: Step[]
 }
