@@ -3,9 +3,9 @@ import fs from 'fs'
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
 
-import { remarkCodeHike } from '@code-hike/mdx'
+// import { remarkCodeHike } from '@code-hike/mdx'
 // import codeHikeTheme from '~/codeHikeTheme.js'
-import theme from 'shiki/themes/solarized-dark.json'
+// import theme from 'shiki/themes/solarized-dark.json'
 
 async function generateRefMarkdown(sections, slug) {
   let markdownContent = []
