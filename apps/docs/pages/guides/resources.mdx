@@ -22,7 +22,7 @@ export const meta = {
           passHref
         >
           <a className={'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={true} showIconBg={true}>
+            <GlassPanel {...resource} background={false} showIconBg={true}>
               {resource.description}
             </GlassPanel>
           </a>
@@ -36,24 +36,24 @@ export const meta = {
 </div>
 
 <div>
-  <div className="max-w-xl">
+  <div className="max-w-xl mb-6">
 
 ### Migrate to Supabase
 
   </div>
 
   <div className="grid grid-cols-12 gap-6 not-prose">
-    {products.map((product) => {
+    {migrationGuides.map((product) => {
       return (
         <Link
           href={`${product.href}`}
           key={product.title}
           passHref
         >
-          <a className={product.span ?? 'col-span-12 md:col-span-4'}>
-            <GlassPanel {...product} background={true} showIconBg={true} showLink={true}>
+          <a className={product.span ?? 'col-span-6 md:col-span-3'}>
+            <IconPanel {...product} background={true} showIconBg={true} showLink={true}>
               {product.description}
-            </GlassPanel>
+            </IconPanel>
           </a>
         </Link>
       )
@@ -95,59 +95,48 @@ export const meta = {
 export const resources = [
   {
     title: 'Examples',
-    icon: '/docs/img/icons/menu/resources',
     hasLightIcon: true,
     href: '/guides/resources/examples',
     description: 'Official GitHub examples, curated content from the community, and more.',
   },
   {
     title: 'Features',
-    icon: '/docs/img/icons/menu/resources',
     hasLightIcon: true,
     href: '/features',
     description: 'A non-exhaustive list of features that Supabase provides for every project.',
   },
   {
     title: 'Glossary',
-    icon: '/docs/img/icons/menu/resources',
     hasLightIcon: true,
     href: '/guides/resources/glossary',
     description: 'Definitions for terminology and acronyms used in the Supabase documentation.',
   },
 ]
 
-export const products = [
+export const migrationGuides = [
   {
     title: 'Firebase Auth',
-    icon: '/docs/img/icons/menu/auth',
-    hasLightIcon: true,
+    icon: '/docs/img/icons/firebase-icon',
     href: '/guides/migrations/firebase-auth',
     description: 'Move your auth users from a Firebase project to a Supabase project.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Firebase Data',
-    icon: '/docs/img/icons/menu/database',
-    hasLightIcon: true,
+    icon: '/docs/img/icons/firebase-icon',
     href: '/guides/migrations/firestore-data',
     description: 'Migrate the contents of a Firestore collection to a single PostgreSQL table.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Firebase Storage',
-    icon: '/docs/img/icons/menu/storage',
-    hasLightIcon: true,
+    icon: '/docs/img/icons/firebase-icon',
     href: '/guides/migrations/firebase-storage',
     description: 'Convert your Firebase Storage files to Supabase Storage.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Heroku',
-    icon: '/docs/img/icons/menu/database',
-    hasLightIcon: true,
+    icon: '/docs/img/icons/heroku-icon',
     href: '/guides/migrations/heroku',
     description: 'Migrate your Heroku Postgres database to Supabase.',
-    span: 'col-span-12 md:col-span-6',
   },
 ]
 

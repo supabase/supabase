@@ -1,0 +1,275 @@
+import Layout from '~/layouts/DefaultLayout'
+import Link from 'next/link'
+import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
+
+export const meta = {
+  id: 'getting-started',
+  title: 'Getting started',
+  description: 'Resources for getting started building with Supabase.',
+}
+
+<div className="flex flex-col gap-12 my-12">
+
+<div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {resources.map((resource) => {
+      return (
+        <Link
+          href={`${resource.href}`}
+          key={resource.title}
+          passHref
+        >
+          <a className={'col-span-12 md:col-span-4'}>
+            <GlassPanel {...resource} background={false} showIconBg={true}>
+              {resource.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+<div>
+  <div className="max-w-xl mb-6">
+
+### Migrate to Supabase
+
+  </div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {migrationGuides.map((product) => {
+      return (
+        <Link
+          href={`${product.href}`}
+          key={product.title}
+          passHref
+        >
+          <a className={product.span ?? 'col-span-6 md:col-span-3'}>
+            <IconPanel {...product} background={true} showIconBg={true} showLink={true}>
+              {product.description}
+            </IconPanel>
+          </a>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+<div className="grid gap-16 md:grid-cols-2">
+
+  <div>
+
+    ### Supabase CLI
+
+    Develop your project locally, manage your Supabase projects, handle database migrations, CI/CD workflows, and generate types from your database schema, all from the comfort of your Terminal.
+
+[Learn more](/docs/guides/resources/supabase-cli)
+
+  </div>
+
+  <div>
+
+    ### Self-Hosting Supabase
+
+    We're happy to host your next big thing, but we also make it easy to host Supabase on your own. We use Docker to help make setup as painless as possible.
+
+[Learn more](/docs/guides/resources/self-hosting)
+
+  </div>
+
+</div>
+
+{/* end of container */}
+
+</div>
+
+### Tutorials
+
+#### Webapps
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  {webapps.map((item) => {
+    return (
+      <Link href={`/${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
+#### Mobile
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  {mobile.map((item) => {
+    return (
+      <Link href={`/${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
+export const webapps = [
+  {
+    title: 'NextJS',
+    href: '/guides/tutorials/with-nextjs',
+    description:
+      'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/nextjs-icon',
+  },
+  {
+    title: 'React',
+    href: '/guides/tutorials/with-react',
+    description:
+      'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/react-icon',
+  },
+  {
+    title: 'Vue 3',
+    href: '/guides/tutorials/with-vue-3',
+    description:
+      'Learn how to build a user management app with Vue 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/vuejs-icon',
+  },
+  {
+    title: 'Nuxt 3',
+    href: '/guides/tutorials/with-nuxt-3',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/nuxt-icon',
+  },
+  {
+    title: 'Anglular',
+    href: '/guides/tutorials/with-angular',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/angular-icon',
+  },
+  {
+    title: 'RedwoodJS',
+    href: '/guides/tutorials/with-redwoodjs',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/redwood-icon',
+  },
+  {
+    title: 'Svelte',
+    href: '/guides/tutorials/with-svelte',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/svelte-icon',
+  },
+  {
+    title: 'SvelteKit',
+    href: '/guides/tutorials/with-sveltekit',
+    description:
+      'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/svelte-icon',
+  },
+]
+
+export const mobile = [
+  {
+    title: 'Flutter',
+    href: '/guides/tutorials/with-flutter',
+    description:
+      'Learn how to build a user management app with Flutter and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/flutter-icon',
+  },
+  {
+    title: 'Expo',
+    href: '/guides/tutorials/with-expo',
+    description:
+      'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/expo-icon',
+  },
+  {
+    title: 'Ionic React',
+    href: '/guides/tutorials/with-ionic-react',
+    description:
+      'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/ionic-icon',
+  },
+  {
+    title: 'Ionic Vue',
+    href: '/guides/tutorials/with-ionic-vue',
+    description:
+      'Learn how to build a user management app with Flutter and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/ionic-icon',
+  },
+  {
+    title: 'Ionic Angular',
+    href: '/guides/tutorials/with-ionic-angular',
+    description:
+      'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/ionic-icon',
+  },
+]
+
+export const resources = [
+  {
+    title: 'Examples',
+    hasLightIcon: true,
+    href: '/guides/resources/examples',
+    description: 'Official GitHub examples, curated content from the community, and more.',
+  },
+  {
+    title: 'Features',
+    hasLightIcon: true,
+    href: '/features',
+    description: 'A non-exhaustive list of features that Supabase provides for every project.',
+  },
+  {
+    title: 'Glossary',
+    hasLightIcon: true,
+    href: '/guides/resources/glossary',
+    description: 'Definitions for terminology and acronyms used in the Supabase documentation.',
+  },
+]
+
+export const migrationGuides = [
+  {
+    title: 'Firebase Auth',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/migrations/firebase-auth',
+    description: 'Move your auth users from a Firebase project to a Supabase project.',
+  },
+  {
+    title: 'Firebase Data',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/migrations/firestore-data',
+    description: 'Migrate the contents of a Firestore collection to a single PostgreSQL table.',
+  },
+  {
+    title: 'Firebase Storage',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/migrations/firebase-storage',
+    description: 'Convert your Firebase Storage files to Supabase Storage.',
+  },
+  {
+    title: 'Heroku',
+    icon: '/docs/img/icons/heroku-icon',
+    href: '/guides/migrations/heroku',
+    description: 'Migrate your Heroku Postgres database to Supabase.',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
