@@ -2,19 +2,46 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Install Supabase with NextJS',
-  subtitle: 'Setting up supabase-js client library in a NextJS app.',
+  title: 'Use Supabase with NextJS',
+  subtitle: 'Set up the supabase-js client library in a NextJS app.',
 }
 
-The fastest way to get started with supabase and NextJS is to use the supabase-js client library, which provides a convenient interface for working with supabase from a NextJS app. To use supabase-js with NextJS, you can follow these steps:
+Learn how to create a Supabase project, add some sample data to your database, and query the data from a NextJS app.
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a Supabase project with sample data">
+
+    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql SQL_EDITOR
+      -- Create the table
+      CREATE TABLE countries (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL
+      );
+      -- Insert some sample data into the table
+      INSERT INTO countries (name) VALUES ('United States');
+      INSERT INTO countries (name) VALUES ('Canada');
+      INSERT INTO countries (name) VALUES ('Mexico');
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
 
     <StepHikeCompact.Details title="Create a NextJS app">
 
-    First, create a Next.js app using the create-next-app command:
+    Create a Next.js app using the `create-next-app` command.
 
     </StepHikeCompact.Details>
 
@@ -28,11 +55,10 @@ The fastest way to get started with supabase and NextJS is to use the supabase-j
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Create create-react-app app">
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install supabase-js">
 
-      Next, we'll navigate into the new app directory and then install the supabase-js package.
-
+      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a NextJS app. Navigate to the NextJS app and install `supabase-js`.
 
     </StepHikeCompact.Details>
 
@@ -40,60 +66,24 @@ The fastest way to get started with supabase and NextJS is to use the supabase-j
 
       ```bash Terminal
       cd my-app
-      npm install supabase-js
       ```
 
     </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Create some sample data">
-
-    To create a table of countries with their timezones, you will first need to create a table in your Supabase database using SQL. You can use the following SQL statement to create a table called countries:
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ```sql SQL_EDITOR
-      -- this creates the table
-      CREATE TABLE countries (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL
-      );
-      -- insert some sample data into new table
-      INSERT INTO countries (name) VALUES ('United States');
-      INSERT INTO countries (name) VALUES ('Canada');
-      INSERT INTO countries (name) VALUES ('Mexico');
-      ````
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Start your app">
-
-    This will create a new directory with the name you specified, and scaffold a new React project inside it. You can then navigate to the new project directory and start the dev server by running the following commands:
-
-    </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      cd my-app
-      npm run dev
+      npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Create client in app">
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create the Supabase client">
 
-    Next, in your Next.js app, create a file called supabase-client.js and add the following code to initialize the Supabase client and set your project's credentials:
+    In the `/lib` directory of your Next.js app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project's [public API (anon) key](https://app.supabase.com/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
@@ -109,10 +99,10 @@ The fastest way to get started with supabase and NextJS is to use the supabase-j
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Create ">
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from your app">
 
-    Now, you can query the countries table using the supabase-js client in your Next.js app. For example, you could use a getInitialProps method to fetch the data when your page loads:
+    Use a `getInitialProps` method to fetch the data when the page loads and display the query result as a simple list. Replace the existing function in your index file in the `pages` directory with the following.
 
     </StepHikeCompact.Details>
 
@@ -140,6 +130,23 @@ The fastest way to get started with supabase and NextJS is to use the supabase-j
         }
 
         export default Page;
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Start the app and open http://localhost:3000 in a browser and you should see the list of countries.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm run dev
       ```
 
     </StepHikeCompact.Code>
