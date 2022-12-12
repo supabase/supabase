@@ -750,22 +750,22 @@ export const reference_api = {
 
 export const reference_self_hosting_auth = {
   icon: 'reference-auth',
-  title: 'Self Hosting Auth',
+  title: 'Self-Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
   icon: 'reference-storage',
-  title: 'Self Hosting Storage',
-  url: '/guides/reference/self-hosting/auth',
+  title: 'Self-Hosting Storage',
+  url: '/guides/reference/self-hosting/storage',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
   icon: 'reference-auth',
-  title: 'Self Hosting Realtime',
-  url: '/guides/reference/self-hosting/auth',
+  title: 'Self-Hosting Realtime',
+  url: '/guides/reference/self-hosting/realtime',
   parent: '/reference',
 }
 
