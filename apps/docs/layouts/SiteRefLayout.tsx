@@ -91,17 +91,15 @@ const SiteRefLayout = ({ children }) => {
             </div>
           </div>
           <div
+            // #docs-content-container is used by layout to scroll to top
+            id="docs-content-container"
             className={[
               'w-full h-screen transition-all ease-out',
               mobileMenuOpen ? 'overflow-hidden' : 'overflow-auto',
-              // !mobileMenuOpen
-              //   ? 'ml-0 MOBILE-MENU-CLOSE overflow-auto'
-              //   : 'ml-[320px] h-0 MOBILE-MENU-OPEN overflow-hidden', // experiment
             ].join(' ')}
           >
             <div className="flex flex-col relative">
               {/* <NavigationMenu /> */}
-
               <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
                 <TopNavBarRef />
               </div>
