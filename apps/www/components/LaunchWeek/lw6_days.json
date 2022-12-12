@@ -1,15 +1,23 @@
 [
   {
-    "title": "Day 1",
-    "shipped": false,
+    "title": "Docs Updated",
+    "shipped": true,
     "date": "12 Dec 2022",
-    "description": "Day 1",
+    "description": "Supabase Docs",
     "d": 1,
     "dd": "Monday",
     "youtube_id": "OpPOaJI_Z28",
-    "blogpost": "https://supabase.com/blog",
+    "blogpost": "https://supabase.com/blog/new-supabase-docs-built-with-nextjs",
     "docs": "https://supabase.com/docs",
-    "steps": []
+    "steps": [
+      {
+        "title": "Supabase Docs",
+        "blog": "/blog/new-supabase-docs-built-with-nextjs",
+        "docs": "/docs",
+        "isNew": true,
+        "description": ""
+      }
+    ]
   },
   {
     "title": "Day 2",

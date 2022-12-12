@@ -1,0 +1,148 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
+
+export const meta = {
+  title: 'Install Supabase with Nuxt.js',
+  subtitle: 'Setting up supabase-js client library in a Nuxt.js app.',
+}
+
+The fastest way to get started with supabase and Nuxt.js is to use the supabase-js client library, which provides a convenient interface for working with supabase from a Nuxt.js app. To use supabase-js with Nuxt.js, you can follow these steps:
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Create a Nuxt.js app">
+
+    Start by creating a new Nuxt.js project if you do not have one set up:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+        npx create-nuxt-app my-project
+        cd my-project
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Install Supabase client library">
+
+    To install the `@supabase/supabase-js` package, you will need to run the following command:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm install @supabase/supabase-js
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Install Supabase client library">
+
+    And finally we want to save the environment variables in a .env. All we need are the API URL and the anon key that you copied earlier.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```text .env
+      SUPABASE_URL="YOUR_SUPABASE_URL"
+      SUPABASE_KEY="YOUR_SUPABASE_ANON_KEY"
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Install Supabase client library">
+
+    Then let's install the only additional dependency: NuxtSupabase. We only need to import NuxtSupabase as a dev dependency:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm install @nuxtjs/supabase --save-dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Create some sample data">
+
+    To create a table of countries with their timezones, you will first need to create a table in your Supabase database using SQL. You can use the following SQL statement to create a table called countries:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql SQL_EDITOR
+      -- this creates the table
+      CREATE TABLE countries (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL
+      );
+      -- insert some sample data into new table
+      INSERT INTO countries (name) VALUES ('United States');
+      INSERT INTO countries (name) VALUES ('Canada');
+      INSERT INTO countries (name) VALUES ('Mexico');
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Start your app">
+
+    Start the dev server by running the following commands:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Create client in app">
+
+    Next, in your Next.js app, create a file called supabase-client.js and add the following code to initialize the Supabase client and set your project's credentials:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js lib/supabaseClient.js
+        import { createClient } from '@supabase/supabase-js'
+
+        const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
+export default Page
