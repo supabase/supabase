@@ -13,7 +13,8 @@ import { menuState } from '~/hooks/useMenuState'
 const SiteRefLayout = ({ children }) => {
   const { isDarkMode } = useTheme()
 
-  const menuLevel = 'home' // useMenuLevelId()
+  const menuLevel = 'home'
+  // useMenuLevelId()
   const mobileMenuOpen = () => void console.log('menuLevel', menuLevel)
 
   const levelsData = {
