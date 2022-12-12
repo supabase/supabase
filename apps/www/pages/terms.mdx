@@ -1,17 +1,12 @@
 import Layout from '../layouts/Layout'
+import SectionContainer from '../components/Layouts/SectionContainer'
 
 export const meta = {
   title: 'Terms of Service',
   description: 'Supabase Terms of Service',
 }
 
-export const Section = ({ children }) => (
-  <div className='m-10'>
-    {children}
-  </div>
-)
-
-<Section>
+<SectionContainer>
 
 # Terms of service
 
@@ -246,6 +241,6 @@ Each Party acknowledges and agrees that a breach or threatened breach by such Pa
 
 Supabase may identify Customer as a user of the Services and may use Customer's name, logo, and other trademarks in Supabase's customer list, press releases, blog posts, advertisements, and website (and all use thereof and goodwill arising therefrom shall inure to the sole and exclusive benefit of Customer). Otherwise, neither Party may use the name, logo, or other trademarks of the other Party for any purpose without the other Party's prior written approval.
 
-</Section>
+</SectionContainer>
 
 export default (context) => <Layout meta={meta} children={context.children} context={context} />
