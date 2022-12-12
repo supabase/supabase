@@ -433,7 +433,6 @@ export const functions = {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
-        { name: 'Overview', url: '/guides/functions/examples', items: [] },
         { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
       ],
     },
