@@ -45,7 +45,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
       ].join(' ')}
     >
       <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
-        <Link href={`${menu.parent ?? '/'}`} passHref shallow={true}>
+        <Link href={`${menu.parent ?? '/'}`} passHref>
           <a
             className={[
               'flex items-center gap-1 text-xs group mb-3',
@@ -61,7 +61,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
           </a>
         </Link>
 
-        <Link href={menu.url ?? ''} passHref shallow={true}>
+        <Link href={menu.url ?? ''} passHref>
           <a>
             <div className="flex items-center gap-3 my-3">
               <Image
@@ -108,7 +108,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
 
                     const LinkContainer = (props) => {
                       return (
-                        <Link href={props.url} passHref shallow={true}>
+                        <Link href={props.url} passHref>
                           <a className={props.className}>{props.children}</a>
                         </Link>
                       )
@@ -147,7 +147,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                               {subItem.items.map((subSubItem, subSubItemIndex) => {
                                 return (
                                   <li key={subItem.name}>
-                                    <Link href={`${subSubItem.url}`} passHref shallow={true}>
+                                    <Link href={`${subSubItem.url}`} passHref>
                                       <a
                                         className={[
                                           'cursor-pointer transition text-sm',
@@ -172,7 +172,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
               ) : (
                 <>
                   <li>
-                    <Link href={`${x.url}`} passHref shallow={true}>
+                    <Link href={`${x.url}`} passHref>
                       <a
                         className={[
                           'cursor-pointer transition text-sm',
@@ -203,7 +203,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
           return (
             <div key={x.name}>
               <li>
-                <Link href={`${x.href}`} passHref shallow={true}>
+                <Link href={`${x.href}`} passHref>
                   <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
                     {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
                     {x.name}

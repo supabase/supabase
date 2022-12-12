@@ -71,8 +71,6 @@ const SideNav = () => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
-  const level = useMenuLevelId()
-
   console.log()
 
   let version = ''
@@ -85,84 +83,84 @@ const SideNav = () => {
     version = '_v0'
   }
 
-  function handleRouteChange(url: string) {
-    switch (url) {
-      case `/docs`:
-        menuState.setMenuLevelId('home')
-        break
-      case url.includes(`/docs/guides/getting-started`) && url:
-        menuState.setMenuLevelId('gettingstarted')
-        break
-      case url.includes(`/docs/guides/database`) && url:
-        menuState.setMenuLevelId('database')
-        break
-      case url.includes(`/docs/guides/auth`) && url:
-        menuState.setMenuLevelId('auth')
-        break
-      case url.includes(`/docs/guides/functions`) && url:
-        menuState.setMenuLevelId('functions')
-        break
-      case url.includes(`/docs/guides/realtime`) && url:
-        menuState.setMenuLevelId('realtime')
-        break
-      case url.includes(`/docs/guides/storage`) && url:
-        menuState.setMenuLevelId('storage')
-        break
-      case url.includes(`/docs/guides/platform`) ||
-        (url.includes(`/docs/guides/hosting/platform`) && url):
-        menuState.setMenuLevelId('platform')
-        break
-      case url.includes(`/docs/guides/resources`) && url:
-        menuState.setMenuLevelId('resources')
-        break
-      case url.includes(`/docs/guides/integrations`) && url:
-        menuState.setMenuLevelId('integrations')
-        break
-      // JS v1
-      case url.includes(`/docs/reference/javascript/v1`) && url:
-        menuState.setMenuLevelId('reference_javascript_v1')
-        break
-      // JS v2 (latest)
-      case url.includes(`/docs/reference/javascript`) && url:
-        menuState.setMenuLevelId('reference_javascript_v2')
-        break
-      // dart v0
-      case url.includes(`/docs/reference/dart/v0`) && url:
-        menuState.setMenuLevelId('reference_dart_v0')
-        break
-      // dart v1 (latest)
-      case url.includes(`/docs/reference/dart`) && url:
-        menuState.setMenuLevelId('reference_dart_v1')
-        break
-      case url.includes(`/docs/reference/cli`) && url:
-        menuState.setMenuLevelId('reference_cli')
-        break
-      case url.includes(`/docs/reference/api`) && url:
-        menuState.setMenuLevelId('reference_api')
-        break
-      case url.includes(`/docs/reference/self-hosting-auth`) && url:
-        menuState.setMenuLevelId('reference_self_hosting_auth')
-        break
-      case url.includes(`/docs/reference/self-hosting-storage`) && url:
-        menuState.setMenuLevelId('reference_self_hosting_storage')
-        break
-      case url.includes(`/docs/reference/self-hosting-realtime`) && url:
-        menuState.setMenuLevelId('reference_self_hosting_realtime')
-        break
+  // function handleRouteChange(url: string) {
+  //   switch (url) {
+  //     case `/docs`:
+  //       menuState.setMenuLevelId('home')
+  //       break
+  //     case url.includes(`/docs/guides/getting-started`) && url:
+  //       menuState.setMenuLevelId('gettingstarted')
+  //       break
+  //     case url.includes(`/docs/guides/database`) && url:
+  //       menuState.setMenuLevelId('database')
+  //       break
+  //     case url.includes(`/docs/guides/auth`) && url:
+  //       menuState.setMenuLevelId('auth')
+  //       break
+  //     case url.includes(`/docs/guides/functions`) && url:
+  //       menuState.setMenuLevelId('functions')
+  //       break
+  //     case url.includes(`/docs/guides/realtime`) && url:
+  //       menuState.setMenuLevelId('realtime')
+  //       break
+  //     case url.includes(`/docs/guides/storage`) && url:
+  //       menuState.setMenuLevelId('storage')
+  //       break
+  //     case url.includes(`/docs/guides/platform`) ||
+  //       (url.includes(`/docs/guides/hosting/platform`) && url):
+  //       menuState.setMenuLevelId('platform')
+  //       break
+  //     case url.includes(`/docs/guides/resources`) && url:
+  //       menuState.setMenuLevelId('resources')
+  //       break
+  //     case url.includes(`/docs/guides/integrations`) && url:
+  //       menuState.setMenuLevelId('integrations')
+  //       break
+  //     // JS v1
+  //     case url.includes(`/docs/reference/javascript/v1`) && url:
+  //       menuState.setMenuLevelId('reference_javascript_v1')
+  //       break
+  //     // JS v2 (latest)
+  //     case url.includes(`/docs/reference/javascript`) && url:
+  //       menuState.setMenuLevelId('reference_javascript_v2')
+  //       break
+  //     // dart v0
+  //     case url.includes(`/docs/reference/dart/v0`) && url:
+  //       menuState.setMenuLevelId('reference_dart_v0')
+  //       break
+  //     // dart v1 (latest)
+  //     case url.includes(`/docs/reference/dart`) && url:
+  //       menuState.setMenuLevelId('reference_dart_v1')
+  //       break
+  //     case url.includes(`/docs/reference/cli`) && url:
+  //       menuState.setMenuLevelId('reference_cli')
+  //       break
+  //     case url.includes(`/docs/reference/api`) && url:
+  //       menuState.setMenuLevelId('reference_api')
+  //       break
+  //     case url.includes(`/docs/reference/self-hosting-auth`) && url:
+  //       menuState.setMenuLevelId('reference_self_hosting_auth')
+  //       break
+  //     case url.includes(`/docs/reference/self-hosting-storage`) && url:
+  //       menuState.setMenuLevelId('reference_self_hosting_storage')
+  //       break
+  //     case url.includes(`/docs/reference/self-hosting-realtime`) && url:
+  //       menuState.setMenuLevelId('reference_self_hosting_realtime')
+  //       break
 
-      default:
-        break
-    }
-  }
+  //     default:
+  //       break
+  //   }
+  // }
 
-  useEffect(() => {
-    handleRouteChange(router.basePath + router.asPath)
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
+  // useEffect(() => {
+  //   handleRouteChange(router.basePath + router.asPath)
+  //   // Listen for page changes after a navigation or when the query changes
+  //   router.events.on('routeChangeComplete', handleRouteChange)
+  //   return () => {
+  //     router.events.off('routeChangeComplete', handleRouteChange)
+  //   }
+  // }, [router.events])
 
   const home = [
     [
@@ -275,9 +273,10 @@ const SideNav = () => {
       <div
         className={[
           'transition-all duration-150 ease-out',
-          level === 'home' || !level
-            ? 'opacity-100 ml-0 delay-150'
-            : 'opacity-0 -ml-8 invisible absolute',
+          // level === 'home' || !level
+          // ?
+          'opacity-100 ml-0 delay-150',
+          // : 'opacity-0 -ml-8 invisible absolute',
         ].join(' ')}
       >
         <ul className="relative w-full flex flex-col gap-4">
@@ -304,7 +303,7 @@ const SideNav = () => {
                         )
                       } else {
                         return (
-                          <Link href={link.href} passHref key={link.label} shallow={true}>
+                          <Link href={link.href} passHref key={link.label}>
                             <a>
                               <li
                                 className={[
