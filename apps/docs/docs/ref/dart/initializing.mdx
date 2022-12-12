@@ -1,0 +1,53 @@
+---
+id: initializing
+title: 'Initializing'
+slug: initializing
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Initialize Supabase with the static `initialize()` method on `Supabase` class.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="flutter"
+    >
+      <TabPanel id="flutter" label="Flutter">
+
+        ```dart main.dart
+        Future<void> main() async {
+          WidgetsFlutterBinding.ensureInitialized();
+
+          await Supabase.initialize(
+            url: 'https://xyzcompany.supabase.co',
+            anonKey: 'public-anon-key',
+          );
+
+          runApp(MyApp());
+        }
+        ```
+
+      </TabPanel>
+      <TabPanel id="dart" label="Other Dart Project">
+
+        ```dart
+        final supabase = SupabaseClient(
+          'https://xyzcompany.supabase.co',
+          'public-anon-key',
+        );
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
