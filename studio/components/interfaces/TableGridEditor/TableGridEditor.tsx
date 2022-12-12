@@ -66,7 +66,7 @@ const TableGridEditor: FC<Props> = ({
 
     const getEncryptedColumns = async (table: any) => {
       const columns = await vault.listEncryptedColumns(table.name)
-      setEncryptedColumns(columns)
+      if (!cancel) setEncryptedColumns(columns)
     }
 
     if (selectedTable !== undefined) {
