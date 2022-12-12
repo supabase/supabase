@@ -73,6 +73,8 @@ const SideNav = () => {
 
   const level = useMenuLevelId()
 
+  console.log()
+
   let version = ''
 
   if (router.asPath.includes('v1')) {
@@ -264,30 +266,6 @@ const SideNav = () => {
         href: '/reference/cli/introduction',
         level: 'reference_javascript',
       },
-      // {
-      //   label: 'Self-Hosting Reference',
-      // },
-      // {
-      //   label: 'Self-Hosting Auth',
-      //   icon: '/img/icons/menu/reference-auth',
-      //   hasLightIcon: true,
-      //   href: '/reference/self-hosting-auth/introduction',
-      //   level: 'reference_self_hosting_auth',
-      // },
-      // {
-      //   label: 'Self-Hosting Storage',
-      //   hasLightIcon: true,
-      //   icon: '/img/icons/menu/reference-storage',
-      //   href: '/reference/self-hosting-storage/introduction',
-      //   level: 'reference_self_hosting_auth',
-      // },
-      // {
-      //   label: 'Self-Hosting Realtime',
-      //   hasLightIcon: true,
-      //   icon: '/img/icons/menu/reference-realtime',
-      //   href: '/reference/self-hosting-realtime/introduction',
-      //   level: 'reference_self_hosting_auth',
-      // },
     ],
   ]
 
@@ -362,25 +340,20 @@ const SideNav = () => {
         </ul>
       </div>
 
-      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} />
-      <NavigationMenuGuideList id={'database'} currentLevel={level} />
-      <NavigationMenuGuideList id={'auth'} currentLevel={level} />
-      <NavigationMenuGuideList id={'functions'} currentLevel={level} />
-      <NavigationMenuGuideList id={'realtime'} currentLevel={level} />
-      <NavigationMenuGuideList id={'storage'} currentLevel={level} />
-      <NavigationMenuGuideList id={'platform'} currentLevel={level} />
-      <NavigationMenuGuideList
-        id={'resources'}
-        currentLevel={level}
-        setMenuLevelId={menuState.setMenuLevelId}
-      />
-      <NavigationMenuGuideList id={'integrations'} currentLevel={level} />
-      <NavigationMenuGuideList id={'reference'} currentLevel={level} />
+      <NavigationMenuGuideList id={'gettingstarted'} />
+      <NavigationMenuGuideList id={'database'} />
+      <NavigationMenuGuideList id={'auth'} />
+      <NavigationMenuGuideList id={'functions'} />
+      <NavigationMenuGuideList id={'realtime'} />
+      <NavigationMenuGuideList id={'storage'} />
+      <NavigationMenuGuideList id={'platform'} />
+      <NavigationMenuGuideList id={'resources'} setMenuLevelId={menuState.setMenuLevelId} />
+      <NavigationMenuGuideList id={'integrations'} />
+      <NavigationMenuGuideList id={'reference'} />
       {/* // Client Libs */}
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v1'}
-        currentLevel={level}
         commonSections={libCommonSections}
         lib="javascript"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v1)}
@@ -388,7 +361,6 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v2'}
-        currentLevel={level}
         commonSections={libCommonSections}
         lib="javascript"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v2)}
@@ -396,7 +368,6 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v0'}
-        currentLevel={level}
         commonSections={libCommonSections}
         lib="dart"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v0)}
@@ -404,7 +375,6 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v1'}
-        currentLevel={level}
         commonSections={libCommonSections}
         lib="dart"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v1)}
@@ -413,14 +383,12 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-cli-menu'}
         id={'reference_cli'}
-        currentLevel={level}
         commonSections={cliCommonSections}
         lib="cli"
       />
       <NavigationMenuRefList
         key={'reference-api-menu'}
         id={'reference_api'}
-        currentLevel={level}
         commonSections={apiCommonSections}
         lib="api"
       />
@@ -428,21 +396,18 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-self-hosting-auth-menu'}
         id={'reference_self_hosting_auth'}
-        currentLevel={level}
         commonSections={authServerCommonSections}
         lib="self-hosting-auth"
       />
       <NavigationMenuRefList
         key={'reference-self-hosting-storage-menu'}
         id={'reference_self_hosting_storage'}
-        currentLevel={level}
         commonSections={storageServerCommonSections}
         lib="self-hosting-storage"
       />
       <NavigationMenuRefList
         key={'reference-self-hosting-realtime-menu'}
         id={'reference_self_hosting_realtime'}
-        currentLevel={level}
         commonSections={realtimeServerCommonSections}
         lib="self-hosting-auth"
       />
