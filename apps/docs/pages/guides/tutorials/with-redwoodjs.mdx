@@ -1,7 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/with-redwoodjs.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'with-redwoodjs',
+  title: 'Quickstart: RedwoodJS',
+  description: 'Learn how to use Supabase in your RedwoodJS App.',
+  sidebar_label: 'RedwoodJS',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

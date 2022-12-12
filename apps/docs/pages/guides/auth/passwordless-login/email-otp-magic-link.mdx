@@ -1,7 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/auth/auth-magic-link.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'auth-magic-link',
+  title: 'Login With Magic Link',
+  description: 'Use Supabase to authenticate and authorize your users using magic links.',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

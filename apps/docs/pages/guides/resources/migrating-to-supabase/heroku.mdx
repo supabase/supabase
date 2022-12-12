@@ -1,7 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/migrations/heroku.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'heroku',
+  title: 'Migrate from Heroku to Supabase',
+  description: 'Migrate your Heroku Postgres database to Supabase.',
+  sidebar_label: 'Heroku',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

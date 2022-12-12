@@ -1,7 +1,14 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/cli.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'cli',
+  title: 'Supabase CLI',
+  description:
+    'The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.',
+  sidebar_label: 'Overview',
+  toc_max_heading_level: 2,
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

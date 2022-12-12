@@ -1,7 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/auth/auth-notion.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'auth-notion',
+  title: 'Login with Notion',
+  description: 'Add Notion OAuth to your Supabase project',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

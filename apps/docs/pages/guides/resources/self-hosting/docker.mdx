@@ -1,7 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/hosting/docker.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'docker',
+  title: 'Self-hosting with Docker',
+  description: 'How to configure and deploy Supabase.',
+  sidebar_label: 'Docker',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
