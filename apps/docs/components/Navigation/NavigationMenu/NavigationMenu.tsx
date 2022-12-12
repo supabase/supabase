@@ -297,7 +297,9 @@ const SideNav = () => {
       <div
         className={[
           'transition-all duration-150 ease-out',
-          level === 'home' ? 'opacity-100 ml-0 delay-150' : 'opacity-0 -ml-8 invisible absolute',
+          level === 'home' || !level
+            ? 'opacity-100 ml-0 delay-150'
+            : 'opacity-0 -ml-8 invisible absolute',
         ].join(' ')}
       >
         <ul className="relative w-full flex flex-col gap-4">
