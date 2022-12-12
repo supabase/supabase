@@ -11,6 +11,10 @@ export const menuState = proxy({
   setMenuLevelId: (value) => {
     menuState.menuLevelId = value
   },
+  menuMobileOpen: false,
+  setMenuMobileOpen: (value) => {
+    menuState.menuMobileOpen = value
+  },
 })
 
 export const useMenuActiveRefId = () => {
@@ -18,4 +22,8 @@ export const useMenuActiveRefId = () => {
 }
 export const useMenuLevelId = () => {
   return useSnapshot(menuState).menuLevelId
+}
+
+export const useMenuMobileOpen = () => {
+  return useSnapshot(menuState).menuMobileOpen
 }
