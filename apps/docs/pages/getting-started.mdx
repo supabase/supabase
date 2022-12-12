@@ -1,0 +1,44 @@
+import Layout from '~/layouts/DefaultLayout'
+import Link from 'next/link'
+import { GlassPanel } from 'ui'
+
+export const meta = {
+  title: 'Getting started',
+}
+
+### Quickstarts
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  {quickstarts.map((item) => {
+    return (
+      <Link href={`/${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
+export const quickstarts = [
+  {
+    title: 'NextJS',
+    href: '/guides/tutorials/with-nextjs',
+    description:
+      'Learn how to build a user management app with NextJS and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/nextjs-icon',
+  },
+  {
+    title: 'React',
+    href: '/guides/tutorials/with-react',
+    description:
+      'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/react-icon',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
