@@ -13,7 +13,7 @@ import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 import { post } from '~/lib/fetchWrappers'
-import { menuState } from '~/hooks/useMenuState'
+// import { menuState } from '~/hooks/useMenuState'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -35,25 +35,25 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       /*
        * handle "scroll to top" behaviour on route change
        */
-      if (document) {
-        console.log('url', url)
-        // do not scroll to top for reference docs
-        if (!url.includes('reference/')) {
-          // scroll container div to top
-          const container = document.getElementById('docs-content-container')
-          // check container exists (only avail on new docs)
-          if (container) container.scrollTop = 0
-        }
-      }
-      menuState.setMenuMobileOpen(false)
+      // if (document) {
+      //   console.log('url', url)
+      //   // do not scroll to top for reference docs
+      //   if (!url.includes('reference/')) {
+      //     // scroll container div to top
+      //     const container = document.getElementById('docs-content-container')
+      //     // check container exists (only avail on new docs)
+      //     if (container) container.scrollTop = 0
+      //   }
+      // }
+      // menuState.setMenuMobileOpen(false)
     }
 
-    function handlePagrScroll() {}
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
+    // function handlePagrScroll() {}
+    // // Listen for page changes after a navigation or when the query changes
+    // router.events.on('routeChangeComplete', handleRouteChange)
+    // return () => {
+    //   router.events.off('routeChangeComplete', handleRouteChange)
+    // }
   }, [router.events])
 
   const SITE_TITLE = 'Supabase Documentation'
