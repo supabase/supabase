@@ -58,5 +58,6 @@ export type ColumnType =
 export interface ColumnHeaderProps<R> extends HeaderRendererProps<R> {
   columnType: ColumnType
   isPrimaryKey: Boolean | undefined
+  isEncrypted: Boolean | undefined
   format: string
 }

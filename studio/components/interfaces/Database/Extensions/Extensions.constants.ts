@@ -11,4 +11,5 @@ export const HIDDEN_EXTENSIONS = [
   'pg_surgery',
   'pg_visibility',
   'pgstattuple',
+  'supabase_vault',
 ]
