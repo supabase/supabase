@@ -1,17 +1,12 @@
 import Layout from '../layouts/Layout'
+import SectionContainer from '../components/Layouts/SectionContainer'
 
 export const meta = {
   title: 'Privacy Policy',
   description: 'Supabase Privacy Policy',
 }
 
-export const Section = ({ children }) => (
-  <div className='m-10'>
-    {children}
-  </div>
-)
-
-<Section>
+<SectionContainer>
 
 # Privacy Policy
 
@@ -303,6 +298,6 @@ Some browsers also give you the option of downloading and installing extensions 
 | <p>a0:state</p><p></p>         | Strictly necessary | 2 Hours                                         | Authentication Purposes.                                                                                                                                                                                                                                                                                                                                      |
 | <p>youtube-nocookie</p><p></p> | Strictly necessary | Persistent                                      | <p>Privacy-enhanced cookie, essential for embedded videos. [Link.](https://support.google.com/youtube/answer/171780)</p><p><blockquote><small>Privacy Enhanced Mode allows you to embed YouTube videos without using cookies that track viewing behavior. This means no activity is collected to personalize the viewing experience.</small></blockquote></p> |
 
-</Section>
+</SectionContainer>
 
 export default (context) => <Layout meta={meta} children={context.children} context={context} />
