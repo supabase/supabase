@@ -1,6 +1,6 @@
 REPO_DIR=$(shell pwd)
 
-run: download transform format
+run: transform format
 
 
 ###############################################################################
@@ -118,4 +118,3 @@ combine-raw.tsdoc.v2:
 ###############################################################################
 format:
 	npx prettier --write .
-
