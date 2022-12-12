@@ -9,7 +9,7 @@ import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { renderBotScores, renderUserAgents } from 'components/interfaces/Reports/renderers/ApiBotsRenderers'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 
-export const ApiBotsPage: NextPageWithLayout = () => {
+export const ApiBotsReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
   const config = PRESET_CONFIG[Presets.API_BOTS]
@@ -28,7 +28,7 @@ export const ApiBotsPage: NextPageWithLayout = () => {
           className="col-span-4 col-start-1"
           title="Top User Agents"
           description="The types of user agents using the API and their organization source."
-          data={userAgents[0].logData}
+          data={userAgents[0].logData || []}
           renderer={renderUserAgents}
         />
         <ReportWidget
@@ -37,7 +37,7 @@ export const ApiBotsPage: NextPageWithLayout = () => {
           className="col-span-4 col-start-1"
           title="Bot-like API Requests"
           description="Suspicious bot-like requests, as flagged by Cloudflare"
-          data={botScores[0].logData}
+          data={botScores[0].logData || []}
           renderer={renderBotScores}
         />
       </div>
@@ -45,6 +45,6 @@ export const ApiBotsPage: NextPageWithLayout = () => {
   )
 }
 
-ApiBotsPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+ApiBotsReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(ApiBotsPage)
+export default observer(ApiBotsReport)
