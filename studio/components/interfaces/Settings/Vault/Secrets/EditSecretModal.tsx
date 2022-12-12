@@ -15,7 +15,6 @@ interface Props {
 const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
   const { ui, vault } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
-  const [secretValue, setSecretValue] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [isLoadingSecretValue, setIsLoadingSecretValue] = useState(false)
 
@@ -29,9 +28,6 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
     if (selectedSecret !== undefined) {
       setShowSecretValue(false)
       setSelectedKeyId(selectedSecret.key_id)
-      if (selectedSecret.decryptedSecret !== undefined) {
-        setSecretValue(selectedSecret.decryptedSecret)
-      }
     }
   }, [selectedSecret])
 
@@ -71,7 +67,6 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
       if (!res.error) {
         ui.setNotification({ category: 'success', message: 'Successfully updated secret' })
         setSubmitting(false)
-        if (payload.secret !== undefined) setShowSecretValue(false)
         onClose()
       } else {
         ui.setNotification({
@@ -111,7 +106,6 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
             if (selectedSecret === undefined) return
             setIsLoadingSecretValue(true)
             const res = await vault.fetchSecretValue(selectedSecret.id)
-            setSecretValue(res)
             resetForm({
               values: { ...INITIAL_VALUES, secret: res },
               initialValues: { ...INITIAL_VALUES, secret: res },
