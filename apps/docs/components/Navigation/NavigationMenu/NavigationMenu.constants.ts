@@ -424,7 +424,6 @@ export const functions = {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
-        { name: 'Overview', url: '/guides/functions/examples', items: [] },
         { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
       ],
     },
@@ -467,7 +466,6 @@ export const platform = {
   url: '/guides/platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
-    { name: 'Architecture', url: '/architecture', items: [] },
     {
       name: 'Add-ons',
       url: undefined,
