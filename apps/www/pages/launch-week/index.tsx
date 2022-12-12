@@ -101,7 +101,7 @@ export default function launchweek() {
           ) : (
             <Badge
               className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] !border-[${
-                shipped ? '#b3cec1' : 'red'
+                shipped ? '#b3cec1' : '#b3cec1'
               }] dark:from-white dark:to-[#1a7a4ca1] dark:border-[${
                 shipped ? '#1f3738' : '#80a794'
               }] h-fit relative ${
@@ -193,16 +193,6 @@ export default function launchweek() {
             </div>
             <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
           </div>
-          {process.env.NEXT_PUBLIC_LW_STARTED && (
-            <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
-              <TicketContainer
-                supabase={supabase}
-                session={session}
-                defaultUserData={defaultUserData}
-                defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
-              />
-            </div>
-          )}
         </SectionContainer>
         <div
           className={classNames(
@@ -701,6 +691,18 @@ export default function launchweek() {
               </div>
             )}
           </div>
+        </SectionContainer>
+        <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24 mb-40">
+          {process.env.NEXT_PUBLIC_LW_STARTED && (
+            <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
+              <TicketContainer
+                supabase={supabase}
+                session={session}
+                defaultUserData={defaultUserData}
+                defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
+              />
+            </div>
+          )}
         </SectionContainer>
       </DefaultLayout>
     </>
