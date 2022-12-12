@@ -63,7 +63,7 @@ const Section: FC<ISectionContainer> = (props) => {
     >
       <StickyHeader {...props} />
       <div
-        className={`ref-container gap-16 ${
+        className={`ref-container w-full gap-16 ${
           !props.singleColumn ? 'grid lg:grid-cols-2' : 'ref-container--full-width lg:max-w-3xl'
         }`}
       >
@@ -117,7 +117,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
 }
 
 const Details: FC<ISectionDetails> = (props) => {
-  return <div>{props.children}</div>
+  return <div className="relative overflow-hidden w-full">{props.children}</div>
 }
 
 const Examples: FC<ISectionExamples> = (props) => {
