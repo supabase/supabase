@@ -13621,23 +13621,7 @@
       ],
       "type": {
         "type": "union",
-        "types": [
-          {
-            "type": "reference",
-            "typeArguments": [
-              {
-                "type": "reference",
-                "id": 532,
-                "name": "T"
-              }
-            ],
-            "name": "PostgrestResponseSuccess"
-          },
-          {
-            "type": "reference",
-            "name": "PostgrestResponseFailure"
-          }
-        ]
+        "types": [null, null]
       }
     },
     {
@@ -13664,23 +13648,7 @@
       ],
       "type": {
         "type": "union",
-        "types": [
-          {
-            "type": "reference",
-            "typeArguments": [
-              {
-                "type": "reference",
-                "id": 534,
-                "name": "T"
-              }
-            ],
-            "name": "PostgrestSingleResponseSuccess"
-          },
-          {
-            "type": "reference",
-            "name": "PostgrestResponseFailure"
-          }
-        ]
+        "types": [null, null]
       }
     }
   ],

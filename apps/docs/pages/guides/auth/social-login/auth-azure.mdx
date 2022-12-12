@@ -1,0 +1,17 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import oldContent from '~/pages/guides/auth/auth-azure.mdx'
+
+export const meta = {
+  id: 'auth-azure',
+  title: 'Login with Azure',
+  description: 'Add Azure OAuth to your Supabase project',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return oldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page
