@@ -256,6 +256,7 @@ export default function launchweek() {
                 justified={false}
                 bordered={false}
                 chevronAlign="right"
+                defaultValue={day1.d.toString()}
               >
                 <div className="border-b pb-3">
                   <Accordion.Item
