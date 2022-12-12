@@ -96,7 +96,7 @@ const Layout: FC<Props> = (props) => {
             !props.hideToc ? 'col-span-12 md:col-span-9' : 'col-span-12',
             'transition-all ease-out',
             'duration-100',
-            active ? 'opacity-100 left-0' : 'opacity-0 left-6',
+            active ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         >
           {props.meta.breadcrumb && (
