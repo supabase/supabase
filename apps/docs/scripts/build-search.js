@@ -41,7 +41,6 @@ const nameMap = {
 }
 
 async function walk(dir) {
-  console.log('dir:', dir)
   let files = await fs.promises.readdir(dir)
   files = await Promise.all(
     files.map(async (file) => {
@@ -67,6 +66,15 @@ async function walk(dir) {
 
   console.log('Preparing docs indexing for Algolia')
 
+  function extractMeta(mdx) {
+    const regex = /^export\sconst\smeta\s=\s(\{[\w\s':,]*\})/gm
+    const match = regex.exec(mdx)
+    if (match) {
+      return JSON.parse(match[1])
+    }
+    return null
+  }
+
   try {
     const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME
     const client = algoliasearch(
@@ -75,13 +83,11 @@ async function walk(dir) {
     )
     const index = client.initIndex(indexName)
 
-    //const referencePages = await walk('docs')
-    //const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
-    //const allPages = guidePages.concat(referencePages)
+    const referencePages = await walk('docs')
+    const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
+    const allPages = guidePages.concat(referencePages)
 
-    const newAllpages = (await walk('docs')).filter((slug) => !ignoredFiles.includes(slug))
-
-    const searchObjects = newAllpages
+    const searchObjects = allPages
       .map((slug) => {
         let id, title, description
         const fileContents = fs.readFileSync(slug, 'utf8')
@@ -93,7 +99,7 @@ async function walk(dir) {
           if (metaIndex !== -1) {
             const metaString =
               fileContents
-                .slice(metaIndex + 20, fileContents.indexOf('}') + 1)
+                .slice(metaIndex + 20, fileContents.indexOf('}', metaIndex + 1) + 1)
                 .replace(/\n/g, '')
                 .slice(0, -2) + '}'
             const meta = eval(`(${metaString})`)
