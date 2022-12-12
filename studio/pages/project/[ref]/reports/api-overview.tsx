@@ -13,7 +13,7 @@ import {
   renderStatusCodesChart,
 } from 'components/interfaces/Reports/renderers/OverviewRenderers'
 
-export const ApiOverviewPage: NextPageWithLayout = () => {
+export const ApiOverviewReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
   const config = PRESET_CONFIG[Presets.API_OVERVIEW]
@@ -31,7 +31,7 @@ export const ApiOverviewPage: NextPageWithLayout = () => {
           className="col-span-4 col-start-1"
           title="API Status Codes"
           description="Distribution of API responses by status codes."
-          data={statusCodes[0].logData}
+          data={statusCodes[0].logData  || []}
           renderer={renderStatusCodesChart}
         />
         <ReportWidget
@@ -40,7 +40,7 @@ export const ApiOverviewPage: NextPageWithLayout = () => {
           className="col-span-4 col-start-1"
           title="Error Rate"
           description="Percentage of API 5XX and 4XX error responses."
-          data={errorRates[0].logData}
+          data={errorRates[0].logData  || []}
           renderer={renderErrorRateChart}
         />
         <ReportWidget
@@ -49,7 +49,7 @@ export const ApiOverviewPage: NextPageWithLayout = () => {
           className="col-span-4 col-start-1"
           title="Slow API Requests"
           description="Most frequently used requests, sorted by total querying time"
-          data={requestPaths[0].logData}
+          data={requestPaths[0].logData || []}
           renderer={renderRequestsPathsTable}
         />
       </div>
@@ -57,6 +57,6 @@ export const ApiOverviewPage: NextPageWithLayout = () => {
   )
 }
 
-ApiOverviewPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+ApiOverviewReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(ApiOverviewPage)
+export default observer(ApiOverviewReport)

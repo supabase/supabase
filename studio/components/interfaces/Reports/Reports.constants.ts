@@ -180,6 +180,18 @@ order by
       cumulativeUsers: {
         queryType: 'db',
         sql: `
+        
+select 
+  date_trunc('day', u.created_at) as timestamp, 
+  sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count
+from auth.users as u
+group by timestamp
+order by timestamp desc
+        `,
+      },
+      newUsers: {
+        queryType: 'db',
+        sql: `
 select 
 date_trunc('day', u.created_at) as timestamp,
 count(u.id) as count
@@ -189,24 +201,6 @@ group by
   timestamp
 order by
   timestamp desc
-        `,
-      },
-      newUsers: {
-        queryType: 'logs',
-        sql: `
-select 
-  TIMESTAMP_TRUNC(f.timestamp, DAY) as timestamp,
-  count(id) as count
-from 
-gotrue_logs f
-  cross join unnest(f.metadata) as m
-where  f.timestamp > "2022-11-20" 
-and m.project = "tzljvicuuxegpzwuwife"
-and JSON_VALUE(f.event_message, "$.path") = "/signup"
-and JSON_VALUE(f.event_message, "$.auth_event.actor_id") is not null
-and JSON_VALUE(f.event_message, "$.auth_event.action") != "user_repeated_signup"
-group by 
-  timestamp
 `,
       },
     },
