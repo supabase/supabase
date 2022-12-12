@@ -501,7 +501,6 @@ export const resources = {
   url: '/guides/resources',
   items: [
     { name: 'Examples', url: '/guides/resources/examples', items: [] },
-    { name: 'Features', url: '/features', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -556,29 +555,29 @@ export const resources = {
         { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
       ],
     },
-    {
-      name: 'Self-Hosting reference docs',
-      items: [
-        {
-          name: 'Auth server',
-          url: '/reference/self-hosting-auth',
-          icon: '/docs/img/icons/menu/reference-auth',
-          items: [],
-        },
-        {
-          name: 'Storage server',
-          url: '/reference/self-hosting-storage',
-          icon: '/docs/img/icons/menu/reference-storage',
-          items: [],
-        },
-        {
-          name: 'Realtime server',
-          url: '/reference/self-hosting-realtime',
-          icon: '/docs/img/icons/menu/reference-realtime',
-          items: [],
-        },
-      ],
-    },
+//    {
+//      name: 'Self-Hosting reference docs',
+//      items: [
+//        {
+//          name: 'Auth server',
+//          url: '/reference/self-hosting-auth',
+//          icon: '/docs/img/icons/menu/reference-auth',
+//          items: [],
+//        },
+//        {
+//          name: 'Storage server',
+//          url: '/reference/self-hosting-storage',
+//          icon: '/docs/img/icons/menu/reference-storage',
+//          items: [],
+//        },
+//        {
+//          name: 'Realtime server',
+//          url: '/reference/self-hosting-realtime',
+//          icon: '/docs/img/icons/menu/reference-realtime',
+//          items: [],
+//        },
+//      ],
+//    },
   ],
 }
 
