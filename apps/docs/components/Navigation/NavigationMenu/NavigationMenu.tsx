@@ -326,7 +326,7 @@ const SideNav = () => {
                         )
                       } else {
                         return (
-                          <Link href={link.href} passHref key={link.label}>
+                          <Link href={link.href} passHref key={link.label} shallow={true}>
                             <a>
                               <li
                                 className={[
