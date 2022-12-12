@@ -184,7 +184,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [737, 736, 738]
+                      "children": [
+                        737,
+                        736,
+                        738
+                      ]
                     }
                   ]
                 }
@@ -197,17 +201,23 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [728]
+          "children": [
+            728
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [732]
+          "children": [
+            732
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [733]
+          "children": [
+            733
+          ]
         }
       ],
       "sources": [
@@ -286,7 +296,9 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [723]
+          "children": [
+            723
+          ]
         }
       ],
       "sources": [
@@ -424,7 +436,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [794, 793]
+                              "children": [
+                                794,
+                                793
+                              ]
                             }
                           ]
                         }
@@ -522,7 +537,10 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [798, 797]
+                      "children": [
+                        798,
+                        797
+                      ]
                     }
                   ]
                 }
@@ -676,7 +694,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [808, 807]
+                                  "children": [
+                                    808,
+                                    807
+                                  ]
                                 }
                               ]
                             }
@@ -747,7 +768,12 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [805, 803, 802, 804]
+                      "children": [
+                        805,
+                        803,
+                        802,
+                        804
+                      ]
                     }
                   ]
                 }
@@ -770,17 +796,25 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [788]
+          "children": [
+            788
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [795, 809, 810]
+          "children": [
+            795,
+            809,
+            810
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [799]
+          "children": [
+            799
+          ]
         }
       ],
       "sources": [
@@ -993,7 +1027,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [784, 783, 785]
+                      "children": [
+                        784,
+                        783,
+                        785
+                      ]
                     }
                   ]
                 }
@@ -1016,17 +1054,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [775]
+          "children": [
+            775
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [778, 779]
+          "children": [
+            778,
+            779
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [780]
+          "children": [
+            780
+          ]
         }
       ],
       "sources": [
@@ -1250,7 +1295,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [823, 822, 824]
+                      "children": [
+                        823,
+                        822,
+                        824
+                      ]
                     }
                   ]
                 }
@@ -1273,17 +1322,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [813]
+          "children": [
+            813
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [817, 818]
+          "children": [
+            817,
+            818
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [819]
+          "children": [
+            819
+          ]
         }
       ],
       "sources": [
@@ -1483,7 +1539,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [771, 770, 772]
+                      "children": [
+                        771,
+                        770,
+                        772
+                      ]
                     }
                   ]
                 }
@@ -1506,17 +1566,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [763]
+          "children": [
+            763
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [765, 766]
+          "children": [
+            765,
+            766
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [767]
+          "children": [
+            767
+          ]
         }
       ],
       "sources": [
@@ -1626,12 +1693,16 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [741]
+          "children": [
+            741
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [745]
+          "children": [
+            745
+          ]
         }
       ],
       "sources": [
@@ -1860,7 +1931,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [759, 758, 760]
+                      "children": [
+                        759,
+                        758,
+                        760
+                      ]
                     }
                   ]
                 }
@@ -1873,17 +1948,24 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [748]
+          "children": [
+            748
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [753, 754]
+          "children": [
+            753,
+            754
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [755]
+          "children": [
+            755
+          ]
         }
       ],
       "sources": [
@@ -2128,7 +2210,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [11, 7, 6]
+                          "children": [
+                            11,
+                            7,
+                            6
+                          ]
                         }
                       ]
                     }
@@ -2444,7 +2530,17 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [412, 415, 419, 416, 413, 418, 417, 414, 411]
+                          "children": [
+                            412,
+                            415,
+                            419,
+                            416,
+                            413,
+                            418,
+                            417,
+                            414,
+                            411
+                          ]
                         }
                       ],
                       "sources": [
@@ -2709,7 +2805,12 @@
                                   {
                                     "title": "Properties",
                                     "kind": 1024,
-                                    "children": [520, 522, 521, 519]
+                                    "children": [
+                                      520,
+                                      522,
+                                      521,
+                                      519
+                                    ]
                                   }
                                 ],
                                 "sources": [
@@ -2839,7 +2940,11 @@
                                   {
                                     "title": "Properties",
                                     "kind": 1024,
-                                    "children": [526, 527, 525]
+                                    "children": [
+                                      526,
+                                      527,
+                                      525
+                                    ]
                                   }
                                 ],
                                 "sources": [
@@ -2951,7 +3056,11 @@
                                   {
                                     "title": "Properties",
                                     "kind": 1024,
-                                    "children": [531, 532, 530]
+                                    "children": [
+                                      531,
+                                      532,
+                                      530
+                                    ]
                                   }
                                 ],
                                 "sources": [
@@ -3093,7 +3202,12 @@
                                   {
                                     "title": "Properties",
                                     "kind": 1024,
-                                    "children": [536, 537, 538, 535]
+                                    "children": [
+                                      536,
+                                      537,
+                                      538,
+                                      535
+                                    ]
                                   }
                                 ],
                                 "sources": [
@@ -3287,7 +3401,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [39, 38]
+                          "children": [
+                            39,
+                            38
+                          ]
                         }
                       ]
                     }
@@ -3399,7 +3516,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [51]
+                                      "children": [
+                                        51
+                                      ]
                                     }
                                   ]
                                 }
@@ -3428,7 +3547,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [49, 52]
+                              "children": [
+                                49,
+                                52
+                              ]
                             }
                           ]
                         }
@@ -3486,7 +3608,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [56]
+                                      "children": [
+                                        56
+                                      ]
                                     }
                                   ]
                                 }
@@ -3516,7 +3640,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [54, 57]
+                              "children": [
+                                54,
+                                57
+                              ]
                             }
                           ]
                         }
@@ -3633,7 +3760,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [31, 32]
+                          "children": [
+                            31,
+                            32
+                          ]
                         }
                       ]
                     }
@@ -3939,7 +4069,17 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [412, 415, 419, 416, 413, 418, 417, 414, 411]
+                          "children": [
+                            412,
+                            415,
+                            419,
+                            416,
+                            413,
+                            418,
+                            417,
+                            414,
+                            411
+                          ]
                         }
                       ],
                       "sources": [
@@ -3981,17 +4121,30 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [2]
+          "children": [
+            2
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [16]
+          "children": [
+            16
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [43, 65, 40, 58, 33, 46, 27, 61]
+          "children": [
+            43,
+            65,
+            40,
+            58,
+            33,
+            46,
+            27,
+            61
+          ]
         }
       ],
       "sources": [
@@ -4267,7 +4420,16 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [296, 295, 299, 290, 297, 298, 294, 289]
+                              "children": [
+                                296,
+                                295,
+                                299,
+                                290,
+                                297,
+                                298,
+                                294,
+                                289
+                              ]
                             }
                           ],
                           "sources": [
@@ -4419,7 +4581,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [128]
+                                      "children": [
+                                        128
+                                      ]
                                     }
                                   ]
                                 }
@@ -4448,7 +4612,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [126, 129]
+                              "children": [
+                                126,
+                                129
+                              ]
                             }
                           ]
                         }
@@ -4507,7 +4674,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [133]
+                                      "children": [
+                                        133
+                                      ]
                                     }
                                   ]
                                 }
@@ -4537,7 +4706,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [131, 134]
+                              "children": [
+                                131,
+                                134
+                              ]
                             }
                           ]
                         }
@@ -4596,7 +4768,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [138]
+                                      "children": [
+                                        138
+                                      ]
                                     }
                                   ]
                                 }
@@ -4625,7 +4799,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [136, 139]
+                              "children": [
+                                136,
+                                139
+                              ]
                             }
                           ]
                         }
@@ -4884,7 +5061,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [194]
+                              "children": [
+                                194
+                              ]
                             }
                           ]
                         }
@@ -4895,7 +5074,9 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [192]
+                      "children": [
+                        192
+                      ]
                     }
                   ]
                 }
@@ -4970,7 +5151,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [163]
+                          "children": [
+                            163
+                          ]
                         }
                       ]
                     }
@@ -5097,7 +5280,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [201, 200]
+                          "children": [
+                            201,
+                            200
+                          ]
                         }
                       ]
                     }
@@ -5167,7 +5353,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [203, 205]
+                              "children": [
+                                203,
+                                205
+                              ]
                             }
                           ]
                         }
@@ -5223,7 +5412,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [207, 208]
+                              "children": [
+                                207,
+                                208
+                              ]
                             }
                           ]
                         }
@@ -5321,7 +5513,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [157, 158]
+                          "children": [
+                            157,
+                            158
+                          ]
                         }
                       ]
                     }
@@ -5534,7 +5729,11 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [484, 482, 483]
+                                      "children": [
+                                        484,
+                                        482,
+                                        483
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -5574,7 +5773,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [480, 479]
+                              "children": [
+                                480,
+                                479
+                              ]
                             }
                           ],
                           "sources": [
@@ -5808,7 +6010,12 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [469, 468, 466, 467]
+                                          "children": [
+                                            469,
+                                            468,
+                                            466,
+                                            467
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -5826,7 +6033,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [463, 464]
+                                  "children": [
+                                    463,
+                                    464
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -5946,7 +6156,11 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [476, 475, 474]
+                                          "children": [
+                                            476,
+                                            475,
+                                            474
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -5985,7 +6199,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [472, 471]
+                                  "children": [
+                                    472,
+                                    471
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -6175,7 +6392,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [453, 452]
+                                          "children": [
+                                            453,
+                                            452
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -6214,7 +6434,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [448, 450, 449]
+                                  "children": [
+                                    448,
+                                    450,
+                                    449
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -6311,7 +6535,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [460, 459]
+                                          "children": [
+                                            460,
+                                            459
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -6371,7 +6598,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [457, 456, 455]
+                                  "children": [
+                                    457,
+                                    456,
+                                    455
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -6546,7 +6777,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [512, 511]
+                                          "children": [
+                                            512,
+                                            511
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -6564,7 +6798,9 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [509]
+                                  "children": [
+                                    509
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -6614,7 +6850,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [514]
+                                      "children": [
+                                        514
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -6661,7 +6899,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [516]
+                                      "children": [
+                                        516
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -6766,7 +7006,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [183]
+                          "children": [
+                            183
+                          ]
                         }
                       ]
                     }
@@ -6959,7 +7201,11 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [438, 437, 436]
+                                          "children": [
+                                            438,
+                                            437,
+                                            436
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -6998,7 +7244,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [432, 434, 433]
+                                  "children": [
+                                    432,
+                                    434,
+                                    433
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -7095,7 +7345,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [445, 444]
+                                          "children": [
+                                            445,
+                                            444
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -7155,7 +7408,11 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [442, 441, 440]
+                                  "children": [
+                                    442,
+                                    441,
+                                    440
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -7328,7 +7585,12 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [409, 406, 408, 407]
+                          "children": [
+                            409,
+                            406,
+                            408,
+                            407
+                          ]
                         }
                       ],
                       "sources": [
@@ -7503,7 +7765,10 @@
                                       {
                                         "title": "Properties",
                                         "kind": 1024,
-                                        "children": [496, 495]
+                                        "children": [
+                                          496,
+                                          495
+                                        ]
                                       }
                                     ]
                                   }
@@ -7578,7 +7843,12 @@
                               {
                                 "title": "Properties",
                                 "kind": 1024,
-                                "children": [493, 490, 491, 492]
+                                "children": [
+                                  493,
+                                  490,
+                                  491,
+                                  492
+                                ]
                               }
                             ],
                             "sources": [
@@ -7692,7 +7962,10 @@
                                       {
                                         "title": "Properties",
                                         "kind": 1024,
-                                        "children": [504, 503]
+                                        "children": [
+                                          504,
+                                          503
+                                        ]
                                       }
                                     ]
                                   }
@@ -7746,7 +8019,12 @@
                               {
                                 "title": "Properties",
                                 "kind": 1024,
-                                "children": [498, 501, 499, 500]
+                                "children": [
+                                  498,
+                                  501,
+                                  499,
+                                  500
+                                ]
                               }
                             ],
                             "sources": [
@@ -7784,17 +8062,38 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [75]
+          "children": [
+            75
+          ]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [78, 79]
+          "children": [
+            78,
+            79
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [123, 140, 101, 184, 159, 195, 153, 111, 114, 108, 120, 180, 105, 143, 117]
+          "children": [
+            123,
+            140,
+            101,
+            184,
+            159,
+            195,
+            153,
+            111,
+            114,
+            108,
+            120,
+            180,
+            105,
+            143,
+            117
+          ]
         }
       ],
       "sources": [
@@ -7869,7 +8168,10 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [356, 357]
+          "children": [
+            356,
+            357
+          ]
         }
       ],
       "sources": [
@@ -8125,7 +8427,17 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [412, 415, 419, 416, 413, 418, 417, 414, 411]
+          "children": [
+            412,
+            415,
+            419,
+            416,
+            413,
+            418,
+            417,
+            414,
+            411
+          ]
         }
       ],
       "sources": [
@@ -8303,7 +8615,14 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [374, 372, 371, 370, 373, 375]
+          "children": [
+            374,
+            372,
+            371,
+            370,
+            373,
+            375
+          ]
         }
       ],
       "sources": [
@@ -8373,7 +8692,10 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [540, 541]
+          "children": [
+            540,
+            541
+          ]
         }
       ],
       "sources": [
@@ -8414,7 +8736,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Deletes a factor on a user. This will log the user out of all active\nsessions (if the deleted factor was verified). There's no need to delete\nunverified factors.",
+                "shortText": "Deletes a factor on a user. This will log the user out of all active\nsessions if the deleted factor was verified.",
                 "tags": [
                   {
                     "tag": "see",
@@ -8454,7 +8776,7 @@
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 855,
+                          "line": 842,
                           "character": 12
                         }
                       ],
@@ -8479,7 +8801,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 857,
+                                  "line": 844,
                                   "character": 2
                                 }
                               ],
@@ -8500,7 +8822,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 860,
+                                  "line": 847,
                                   "character": 2
                                 }
                               ],
@@ -8514,13 +8836,16 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [684, 685]
+                              "children": [
+                                684,
+                                685
+                              ]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 855,
+                              "line": 842,
                               "character": 45
                             }
                           ]
@@ -8560,7 +8885,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Lists all factors attached to a user."
+                "shortText": "Lists all factors associated to a user."
               },
               "parameters": [
                 {
@@ -8590,7 +8915,7 @@
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 879,
+                          "line": 866,
                           "character": 12
                         }
                       ],
@@ -8610,12 +8935,12 @@
                               "kindString": "Property",
                               "flags": {},
                               "comment": {
-                                "shortText": "ID of the user for which to list all MFA factors."
+                                "shortText": "ID of the user."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 881,
+                                  "line": 868,
                                   "character": 2
                                 }
                               ],
@@ -8629,13 +8954,15 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [697]
+                              "children": [
+                                697
+                              ]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 879,
+                              "line": 866,
                               "character": 44
                             }
                           ]
@@ -8666,13 +8993,16 @@
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [702, 699]
+          "children": [
+            702,
+            699
+          ]
         }
       ],
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 889,
+          "line": 876,
           "character": 17
         }
       ]
@@ -8701,7 +9031,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Prepares a challenge used to verify that a user has access to a MFA\nfactor. Provide the challenge ID and verification code by calling\n{@link GoTrueMFAApi#verify}."
+                "shortText": "Prepares a challenge used to verify that a user has access to a MFA\nfactor."
               },
               "parameters": [
                 {
@@ -8723,7 +9053,7 @@
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 619,
+                          "line": 622,
                           "character": 12
                         }
                       ],
@@ -8743,12 +9073,12 @@
                               "kindString": "Property",
                               "flags": {},
                               "comment": {
-                                "shortText": "ID of the factor to be challenged."
+                                "shortText": "ID of the factor to be challenged. Returned in enroll()."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 621,
+                                  "line": 624,
                                   "character": 2
                                 }
                               ],
@@ -8762,13 +9092,15 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [579]
+                              "children": [
+                                579
+                              ]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 619,
+                              "line": 622,
                               "character": 33
                             }
                           ]
@@ -8808,13 +9140,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Helper method which creates a challenge and immediately uses the given code to verify against it thereafter. The verification code is\nprovided by the user by entering a code seen in their authenticator app.",
-                "tags": [
-                  {
-                    "tag": "see",
-                    "text": "{@link GoTrueMFAApi#challengeAndVerify}\n\n"
-                  }
-                ]
+                "shortText": "Helper method which creates a challenge and immediately uses the given code to verify against it thereafter. The verification code is\nprovided by the user by entering a code seen in their authenticator app."
               },
               "parameters": [
                 {
@@ -8836,7 +9162,7 @@
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 624,
+                          "line": 627,
                           "character": 12
                         }
                       ],
@@ -8861,7 +9187,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 628,
+                                  "line": 631,
                                   "character": 2
                                 }
                               ],
@@ -8877,12 +9203,12 @@
                               "kindString": "Property",
                               "flags": {},
                               "comment": {
-                                "shortText": "ID of the factor being verified."
+                                "shortText": "ID of the factor being verified. Returned in enroll()."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 626,
+                                  "line": 629,
                                   "character": 2
                                 }
                               ],
@@ -8896,13 +9222,16 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [583, 582]
+                              "children": [
+                                583,
+                                582
+                              ]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 624,
+                              "line": 627,
                               "character": 42
                             }
                           ]
@@ -8942,22 +9271,8 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Starts the enrollment process for a new Multi-Factor Authentication\nfactor. This method creates a new factor in the 'unverified' state.\nPresent the QR code or secret to the user and ask them to add it to their\nauthenticator app. Ask the user to provide you with an authenticator code\nfrom their app and verify it by calling challenge and then verify.",
-                "text": "The first successful verification of an unverified factor activates the\nfactor. All other sessions are logged out and the current one gets an\n`aal2` authenticator level.\n",
-                "tags": [
-                  {
-                    "tag": "see",
-                    "text": "{@link GoTrueMFAApi#challenge}"
-                  },
-                  {
-                    "tag": "see",
-                    "text": "{@link GoTrueMFAApi#verify}"
-                  },
-                  {
-                    "tag": "see",
-                    "text": "{@link GoTrueMFAApi#getAuthenticatorAssuranceLevel}\n\n"
-                  }
-                ]
+                "shortText": "Starts the enrollment process for a new Multi-Factor Authentication (MFA)\nfactor. This method creates a new `unverified` factor.\nTo verify a factor, present the QR code or secret to the user and ask them to add it to their\nauthenticator app.\nThe user has to enter the code from their authenticator app to verify it.",
+                "text": "Upon verifying a factor, all other sessions are logged out and the current session's authenticator level is promoted to `aal2`.\n\n"
               },
               "parameters": [
                 {
@@ -8998,10 +9313,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "comment": {
+                                "shortText": "The type of factor being enrolled."
+                              },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 598,
+                                  "line": 599,
                                   "character": 2
                                 }
                               ],
@@ -9018,10 +9336,13 @@
                               "flags": {
                                 "isOptional": true
                               },
+                              "comment": {
+                                "shortText": "Human readable name assigned to the factor."
+                              },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 600,
+                                  "line": 603,
                                   "character": 2
                                 }
                               ],
@@ -9038,10 +9359,13 @@
                               "flags": {
                                 "isOptional": true
                               },
+                              "comment": {
+                                "shortText": "Domain which the user is enrolled with."
+                              },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 599,
+                                  "line": 601,
                                   "character": 2
                                 }
                               ],
@@ -9055,7 +9379,11 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [566, 568, 567]
+                              "children": [
+                                566,
+                                568,
+                                567
+                              ]
                             }
                           ],
                           "sources": [
@@ -9180,7 +9508,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Unenroll removes a MFA factor. Unverified factors can safely be ignored\nand it's not necessary to unenroll them. Unenrolling a verified MFA factor\ncannot be done from a session with an `aal1` authenticator level."
+                "shortText": "Unenroll removes a MFA factor.\nA user has to have an `aal2` authenticator level in order to unenroll a `verified` factor."
               },
               "parameters": [
                 {
@@ -9202,7 +9530,7 @@
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 603,
+                          "line": 606,
                           "character": 12
                         }
                       ],
@@ -9227,7 +9555,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 605,
+                                  "line": 608,
                                   "character": 2
                                 }
                               ],
@@ -9241,13 +9569,15 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [571]
+                              "children": [
+                                571
+                              ]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 603,
+                              "line": 606,
                               "character": 32
                             }
                           ]
@@ -9287,13 +9617,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Verifies a verification code against a challenge. The verification code is\nprovided by the user by entering a code seen in their authenticator app.",
-                "tags": [
-                  {
-                    "tag": "see",
-                    "text": "{@link GoTrueMFAApi#challenge}\n\n"
-                  }
-                ]
+                "shortText": "Verifies a code against a challenge. The verification code is\nprovided by the user by entering a code seen in their authenticator app."
               },
               "parameters": [
                 {
@@ -9315,7 +9639,7 @@
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 608,
+                          "line": 611,
                           "character": 12
                         }
                       ],
@@ -9335,12 +9659,12 @@
                               "kindString": "Property",
                               "flags": {},
                               "comment": {
-                                "shortText": "ID of the challenge being verified."
+                                "shortText": "ID of the challenge being verified. Returned in challenge()."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 613,
+                                  "line": 616,
                                   "character": 2
                                 }
                               ],
@@ -9361,7 +9685,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 616,
+                                  "line": 619,
                                   "character": 2
                                 }
                               ],
@@ -9377,12 +9701,12 @@
                               "kindString": "Property",
                               "flags": {},
                               "comment": {
-                                "shortText": "ID of the factor being verified."
+                                "shortText": "ID of the factor being verified. Returned in enroll()."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 610,
+                                  "line": 613,
                                   "character": 2
                                 }
                               ],
@@ -9396,13 +9720,17 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [575, 576, 574]
+                              "children": [
+                                575,
+                                576,
+                                574
+                              ]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 608,
+                              "line": 611,
                               "character": 30
                             }
                           ]
@@ -9433,13 +9761,21 @@
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [657, 666, 654, 671, 669, 663, 660]
+          "children": [
+            657,
+            666,
+            654,
+            671,
+            669,
+            663,
+            660
+          ]
         }
       ],
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 756,
+          "line": 759,
           "character": 17
         }
       ]
@@ -9643,7 +9979,16 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [349, 352, 351, 348, 347, 350, 353, 354]
+          "children": [
+            349,
+            352,
+            351,
+            348,
+            347,
+            350,
+            353,
+            354
+          ]
         }
       ],
       "sources": [
@@ -9843,12 +10188,17 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [421]
+          "children": [
+            421
+          ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [422, 426]
+          "children": [
+            422,
+            426
+          ]
         }
       ],
       "sources": [
@@ -9889,7 +10239,9 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [429]
+          "children": [
+            429
+          ]
         }
       ],
       "sources": [
@@ -10333,8 +10685,27 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
-            393, 385, 387, 388, 397, 396, 394, 390, 398, 404, 384, 403, 392, 400, 391, 395, 399,
-            389, 401, 402, 386
+            393,
+            385,
+            387,
+            388,
+            397,
+            396,
+            394,
+            390,
+            398,
+            404,
+            384,
+            403,
+            392,
+            400,
+            391,
+            395,
+            399,
+            389,
+            401,
+            402,
+            386
           ]
         }
       ],
@@ -10378,7 +10749,9 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [377]
+          "children": [
+            377
+          ]
         }
       ],
       "sources": [
@@ -10517,7 +10890,12 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [409, 406, 408, 407]
+          "children": [
+            409,
+            406,
+            408,
+            407
+          ]
         }
       ],
       "sources": [
@@ -10704,7 +11082,15 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [366, 359, 361, 367, 365, 368, 360]
+          "children": [
+            366,
+            359,
+            361,
+            367,
+            365,
+            368,
+            360
+          ]
         }
       ],
       "sources": [
@@ -10855,7 +11241,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [504, 503]
+                  "children": [
+                    504,
+                    503
+                  ]
                 }
               ]
             }
@@ -10909,7 +11298,12 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [498, 501, 499, 500]
+          "children": [
+            498,
+            501,
+            499,
+            500
+          ]
         }
       ],
       "sources": [
@@ -11008,7 +11402,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [496, 495]
+                  "children": [
+                    496,
+                    495
+                  ]
                 }
               ]
             }
@@ -11083,7 +11480,12 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [493, 490, 491, 492]
+          "children": [
+            493,
+            490,
+            491,
+            492
+          ]
         }
       ],
       "sources": [
@@ -11190,7 +11592,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 855,
+          "line": 842,
           "character": 12
         }
       ],
@@ -11215,7 +11617,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 857,
+                  "line": 844,
                   "character": 2
                 }
               ],
@@ -11236,7 +11638,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 860,
+                  "line": 847,
                   "character": 2
                 }
               ],
@@ -11250,13 +11652,16 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [684, 685]
+              "children": [
+                684,
+                685
+              ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 855,
+              "line": 842,
               "character": 45
             }
           ]
@@ -11280,7 +11685,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 842,
+          "line": 829,
           "character": 12
         }
       ],
@@ -11305,7 +11710,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 844,
+                      "line": 831,
                       "character": 6
                     }
                   ],
@@ -11330,7 +11735,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 846,
+                              "line": 833,
                               "character": 8
                             }
                           ],
@@ -11344,13 +11749,15 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [677]
+                          "children": [
+                            677
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 844,
+                          "line": 831,
                           "character": 12
                         }
                       ]
@@ -11366,7 +11773,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 848,
+                      "line": 835,
                       "character": 6
                     }
                   ],
@@ -11380,13 +11787,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [675, 678]
+                  "children": [
+                    675,
+                    678
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 843,
+                  "line": 830,
                   "character": 4
                 }
               ]
@@ -11410,7 +11820,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 850,
+                      "line": 837,
                       "character": 6
                     }
                   ],
@@ -11428,7 +11838,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 850,
+                      "line": 837,
                       "character": 18
                     }
                   ],
@@ -11443,13 +11853,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [680, 681]
+                  "children": [
+                    680,
+                    681
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 850,
+                  "line": 837,
                   "character": 4
                 }
               ]
@@ -11475,7 +11888,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 879,
+          "line": 866,
           "character": 12
         }
       ],
@@ -11495,12 +11908,12 @@
               "kindString": "Property",
               "flags": {},
               "comment": {
-                "shortText": "ID of the user for which to list all MFA factors."
+                "shortText": "ID of the user."
               },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 881,
+                  "line": 868,
                   "character": 2
                 }
               ],
@@ -11514,13 +11927,15 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [697]
+              "children": [
+                697
+              ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 879,
+              "line": 866,
               "character": 44
             }
           ]
@@ -11544,7 +11959,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 866,
+          "line": 853,
           "character": 12
         }
       ],
@@ -11569,7 +11984,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 868,
+                      "line": 855,
                       "character": 6
                     }
                   ],
@@ -11594,7 +12009,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 870,
+                              "line": 857,
                               "character": 8
                             }
                           ],
@@ -11612,13 +12027,15 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [690]
+                          "children": [
+                            690
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 868,
+                          "line": 855,
                           "character": 12
                         }
                       ]
@@ -11634,7 +12051,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 872,
+                      "line": 859,
                       "character": 6
                     }
                   ],
@@ -11648,13 +12065,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [688, 691]
+                  "children": [
+                    688,
+                    691
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 867,
+                  "line": 854,
                   "character": 4
                 }
               ]
@@ -11678,7 +12098,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 874,
+                      "line": 861,
                       "character": 6
                     }
                   ],
@@ -11696,7 +12116,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 874,
+                      "line": 861,
                       "character": 18
                     }
                   ],
@@ -11711,13 +12131,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [693, 694]
+                  "children": [
+                    693,
+                    694
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 874,
+                  "line": 861,
                   "character": 4
                 }
               ]
@@ -11735,7 +12158,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 699,
+          "line": 702,
           "character": 12
         }
       ],
@@ -11760,7 +12183,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 701,
+                      "line": 704,
                       "character": 6
                     }
                   ],
@@ -11785,7 +12208,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 706,
+                              "line": 709,
                               "character": 8
                             }
                           ],
@@ -11806,7 +12229,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 703,
+                              "line": 706,
                               "character": 8
                             }
                           ],
@@ -11820,13 +12243,16 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [626, 625]
+                          "children": [
+                            626,
+                            625
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 701,
+                          "line": 704,
                           "character": 12
                         }
                       ]
@@ -11842,7 +12268,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 708,
+                      "line": 711,
                       "character": 6
                     }
                   ],
@@ -11856,13 +12282,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [623, 627]
+                  "children": [
+                    623,
+                    627
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 700,
+                  "line": 703,
                   "character": 4
                 }
               ]
@@ -11886,7 +12315,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 710,
+                      "line": 713,
                       "character": 6
                     }
                   ],
@@ -11904,7 +12333,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 710,
+                      "line": 713,
                       "character": 18
                     }
                   ],
@@ -11919,13 +12348,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [629, 630]
+                  "children": [
+                    629,
+                    630
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 710,
+                  "line": 713,
                   "character": 4
                 }
               ]
@@ -11943,7 +12375,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 656,
+          "line": 659,
           "character": 12
         }
       ],
@@ -11968,7 +12400,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 658,
+                      "line": 661,
                       "character": 6
                     }
                   ],
@@ -11993,7 +12425,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 660,
+                              "line": 663,
                               "character": 8
                             }
                           ],
@@ -12014,7 +12446,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 666,
+                              "line": 669,
                               "character": 8
                             }
                           ],
@@ -12039,7 +12471,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 670,
+                                      "line": 673,
                                       "character": 10
                                     }
                                   ],
@@ -12060,7 +12492,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 675,
+                                      "line": 678,
                                       "character": 10
                                     }
                                   ],
@@ -12081,7 +12513,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/lib/types.ts",
-                                      "line": 679,
+                                      "line": 682,
                                       "character": 10
                                     }
                                   ],
@@ -12095,13 +12527,17 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [605, 606, 607]
+                                  "children": [
+                                    605,
+                                    606,
+                                    607
+                                  ]
                                 }
                               ],
                               "sources": [
                                 {
                                   "fileName": "src/lib/types.ts",
-                                  "line": 666,
+                                  "line": 669,
                                   "character": 14
                                 }
                               ]
@@ -12120,7 +12556,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 663,
+                              "line": 666,
                               "character": 8
                             }
                           ],
@@ -12134,13 +12570,17 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [601, 603, 602]
+                          "children": [
+                            601,
+                            603,
+                            602
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 658,
+                          "line": 661,
                           "character": 12
                         }
                       ]
@@ -12156,7 +12596,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 682,
+                      "line": 685,
                       "character": 6
                     }
                   ],
@@ -12170,13 +12610,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [599, 608]
+                  "children": [
+                    599,
+                    608
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 657,
+                  "line": 660,
                   "character": 4
                 }
               ]
@@ -12200,7 +12643,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 685,
+                      "line": 688,
                       "character": 6
                     }
                   ],
@@ -12218,7 +12661,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 686,
+                      "line": 689,
                       "character": 6
                     }
                   ],
@@ -12233,13 +12676,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [610, 611]
+                  "children": [
+                    610,
+                    611
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 684,
+                  "line": 687,
                   "character": 4
                 }
               ]
@@ -12257,7 +12703,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 727,
+          "line": 730,
           "character": 12
         }
       ],
@@ -12282,7 +12728,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 729,
+                      "line": 732,
                       "character": 6
                     }
                   ],
@@ -12307,7 +12753,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 746,
+                              "line": 749,
                               "character": 8
                             }
                           ],
@@ -12332,7 +12778,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 731,
+                              "line": 734,
                               "character": 8
                             }
                           ],
@@ -12369,7 +12815,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 739,
+                              "line": 742,
                               "character": 8
                             }
                           ],
@@ -12393,13 +12839,17 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [648, 646, 647]
+                          "children": [
+                            648,
+                            646,
+                            647
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 729,
+                          "line": 732,
                           "character": 12
                         }
                       ]
@@ -12415,7 +12865,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 748,
+                      "line": 751,
                       "character": 6
                     }
                   ],
@@ -12429,13 +12879,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [644, 649]
+                  "children": [
+                    644,
+                    649
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 728,
+                  "line": 731,
                   "character": 4
                 }
               ]
@@ -12459,7 +12912,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 750,
+                      "line": 753,
                       "character": 6
                     }
                   ],
@@ -12477,7 +12930,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 750,
+                      "line": 753,
                       "character": 18
                     }
                   ],
@@ -12492,13 +12945,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [651, 652]
+                  "children": [
+                    651,
+                    652
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 750,
+                  "line": 753,
                   "character": 4
                 }
               ]
@@ -12516,7 +12972,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 712,
+          "line": 715,
           "character": 12
         }
       ],
@@ -12541,7 +12997,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 714,
+                      "line": 717,
                       "character": 6
                     }
                   ],
@@ -12566,7 +13022,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 716,
+                              "line": 719,
                               "character": 8
                             }
                           ],
@@ -12591,7 +13047,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 719,
+                              "line": 722,
                               "character": 8
                             }
                           ],
@@ -12609,13 +13065,16 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [635, 636]
+                          "children": [
+                            635,
+                            636
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 714,
+                          "line": 717,
                           "character": 12
                         }
                       ]
@@ -12631,7 +13090,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 721,
+                      "line": 724,
                       "character": 6
                     }
                   ],
@@ -12645,13 +13104,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [633, 637]
+                  "children": [
+                    633,
+                    637
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 713,
+                  "line": 716,
                   "character": 4
                 }
               ]
@@ -12675,7 +13137,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 723,
+                      "line": 726,
                       "character": 6
                     }
                   ],
@@ -12693,7 +13155,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 723,
+                      "line": 726,
                       "character": 18
                     }
                   ],
@@ -12708,13 +13170,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [639, 640]
+                  "children": [
+                    639,
+                    640
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 723,
+                  "line": 726,
                   "character": 4
                 }
               ]
@@ -12732,7 +13197,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 689,
+          "line": 692,
           "character": 12
         }
       ],
@@ -12757,7 +13222,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 691,
+                      "line": 694,
                       "character": 6
                     }
                   ],
@@ -12782,7 +13247,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 693,
+                              "line": 696,
                               "character": 8
                             }
                           ],
@@ -12796,13 +13261,15 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [616]
+                          "children": [
+                            616
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 691,
+                          "line": 694,
                           "character": 12
                         }
                       ]
@@ -12818,7 +13285,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 695,
+                      "line": 698,
                       "character": 6
                     }
                   ],
@@ -12832,13 +13299,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [614, 617]
+                  "children": [
+                    614,
+                    617
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 690,
+                  "line": 693,
                   "character": 4
                 }
               ]
@@ -12862,7 +13332,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 697,
+                      "line": 700,
                       "character": 6
                     }
                   ],
@@ -12880,7 +13350,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 697,
+                      "line": 700,
                       "character": 18
                     }
                   ],
@@ -12895,13 +13365,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [619, 620]
+                  "children": [
+                    619,
+                    620
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 697,
+                  "line": 700,
                   "character": 4
                 }
               ]
@@ -12919,7 +13392,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 631,
+          "line": 634,
           "character": 12
         }
       ],
@@ -12944,7 +13417,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 633,
+                      "line": 636,
                       "character": 6
                     }
                   ],
@@ -12969,7 +13442,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 635,
+                              "line": 638,
                               "character": 8
                             }
                           ],
@@ -12990,7 +13463,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 641,
+                              "line": 644,
                               "character": 8
                             }
                           ],
@@ -13011,7 +13484,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 644,
+                              "line": 647,
                               "character": 8
                             }
                           ],
@@ -13032,7 +13505,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 638,
+                              "line": 641,
                               "character": 8
                             }
                           ],
@@ -13053,7 +13526,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 647,
+                              "line": 650,
                               "character": 8
                             }
                           ],
@@ -13068,13 +13541,19 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [588, 590, 591, 589, 592]
+                          "children": [
+                            588,
+                            590,
+                            591,
+                            589,
+                            592
+                          ]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 633,
+                          "line": 636,
                           "character": 12
                         }
                       ]
@@ -13090,7 +13569,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 649,
+                      "line": 652,
                       "character": 6
                     }
                   ],
@@ -13104,13 +13583,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [586, 593]
+                  "children": [
+                    586,
+                    593
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 632,
+                  "line": 635,
                   "character": 4
                 }
               ]
@@ -13134,7 +13616,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 652,
+                      "line": 655,
                       "character": 6
                     }
                   ],
@@ -13152,7 +13634,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 653,
+                      "line": 656,
                       "character": 6
                     }
                   ],
@@ -13167,13 +13649,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [595, 596]
+                  "children": [
+                    595,
+                    596
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 651,
+                  "line": 654,
                   "character": 4
                 }
               ]
@@ -13290,7 +13775,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [305, 304]
+                          "children": [
+                            305,
+                            304
+                          ]
                         }
                       ],
                       "sources": [
@@ -13326,7 +13814,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [302, 306]
+                  "children": [
+                    302,
+                    306
+                  ]
                 }
               ],
               "sources": [
@@ -13410,7 +13901,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [311, 310]
+                          "children": [
+                            311,
+                            310
+                          ]
                         }
                       ],
                       "sources": [
@@ -13447,7 +13941,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [308, 312]
+                  "children": [
+                    308,
+                    312
+                  ]
                 }
               ],
               "sources": [
@@ -13471,7 +13968,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 725,
+          "line": 728,
           "character": 12
         }
       ],
@@ -13498,7 +13995,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 921,
+          "line": 907,
           "character": 12
         }
       ],
@@ -13523,7 +14020,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 924,
+                      "line": 910,
                       "character": 6
                     }
                   ],
@@ -13541,7 +14038,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 923,
+                      "line": 909,
                       "character": 6
                     }
                   ],
@@ -13556,13 +14053,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [712, 711]
+                  "children": [
+                    712,
+                    711
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 922,
+                  "line": 908,
                   "character": 4
                 }
               ]
@@ -13586,7 +14086,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 928,
+                      "line": 914,
                       "character": 6
                     }
                   ],
@@ -13605,7 +14105,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 927,
+                      "line": 913,
                       "character": 6
                     }
                   ],
@@ -13619,13 +14119,16 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [715, 714]
+                  "children": [
+                    715,
+                    714
+                  ]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 926,
+                  "line": 912,
                   "character": 4
                 }
               ]
@@ -13802,7 +14305,12 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [536, 537, 538, 535]
+              "children": [
+                536,
+                537,
+                538,
+                535
+              ]
             }
           ],
           "sources": [
@@ -13932,7 +14440,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [526, 527, 525]
+              "children": [
+                526,
+                527,
+                525
+              ]
             }
           ],
           "sources": [
@@ -14084,7 +14596,12 @@
                   {
                     "title": "Properties",
                     "kind": 1024,
-                    "children": [520, 522, 521, 519]
+                    "children": [
+                      520,
+                      522,
+                      521,
+                      519
+                    ]
                   }
                 ],
                 "sources": [
@@ -14214,7 +14731,11 @@
                   {
                     "title": "Properties",
                     "kind": 1024,
-                    "children": [526, 527, 525]
+                    "children": [
+                      526,
+                      527,
+                      525
+                    ]
                   }
                 ],
                 "sources": [
@@ -14326,7 +14847,11 @@
                   {
                     "title": "Properties",
                     "kind": 1024,
-                    "children": [531, 532, 530]
+                    "children": [
+                      531,
+                      532,
+                      530
+                    ]
                   }
                 ],
                 "sources": [
@@ -14468,7 +14993,12 @@
                   {
                     "title": "Properties",
                     "kind": 1024,
-                    "children": [536, 537, 538, 535]
+                    "children": [
+                      536,
+                      537,
+                      538,
+                      535
+                    ]
                   }
                 ],
                 "sources": [
@@ -14620,7 +15150,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [558, 559, 560, 561, 562]
+              "children": [
+                558,
+                559,
+                560,
+                561,
+                562
+              ]
             }
           ],
           "sources": [
@@ -14723,7 +15259,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [547, 548]
+                          "children": [
+                            547,
+                            548
+                          ]
                         }
                       ],
                       "sources": [
@@ -14759,7 +15298,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [545, 549]
+                  "children": [
+                    545,
+                    549
+                  ]
                 }
               ],
               "sources": [
@@ -14843,7 +15385,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [553, 554]
+                          "children": [
+                            553,
+                            554
+                          ]
                         }
                       ],
                       "sources": [
@@ -14880,7 +15425,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [551, 555]
+                  "children": [
+                    551,
+                    555
+                  ]
                 }
               ],
               "sources": [
@@ -15037,7 +15585,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [531, 532, 530]
+              "children": [
+                531,
+                532,
+                530
+              ]
             }
           ],
           "sources": [
@@ -15173,7 +15725,12 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [520, 522, 521, 519]
+              "children": [
+                520,
+                522,
+                521,
+                519
+              ]
             }
           ],
           "sources": [
@@ -15410,7 +15967,16 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [296, 295, 299, 290, 297, 298, 294, 289]
+              "children": [
+                296,
+                295,
+                299,
+                290,
+                297,
+                298,
+                294,
+                289
+              ]
             }
           ],
           "sources": [
@@ -15432,7 +15998,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 919,
+          "line": 905,
           "character": 12
         }
       ],
@@ -15454,7 +16020,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 919,
+                  "line": 905,
                   "character": 33
                 }
               ],
@@ -15478,13 +16044,15 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [708]
+              "children": [
+                708
+              ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 919,
+              "line": 905,
               "character": 31
             }
           ]
@@ -15500,7 +16068,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 624,
+          "line": 627,
           "character": 12
         }
       ],
@@ -15525,7 +16093,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 628,
+                  "line": 631,
                   "character": 2
                 }
               ],
@@ -15541,12 +16109,12 @@
               "kindString": "Property",
               "flags": {},
               "comment": {
-                "shortText": "ID of the factor being verified."
+                "shortText": "ID of the factor being verified. Returned in enroll()."
               },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 626,
+                  "line": 629,
                   "character": 2
                 }
               ],
@@ -15560,13 +16128,16 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [583, 582]
+              "children": [
+                583,
+                582
+              ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 624,
+              "line": 627,
               "character": 42
             }
           ]
@@ -15582,7 +16153,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 619,
+          "line": 622,
           "character": 12
         }
       ],
@@ -15602,12 +16173,12 @@
               "kindString": "Property",
               "flags": {},
               "comment": {
-                "shortText": "ID of the factor to be challenged."
+                "shortText": "ID of the factor to be challenged. Returned in enroll()."
               },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 621,
+                  "line": 624,
                   "character": 2
                 }
               ],
@@ -15621,13 +16192,15 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [579]
+              "children": [
+                579
+              ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 619,
+              "line": 622,
               "character": 33
             }
           ]
@@ -15662,10 +16235,13 @@
               "kind": 1024,
               "kindString": "Property",
               "flags": {},
+              "comment": {
+                "shortText": "The type of factor being enrolled."
+              },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 598,
+                  "line": 599,
                   "character": 2
                 }
               ],
@@ -15682,10 +16258,13 @@
               "flags": {
                 "isOptional": true
               },
+              "comment": {
+                "shortText": "Human readable name assigned to the factor."
+              },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 600,
+                  "line": 603,
                   "character": 2
                 }
               ],
@@ -15702,10 +16281,13 @@
               "flags": {
                 "isOptional": true
               },
+              "comment": {
+                "shortText": "Domain which the user is enrolled with."
+              },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 599,
+                  "line": 601,
                   "character": 2
                 }
               ],
@@ -15719,7 +16301,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [566, 568, 567]
+              "children": [
+                566,
+                568,
+                567
+              ]
             }
           ],
           "sources": [
@@ -15741,7 +16327,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 603,
+          "line": 606,
           "character": 12
         }
       ],
@@ -15766,7 +16352,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 605,
+                  "line": 608,
                   "character": 2
                 }
               ],
@@ -15780,13 +16366,15 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [571]
+              "children": [
+                571
+              ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 603,
+              "line": 606,
               "character": 32
             }
           ]
@@ -15802,7 +16390,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 608,
+          "line": 611,
           "character": 12
         }
       ],
@@ -15822,12 +16410,12 @@
               "kindString": "Property",
               "flags": {},
               "comment": {
-                "shortText": "ID of the challenge being verified."
+                "shortText": "ID of the challenge being verified. Returned in challenge()."
               },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 613,
+                  "line": 616,
                   "character": 2
                 }
               ],
@@ -15848,7 +16436,7 @@
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 616,
+                  "line": 619,
                   "character": 2
                 }
               ],
@@ -15864,12 +16452,12 @@
               "kindString": "Property",
               "flags": {},
               "comment": {
-                "shortText": "ID of the factor being verified."
+                "shortText": "ID of the factor being verified. Returned in enroll()."
               },
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 610,
+                  "line": 613,
                   "character": 2
                 }
               ],
@@ -15883,13 +16471,17 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [575, 576, 574]
+              "children": [
+                575,
+                576,
+                574
+              ]
             }
           ],
           "sources": [
             {
               "fileName": "src/lib/types.ts",
-              "line": 608,
+              "line": 611,
               "character": 30
             }
           ]
@@ -16012,7 +16604,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [317, 318]
+                          "children": [
+                            317,
+                            318
+                          ]
                         }
                       ],
                       "sources": [
@@ -16048,7 +16643,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [315, 319]
+                  "children": [
+                    315,
+                    319
+                  ]
                 }
               ],
               "sources": [
@@ -16133,7 +16731,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [323, 324]
+                          "children": [
+                            323,
+                            324
+                          ]
                         }
                       ],
                       "sources": [
@@ -16170,7 +16771,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [321, 325]
+                  "children": [
+                    321,
+                    325
+                  ]
                 }
               ],
               "sources": [
@@ -16344,7 +16948,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [330]
+                          "children": [
+                            330
+                          ]
                         }
                       ],
                       "sources": [
@@ -16380,7 +16986,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [328, 331]
+                  "children": [
+                    328,
+                    331
+                  ]
                 }
               ],
               "sources": [
@@ -16443,7 +17052,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [333, 334]
+                  "children": [
+                    333,
+                    334
+                  ]
                 }
               ],
               "sources": [
@@ -16614,7 +17226,11 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [484, 482, 483]
+                      "children": [
+                        484,
+                        482,
+                        483
+                      ]
                     }
                   ],
                   "sources": [
@@ -16654,7 +17270,10 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [480, 479]
+              "children": [
+                480,
+                479
+              ]
             }
           ],
           "sources": [
@@ -16789,7 +17408,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [453, 452]
+                          "children": [
+                            453,
+                            452
+                          ]
                         }
                       ],
                       "sources": [
@@ -16828,7 +17450,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [448, 450, 449]
+                  "children": [
+                    448,
+                    450,
+                    449
+                  ]
                 }
               ],
               "sources": [
@@ -16925,7 +17551,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [460, 459]
+                          "children": [
+                            460,
+                            459
+                          ]
                         }
                       ],
                       "sources": [
@@ -16985,7 +17614,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [457, 456, 455]
+                  "children": [
+                    457,
+                    456,
+                    455
+                  ]
                 }
               ],
               "sources": [
@@ -17168,7 +17801,12 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [469, 468, 466, 467]
+                          "children": [
+                            469,
+                            468,
+                            466,
+                            467
+                          ]
                         }
                       ],
                       "sources": [
@@ -17186,7 +17824,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [463, 464]
+                  "children": [
+                    463,
+                    464
+                  ]
                 }
               ],
               "sources": [
@@ -17306,7 +17947,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [476, 475, 474]
+                          "children": [
+                            476,
+                            475,
+                            474
+                          ]
                         }
                       ],
                       "sources": [
@@ -17345,7 +17990,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [472, 471]
+                  "children": [
+                    472,
+                    471
+                  ]
                 }
               ],
               "sources": [
@@ -17460,7 +18108,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [512, 511]
+                          "children": [
+                            512,
+                            511
+                          ]
                         }
                       ],
                       "sources": [
@@ -17478,7 +18129,9 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [509]
+                  "children": [
+                    509
+                  ]
                 }
               ],
               "sources": [
@@ -17528,7 +18181,9 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [514]
+                      "children": [
+                        514
+                      ]
                     }
                   ],
                   "sources": [
@@ -17575,7 +18230,9 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [516]
+                      "children": [
+                        516
+                      ]
                     }
                   ],
                   "sources": [
@@ -17737,7 +18394,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [438, 437, 436]
+                          "children": [
+                            438,
+                            437,
+                            436
+                          ]
                         }
                       ],
                       "sources": [
@@ -17776,7 +18437,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [432, 434, 433]
+                  "children": [
+                    432,
+                    434,
+                    433
+                  ]
                 }
               ],
               "sources": [
@@ -17873,7 +18538,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [445, 444]
+                          "children": [
+                            445,
+                            444
+                          ]
                         }
                       ],
                       "sources": [
@@ -17933,7 +18601,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [442, 441, 440]
+                  "children": [
+                    442,
+                    441,
+                    440
+                  ]
                 }
               ],
               "sources": [
@@ -17957,7 +18629,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 917,
+          "line": 903,
           "character": 12
         }
       ],
@@ -18070,7 +18742,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [339]
+                          "children": [
+                            339
+                          ]
                         }
                       ],
                       "sources": [
@@ -18106,7 +18780,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [337, 340]
+                  "children": [
+                    337,
+                    340
+                  ]
                 }
               ],
               "sources": [
@@ -18172,7 +18849,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [344]
+                          "children": [
+                            344
+                          ]
                         }
                       ],
                       "sources": [
@@ -18209,7 +18888,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [342, 345]
+                  "children": [
+                    342,
+                    345
+                  ]
                 }
               ],
               "sources": [
@@ -18328,7 +19010,10 @@
                       {
                         "title": "Properties",
                         "kind": 1024,
-                        "children": [496, 495]
+                        "children": [
+                          496,
+                          495
+                        ]
                       }
                     ]
                   }
@@ -18403,7 +19088,12 @@
               {
                 "title": "Properties",
                 "kind": 1024,
-                "children": [493, 490, 491, 492]
+                "children": [
+                  493,
+                  490,
+                  491,
+                  492
+                ]
               }
             ],
             "sources": [
@@ -18517,7 +19207,10 @@
                       {
                         "title": "Properties",
                         "kind": 1024,
-                        "children": [504, 503]
+                        "children": [
+                          504,
+                          503
+                        ]
                       }
                     ]
                   }
@@ -18571,7 +19264,12 @@
               {
                 "title": "Properties",
                 "kind": 1024,
-                "children": [498, 501, 499, 500]
+                "children": [
+                  498,
+                  501,
+                  499,
+                  500
+                ]
               }
             ],
             "sources": [
@@ -18682,26 +19380,97 @@
     {
       "title": "Classes",
       "kind": 128,
-      "children": [727, 722, 787, 774, 812, 762, 740, 747, 1, 74]
+      "children": [
+        727,
+        722,
+        787,
+        774,
+        812,
+        762,
+        740,
+        747,
+        1,
+        74
+      ]
     },
     {
       "title": "Interfaces",
       "kind": 256,
-      "children": [355, 410, 369, 539, 698, 653, 346, 420, 428, 383, 376, 405, 358, 380, 497, 489]
+      "children": [
+        355,
+        410,
+        369,
+        539,
+        698,
+        653,
+        346,
+        420,
+        428,
+        383,
+        376,
+        405,
+        358,
+        380,
+        497,
+        489
+      ]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
       "children": [
-        286, 285, 682, 673, 695, 686, 621, 597, 642, 631, 612, 584, 300, 641, 709, 506, 533, 523,
-        542, 556, 543, 563, 528, 517, 287, 706, 580, 577, 564, 569, 572, 505, 313, 284, 326, 477,
-        446, 461, 507, 430, 705, 335, 488
+        286,
+        285,
+        682,
+        673,
+        695,
+        686,
+        621,
+        597,
+        642,
+        631,
+        612,
+        584,
+        300,
+        641,
+        709,
+        506,
+        533,
+        523,
+        542,
+        556,
+        543,
+        563,
+        528,
+        517,
+        287,
+        706,
+        580,
+        577,
+        564,
+        569,
+        572,
+        505,
+        313,
+        284,
+        326,
+        477,
+        446,
+        461,
+        507,
+        430,
+        705,
+        335,
+        488
       ]
     },
     {
       "title": "Functions",
       "kind": 64,
-      "children": [719, 716]
+      "children": [
+        719,
+        716
+      ]
     }
   ],
   "sources": [
