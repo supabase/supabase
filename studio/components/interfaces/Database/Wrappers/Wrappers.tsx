@@ -204,7 +204,7 @@ const Wrappers = () => {
                       <Button
                         type="primary"
                         loading={isEnabling}
-                        disabled={isEnabling || !canToggleWrappers}
+                        disabled={isNotAvailable || isEnabling || !canToggleWrappers}
                         onClick={() => onEnableWrappers()}
                       >
                         Enable Wrappers

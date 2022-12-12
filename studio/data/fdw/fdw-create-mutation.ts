@@ -34,7 +34,8 @@ export function getFDWCreateSql({
 
   const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
     const key = `${wrapper.name}_${option.name}`
-    const value = formState[option.name] // TODO(alaister): escape '
+    // Escape single quotes in postgresql by doubling them up
+    const value = (formState[option.name] || '').replace(/'/g, "''")
 
     return /* SQL */ `
       select pgsodium.create_key(
