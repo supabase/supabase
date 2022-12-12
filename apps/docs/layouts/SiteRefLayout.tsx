@@ -1,27 +1,20 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
-import { useTheme } from 'common/Providers'
-
-import RefSwitcher from '~/components/Navigation/RefSwitcher'
-import { useEffect, useState, memo } from 'react'
 
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 import { NavigationMenuContextProvider } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
-import { useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 import { menuState } from '~/hooks/useMenuState'
 
 const SiteRefLayout = ({ children }) => {
-  const router = useRouter()
   const { isDarkMode } = useTheme()
 
-  const menuLevel = useMenuLevelId()
-  const mobileMenuOpen = useMenuMobileOpen()
-
-  //console.log('menuLevel', menuLevel)
+  const menuLevel = 'home' // useMenuLevelId()
+  const mobileMenuOpen = () => void console.log('menuLevel', menuLevel)
 
   const levelsData = {
     home: {
