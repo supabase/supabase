@@ -260,47 +260,47 @@ const SideNav = () => {
         href: '/reference/dart/introduction',
         level: 'reference_dart',
       },
-      {
-        label: 'Tools Reference',
-      },
-      {
-        label: 'Management API',
-        icon: '/img/icons/menu/reference-api',
-        hasLightIcon: true,
-        href: '/reference/api/introduction',
-        level: 'reference_javascript',
-      },
-      {
-        label: 'Supabase CLI',
-        icon: '/img/icons/menu/reference-cli',
-        hasLightIcon: true,
-        href: '/reference/cli/introduction',
-        level: 'reference_javascript',
-      },
-      {
-        label: 'Self-Hosting Reference',
-      },
-      {
-        label: 'Self-Hosting Auth',
-        icon: '/img/icons/menu/reference-auth',
-        hasLightIcon: true,
-        href: '/reference/self-hosting-auth/introduction',
-        level: 'reference_self_hosting_auth',
-      },
-      {
-        label: 'Self-Hosting Storage',
-        hasLightIcon: true,
-        icon: '/img/icons/menu/reference-storage',
-        href: '/reference/self-hosting-storage/introduction',
-        level: 'reference_self_hosting_auth',
-      },
-      {
-        label: 'Self-Hosting Realtime',
-        hasLightIcon: true,
-        icon: '/img/icons/menu/reference-realtime',
-        href: '/reference/self-hosting-realtime/introduction',
-        level: 'reference_self_hosting_auth',
-      },
+      // {
+      //   label: 'Tools Reference',
+      // },
+      // {
+      //   label: 'Management API',
+      //   icon: '/img/icons/menu/reference-api',
+      //   hasLightIcon: true,
+      //   href: '/reference/api/introduction',
+      //   level: 'reference_javascript',
+      // },
+      // {
+      //   label: 'Supabase CLI',
+      //   icon: '/img/icons/menu/reference-cli',
+      //   hasLightIcon: true,
+      //   href: '/reference/cli/introduction',
+      //   level: 'reference_javascript',
+      // },
+      // {
+      //   label: 'Self-Hosting Reference',
+      // },
+      // {
+      //   label: 'Self-Hosting Auth',
+      //   icon: '/img/icons/menu/reference-auth',
+      //   hasLightIcon: true,
+      //   href: '/reference/self-hosting-auth/introduction',
+      //   level: 'reference_self_hosting_auth',
+      // },
+      // {
+      //   label: 'Self-Hosting Storage',
+      //   hasLightIcon: true,
+      //   icon: '/img/icons/menu/reference-storage',
+      //   href: '/reference/self-hosting-storage/introduction',
+      //   level: 'reference_self_hosting_auth',
+      // },
+      // {
+      //   label: 'Self-Hosting Realtime',
+      //   hasLightIcon: true,
+      //   icon: '/img/icons/menu/reference-realtime',
+      //   href: '/reference/self-hosting-realtime/introduction',
+      //   level: 'reference_self_hosting_auth',
+      // },
     ],
   ]
 
