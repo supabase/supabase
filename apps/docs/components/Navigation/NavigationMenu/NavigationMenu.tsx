@@ -260,23 +260,23 @@ const SideNav = () => {
         href: '/reference/dart/introduction',
         level: 'reference_dart',
       },
-      // {
-      //   label: 'Tools Reference',
-      // },
-      // {
-      //   label: 'Management API',
-      //   icon: '/img/icons/menu/reference-api',
-      //   hasLightIcon: true,
-      //   href: '/reference/api/introduction',
-      //   level: 'reference_javascript',
-      // },
-      // {
-      //   label: 'Supabase CLI',
-      //   icon: '/img/icons/menu/reference-cli',
-      //   hasLightIcon: true,
-      //   href: '/reference/cli/introduction',
-      //   level: 'reference_javascript',
-      // },
+      {
+        label: 'Tools Reference',
+      },
+      {
+        label: 'Management API',
+        icon: '/img/icons/menu/reference-api',
+        hasLightIcon: true,
+        href: '/reference/api/introduction',
+        level: 'reference_javascript',
+      },
+      {
+        label: 'Supabase CLI',
+        icon: '/img/icons/menu/reference-cli',
+        hasLightIcon: true,
+        href: '/reference/cli/introduction',
+        level: 'reference_javascript',
+      },
       // {
       //   label: 'Self-Hosting Reference',
       // },
