@@ -63135,7 +63135,7 @@
               "sources": [
                 {
                   "fileName": "src/FunctionsClient.ts",
-                  "line": 43,
+                  "line": 44,
                   "character": 8
                 }
               ],
@@ -63170,7 +63170,7 @@
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "the name of the function to invoke\n"
+                        "shortText": "The name of the Function to invoke."
                       },
                       "type": {
                         "type": "intrinsic",
@@ -63179,13 +63179,198 @@
                     },
                     {
                       "id": 27,
-                      "name": "invokeOptions",
+                      "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
+                      "comment": {
+                        "shortText": "Options for invoking the Function.\n"
+                      },
                       "type": {
                         "type": "reference",
-                        "name": "FunctionInvokeOptions"
+                        "id": 28,
+                        "name": "FunctionInvokeOptions",
+                        "dereferenced": {
+                          "id": 28,
+                          "name": "FunctionInvokeOptions",
+                          "kind": 4194304,
+                          "kindString": "Type alias",
+                          "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/types.ts",
+                              "line": 44,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "reflection",
+                            "declaration": {
+                              "id": 29,
+                              "name": "__type",
+                              "kind": 65536,
+                              "kindString": "Type literal",
+                              "flags": {},
+                              "children": [
+                                {
+                                  "id": 34,
+                                  "name": "body",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "The body of the request."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 52,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "union",
+                                    "types": [
+                                      {
+                                        "type": "reference",
+                                        "qualifiedName": "File",
+                                        "package": "typescript",
+                                        "name": "File"
+                                      },
+                                      {
+                                        "type": "reference",
+                                        "qualifiedName": "Blob",
+                                        "package": "typescript",
+                                        "name": "Blob"
+                                      },
+                                      {
+                                        "type": "reference",
+                                        "qualifiedName": "ArrayBuffer",
+                                        "package": "typescript",
+                                        "name": "ArrayBuffer"
+                                      },
+                                      {
+                                        "type": "reference",
+                                        "qualifiedName": "FormData",
+                                        "package": "typescript",
+                                        "name": "FormData"
+                                      },
+                                      {
+                                        "type": "reference",
+                                        "typeArguments": [
+                                          {
+                                            "type": "reference",
+                                            "qualifiedName": "Uint8Array",
+                                            "package": "typescript",
+                                            "name": "Uint8Array"
+                                          }
+                                        ],
+                                        "qualifiedName": "ReadableStream",
+                                        "package": "typescript",
+                                        "name": "ReadableStream"
+                                      },
+                                      {
+                                        "type": "reference",
+                                        "typeArguments": [
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          {
+                                            "type": "intrinsic",
+                                            "name": "any"
+                                          }
+                                        ],
+                                        "qualifiedName": "Record",
+                                        "package": "typescript",
+                                        "name": "Record"
+                                      },
+                                      {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "id": 30,
+                                  "name": "headers",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {
+                                    "isOptional": true
+                                  },
+                                  "comment": {
+                                    "shortText": "Object representing the headers to send with the request."
+                                  },
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 48,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "reflection",
+                                    "declaration": {
+                                      "id": 31,
+                                      "name": "__type",
+                                      "kind": 65536,
+                                      "kindString": "Type literal",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 48,
+                                          "character": 12
+                                        }
+                                      ],
+                                      "indexSignature": {
+                                        "id": 32,
+                                        "name": "__index",
+                                        "kind": 8192,
+                                        "kindString": "Index signature",
+                                        "flags": {},
+                                        "parameters": [
+                                          {
+                                            "id": 33,
+                                            "name": "key",
+                                            "kind": 32768,
+                                            "flags": {},
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            }
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              ],
+                              "groups": [
+                                {
+                                  "title": "Properties",
+                                  "kind": 1024,
+                                  "children": [34, 30]
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "src/types.ts",
+                                  "line": 44,
+                                  "character": 36
+                                }
+                              ]
+                            }
+                          }
+                        }
                       },
                       "defaultValue": "{}"
                     }
@@ -63195,7 +63380,7 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 50,
+                        "id": 57,
                         "typeArguments": [
                           {
                             "type": "reference",
@@ -63286,14 +63471,14 @@
           ]
         },
         {
-          "id": 28,
+          "id": 35,
           "name": "FunctionsError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 29,
+              "id": 36,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -63307,14 +63492,14 @@
               ],
               "signatures": [
                 {
-                  "id": 30,
+                  "id": 37,
                   "name": "new FunctionsError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 31,
+                      "id": 38,
                       "name": "message",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -63325,7 +63510,7 @@
                       }
                     },
                     {
-                      "id": 32,
+                      "id": 39,
                       "name": "name",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -63337,7 +63522,7 @@
                       "defaultValue": "'FunctionsError'"
                     },
                     {
-                      "id": 33,
+                      "id": 40,
                       "name": "context",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -63352,7 +63537,7 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 28,
+                    "id": 35,
                     "name": "FunctionsError"
                   },
                   "overwrites": {
@@ -63367,7 +63552,7 @@
               }
             },
             {
-              "id": 34,
+              "id": 41,
               "name": "context",
               "kind": 1024,
               "kindString": "Property",
@@ -63389,12 +63574,12 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [29]
+              "children": [36]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [34]
+              "children": [41]
             }
           ],
           "sources": [
@@ -63415,30 +63600,30 @@
           "extendedBy": [
             {
               "type": "reference",
-              "id": 35,
+              "id": 42,
               "name": "FunctionsFetchError"
             },
             {
               "type": "reference",
-              "id": 40,
+              "id": 47,
               "name": "FunctionsHttpError"
             },
             {
               "type": "reference",
-              "id": 45,
+              "id": 52,
               "name": "FunctionsRelayError"
             }
           ]
         },
         {
-          "id": 35,
+          "id": 42,
           "name": "FunctionsFetchError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 36,
+              "id": 43,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -63452,14 +63637,14 @@
               ],
               "signatures": [
                 {
-                  "id": 37,
+                  "id": 44,
                   "name": "new FunctionsFetchError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 38,
+                      "id": 45,
                       "name": "context",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -63472,24 +63657,24 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 35,
+                    "id": 42,
                     "name": "FunctionsFetchError"
                   },
                   "overwrites": {
                     "type": "reference",
-                    "id": 30,
+                    "id": 37,
                     "name": "FunctionsError.constructor"
                   }
                 }
               ],
               "overwrites": {
                 "type": "reference",
-                "id": 29,
+                "id": 36,
                 "name": "FunctionsError.constructor"
               }
             },
             {
-              "id": 39,
+              "id": 46,
               "name": "context",
               "kind": 1024,
               "kindString": "Property",
@@ -63507,7 +63692,7 @@
               },
               "inheritedFrom": {
                 "type": "reference",
-                "id": 34,
+                "id": 41,
                 "name": "FunctionsError.context"
               }
             }
@@ -63516,12 +63701,12 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [36]
+              "children": [43]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [39]
+              "children": [46]
             }
           ],
           "sources": [
@@ -63534,20 +63719,20 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 28,
+              "id": 35,
               "name": "FunctionsError"
             }
           ]
         },
         {
-          "id": 40,
+          "id": 47,
           "name": "FunctionsHttpError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 41,
+              "id": 48,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -63561,14 +63746,14 @@
               ],
               "signatures": [
                 {
-                  "id": 42,
+                  "id": 49,
                   "name": "new FunctionsHttpError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 43,
+                      "id": 50,
                       "name": "context",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -63581,24 +63766,24 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 40,
+                    "id": 47,
                     "name": "FunctionsHttpError"
                   },
                   "overwrites": {
                     "type": "reference",
-                    "id": 30,
+                    "id": 37,
                     "name": "FunctionsError.constructor"
                   }
                 }
               ],
               "overwrites": {
                 "type": "reference",
-                "id": 29,
+                "id": 36,
                 "name": "FunctionsError.constructor"
               }
             },
             {
-              "id": 44,
+              "id": 51,
               "name": "context",
               "kind": 1024,
               "kindString": "Property",
@@ -63616,7 +63801,7 @@
               },
               "inheritedFrom": {
                 "type": "reference",
-                "id": 34,
+                "id": 41,
                 "name": "FunctionsError.context"
               }
             }
@@ -63625,12 +63810,12 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [41]
+              "children": [48]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [44]
+              "children": [51]
             }
           ],
           "sources": [
@@ -63643,20 +63828,20 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 28,
+              "id": 35,
               "name": "FunctionsError"
             }
           ]
         },
         {
-          "id": 45,
+          "id": 52,
           "name": "FunctionsRelayError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 46,
+              "id": 53,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -63670,14 +63855,14 @@
               ],
               "signatures": [
                 {
-                  "id": 47,
+                  "id": 54,
                   "name": "new FunctionsRelayError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 48,
+                      "id": 55,
                       "name": "context",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -63690,24 +63875,24 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 45,
+                    "id": 52,
                     "name": "FunctionsRelayError"
                   },
                   "overwrites": {
                     "type": "reference",
-                    "id": 30,
+                    "id": 37,
                     "name": "FunctionsError.constructor"
                   }
                 }
               ],
               "overwrites": {
                 "type": "reference",
-                "id": 29,
+                "id": 36,
                 "name": "FunctionsError.constructor"
               }
             },
             {
-              "id": 49,
+              "id": 56,
               "name": "context",
               "kind": 1024,
               "kindString": "Property",
@@ -63725,7 +63910,7 @@
               },
               "inheritedFrom": {
                 "type": "reference",
-                "id": 34,
+                "id": 41,
                 "name": "FunctionsError.context"
               }
             }
@@ -63734,12 +63919,12 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [46]
+              "children": [53]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [49]
+              "children": [56]
             }
           ],
           "sources": [
@@ -63752,13 +63937,194 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 28,
+              "id": 35,
               "name": "FunctionsError"
             }
           ]
         },
         {
-          "id": 50,
+          "id": 28,
+          "name": "FunctionInvokeOptions",
+          "kind": 4194304,
+          "kindString": "Type alias",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 44,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 29,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 34,
+                  "name": "body",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "The body of the request."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 52,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "reference",
+                        "qualifiedName": "File",
+                        "package": "typescript",
+                        "name": "File"
+                      },
+                      {
+                        "type": "reference",
+                        "qualifiedName": "Blob",
+                        "package": "typescript",
+                        "name": "Blob"
+                      },
+                      {
+                        "type": "reference",
+                        "qualifiedName": "ArrayBuffer",
+                        "package": "typescript",
+                        "name": "ArrayBuffer"
+                      },
+                      {
+                        "type": "reference",
+                        "qualifiedName": "FormData",
+                        "package": "typescript",
+                        "name": "FormData"
+                      },
+                      {
+                        "type": "reference",
+                        "typeArguments": [
+                          {
+                            "type": "reference",
+                            "qualifiedName": "Uint8Array",
+                            "package": "typescript",
+                            "name": "Uint8Array"
+                          }
+                        ],
+                        "qualifiedName": "ReadableStream",
+                        "package": "typescript",
+                        "name": "ReadableStream"
+                      },
+                      {
+                        "type": "reference",
+                        "typeArguments": [
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "any"
+                          }
+                        ],
+                        "qualifiedName": "Record",
+                        "package": "typescript",
+                        "name": "Record"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "id": 30,
+                  "name": "headers",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "shortText": "Object representing the headers to send with the request."
+                  },
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 48,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 31,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 48,
+                          "character": 12
+                        }
+                      ],
+                      "indexSignature": {
+                        "id": 32,
+                        "name": "__index",
+                        "kind": 8192,
+                        "kindString": "Index signature",
+                        "flags": {},
+                        "parameters": [
+                          {
+                            "id": 33,
+                            "name": "key",
+                            "kind": 32768,
+                            "flags": {},
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            }
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [34, 30]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/types.ts",
+                  "line": 44,
+                  "character": 36
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": 57,
           "name": "FunctionsResponse",
           "kind": 4194304,
           "kindString": "Type alias",
@@ -63772,7 +64138,7 @@
           ],
           "typeParameter": [
             {
-              "id": 51,
+              "id": 58,
               "name": "T",
               "kind": 131072,
               "kindString": "Type parameter",
@@ -63789,12 +64155,12 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [1, 28, 35, 40, 45]
+          "children": [1, 35, 42, 47, 52]
         },
         {
           "title": "Type Aliases",
           "kind": 4194304,
-          "children": [50]
+          "children": [28, 57]
         }
       ],
       "sources": [
