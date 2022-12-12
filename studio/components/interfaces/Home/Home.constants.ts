@@ -1,5 +1,19 @@
 export const CLIENT_LIBRARIES = [
   {
+    language: 'C#',
+    officialSupport: false,
+    releaseState: 'Alpha',
+    docsUrl: 'https://supabase-community.github.io/supabase-csharp/api/Supabase.html',
+    gitUrl: 'https://github.com/supabase-community/supabase-csharp',
+  },
+  {
+    language: 'GDScript',
+    officialSupport: false,
+    releaseState: 'Alpha',
+    docsUrl: undefined,
+    gitUrl: 'https://github.com/supabase-community/godot-engine.supabase',
+  },
+  {
     language: 'JavaScript',
     officialSupport: true,
     releaseState: undefined,
@@ -7,11 +21,32 @@ export const CLIENT_LIBRARIES = [
     gitUrl: 'https://github.com/supabase/supabase-js',
   },
   {
+    language: 'Kotlin',
+    releaseState: 'Alpha',
+    officialSupport: false,
+    docsUrl: undefined,
+    gitUrl: 'https://github.com/supabase-community/supabase-kt',
+  },
+  {
     language: 'Python',
     officialSupport: false,
     releaseState: 'Alpha',
     docsUrl: undefined,
     gitUrl: 'https://github.com/supabase/supabase-py',
+  },
+  {
+    language: 'Ruby',
+    officialSupport: false,
+    releaseState: 'Alpha',
+    docsUrl: undefined,
+    gitUrl: 'https://github.com/supabase-community/supabase-rb',
+  },
+  {
+    language: 'Swift',
+    officialSupport: false,
+    releaseState: 'Alpha',
+    docsUrl: undefined,
+    gitUrl: 'https://github.com/supabase-community/supabase-swift',
   },
   {
     language: 'Flutter',
