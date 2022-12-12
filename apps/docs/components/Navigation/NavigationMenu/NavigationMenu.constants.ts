@@ -61,7 +61,6 @@ export const gettingstarted = {
           name: 'React',
           url: '/guides/getting-started/tutorials/with-react',
           items: [],
-          icon: '/img/icons/react-icon.svg',
         },
         {
           name: 'Vue 3',
@@ -423,9 +422,7 @@ export const functions = {
     {
       name: 'Examples',
       url: '/guides/functions/examples',
-      items: [
-        { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
-      ],
+      items: [{ name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] }],
     },
   ],
 }
@@ -564,19 +561,19 @@ export const resources = {
       items: [
         {
           name: 'Auth server',
-          parent: 'reference_self_hosting_auth',
+          url: '/reference/self-hosting-auth',
           icon: '/docs/img/icons/menu/reference-auth',
           items: [],
         },
         {
           name: 'Storage server',
-          parent: 'reference_self_hosting_storage',
+          url: '/reference/self-hosting-storage',
           icon: '/docs/img/icons/menu/reference-storage',
           items: [],
         },
         {
           name: 'Realtime server',
-          parent: 'reference_self_hosting_realtime',
+          url: '/reference/self-hosting-realtime',
           icon: '/docs/img/icons/menu/reference-realtime',
           items: [],
         },
