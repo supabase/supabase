@@ -132,7 +132,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         let usageElement
                         if (!isAvailableInPlan) {
                           usageElement = (
-                            <div className="flex justify-between">
+                            <div className="flex justify-between items-center">
                               <span>Not included in {planName} tier</span>
                               <Button
                                 size="tiny"
