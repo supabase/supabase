@@ -5,14 +5,14 @@ import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { WRAPPERS } from './Wrappers.constants'
 import WrapperRow from './WrapperRow'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Image from 'next/image'
 
 const Wrappers = () => {
+  const { ref } = useParams()
   const { ui, meta } = useStore()
   const { project } = useProjectContext()
   const { data, isLoading } = useFDWsQuery({
@@ -26,6 +26,7 @@ const Wrappers = () => {
 
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
 
   const isWrappersEnabled =
     wrappersExtension !== undefined &&
@@ -158,42 +159,75 @@ const Wrappers = () => {
                   third-party APIs directly from your database.
                 </p>
               </div>
-              <div className="flex items-center space-x-2">
-                <Link href="https://supabase.com/docs">
-                  <a target="_blank">
-                    <Button type="default" icon={<IconExternalLink />}>
-                      About Wrappers
-                    </Button>
-                  </a>
-                </Link>
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
-                    <Button
-                      type="primary"
-                      loading={isEnabling}
-                      disabled={isEnabling || !canToggleWrappers}
-                      onClick={() => onEnableWrappers()}
-                    >
-                      Enable Wrappers
-                    </Button>
-                  </Tooltip.Trigger>
-                  {!canToggleWrappers && (
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
+              {isNotAvailable ? (
+                <div className="space-y-4">
+                  <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
+                    <div>
+                      <p className="text-scale-1100 text-sm">
+                        Wrappers is not available for this project yet.
+                      </p>
+                      <p className="text-scale-1000 text-sm">
+                        Do reach out to us if you're interested!
+                      </p>
+                    </div>
+                    <div>
+                      <Link
+                        href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20wrappers`}
                       >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to enable Wrappers for this project
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  )}
-                </Tooltip.Root>
-              </div>
+                        <a target="_blank">
+                          <Button type="primary">Contact us</Button>
+                        </a>
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 my-1 ml-[1px]">
+                    <Link href="https://supabase.com/docs">
+                      <a target="_blank">
+                        <Button type="default" icon={<IconExternalLink />}>
+                          About Vault
+                        </Button>
+                      </a>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Link href="https://supabase.com/docs">
+                    <a target="_blank">
+                      <Button type="default" icon={<IconExternalLink />}>
+                        About Wrappers
+                      </Button>
+                    </a>
+                  </Link>
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger>
+                      <Button
+                        type="primary"
+                        loading={isEnabling}
+                        disabled={isEnabling || !canToggleWrappers}
+                        onClick={() => onEnableWrappers()}
+                      >
+                        Enable Wrappers
+                      </Button>
+                    </Tooltip.Trigger>
+                    {!canToggleWrappers && (
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to enable Wrappers for this project
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    )}
+                  </Tooltip.Root>
+                </div>
+              )}
             </div>
           </div>
         </div>

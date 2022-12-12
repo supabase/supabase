@@ -2,11 +2,10 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconExternalLink } from 'ui'
+import { Button, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useParams, useStore } from 'hooks'
-import InformationBox from 'components/ui/InformationBox'
 
 interface Props {}
 
@@ -80,7 +79,6 @@ const VaultToggle: FC<Props> = () => {
             <div className="space-y-4">
               <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
                 <div>
-                  {/* <IconAlertCircle className="text-scale-1100" strokeWidth={1.5} size={18} /> */}
                   <p className="text-scale-1100 text-sm">
                     Vault is not available for this project yet.
                   </p>
