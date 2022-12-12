@@ -4,16 +4,21 @@ import NavBar from '../components/Navigation/NavBar'
 import SideBar from '../components/Navigation/SideBar'
 import Footer from '../components/Footer'
 import TableOfContents from '~/components/TableOfContents'
+import { menuItems } from '~/components/Navigation/Navigation.constants'
+import { useRouter } from 'next/router'
+import { getPageType } from '~/lib/helpers'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean }
   children: any
   toc?: any
-  menuItems: any
-  currentPage: string
+  menuItems?: any
+  currentPage?: string
 }
 
-const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
+const Layout: FC<Props> = ({ meta, children, toc }) => {
+  const { asPath } = useRouter()
+
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
     if (!key) {
@@ -27,6 +32,10 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
   const hasTableOfContents =
     toc !== undefined && toc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
 
+  const pageType = getPageType(asPath)
+
+  console.log('Default, pageType', pageType)
+
   return (
     <>
       <NextSeo
@@ -35,7 +44,7 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
         openGraph={{
           title: meta?.title,
           description: meta?.description,
-          url: `https://supabase.com/docs/${currentPage}`,
+          url: `https://supabase.com/docs/${asPath}`,
           images: [
             {
               url: `https://supabase.com/docs/img/supabase-og-image.png`,
@@ -45,9 +54,9 @@ const Layout: FC<Props> = ({ meta, children, toc, menuItems, currentPage }) => {
       />
 
       <main>
-        <NavBar currentPage={currentPage} />
+        <NavBar />
         <div className="flex w-full flex-row">
-          <SideBar menuItems={menuItems} />
+          <SideBar menuItems={menuItems[pageType]} />
           <div className="main-content-pane docs-width grid md:grid-cols-12 gap-4 justify-between p-4 pb-8 w-full">
             <div
               className={`${

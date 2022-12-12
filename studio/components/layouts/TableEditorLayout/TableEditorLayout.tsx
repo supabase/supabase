@@ -29,7 +29,7 @@ const TableEditorLayout: FC<Props> = ({
   onDuplicateTable = () => {},
   children,
 }) => {
-  const { meta, ui } = useStore()
+  const { vault, meta, ui } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
 
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
@@ -42,6 +42,8 @@ const TableEditorLayout: FC<Props> = ({
       meta.types.load()
       meta.policies.load()
       meta.publications.load()
+      meta.extensions.load()
+      vault.load()
     }
   }, [ui.selectedProject?.ref])
 
