@@ -30,7 +30,7 @@ interface Props {
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
   onTableCreated?: (table: PostgresTable) => void
-  onColumnSaved?: () => void
+  onColumnSaved?: (hasEncryptedColumns?: boolean) => void
 }
 
 const SidePanelEditor: FC<Props> = ({
@@ -144,7 +144,7 @@ const SidePanelEditor: FC<Props> = ({
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
       await meta.tables.loadById(selectedTable!.id)
-      onColumnSaved()
+      onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
     }
