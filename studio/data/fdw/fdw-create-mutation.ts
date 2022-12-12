@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { AvailableColumn, Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { useStore } from 'hooks'
 
 export type FDWCreateVariables = {
   projectRef?: string
@@ -150,12 +151,16 @@ export const useFDWCreateMutation = ({
   ...options
 }: Omit<UseMutationOptions<FDWCreateData, unknown, FDWCreateVariables>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
+  const { vault } = useStore()
 
   return useMutation<FDWCreateData, unknown, FDWCreateVariables>((vars) => createFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws']))
+      await Promise.all([
+        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
+        vault.load(),
+      ])
 
       await onSuccess?.(data, variables, context)
     },
