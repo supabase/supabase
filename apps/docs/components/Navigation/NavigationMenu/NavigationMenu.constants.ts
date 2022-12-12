@@ -557,7 +557,7 @@ export const resources = {
       ],
     },
     {
-      name: 'Self-Hosting Feference',
+      name: 'Self-Hosting Reference',
       items: [
         {
           name: 'Auth Server',
