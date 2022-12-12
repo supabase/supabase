@@ -458,7 +458,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
     notes: |
       - Currently, `totp` is the only supported `factorType`.
-      - To verify the factor next, see `auth.mfa.challengeAndVerify()`.
+      - To verify the factor next, see [`mfa.challengeAndVerify`](/docs/reference/javascript/auth-mfa-challengeandverify).
       - To generate a QR code for the `totp` secret in nextjs, you can do the following:
       ```html
       <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
