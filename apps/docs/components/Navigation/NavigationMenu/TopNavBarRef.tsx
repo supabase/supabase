@@ -1,23 +1,10 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import {
-  Badge,
-  Button,
-  Dropdown,
-  IconCommand,
-  IconMenu,
-  IconMessageSquare,
-  IconMoon,
-  IconSearch,
-  IconSun,
-  Input,
-  Listbox,
-} from 'ui'
-import { SearchButton } from '~/components/DocSearch'
+import { Button, IconMoon, IconSun } from 'ui'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from 'common/Providers'
 
 import { getPageType } from '~/lib/helpers'
 
@@ -96,7 +83,7 @@ const TopNavBarRef: FC = () => {
         </div>
 
         <div className="flex items-center gap-12">
-          <SearchButton className="w-full lg:w-96">
+          {/* <SearchButton className="w-full lg:w-96">
             <div
               className="
               flex
@@ -123,7 +110,7 @@ const TopNavBarRef: FC = () => {
                 </div>
               </div>
             </div>
-          </SearchButton>
+          </SearchButton> */}
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button
