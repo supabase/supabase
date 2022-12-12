@@ -10,7 +10,7 @@ export const meta = {
 Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
 
 <Admonition type="note">
-    Image Resizing is enabled for PRO tiers and above
+    Image Resizing is currently in beta and enabled for PRO tiers and above
 </Admonition>
 
 ### Get a public URL for a Transformed image
@@ -26,10 +26,8 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
 })
 ```
 
-This will return the public URL with the formatted transformation parameters.
-Once visited you’ll be served with the resized image
-
 An example URL could look like this:
+
 `https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
 
 
@@ -48,7 +46,7 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
 
 The transformation options are embedded into the token, they cannot be changed once signed.
 
-## Downloading Images
+### Downloading Images
 
 To download a transformed image, pass the `transform` option to the `download` function
 
@@ -61,7 +59,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 })
 ```
 
-### Transformation options
+## Transformation options
 
 We currently support a few transformation options focusing on resizing & cropping.
 We have plans to increase the transformation types available in a later release.
@@ -104,16 +102,16 @@ supabase.storage.from('bucket').download('image.jpg', {
 
 | Format | Extension | Source | Result |
 | -------|-----------|--------|--------|
-| PNG    | `png`     | Yes    | Yes    |
-| JPEG   | `jpg`     | Yes    | Yes    |
-| WebP   | `webp`    | Yes    | Yes    |
-| AVIF   | `avif`    | Yes    | Yes    |
-| GIF    | `gif`     | Yes    | Yes    |
-| ICO    | `ico`     | Yes    | Yes    |
-| SVG    | `svg`     | Yes    | Yes    |
-| HEIC   | `heic`    | Yes    | No     |
-| BMP    | `bmp`     | Yes    | Yes    |
-| TIFF   | `tiff`    | Yes    | Yes    |
+| PNG    | `png`     | ☑️    | ☑️    |
+| JPEG   | `jpg`     | ☑️    | ☑️    |
+| WebP   | `webp`    | ☑️    | ☑️    |
+| AVIF   | `avif`    | ☑️    | ☑️    |
+| GIF    | `gif`     | ☑️    | ☑️    |
+| ICO    | `ico`     | ☑️    | ☑️    |
+| SVG    | `svg`     | ☑️    | ☑️    |
+| HEIC   | `heic`    | ☑️    | ❌     |
+| BMP    | `bmp`     | ☑️    | ☑️    |
+| TIFF   | `tiff`    | ☑️    | ☑️    |
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

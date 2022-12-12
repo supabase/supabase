@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { IconKey, IconLink } from 'ui'
+import { IconKey, IconLink, IconLock } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 import { XYCoord } from 'dnd-core'
 import { useDispatch } from '../../store'
@@ -11,6 +12,7 @@ export function ColumnHeader<R>({
   column,
   columnType,
   isPrimaryKey,
+  isEncrypted,
   format,
 }: ColumnHeaderProps<R>) {
   const ref = React.useRef<HTMLDivElement>(null)
@@ -119,14 +121,47 @@ export function ColumnHeader<R>({
         <div className="sb-grid-column-header__inner">
           {renderColumnIcon(columnType)}
           {isPrimaryKey && (
-            <div className="sb-grid-column-header__inner__primary-key">
-              <IconKey size="tiny" strokeWidth={2} />
-            </div>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <div className="sb-grid-column-header__inner__primary-key">
+                  <IconKey size="tiny" strokeWidth={2} />
+                </div>
+              </Tooltip.Trigger>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">Primary key</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Root>
           )}
           <span className="sb-grid-column-header__inner__name" title={hoverValue}>
             {column.name}
           </span>
           <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
+          {isEncrypted && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <IconLock size="tiny" strokeWidth={2} />
+              </Tooltip.Trigger>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">Encrypted column</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          )}
         </div>
         <ColumnMenu column={column} />
       </div>
