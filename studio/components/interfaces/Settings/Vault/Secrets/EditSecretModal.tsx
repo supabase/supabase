@@ -46,7 +46,6 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
     const payload: Partial<VaultSecret> = {}
     if (values.name !== selectedSecret.name) payload.name = values.name
     if (values.description !== selectedSecret.description) payload.description = values.description
-    if (values.secret !== secretValue) payload.secret = values.secret
     if (selectedKeyId !== selectedSecret.key_id) {
       let encryptionKeyId = selectedKeyId
       if (values.keyId === 'create-new') {
@@ -63,8 +62,8 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
       }
 
       payload.key_id = encryptionKeyId
-      payload.secret = values.secret
     }
+    payload.secret = values.secret
 
     if (!isEmpty(payload)) {
       setSubmitting(true)
@@ -72,6 +71,7 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
       if (!res.error) {
         ui.setNotification({ category: 'success', message: 'Successfully updated secret' })
         setSubmitting(false)
+        if (payload.secret !== undefined) setShowSecretValue(false)
         onClose()
       } else {
         ui.setNotification({
