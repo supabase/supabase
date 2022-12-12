@@ -10,9 +10,9 @@ import * as NavItems from './NavigationMenu.constants'
 interface Props {
   currentLevel: string
   id: string
-  setLevel?: any
+  setMenuLevelId?: any
 }
-const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setLevel }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLevelId }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
@@ -61,13 +61,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setLevel }
 
         <Link href={menu.url ?? ''} passHref>
           <a>
-            <div
-              className="flex items-center gap-3 my-3
-
-        invisible md:visible"
-            >
-              {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
-
+            <div className="flex items-center gap-3 my-3">
               <Image
                 alt={menu.icon}
                 width={15}
@@ -122,7 +116,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setLevel }
                           <button
                             className={props.className}
                             onClick={() => {
-                              if (props.parent && setLevel) setLevel(props.parent)
+                              if (props.parent && setMenuLevelId) setMenuLevelId(props.parent)
                             }}
                           >
                             {props.children}
