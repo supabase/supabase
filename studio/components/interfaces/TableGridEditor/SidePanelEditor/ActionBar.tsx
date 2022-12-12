@@ -35,8 +35,8 @@ const ActionBar: FC<ActionBarProps> = ({
   }
 
   return (
-    <div className="flex justify-between w-full px-3 py-4 space-x-3 border-t border-scale-500">
-      <Button size="small" onClick={closePanel} type="default" htmlType="button">
+    <div className="flex w-full justify-end space-x-3 border-t border-scale-500 px-3 py-4">
+      <Button size="small" type="default" htmlType="button" onClick={closePanel}>
         {backButtonLabel}
       </Button>
 
