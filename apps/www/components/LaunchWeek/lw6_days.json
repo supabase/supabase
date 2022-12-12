@@ -20,31 +20,16 @@
     ]
   },
   {
-    "title": "Image Processing: Resize V2 + CDN",
-    "shipped": true,
+    "title": "Day 2",
+    "shipped": false,
     "date": "13 Dec 2022",
-    "description": "Image Processing",
+    "description": "Day 2",
     "d": 2,
     "dd": "Tuesday",
     "youtube_id": "iqZlPtl_b-I",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "steps": [
-      {
-        "title": "Image Processing",
-        "blog": "/blog",
-        "docs": "/docs",
-        "isNew": true,
-        "description": ""
-      },
-      {
-        "title": "CDN Caching",
-        "description": "Faster asset delivery, now even faster.",
-        "blog": "/blog",
-        "docs": "/docs",
-        "isNew": true
-      }
-    ]
+    "steps": []
   },
   {
     "title": "Day 3",
