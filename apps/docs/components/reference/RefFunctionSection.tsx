@@ -132,12 +132,13 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
               >
                 {item.examples &&
                   item.examples.map((example, exampleIndex) => {
-                    const exampleString = `
-import { createClient } from '@supabase/supabase-js'
+                    const exampleString = ''
+                    //                     `
+                    // import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-`
+                    // // Create a single supabase client for interacting with your database
+                    // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+                    // `
                     const currentExampleId = example.id
                     const staticExample = item.examples[exampleIndex]
 
@@ -180,7 +181,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
                                   language="sql"
                                   hideLineNumbers={true}
                                 >
-                                  {sql}
+                                  {sql.replace(/sql/g, '').replace(/```/g, '')}
                                 </CodeBlock>
                               )}
                             </>
