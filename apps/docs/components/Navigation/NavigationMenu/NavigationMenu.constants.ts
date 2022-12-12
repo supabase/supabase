@@ -364,7 +364,6 @@ export const database = {
   label: 'Database',
   url: '/guides/database',
   items: [
-    { name: 'Overview', url: '/guides/database', items: [] },
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
     { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
     { name: 'Database Functions', url: '/guides/database/functions', items: [] },
