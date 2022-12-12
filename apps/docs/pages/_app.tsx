@@ -2,14 +2,14 @@ import { DefaultSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { AppPropsWithLayout } from 'types'
-import Favicons from '~/components/Favicons'
+// import Favicons from '~/components/Favicons'
 import { post } from '~/lib/fetchWrappers'
 import '../styles/algolia-search.scss'
-import '../styles/ch.scss'
-import '../styles/docsearch.scss'
+// import '../styles/ch.scss'
+// import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
-import '../styles/prism-okaidia.scss'
+// import '../styles/prism-okaidia.scss'
 // import { menuState } from '~/hooks/useMenuState'
 import SiteRefLayout from '~/layouts/SiteRefLayout'
 
@@ -60,7 +60,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <>
-      <Favicons />
+      {/* <Favicons /> */}
       <DefaultSeo
         title={SITE_TITLE}
         description={SITE_DESCRIPTION}
