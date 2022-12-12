@@ -19,6 +19,10 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
+import React from 'react'
+import RefSubLayout from '~/layouts/ref/RefSubLayout'
+// import { CH } from '@code-hike/mdx/components'
+import RefHeaderSection from './reference/RefHeaderSection'
 
 const components = {
   Admonition,
@@ -40,7 +44,6 @@ const components = {
   ),
   Tabs,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}
@@ -51,12 +54,16 @@ const components = {
       {props.children}
     </Heading>
   ),
-  code: (props: any) => {
-    const linesToHighlight = parseNumericRange(props.lines ?? '')
-    return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
-  },
+  // pre: (props: any) => {
+  //   const linesToHighlight = parseNumericRange(props.lines ?? '')
+  //   return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
+  // },
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
-  inlineCode: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
+  // inlineCode: (props: { children: string }) => <InlineCodeTag {...props} />,
+  RefSubLayout,
+  // CH,
+  code: (props: any) => <CodeBlock {...props} />,
+  RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
 }
 
 export default components

@@ -14,13 +14,22 @@ init:
 ###############################################################################
 # Download all the specs
 ###############################################################################
-download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v2
+# commment out download.auth.v1 temporarily, we're manually creating the file
+# download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v2
+download: download.api.v1 download.storage.v1 download.tsdoc.v2
 
 download.api.v1:
 	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v0_openapi.json
 
-download.auth.v1:
-	curl -sS https://supabase.github.io/gotrue/swagger.json > $(REPO_DIR)/auth_v1_openapi.json
+
+# This flow needs to be updated, so we'l comment out for the moment
+# Manual flow for now:
+# — get swagger.json (https://supabase.github.io/gotrue/swagger.json)
+# — manually convert via swagger editor -> open api v3 spec
+# dereference.tsdoc.v2 -> auth_v1_openapi_deparsed.json
+
+# download.auth.v1:
+# 	curl -sS https://supabase.github.io/gotrue/swagger.json > $(REPO_DIR)/auth_v1_openapi.json
 
 download.storage.v1:
 	curl -sS https://supabase.github.io/storage-api/api.json > $(REPO_DIR)/storage_v0_openapi.json
@@ -93,6 +102,16 @@ combine.tsdoc.v2:
 	$(REPO_DIR)/enrichments/tsdoc_v2/storage_dereferenced.json \
 	$(REPO_DIR)/enrichments/tsdoc_v2/functions_dereferenced.json \
 	> $(REPO_DIR)/enrichments/tsdoc_v2/combined.json
+
+combine-raw.tsdoc.v2:
+	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4], .[5]] }' \
+	$(REPO_DIR)/enrichments/tsdoc_v2/supabase.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/realtime.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/storage.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/functions.json \
+	> $(REPO_DIR)/enrichments/tsdoc_v2/combined_raw.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.
