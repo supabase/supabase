@@ -169,7 +169,6 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           align === 'Left' ? 'text-center xl:text-left' : 'text-center'
         )}
       >
-        <p className="text-scale-1200 text-base w-full">Coming soon</p>
         <p className="text-scale-1000 text-base max-w-[420px]">
           Register to get your ticket and stay tuned all week for daily announcements
         </p>

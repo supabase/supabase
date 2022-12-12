@@ -22,7 +22,7 @@ interface CustomProps {
   children?: React.ReactNode
   header?: string | React.ReactNode
   visible: boolean
-  size?: 'medium' | 'large'
+  size?: 'medium' | 'large' | 'xlarge'
   loading?: boolean
   align?: 'right' | 'left'
   hideFooter?: boolean

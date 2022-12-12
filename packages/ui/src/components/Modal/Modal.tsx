@@ -115,13 +115,14 @@ const Modal = ({
     customFooter
   ) : (
     <Space
+      className="flex w-full space-x-2"
       style={{
         width: '100%',
         justifyContent:
           layout === 'vertical' ? 'center' : alignFooter === 'right' ? 'flex-end' : 'flex-start',
       }}
     >
-      <Button type="secondary" onClick={onCancel} disabled={loading}>
+      <Button type="default" onClick={onCancel} disabled={loading}>
         {cancelText}
       </Button>
       <Button onClick={onConfirm} loading={loading} danger={variant === 'danger'}>
