@@ -19,7 +19,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
   const router = useRouter()
   const { ref } = router.query
   return (
-    <Panel className={'pb-0 ' + props.className} bodyClassName="h-full" wrapWithLoading={false}>
+    <Panel noMargin className={'pb-0 ' + props.className} bodyClassName="h-full" wrapWithLoading={false}>
       <Panel.Content className="space-y-4">
         <div className="flex flex-row items-start justify-between">
           <div className="gap-2">

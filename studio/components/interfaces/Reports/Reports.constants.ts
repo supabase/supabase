@@ -167,14 +167,13 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         sql: `
 select 
   timestamp_trunc(timestamp, day) as timestamp,
-  count(distinct json_extract(f.event_message, "$.user_id")) as count
-from gotrue_logs f
-cross join unnest(f.metadata) as m
-where json_extract(f.event_message, "$.user_id") is not null
+  count(distinct json_value(f.event_message, "$.user_id")) as count
+from auth_logs f
+where json_value(f.event_message, "$.action") = "login"
 group by 
   timestamp
 order by
-  timestamp
+  timestamp desc
 `,
       },
       cumulativeUsers: {

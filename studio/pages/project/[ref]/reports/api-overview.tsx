@@ -24,7 +24,7 @@ export const ApiOverviewReport: NextPageWithLayout = () => {
   const { isLoading, Layout } = usePresetReport([statusCodes, errorRates, requestPaths])
   return (
     <Layout title={config.title}>
-      <div className="grid  lg:grid-cols-4">
+      <div className="grid lg:grid-cols-4 gap-4">
         <ReportWidget
           isLoading={isLoading}
           params={statusCodes[0].params}
