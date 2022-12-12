@@ -22,7 +22,7 @@ toc_max_heading_level: 3
 
 <%- parameter.description %>
 
-<ul class="method-list-group">
+<ul class="method-list-group not-prose">
 <li class="method-list-item-label flex items-center gap-4">Required: <code><%= parameter.required %></code></li>
 <li class="method-list-item-label flex items-center gap-4">Default: <code><%- parameter?.default ? parameter?.default : 'None' %></code></li><% if(parameter?.links?.length){ %>
 <li>

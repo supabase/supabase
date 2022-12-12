@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
-    "@mdx-js/loader": "^1.6.22",
-    "@mdx-js/react": "^1.6.22",
+    "@mdx-js/loader": "^2.1.5",
+    "@mdx-js/react": "^2.1.5",
     "@next/bundle-analyzer": "^13.0.0",
-    "@next/mdx": "^10.0.7",
+    "@next/mdx": "^12.3.2",
     "@supabase/auth-ui-react": "^0.1.6",
     "@supabase/supabase-js": "^2.0.0",
     "classnames": "^2.3.1",
