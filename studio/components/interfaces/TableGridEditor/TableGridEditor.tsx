@@ -67,10 +67,10 @@ const TableGridEditor: FC<Props> = ({
   }
 
   useEffect(() => {
-    if (selectedTable !== undefined) {
+    if (selectedTable !== undefined && selectedTable.id !== undefined) {
       getEncryptedColumns(selectedTable)
     }
-  }, [selectedTable])
+  }, [selectedTable?.id])
 
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(router.query.id)} />
@@ -107,8 +107,7 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const onColumnSaved = (hasEncryptedColumns = false) => {
-    if (hasEncryptedColumns) {
-    }
+    if (hasEncryptedColumns) getEncryptedColumns(selectedTable)
   }
 
   const onTableCreated = (table: PostgresTable) => {
