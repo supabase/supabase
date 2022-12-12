@@ -61,20 +61,14 @@ const TableGridEditor: FC<Props> = ({
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
 
+  const getEncryptedColumns = async (table: any) => {
+    const columns = await vault.listEncryptedColumns(table.name)
+    setEncryptedColumns(columns)
+  }
+
   useEffect(() => {
-    let cancel = false
-
-    const getEncryptedColumns = async (table: any) => {
-      const columns = await vault.listEncryptedColumns(table.name)
-      if (!cancel) setEncryptedColumns(columns)
-    }
-
     if (selectedTable !== undefined) {
       getEncryptedColumns(selectedTable)
-    }
-
-    return () => {
-      cancel = true
     }
   }, [selectedTable])
 
@@ -110,6 +104,11 @@ const TableGridEditor: FC<Props> = ({
 
   const onRowUpdated = (row: Dictionary<any>, idx: number) => {
     if (gridRef.current) gridRef.current.rowEdited(row, idx)
+  }
+
+  const onColumnSaved = (hasEncryptedColumns = false) => {
+    if (hasEncryptedColumns) {
+    }
   }
 
   const onTableCreated = (table: PostgresTable) => {
@@ -191,6 +190,7 @@ const TableGridEditor: FC<Props> = ({
           sidePanelKey={sidePanelKey}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
+          onColumnSaved={onColumnSaved}
           onTableCreated={onTableCreated}
           closePanel={onClosePanel}
         />
