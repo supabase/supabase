@@ -402,7 +402,13 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [68, 71, 70, 72, 69]
+                                          "children": [
+                                            68,
+                                            71,
+                                            70,
+                                            72,
+                                            69
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -460,7 +466,8 @@
                                           "type": {
                                             "type": "reference",
                                             "id": 78,
-                                            "name": "SchemaName"
+                                            "name": "SchemaName",
+                                            "dereferenced": {}
                                           }
                                         }
                                       ],
@@ -468,7 +475,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [65]
+                                          "children": [
+                                            65
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -526,7 +535,31 @@
                                           "type": {
                                             "type": "reference",
                                             "id": 60,
-                                            "name": "Fetch"
+                                            "name": "Fetch",
+                                            "dereferenced": {
+                                              "id": 60,
+                                              "name": "Fetch",
+                                              "kind": 4194304,
+                                              "kindString": "Type alias",
+                                              "flags": {},
+                                              "sources": [
+                                                {
+                                                  "fileName": "src/lib/types.ts",
+                                                  "line": 8,
+                                                  "character": 12
+                                                }
+                                              ],
+                                              "type": {
+                                                "type": "query",
+                                                "queryType": {
+                                                  "type": "reference",
+                                                  "id": 18,
+                                                  "qualifiedName": "fetch",
+                                                  "package": "typescript",
+                                                  "name": "fetch"
+                                                }
+                                              }
+                                            }
                                           }
                                         },
                                         {
@@ -569,7 +602,10 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [76, 77]
+                                          "children": [
+                                            76,
+                                            77
+                                          ]
                                         }
                                       ],
                                       "sources": [
@@ -612,7 +648,12 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [66, 63, 74, 73]
+                                  "children": [
+                                    66,
+                                    63,
+                                    74,
+                                    73
+                                  ]
                                 }
                               ],
                               "sources": [
@@ -2064,7 +2105,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [157, 156]
+                              "children": [
+                                157,
+                                156
+                              ]
                             }
                           ]
                         }
@@ -2182,22 +2226,53 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [105]
+              "children": [
+                105
+              ]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [113, 115, 126, 121, 117, 127, 118, 114, 119, 120, 116, 132, 131]
+              "children": [
+                113,
+                115,
+                126,
+                121,
+                117,
+                127,
+                118,
+                114,
+                119,
+                120,
+                116,
+                132,
+                131
+              ]
             },
             {
               "title": "Accessors",
               "kind": 262144,
-              "children": [133, 135]
+              "children": [
+                133,
+                135
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [169, 186, 180, 171, 183, 158, 137, 162, 167, 164, 148]
+              "children": [
+                169,
+                186,
+                180,
+                171,
+                183,
+                158,
+                137,
+                162,
+                167,
+                164,
+                148
+              ]
             }
           ],
           "sources": [
@@ -2692,7 +2767,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [68, 71, 70, 72, 69]
+                                      "children": [
+                                        68,
+                                        71,
+                                        70,
+                                        72,
+                                        69
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -2750,7 +2831,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -2758,7 +2840,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [65]
+                                      "children": [
+                                        65
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -2816,7 +2900,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -2859,7 +2967,10 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [76, 77]
+                                      "children": [
+                                        76,
+                                        77
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -2902,7 +3013,12 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [66, 63, 74, 73]
+                              "children": [
+                                66,
+                                63,
+                                74,
+                                73
+                              ]
                             }
                           ],
                           "sources": [
@@ -2948,17 +3064,23 @@
         {
           "title": "References",
           "kind": 16777216,
-          "children": [194]
+          "children": [
+            194
+          ]
         },
         {
           "title": "Classes",
           "kind": 128,
-          "children": [104]
+          "children": [
+            104
+          ]
         },
         {
           "title": "Functions",
           "kind": 64,
-          "children": [2]
+          "children": [
+            2
+          ]
         }
       ],
       "sources": [
@@ -3024,7 +3146,9 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [13]
+                  "children": [
+                    13
+                  ]
                 }
               ]
             }
@@ -3036,7 +3160,9 @@
         {
           "title": "Variables",
           "kind": 32,
-          "children": [11]
+          "children": [
+            11
+          ]
         }
       ],
       "sources": [
@@ -3470,7 +3596,11 @@
         {
           "title": "Functions",
           "kind": 64,
-          "children": [29, 15, 26]
+          "children": [
+            29,
+            15,
+            26
+          ]
         }
       ],
       "sources": [
@@ -3771,7 +3901,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [68, 71, 70, 72, 69]
+                                      "children": [
+                                        68,
+                                        71,
+                                        70,
+                                        72,
+                                        69
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -3829,7 +3965,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -3837,7 +3974,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [65]
+                                      "children": [
+                                        65
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -3895,7 +4034,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -3938,7 +4101,10 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [76, 77]
+                                      "children": [
+                                        76,
+                                        77
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -3981,7 +4147,12 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [66, 63, 74, 73]
+                              "children": [
+                                66,
+                                63,
+                                74,
+                                73
+                              ]
                             }
                           ],
                           "sources": [
@@ -4195,7 +4366,13 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [68, 71, 70, 72, 69]
+                                      "children": [
+                                        68,
+                                        71,
+                                        70,
+                                        72,
+                                        69
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -4253,7 +4430,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -4261,7 +4439,9 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [65]
+                                      "children": [
+                                        65
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -4319,7 +4499,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -4362,7 +4566,10 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [76, 77]
+                                      "children": [
+                                        76,
+                                        77
+                                      ]
                                     }
                                   ],
                                   "sources": [
@@ -4405,7 +4612,12 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [66, 63, 74, 73]
+                              "children": [
+                                66,
+                                63,
+                                74,
+                                73
+                              ]
                             }
                           ],
                           "sources": [
@@ -4535,7 +4747,12 @@
         {
           "title": "Functions",
           "kind": 64,
-          "children": [50, 56, 47, 45]
+          "children": [
+            50,
+            56,
+            47,
+            45
+          ]
         }
       ],
       "sources": [
@@ -4672,7 +4889,10 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [95, 96]
+                  "children": [
+                    95,
+                    96
+                  ]
                 }
               ],
               "sources": [
@@ -4742,7 +4962,9 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [91]
+                  "children": [
+                    91
+                  ]
                 }
               ],
               "sources": [
@@ -4875,7 +5097,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [101, 99, 100]
+                  "children": [
+                    101,
+                    99,
+                    100
+                  ]
                 }
               ],
               "sources": [
@@ -5005,7 +5231,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [82, 81, 83]
+                  "children": [
+                    82,
+                    81,
+                    83
+                  ]
                 }
               ],
               "sources": [
@@ -5135,7 +5365,11 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [87, 86, 88]
+                  "children": [
+                    87,
+                    86,
+                    88
+                  ]
                 }
               ],
               "sources": [
@@ -5281,7 +5515,11 @@
                       {
                         "title": "Properties",
                         "kind": 1024,
-                        "children": [87, 86, 88]
+                        "children": [
+                          87,
+                          86,
+                          88
+                        ]
                       }
                     ],
                     "sources": [
@@ -5351,7 +5589,9 @@
                       {
                         "title": "Properties",
                         "kind": 1024,
-                        "children": [91]
+                        "children": [
+                          91
+                        ]
                       }
                     ],
                     "sources": [
@@ -5550,7 +5790,13 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [68, 71, 70, 72, 69]
+                          "children": [
+                            68,
+                            71,
+                            70,
+                            72,
+                            69
+                          ]
                         }
                       ],
                       "sources": [
@@ -5608,7 +5854,8 @@
                           "type": {
                             "type": "reference",
                             "id": 78,
-                            "name": "SchemaName"
+                            "name": "SchemaName",
+                            "dereferenced": {}
                           }
                         }
                       ],
@@ -5616,7 +5863,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [65]
+                          "children": [
+                            65
+                          ]
                         }
                       ],
                       "sources": [
@@ -5674,7 +5923,31 @@
                           "type": {
                             "type": "reference",
                             "id": 60,
-                            "name": "Fetch"
+                            "name": "Fetch",
+                            "dereferenced": {
+                              "id": 60,
+                              "name": "Fetch",
+                              "kind": 4194304,
+                              "kindString": "Type alias",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 8,
+                                  "character": 12
+                                }
+                              ],
+                              "type": {
+                                "type": "query",
+                                "queryType": {
+                                  "type": "reference",
+                                  "id": 18,
+                                  "qualifiedName": "fetch",
+                                  "package": "typescript",
+                                  "name": "fetch"
+                                }
+                              }
+                            }
                           }
                         },
                         {
@@ -5717,7 +5990,10 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [76, 77]
+                          "children": [
+                            76,
+                            77
+                          ]
                         }
                       ],
                       "sources": [
@@ -5760,7 +6036,12 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [66, 63, 74, 73]
+                  "children": [
+                    66,
+                    63,
+                    74,
+                    73
+                  ]
                 }
               ],
               "sources": [
@@ -5778,12 +6059,23 @@
         {
           "title": "Interfaces",
           "kind": 256,
-          "children": [59]
+          "children": [
+            59
+          ]
         },
         {
           "title": "Type Aliases",
           "kind": 4194304,
-          "children": [60, 93, 89, 97, 79, 84, 92, 61]
+          "children": [
+            60,
+            93,
+            89,
+            97,
+            79,
+            84,
+            92,
+            61
+          ]
         }
       ],
       "sources": [
@@ -5827,7 +6119,9 @@
         {
           "title": "Variables",
           "kind": 32,
-          "children": [103]
+          "children": [
+            103
+          ]
         }
       ],
       "sources": [
@@ -5843,7 +6137,14 @@
     {
       "title": "Modules",
       "kind": 2,
-      "children": [1, 10, 14, 44, 58, 102]
+      "children": [
+        1,
+        10,
+        14,
+        44,
+        58,
+        102
+      ]
     }
   ]
 }
