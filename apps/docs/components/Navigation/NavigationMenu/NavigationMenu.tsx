@@ -85,11 +85,8 @@ const SideNav = () => {
       case `/docs`:
         setLevel('home')
         break
-      case url.includes(`/docs/getting-started`) && url:
+      case url.includes(`/docs/guides/getting-started`) && url:
         setLevel('gettingstarted')
-        break
-      case url.includes(`/docs/guides/tutorials`) && url:
-        setLevel('tutorials')
         break
       case url.includes(`/docs/guides/database`) && url:
         setLevel('database')
@@ -173,14 +170,8 @@ const SideNav = () => {
       {
         label: 'Getting Started',
         icon: '/img/icons/menu/getting-started',
-        href: '/getting-started',
+        href: '/guides/getting-started',
         level: 'gettingstarted',
-      },
-      {
-        label: 'Tutorials',
-        icon: '/img/icons/menu/tutorials',
-        href: '/guides/tutorials',
-        level: 'tutorials',
       },
     ],
     [
@@ -246,13 +237,6 @@ const SideNav = () => {
         href: '/reference/javascript/introduction',
         level: 'reference_javascript',
       },
-      // {
-      //   label: 'Python Client Library',
-      //   icon: '/img/icons/python-icon',
-      //   hasLightIcon: false,
-      //   href: '/reference/javascript/start',
-      //   level: 'reference_javascript',
-      // },
       {
         label: 'Flutter',
         icon: '/img/icons/menu/reference-dart',
@@ -304,20 +288,13 @@ const SideNav = () => {
     ],
   ]
 
-  // generate Open API specs
-
-  // @ts-ignore
-  // const apiSpec = gen_v3(apiSpecRaw, 'wat', { apiUrl: 'apiv0' })
-
   return (
     <div className="flex relative">
       {/* // main menu */}
       <div
         className={[
-          '',
           'transition-all duration-150 ease-out',
           level === 'home' ? 'opacity-100 ml-0 delay-150' : 'opacity-0 -ml-8 invisible absolute',
-          // level !== 'home' && 'opacity-0 invisible'
         ].join(' ')}
       >
         <ul className="relative w-full flex flex-col gap-4">
@@ -381,14 +358,13 @@ const SideNav = () => {
       </div>
 
       <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} />
-      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} />
       <NavigationMenuGuideList id={'database'} currentLevel={level} />
       <NavigationMenuGuideList id={'auth'} currentLevel={level} />
       <NavigationMenuGuideList id={'functions'} currentLevel={level} />
       <NavigationMenuGuideList id={'realtime'} currentLevel={level} />
       <NavigationMenuGuideList id={'storage'} currentLevel={level} />
       <NavigationMenuGuideList id={'platform'} currentLevel={level} />
-      <NavigationMenuGuideList id={'resources'} currentLevel={level} />
+      <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
       <NavigationMenuGuideList id={'integrations'} currentLevel={level} />
       <NavigationMenuGuideList id={'reference'} currentLevel={level} />
       {/* // Client Libs */}
