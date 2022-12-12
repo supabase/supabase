@@ -194,7 +194,7 @@ function StoragePage() {
                     title="Transformations"
                     text="Resize and compress your media before you serve it."
                   />
-                  <Badge>Coming soon</Badge>
+                  <Badge>New</Badge>
                 </div>
               </div>,
             ]}
