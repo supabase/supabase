@@ -2,18 +2,16 @@ import { DefaultSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
-import { ThemeProvider } from 'common/Providers'
-import SiteLayout from '~/layouts/SiteLayout'
+import { post } from '~/lib/fetchWrappers'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
-import { post } from '~/lib/fetchWrappers'
 // import { menuState } from '~/hooks/useMenuState'
+import SiteRefLayout from '~/layouts/SiteRefLayout'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -85,13 +83,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           cardType: 'summary_large_image',
         }}
       />
-      <ThemeProvider>
-        <SearchProvider>
-          <SiteLayout>
-            <Component {...pageProps} />
-          </SiteLayout>
-        </SearchProvider>
-      </ThemeProvider>
+      {/* <ThemeProvider> */}
+      {/* <SearchProvider> */}
+      <SiteRefLayout>
+        <Component {...pageProps} />
+      </SiteRefLayout>
+      {/* </SearchProvider> */}
+      {/* </ThemeProvider> */}
     </>
   )
 }
