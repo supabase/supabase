@@ -1,4 +1,4 @@
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import { IconSun, IconMoon } from '@supabase/ui'
 
 function DarkModeToggle() {
@@ -19,7 +19,7 @@ function DarkModeToggle() {
         type="button"
         aria-pressed="false"
         className={`
-                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent 
+                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
                 transition-colors duration-200 ease-in-out focus:outline-none ${
                   isDarkMode ? 'bg-scale-500' : 'bg-scale-900'
                 } mx-5

@@ -1,0 +1,18 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import oldContent from '~/pages/guides/database.mdx'
+
+export const meta = {
+  id: 'database',
+  title: 'Database',
+  description: 'Use Supabase to manage your data.',
+  sidebar_label: 'Overview',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return oldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page
