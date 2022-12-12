@@ -1,11 +1,10 @@
-import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { partition, isNull } from 'lodash'
 import { Input, IconSearch, IconAlertCircle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, useFlag, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useParams } from 'hooks'
 import ExtensionCard from './ExtensionCard'
 import { HIDDEN_EXTENSIONS } from './Extensions.constants'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -15,22 +14,15 @@ interface Props {}
 
 const Extensions: FC<Props> = ({}) => {
   const { meta } = useStore()
-  const router = useRouter()
-  const { filter } = router.query
-
+  const { filter } = useParams()
   const [filterString, setFilterString] = useState<string>('')
-
-  const enableVaultExtension = useFlag('vaultExtension')
-  const hiddenExtensions = enableVaultExtension
-    ? HIDDEN_EXTENSIONS
-    : HIDDEN_EXTENSIONS.concat(['vault'])
 
   const extensions =
     filterString.length === 0
       ? meta.extensions.list()
       : meta.extensions.list((ext: any) => ext.name.includes(filterString))
   const extensionsWithoutHidden = extensions.filter(
-    (ext: any) => !hiddenExtensions.includes(ext.name)
+    (ext: any) => !HIDDEN_EXTENSIONS.includes(ext.name)
   )
   const [enabledExtensions, disabledExtensions] = partition(
     extensionsWithoutHidden,

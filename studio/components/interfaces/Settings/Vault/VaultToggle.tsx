@@ -2,18 +2,22 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconExternalLink } from 'ui'
+import { Button, IconAlertCircle, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {}
 
 const VaultToggle: FC<Props> = () => {
   const { meta, ui } = useStore()
+  const { ref } = useParams()
   const [isEnabling, setIsEnabling] = useState(false)
   const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+
   const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isNotAvailable = vaultExtension === undefined
 
   const onEnableVault = async () => {
     if (vaultExtension === undefined) return
@@ -57,7 +61,7 @@ const VaultToggle: FC<Props> = () => {
       <div
         className="px-12 py-12 w-full bg-white dark:bg-scale-200 border border-scale-500 rounded bg-no-repeat"
         style={{
-          backgroundSize: '40%',
+          backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
           backgroundImage: ui.isDarkTheme
             ? 'url("/img/vault-dark.png")'
@@ -72,42 +76,74 @@ const VaultToggle: FC<Props> = () => {
               database without leaking any sensitive information.
             </p>
           </div>
-          <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs">
-              <a target="_blank">
-                <Button type="default" icon={<IconExternalLink />}>
-                  About Vault
-                </Button>
-              </a>
-            </Link>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button
-                  type="primary"
-                  loading={isEnabling}
-                  disabled={isEnabling || !canToggleVault}
-                  onClick={() => onEnableVault()}
-                >
-                  Enable Vault
-                </Button>
-              </Tooltip.Trigger>
-              {!canToggleVault && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      You need additional permissions to enable Vault for this project
-                    </span>
+          {isNotAvailable ? (
+            <InformationBox
+              hideCollapse
+              defaultVisibility
+              icon={<IconAlertCircle strokeWidth={1.5} size={18} />}
+              title="Vault is not available for your project"
+              description={
+                <>
+                  <p className="mb-4">
+                    Do reach out to us if you're interested in having Vault for this project!
+                  </p>
+                  <div className="flex items-center space-x-2 my-1 ml-[1px]">
+                    <Link href="https://supabase.com/docs">
+                      <a target="_blank">
+                        <Button type="default" icon={<IconExternalLink />}>
+                          About Vault
+                        </Button>
+                      </a>
+                    </Link>
+                    <Link
+                      href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
+                    >
+                      <a target="_blank">
+                        <Button type="primary">Contact us</Button>
+                      </a>
+                    </Link>
                   </div>
-                </Tooltip.Content>
-              )}
-            </Tooltip.Root>
-          </div>
+                </>
+              }
+            />
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Link href="https://supabase.com/docs">
+                <a target="_blank">
+                  <Button type="default" icon={<IconExternalLink />}>
+                    About Vault
+                  </Button>
+                </a>
+              </Link>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="primary"
+                    loading={isEnabling}
+                    disabled={isNotAvailable || isEnabling || !canToggleVault}
+                    onClick={() => onEnableVault()}
+                  >
+                    Enable Vault
+                  </Button>
+                </Tooltip.Trigger>
+                {!canToggleVault && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to enable Vault for this project
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
+            </div>
+          )}
         </div>
       </div>
     </div>
