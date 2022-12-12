@@ -16,9 +16,8 @@ import {
   IconLoader,
   IconX,
 } from 'ui'
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import Divider from 'components/ui/Divider'
-import { useRouter } from 'next/router'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
@@ -26,8 +25,7 @@ interface Props {}
 
 const EncryptionKeysManagement: FC<Props> = ({}) => {
   const { vault, ui } = useStore()
-  const router = useRouter()
-  const { id } = router.query
+  const { id } = useParams()
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'name' | 'created'>('created')
@@ -36,7 +34,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   const [isDeletingKey, setIsDeletingKey] = useState(false)
 
   useEffect(() => {
-    if (id !== undefined) setSearchValue(id as string)
+    if (id !== undefined) setSearchValue(id)
   }, [id])
 
   const keys = (
