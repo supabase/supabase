@@ -5,5 +5,24 @@
     "slug": "introduction",
     "summary": "Introduction",
     "type": "markdown"
+  },
+  {
+    "title": "Configuration",
+    "items": [
+      {
+        "id": "port",
+        "title": "Port",
+        "slug": "port",
+        "summary": "The port to connect your client/listeners.",
+        "type": "operation"
+      },
+      {
+        "id": "replication-mode",
+        "title": "Replication Mode",
+        "slug": "replication_mode",
+        "summary": "Connect to the database either through IPv4 or IPv6. Disregarded if database host is an IP address (e.g., `127.0.0.1`) and recommended if database host is a name (e.g., `db.abcd.supabase.co`) to prevent potential non-existent domain (NXDOMAIN) errors.",
+        "type": "operation"
+      }
+    ]
   }
 ]
