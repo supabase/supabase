@@ -42,9 +42,9 @@ This release adds a few new features:
 
 ### New design
 
-- **New design**.. talk about UI, branding, etc?
+We’ve started implementing a set of new UI components to help facilitate our growing documentation content. While working on these, we’ve started to also refine how we want to present this information with more care on the smaller things we'd overlooked before, such as panels, buttons and icons.
 
-We’ve started implementing a set of new UI components to help facilitate our growing documentation content. While working on these, we’ve started to also refine how we want to present this information with more focus on things like navigation buttons that were more of an afterthought beforehand.
+![New reference docs](/images/blog/launch-week-6/day-1-new-docs/redesign.png)
 
 ### Better navigation
 
@@ -57,9 +57,11 @@ Inspiration: [Airwallex](https://www.airwallex.com/docs)
 
 ### Better reference docs
 
+![New reference docs](/images/blog/launch-week-6/day-1-new-docs/reference-screenshot.png)
+
 Previously when browsing through our reference docs, each function lived on a separate page. This release changes that behaviour - the new layout has all of a library’s functions on one page. This promotes discoverability within a single tool. Developers have the ability to use the search bar _or_ they can just `cmd+f` in their browser.
 
-We’ve also reengineered how our reference docs are generated from typedoc, so it’s easier for contributors and our own team members to edit and add to Supabase documentation.
+We’ve also re-engineered how our reference docs are generated from typedoc, so it’s easier for contributors and our own team members to edit and add to Supabase documentation.
 
 Inspiration: [Stripe](https://stripe.com/docs/cli).
 
@@ -70,28 +72,21 @@ This is just the start. With this foundation, we hope to re-imagine what a docum
 ### Fully integrated experience
 
 - **Unified Authentication:** If you’re logged into the Dashboard, then you’re logged into Supabase docs. That means personalization and project-specific documentation. No more placeholders like “`SUPABASE_URL`". We will add URLs and Keys for the project you’ve selected, making it easier to copy and run code snippets.
-- **Auto docs:** into the docs so its all in one place. reference docs are then just reference docs.. but you can see it in context to the table/schema your interested in 🤯
+- **Auto docs:** We may also move AutoDocs (in the dashboard) into the main Docs website. Reference docs are then just, reference docs.. but you can see it in context to the table/schema your interested in 🤯.
 
 ### Runnable code blocks
 
-- With [Postgres WASM](https://supabase.com/blog/postgres-wasm), can create runnable-examples against a full Postgres database (in the browser).
-- Similarly, you will be able to connect examples and snippets to a live database in your Dashboard.
-- Paste the JS into a console, see the results come back. woo. Also be good to toggle to see the actual data 👀 anyway….
-- Obviously we need to add a CLI terminal in there.. and you can easily copy and paste commands into the terminal
+With [Postgres WASM](https://supabase.com/blog/postgres-wasm), you could run code examples against a full Postgres database (in the browser).
 
 ### Tutorials
 
 In the background, we’ve been working with the creator of [CodeHike](https://codehike.org/), [sponsoring](https://github.com/sponsors/pomber#sponsors) him to re-imagine what a fully interactive tutorial for Supabase could look like.
 
-- [ ] Can we drop a video?
-
 ### Improved search
 
-We’re happy users of Algolia search and their extremely generous [Open Source](https://www.algolia.com/for-open-source/) plan. That said, we’re a Postgres company, and it would only be right for us to dog-food (and help to improve) all the features that Postgres have to offer. We hope to go deep in Postgres FTS (small hint: check back on [Friday](https://supabase.com/launch-week) for a search-related announcement).
-
-### Speed optimization
-
-- Our reference pages are not yet optimized for long pages of content. We may need to use libraries like `react-window` to deal with the excessive content in a long page.
+We’re happy users of Algolia search and their extremely generous [Open Source](https://www.algolia.com/for-open-source/) plan.
+That said, we’re a Postgres company, and it would only be right for us to dog-food (and help to improve) all the features that Postgres have to offer.
+We hope to go deep in Postgres FTS (small hint: check back on [Friday](https://supabase.com/launch-week) for a search-related announcement).
 
 ### More (and less!) content
 
