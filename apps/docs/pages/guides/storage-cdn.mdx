@@ -31,6 +31,31 @@ Note that CDNs might still evict your object from their cache if it has not been
 
 The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
 
+
+## Smart CDN Caching
+
+With Smart CDN caching enabled, we are synchronizing the asset metadata (not the content) that live in your database to the edge.
+By doing this we are able to automatically revalidate the cache when the content of an asset changes or gets deleted.
+
+On top of automatic revalidation, you will also benefit from a much greater Cache HIT ratio, since we are able to shield the origin server when
+requesting an asset that hasn't changed with a different query string url.
+
+### Cache duration
+
+When using Smart CDN, we will control the CDN cache duration on the server and caching it for as long as possible.
+However, you are still in control of the browser caching TTL which you can set by using the [cacheControl](/docs/reference/javascript/storage-from-upload) option while uploading the file.
+
+When a file is updated or deleted, we will automatically invalidate the CDN cache to reflect the change as well as to all derivatives (transformed images).
+Keep in mind that the invalidation can take <b>up to 60 seconds</b> to be propagated across all the data-centers across the globe.
+
+When we invalidate an asset at the CDN level, it can't, doesn't, affect browser caching.
+If you don't see the reflected changes make sure the browser cache has been updated.
+
+If your asset is updated frequently we recommend setting a low browser ttl value using the `cacheControl` option when using smart cdn caching.
+
+Smart CDN caching works with all types of operations including signed urls.
+
+
 ## Public vs Private Buckets
 
 Objects in public buckets do not require any Authorization to access objects. This leads to a better cache hit rate compared to private buckets. For private buckets, permissions for accessing each object is checked on a per user level. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both the users since they might have different security policies attached to them. On the other hand, if two different users access the same object in a public bucket from the same region, it results in a cache hit for the second user.
