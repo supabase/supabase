@@ -118,7 +118,7 @@ export default function launchweek() {
           <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
             Blog post
             <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
+              <img src="/images/launchweek/icons-blogpost.svg" className="w-4 h-4"></img>
             </div>
           </div>
         </a>
@@ -126,7 +126,7 @@ export default function launchweek() {
           <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
             Docs
             <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <IconExternalLink className="text-[#4cc38a] w-3 h-3" />
+              <img src="/images/launchweek/icons-docs.svg" className="w-4 h-4"></img>
             </div>
           </div>
         </a>
@@ -274,9 +274,9 @@ export default function launchweek() {
                     {day1.steps.length > 0 && (
                       <div className="h-[400px] flex flex-col lg:flex-row">
                         <div
-                          className={`flex flex-col flex-1 items-center lg:items-start justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_top_50px] lg:after:bg-[right_15%_top_60px] after:bg-[length:200px_100px] after:xl:bg-[length:528px_367px] after:bg-[url('/images/launchweek/docs-update-bg.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10`}
+                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:bg-[url('/images/launchweek/docs-update-bg.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10`}
                         >
-                          <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start">
+                          <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2">
                             <span>{day1.description}</span>
                             <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#1f3738] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#1f3738]">
                               Redesigned
