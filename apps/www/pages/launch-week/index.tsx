@@ -163,7 +163,7 @@ export default function launchweek() {
                 className="hidden w-40 dark:flex lg:w-80"
               />
             </div>
-            <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
+            <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
           </div>
           {process.env.NEXT_PUBLIC_LW_STARTED && (
             <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
