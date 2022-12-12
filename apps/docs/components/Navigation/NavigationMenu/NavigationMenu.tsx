@@ -363,7 +363,7 @@ const SideNav = () => {
                                   }${!link.icon.includes('png') ? '.svg' : ''}`}
                                   width={17}
                                   height={17}
-                                  className="opacity-75 w-4 h-4 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
+                                  className="w-4 h-4 group-hover:scale-110 ease-out transition-all"
                                 />
                                 {link.label}
                               </li>
