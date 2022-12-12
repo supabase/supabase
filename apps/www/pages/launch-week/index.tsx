@@ -94,7 +94,11 @@ export default function launchweek() {
       <div className="flex flex-1 flex-col sm:flex-row">
         <div className="flex gap-4 min-w-[320px] items-center">
           <Badge
-            className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#c8d8d9] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#1f3738] h-fit relative ${
+            className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] !border-[${
+              shipped ? '#b3cec1' : 'red'
+            }] dark:from-white dark:to-[#1a7a4ca1] dark:border-[${
+              shipped ? '#1f3738' : '#80a794'
+            }] h-fit relative ${
               shipped
                 ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#b6b6b6] dark:text-transparent dark:border-[#1f3738] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10'
                 : ''
