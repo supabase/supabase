@@ -426,7 +426,6 @@ export const functions = {
   label: 'Edge Functions',
   url: '/guides/functions',
   items: [
-    { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
     { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
