@@ -17,7 +17,7 @@ export interface IPostgresMetaInterface<T> {
   load: () => void
   create: (payload: any) => Promise<T | { error: ResponseError }>
   update: (id: number | string, updates: any) => Promise<T | { error: ResponseError }>
-  del: (id: number | string) => Promise<boolean | { error: ResponseError }>
+  del: (id: number | string, cascade?: boolean) => Promise<boolean | { error: ResponseError }>
   list: (filter?: any) => T[]
   find: (filter?: any) => T | undefined
   byId: (id: number | string) => T | undefined
@@ -187,10 +187,10 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     }
   }
 
-  async del(id: number | string) {
+  async del(id: number | string, cascade: boolean = false) {
     try {
       const headers = { 'Content-Type': 'application/json', ...this.headers }
-      const url = `${this.url}?id=${id}`
+      const url = `${this.url}?id=${id}&cascade=${cascade}`
       const response = await delete_<T>(url, {}, { headers })
       if (response.error) throw response.error
 
