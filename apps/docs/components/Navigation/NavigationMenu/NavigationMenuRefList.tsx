@@ -6,7 +6,7 @@ import * as NavItems from './NavigationMenu.constants'
 
 import { find } from 'lodash'
 import Image from 'next/image'
-import { memo } from 'react'
+import { useTheme } from 'common/Providers'
 
 // import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
 
@@ -82,6 +82,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   allowedClientKeys,
 }) => {
   const router = useRouter()
+  const { isDarkMode } = useTheme()
 
   let sections = commonSections
 
@@ -171,7 +172,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
             alt={id}
             width={24}
             height={24}
-            src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            src={`${router.basePath}/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`}
             className="rounded"
           />
           <span className={['text-base text-brand-1200 ', !menu.title && 'capitalize'].join(' ')}>
