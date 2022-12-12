@@ -147,13 +147,8 @@
           "403": { "description": "" },
           "500": { "description": "Failed to create project's function" }
         },
-        "tags": ["projects"],
-        "security": [
-          { "apiKeyHeader": [], "apiKeyParam": [] },
-          { "bearer": [] },
-          { "apiKeyHeader": [], "apiKeyParam": [] },
-          { "bearer": [] }
-        ]
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "get": {
         "operationId": "getFunctions",
@@ -183,13 +178,8 @@
           "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's functions" }
         },
-        "tags": ["projects"],
-        "security": [
-          { "apiKeyHeader": [], "apiKeyParam": [] },
-          { "bearer": [] },
-          { "apiKeyHeader": [], "apiKeyParam": [] },
-          { "bearer": [] }
-        ]
+        "tags": ["functions"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}": {
@@ -225,7 +215,7 @@
           "403": { "description": "" },
           "500": { "description": "Failed to retrieve function with given slug" }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "patch": {
@@ -286,7 +276,7 @@
           "403": { "description": "" },
           "500": { "description": "Failed to update function with given slug" }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       },
       "delete": {
@@ -314,7 +304,7 @@
           "403": { "description": "" },
           "500": { "description": "Failed to delete function with given slug" }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
@@ -344,8 +334,167 @@
           "403": { "description": "" },
           "500": { "description": "Failed to retrieve function body with given slug" }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/secrets": {
+      "get": {
+        "operationId": "getSecrets",
+        "summary": "List all secrets",
+        "description": "Returns all secrets you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SecretResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's secrets" }
+        },
+        "tags": ["secrets"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "post": {
+        "operationId": "createSecrets",
+        "summary": "Bulk create secrets",
+        "description": "Creates multiple secrets and adds them to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/CreateSecretBody" }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to create project's secrets" }
+        },
+        "tags": ["secrets"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "deleteSecrets",
+        "summary": "Bulk delete secrets",
+        "description": "Deletes all secrets with the given names from the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "type": "array", "items": { "type": "string" } } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete secrets with given names" }
+        },
+        "tags": ["secrets"],
+        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/postgrest": {
+      "get": {
+        "operationId": "getPostgRESTConfig",
+        "summary": "Gets project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgrestConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's postgrest config" }
+        },
+        "tags": ["services"],
+        "security": [{ "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "updatePostgRESTConfig",
+        "summary": "Updates project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostgrestConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgrestConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's postgrest config" }
+        },
+        "tags": ["services"],
+        "security": [{ "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/custom-hostname": {
@@ -508,7 +657,11 @@
         "responses": {
           "200": {
             "description": "",
-            "content": { "application/json": { "schema": { "type": "object" } } }
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+              }
+            }
           },
           "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's pgsodium config" }
@@ -539,108 +692,17 @@
         "responses": {
           "200": {
             "description": "",
-            "content": { "application/json": { "schema": { "type": "object" } } }
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+              }
+            }
           },
           "403": { "description": "" },
           "500": { "description": "Failed to update project's pgsodium config" }
         },
         "tags": ["pgsodium (beta)"],
         "security": [{ "bearer": [] }]
-      }
-    },
-    "/v1/projects/{ref}/secrets": {
-      "get": {
-        "operationId": "getSecrets",
-        "summary": "List all secrets",
-        "description": "Returns all secrets you've previously added to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/SecretResponse" }
-                }
-              }
-            }
-          },
-          "403": { "description": "" },
-          "500": { "description": "Failed to retrieve project's secrets" }
-        },
-        "tags": ["projects"],
-        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
-      },
-      "post": {
-        "operationId": "createSecrets",
-        "summary": "Bulk create secrets",
-        "description": "Creates multiple secrets and adds them to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": { "$ref": "#/components/schemas/CreateSecretBody" }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "" },
-          "403": { "description": "" },
-          "500": { "description": "Failed to create project's secrets" }
-        },
-        "tags": ["projects"],
-        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
-      },
-      "delete": {
-        "operationId": "deleteSecrets",
-        "summary": "Bulk delete secrets",
-        "description": "Deletes all secrets with the given names from the specified project",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "type": "array", "items": { "type": "string" } } }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": { "application/json": { "schema": { "type": "object" } } }
-          },
-          "403": { "description": "" },
-          "500": { "description": "Failed to delete secrets with given names" }
-        },
-        "tags": ["projects"],
-        "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/types/typescript": {
@@ -803,6 +865,125 @@
         "tags": ["network restrictions (beta)"],
         "security": [{ "bearer": [] }]
       }
+    },
+    "/v1/projects/{ref}/vanity-subdomain": {
+      "get": {
+        "operationId": "getVanitySubdomainConfig",
+        "summary": "Gets current vanity subdomain config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VanitySubdomainConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to get project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "removeVanitySubdomainConfig",
+        "summary": "Deletes a project's vanity subdomain configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "403": { "description": "" },
+          "500": { "description": "Failed to delete project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/check-availability": {
+      "post": {
+        "operationId": "checkVanitySubdomainAvailability",
+        "summary": "Checks vanity subdomain availability",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/VanitySubdomainBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubdomainAvailabilityResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to check project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/activate": {
+      "post": {
+        "operationId": "activateVanitySubdomainPlease",
+        "summary": "Activates a vanity subdomain for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/VanitySubdomainBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ActivateVanitySubdomainResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to activate project vanity subdomain configuration" }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [{ "bearer": [] }]
+      }
     }
   },
   "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
@@ -919,6 +1100,36 @@
           "verify_jwt": { "type": "boolean" }
         }
       },
+      "SecretResponse": {
+        "type": "object",
+        "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
+        "required": ["name", "value"]
+      },
+      "CreateSecretBody": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": "string", "pattern": "/^(?!SUPABASE_).*/" }
+        },
+        "required": ["name", "value"]
+      },
+      "PostgrestConfigResponse": {
+        "type": "object",
+        "properties": {
+          "db_schema": { "type": "string" },
+          "max_rows": { "type": "number" },
+          "db_extra_search_path": { "type": "string" }
+        },
+        "required": ["db_schema", "max_rows", "db_extra_search_path"]
+      },
+      "UpdatePostgrestConfigBody": {
+        "type": "object",
+        "properties": {
+          "db_extra_search_path": { "type": "string" },
+          "db_schema": { "type": "string" },
+          "max_rows": { "type": "number", "maximum": 1000000 }
+        }
+      },
       "UpdateCustomHostnameResponse": {
         "type": "object",
         "properties": {
@@ -942,23 +1153,15 @@
         "properties": { "custom_hostname": { "type": "string" } },
         "required": ["custom_hostname"]
       },
-      "UpdatePgsodiumConfigBody": {
+      "PgsodiumConfigResponse": {
         "type": "object",
         "properties": { "root_key": { "type": "string" } },
         "required": ["root_key"]
       },
-      "SecretResponse": {
+      "UpdatePgsodiumConfigBody": {
         "type": "object",
-        "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
-        "required": ["name", "value"]
-      },
-      "CreateSecretBody": {
-        "type": "object",
-        "properties": {
-          "name": { "type": "string" },
-          "value": { "type": "string", "pattern": "/^(?!SUPABASE_).*/" }
-        },
-        "required": ["name", "value"]
+        "properties": { "root_key": { "type": "string" } },
+        "required": ["root_key"]
       },
       "TypescriptResponse": {
         "type": "object",
@@ -990,6 +1193,29 @@
           "status": { "enum": ["stored", "applied"], "type": "string" }
         },
         "required": ["entitlement", "config", "status"]
+      },
+      "VanitySubdomainConfigResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["not-used", "custom-domain-used", "active"] },
+          "custom_domain": { "type": "string" }
+        },
+        "required": ["status"]
+      },
+      "VanitySubdomainBody": {
+        "type": "object",
+        "properties": { "vanity_subdomain": { "type": "string" } },
+        "required": ["vanity_subdomain"]
+      },
+      "SubdomainAvailabilityResponse": {
+        "type": "object",
+        "properties": { "available": { "type": "boolean" } },
+        "required": ["available"]
+      },
+      "ActivateVanitySubdomainResponse": {
+        "type": "object",
+        "properties": { "custom_domain": { "type": "string" } },
+        "required": ["custom_domain"]
       }
     }
   }

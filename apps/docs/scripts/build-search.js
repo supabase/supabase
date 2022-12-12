@@ -25,10 +25,6 @@ const ignoredFiles = [
   'pages/_app.tsx',
   'pages/_document.tsx',
   'pages/[...slug].tsx',
-  'pages/company/aup.md',
-  'pages/company/privacy.md',
-  'pages/company/sla.md',
-  'pages/company/terms.md',
   'pages/handbook/contributing.mdx',
   'pages/handbook/introduction.mdx',
   'pages/handbook/supasquad.mdx',
@@ -70,6 +66,15 @@ async function walk(dir) {
 
   console.log('Preparing docs indexing for Algolia')
 
+  function extractMeta(mdx) {
+    const regex = /^export\sconst\smeta\s=\s(\{[\w\s':,]*\})/gm
+    const match = regex.exec(mdx)
+    if (match) {
+      return JSON.parse(match[1])
+    }
+    return null
+  }
+
   try {
     const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME
     const client = algoliasearch(
@@ -94,7 +99,7 @@ async function walk(dir) {
           if (metaIndex !== -1) {
             const metaString =
               fileContents
-                .slice(metaIndex + 20, fileContents.indexOf('}') + 1)
+                .slice(metaIndex + 20, fileContents.indexOf('}', metaIndex + 1) + 1)
                 .replace(/\n/g, '')
                 .slice(0, -2) + '}'
             const meta = eval(`(${metaString})`)
