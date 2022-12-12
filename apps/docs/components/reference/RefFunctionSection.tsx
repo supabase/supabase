@@ -124,97 +124,105 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
         <RefSubLayout.Examples>
           {item.examples && (
             <>
-              <Tabs
-                defaultActiveId={item.examples[0].id}
-                size="tiny"
-                type="rounded-pills"
-                scrollable
-              >
-                {item.examples &&
-                  item.examples.map((example, exampleIndex) => {
-                    const exampleString = `
-import { createClient } from '@supabase/supabase-js'
+              <div className="overflow-hidden w-full">
+                <Tabs
+                  defaultActiveId={item.examples[0].id}
+                  size="tiny"
+                  type="rounded-pills"
+                  scrollable
+                >
+                  {item.examples &&
+                    item.examples.map((example, exampleIndex) => {
+                      const exampleString = ''
+                      //                     `
+                      // import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-`
-                    const currentExampleId = example.id
-                    const staticExample = item.examples[exampleIndex]
+                      // // Create a single supabase client for interacting with your database
+                      // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+                      // `
+                      const currentExampleId = example.id
+                      const staticExample = item.examples[exampleIndex]
 
-                    const response = staticExample.response
-                    const sql = staticExample?.data?.sql
-                    const tables = staticExample?.data?.tables
+                      const response = staticExample.response
+                      const sql = staticExample?.data?.sql
+                      const tables = staticExample?.data?.tables
 
-                    return (
-                      <Tabs.Panel
-                        id={example.id}
-                        label={example.name}
-                        className="flex flex-col gap-3"
-                      >
-                        {((tables && tables.length > 0) || sql) && (
-                          <RefDetailCollapse
-                            id={`${example.id}-${exampleIndex}-data`}
-                            label="Example data source"
-                            defaultOpen={false}
-                          >
-                            <>
-                              {tables &&
-                                tables.length > 0 &&
-                                tables.map((table) => {
-                                  return (
-                                    <div className="bg-scale-300 border rounded prose max-w-none">
-                                      <div className="bg-scale-200 px-5 py-2">
-                                        <div className="flex gap-2 items-center">
-                                          <div className="text-brand-900">
-                                            <IconDatabase size={16} />
+                      return (
+                        <Tabs.Panel
+                          id={example.id}
+                          label={example.name}
+                          className="flex flex-col gap-3"
+                        >
+                          {((tables && tables.length > 0) || sql) && (
+                            <RefDetailCollapse
+                              id={`${example.id}-${exampleIndex}-data`}
+                              label="Example data source"
+                              defaultOpen={false}
+                            >
+                              <>
+                                {tables &&
+                                  tables.length > 0 &&
+                                  tables.map((table) => {
+                                    return (
+                                      <div className="bg-scale-300 border rounded prose max-w-none">
+                                        <div className="bg-scale-200 px-5 py-2">
+                                          <div className="flex gap-2 items-center">
+                                            <div className="text-brand-900">
+                                              <IconDatabase size={16} />
+                                            </div>
+                                            <h5 className="text-xs text-scale-1200">
+                                              {table.name}
+                                            </h5>
                                           </div>
-                                          <h5 className="text-xs text-scale-1200">{table.name}</h5>
                                         </div>
                                       </div>
-                                    </div>
-                                  )
-                                })}
-                              {sql && (
-                                <CodeBlock
-                                  className="useless-code-block-class my-0 border border-t-0 border-scale-500 !rounded-tl-none !rounded-tr-none"
-                                  language="sql"
-                                  hideLineNumbers={true}
-                                >
-                                  {sql}
-                                </CodeBlock>
-                              )}
-                            </>
-                          </RefDetailCollapse>
-                        )}
+                                    )
+                                  })}
+                                {sql && (
+                                  <CodeBlock
+                                    className="useless-code-block-class my-0 border border-t-0 border-scale-500 !rounded-tl-none !rounded-tr-none"
+                                    language="sql"
+                                    hideLineNumbers={true}
+                                  >
+                                    {sql.replace(/sql/g, '').replace(/```/g, '')}
+                                  </CodeBlock>
+                                )}
+                              </>
+                            </RefDetailCollapse>
+                          )}
 
-                        <CodeBlock
-                          className="useless-code-block-class"
-                          language="js"
-                          hideLineNumbers={true}
-                        >
-                          {exampleString +
-                            (example.code &&
-                              example.code.replace(/```/g, '').replace('js', '').replace('ts', ''))}
-                        </CodeBlock>
-                        {response && (
-                          <RefDetailCollapse
-                            id={`${example.id}-${exampleIndex}-response`}
-                            label="Example response"
-                            defaultOpen={false}
+                          <CodeBlock
+                            className="useless-code-block-class"
+                            language="js"
+                            hideLineNumbers={true}
                           >
-                            <CodeBlock
-                              className="useless-code-block-class"
-                              language="js"
-                              hideLineNumbers={true}
+                            {exampleString +
+                              (example.code &&
+                                example.code
+                                  .replace(/```/g, '')
+                                  .replace('js', '')
+                                  .replace('ts', ''))}
+                          </CodeBlock>
+                          {response && (
+                            <RefDetailCollapse
+                              id={`${example.id}-${exampleIndex}-response`}
+                              label="Example response"
+                              defaultOpen={false}
                             >
-                              {response.replace(/```/g, '').replace('json', '')}
-                            </CodeBlock>
-                          </RefDetailCollapse>
-                        )}
-                      </Tabs.Panel>
-                    )
-                  })}
-              </Tabs>
+                              <CodeBlock
+                                className="useless-code-block-class"
+                                language="js"
+                                hideLineNumbers={true}
+                              >
+                                {response.replace(/```/g, '').replace('json', '')}
+                              </CodeBlock>
+                            </RefDetailCollapse>
+                          )}
+                        </Tabs.Panel>
+                      )
+                    })}
+                </Tabs>
+              </div>
             </>
           )}
         </RefSubLayout.Examples>

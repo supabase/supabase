@@ -219,3 +219,9 @@ div.fixed.inset-0 {
 .capitalize-sentence:first-letter {
   text-transform: capitalize;
 }
+
+.input-clear {
+  input {
+    @apply pr-7;
+  }
+}

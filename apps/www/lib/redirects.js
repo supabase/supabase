@@ -558,11 +558,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/oss',
-    destination: '/docs/oss',
-  },
-  {
-    permanent: true,
     source: '/docs/reference/postgres/connection-strings',
     destination: '/docs/guides/database/connecting-to-postgres',
   },
@@ -1574,5 +1569,30 @@ module.exports = [
     permanent: true,
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
+  },
+  {
+    permanent: true,
+    source: '/docs/oss',
+    destination: '/oss',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/aup',
+    destination: '/aup',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/terms',
+    destination: '/terms',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/privacy',
+    destination: '/privacy',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/sla',
+    destination: '/sla',
   },
 ]

@@ -39,110 +39,100 @@ export const REFERENCES: References = {
 export const gettingstarted = {
   icon: 'getting-started',
   title: 'Getting Started',
-  label: 'Overview',
   items: [
+    { name: 'Features', url: '/guides/getting-started/features', items: [] },
+    { name: 'Architecture', url: '/guides/getting-started/architecture', items: [] },
+    // {
+    //   name: 'Quickstarts',
+    //   items: [
+    //     { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
+    //     { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+    //   ],
+    // },
     {
-      name: 'Framework Quickstarts',
+      name: 'Web app tutorials',
       items: [
-        { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
-        { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
+        {
+          name: 'Next.js',
+          url: '/guides/getting-started/tutorials/with-nextjs',
+          items: [],
+        },
+        {
+          name: 'React',
+          url: '/guides/getting-started/tutorials/with-react',
+          items: [],
+        },
+        {
+          name: 'Vue 3',
+          url: '/guides/getting-started/tutorials/with-vue-3',
+          items: [],
+        },
+        {
+          name: 'Nuxt 3',
+          url: '/guides/getting-started/tutorials/with-nuxt-3',
+          items: [],
+        },
+        {
+          name: 'Angular',
+          url: '/guides/getting-started/tutorials/with-angular',
+          items: [],
+        },
+        {
+          name: 'RedwoodJS',
+          url: '/guides/getting-started/tutorials/with-redwoodjs',
+          items: [],
+        },
+        {
+          name: 'SolidJS',
+          url: '/guides/getting-started/tutorials/with-solidjs',
+          items: [],
+        },
+        {
+          name: 'Svelte',
+          url: '/guides/getting-started/tutorials/with-svelte',
+          items: [],
+        },
+        {
+          name: 'SvelteKit',
+          url: '/guides/getting-started/tutorials/with-sveltekit',
+          items: [],
+        },
+      ],
+    },
+    {
+      name: 'Mobile tutorials',
+      items: [
+        {
+          name: 'Flutter',
+          url: '/guides/getting-started/tutorials/with-flutter',
+          items: [],
+        },
+        {
+          name: 'Expo',
+          url: '/guides/getting-started/tutorials/with-expo',
+          items: [],
+        },
+
+        {
+          name: 'Ionic React',
+          url: '/guides/getting-started/tutorials/with-ionic-react',
+          items: [],
+        },
+        {
+          name: 'Ionic Vue',
+          url: '/guides/getting-started/tutorials/with-ionic-vue',
+          items: [],
+        },
+        {
+          name: 'Ionic Angular',
+          url: '/guides/getting-started/tutorials/with-ionic-angular',
+          items: [],
+        },
       ],
     },
   ],
 }
 
-export const tutorials = {
-  icon: 'tutorials',
-  label: 'Quickstarts',
-  items: [
-    {
-      name: 'Web apps',
-      items: [
-        {
-          name: 'Next.js',
-          url: '/guides/tutorials/with-nextjs',
-          items: [],
-        },
-        {
-          name: 'React',
-          url: '/guides/tutorials/with-react',
-          items: [],
-          icon: '/img/icons/react-icon.svg',
-        },
-        {
-          name: 'Vue 3',
-          url: '/guides/tutorials/with-vue-3',
-          items: [],
-        },
-        {
-          name: 'Nuxt 3',
-          url: '/guides/tutorials/with-nuxt-3',
-          items: [],
-        },
-        {
-          name: 'Angular',
-          url: '/guides/tutorials/with-angular',
-          items: [],
-        },
-        {
-          name: 'RedwoodJS',
-          url: '/guides/tutorials/with-redwoodjs',
-          items: [],
-        },
-        {
-          name: 'SolidJS',
-          url: '/guides/tutorials/with-solidjs',
-          items: [],
-        },
-        {
-          name: 'Svelte',
-          url: '/guides/tutorials/with-svelte',
-          items: [],
-        },
-        {
-          name: 'SvelteKit',
-          url: '/guides/tutorials/with-sveltekit',
-          items: [],
-        },
-      ],
-    },
-    {
-      name: 'Mobile',
-      items: [
-        {
-          name: 'Flutter',
-          url: '/guides/tutorials/with-flutter',
-          items: [],
-        },
-        {
-          name: 'Expo',
-          url: '/guides/tutorials/with-expo',
-          items: [],
-        },
-      ],
-    },
-    {
-      name: 'Low code',
-      items: [
-        {
-          name: 'Ionic React',
-          url: '/guides/tutorials/with-ionic-react',
-          items: [],
-        },
-        {
-          name: 'Ionic Vue',
-          url: '/guides/tutorials/with-ionic-vue',
-          items: [],
-        },
-        {
-          name: 'Ionic Angular',
-          url: '/guides/tutorials/with-ionic-angular',
-          items: [],
-        },
-      ],
-    },
-  ],
-}
 export const cli = {
   label: 'CLI',
   items: [
@@ -432,10 +422,7 @@ export const functions = {
     {
       name: 'Examples',
       url: '/guides/functions/examples',
-      items: [
-        { name: 'Overview', url: '/guides/functions/examples', items: [] },
-        { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
-      ],
+      items: [{ name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] }],
     },
   ],
 }
@@ -514,7 +501,6 @@ export const resources = {
   url: '/guides/resources',
   items: [
     { name: 'Examples', url: '/guides/resources/examples', items: [] },
-    { name: 'Features', url: '/features', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -567,6 +553,29 @@ export const resources = {
       items: [
         { name: 'Overview', url: '/guides/resources/self-hosting', items: [] },
         { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
+      ],
+    },
+    {
+      name: 'Self-Hosting Reference',
+      items: [
+        {
+          name: 'Auth Server',
+          url: '/reference/self-hosting-auth/introduction',
+          icon: '/docs/img/icons/menu/reference-auth',
+          items: [],
+        },
+        {
+          name: 'Storage Server',
+          url: '/reference/self-hosting-storage/introduction',
+          icon: '/docs/img/icons/menu/reference-storage',
+          items: [],
+        },
+        {
+          name: 'Realtime Server',
+          url: '/reference/self-hosting-realtime/introduction',
+          icon: '/docs/img/icons/menu/reference-realtime',
+          items: [],
+        },
       ],
     },
   ],
@@ -740,22 +749,22 @@ export const reference_api = {
 
 export const reference_self_hosting_auth = {
   icon: 'reference-auth',
-  title: 'Self Hosting Auth',
+  title: 'Self-Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
   icon: 'reference-storage',
-  title: 'Self Hosting Storage',
-  url: '/guides/reference/self-hosting/auth',
+  title: 'Self-Hosting Storage',
+  url: '/guides/reference/self-hosting/storage',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
   icon: 'reference-auth',
-  title: 'Self Hosting Realtime',
-  url: '/guides/reference/self-hosting/auth',
+  title: 'Self-Hosting Realtime',
+  url: '/guides/reference/self-hosting/realtime',
   parent: '/reference',
 }
 

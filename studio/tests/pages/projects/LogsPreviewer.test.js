@@ -391,9 +391,10 @@ test('filters alter generated query', async () => {
 
   await waitFor(() => {
     // counts are adjusted
-    expect(get).not.toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/))
+    expect(get).not.toHaveBeenCalledWith(
+      expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/)
+    )
     expect(get).toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+400.+499/))
-
 
     expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
     expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))

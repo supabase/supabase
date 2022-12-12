@@ -288,7 +288,7 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
   - `getPublicURL` only returns the public URL inside the data object. This keeps it consistent with our other methods of returning only within the data object. No error is returned since this method cannot does not throw an error ([PR](https://github.com/supabase/storage-js/pull/93))
   - signed urls are returned as `signedUrl` instead of `signedURL` in both `createSignedUrl` and `createSignedUrls` ([PR](https://github.com/supabase/storage-js/pull/94))
   - Encodes URLs returned by `createSignedUrl`, `createSignedUrls` and `getPublicUrl` ([PR](https://github.com/supabase/storage-js/pull/86))
-  - `createsignedUrl` used to return a url directly and and within the data object. This was inconsistent. Now we always return values only inside the data object across all methods. ([PR](https://www.notion.so/LW5-supabase-js-v2-7b0bfcdf571d4f20b9b7a9308883f24b))
+  - `createsignedUrl` used to return a url directly and and within the data object. This was inconsistent. Now we always return values only inside the data object across all methods. ([PR](https://github.com/supabase/storage-js/pull/88))
   - `createBucket` returns a data object instead of the name of the bucket directly. ([PR](https://github.com/supabase/storage-js/pull/89))
   - Fixed types for metadata ([PR](https://github.com/supabase/storage-js/pull/90))
   - Better error types make it easier to track down what went wrong quicker.

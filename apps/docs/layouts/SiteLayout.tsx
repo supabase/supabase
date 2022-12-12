@@ -5,6 +5,7 @@ import Footer from '~/components/Footer'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import SiteRefLayout from './SiteRefLayout'
+import Image from 'next/image'
 
 const Layout = (props) => {
   const router = useRouter()
@@ -32,7 +33,10 @@ const Layout = (props) => {
   return (
     <>
       <main>
-        <img
+        <Image
+          width={608}
+          height={975}
+          alt="background"
           src={`${router.basePath}/img/gradient-bg.png`}
           className="absolute left-0 w-[520px] top-0 -z-10"
         />

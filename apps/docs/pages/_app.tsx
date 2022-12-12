@@ -13,6 +13,7 @@ import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 import { post } from '~/lib/fetchWrappers'
+import { menuState } from '~/hooks/useMenuState'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -40,9 +41,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         if (!url.includes('reference/')) {
           // scroll container div to top
           const container = document.getElementById('docs-content-container')
-          container.scrollTop = 0
+          // check container exists (only avail on new docs)
+          if (container) container.scrollTop = 0
         }
       }
+      menuState.setMenuMobileOpen(false)
     }
 
     function handlePagrScroll() {}

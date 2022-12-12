@@ -140,14 +140,13 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
     <div
       className={[
         'transition-all ml-8 duration-150 ease-out',
-
         // enabled
-        currentLevel === id && 'opacity-100 ml-0 delay-150',
+        currentLevel === id && 'opacity-100 ml-0 delay-150 h-auto',
+        // move menu back to margin-left
         currentLevel === 'home' && 'ml-12',
-
         // disabled
         currentLevel !== 'home' && currentLevel !== id ? '-ml-8' : '',
-        currentLevel !== id ? 'opacity-0 invisible absolute' : '',
+        currentLevel !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>

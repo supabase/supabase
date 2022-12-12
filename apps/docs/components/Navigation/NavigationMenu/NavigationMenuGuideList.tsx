@@ -1,14 +1,18 @@
+import * as Accordion from '@radix-ui/react-accordion'
+import { useTheme } from 'common/Providers'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import rehypeFilter from 'react-markdown/lib/rehype-filter'
+import React from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
-import * as Accordion from '@radix-ui/react-accordion'
-import { useEffect } from 'react'
-import Image from 'next/image'
-import { useTheme } from 'common/Providers'
 
-const NavigationMenuGuideList = ({ currentLevel, id }) => {
+interface Props {
+  currentLevel: string
+  id: string
+  setMenuLevelId?: any
+}
+const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLevelId }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
@@ -30,12 +34,12 @@ const NavigationMenuGuideList = ({ currentLevel, id }) => {
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        currentLevel === id && 'opacity-100 ml-0 delay-150 h-auto',
-        // move menu back to margin-left
+        currentLevel === id && 'opacity-100 ml-0 delay-150',
         currentLevel === 'home' && 'ml-12',
+
         // disabled
         currentLevel !== 'home' && currentLevel !== id ? '-ml-8' : '',
-        currentLevel !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
+        currentLevel !== id ? 'opacity-0 invisible absolute' : '',
       ].join(' ')}
     >
       <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
@@ -57,13 +61,7 @@ const NavigationMenuGuideList = ({ currentLevel, id }) => {
 
         <Link href={menu.url ?? ''} passHref>
           <a>
-            <div
-              className="flex items-center gap-3 my-3
-
-        invisible md:visible"
-            >
-              {/* <div className="w-10 h-10 bg-brand-500 rounded flex items-center justify-center"> */}
-
+            <div className="flex items-center gap-3 my-3">
               <Image
                 alt={menu.icon}
                 width={15}
@@ -106,6 +104,27 @@ const NavigationMenuGuideList = ({ currentLevel, id }) => {
                       subItemMenuOpen = true
                     }
 
+                    const LinkContainer = (props) => {
+                      if (props.url) {
+                        return (
+                          <Link href={props.url} passHref>
+                            <a className={props.className}>{props.children}</a>
+                          </Link>
+                        )
+                      } else {
+                        return (
+                          <button
+                            className={props.className}
+                            onClick={() => {
+                              if (props.parent && setMenuLevelId) setMenuLevelId(props.parent)
+                            }}
+                          >
+                            {props.children}
+                          </button>
+                        )
+                      }
+                    }
+
                     return (
                       <>
                         {subItemIndex === 0 && (
@@ -118,18 +137,36 @@ const NavigationMenuGuideList = ({ currentLevel, id }) => {
                         )}
                         <Accordion.Item key={subItem.label} value={subItem.url}>
                           <li key={subItem.name}>
-                            <Link href={`${subItem.url}`} passHref>
+                            <LinkContainer
+                              url={subItem.url}
+                              className={[
+                                'flex items-center gap-2',
+                                'cursor-pointer transition text-sm',
+                                subItem.url === router.pathname
+                                  ? 'text-brand-900'
+                                  : 'hover:text-brand-900 text-scale-1000',
+                              ].join(' ')}
+                              parent={subItem.parent}
+                            >
+                              {subItem.icon && <img src={`${subItem.icon}.svg`} className="w-3" />}
+                              {subItem.name}
+                            </LinkContainer>
+                            {/* <Link href={`${subItem.url}`} passHref>
                               <a
                                 className={[
+                                  'flex items-center gap-2',
                                   'cursor-pointer transition text-sm',
                                   subItem.url === router.pathname
                                     ? 'text-brand-900'
                                     : 'hover:text-brand-900 text-scale-1000',
                                 ].join(' ')}
                               >
+                                {subItem.icon && (
+                                  <img src={`${subItem.icon}.svg`} className="w-3" />
+                                )}
                                 {subItem.name}
                               </a>
-                            </Link>
+                            </Link> */}
                           </li>
 
                           {subItem.items && subItem.items.length > 0 && (
