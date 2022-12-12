@@ -1,7 +1,17 @@
 import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import { DATETIME_FORMAT } from '../Reports.constants'
 import { ReportWidgetProps } from '../ReportWidget'
-
+import Statistic from '../Statistic'
+export const renderFailedMigrations = (
+  props: ReportWidgetProps<{
+    timestamp: string
+    count: number
+  }>
+) => {
+  console.log(props.data)
+  const count = props.data.length === 0 ? 0: props?.data?.[0]?.count
+  return <Statistic value={count} />
+}
 export const renderCumulativeUsers = (
   props: ReportWidgetProps<{
     count: number
@@ -15,6 +25,7 @@ export const renderCumulativeUsers = (
         data={props.data}
         attribute="count"
         label=""
+        minimalHeader
         highlightedValue={total}
         customDateFormat={DATETIME_FORMAT}
         noDataMessage={'No confirmed users yet'}
@@ -36,6 +47,7 @@ export const renderNewUsers = (
         data={props.data}
         attribute="count"
         label=""
+        minimalHeader
         highlightedValue={sum}
         customDateFormat={DATETIME_FORMAT}
         noDataMessage={'No new user signups during this time period'}
