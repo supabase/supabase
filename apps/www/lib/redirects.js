@@ -599,7 +599,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/supabase-client',
-    destination: '/docs',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1331,7 +1331,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/client-libraries',
-    destination: '/docs',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1598,6 +1598,6 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference',
-    destination: '/docs',
+    destination: '/docs#reference-documentation',
   },
 ]
