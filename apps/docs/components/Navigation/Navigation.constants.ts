@@ -246,7 +246,7 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Overview', url: '/guides/storage', items: [] },
         { name: 'CDN', url: '/guides/storage-cdn', items: [] },
-        { name: 'Image Resizing', url: '/guides/storage-image-resizing', items: [] },
+        { name: 'Image Resizing', url: '/guides/storage/image-resizing', items: [] },
       ],
     },
     {
