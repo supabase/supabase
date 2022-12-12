@@ -2,44 +2,54 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Install Supabase with Create React App',
-  subtitle: 'Setting up supabase-js client library in a Create React App project.',
+  title: 'Use Supabase with React',
+  subtitle: 'Set up the supabase-js client library in a React app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
-The fastest way to get started with supabase and create-react-app is to use the supabase-js client library, which provides a convenient interface for working with supabase from a React app. To use supabase-js with create-react-app, you can follow these steps:
+Learn how to create a Supabase project, add some sample data to your database, and query the data from a React app.
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a Supabase project with sample data">
 
-    <StepHikeCompact.Details title="Install Create Next App">
+    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
 
-    To create a new Create React App project, you will first need to ensure that you have the Create React App CLI installed on your machine. You can do this by running the following command:
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
-      npm install -g create-react-app
-      ```
+     ```sql SQL_EDITOR
+      -- Create the table
+      CREATE TABLE countries (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL
+      );
+      -- Insert some sample data into the table
+      INSERT INTO countries (name) VALUES ('United States');
+      INSERT INTO countries (name) VALUES ('Canada');
+      INSERT INTO countries (name) VALUES ('Mexico');
+      ````
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Create create-react-app app">
 
-    Once you have the CLI installed, you can create a new React project by running the following command, replacing my-app with the name you want to give your project:
+    <StepHikeCompact.Details title="Create a React app">
+
+    Create a React app using the `create-react-app` command.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      create-react-app my-app
+      npx create-react-app my-app
       ```
 
     </StepHikeCompact.Code>
@@ -47,34 +57,18 @@ The fastest way to get started with supabase and create-react-app is to use the 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Start your app">
+    <StepHikeCompact.Details title="Install the Supabase client library">
 
-    This will create a new directory with the name you specified, and scaffold a new React project inside it. You can then navigate to the new project directory and start the dev server by running the following commands:
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash Terminal
-      cd my-app
-      npm start
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Install Supabase client library">
-
-    To install the `@supabase/supabase-js` package, you will need to run the following command:
+    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a React app.
+    
+    Navigate to the React app and install `supabase-js`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      npm install @supabase/supabase-js
+      cd my-app && npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
@@ -82,32 +76,44 @@ The fastest way to get started with supabase and create-react-app is to use the 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Create some sample data">
+    <StepHikeCompact.Details title="Query data from the app">
 
-    To create a table of countries with their timezones, you will first need to create a table in your Supabase database using SQL. You can use the following SQL statement to create a table called countries:
-
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Create client in app">
-
-    You can select from the countries table in your Supabase server by doing the following:
+    In `index.js`, create a Supabase client using your [Project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
+    
+    Add a `getCountries` function to fetch the data and log the query result to the browser console.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
       ```js src/index.js
-        import { createClient } from '@supabase-js'
+        import { createClient } from '@supabase/supabase-js'
 
-        const supabase = createClient('https://<username>.<project>.supabase.co', '<your-anon-key>')
+        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
         async function getCountries() {
           const countries = await supabase.from('countries').select('*')
           console.log(countries)
         }
+
+        getCountries()
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Start the app, go to http://localhost:3000 in a browser, and open the browser console and you should see the list of countries.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm start
       ```
 
     </StepHikeCompact.Code>
