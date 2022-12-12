@@ -50,6 +50,9 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     domains: ['avatars.githubusercontent.com', 'github.com', 'user-images.githubusercontent.com'],
   },
+  experimental: {
+    mdxRs: true,
+  },
   async headers() {
     return [
       {
