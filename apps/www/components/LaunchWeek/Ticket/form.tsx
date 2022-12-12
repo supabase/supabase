@@ -229,7 +229,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
               )}
             </button>
             {/* Cloudflare Turnstile */}
-            <div className="cf-turnstile" data-sitekey="0x4AAAAAAABi5LXXIuEfWl3T"></div>
+            <div className="cf-turnstile" data-sitekey="0x4AAAAAAABjWXsUsK9BtHBu"></div>
           </form>
         )}
       </div>
