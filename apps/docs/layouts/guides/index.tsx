@@ -65,9 +65,7 @@ const Layout: FC<Props> = (props) => {
   }, [])
 
   useEffect(() => {
-    setTimeout(function () {
-      setActive(true)
-    }, 150)
+    setActive(true)
   }, [])
 
   const hasTableOfContents = tocList.length > 0
