@@ -6,7 +6,10 @@ import { Presets } from 'components/interfaces/Reports/Reports.types'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { hooksFactory, usePresetReport } from 'components/interfaces/Reports/Reports.utils'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { renderBotScores, renderUserAgents } from 'components/interfaces/Reports/renderers/ApiBotsRenderers'
+import {
+  renderBotScores,
+  renderUserAgents,
+} from 'components/interfaces/Reports/renderers/ApiBotsRenderers'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 
 export const ApiBotsReport: NextPageWithLayout = () => {
@@ -16,12 +19,10 @@ export const ApiBotsReport: NextPageWithLayout = () => {
   const hooks = hooksFactory(ref as string, config)
   const userAgents = hooks.userAgents()
   const botScores = hooks.botScores()
-  const { isLoading, Layout } = usePresetReport(
-    [userAgents, botScores],
-  )
+  const { isLoading, Layout } = usePresetReport([userAgents, botScores])
   return (
     <Layout title={config.title}>
-      <div className="grid  lg:grid-cols-4">
+      <div className="grid lg:grid-cols-4 gap-4">
         <ReportWidget
           isLoading={isLoading}
           params={userAgents[0].params}

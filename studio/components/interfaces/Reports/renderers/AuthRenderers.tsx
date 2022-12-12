@@ -14,7 +14,7 @@ export const renderCumulativeUsers = (
       <BarChart
         data={props.data}
         attribute="count"
-        label="Total users"
+        label=""
         highlightedValue={total}
         customDateFormat={DATETIME_FORMAT}
         noDataMessage={'No confirmed users yet'}
@@ -35,7 +35,7 @@ export const renderNewUsers = (
       <BarChart
         data={props.data}
         attribute="count"
-        label="New users"
+        label=""
         highlightedValue={sum}
         customDateFormat={DATETIME_FORMAT}
         noDataMessage={'No new user signups during this time period'}
@@ -50,6 +50,8 @@ export const renderDailyActiveUsers = (
     timestamp: string
   }>
 ) => {
+  const last = props.data?.[props.data.length - 1]?.count
+
   return (
     <div className="flex w-full flex-col">
       <BarChart
@@ -57,6 +59,7 @@ export const renderDailyActiveUsers = (
         attribute="count"
         label=""
         minimalHeader
+        highlightedValue={last}
         customDateFormat={DATETIME_FORMAT}
         noDataMessage={'No authenticated users during this time period'}
       />
