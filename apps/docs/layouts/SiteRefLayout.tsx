@@ -15,7 +15,7 @@ const SiteRefLayout = ({ children }) => {
 
   const menuLevel = 'home'
   // useMenuLevelId()
-  const mobileMenuOpen = () => void console.log('menuLevel', menuLevel)
+  const mobileMenuOpen = false
 
   const levelsData = {
     home: {
