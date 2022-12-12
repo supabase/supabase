@@ -1,7 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/migrations/firebase-storage.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'firebase-storage',
+  title: 'Firebase Storage Migration',
+  description: 'Migrate Firebase Storage files to Supabase Storage.',
+  sidebar_label: 'Firebase Storage',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

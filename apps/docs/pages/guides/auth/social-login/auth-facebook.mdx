@@ -1,7 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/auth/auth-facebook.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'auth-facebook',
+  title: 'Login with Facebook',
+  description: 'Add Facebook OAuth to your Supabase project',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
