@@ -36,7 +36,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
        * handle "scroll to top" behaviour on route change
        */
       if (document) {
-        console.log('url', url)
         // do not scroll to top for reference docs
         if (!url.includes('reference/')) {
           // scroll container div to top
