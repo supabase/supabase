@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react'
+import { FC, useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { find, isUndefined } from 'lodash'
@@ -54,10 +54,29 @@ const TableGridEditor: FC<Props> = ({
   onDeleteColumn = () => {},
   onClosePanel = () => {},
 }) => {
-  const { meta, ui } = useStore()
+  const { meta, ui, vault } = useStore()
   const router = useRouter()
   const gridRef = useRef<SupabaseGridRef>(null)
   const projectRef = ui.selectedProject?.ref
+
+  const [encryptedColumns, setEncryptedColumns] = useState([])
+
+  useEffect(() => {
+    let cancel = false
+
+    const getEncryptedColumns = async (table: any) => {
+      const columns = await vault.listEncryptedColumns(table.name)
+      setEncryptedColumns(columns)
+    }
+
+    if (selectedTable !== undefined) {
+      getEncryptedColumns(selectedTable)
+    }
+
+    return () => {
+      cancel = true
+    }
+  }, [selectedTable])
 
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(router.query.id)} />
@@ -72,12 +91,15 @@ const TableGridEditor: FC<Props> = ({
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const gridTable = !isViewSelected
-    ? parseSupaTable({
-        table: selectedTable as PostgresTable,
-        columns: (selectedTable as PostgresTable).columns,
-        primaryKeys: (selectedTable as PostgresTable).primary_keys,
-        relationships: (selectedTable as PostgresTable).relationships,
-      })
+    ? parseSupaTable(
+        {
+          table: selectedTable as PostgresTable,
+          columns: (selectedTable as PostgresTable).columns,
+          primaryKeys: (selectedTable as PostgresTable).primary_keys,
+          relationships: (selectedTable as PostgresTable).relationships,
+        },
+        encryptedColumns
+      )
     : (selectedTable as SchemaView).name
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
