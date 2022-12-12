@@ -13,7 +13,7 @@ import {
   renderCumulativeUsers,
 } from 'components/interfaces/Reports/renderers/AuthRenderers'
 
-export const ApiBotsPage: NextPageWithLayout = () => {
+export const AuthReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
   const config = PRESET_CONFIG[Presets.AUTH]
@@ -31,33 +31,33 @@ export const ApiBotsPage: NextPageWithLayout = () => {
           params={cumulativeUsers[0].params}
           className="col-span-2 col-start-1"
           title="Users Over Time"
-          description="Daily count of confirmed users"
+          description="Cumulative count of confirmed users"
           data={cumulativeUsers[0].data!}
           renderer={renderCumulativeUsers}
         />
         <ReportWidget
           isLoading={isLoading}
-          params={dailyActiveUsers[0].params}
+          params={newUsers[0].params}
           className="col-span-2 col-start-3"
+          title="Daily New Users"
+          description="The daily count of new user signups"
+          data={newUsers[0].data!}
+          renderer={renderNewUsers}
+        />
+        <ReportWidget
+          isLoading={isLoading}
+          params={dailyActiveUsers[0].params}
+          className="col-span-4 col-start-1"
           title="Daily Active Users"
           description="The daily count of active authenticated users"
           data={dailyActiveUsers[0].logData!}
           renderer={renderDailyActiveUsers}
-        />
-        <ReportWidget
-          isLoading={isLoading}
-          params={newUsers[0].params}
-          className="col-span-4 col-start-1"
-          title="Daily New Users"
-          description="The daily count of new user signups"
-          data={newUsers[0].logData!}
-          renderer={renderNewUsers}
         />
       </div>
     </Layout>
   )
 }
 
-ApiBotsPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+AuthReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(ApiBotsPage)
+export default observer(AuthReport)

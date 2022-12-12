@@ -14,7 +14,6 @@ const useDbQuery: UseDbQuery = (sql, params = DEFAULT_QUERY_PARAMS) => {
   const { meta } = useStore()
 
   const resolvedSql = typeof sql === 'function' ? sql(params) : sql
-  console.log('useDbQuery', 'sql', resolvedSql)
   const {
     data,
     error: swrError,
@@ -23,8 +22,6 @@ const useDbQuery: UseDbQuery = (sql, params = DEFAULT_QUERY_PARAMS) => {
   } = useSWR<MetaQueryResponse>(resolvedSql, async () => await meta.query(resolvedSql), {
     revalidateOnFocus: false,
   })
-  console.log('useDbQuery', 'data', data)
-  console.log('useDbQuery', 'isLoading', isLoading)
 
   const error = swrError || (typeof data === 'object' ? data?.error : '')
   return [{ error, data, isLoading, params }, { runQuery: () => mutate() }]
