@@ -155,7 +155,7 @@ const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
 }
 
 const methodListGroup = (items) => `
-<ul className="method-list-group">
+<ul className="method-list-group not-prose">
   ${items}
 </ul>
 `

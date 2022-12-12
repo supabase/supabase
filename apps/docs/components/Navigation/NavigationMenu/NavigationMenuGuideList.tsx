@@ -3,10 +3,16 @@ import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import React from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
 
-const NavigationMenuGuideList = ({ currentLevel, id, setLevel }) => {
+interface Props {
+  currentLevel: string
+  id: string
+  setLevel?: any
+}
+const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setLevel }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
@@ -116,7 +122,7 @@ const NavigationMenuGuideList = ({ currentLevel, id, setLevel }) => {
                           <button
                             className={props.className}
                             onClick={() => {
-                              if (props.parent) setLevel(props.parent)
+                              if (props.parent && setLevel) setLevel(props.parent)
                             }}
                           >
                             {props.children}
