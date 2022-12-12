@@ -111,7 +111,7 @@ export default function launchweek() {
     )
   }
 
-  const SectionButtons = ({ blog, docs }) => {
+  const SectionButtons = ({ blog, docs, video }) => {
     return (
       <div className="flex gap-2 z-10">
         <a href={blog} target="_blank" rel="noopener">
@@ -130,6 +130,16 @@ export default function launchweek() {
             </div>
           </div>
         </a>
+        {video && (
+          <a href={video} target="_blank" rel="noopener">
+            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+              Video
+              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+              </div>
+            </div>
+          </a>
+        )}
       </div>
     )
   }
@@ -275,7 +285,7 @@ export default function launchweek() {
                     {day1.steps.length > 0 && (
                       <div className="h-[400px] flex flex-col lg:flex-row">
                         <div
-                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:bg-[url('/images/launchweek/docs-update-bg.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10`}
+                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:bg-[url('/images/launchweek/docs-update-bg.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10 !px-3 sm:!px-14`}
                         >
                           <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <span>{day1.description}</span>
@@ -284,7 +294,13 @@ export default function launchweek() {
                             </Badge>
                           </div>
 
-                          <SectionButtons docs={day1.steps[0].docs} blog={day1.steps[0].blog} />
+                          <SectionButtons
+                            docs={day1.steps[0].docs}
+                            blog={day1.steps[0].blog}
+                            video={
+                              'https://www.youtube.com/watch?v=Q1Amk6iDlF8&ab_channel=Supabase'
+                            }
+                          />
                         </div>
                       </div>
                     )}
