@@ -7,12 +7,12 @@
     "d": 1,
     "dd": "Monday",
     "youtube_id": "OpPOaJI_Z28",
-    "blogpost": "https://supabase.com/blog",
+    "blogpost": "https://supabase.com/blog/new-supabase-docs-built-with-nextjs",
     "docs": "https://supabase.com/docs",
     "steps": [
       {
         "title": "Supabase Docs",
-        "blog": "/blog",
+        "blog": "/blog/new-supabase-docs-built-with-nextjs",
         "docs": "/docs",
         "isNew": true,
         "description": ""
