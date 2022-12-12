@@ -462,7 +462,6 @@ export const platform = {
   label: 'Platform',
   url: '/guides/platform',
   items: [
-    { name: 'Overview', url: '/guides/hosting/platform', items: [] },
     {
       name: 'Add-ons',
       url: undefined,
