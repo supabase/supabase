@@ -2,7 +2,7 @@ import { proxy, useSnapshot } from 'valtio'
 
 export const menuState = proxy({
   // values
-  menuActiveRefId: '',
+  menuActiveRefId: 'home',
   // set states
   setMenuActiveRefId: (value) => {
     menuState.menuActiveRefId = value
