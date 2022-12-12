@@ -236,5 +236,12 @@
     "position": "Growth Marketer",
     "author_url": "https://twitter.com/ramiro__nd",
     "author_image_url": "https://avatars.githubusercontent.com/u/20600542?v=4"
+  },
+  {
+    "author_id": "jonny",
+    "author": "Jonathan Summers-Muir",
+    "position": "Engineering",
+    "author_url": "https://github.com/mildtomato",
+    "author_image_url": "https://github.com/mildtomato.png"
   }
 ]
