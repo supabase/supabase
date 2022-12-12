@@ -60,46 +60,44 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   const apiConfig = apiService?.app_config
 
   return (
-    <>
-      <div className="">
-        <h3 className="text-scale-1200 mb-6 text-xl">API Settings</h3>
-        <section>
-          <Panel title={<h5 className="mb-0">Project URL</h5>}>
-            <Panel.Content>
-              {isError ? (
-                <div className="flex items-center justify-center space-x-2 py-4">
-                  <IconAlertCircle size={16} strokeWidth={1.5} />
-                  <p className="text-sm text-scale-1100">Failed to retrieve project URL</p>
-                </div>
-              ) : (
-                <Input
-                  copy
-                  label="URL"
-                  readOnly
-                  disabled
-                  className="input-mono"
-                  value={`https://${apiConfig?.endpoint ?? '-'}`}
-                  descriptionText="A RESTful endpoint for querying and managing your database."
-                  layout="horizontal"
-                />
-              )}
-            </Panel.Content>
-          </Panel>
-        </section>
+    <div>
+      <h3 className="text-scale-1200 mb-6 text-xl">API Settings</h3>
+      <section>
+        <Panel title={<h5 className="mb-0">Project URL</h5>}>
+          <Panel.Content>
+            {isError ? (
+              <div className="flex items-center justify-center space-x-2 py-4">
+                <IconAlertCircle size={16} strokeWidth={1.5} />
+                <p className="text-sm text-scale-1100">Failed to retrieve project URL</p>
+              </div>
+            ) : (
+              <Input
+                copy
+                label="URL"
+                readOnly
+                disabled
+                className="input-mono"
+                value={`https://${apiConfig?.endpoint ?? '-'}`}
+                descriptionText="A RESTful endpoint for querying and managing your database."
+                layout="horizontal"
+              />
+            )}
+          </Panel.Content>
+        </Panel>
+      </section>
 
-        <section>
-          <DisplayApiSettings key="DisplayAPISettings" />
-        </section>
+      <section>
+        <DisplayApiSettings key="DisplayAPISettings" />
+      </section>
 
-        <section>
-          <JWTSettings />
-        </section>
+      <section>
+        <JWTSettings />
+      </section>
 
-        <section>
-          <PostgrestConfig />
-        </section>
-      </div>
-    </>
+      <section>
+        <PostgrestConfig />
+      </section>
+    </div>
   )
 }
 

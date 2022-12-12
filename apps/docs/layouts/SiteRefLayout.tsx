@@ -10,15 +10,16 @@ import { useEffect, useState, memo } from 'react'
 
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 import { NavigationMenuContextProvider } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
-import { useMenuLevelId } from '~/hooks/useMenuState'
+import { useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+
+import { menuState } from '~/hooks/useMenuState'
 
 const SiteRefLayout = ({ children }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
   const menuLevel = useMenuLevelId()
+  const mobileMenuOpen = useMenuMobileOpen()
 
   console.log('menuLevel', menuLevel)
 
@@ -194,10 +195,14 @@ const SiteRefLayout = ({ children }) => {
                       'transition-all ease-out z-10',
                       'top-0',
                       mobileMenuOpen && 'absolute',
-                      'flex items-center gap-3 h-[40px]',
+                      'flex items-center h-[40px]',
+                      mobileMenuOpen ? 'gap-0' : 'gap-3',
                     ].join(' ')}
                   >
-                    <button className="mr-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                    <button
+                      className={['mr-2', mobileMenuOpen && 'mt-0.5'].join(' ')}
+                      onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+                    >
                       <div
                         className={[
                           'space-y-1 group cursor-pointer relative',
@@ -237,7 +242,7 @@ const SiteRefLayout = ({ children }) => {
                       className={[
                         'transition-all duration-200',
                         'text-scale-1200',
-                        mobileMenuOpen ? 'text-base' : 'text-sm',
+                        mobileMenuOpen ? 'text-xs' : 'text-sm',
                       ].join(' ')}
                     >
                       {mobileMenuOpen
@@ -251,11 +256,11 @@ const SiteRefLayout = ({ children }) => {
                     className={[
                       'transition-all ease-out duration-200',
                       'absolute left-0 right-0 h-screen',
-                      'py-8 px-5 pl-14 pt-16',
+                      'px-5 pl-5 py-16',
                       'top-[0px]',
                       'bg-scale-200',
                       mobileMenuOpen
-                        ? 'opacity-100 left-[0px] visible'
+                        ? 'overflow-y-auto opacity-100 left-[0px] visible'
                         : 'left-[-40px] h-0 opacity-0 invisible',
                     ].join(' ')}
                   >
@@ -303,7 +308,7 @@ const SiteRefLayout = ({ children }) => {
                   'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-blackA-600',
                   mobileMenuOpen ? 'absolute MOBILE-MENU-OPEN' : 'hidden h-0 MOBILE-MENU-CLOSED',
                 ].join(' ')}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
               ></div>
             </div>
           </div>
