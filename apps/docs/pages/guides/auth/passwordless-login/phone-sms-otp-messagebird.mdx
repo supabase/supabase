@@ -1,7 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/auth/auth-messagebird.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'auth-messagebird',
+  title: 'Phone Auth with MessageBird',
+  description: 'How to set up and use Mobile OTP with MessageBird and Supabase.',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

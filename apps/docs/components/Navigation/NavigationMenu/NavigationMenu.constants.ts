@@ -701,61 +701,61 @@ export const reference = {
 }
 
 export const reference_javascript_v1 = {
-  icon: '/img/icons/menu/reference-javascript.svg',
+  icon: 'reference-javascript',
   title: 'javascript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_javascript_v2 = {
-  icon: '/img/icons/menu/reference-javascript.svg',
+  icon: 'reference-javascript',
   title: 'javascript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_dart_v0 = {
-  icon: '/img/icons/menu/reference-dart.svg',
+  icon: 'reference-dart',
   title: 'dart',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 export const reference_dart_v1 = {
-  icon: '/img/icons/menu/reference-dart.svg',
+  icon: 'reference-dart',
   title: 'dart',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 
 export const reference_cli = {
-  icon: '/img/icons/menu/reference-cli.svg',
+  icon: 'reference-cli',
   title: 'Supabase CLI',
   url: '/guides/reference/cli',
   parent: '/',
 }
 export const reference_api = {
-  icon: '/img/icons/menu/reference-api.svg',
+  icon: 'reference-api',
   title: 'Management API',
   url: '/guides/reference/api',
   parent: '/reference',
 }
 
 export const reference_self_hosting_auth = {
-  icon: '/img/icons/menu/reference-auth.svg',
+  icon: 'reference-auth',
   title: 'Self Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
-  icon: '/img/icons/menu/reference-storage.svg',
+  icon: 'reference-storage',
   title: 'Self Hosting Storage',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
-  icon: '/img/icons/menu/reference-auth.svg',
+  icon: 'reference-auth',
   title: 'Self Hosting Realtime',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
