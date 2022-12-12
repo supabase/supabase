@@ -238,3 +238,18 @@ article p code {
   background: none;
   border: none;
 }
+
+// prevent horizontal scroll on mobile for tablist tab headers
+div[role='tablist'] {
+  @media screen and (min-width: 320px) {
+    max-width: 320px;
+  }
+
+  @media screen and (min-width: 600px) {
+    max-width: 520px;
+  }
+
+  @media screen and (min-width: 769px) {
+    max-width: 620px;
+  }
+}
