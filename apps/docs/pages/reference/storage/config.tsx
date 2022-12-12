@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 
 // Parameters are grouped on the page by tag
 const TAGS = ['general', 'multitenant']
-console.log(specFile)
+// console.log(specFile)
 export default function Config() {
   return (
     <div>

@@ -2,8 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
-// @ts-expect-error
-import jsSpec from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+
 // @ts-expect-error
 import clientLibsCommon from '~/../../spec/common-cli.yml' assert { type: 'yml' }
 
@@ -11,20 +10,6 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   const router = useRouter()
 
   const menu = NavItems[id]
-  let functions = jsSpec.functions
-
-  functions = functions.map((func) => {
-    let data = {
-      ...func,
-    }
-    data = {
-      ...data,
-      ...clientLibsCommon.commands.filter((x) => {
-        return x.id === func.id
-      })[0],
-    }
-    return data
-  })
 
   const FunctionLink = ({
     title,
@@ -148,12 +133,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
                 {clientLibsCommon.commands
                   .filter((x) => x.product === section.key)
                   .map((x, index) => {
-                    // console.log(functions)
-                    return (
-                      <>
-                        <FunctionLink {...x} />
-                      </>
-                    )
+                    return <FunctionLink {...x} />
                   })}
               </>
             )

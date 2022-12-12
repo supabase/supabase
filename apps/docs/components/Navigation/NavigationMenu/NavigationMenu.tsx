@@ -7,13 +7,13 @@ import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
 // @ts-expect-error
-import spec_js_v2 from '~/../../spec/supabase_js_v2_temp_new_shape.yml' assert { type: 'yml' }
+import spec_js_v2 from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_js_v1 from '~/../../spec/supabase_js_v1_temp_new_shape.yml' assert { type: 'yml' }
+import spec_js_v1 from '~/../../spec/supabase_js_v1.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_dart_v1 from '~/../../spec/supabase_dart_v1_temp_new_shape.yml' assert { type: 'yml' }
+import spec_dart_v1 from '~/../../spec/supabase_dart_v1.yml' assert { type: 'yml' }
 // @ts-expect-error
-import spec_dart_v0 from '~/../../spec/supabase_dart_v0_temp_new_shape.yml' assert { type: 'yml' }
+import spec_dart_v0 from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml' }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 import libCommonSections from '~/../../spec/common-client-libs-sections.json'
@@ -242,7 +242,7 @@ const SideNav = () => {
       {
         label: 'JavaScript',
         icon: '/img/icons/menu/reference-javascript',
-        hasLightIcon: false,
+        hasLightIcon: true,
         href: '/reference/javascript/introduction',
         level: 'reference_javascript',
       },
@@ -256,7 +256,7 @@ const SideNav = () => {
       {
         label: 'Flutter',
         icon: '/img/icons/menu/reference-dart',
-        hasLightIcon: false,
+        hasLightIcon: true,
         href: '/reference/dart/introduction',
         level: 'reference_dart',
       },
@@ -266,38 +266,41 @@ const SideNav = () => {
       {
         label: 'Management API',
         icon: '/img/icons/menu/reference-api',
-        hasLightIcon: false,
+        hasLightIcon: true,
         href: '/reference/api/introduction',
         level: 'reference_javascript',
       },
       {
         label: 'Supabase CLI',
         icon: '/img/icons/menu/reference-cli',
-        hasLightIcon: false,
+        hasLightIcon: true,
         href: '/reference/cli/introduction',
         level: 'reference_javascript',
       },
-      {
-        label: 'Self Hosting reference',
-      },
-      {
-        label: 'Self-hosting Auth',
-        icon: '/img/icons/menu/reference-auth',
-        href: '/reference/self-hosting-auth/introduction',
-        level: 'reference_self_hosting_auth',
-      },
-      {
-        label: 'Self-hosting Storage',
-        icon: '/img/icons/menu/reference-storage',
-        href: '/reference/self-hosting-storage/introduction',
-        level: 'reference_self_hosting_auth',
-      },
-      {
-        label: 'Self-hosting Realtime',
-        icon: '/img/icons/menu/reference-realtime',
-        href: '/reference/self-hosting-realtime/introduction',
-        level: 'reference_self_hosting_auth',
-      },
+      // {
+      //   label: 'Self-Hosting Reference',
+      // },
+      // {
+      //   label: 'Self-Hosting Auth',
+      //   icon: '/img/icons/menu/reference-auth',
+      //   hasLightIcon: true,
+      //   href: '/reference/self-hosting-auth/introduction',
+      //   level: 'reference_self_hosting_auth',
+      // },
+      // {
+      //   label: 'Self-Hosting Storage',
+      //   hasLightIcon: true,
+      //   icon: '/img/icons/menu/reference-storage',
+      //   href: '/reference/self-hosting-storage/introduction',
+      //   level: 'reference_self_hosting_auth',
+      // },
+      // {
+      //   label: 'Self-Hosting Realtime',
+      //   hasLightIcon: true,
+      //   icon: '/img/icons/menu/reference-realtime',
+      //   href: '/reference/self-hosting-realtime/introduction',
+      //   level: 'reference_self_hosting_auth',
+      // },
     ],
   ]
 
@@ -377,17 +380,17 @@ const SideNav = () => {
         </ul>
       </div>
 
-      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'database'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'auth'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'functions'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'realtime'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'storage'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'platform'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'integrations'} currentLevel={level} setLevel={setLevel} />
-      <NavigationMenuGuideList id={'reference'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} />
+      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} />
+      <NavigationMenuGuideList id={'database'} currentLevel={level} />
+      <NavigationMenuGuideList id={'auth'} currentLevel={level} />
+      <NavigationMenuGuideList id={'functions'} currentLevel={level} />
+      <NavigationMenuGuideList id={'realtime'} currentLevel={level} />
+      <NavigationMenuGuideList id={'storage'} currentLevel={level} />
+      <NavigationMenuGuideList id={'platform'} currentLevel={level} />
+      <NavigationMenuGuideList id={'resources'} currentLevel={level} />
+      <NavigationMenuGuideList id={'integrations'} currentLevel={level} />
+      <NavigationMenuGuideList id={'reference'} currentLevel={level} />
       {/* // Client Libs */}
       <NavigationMenuRefList
         key={'reference-js-menu'}

@@ -38,14 +38,14 @@ export const REFERENCES: References = {
 
 export const gettingstarted = {
   icon: 'getting-started',
-  title: 'Getting started',
+  title: 'Getting Started',
   label: 'Overview',
   items: [
     {
       name: 'Framework Quickstarts',
       items: [
-        { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/getting-started/quickstarts/nextjs', items: [] },
+        { name: 'ReactJS', url: '/getting-started/quickstarts/reactjs', items: [] },
       ],
     },
   ],
@@ -56,8 +56,13 @@ export const tutorials = {
   label: 'Quickstarts',
   items: [
     {
-      name: 'Javascript',
+      name: 'Web apps',
       items: [
+        {
+          name: 'Next.js',
+          url: '/guides/tutorials/with-nextjs',
+          items: [],
+        },
         {
           name: 'React',
           url: '/guides/tutorials/with-react',
@@ -65,18 +70,18 @@ export const tutorials = {
           icon: '/img/icons/react-icon.svg',
         },
         {
-          name: 'Next.js',
-          url: '/guides/tutorials/with-nextjs',
-          items: [],
-        },
-        {
-          name: 'Angular',
-          url: '/guides/tutorials/with-angular',
+          name: 'Vue 3',
+          url: '/guides/tutorials/with-vue-3',
           items: [],
         },
         {
           name: 'Nuxt 3',
           url: '/guides/tutorials/with-nuxt-3',
+          items: [],
+        },
+        {
+          name: 'Angular',
+          url: '/guides/tutorials/with-angular',
           items: [],
         },
         {
@@ -99,15 +104,10 @@ export const tutorials = {
           url: '/guides/tutorials/with-sveltekit',
           items: [],
         },
-        {
-          name: 'Vue 3',
-          url: '/guides/tutorials/with-vue-3',
-          items: [],
-        },
       ],
     },
     {
-      name: 'Mobile based',
+      name: 'Mobile',
       items: [
         {
           name: 'Flutter',
@@ -125,11 +125,6 @@ export const tutorials = {
       name: 'Low code',
       items: [
         {
-          name: 'Ionic Angular',
-          url: '/guides/tutorials/with-ionic-angular',
-          items: [],
-        },
-        {
           name: 'Ionic React',
           url: '/guides/tutorials/with-ionic-react',
           items: [],
@@ -137,6 +132,11 @@ export const tutorials = {
         {
           name: 'Ionic Vue',
           url: '/guides/tutorials/with-ionic-vue',
+          items: [],
+        },
+        {
+          name: 'Ionic Angular',
+          url: '/guides/tutorials/with-ionic-angular',
           items: [],
         },
       ],
@@ -154,6 +154,18 @@ export const cli = {
 
 export const SocialLoginItems = [
   {
+    name: 'Google',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/social-login/auth-google',
+    items: [],
+  },
+  {
+    name: 'Facebook',
+    icon: '/docs/img/icons/facebook-icon',
+    url: '/guides/auth/social-login/auth-facebook',
+    items: [],
+  },
+  {
     name: 'Apple',
     icon: '/docs/img/icons/apple-icon',
     url: '/guides/auth/social-login/auth-apple',
@@ -166,21 +178,9 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Bitbucket',
-    icon: '/docs/img/icons/bitbucket-icon',
-    url: '/guides/auth/social-login/auth-bitbucket',
-    items: [],
-  },
-  {
-    name: 'Discord',
-    icon: '/docs/img/icons/discord-icon',
-    url: '/guides/auth/social-login/auth-discord',
-    items: [],
-  },
-  {
-    name: 'Facebook',
-    icon: '/docs/img/icons/facebook-icon',
-    url: '/guides/auth/social-login/auth-facebook',
+    name: 'Twitter',
+    icon: '/docs/img/icons/twitter-icon',
+    url: '/guides/auth/social-login/auth-twitter',
     items: [],
   },
   {
@@ -197,9 +197,15 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Google',
-    icon: '/docs/img/icons/google-icon',
-    url: '/guides/auth/social-login/auth-google',
+    name: 'Bitbucket',
+    icon: '/docs/img/icons/bitbucket-icon',
+    url: '/guides/auth/social-login/auth-bitbucket',
+    items: [],
+  },
+  {
+    name: 'Discord',
+    icon: '/docs/img/icons/discord-icon',
+    url: '/guides/auth/social-login/auth-discord',
     items: [],
   },
   {
@@ -239,12 +245,6 @@ export const SocialLoginItems = [
     items: [],
   },
   {
-    name: 'Twitter',
-    icon: '/docs/img/icons/twitter-icon',
-    url: '/guides/auth/social-login/auth-twitter',
-    items: [],
-  },
-  {
     name: 'WorkOS',
     icon: '/docs/img/icons/workos-icon',
     url: '/guides/auth/social-login/auth-workos',
@@ -254,25 +254,25 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'MessageBird SMS login',
+    name: 'MessageBird SMS Login',
     icon: '/docs/img/icons/messagebird-icon',
-    linkDescription: 'communication between businesses and their customers — across any channel.',
+    linkDescription: 'Communication between businesses and their customers — across any channel.',
     url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     items: [],
   },
   {
-    name: 'Twilio SMS login',
+    name: 'Twilio SMS Login',
     icon: '/docs/img/icons/twilio-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
     items: [],
   },
   {
-    name: 'Vonage SMS login',
+    name: 'Vonage SMS Login',
     icon: '/docs/img/icons/vonage-icon',
     url: '/guides/auth/passwordless-login/phone-sms-otp-vonage',
     linkDescription:
-      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses',
+      'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     items: [],
     isDarkMode: true,
   },
@@ -290,13 +290,13 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
-        { name: 'Email login', url: '/guides/auth/auth-email', items: [] },
+        { name: 'Email Login', url: '/guides/auth/auth-email', items: [] },
         {
-          name: 'Passwordless login',
+          name: 'Passwordless Login',
           url: '/guides/auth/passwordless-login',
           items: [
             {
-              name: 'Magiclink login',
+              name: 'Magic Link Login',
               icon: '',
               url: '/guides/auth/passwordless-login/email-otp-magic-link',
               items: [],
@@ -364,7 +364,6 @@ export const database = {
   label: 'Database',
   url: '/guides/database',
   items: [
-    { name: 'Overview', url: '/guides/database', items: [] },
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
     { name: 'Tables and Data', url: '/guides/database/tables', items: [] },
     { name: 'Database Functions', url: '/guides/database/functions', items: [] },
@@ -426,7 +425,6 @@ export const functions = {
   label: 'Edge Functions',
   url: '/guides/functions',
   items: [
-    { name: 'Overview', url: '/guides/functions', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
     { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
@@ -478,7 +476,6 @@ export const platform = {
   url: '/guides/platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
-    { name: 'Architecture', url: '/architecture', items: [] },
     {
       name: 'Add-ons',
       url: undefined,
@@ -702,61 +699,61 @@ export const reference = {
 }
 
 export const reference_javascript_v1 = {
-  icon: '/img/icons/menu/reference-javascript.svg',
+  icon: 'reference-javascript',
   title: 'javascript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_javascript_v2 = {
-  icon: '/img/icons/menu/reference-javascript.svg',
+  icon: 'reference-javascript',
   title: 'javascript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_dart_v0 = {
-  icon: '/img/icons/menu/reference-dart.svg',
+  icon: 'reference-dart',
   title: 'dart',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 export const reference_dart_v1 = {
-  icon: '/img/icons/menu/reference-dart.svg',
+  icon: 'reference-dart',
   title: 'dart',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 
 export const reference_cli = {
-  icon: '/img/icons/menu/reference-cli.svg',
+  icon: 'reference-cli',
   title: 'Supabase CLI',
   url: '/guides/reference/cli',
   parent: '/',
 }
 export const reference_api = {
-  icon: '/img/icons/menu/reference-api.svg',
+  icon: 'reference-api',
   title: 'Management API',
   url: '/guides/reference/api',
   parent: '/reference',
 }
 
 export const reference_self_hosting_auth = {
-  icon: '/img/icons/menu/reference-auth.svg',
+  icon: 'reference-auth',
   title: 'Self Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
-  icon: '/img/icons/menu/reference-storage.svg',
+  icon: 'reference-storage',
   title: 'Self Hosting Storage',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
-  icon: '/img/icons/menu/reference-auth.svg',
+  icon: 'reference-auth',
   title: 'Self Hosting Realtime',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',

@@ -32,7 +32,10 @@ const GlassPanel = ({
 
   const IconBackground: React.FC = (props) => (
     <div
-      className={showIconBg ? 'bg-green-600 w-8 h-8 flex items-center justify-center rounded' : ''}
+      className={[
+        'shrink-0',
+        showIconBg ? 'bg-green-600 w-8 h-8 flex items-center justify-center rounded' : '',
+      ].join(' ')}
     >
       {props.children}
     </div>

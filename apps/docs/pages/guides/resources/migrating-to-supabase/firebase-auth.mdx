@@ -1,7 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/migrations/firebase-auth.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'firebase-auth',
+  title: 'Firebase Auth Migration',
+  description: 'Migrate Firebase auth users to a Supabase project.',
+  sidebar_label: 'Firebase Auth',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

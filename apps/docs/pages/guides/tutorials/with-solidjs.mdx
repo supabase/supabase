@@ -1,7 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import oldContent from '~/pages/guides/with-solidjs.mdx'
 
-export const meta = {}
+export const meta = {
+  id: 'with-solidjs',
+  title: 'Quickstart: SolidJS',
+  description: 'Learn how to use Supabase in your SolidJS App.',
+  sidebar_label: 'SolidJS',
+}
 
 export const Page = ({ children }) => {
   if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {

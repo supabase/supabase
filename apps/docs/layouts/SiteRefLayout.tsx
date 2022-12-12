@@ -91,17 +91,15 @@ const SiteRefLayout = ({ children }) => {
             </div>
           </div>
           <div
+            // #docs-content-container is used by layout to scroll to top
+            id="docs-content-container"
             className={[
               'w-full h-screen transition-all ease-out',
               mobileMenuOpen ? 'overflow-hidden' : 'overflow-auto',
-              // !mobileMenuOpen
-              //   ? 'ml-0 MOBILE-MENU-CLOSE overflow-auto'
-              //   : 'ml-[320px] h-0 MOBILE-MENU-OPEN overflow-hidden', // experiment
             ].join(' ')}
           >
             <div className="flex flex-col relative">
               {/* <NavigationMenu /> */}
-
               <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
                 <TopNavBarRef />
               </div>
@@ -193,7 +191,7 @@ const SiteRefLayout = ({ children }) => {
                   <FooterHelpCallout />
                 </div>
                 <hr className="border-scale-400  mt-8"></hr>
-                <div className="flex flex-row gap-3 mt-6">
+                <div className="flex flex-col lg:flex-row gap-3 mt-6">
                   <span className="text-xs text-scale-900">Supabase 2022</span>
                   <span className="text-xs text-scale-900">—</span>
                   <Link href="/handbook/contributing">
