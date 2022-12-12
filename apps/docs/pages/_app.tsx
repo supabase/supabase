@@ -40,7 +40,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         if (!url.includes('reference/')) {
           // scroll container div to top
           const container = document.getElementById('docs-content-container')
-          container.scrollTop = 0
+          // check container exists (only avail on new docs)
+          if (container) container.scrollTop = 0
         }
       }
     }
