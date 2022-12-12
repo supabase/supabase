@@ -4,6 +4,7 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 export const meta = {
   title: 'Use Supabase with NextJS',
   subtitle: 'Set up the supabase-js client library in a NextJS app.',
+  breadcrumb: 'Framework Quickstarts',
 }
 
 Learn how to create a Supabase project, add some sample data to your database, and query the data from a NextJS app.
@@ -77,7 +78,7 @@ Learn how to create a Supabase project, add some sample data to your database, a
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Create the Supabase client">
 
-    In the `/lib` directory of your Next.js app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project's [public API (anon) key](https://app.supabase.com/project/_/settings/api).
+    In the `/lib` directory of your Next.js app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your [project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
@@ -86,7 +87,7 @@ Learn how to create a Supabase project, add some sample data to your database, a
       ```js lib/supabaseClient.js
         import { createClient } from '@supabase/supabase-js'
 
-        const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
       ```
 
     </StepHikeCompact.Code>
