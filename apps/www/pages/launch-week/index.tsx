@@ -95,18 +95,14 @@ export default function launchweek() {
       <div className="flex flex-1 flex-col sm:flex-row">
         <div className="flex gap-4 min-w-[320px] items-center">
           {liveDay === day ? (
-            <Badge className="bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
+            <Badge className="bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200 border-[#DFFFF1]">
               Currently Happening
             </Badge>
           ) : (
             <Badge
-              className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] !border-[${
-                shipped ? '#b3cec1' : '#b3cec1'
-              }] dark:from-white dark:to-[#1a7a4ca1] dark:border-[${
-                shipped ? '#1f3738' : '#80a794'
-              }] h-fit relative ${
+              className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] !border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:!border-[#DFFFF1] h-fit relative ${
                 shipped
-                  ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#b6b6b6] dark:text-transparent dark:border-[#1f3738] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10'
+                  ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#b6b6b6] dark:text-transparent dark:border-[#1f3738] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10 border-[#DFFFF1]'
                   : ''
               }`}
             >
@@ -291,7 +287,7 @@ export default function launchweek() {
                         >
                           <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <span>{day1.description}</span>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#1f3738] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#1f3738]">
+                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:border-[#DFFFF1]">
                               Redesigned
                             </Badge>
                           </div>
