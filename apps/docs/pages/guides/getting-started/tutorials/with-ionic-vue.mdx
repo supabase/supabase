@@ -1,0 +1,18 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import oldContent from '~/pages/guides/with-ionic-vue.mdx'
+
+export const meta = {
+  id: 'with-ionic-vue',
+  title: 'Quickstart: Ionic Vue',
+  description: 'Learn how to use Supabase in your Ionic Vue App.',
+  sidebar_label: 'Ionic Vue',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return oldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page
