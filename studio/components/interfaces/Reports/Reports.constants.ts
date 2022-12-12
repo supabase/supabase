@@ -162,6 +162,16 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.AUTH]: {
     title: 'Auth',
     queries: {
+      failedMigrations: {
+        queryType: "logs",
+        sql: `
+select count(f.id)
+from auth_logs
+where json_value(f.event_message, "$.level") = "fatal"
+  and regexp_contains(f.event_message, "error executing migrations") 
+limit 1
+`
+      },
       dailyActiveUsers: {
         queryType: 'logs',
         sql: `
