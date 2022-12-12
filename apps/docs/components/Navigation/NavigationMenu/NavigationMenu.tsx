@@ -44,6 +44,8 @@ function generateAllowedClientLibKeys(sections, spec) {
     return func.id
   })
 
+  console.log('final', final)
+
   return final
 }
 
