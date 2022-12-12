@@ -476,7 +476,6 @@ export const platform = {
   url: '/guides/platform',
   items: [
     { name: 'Overview', url: '/guides/hosting/platform', items: [] },
-    { name: 'Architecture', url: '/architecture', items: [] },
     {
       name: 'Add-ons',
       url: undefined,
