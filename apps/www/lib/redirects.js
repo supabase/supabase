@@ -1575,4 +1575,9 @@ module.exports = [
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
   },
+  {
+    permanent: true,
+    source: '/docs/architecture',
+    destination: '/docs/getting-started',
+  },
 ]
