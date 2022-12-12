@@ -457,8 +457,10 @@ functions:
     title: 'mfa.enroll()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
     notes: |
-      - Currently, `totp` is the only supported `factorType`.
-      - To verify the factor next, see [`mfa.challengeAndVerify`](/docs/reference/javascript/auth-mfa-challengeandverify).
+      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
       - To generate a QR code for the `totp` secret in nextjs, you can do the following:
       ```html
       <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
@@ -472,10 +474,18 @@ functions:
           const { data, error } = await supabase.auth.mfa.enroll({ 
             factorType: 'totp' 
           })
+
+          // Use the id to create a challenge.
+          // The challenge can be verified by entering the code generated from the authenticator app.
+          // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
+          const { id, type, totp: { qr_code, secret, uri } } = data
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challenge'
+    notes: |
+      - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -489,6 +499,8 @@ functions:
   - id: mfa-verify
     title: 'mfa.verify()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.verify'
+    notes: |
+      - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
     examples:
       - id: verify-challenge
         name: Verify a challenge for a factor
@@ -505,7 +517,8 @@ functions:
     title: 'mfa.challengeAndVerify()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
-      - Combines `mfa.challenge()` and `mfa.verify()` in 1 step
+      - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
     examples:
       - id: challenge-and-verify
         name: Create and verify a challenge for a factor
@@ -537,6 +550,7 @@ functions:
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
     examples:
       - id: get-aal
         name: Get the AAL details of a session
