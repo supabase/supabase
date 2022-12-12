@@ -557,23 +557,23 @@ export const resources = {
       ],
     },
     {
-      name: 'Self-Hosting reference docs',
+      name: 'Self-Hosting Feference',
       items: [
         {
-          name: 'Auth server',
-          url: '/reference/self-hosting-auth',
+          name: 'Auth Server',
+          url: '/reference/self-hosting-auth/introduction',
           icon: '/docs/img/icons/menu/reference-auth',
           items: [],
         },
         {
-          name: 'Storage server',
-          url: '/reference/self-hosting-storage',
+          name: 'Storage Server',
+          url: '/reference/self-hosting-storage/introduction',
           icon: '/docs/img/icons/menu/reference-storage',
           items: [],
         },
         {
-          name: 'Realtime server',
-          url: '/reference/self-hosting-realtime',
+          name: 'Realtime Server',
+          url: '/reference/self-hosting-realtime/introduction',
           icon: '/docs/img/icons/menu/reference-realtime',
           items: [],
         },
