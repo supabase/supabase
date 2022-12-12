@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { memo, useEffect, useState } from 'react'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import { menuState } from '~/hooks/useMenuState'
 
 // @ts-expect-error
 import spec_js_v2 from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
@@ -23,6 +24,7 @@ import authServerCommonSections from '~/../../spec/common-self-hosting-auth-sect
 import storageServerCommonSections from '~/../../spec/common-self-hosting-storage-sections.json'
 import realtimeServerCommonSections from '~/../../spec/common-self-hosting-realtime-sections.json'
 import { flattenSections } from '~/lib/helpers'
+import { useMenuLevelId } from '~/hooks/useMenuState'
 
 // Filter libCommonSections for just the relevant sections in the current library
 function generateAllowedClientLibKeys(sections, spec) {
@@ -68,7 +70,8 @@ export type RefKeyOptions =
 const SideNav = () => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
-  const [level, setLevel] = useState('home')
+
+  const level = useMenuLevelId()
 
   let version = ''
 
@@ -83,66 +86,66 @@ const SideNav = () => {
   function handleRouteChange(url: string) {
     switch (url) {
       case `/docs`:
-        setLevel('home')
+        menuState.setMenuLevelId('home')
         break
       case url.includes(`/docs/guides/getting-started`) && url:
-        setLevel('gettingstarted')
+        menuState.setMenuLevelId('gettingstarted')
         break
       case url.includes(`/docs/guides/database`) && url:
-        setLevel('database')
+        menuState.setMenuLevelId('database')
         break
       case url.includes(`/docs/guides/auth`) && url:
-        setLevel('auth')
+        menuState.setMenuLevelId('auth')
         break
       case url.includes(`/docs/guides/functions`) && url:
-        setLevel('functions')
+        menuState.setMenuLevelId('functions')
         break
       case url.includes(`/docs/guides/realtime`) && url:
-        setLevel('realtime')
+        menuState.setMenuLevelId('realtime')
         break
       case url.includes(`/docs/guides/storage`) && url:
-        setLevel('storage')
+        menuState.setMenuLevelId('storage')
         break
       case url.includes(`/docs/guides/platform`) ||
         (url.includes(`/docs/guides/hosting/platform`) && url):
-        setLevel('platform')
+        menuState.setMenuLevelId('platform')
         break
       case url.includes(`/docs/guides/resources`) && url:
-        setLevel('resources')
+        menuState.setMenuLevelId('resources')
         break
       case url.includes(`/docs/guides/integrations`) && url:
-        setLevel('integrations')
+        menuState.setMenuLevelId('integrations')
         break
       // JS v1
       case url.includes(`/docs/reference/javascript/v1`) && url:
-        setLevel('reference_javascript_v1')
+        menuState.setMenuLevelId('reference_javascript_v1')
         break
       // JS v2 (latest)
       case url.includes(`/docs/reference/javascript`) && url:
-        setLevel('reference_javascript_v2')
+        menuState.setMenuLevelId('reference_javascript_v2')
         break
       // dart v0
       case url.includes(`/docs/reference/dart/v0`) && url:
-        setLevel('reference_dart_v0')
+        menuState.setMenuLevelId('reference_dart_v0')
         break
       // dart v1 (latest)
       case url.includes(`/docs/reference/dart`) && url:
-        setLevel('reference_dart_v1')
+        menuState.setMenuLevelId('reference_dart_v1')
         break
       case url.includes(`/docs/reference/cli`) && url:
-        setLevel('reference_cli')
+        menuState.setMenuLevelId('reference_cli')
         break
       case url.includes(`/docs/reference/api`) && url:
-        setLevel('reference_api')
+        menuState.setMenuLevelId('reference_api')
         break
       case url.includes(`/docs/reference/self-hosting-auth`) && url:
-        setLevel('reference_self_hosting_auth')
+        menuState.setMenuLevelId('reference_self_hosting_auth')
         break
       case url.includes(`/docs/reference/self-hosting-storage`) && url:
-        setLevel('reference_self_hosting_storage')
+        menuState.setMenuLevelId('reference_self_hosting_storage')
         break
       case url.includes(`/docs/reference/self-hosting-realtime`) && url:
-        setLevel('reference_self_hosting_realtime')
+        menuState.setMenuLevelId('reference_self_hosting_realtime')
         break
 
       default:
@@ -364,7 +367,11 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'realtime'} currentLevel={level} />
       <NavigationMenuGuideList id={'storage'} currentLevel={level} />
       <NavigationMenuGuideList id={'platform'} currentLevel={level} />
-      <NavigationMenuGuideList id={'resources'} currentLevel={level} setLevel={setLevel} />
+      <NavigationMenuGuideList
+        id={'resources'}
+        currentLevel={level}
+        setMenuLevelId={menuState.setMenuLevelId}
+      />
       <NavigationMenuGuideList id={'integrations'} currentLevel={level} />
       <NavigationMenuGuideList id={'reference'} currentLevel={level} />
       {/* // Client Libs */}
