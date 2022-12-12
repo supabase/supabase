@@ -25,7 +25,11 @@ export const renderUserAgents = (
             return (
               <Table.tr key={index}>
                 <Table.td className="max-w-sm lg:max-w-lg" style={{ padding: '0.3rem' }}>
-                  {row.user_agent}
+                  {row.user_agent ? (
+                    row.user_agent
+                  ) : (
+                    <span className="text-scale-1000">No user agent</span>
+                  )}
                 </Table.td>
                 <Table.td>{row.request_source}</Table.td>
                 <Table.td style={{ padding: '0.5rem' }} className="align-top text-xs">
