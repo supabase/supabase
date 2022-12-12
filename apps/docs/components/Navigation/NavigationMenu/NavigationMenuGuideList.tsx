@@ -34,12 +34,12 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setLevel }
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        currentLevel === id && 'opacity-100 ml-0 delay-150 h-auto',
-        // move menu back to margin-left
+        currentLevel === id && 'opacity-100 ml-0 delay-150',
         currentLevel === 'home' && 'ml-12',
+
         // disabled
         currentLevel !== 'home' && currentLevel !== id ? '-ml-8' : '',
-        currentLevel !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
+        currentLevel !== id ? 'opacity-0 invisible absolute' : '',
       ].join(' ')}
     >
       <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
