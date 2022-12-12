@@ -611,6 +611,14 @@
         "libs": ["js"]
       },
       {
+        "id": "mfa-unenroll",
+        "title": "Unenroll a factor",
+        "slug": "auth-mfa-unenroll",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
         "id": "mfa-get-authenticator-assurance-level",
         "title": "Get Authenticator Assurance Level",
         "slug": "auth-mfa-getauthenticatorassurancelevel",
