@@ -130,11 +130,11 @@ const SignInLayout = ({
               <div className="sm:text-center">
                 <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}
-                  <Link href="https://supabase.com/docs/company/terms">
+                  <Link href="https://supabase.com/terms">
                     <a className="underline hover:text-scale-1100">Terms of Service</a>
                   </Link>{' '}
                   and{' '}
-                  <Link href="https://supabase.com/docs/company/privacy">
+                  <Link href="https://supabase.com/privacy">
                     <a className="underline hover:text-scale-1100">Privacy Policy</a>
                   </Link>
                   , and to receive periodic emails with updates.

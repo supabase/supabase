@@ -1,8 +1,14 @@
-import Layout from '~/layouts/DefaultGuideLayout'
+import Layout from '../layouts/Layout'
+import SectionContainer from '../components/Layouts/SectionContainer'
 
 export const meta = {
   title: 'Acceptable Use Policy',
+  description: 'Supabase Acceptable Use Policy',
 }
+
+<SectionContainer>
+
+# Acceptable Use Policy
 
 _Last Modified: 15 April 2021_
 
@@ -52,6 +58,6 @@ Reporting of Violations of this Policy
 
 If you become aware of any violation of this Policy, you will immediately notify us and provide us with assistance, as requested, to stop or remedy the violation. To report any violation of this Policy, please contact us at support@supabase.io.
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+</SectionContainer>
 
-export default Page
+export default (context) => <Layout meta={meta} children={context.children} context={context} />
