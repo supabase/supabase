@@ -1,0 +1,120 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-image-resizing',
+  title: 'Storage Image Resizing',
+  description: 'Resize images with Storage',
+  sidebar_label: 'Image Transformation',
+}
+
+Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
+
+<Admonition type="note">
+    Image Resizing is enabled for PRO tiers and above
+</Admonition>
+
+### Get a public URL for a Transformed image
+
+You can pass a `transform` option to the functions you are currently using to interact with your objects. This returns the public URL that serves the resized image.
+
+```ts
+supabase.storage.from('bucket').getPublicUrl('image.jpg', {
+    transform: {
+        width: 500,
+        height: 600,
+    }
+})
+```
+
+This will return the public URL with the formatted transformation parameters.
+Once visited you’ll be served with the resized image
+
+An example URL could look like this:
+`https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
+
+
+### Signing URLs - With transformation options
+
+To share a transformed image for a fixed amount of time, provide the transform options when you create the signed URL:
+
+```ts
+supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
+    transform: {
+       width: 200,
+       height: 200,
+    }
+})
+```
+
+The transformation options are embedded into the token, they cannot be changed once signed.
+
+## Downloading Images
+
+To download a transformed image, pass the `transform` option to the `download` function
+
+```ts
+supabase.storage.from('bucket').download('image.jpg', {
+    transform: {
+         width: 800,
+         height: 300,
+    }
+})
+```
+
+### Transformation options
+
+We currently support a few transformation options focusing on resizing & cropping.
+We have plans to increase the transformation types available in a later release.
+
+### Resizing
+
+You can use `width` and `height` parameters to resize an image to a specific dimension. If only one parameter is specified, the image will be resized and cropped, maintaining the aspect ratio.
+
+### Modes
+
+You can use different resizing modes to fit your needs, each of them uses a different approach to resize the image:
+
+Use the `resize` parameter with one of the following values:
+
+- `cover` : resizes the image while keeping the aspect ratio to fill a given size and crops projecting parts. (default)
+
+- `contain` : resizes the image while keeping the aspect ratio to fit a given size.
+
+- `fill` : resizes the image without keeping the aspect ratio.
+
+Example:
+
+```ts
+supabase.storage.from('bucket').download('image.jpg', {
+    transform: {
+         width: 800,
+         height: 300,
+         resize: 'contain' // 'cover' | 'fill'
+    }
+})
+```
+
+### Limits
+
+- Width and height must be an integer value between 1-2500.
+- The image size cannot exceed 25MB.
+- The image resolution cannot exceed 50MP.
+
+### Supported Image Formats
+
+| Format | Extension | Source | Result |
+| -------|-----------|--------|--------|
+| PNG    | `png`     | Yes    | Yes    |
+| JPEG   | `jpg`     | Yes    | Yes    |
+| WebP   | `webp`    | Yes    | Yes    |
+| AVIF   | `avif`    | Yes    | Yes    |
+| GIF    | `gif`     | Yes    | Yes    |
+| ICO    | `ico`     | Yes    | Yes    |
+| SVG    | `svg`     | Yes    | Yes    |
+| HEIC   | `heic`    | Yes    | No     |
+| BMP    | `bmp`     | Yes    | Yes    |
+| TIFF   | `tiff`    | Yes    | Yes    |
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
