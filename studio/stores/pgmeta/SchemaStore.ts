@@ -28,13 +28,14 @@ export default class SchemaStore extends PostgresMetaInterface<PostgresSchema> {
   }
 
   async loadViews(schema: string) {
-    const query = `
-      select schemaname as schema, viewname as name from pg_catalog.pg_views
-      where schemaname = '${schema}'
-      order by schemaname, viewname;
-    `
-    const views = await this.rootStore.meta.query(query)
-    this.views = views
-    return views
+    return [] as any
+    // const query = `
+    //   select schemaname as schema, viewname as name from pg_catalog.pg_views
+    //   where schemaname = '${schema}'
+    //   order by schemaname, viewname;
+    // `
+    // const views = await this.rootStore.meta.query(query)
+    // this.views = views
+    // return views
   }
 }
