@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { useStore } from 'hooks'
 
 export type FDWDeleteVariables = {
   projectRef?: string
@@ -56,12 +57,16 @@ export const useFDWDeleteMutation = ({
   ...options
 }: Omit<UseMutationOptions<FDWDeleteData, unknown, FDWDeleteVariables>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
+  const { vault } = useStore()
 
   return useMutation<FDWDeleteData, unknown, FDWDeleteVariables>((vars) => deleteFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws']))
+      await Promise.all([
+        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
+        vault.load(),
+      ])
 
       await onSuccess?.(data, variables, context)
     },
