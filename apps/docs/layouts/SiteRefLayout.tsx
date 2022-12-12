@@ -10,18 +10,97 @@ import { useEffect, useState, memo } from 'react'
 
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 import { NavigationMenuContextProvider } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
+import { useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+
+import { menuState } from '~/hooks/useMenuState'
 
 const SiteRefLayout = ({ children }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const menuLevel = useMenuLevelId()
+  const mobileMenuOpen = useMenuMobileOpen()
 
-  // const [activeRefItem, setActiveRefItem] = useState('')
+  //console.log('menuLevel', menuLevel)
 
-  // useEffect(() => {
-  //   setMobileMenuOpen(false)
-  // }, [router.asPath])
+  const levelsData = {
+    home: {
+      icon: '/docs/img/icons/menu/home',
+      name: 'Home',
+    },
+    gettingstarted: {
+      icon: '/docs/img/icons/menu/getting-started',
+      name: 'Getting Started',
+    },
+    database: {
+      icon: '/docs/img/icons/menu/database',
+      name: 'Database',
+    },
+    auth: {
+      icon: '/docs/img/icons/menu/auth',
+      name: 'Auth',
+    },
+    functions: {
+      icon: '/docs/img/icons/menu/functions',
+      name: 'Functions',
+    },
+    realtime: {
+      icon: '/docs/img/icons/menu/realtime',
+      name: 'Realtime',
+    },
+    storage: {
+      icon: '/docs/img/icons/menu/storage',
+      name: 'Storage',
+    },
+    platform: {
+      icon: '/docs/img/icons/menu/platform',
+      name: 'Platform',
+    },
+    resources: {
+      icon: '/docs/img/icons/menu/resources',
+      name: 'Resources',
+    },
+    integrations: {
+      icon: '/docs/img/icons/menu/integrations',
+      name: 'Integrations',
+    },
+    reference_javascript_v1: {
+      icon: '/docs/img/icons/menu/reference-javascript',
+      name: 'Javascript Reference v1.0',
+    },
+    reference_javascript_v2: {
+      icon: '/docs/img/icons/menu/reference-javascript',
+      name: 'Javascript Reference v2.0',
+    },
+    reference_dart_v0: {
+      icon: '/docs/img/icons/menu/reference-dart',
+      name: 'Dart Reference v0.0',
+    },
+    reference_dart_v1: {
+      icon: '/docs/img/icons/menu/reference-dart',
+      name: 'Dart Reference v0.0',
+    },
+    reference_cli: {
+      icon: '/docs/img/icons/menu/reference-cli',
+      name: 'CLI Reference',
+    },
+    reference_api: {
+      icon: '/docs/img/icons/menu/reference-api',
+      name: 'Management API Reference',
+    },
+    reference_self_hosting_auth: {
+      icon: '/docs/img/icons/menu/reference-auth',
+      name: 'Auth Server Reference',
+    },
+    reference_self_hosting_storage: {
+      icon: '/docs/img/icons/menu/reference-storage',
+      name: 'Storage Server Reference',
+    },
+    reference_self_hosting_realtime: {
+      icon: '/docs/img/icons/menu/reference-realtime',
+      name: 'Realtime Server Reference',
+    },
+  }
 
   return (
     <NavigationMenuContextProvider activeRefItem={''} setActiveRefItem={() => {}}>
@@ -110,23 +189,20 @@ const SiteRefLayout = ({ children }) => {
                   'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
                 ].join(' ')}
               >
-                <div
-                  className={[
-                    'lg:hidden',
-                    'px-5 ',
-                    'border-b z-10',
-                    mobileMenuOpen ? 'MOBILE-MENU-OPEN' : 'MOBILE-MENU-CLOSED', // experiment new
-                    mobileMenuOpen ? 'MOBILE-MENU-OPEN' : 'MOBILE-MENU-CLOSED',
-                  ].join(' ')}
-                >
+                <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
                   <div
                     className={[
                       'transition-all ease-out z-10',
-                      mobileMenuOpen ? 'absolute mt-[64px]' : 'top-0',
-                      'flex items-center gap-3 h-[40px]',
+                      'top-0',
+                      mobileMenuOpen && 'absolute',
+                      'flex items-center h-[40px]',
+                      mobileMenuOpen ? 'gap-0' : 'gap-3',
                     ].join(' ')}
                   >
-                    <button className="mr-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                    <button
+                      className={['mr-2', mobileMenuOpen && 'mt-0.5'].join(' ')}
+                      onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+                    >
                       <div
                         className={[
                           'space-y-1 group cursor-pointer relative',
@@ -151,10 +227,14 @@ const SiteRefLayout = ({ children }) => {
                     </button>
                     <div className={[].join(' ')}>
                       <img
-                        src="/docs/img/icons/menu/auth.svg"
+                        src={
+                          menuLevel
+                            ? levelsData[menuLevel].icon + '.svg'
+                            : levelsData['home'].icon + '.svg'
+                        }
                         className={[
                           'transition-all duration-200',
-                          mobileMenuOpen ? 'w-5 h-5' : 'w-4 h-4',
+                          mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4',
                         ].join(' ')}
                       />
                     </div>
@@ -162,21 +242,25 @@ const SiteRefLayout = ({ children }) => {
                       className={[
                         'transition-all duration-200',
                         'text-scale-1200',
-                        mobileMenuOpen ? 'text-base' : 'text-sm',
+                        mobileMenuOpen ? 'text-xs' : 'text-sm',
                       ].join(' ')}
                     >
-                      Auth
+                      {mobileMenuOpen
+                        ? 'Close'
+                        : menuLevel
+                        ? levelsData[menuLevel].name
+                        : levelsData['home'].name}
                     </span>
                   </div>
                   <div
                     className={[
                       'transition-all ease-out duration-200',
                       'absolute left-0 right-0 h-screen',
-                      'py-8 px-5 pl-14',
+                      'px-5 pl-5 py-16',
                       'top-[0px]',
                       'bg-scale-200',
                       mobileMenuOpen
-                        ? 'opacity-100 left-[0px] visible'
+                        ? 'overflow-y-auto opacity-100 left-[0px] visible'
                         : 'left-[-40px] h-0 opacity-0 invisible',
                     ].join(' ')}
                   >
@@ -224,7 +308,7 @@ const SiteRefLayout = ({ children }) => {
                   'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-blackA-600',
                   mobileMenuOpen ? 'absolute MOBILE-MENU-OPEN' : 'hidden h-0 MOBILE-MENU-CLOSED',
                 ].join(' ')}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
               ></div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { memo, useEffect, useState } from 'react'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import { menuState } from '~/hooks/useMenuState'
 
 // @ts-expect-error
 import spec_js_v2 from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
@@ -23,6 +24,7 @@ import authServerCommonSections from '~/../../spec/common-self-hosting-auth-sect
 import storageServerCommonSections from '~/../../spec/common-self-hosting-storage-sections.json'
 import realtimeServerCommonSections from '~/../../spec/common-self-hosting-realtime-sections.json'
 import { flattenSections } from '~/lib/helpers'
+import { useMenuLevelId } from '~/hooks/useMenuState'
 
 // Filter libCommonSections for just the relevant sections in the current library
 function generateAllowedClientLibKeys(sections, spec) {
@@ -68,7 +70,8 @@ export type RefKeyOptions =
 const SideNav = () => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
-  const [level, setLevel] = useState('home')
+
+  const level = useMenuLevelId()
 
   let version = ''
 
@@ -83,69 +86,66 @@ const SideNav = () => {
   function handleRouteChange(url: string) {
     switch (url) {
       case `/docs`:
-        setLevel('home')
+        menuState.setMenuLevelId('home')
         break
-      case url.includes(`/docs/getting-started`) && url:
-        setLevel('gettingstarted')
-        break
-      case url.includes(`/docs/guides/tutorials`) && url:
-        setLevel('tutorials')
+      case url.includes(`/docs/guides/getting-started`) && url:
+        menuState.setMenuLevelId('gettingstarted')
         break
       case url.includes(`/docs/guides/database`) && url:
-        setLevel('database')
+        menuState.setMenuLevelId('database')
         break
       case url.includes(`/docs/guides/auth`) && url:
-        setLevel('auth')
+        menuState.setMenuLevelId('auth')
         break
       case url.includes(`/docs/guides/functions`) && url:
-        setLevel('functions')
+        menuState.setMenuLevelId('functions')
         break
       case url.includes(`/docs/guides/realtime`) && url:
-        setLevel('realtime')
+        menuState.setMenuLevelId('realtime')
         break
       case url.includes(`/docs/guides/storage`) && url:
-        setLevel('storage')
+        menuState.setMenuLevelId('storage')
         break
       case url.includes(`/docs/guides/platform`) ||
         (url.includes(`/docs/guides/hosting/platform`) && url):
-        setLevel('platform')
+        menuState.setMenuLevelId('platform')
         break
       case url.includes(`/docs/guides/resources`) && url:
-        setLevel('resources')
+        menuState.setMenuLevelId('resources')
         break
       case url.includes(`/docs/guides/integrations`) && url:
-        setLevel('integrations')
+        menuState.setMenuLevelId('integrations')
         break
       // JS v1
       case url.includes(`/docs/reference/javascript/v1`) && url:
-        setLevel('reference_javascript_v1')
+        menuState.setMenuLevelId('reference_javascript_v1')
         break
       // JS v2 (latest)
       case url.includes(`/docs/reference/javascript`) && url:
-        setLevel('reference_javascript_v2')
+        menuState.setMenuLevelId('reference_javascript_v2')
         break
       // dart v0
       case url.includes(`/docs/reference/dart/v0`) && url:
-        setLevel('reference_dart_v0')
+        menuState.setMenuLevelId('reference_dart_v0')
         break
       // dart v1 (latest)
       case url.includes(`/docs/reference/dart`) && url:
-        setLevel('reference_dart_v1')
+        menuState.setMenuLevelId('reference_dart_v1')
         break
       case url.includes(`/docs/reference/cli`) && url:
-        setLevel('reference_cli')
+        menuState.setMenuLevelId('reference_cli')
         break
       case url.includes(`/docs/reference/api`) && url:
-        setLevel('reference_api')
+        menuState.setMenuLevelId('reference_api')
         break
       case url.includes(`/docs/reference/self-hosting-auth`) && url:
-        setLevel('reference_self_hosting_auth')
+        menuState.setMenuLevelId('reference_self_hosting_auth')
         break
       case url.includes(`/docs/reference/self-hosting-storage`) && url:
-        setLevel('reference_self_hosting_storage')
+        menuState.setMenuLevelId('reference_self_hosting_storage')
         break
       case url.includes(`/docs/reference/self-hosting-realtime`) && url:
-        setLevel('reference_self_hosting_realtime')
+        menuState.setMenuLevelId('reference_self_hosting_realtime')
         break
 
       default:
@@ -173,14 +173,8 @@ const SideNav = () => {
       {
         label: 'Getting Started',
         icon: '/img/icons/menu/getting-started',
-        href: '/getting-started',
+        href: '/guides/getting-started',
         level: 'gettingstarted',
-      },
-      {
-        label: 'Tutorials',
-        icon: '/img/icons/menu/tutorials',
-        href: '/guides/tutorials',
-        level: 'tutorials',
       },
     ],
     [
@@ -246,13 +240,6 @@ const SideNav = () => {
         href: '/reference/javascript/introduction',
         level: 'reference_javascript',
       },
-      // {
-      //   label: 'Python Client Library',
-      //   icon: '/img/icons/python-icon',
-      //   hasLightIcon: false,
-      //   href: '/reference/javascript/start',
-      //   level: 'reference_javascript',
-      // },
       {
         label: 'Flutter',
         icon: '/img/icons/menu/reference-dart',
@@ -304,20 +291,15 @@ const SideNav = () => {
     ],
   ]
 
-  // generate Open API specs
-
-  // @ts-ignore
-  // const apiSpec = gen_v3(apiSpecRaw, 'wat', { apiUrl: 'apiv0' })
-
   return (
     <div className="flex relative">
       {/* // main menu */}
       <div
         className={[
-          '',
           'transition-all duration-150 ease-out',
-          level === 'home' ? 'opacity-100 ml-0 delay-150' : 'opacity-0 -ml-8 invisible absolute',
-          // level !== 'home' && 'opacity-0 invisible'
+          level === 'home' || !level
+            ? 'opacity-100 ml-0 delay-150'
+            : 'opacity-0 -ml-8 invisible absolute',
         ].join(' ')}
       >
         <ul className="relative w-full flex flex-col gap-4">
@@ -363,7 +345,7 @@ const SideNav = () => {
                                   }${!link.icon.includes('png') ? '.svg' : ''}`}
                                   width={17}
                                   height={17}
-                                  className="opacity-75 w-4 h-4 group-hover:scale-110 group-hover:opacity-100 ease-out transition-all"
+                                  className="w-4 h-4 group-hover:scale-110 ease-out transition-all"
                                 />
                                 {link.label}
                               </li>
@@ -381,14 +363,17 @@ const SideNav = () => {
       </div>
 
       <NavigationMenuGuideList id={'gettingstarted'} currentLevel={level} />
-      <NavigationMenuGuideList id={'tutorials'} currentLevel={level} />
       <NavigationMenuGuideList id={'database'} currentLevel={level} />
       <NavigationMenuGuideList id={'auth'} currentLevel={level} />
       <NavigationMenuGuideList id={'functions'} currentLevel={level} />
       <NavigationMenuGuideList id={'realtime'} currentLevel={level} />
       <NavigationMenuGuideList id={'storage'} currentLevel={level} />
       <NavigationMenuGuideList id={'platform'} currentLevel={level} />
-      <NavigationMenuGuideList id={'resources'} currentLevel={level} />
+      <NavigationMenuGuideList
+        id={'resources'}
+        currentLevel={level}
+        setMenuLevelId={menuState.setMenuLevelId}
+      />
       <NavigationMenuGuideList id={'integrations'} currentLevel={level} />
       <NavigationMenuGuideList id={'reference'} currentLevel={level} />
       {/* // Client Libs */}

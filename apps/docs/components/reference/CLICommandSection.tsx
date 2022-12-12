@@ -79,11 +79,11 @@ const CliCommandSection = (props) => {
 
             {command.subcommands.length > 0 && (
               <div className="">
-                <h3 className="text-sm font-bold text-scale-1200 mb-3">Available Commands</h3>
+                <h3 className="text-sm text-scale-1200 mb-3">Available Commands</h3>
                 <ul>
                   {command.subcommands.map((subcommand) => (
                     <li key={subcommand}>
-                      <a href={`#${subcommand}`}>
+                      <a href={`#${subcommand}`} className="text-scale-1200">
                         <CodeBlock language="bash">{subcommand}</CodeBlock>
                       </a>
                     </li>
