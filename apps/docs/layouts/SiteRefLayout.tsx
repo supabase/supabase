@@ -10,6 +10,7 @@ import { useEffect, useState, memo } from 'react'
 
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 import { NavigationMenuContextProvider } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
+import { useMenuLevelId } from '~/hooks/useMenuState'
 
 const SiteRefLayout = ({ children }) => {
   const router = useRouter()
@@ -17,11 +18,88 @@ const SiteRefLayout = ({ children }) => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // const [activeRefItem, setActiveRefItem] = useState('')
+  const menuLevel = useMenuLevelId()
 
-  // useEffect(() => {
-  //   setMobileMenuOpen(false)
-  // }, [router.asPath])
+  console.log('menuLevel', menuLevel)
+
+  const levelsData = {
+    home: {
+      icon: '/docs/img/icons/menu/home',
+      name: 'Home',
+    },
+    gettingstarted: {
+      icon: '/docs/img/icons/menu/getting-started',
+      name: 'Getting Started',
+    },
+    database: {
+      icon: '/docs/img/icons/menu/database',
+      name: 'Database',
+    },
+    auth: {
+      icon: '/docs/img/icons/menu/auth',
+      name: 'Auth',
+    },
+    functions: {
+      icon: '/docs/img/icons/menu/functions',
+      name: 'Functions',
+    },
+    realtime: {
+      icon: '/docs/img/icons/menu/realtime',
+      name: 'Realtime',
+    },
+    storage: {
+      icon: '/docs/img/icons/menu/storage',
+      name: 'Storage',
+    },
+    platform: {
+      icon: '/docs/img/icons/menu/platform',
+      name: 'Platform',
+    },
+    resources: {
+      icon: '/docs/img/icons/menu/resources',
+      name: 'Resources',
+    },
+    integrations: {
+      icon: '/docs/img/icons/menu/integrations',
+      name: 'Integrations',
+    },
+    reference_javascript_v1: {
+      icon: '/docs/img/icons/menu/reference-javascript',
+      name: 'Javascript Reference v1.0',
+    },
+    reference_javascript_v2: {
+      icon: '/docs/img/icons/menu/reference-javascript',
+      name: 'Javascript Reference v2.0',
+    },
+    reference_dart_v0: {
+      icon: '/docs/img/icons/menu/reference-dart',
+      name: 'Dart Reference v0.0',
+    },
+    reference_dart_v1: {
+      icon: '/docs/img/icons/menu/reference-dart',
+      name: 'Dart Reference v0.0',
+    },
+    reference_cli: {
+      icon: '/docs/img/icons/menu/reference-cli',
+      name: 'CLI Reference',
+    },
+    reference_api: {
+      icon: '/docs/img/icons/menu/reference-api',
+      name: 'Management API Reference',
+    },
+    reference_self_hosting_auth: {
+      icon: '/docs/img/icons/menu/reference-auth',
+      name: 'Auth Server Reference',
+    },
+    reference_self_hosting_storage: {
+      icon: '/docs/img/icons/menu/reference-storage',
+      name: 'Storage Server Reference',
+    },
+    reference_self_hosting_realtime: {
+      icon: '/docs/img/icons/menu/reference-realtime',
+      name: 'Realtime Server Reference',
+    },
+  }
 
   return (
     <NavigationMenuContextProvider activeRefItem={''} setActiveRefItem={() => {}}>
@@ -91,17 +169,15 @@ const SiteRefLayout = ({ children }) => {
             </div>
           </div>
           <div
+            // #docs-content-container is used by layout to scroll to top
+            id="docs-content-container"
             className={[
               'w-full h-screen transition-all ease-out',
               mobileMenuOpen ? 'overflow-hidden' : 'overflow-auto',
-              // !mobileMenuOpen
-              //   ? 'ml-0 MOBILE-MENU-CLOSE overflow-auto'
-              //   : 'ml-[320px] h-0 MOBILE-MENU-OPEN overflow-hidden', // experiment
             ].join(' ')}
           >
             <div className="flex flex-col relative">
               {/* <NavigationMenu /> */}
-
               <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
                 <TopNavBarRef />
               </div>
@@ -112,19 +188,12 @@ const SiteRefLayout = ({ children }) => {
                   'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
                 ].join(' ')}
               >
-                <div
-                  className={[
-                    'lg:hidden',
-                    'px-5 ',
-                    'border-b z-10',
-                    mobileMenuOpen ? 'MOBILE-MENU-OPEN' : 'MOBILE-MENU-CLOSED', // experiment new
-                    mobileMenuOpen ? 'MOBILE-MENU-OPEN' : 'MOBILE-MENU-CLOSED',
-                  ].join(' ')}
-                >
+                <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
                   <div
                     className={[
                       'transition-all ease-out z-10',
-                      mobileMenuOpen ? 'absolute mt-[64px]' : 'top-0',
+                      'top-0',
+                      mobileMenuOpen && 'absolute',
                       'flex items-center gap-3 h-[40px]',
                     ].join(' ')}
                   >
@@ -153,10 +222,14 @@ const SiteRefLayout = ({ children }) => {
                     </button>
                     <div className={[].join(' ')}>
                       <img
-                        src="/docs/img/icons/menu/auth.svg"
+                        src={
+                          menuLevel
+                            ? levelsData[menuLevel].icon + '.svg'
+                            : levelsData['home'].icon + '.svg'
+                        }
                         className={[
                           'transition-all duration-200',
-                          mobileMenuOpen ? 'w-5 h-5' : 'w-4 h-4',
+                          mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4',
                         ].join(' ')}
                       />
                     </div>
@@ -167,14 +240,18 @@ const SiteRefLayout = ({ children }) => {
                         mobileMenuOpen ? 'text-base' : 'text-sm',
                       ].join(' ')}
                     >
-                      Auth
+                      {mobileMenuOpen
+                        ? 'Close'
+                        : menuLevel
+                        ? levelsData[menuLevel].name
+                        : levelsData['home'].name}
                     </span>
                   </div>
                   <div
                     className={[
                       'transition-all ease-out duration-200',
                       'absolute left-0 right-0 h-screen',
-                      'py-8 px-5 pl-14',
+                      'py-8 px-5 pl-14 pt-16',
                       'top-[0px]',
                       'bg-scale-200',
                       mobileMenuOpen

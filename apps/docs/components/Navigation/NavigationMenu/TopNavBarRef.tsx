@@ -124,158 +124,17 @@ const TopNavBarRef: FC = () => {
               </div>
             </div>
           </SearchButton>
-
-          {/* <div className="flex items-center -space-x-px">
-            <div className="w-64">
-              <div
-                className="
-              flex
-              group
-              items-center
-              justify-between
-              bg-scaleA-200
-              border
-              transition
-              hover:border-scale-600
-              hover:bg-scaleA-300
-              border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
-              rounded-tr-none
-              rounded-br-none
-              font-mono
-              "
-              >
-                <div className="flex items-center space-x-2">
-                  <img src="/docs/img/icons/javascript-icon.svg" className="w-4 h-4" />
-                  <p className="text-scale-1200 text-sm group-hover:text-scale-1200 transition">
-                    supabase-js
-                  </p>
-                </div>
-              </div>
-            </div>
-            <Dropdown
-              size="small"
-              align="start"
-              side="bottom"
-              overlay={
-                <>
-                  <Dropdown.Label>Stable releases</Dropdown.Label>
-                  <Dropdown.Item>
-                    version 2.0
-                    <Dropdown.RightSlot>
-                      <Badge size="small">Latest</Badge>
-                    </Dropdown.RightSlot>
-                  </Dropdown.Item>
-                  <Dropdown.Item>Version 1.0 </Dropdown.Item>
-                  <Dropdown.Separator />
-                  <Dropdown.Label>Alpha releases</Dropdown.Label>
-                  <Dropdown.Misc>
-                    <p className="text-scale-900 text-xs">Currently no alpha releases</p>
-                  </Dropdown.Misc>
-                </>
-              }
-            >
-              <div className="w-32">
-                <div
-                  className="
-              flex
-              group
-              items-center
-              justify-between
-              bg-scaleA-200
-              border
-              transition
-              hover:border-scale-600
-              hover:bg-scaleA-300
-              border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
-              font-mono
-
-              rounded-tl-none
-              rounded-bl-none
-              "
-                >
-                  <div className="flex items-center space-x-2">
-                    <p className="text-scale-900 text-xs group-hover:text-scale-1200 transition">
-                      version
-                    </p>
-                    <p className="text-scale-1200 text-sm group-hover:text-scale-1200 transition">
-                      2.0
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Dropdown>
-          </div> */}
-
-          {/* <Dropdown
-            size="small"
-            align="start"
-            side="bottom"
-            overlay={
-              <>
-                <Dropdown.Label>Stable releases</Dropdown.Label>
-                <Dropdown.Item>
-                  version 2.0
-                  <Dropdown.RightSlot>
-                    <Badge size="small">Latest</Badge>
-                  </Dropdown.RightSlot>
-                </Dropdown.Item>
-                <Dropdown.Item>Version 1.0 </Dropdown.Item>
-                <Dropdown.Separator />
-                <Dropdown.Label>Alpha releases</Dropdown.Label>
-                <Dropdown.Misc>
-                  <p className="text-scale-900 text-xs">Currently no alpha releases</p>
-                </Dropdown.Misc>
-              </>
-            }
-          >
-            <div className="w-96">
-              <div
-                className="
-              flex
-              gap-3
-              group
-              items-center
-              bg-scaleA-200
-              border
-              transition
-              hover:border-scale-600
-              hover:bg-scaleA-300
-              border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
-              font-mono
-              "
-              >
-                <div className="flex items-center space-x-2">
-                  <p className="text-scale-900 text-xs group-hover:text-scale-1200 transition">
-                    Project
-                  </p>
-                  <div className="flex flex-row text-left gap-3">
-                    <p className="text-scale-1200 text-sm group-hover:text-scale-1200 transition">
-                      Meme.Town
-                    </p>
-                  </div>
-                </div>
-                <div className="text-left">
-                  <p className="text-scale-1100 text-[10px] group-hover:text-scale-1200 transition">
-                    ref: an9q3p23dn32pdnc2n
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Dropdown> */}
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button
             type="text"
             as="a"
             // @ts-ignore
-            href="https://app.supabase.com"
+            href="https://supabase.com"
             target="_blank"
             rel="noreferrer noopener"
           >
-            Docs
-          </Button>
-          <Button type="text" icon={<IconMessageSquare />}>
-            Feedback
+            Main site
           </Button>
           <Button
             type="text"

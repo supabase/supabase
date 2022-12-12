@@ -134,7 +134,6 @@ const TopNavBar: FC = () => {
           </div>
         </div>
         <div className="col-span-4 flex items-center justify-end gap-3">
-          <Button type="default">Feedback</Button>
           <Button
             type="outline"
             as="a"
