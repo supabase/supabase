@@ -1842,4 +1842,39 @@ module.exports = [
     source: '/guides/migrations/heroku',
     destination: '/guides/resources/migrating-to-supabase/heroku',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript',
+    destination: '/docs/reference/javascript/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/dart',
+    destination: '/docs/reference/dart/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli',
+    destination: '/docs/reference/cli/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/api',
+    destination: '/docs/reference/api/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth',
+    destination: '/docs/reference/auth/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/storage',
+    destination: '/docs/reference/storage/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/realtime',
+    destination: '/docs/reference/realtime/introduction',
+  },
 ]
