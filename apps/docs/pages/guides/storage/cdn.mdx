@@ -9,7 +9,9 @@ export const meta = {
 
 All assets uploaded to Supabase Storage are cached on a Content Delivery Network (CDN) to improve the latency for users all around the world. CDNs are a geographically distributed set of servers or **nodes** which caches content from an **origin server**. For Supabase Storage, the origin is the storage server running in the [same region as your project](https://app.supabase.com/project/_/settings/general). Aside from performance, CDNs also help with security and availability by mitigating Distributed Denial of Service and other application attacks.
 
-## Basic CDN - TTL Caching
+## Basic CDN
+
+Our basic CDN caches objects based on the cache time set when uploading objects.
 
 ### Example
 
@@ -17,7 +19,11 @@ Let’s walk through an example of how a CDN helps with performance.
 
 A new bucket is created for a Supabase project launched in Singapore. All requests to the Supabase Storage API are routed to the CDN first.
 
-A user from the United States requests an object and is routed to the U.S. CDN. At this point, that CDN node does not have the object in its cache and pings the origin server in Singapore. Another user, also in the United States, requests the same object and is served directly from the CDN cache in the United States instead of routing the request back to Singapore.
+A user from the United States requests an object and is routed to the U.S. CDN. At this point, that CDN node does not have the object in its cache and pings the origin server in Singapore.
+![CDN cache miss](/docs/img/cdn-cache-miss.png)
+
+Another user, also in the United States, requests the same object and is served directly from the CDN cache in the United States instead of routing the request back to Singapore.
+![CDN cache hit](/docs/img/cdn-cache-hit.png)
 
 ### Cache duration
 
@@ -36,29 +42,29 @@ Note that CDNs might still evict your object from their cache if it has not been
 
 The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
 
+
 ## Smart CDN Caching
 
 <Admonition type="note">
-   Smart CDN caching is enabled for [PRO tiers and above](https://supabase.com/pricing).
+  Smart CDN caching is automatically enabled for [Pro tiers and
+  above](https://supabase.com/pricing).
 </Admonition>
 
-With Smart CDN caching enabled, the asset metadata (not the content) in your database is synchronized to the edge. This automatically revalidates the cache when the content of an asset is changed or deleted.
+With Smart CDN caching enabled, the asset metadata in your database is synchronized to the edge. This automatically revalidates the cache when the asset is changed or deleted.
 
-Additionally, the cache HIT ratio is increased as the origin server is shielded from asset requests that haven't changed when using a different query string URL.
+Additionally, the smart CDN has a higher cache hit ratio as the origin server is shielded from asset requests that haven't changed when using different query strings in the URL.
 
 ### Cache duration
 
-The Smart CDN cache duration is controlled on the server and cached for as long as possible. However, you can still control the browser caching TTL using the [cacheControl](/docs/reference/javascript/storage-from-upload) option when uploading a file. Smart CDN caching works with all types of operations including signed URLs.
+When Smart CDN is enabled, the asset is cached on the CDN for as long as possible. You can still control how long assets are stored in the browser using the [cacheControl](/docs/reference/javascript/storage-from-upload) option when uploading a file. Smart CDN caching works with all types of storage operations including signed URLs.
 
 When a file is updated or deleted, the CDN cache is automatically invalidated to reflect the change (including transformed images).
-It can take **up to 60 seconds** for the CDN cache to be invalidated as it has to propagate across all the data-centers around the globe.
+It can take **up to 60 seconds** for the CDN cache to be invalidated as the asset metadata has to propagate across all the data-centers around the globe.
 
-When an asset is invalidated at the CDN level, it doesn't affect browser caching.
-If you don't see the changes, make sure the browser cache has been updated.
+When an asset is invalidated at the CDN level, browsers may not update its cache.
 
 If your asset is updated frequently, we recommend that you re-upload the new asset in a different key, this way you'll always have the latest changes available without waiting the propagation delay.
-If your expect your asset to be deleted, we recommend setting a low browser TTL value using the `cacheControl` option when using smart CDN caching, the default is 1hour which generally is a good default.
-
+If you expect your asset to be deleted, we recommend setting a low browser TTL value using the `cacheControl` option when using smart CDN caching, the default is 1 hour which generally is a good default.
 
 ## Public vs Private Buckets
 
