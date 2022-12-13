@@ -561,19 +561,19 @@ export const resources = {
         {
           name: 'Auth Server',
           url: '/reference/self-hosting-auth/introduction',
-          icon: '/docs/img/icons/menu/reference-auth',
+          icon: '/img/icons/menu/reference-auth',
           items: [],
         },
         {
           name: 'Storage Server',
           url: '/reference/self-hosting-storage/introduction',
-          icon: '/docs/img/icons/menu/reference-storage',
+          icon: '/img/icons/menu/reference-storage',
           items: [],
         },
         {
           name: 'Realtime Server',
           url: '/reference/self-hosting-realtime/introduction',
-          icon: '/docs/img/icons/menu/reference-realtime',
+          icon: '/img/icons/menu/reference-realtime',
           items: [],
         },
       ],
