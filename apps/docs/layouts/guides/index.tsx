@@ -24,23 +24,12 @@ interface Props {
 
 const Layout: FC<Props> = (props) => {
   const [hash] = useHash()
-  const [active, setActive] = useState(false)
 
   const articleRef = useRef()
   const [tocList, setTocList] = useState([])
 
   const { asPath } = useRouter()
   const page = getPageType(asPath)
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-    }
-  }, [])
 
   useEffect(() => {
     if (hash && tocList.length > 0) {
@@ -62,10 +51,6 @@ const Layout: FC<Props> = (props) => {
         return { text, link, level }
       })
     setTocList(newHeadings)
-  }, [])
-
-  useEffect(() => {
-    setActive(true)
   }, [])
 
   const hasTableOfContents = tocList.length > 0
@@ -94,7 +79,6 @@ const Layout: FC<Props> = (props) => {
             !props.hideToc ? 'col-span-12 md:col-span-9' : 'col-span-12',
             'transition-all ease-out',
             'duration-100',
-            active ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         >
           {props.meta.breadcrumb && (
@@ -122,7 +106,6 @@ const Layout: FC<Props> = (props) => {
               'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
               'transition-all ease-out',
               'duration-100',
-              active ? 'opacity-100' : 'opacity-0',
             ].join(' ')}
           >
             <div className="border-l">

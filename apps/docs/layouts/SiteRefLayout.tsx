@@ -8,9 +8,20 @@ import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 
 import { menuState } from '~/hooks/useMenuState'
+import { useEffect } from 'react'
 
 const SiteRefLayout = ({ children }) => {
   const { isDarkMode } = useTheme()
+
+  useEffect(() => {
+    const key = localStorage.getItem('supabaseDarkMode')
+    if (!key) {
+      // Default to dark mode if no preference config
+      document.documentElement.className = 'dark'
+    } else {
+      document.documentElement.className = key === 'true' ? 'dark' : ''
+    }
+  }, [])
 
   const menuLevel = 'home'
   // useMenuLevelId()
