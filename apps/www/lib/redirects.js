@@ -537,9 +537,9 @@ module.exports = [
   },
 
   {
-    permanent: false,
-    source: '/docs/guides/platform',
-    destination: '/docs/guides/hosting/platform',
+    permanent: true,
+    source: '/docs/guides/hosting/platform',
+    destination: '/docs/guides/platform',
   },
   {
     permanent: false,
