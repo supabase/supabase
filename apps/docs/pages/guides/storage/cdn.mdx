@@ -15,22 +15,20 @@ All assets uploaded to Supabase Storage are cached on a Content Delivery Network
 
 Let’s walk through an example of how a CDN helps with performance.
 
-A new bucket is created for a Supabase project launched in Singapore. All requests to the Supabase Storage API first hit the CDN.
+A new bucket is created for a Supabase project launched in Singapore. All requests to the Supabase Storage API are routed to the CDN first.
 
 A user from the United States requests an object and is routed to the U.S. CDN. At this point, that CDN node does not have the object in its cache and pings the origin server in Singapore. Another user, also in the United States, requests the same object and is served directly from the CDN cache in the United States instead of routing the request back to Singapore.
 
 ### Cache duration
 
-By default, assets are cached both in the CDN and in the user's browser for 1 hour.
-
-After this, the CDN nodes ping the storage server to see if an object has been updated. You can modify this cache time when you are [uploading](/docs/reference/javascript/storage-from-upload) or [updating](/docs/reference/javascript/storage-from-update) an object by modifying the `cacheControl` parameter.
+By default, assets are cached both in the CDN and in the user's browser for 1 hour. After this, the CDN nodes ping the storage server to see if an object has been updated. You can modify this cache time when you are [uploading](/docs/reference/javascript/storage-from-upload) or [updating](/docs/reference/javascript/storage-from-update) an object by modifying the `cacheControl` parameter.
 If you expect the object to not change at a given URL, setting a longer cache duration is preferable.
 
-If you need to update the version of the object stored in the CDN, there are various cache-busting techniques you can use.<br /> The most common way to do this is to add a version query parameter in the URL.
+If you need to update the version of the object stored in the CDN, there are various cache-busting techniques you can use. The most common way to do this is to add a version query parameter in the URL.
 
 For example, you can use a URL like `/storage/v1/object/sign/profile-pictures/cat.jpg?token=eyJh...&version=1` in your applications and set a long cache time of 1 year.
 
-When you want to update the cat picture, you can increment the version query parameter in the URL. The CDN will treat `/storage/v1/object/sign/profile-pictures/cat.jpg?token=eyJh...&version=2` as a new object and pings the origin for the updated version.
+When you want to update the cat picture, you can increment the version query parameter in the URL. The CDN treats `/storage/v1/object/sign/profile-pictures/cat.jpg?token=eyJh...&version=2` as a new object and pings the origin for the updated version.
 
 Note that CDNs might still evict your object from their cache if it has not been requested for a while from a specific region. For example, if no user from United States requests your object, it will be removed from the CDN cache even if you set a very long cache control duration.
 
@@ -39,30 +37,24 @@ The cache status of a particular request is sent in the `cf-cache-status` header
 
 ## Smart CDN Caching
 
-With Smart CDN caching enabled, we are synchronizing the asset metadata (not the content) that live in your database to the edge.
-By doing this we are able to automatically revalidate the cache when the content of an asset changes or gets deleted.
-
-On top of automatic revalidation, you will also benefit from a much greater Cache HIT ratio, since we are able to shield the origin server when
-requesting an asset that hasn't changed when using different query string url.
-
 <Admonition type="note">
-   Smart CDN caching is enabled for PRO tiers and above
+   Smart CDN caching is enabled for [PRO tiers and above](https://supabase.com/pricing).
 </Admonition>
+
+With Smart CDN caching enabled, the asset metadata (not the content) in your database is synchronized to the edge. This automatically revalidates the cache when the content of an asset is changed or deleted.
+
+Additionally, the cache HIT ratio is increased as the origin server is shielded from asset requests that haven't changed when using a different query string URL.
 
 ### Cache duration
 
-When using Smart CDN, we will control the CDN cache duration on the server and caching it for as long as possible.
-However, you are still in control of the browser caching TTL which you can set by using the [cacheControl](/docs/reference/javascript/storage-from-upload) option while uploading the file.
+The Smart CDN cache duration is controlled on the server and cached for as long as possible. However, you can still control the browser caching TTL using the [cacheControl](/docs/reference/javascript/storage-from-upload) option when uploading a file. Smart CDN caching works with all types of operations including signed URLs.
 
-When a file is updated or deleted, we will automatically invalidate the CDN cache to reflect the change as well as to all derivatives (transformed images).
-Keep in mind that the invalidation can take <b>up to 60 seconds</b> to be propagated across all the data-centers across the globe.
+When a file is updated or deleted, the CDN cache is automatically invalidated to reflect the change (including transformed images).
+It can take **up to 60 seconds** for the CDN cache to be invalidated as it has to propagate across all the data-centers around the globe.
 
-When we invalidate an asset at the CDN level, it can't, doesn't, affect browser caching.
-If you don't see the reflected changes make sure the browser cache has been updated.
-
-If your asset is updated frequently we recommend setting a low browser ttl value using the `cacheControl` option when using smart cdn caching.
-
-Smart CDN caching works with all types of operations including signed urls.
+When an asset is invalidated at the CDN level, it doesn't affect browser caching.
+If you don't see the changes, make sure the browser cache has been updated.
+If your asset is updated frequently, we recommend setting a low browser TTL value using the `cacheControl` option when using smart CDN caching.
 
 
 ## Public vs Private Buckets
