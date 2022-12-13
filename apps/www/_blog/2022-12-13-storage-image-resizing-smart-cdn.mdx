@@ -132,7 +132,7 @@ Let's step through a few different flows to see how it all works:
 
 Let's imagine one of your users makes a request for a resized cat (kitten?) image in your application. Here's the flow:
 
-![Cache miss flow](/images/blog/launch-week-6/day-2-storage-resize/cache%20miss.jpg)
+![Cache miss flow](/images/blog/launch-week-6/day-2-storage-resize/cache-miss.png)
 
 1. The request hits our globally-distributed API Gateway. This gateway reads the image metadata from a global KV store (this metadata is created when the image was uploaded).
 2. Inside the image metadata is a Cache Key - this is comprised of an [Etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) + tenant ID + bucketname + image name. The Gateway tries to find a cached object in our CDN using the Cache Key. If the image has never been accessed, it is a “Cache miss”.
