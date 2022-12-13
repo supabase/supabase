@@ -10,6 +10,7 @@ interface ActionBarProps {
   backButtonLabel?: string
   applyFunction?: (resolve: any) => void
   closePanel: () => void
+  formId?: string
 }
 const ActionBar: FC<ActionBarProps> = ({
   loading = false,
@@ -20,6 +21,7 @@ const ActionBar: FC<ActionBarProps> = ({
   backButtonLabel = 'Back',
   applyFunction = undefined,
   closePanel = () => {},
+  formId,
 }) => {
   const [isRunning, setIsRunning] = useState(false)
 
@@ -53,7 +55,13 @@ const ActionBar: FC<ActionBarProps> = ({
       ) : !hideApply ? (
         // New solution, when using the Form component, loading is handled by the Form itself
         // Does not require applyFunction() callback
-        <Button size="small" disabled={disableApply} loading={loading} htmlType="submit">
+        <Button
+          size="small"
+          disabled={disableApply}
+          loading={loading}
+          htmlType="submit"
+          form={formId}
+        >
           {applyButtonLabel}
         </Button>
       ) : (
