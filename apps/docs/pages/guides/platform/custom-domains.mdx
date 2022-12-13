@@ -18,7 +18,7 @@ To get started:
 
 1. [Install](/docs/guides/cli) the Supabase CLI 1.11.3+.
 1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
-1. Ensure that you have [Owner or Admin permissions](/docs/guides/hosting/platform#manage-team-members) for the project you'd like to set up a custom domain for.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform#manage-team-members) for the project you'd like to set up a custom domain for.
 1. Enable the Custom Domains add-on in the Billing page of the Dashboard.
 
 ## Configure a Custom Domain
@@ -88,6 +88,64 @@ As with the final activation stage of the process for setting up a custom domain
 ## Limitations
 
 Edge functions do not honor the custom domain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
+
+# Vanity Subdomains
+
+<Admonition type="note">
+
+Vanity Subdomains are currently in beta, and are being slowly made available to projects. [Contact Support](https://app.supabase.com/support/new) if you'd like to request early access.
+
+</Admonition>
+
+Vanity Subdomains allow you to present a basic branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on Supabase (e.g., `my-example-brand.supabase.co`) instead of the default, randomly-assigned `foobarbaz.supabase.co`.
+
+To get started:
+
+1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
+1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/hosting/platform#manage-team-members) for the project you'd like to set up a vanity subdomain for.
+1. Ensure that your project has a paid subscription (Pro/Pay as you go/Enterprise tier) in the [Billing page of the Dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
+
+## Configure a Vanity Subdomain
+
+This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a vanity subdomain at `my-example-brand.supabase.co`.
+
+### Check subdomain availability
+
+Use the `check-availability` subcommand of the CLI to check if your desired subdomain is available for use:
+
+```bash
+supabase vanity-subdomains --project-ref foobarbaz check-availability --desired-subdomain my-example-brand --experimental
+```
+
+### Activate a subdomain
+
+Once you've chosen an available subdomain, you can reconfigure your Supabase project to start serving traffic on the vanity subdomain (`my-example-brand.supabase.co`).
+The auth service, in particular, will no longer work with the original URL (`foobarbaz.supabase.co`).
+As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your vanity subdomain:
+
+- any client code (e.g., frontends, mobile apps)
+- any OAuth providers (e.g., Google, GitHub)
+
+The `activate` subcommand can be used to initiate the activation:
+
+```bash
+supabase vanity-subdomains --project-ref fwmssjhjgszhnavvqxnt check-availability --desired-subdomain my-example-subdomain --experimental
+```
+
+## Remove a Vanity Subdomain
+
+If you have a vanity subdomain (`my-example-brand.supabase.co`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
+
+```bash
+supabase vanity-subdomains delete --project-ref foobarbaz --experimental
+```
+
+As with the final activation stage of the process for setting up a vanity subdomain, you'll need to update any references in your client code and OAuth providers from the vanity subdomain to the Supabase-provisioned endpoints.
+
+## Limitations
+
+Edge functions do not honor the vanity subdomain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -253,7 +253,7 @@ export const menuItems: NavMenu = {
     {
       label: 'Platform',
       items: [
-        { name: 'Overview', url: '/guides/hosting/platform', items: [] },
+        { name: 'Overview', url: '/guides/platform', items: [] },
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
