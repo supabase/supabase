@@ -463,7 +463,6 @@ export const platform = {
   label: 'Platform',
   url: '/guides/platform',
   items: [
-    { name: 'Overview', url: '/guides/hosting/platform', items: [] },
     {
       name: 'Add-ons',
       url: undefined,
@@ -502,7 +501,6 @@ export const resources = {
   url: '/guides/resources',
   items: [
     { name: 'Examples', url: '/guides/resources/examples', items: [] },
-    { name: 'Features', url: '/features', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -558,23 +556,23 @@ export const resources = {
       ],
     },
     {
-      name: 'Self-Hosting reference docs',
+      name: 'Self-Hosting Reference',
       items: [
         {
-          name: 'Auth server',
-          url: '/reference/self-hosting-auth',
+          name: 'Auth Server',
+          url: '/reference/self-hosting-auth/introduction',
           icon: '/docs/img/icons/menu/reference-auth',
           items: [],
         },
         {
-          name: 'Storage server',
-          url: '/reference/self-hosting-storage',
+          name: 'Storage Server',
+          url: '/reference/self-hosting-storage/introduction',
           icon: '/docs/img/icons/menu/reference-storage',
           items: [],
         },
         {
-          name: 'Realtime server',
-          url: '/reference/self-hosting-realtime',
+          name: 'Realtime Server',
+          url: '/reference/self-hosting-realtime/introduction',
           icon: '/docs/img/icons/menu/reference-realtime',
           items: [],
         },
@@ -751,22 +749,22 @@ export const reference_api = {
 
 export const reference_self_hosting_auth = {
   icon: 'reference-auth',
-  title: 'Self Hosting Auth',
+  title: 'Self-Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
   icon: 'reference-storage',
-  title: 'Self Hosting Storage',
-  url: '/guides/reference/self-hosting/auth',
+  title: 'Self-Hosting Storage',
+  url: '/guides/reference/self-hosting/storage',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
   icon: 'reference-auth',
-  title: 'Self Hosting Realtime',
-  url: '/guides/reference/self-hosting/auth',
+  title: 'Self-Hosting Realtime',
+  url: '/guides/reference/self-hosting/realtime',
   parent: '/reference',
 }
 
