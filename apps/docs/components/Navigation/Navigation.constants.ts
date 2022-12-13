@@ -248,7 +248,7 @@ export const menuItems: NavMenu = {
         { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
         { name: 'Access Control', url: '/guides/storage/access-control', items: [] },
         { name: 'CDN', url: '/guides/storage/cdn', items: [] },
-        { name: 'Image Resizing', url: '/guides/storage/image-resizing', items: [] },
+        { name: 'Image Transformations', url: '/guides/storage/image-transformations', items: [] },
       ],
     },
     {
