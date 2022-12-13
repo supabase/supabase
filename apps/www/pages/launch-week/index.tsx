@@ -321,7 +321,7 @@ export default function launchweek() {
                     {day2.steps.length > 0 && (
                       <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                         <div
-                          className={`flex-1 flex flex-col items-center gap-5 lg:items-start justify-between basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-[url('/images/launchweek/image-processing-bg-light.png')] dark:bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_28px_top_35px] lg:bg-[top_right] bg-contain`}
+                          className={`flex-1 flex flex-col items-center gap-5 lg:items-start justify-between basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-[url('/images/launchweek/image-processing-bg-light.png')] dark:bg-[url('/images/launchweek/image-processing-bg.png')] bg-[center_top_35px] lg:bg-[top_25px_right_25px] bg-contain`}
                         >
                           <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <div>{day2.steps[0].title}</div>
@@ -553,7 +553,7 @@ export default function launchweek() {
                 <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[10px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand-900"
                   ></img>
                   <h3 className="text-black dark:text-white">Supabase Cache Helpers</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Winner</p>
@@ -567,7 +567,7 @@ export default function launchweek() {
                 <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[10px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand-900"
                   ></img>
                   <h3 className="text-black dark:text-white">Super UI</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Runner Up</p>
@@ -582,7 +582,7 @@ export default function launchweek() {
                 <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[10px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand-900"
                   ></img>
                   <h3 className="text-black dark:text-white">Quid Faciam Hodie?</h3>
                   <p className="text-slate-1000 text-xs">Winner Best Flutter Project</p>
@@ -592,7 +592,7 @@ export default function launchweek() {
                 <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[10px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand-900"
                   ></img>
                   <h3 className="text-black dark:text-white">That Hot Dog Game</h3>
                   <p className="text-slate-1000 text-xs">Previous Winner: Most Fun/Interesting</p>
@@ -607,7 +607,7 @@ export default function launchweek() {
                 <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[10px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand-900"
                   ></img>
                   <h3 className="text-black dark:text-white">RepoWatch</h3>
                   <p className="text-slate-1000 text-xs">Previous Winner Best Realtime Project</p>
