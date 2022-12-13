@@ -190,7 +190,11 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [412, 411, 413]
+                          "children": [
+                            412,
+                            411,
+                            413
+                          ]
                         }
                       ]
                     }
@@ -203,17 +207,23 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [403]
+              "children": [
+                403
+              ]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [407]
+              "children": [
+                407
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [408]
+              "children": [
+                408
+              ]
             }
           ],
           "sources": [
@@ -482,7 +492,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [314]
+                              "children": [
+                                314
+                              ]
                             }
                           ]
                         }
@@ -559,7 +571,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [316, 317]
+                                  "children": [
+                                    316,
+                                    317
+                                  ]
                                 }
                               ]
                             }
@@ -615,7 +630,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [319, 320]
+                                  "children": [
+                                    319,
+                                    320
+                                  ]
                                 }
                               ]
                             }
@@ -739,7 +757,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [352]
+                                          "children": [
+                                            352
+                                          ]
                                         }
                                       ]
                                     }
@@ -768,7 +788,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [350, 353]
+                                  "children": [
+                                    350,
+                                    353
+                                  ]
                                 }
                               ]
                             }
@@ -824,7 +847,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [355, 356]
+                                  "children": [
+                                    355,
+                                    356
+                                  ]
                                 }
                               ]
                             }
@@ -948,7 +974,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [341]
+                                          "children": [
+                                            341
+                                          ]
                                         }
                                       ]
                                     }
@@ -977,7 +1005,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [339, 342]
+                                  "children": [
+                                    339,
+                                    342
+                                  ]
                                 }
                               ]
                             }
@@ -1033,7 +1064,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [344, 345]
+                                  "children": [
+                                    344,
+                                    345
+                                  ]
                                 }
                               ]
                             }
@@ -1201,7 +1235,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [304, 305]
+                                  "children": [
+                                    304,
+                                    305
+                                  ]
                                 }
                               ]
                             }
@@ -1257,7 +1294,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [307, 308]
+                                  "children": [
+                                    307,
+                                    308
+                                  ]
                                 }
                               ]
                             }
@@ -1365,7 +1405,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [295, 296]
+                                  "children": [
+                                    295,
+                                    296
+                                  ]
                                 }
                               ]
                             }
@@ -1421,7 +1464,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [298, 299]
+                                  "children": [
+                                    298,
+                                    299
+                                  ]
                                 }
                               ]
                             }
@@ -1525,7 +1571,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [326]
+                              "children": [
+                                326
+                              ]
                             }
                           ]
                         }
@@ -1592,7 +1640,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [330]
+                                          "children": [
+                                            330
+                                          ]
                                         }
                                       ]
                                     }
@@ -1621,7 +1671,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [328, 331]
+                                  "children": [
+                                    328,
+                                    331
+                                  ]
                                 }
                               ]
                             }
@@ -1677,7 +1730,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [333, 334]
+                                  "children": [
+                                    333,
+                                    334
+                                  ]
                                 }
                               ]
                             }
@@ -1707,12 +1763,22 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [267]
+              "children": [
+                267
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [309, 346, 335, 279, 300, 292, 321]
+              "children": [
+                309,
+                346,
+                335,
+                279,
+                300,
+                292,
+                321
+              ]
             }
           ],
           "sources": [
@@ -1791,7 +1857,9 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [398]
+              "children": [
+                398
+              ]
             }
           ],
           "sources": [
@@ -1914,12 +1982,16 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [416]
+              "children": [
+                416
+              ]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [420]
+              "children": [
+                420
+              ]
             }
           ],
           "sources": [
@@ -2057,7 +2129,14 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [361, 358, 359, 360, 363, 362]
+              "children": [
+                361,
+                358,
+                359,
+                360,
+                363,
+                362
+              ]
             }
           ],
           "sources": [
@@ -2105,7 +2184,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [387]
+              "children": [
+                387
+              ]
             }
           ],
           "sources": [
@@ -2157,7 +2238,145 @@
               "type": {
                 "type": "reference",
                 "id": 357,
-                "name": "Bucket"
+                "name": "Bucket",
+                "dereferenced": {
+                  "id": 357,
+                  "name": "Bucket",
+                  "kind": 256,
+                  "kindString": "Interface",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 361,
+                      "name": "created_at",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 5,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 358,
+                      "name": "id",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 2,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 359,
+                      "name": "name",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 3,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 360,
+                      "name": "owner",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 4,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 363,
+                      "name": "public",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 7,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      }
+                    },
+                    {
+                      "id": 362,
+                      "name": "updated_at",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 6,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [
+                        361,
+                        358,
+                        359,
+                        360,
+                        363,
+                        362
+                      ]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 1,
+                      "character": 17
+                    }
+                  ]
+                }
               }
             },
             {
@@ -2303,7 +2522,17 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [366, 373, 370, 368, 371, 372, 365, 367, 369]
+              "children": [
+                366,
+                373,
+                370,
+                368,
+                371,
+                372,
+                365,
+                367,
+                369
+              ]
             }
           ],
           "sources": [
@@ -2395,7 +2624,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [378, 379, 380]
+              "children": [
+                378,
+                379,
+                380
+              ]
             }
           ],
           "sources": [
@@ -2436,7 +2669,9 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [389]
+              "children": [
+                389
+              ]
             }
           ],
           "sources": [
@@ -2544,7 +2779,73 @@
               "type": {
                 "type": "reference",
                 "id": 374,
-                "name": "SortBy"
+                "name": "SortBy",
+                "dereferenced": {
+                  "id": 374,
+                  "name": "SortBy",
+                  "kind": 256,
+                  "kindString": "Interface",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 375,
+                      "name": "column",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 23,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 376,
+                      "name": "order",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 24,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [
+                        375,
+                        376
+                      ]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 22,
+                      "character": 17
+                    }
+                  ]
+                }
               }
             }
           ],
@@ -2552,7 +2853,12 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [382, 383, 385, 384]
+              "children": [
+                382,
+                383,
+                385,
+                384
+              ]
             }
           ],
           "sources": [
@@ -2615,7 +2921,10 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [375, 376]
+              "children": [
+                375,
+                376
+              ]
             }
           ],
           "sources": [
@@ -2720,7 +3029,11 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [392, 393, 391]
+              "children": [
+                392,
+                393,
+                391
+              ]
             }
           ],
           "sources": [
@@ -2782,17 +3095,33 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [402, 266, 397, 415]
+          "children": [
+            402,
+            266,
+            397,
+            415
+          ]
         },
         {
           "title": "Interfaces",
           "kind": 256,
-          "children": [357, 386, 364, 377, 388, 381, 374, 390]
+          "children": [
+            357,
+            386,
+            364,
+            377,
+            388,
+            381,
+            374,
+            390
+          ]
         },
         {
           "title": "Functions",
           "kind": 64,
-          "children": [394]
+          "children": [
+            394
+          ]
         }
       ],
       "sources": [
@@ -3051,7 +3380,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [48]
+                              "children": [
+                                48
+                              ]
                             }
                           ]
                         }
@@ -3128,7 +3459,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [50, 51]
+                                  "children": [
+                                    50,
+                                    51
+                                  ]
                                 }
                               ]
                             }
@@ -3184,7 +3518,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [53, 54]
+                                  "children": [
+                                    53,
+                                    54
+                                  ]
                                 }
                               ]
                             }
@@ -3298,7 +3635,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [86]
+                                          "children": [
+                                            86
+                                          ]
                                         }
                                       ]
                                     }
@@ -3327,7 +3666,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [84, 87]
+                                  "children": [
+                                    84,
+                                    87
+                                  ]
                                 }
                               ]
                             }
@@ -3383,7 +3725,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [89, 90]
+                                  "children": [
+                                    89,
+                                    90
+                                  ]
                                 }
                               ]
                             }
@@ -3497,7 +3842,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [75]
+                                          "children": [
+                                            75
+                                          ]
                                         }
                                       ]
                                     }
@@ -3526,7 +3873,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [73, 76]
+                                  "children": [
+                                    73,
+                                    76
+                                  ]
                                 }
                               ]
                             }
@@ -3582,7 +3932,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [78, 79]
+                                  "children": [
+                                    78,
+                                    79
+                                  ]
                                 }
                               ]
                             }
@@ -3693,7 +4046,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [38, 39]
+                                  "children": [
+                                    38,
+                                    39
+                                  ]
                                 }
                               ]
                             }
@@ -3749,7 +4105,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [41, 42]
+                                  "children": [
+                                    41,
+                                    42
+                                  ]
                                 }
                               ]
                             }
@@ -3847,7 +4206,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [29, 30]
+                                  "children": [
+                                    29,
+                                    30
+                                  ]
                                 }
                               ]
                             }
@@ -3903,7 +4265,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [32, 33]
+                                  "children": [
+                                    32,
+                                    33
+                                  ]
                                 }
                               ]
                             }
@@ -3997,7 +4362,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [60]
+                              "children": [
+                                60
+                              ]
                             }
                           ]
                         }
@@ -4064,7 +4431,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [64]
+                                          "children": [
+                                            64
+                                          ]
                                         }
                                       ]
                                     }
@@ -4093,7 +4462,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [62, 65]
+                                  "children": [
+                                    62,
+                                    65
+                                  ]
                                 }
                               ]
                             }
@@ -4149,7 +4521,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [67, 68]
+                                  "children": [
+                                    67,
+                                    68
+                                  ]
                                 }
                               ]
                             }
@@ -4169,12 +4544,21 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [4]
+              "children": [
+                4
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [43, 80, 69, 34, 26, 55]
+              "children": [
+                43,
+                80,
+                69,
+                34,
+                26,
+                55
+              ]
             }
           ],
           "sources": [
@@ -4197,7 +4581,9 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [3]
+          "children": [
+            3
+          ]
         }
       ],
       "sources": [
@@ -4502,7 +4888,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [176]
+                                          "children": [
+                                            176
+                                          ]
                                         }
                                       ]
                                     }
@@ -4531,7 +4919,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [174, 177]
+                                  "children": [
+                                    174,
+                                    177
+                                  ]
                                 }
                               ]
                             }
@@ -4587,7 +4978,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [179, 180]
+                                  "children": [
+                                    179,
+                                    180
+                                  ]
                                 }
                               ]
                             }
@@ -4721,7 +5115,116 @@
                               "type": {
                                 "type": "reference",
                                 "id": 390,
-                                "name": "TransformOptions"
+                                "name": "TransformOptions",
+                                "dereferenced": {
+                                  "id": 390,
+                                  "name": "TransformOptions",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 392,
+                                      "name": "height",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The height of the image in pixels. If the width is not specified, the image will be resized to the height while maintaining the aspect ratio."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 84,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    },
+                                    {
+                                      "id": 393,
+                                      "name": "resize",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The resize mode can be cover, contain or fill. Default is cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 91,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "literal",
+                                            "value": "cover"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "contain"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "fill"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 391,
+                                      "name": "width",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The width of the image in pixels. If the height is not specified, the image will be resized to the width while maintaining the aspect ratio."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 80,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [
+                                        392,
+                                        393,
+                                        391
+                                      ]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 76,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],
@@ -4729,7 +5232,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [187, 188]
+                              "children": [
+                                187,
+                                188
+                              ]
                             }
                           ]
                         }
@@ -4796,7 +5302,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [192]
+                                          "children": [
+                                            192
+                                          ]
                                         }
                                       ]
                                     }
@@ -4825,7 +5333,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [190, 193]
+                                  "children": [
+                                    190,
+                                    193
+                                  ]
                                 }
                               ]
                             }
@@ -4881,7 +5392,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [195, 196]
+                                  "children": [
+                                    195,
+                                    196
+                                  ]
                                 }
                               ]
                             }
@@ -5003,7 +5517,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [203]
+                              "children": [
+                                203
+                              ]
                             }
                           ]
                         }
@@ -5126,7 +5642,11 @@
                                           {
                                             "title": "Properties",
                                             "kind": 1024,
-                                            "children": [207, 208, 209]
+                                            "children": [
+                                              207,
+                                              208,
+                                              209
+                                            ]
                                           }
                                         ]
                                       }
@@ -5156,7 +5676,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [205, 210]
+                                  "children": [
+                                    205,
+                                    210
+                                  ]
                                 }
                               ]
                             }
@@ -5212,7 +5735,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [212, 213]
+                                  "children": [
+                                    212,
+                                    213
+                                  ]
                                 }
                               ]
                             }
@@ -5300,7 +5826,116 @@
                               "type": {
                                 "type": "reference",
                                 "id": 390,
-                                "name": "TransformOptions"
+                                "name": "TransformOptions",
+                                "dereferenced": {
+                                  "id": 390,
+                                  "name": "TransformOptions",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 392,
+                                      "name": "height",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The height of the image in pixels. If the width is not specified, the image will be resized to the height while maintaining the aspect ratio."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 84,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    },
+                                    {
+                                      "id": 393,
+                                      "name": "resize",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The resize mode can be cover, contain or fill. Default is cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 91,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "literal",
+                                            "value": "cover"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "contain"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "fill"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 391,
+                                      "name": "width",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The width of the image in pixels. If the height is not specified, the image will be resized to the width while maintaining the aspect ratio."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 80,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [
+                                        392,
+                                        393,
+                                        391
+                                      ]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 76,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],
@@ -5308,7 +5943,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [219]
+                              "children": [
+                                219
+                              ]
                             }
                           ]
                         }
@@ -5373,7 +6010,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [221, 222]
+                                  "children": [
+                                    221,
+                                    222
+                                  ]
                                 }
                               ]
                             }
@@ -5429,7 +6069,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [224, 225]
+                                  "children": [
+                                    224,
+                                    225
+                                  ]
                                 }
                               ]
                             }
@@ -5552,7 +6195,116 @@
                               "type": {
                                 "type": "reference",
                                 "id": 390,
-                                "name": "TransformOptions"
+                                "name": "TransformOptions",
+                                "dereferenced": {
+                                  "id": 390,
+                                  "name": "TransformOptions",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 392,
+                                      "name": "height",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The height of the image in pixels. If the width is not specified, the image will be resized to the height while maintaining the aspect ratio."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 84,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    },
+                                    {
+                                      "id": 393,
+                                      "name": "resize",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The resize mode can be cover, contain or fill. Default is cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 91,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "literal",
+                                            "value": "cover"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "contain"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "fill"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 391,
+                                      "name": "width",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The width of the image in pixels. If the height is not specified, the image will be resized to the width while maintaining the aspect ratio."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 80,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [
+                                        392,
+                                        393,
+                                        391
+                                      ]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 76,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],
@@ -5560,7 +6312,10 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [231, 232]
+                              "children": [
+                                231,
+                                232
+                              ]
                             }
                           ]
                         }
@@ -5621,7 +6376,9 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [236]
+                                  "children": [
+                                    236
+                                  ]
                                 }
                               ]
                             }
@@ -5632,7 +6389,9 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [234]
+                          "children": [
+                            234
+                          ]
                         }
                       ]
                     }
@@ -5789,7 +6548,73 @@
                               "type": {
                                 "type": "reference",
                                 "id": 374,
-                                "name": "SortBy"
+                                "name": "SortBy",
+                                "dereferenced": {
+                                  "id": 374,
+                                  "name": "SortBy",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 375,
+                                      "name": "column",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 23,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    },
+                                    {
+                                      "id": 376,
+                                      "name": "order",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 24,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [
+                                        375,
+                                        376
+                                      ]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 22,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],
@@ -5797,7 +6622,12 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [382, 383, 385, 384]
+                              "children": [
+                                382,
+                                383,
+                                385,
+                                384
+                              ]
                             }
                           ],
                           "sources": [
@@ -5859,7 +6689,9 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [387]
+                              "children": [
+                                387
+                              ]
                             }
                           ],
                           "sources": [
@@ -5933,7 +6765,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [252, 253]
+                                  "children": [
+                                    252,
+                                    253
+                                  ]
                                 }
                               ]
                             }
@@ -5989,7 +6824,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [255, 256]
+                                  "children": [
+                                    255,
+                                    256
+                                  ]
                                 }
                               ]
                             }
@@ -6117,7 +6955,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [164]
+                                          "children": [
+                                            164
+                                          ]
                                         }
                                       ]
                                     }
@@ -6146,7 +6986,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [162, 165]
+                                  "children": [
+                                    162,
+                                    165
+                                  ]
                                 }
                               ]
                             }
@@ -6202,7 +7045,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [167, 168]
+                                  "children": [
+                                    167,
+                                    168
+                                  ]
                                 }
                               ]
                             }
@@ -6319,7 +7165,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [241, 242]
+                                  "children": [
+                                    241,
+                                    242
+                                  ]
                                 }
                               ]
                             }
@@ -6375,7 +7224,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [244, 245]
+                                  "children": [
+                                    244,
+                                    245
+                                  ]
                                 }
                               ]
                             }
@@ -6602,7 +7454,11 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [378, 379, 380]
+                              "children": [
+                                378,
+                                379,
+                                380
+                              ]
                             }
                           ],
                           "sources": [
@@ -6676,7 +7532,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [152]
+                                          "children": [
+                                            152
+                                          ]
                                         }
                                       ]
                                     }
@@ -6705,7 +7563,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [150, 153]
+                                  "children": [
+                                    150,
+                                    153
+                                  ]
                                 }
                               ]
                             }
@@ -6761,7 +7622,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [155, 156]
+                                  "children": [
+                                    155,
+                                    156
+                                  ]
                                 }
                               ]
                             }
@@ -6988,7 +7852,11 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [378, 379, 380]
+                              "children": [
+                                378,
+                                379,
+                                380
+                              ]
                             }
                           ],
                           "sources": [
@@ -7062,7 +7930,9 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [139]
+                                          "children": [
+                                            139
+                                          ]
                                         }
                                       ]
                                     }
@@ -7091,7 +7961,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [137, 140]
+                                  "children": [
+                                    137,
+                                    140
+                                  ]
                                 }
                               ]
                             }
@@ -7147,7 +8020,10 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [142, 143]
+                                  "children": [
+                                    142,
+                                    143
+                                  ]
                                 }
                               ]
                             }
@@ -7167,12 +8043,25 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [93]
+              "children": [
+                93
+              ]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [169, 181, 197, 214, 226, 246, 157, 237, 144, 131]
+              "children": [
+                169,
+                181,
+                197,
+                214,
+                226,
+                246,
+                157,
+                237,
+                144,
+                131
+              ]
             }
           ],
           "sources": [
@@ -7188,7 +8077,9 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [92]
+          "children": [
+            92
+          ]
         }
       ],
       "sources": [
@@ -7204,7 +8095,11 @@
     {
       "title": "Modules",
       "kind": 2,
-      "children": [1, 2, 91]
+      "children": [
+        1,
+        2,
+        91
+      ]
     }
   ]
 }
