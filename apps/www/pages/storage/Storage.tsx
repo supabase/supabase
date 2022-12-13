@@ -205,7 +205,7 @@ function StoragePage() {
                     title="Transformations"
                     text="Resize and compress your media before you serve it."
                   />
-                  <Link href="/docs/guides/storage/image-resizing" passHref>
+                  <Link href="/docs/guides/storage/image-transformations" passHref>
                     <Button
                       as="a"
                       size="small"
