@@ -338,7 +338,9 @@ export default function launchweek() {
                             <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
                             </Badge>
-                            <span>{day2.steps[1].title}</span>
+                            <span className="text-black dark:text-white">
+                              {day2.steps[1].title}
+                            </span>
                             <p className="text-sm text-slate-900">{day2.steps[1].description}</p>
                           </div>
                           <SectionButtons docs={day2.steps[1].docs} blog={day2.steps[1].blog} />
