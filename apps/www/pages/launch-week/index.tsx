@@ -224,10 +224,10 @@ export default function launchweek() {
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex">
                     <Image
-                      src="/images/launchweek/antcopple.png"
-                      className="rounded-xl w-32 h-32"
-                      width={128}
-                      height={72}
+                      src="/images/launchweek/antcopplecall.png"
+                      className="rounded-xl w-32 h-32 brightness-125"
+                      width={120}
+                      height={80}
                     ></Image>
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
