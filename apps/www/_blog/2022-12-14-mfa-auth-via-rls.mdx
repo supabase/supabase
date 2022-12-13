@@ -38,7 +38,7 @@ The first portion of  `otpauth://totp/supabase.io` describes the protocol and is
 
 In the event that the user faces difficulties entering a QR code the user can also opt to manually type the secret into the authenticator device.
 
-## MFA Flows: Enrolment and Verification
+## MFA Flows: Enrollment and Verification
 
 An MFA flow can be broken into two key steps: Enrollment and Verification. During the *Enrollment* process Supabase Auth exchanges a randomly generated secret with the user’s authenticator application. During the *Verification* process, the device makes use of the timestamp together with the secret to produce a six digit code that the server can verify.
 
