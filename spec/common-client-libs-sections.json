@@ -389,6 +389,21 @@
     "libs": ["js", "js_v1", "dart", "dart_v0"],
     "items": [
       {
+        "id": "auth-api",
+        "title": "Overview",
+        "slug": "auth-api",
+        "libs": ["js"],
+        "type": "function"
+      },
+      {
+        "id": "auth-user",
+        "title": "The User object",
+        "slug": "auth-user",
+        "product": "auth",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
         "id": "sign-up",
         "title": "Create a new user",
         "slug": "auth-signup",
@@ -616,12 +631,12 @@
     ]
   },
   {
-    "title": "Auth (server-only)",
+    "title": "Auth Admin",
     "libs": ["js", "js_v1"],
     "items": [
       {
         "id": "admin-api",
-        "title": "Auth (server-only)",
+        "title": "Overview",
         "slug": "admin-api",
         "libs": ["js", "js_v1"],
         "type": "function"
