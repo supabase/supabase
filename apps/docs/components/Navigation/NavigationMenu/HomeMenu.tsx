@@ -55,7 +55,7 @@ const home = [
     {
       label: 'Platform',
       icon: '/img/icons/menu/platform',
-      href: '/guides/hosting/platform',
+      href: '/guides/platform',
       level: 'platform',
     },
     {
