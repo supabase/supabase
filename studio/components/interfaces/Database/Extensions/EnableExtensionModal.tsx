@@ -56,19 +56,21 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
     setSubmitting(true)
 
     const schema =
-      defaultSchema !== undefined
+      defaultSchema !== undefined && defaultSchema !== null
         ? defaultSchema
         : values.schema === 'custom'
         ? values.name
         : values.schema
 
-    const { error: createSchemaError } = await meta.query(`create schema if not exists ${schema}`)
-    if (createSchemaError) {
-      return ui.setNotification({
-        error: createSchemaError,
-        category: 'error',
-        message: `Failed to create schema: ${createSchemaError.message}`,
-      })
+    if (!schema.startsWith('pg_')) {
+      const { error: createSchemaError } = await meta.query(`create schema if not exists ${schema}`)
+      if (createSchemaError) {
+        return ui.setNotification({
+          error: createSchemaError,
+          category: 'error',
+          message: `Failed to create schema: ${createSchemaError.message}`,
+        })
+      }
     }
 
     const { error: createExtensionError } = await meta.extensions.create({

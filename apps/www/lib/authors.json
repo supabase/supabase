@@ -243,5 +243,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/mildtomato",
     "author_image_url": "https://github.com/mildtomato.png"
+  },
+  {
+    "author_id": "fabrizio",
+    "author": "Fabrizio Fenoglio",
+    "position": "Engineering",
+    "author_url": "https://github.com/fenos",
+    "author_image_url": "https://github.com/fenos.png"
   }
 ]

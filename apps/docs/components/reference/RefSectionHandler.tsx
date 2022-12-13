@@ -65,7 +65,7 @@ const RefSectionHandler = (props) => {
               />
             )
           case 'cli-command':
-            return <CliCommandSection funcData={x} commonFuncData={x} spec={props.spec} />
+            return <CliCommandSection funcData={x} commonFuncData={x} />
             break
           case 'operation':
             return <ApiOperationSection funcData={x} commonFuncData={x} spec={props.spec} />

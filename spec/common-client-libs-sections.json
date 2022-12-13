@@ -932,7 +932,7 @@
       },
       {
         "id": "from-get-public-url",
-        "title": "Retrieve an asset's URL",
+        "title": "Retrieve public URL",
         "slug": "storage-from-getpublicurl",
         "product": "storage",
         "type": "function",

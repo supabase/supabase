@@ -69,12 +69,31 @@ function dereferenceReducer(child: any, kv: KV) {
   if (!!child.parameters) {
     child.parameters.forEach((x: any) => dereferenceReducer(x, kv))
   }
+  if (
+    !!child.type &&
+    !!child.type.declaration &&
+    !!child.type.declaration.children &&
+    child.type.type === 'reflection'
+  ) {
+    child.type.declaration.children.forEach((x: any) =>
+      dereferenceReducer(x, kv)
+    )
+  }
+
   const final = { ...child }
   if (
     // For now I can only dereference parameters
     // because anything else is producing an error when saving to file:
     // TypeError: Converting circular structure to JSON
     final.kindString === 'Parameter' &&
+    final.type?.type === 'reference' &&
+    final.type?.id
+  ) {
+    const dereferenced = kv[final.type.id]
+    final.type.dereferenced = dereferenced || {}
+    return final
+  } else if (
+    final.kindString === 'Property' &&
     final.type?.type === 'reference' &&
     final.type?.id
   ) {

@@ -137,7 +137,17 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                               ].join(' ')}
                               parent={subItem.parent}
                             >
-                              {subItem.icon && <img src={`${subItem.icon}.svg`} className="w-3" />}
+                              {subItem.icon && (
+                                <Image
+                                  alt={subItem.name + router.basePath}
+                                  src={
+                                    `${router.basePath}` +
+                                    `${subItem.icon}${!isDarkMode ? '-light' : ''}.svg`
+                                  }
+                                  width={15}
+                                  height={15}
+                                />
+                              )}
                               {subItem.name}
                             </LinkContainer>
                           </li>
