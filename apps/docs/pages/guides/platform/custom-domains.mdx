@@ -93,18 +93,18 @@ Edge functions do not honor the custom domain setting and they still have to be 
 
 <Admonition type="note">
 
-Vanity Subdomains are currently in beta, and are being slowly made available to projects. Contact Support through the Dashboard if you'd like to request early access.
+Vanity Subdomains are currently in beta, and are being slowly made available to projects. [Contact Support](https://app.supabase.com/support/new) if you'd like to request early access.
 
 </Admonition>
 
-Vanity subdomains allow you to present a weaker branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on Supabase, e.g. `my-example-brand.supabase.co`, instead of the default, randomly-assigned `foobarbaz.supabase.co`.
+Vanity Subdomains allow you to present a basic branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on Supabase (e.g., `my-example-brand.supabase.co`) instead of the default, randomly-assigned `foobarbaz.supabase.co`.
 
 To get started:
 
 1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
 1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
 1. Ensure that you have [Owner or Admin permissions](/docs/guides/hosting/platform#manage-team-members) for the project you'd like to set up a vanity subdomain for.
-1. Ensure that your project has a paid subscription (Pro/Pay as you go/Enterprise tier) in the [Billing page of the Dashboard](https://app.supabase.com/project/_/settings/billing/subscription)
+1. Ensure that your project has a paid subscription (Pro/Pay as you go/Enterprise tier) in the [Billing page of the Dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
 
 ## Configure a Vanity Subdomain
 
@@ -125,7 +125,7 @@ The auth service, in particular, will no longer work with the original URL (`foo
 As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your vanity subdomain:
 
 - any client code (e.g., frontends, mobile apps)
-- any OAuth providers (e.g., google, github)
+- any OAuth providers (e.g., Google, GitHub)
 
 The `activate` subcommand can be used to initiate the activation:
 
