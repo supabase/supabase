@@ -184,7 +184,7 @@ const Wrappers = () => {
                     <Link href="https://supabase.com/docs">
                       <a target="_blank">
                         <Button type="default" icon={<IconExternalLink />}>
-                          About Vault
+                          About Wrappers
                         </Button>
                       </a>
                     </Link>
