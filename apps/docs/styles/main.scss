@@ -23,7 +23,7 @@
 }
 
 body {
-  @apply bg-white dark:bg-[#1c1c1c] #{!important};
+  @apply bg-scale-100 dark:bg-[#1c1c1c] #{!important};
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -34,14 +34,14 @@ body {
   color: #333 !important;
 }
 
-a {
-  text-decoration: none !important;
-}
+// a {
+//   text-decoration: none !important;
+// }
 
 article h1 {
-  margin-bottom: 2rem !important;
-  font-size: 3rem !important;
-  font-weight: 400 !important;
+  // margin-bottom: 2rem !important;
+  // font-size: 3rem !important;
+  // font-weight: 400 !important;
 }
 
 .thin-scrollbar {
@@ -237,4 +237,19 @@ article p code {
 .toc-menu li a code {
   background: none;
   border: none;
+}
+
+// prevent horizontal scroll on mobile for tablist tab headers
+div[role='tablist'] {
+  @media screen and (min-width: 320px) {
+    max-width: 320px;
+  }
+
+  @media screen and (min-width: 600px) {
+    max-width: 520px;
+  }
+
+  @media screen and (min-width: 769px) {
+    max-width: 620px;
+  }
 }

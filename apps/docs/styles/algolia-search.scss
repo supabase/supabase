@@ -967,3 +967,9 @@ body {
     display: none;
   }
 }
+
+// search bar
+.dark .DocSearch-Input {
+  background-color: var(--colors-scale2);
+  color: white;
+}

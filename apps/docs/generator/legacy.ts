@@ -16,6 +16,13 @@ import { TsDoc, OpenRef } from './legacy/definitions'
 import { uniqBy } from 'lodash'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
+import { flattenSections } from '../lib/helpers'
+
+const commonDocSpecJson = JSON.parse(
+  fs.readFileSync('../../spec/common-client-libs-sections.json', 'utf8')
+)
+
+const flattenedCommonDocSpecJson = flattenSections(commonDocSpecJson)
 
 export default async function gen(inputFileName: string, outputDir: string) {
   const docSpec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
@@ -24,7 +31,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
   const definition = JSON.parse(defRef)
   const id = docSpec.info.id
   const allLanguages = docSpec.info.libraries
-  const pages = Object.entries(docSpec.pages).map(([name, x]: [string, OpenRef.Page]) => ({
+  const pages = Object.entries(docSpec.functions).map(([name, x]: [string, OpenRef.Page]) => ({
     ...x,
     pageName: name,
   }))
@@ -38,7 +45,9 @@ export default async function gen(inputFileName: string, outputDir: string) {
   // Generate Pages
   pages.forEach(async (pageSpec: OpenRef.Page) => {
     try {
-      const slug = slugify(pageSpec.pageName)
+      // get the slug from common-client-libs.yml
+      const slug = flattenedCommonDocSpecJson.find((item) => item.id === pageSpec.id).slug
+
       const hasTsRef = pageSpec['$ref'] || null
       const tsDefinition = hasTsRef && extractTsDocNode(hasTsRef, definition)
       if (hasTsRef && !tsDefinition) throw new Error('Definition not found: ' + hasTsRef)
@@ -48,8 +57,8 @@ export default async function gen(inputFileName: string, outputDir: string) {
 
       // Create page
       const content = Page({
-        slug: (docSpec.info.slugPrefix || '') + slug,
-        id: slug,
+        slug: slug,
+        id: pageSpec.id,
         specFileName: docSpec.info.specUrl || inputFileName,
         title: pageSpec.title || pageSpec.pageName,
         description,
@@ -58,7 +67,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
         examples: generateExamples(id, pageSpec['examples'] || [], allLanguages),
         notes: pageSpec.notes,
       })
-
+      //console.log({ slug })
       // Write to disk
       const dest = outputDir + `/${slug}.mdx`
       await writeToDisk(dest, content)
@@ -146,7 +155,7 @@ const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
 }
 
 const methodListGroup = (items) => `
-<ul className="method-list-group">
+<ul className="method-list-group not-prose">
   ${items}
 </ul>
 `
@@ -265,7 +274,7 @@ function extractParamTypeAsString(paramDefinition) {
  * Iterates through the definition to find the correct definition.
  * You can pass it a deeply nested node using dot notation. eg: 'LoggedInUser.data.email'
  */
-function extractTsDocNode(nodeToFind: string, definition: any) {
+export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
   let i = 0
   let previousNode = definition

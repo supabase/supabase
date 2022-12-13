@@ -18,7 +18,7 @@ export const getAuthUser = async (token: String): Promise<any> => {
 
     return { user, error: null }
   } catch (err) {
-    console.log(err)
+    console.error(err)
     return { user: null, error: err }
   }
 }
