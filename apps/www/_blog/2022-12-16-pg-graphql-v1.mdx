@@ -69,7 +69,7 @@ pgx is a rust framework for building Postgres extensions. It has a very polished
 
 One of rust’s main selling points is zero cost abstractions. That means high-level concepts like generics incur no runtime penalty. Transitioning from SQL’s expensive abstractions to rust’s zero cost abstractions has been hugely satisfying as it enabled refactoring the codebase into a more maintainable state. Development velocity is up. Code quality is up. Performance is WAY up.
 
-As of 1.0, overhead introduced by pg_graphql is sub 300 *micro*seconds per request on free-tier hardware. When executed from SQL we see~1060 queries per second per connection (no parallelism). If we include the entire Auth + HTTP stack, free tier can handle ~645 requests per second.
+As of 1.0, overhead introduced by pg_graphql is sub 300 *micro*seconds per request on free-tier hardware. When executed from SQL we see ~1060 queries per second per connection (no parallelism). If we include the entire Auth + HTTP stack, free tier can handle ~645 requests per second. On larger instance the stack handles upwards of 10k requests / second.
 
 ```text
 This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
@@ -85,7 +85,6 @@ Time per request:       15.494 [ms] (mean)
 Time per request:       1.549 [ms] (mean, across all concurrent requests)
 ```
 
-On larger instance the stack handles upwards of 10k requests / second.
 
 ## Roadmap
 
