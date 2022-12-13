@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Monday'
+  const liveDay = 'Tuesday'
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -264,7 +264,7 @@ export default function launchweek() {
                 justified={false}
                 bordered={false}
                 chevronAlign="right"
-                defaultValue={[day1.d.toString()]}
+                defaultValue={[day2.d.toString()]}
               >
                 <div className="border-b pb-3">
                   <Accordion.Item
