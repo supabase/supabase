@@ -8,6 +8,7 @@
    - [Running turborepo](#running-turborepo)
      - [Shared components](#shared-components)
      - [Installing packages](#installing-packages)
+   - [New Supabase Docs](#new-supabase-docs)
 3. [Create a pull request](#create-a-pull-request)
 
 - [Common tasks](#common-tasks)
@@ -105,6 +106,14 @@ For example:
 - `npm install react -w studio`: installs into `./studio`
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
+
+#### New Supabase docs
+
+Following the changes to the [Supabase docs](https://supabase.com/blog/new-supabase-docs-built-with-nextjs) the following is needed to run the new docs locally:
+
+- Inside of `apps/docs` create a `.env.local` file with the following: `NEXT_PUBLIC_NEW_DOCS=true`
+
+Now when you run a local devlopment docs server you will see the new docs site.
 
 ---
 
