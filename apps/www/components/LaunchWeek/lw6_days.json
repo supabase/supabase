@@ -33,7 +33,7 @@
       {
         "title": "Image Processing",
         "blog": "/blog",
-        "docs": "/docs",
+        "docs": "/docs/guides/storage/image-resizing",
         "isNew": true,
         "description": ""
       },
@@ -41,7 +41,7 @@
         "title": "CDN Caching",
         "description": "Faster asset delivery, now even faster.",
         "blog": "/blog",
-        "docs": "/docs",
+        "docs": "/docs/guides/storage/cdn",
         "isNew": true
       }
     ]

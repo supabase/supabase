@@ -469,7 +469,7 @@ export default function launchweek() {
         )}
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
           <div className="flex flex-col mb-16">
-            <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973] w-fit after:bg-white mb-4">
+            <Badge className="mb-4 w-fit bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
               Happening all week
             </Badge>
             <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackathon</h2>
@@ -653,7 +653,7 @@ export default function launchweek() {
           </div>
           <div className="flex-1">
             <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
-              Live
+              Currently Happening
             </Badge>
             <h2 className="text-3xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
