@@ -240,6 +240,12 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-workos',
     items: [],
   },
+  {
+    name: 'Zoom',
+    icon: '/docs/img/icons/zoom-icon',
+    url: '/guides/auth/social-login/auth-zoom',
+    items: [],
+  },
 ]
 
 export const PhoneLoginsItems = [
