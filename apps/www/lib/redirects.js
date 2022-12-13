@@ -537,9 +537,9 @@ module.exports = [
   },
 
   {
-    permanent: false,
-    source: '/docs/guides/platform',
-    destination: '/docs/guides/hosting/platform',
+    permanent: true,
+    source: '/docs/guides/hosting/platform',
+    destination: '/docs/guides/platform',
   },
   {
     permanent: false,
@@ -555,11 +555,6 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/javascript/reset-password-email',
     destination: '/docs/reference/javascript/auth-api-resetpasswordforemail',
-  },
-  {
-    permanent: true,
-    source: '/oss',
-    destination: '/docs/oss',
   },
   {
     permanent: true,
@@ -604,7 +599,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/supabase-client',
-    destination: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1336,7 +1331,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/client-libraries',
-    destination: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1574,5 +1569,35 @@ module.exports = [
     permanent: true,
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
+  },
+  {
+    permanent: true,
+    source: '/docs/oss',
+    destination: '/oss',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/aup',
+    destination: '/aup',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/terms',
+    destination: '/terms',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/privacy',
+    destination: '/privacy',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/sla',
+    destination: '/sla',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
 ]

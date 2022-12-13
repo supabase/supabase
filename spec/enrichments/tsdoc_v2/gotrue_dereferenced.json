@@ -2587,24 +2587,524 @@
                         "type": "union",
                         "types": [
                           {
-                            "type": "reference",
                             "id": 517,
-                            "name": "GenerateSignupLinkParams"
+                            "name": "GenerateSignupLinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 502,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 518,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 520,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 504,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 522,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 506,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 539,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "union",
+                                          "types": [
+                                            {
+                                              "type": "literal",
+                                              "value": "data"
+                                            },
+                                            {
+                                              "type": "literal",
+                                              "value": "redirectTo"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 521,
+                                    "name": "password",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 505,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 519,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 503,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "literal",
+                                      "value": "signup"
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [520, 522, 521, 519]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 502,
+                                    "character": 39
+                                  }
+                                ]
+                              }
+                            }
                           },
                           {
-                            "type": "reference",
                             "id": 523,
-                            "name": "GenerateInviteOrMagiclinkParams"
+                            "name": "GenerateInviteOrMagiclinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 509,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 524,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 526,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's email"
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 512,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 527,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 513,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 539,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "union",
+                                          "types": [
+                                            {
+                                              "type": "literal",
+                                              "value": "data"
+                                            },
+                                            {
+                                              "type": "literal",
+                                              "value": "redirectTo"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 525,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 510,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "union",
+                                      "types": [
+                                        {
+                                          "type": "literal",
+                                          "value": "invite"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "magiclink"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [526, 527, 525]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 509,
+                                    "character": 46
+                                  }
+                                ]
+                              }
+                            }
                           },
                           {
-                            "type": "reference",
                             "id": 528,
-                            "name": "GenerateRecoveryLinkParams"
+                            "name": "GenerateRecoveryLinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 516,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 529,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 531,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's email"
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 519,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 532,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 520,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 539,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "redirectTo"
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 530,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 517,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "literal",
+                                      "value": "recovery"
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [531, 532, 530]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 516,
+                                    "character": 41
+                                  }
+                                ]
+                              }
+                            }
                           },
                           {
-                            "type": "reference",
                             "id": 533,
-                            "name": "GenerateEmailChangeLinkParams"
+                            "name": "GenerateEmailChangeLinkParams",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 523,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "reflection",
+                              "declaration": {
+                                "id": 534,
+                                "name": "__type",
+                                "kind": 65536,
+                                "kindString": "Type literal",
+                                "flags": {},
+                                "children": [
+                                  {
+                                    "id": 536,
+                                    "name": "email",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's email"
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 526,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 537,
+                                    "name": "newEmail",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "comment": {
+                                      "shortText": "The user's new email. Only required if type is 'email_change_current' or 'email_change_new'."
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 530,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "id": 538,
+                                    "name": "options",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {
+                                      "isOptional": true
+                                    },
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 531,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "reference",
+                                      "typeArguments": [
+                                        {
+                                          "type": "reference",
+                                          "id": 539,
+                                          "name": "GenerateLinkOptions"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "redirectTo"
+                                        }
+                                      ],
+                                      "qualifiedName": "Pick",
+                                      "package": "typescript",
+                                      "name": "Pick"
+                                    }
+                                  },
+                                  {
+                                    "id": 535,
+                                    "name": "type",
+                                    "kind": 1024,
+                                    "kindString": "Property",
+                                    "flags": {},
+                                    "sources": [
+                                      {
+                                        "fileName": "src/lib/types.ts",
+                                        "line": 524,
+                                        "character": 2
+                                      }
+                                    ],
+                                    "type": {
+                                      "type": "union",
+                                      "types": [
+                                        {
+                                          "type": "literal",
+                                          "value": "email_change_current"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "email_change_new"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ],
+                                "groups": [
+                                  {
+                                    "title": "Properties",
+                                    "kind": 1024,
+                                    "children": [536, 537, 538, 535]
+                                  }
+                                ],
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 523,
+                                    "character": 44
+                                  }
+                                ]
+                              }
+                            }
                           }
                         ]
                       }
@@ -6916,14 +7416,346 @@
                         "type": "union",
                         "types": [
                           {
-                            "type": "reference",
                             "id": 489,
-                            "name": "VerifyMobileOtpParams"
+                            "name": "VerifyMobileOtpParams",
+                            "kind": 256,
+                            "kindString": "Interface",
+                            "flags": {},
+                            "children": [
+                              {
+                                "id": 493,
+                                "name": "options",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {
+                                  "isOptional": true
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 454,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reflection",
+                                  "declaration": {
+                                    "id": 494,
+                                    "name": "__type",
+                                    "kind": 65536,
+                                    "kindString": "Type literal",
+                                    "flags": {},
+                                    "children": [
+                                      {
+                                        "id": 496,
+                                        "name": "captchaToken",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "Verification token received when the user completes the captcha on the site.",
+                                          "tags": [
+                                            {
+                                              "tag": "deprecated",
+                                              "text": "\n"
+                                            }
+                                          ]
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 463,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      },
+                                      {
+                                        "id": 495,
+                                        "name": "redirectTo",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "A URL to send the user to after they are confirmed."
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 456,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    ],
+                                    "groups": [
+                                      {
+                                        "title": "Properties",
+                                        "kind": 1024,
+                                        "children": [496, 495]
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "id": 490,
+                                "name": "phone",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's phone number."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 449,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 491,
+                                "name": "token",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The otp sent to the user's phone number."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 451,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 492,
+                                "name": "type",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's verification type."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 453,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reference",
+                                  "id": 505,
+                                  "name": "MobileOtpType"
+                                }
+                              }
+                            ],
+                            "groups": [
+                              {
+                                "title": "Properties",
+                                "kind": 1024,
+                                "children": [493, 490, 491, 492]
+                              }
+                            ],
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 447,
+                                "character": 17
+                              }
+                            ]
                           },
                           {
-                            "type": "reference",
                             "id": 497,
-                            "name": "VerifyEmailOtpParams"
+                            "name": "VerifyEmailOtpParams",
+                            "kind": 256,
+                            "kindString": "Interface",
+                            "flags": {},
+                            "children": [
+                              {
+                                "id": 498,
+                                "name": "email",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's email address."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 468,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 501,
+                                "name": "options",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {
+                                  "isOptional": true
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 473,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reflection",
+                                  "declaration": {
+                                    "id": 502,
+                                    "name": "__type",
+                                    "kind": 65536,
+                                    "kindString": "Type literal",
+                                    "flags": {},
+                                    "children": [
+                                      {
+                                        "id": 504,
+                                        "name": "captchaToken",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "Verification token received when the user completes the captcha on the site."
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 477,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      },
+                                      {
+                                        "id": 503,
+                                        "name": "redirectTo",
+                                        "kind": 1024,
+                                        "kindString": "Property",
+                                        "flags": {
+                                          "isOptional": true
+                                        },
+                                        "comment": {
+                                          "shortText": "A URL to send the user to after they are confirmed."
+                                        },
+                                        "sources": [
+                                          {
+                                            "fileName": "src/lib/types.ts",
+                                            "line": 475,
+                                            "character": 4
+                                          }
+                                        ],
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    ],
+                                    "groups": [
+                                      {
+                                        "title": "Properties",
+                                        "kind": 1024,
+                                        "children": [504, 503]
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "id": 499,
+                                "name": "token",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The otp sent to the user's email address."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 470,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "id": 500,
+                                "name": "type",
+                                "kind": 1024,
+                                "kindString": "Property",
+                                "flags": {},
+                                "comment": {
+                                  "shortText": "The user's verification type."
+                                },
+                                "sources": [
+                                  {
+                                    "fileName": "src/lib/types.ts",
+                                    "line": 472,
+                                    "character": 2
+                                  }
+                                ],
+                                "type": {
+                                  "type": "reference",
+                                  "id": 506,
+                                  "name": "EmailOtpType"
+                                }
+                              }
+                            ],
+                            "groups": [
+                              {
+                                "title": "Properties",
+                                "kind": 1024,
+                                "children": [498, 501, 499, 500]
+                              }
+                            ],
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 466,
+                                "character": 17
+                              }
+                            ]
                           }
                         ]
                       }
@@ -8925,9 +9757,22 @@
                             "value": "USER_DELETED"
                           },
                           {
-                            "type": "reference",
                             "id": 285,
-                            "name": "AuthChangeEventMFA"
+                            "name": "AuthChangeEventMFA",
+                            "kind": 4194304,
+                            "kindString": "Type alias",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "src/lib/types.ts",
+                                "line": 23,
+                                "character": 12
+                              }
+                            ],
+                            "type": {
+                              "type": "literal",
+                              "value": "MFA_CHALLENGE_VERIFIED"
+                            }
                           }
                         ]
                       }
@@ -10290,9 +11135,22 @@
             "value": "USER_DELETED"
           },
           {
-            "type": "reference",
             "id": 285,
-            "name": "AuthChangeEventMFA"
+            "name": "AuthChangeEventMFA",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 23,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "literal",
+              "value": "MFA_CHALLENGE_VERIFIED"
+            }
           }
         ]
       }
@@ -13104,24 +13962,524 @@
         "type": "union",
         "types": [
           {
-            "type": "reference",
             "id": 517,
-            "name": "GenerateSignupLinkParams"
+            "name": "GenerateSignupLinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 502,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 518,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 520,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 504,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 522,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 506,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 539,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "union",
+                          "types": [
+                            {
+                              "type": "literal",
+                              "value": "data"
+                            },
+                            {
+                              "type": "literal",
+                              "value": "redirectTo"
+                            }
+                          ]
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 521,
+                    "name": "password",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 505,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 519,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 503,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "literal",
+                      "value": "signup"
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [520, 522, 521, 519]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 502,
+                    "character": 39
+                  }
+                ]
+              }
+            }
           },
           {
-            "type": "reference",
             "id": 523,
-            "name": "GenerateInviteOrMagiclinkParams"
+            "name": "GenerateInviteOrMagiclinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 509,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 524,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 526,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's email"
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 512,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 527,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 513,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 539,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "union",
+                          "types": [
+                            {
+                              "type": "literal",
+                              "value": "data"
+                            },
+                            {
+                              "type": "literal",
+                              "value": "redirectTo"
+                            }
+                          ]
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 525,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 510,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "union",
+                      "types": [
+                        {
+                          "type": "literal",
+                          "value": "invite"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "magiclink"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [526, 527, 525]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 509,
+                    "character": 46
+                  }
+                ]
+              }
+            }
           },
           {
-            "type": "reference",
             "id": 528,
-            "name": "GenerateRecoveryLinkParams"
+            "name": "GenerateRecoveryLinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 516,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 529,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 531,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's email"
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 519,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 532,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 520,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 539,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "redirectTo"
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 530,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 517,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "literal",
+                      "value": "recovery"
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [531, 532, 530]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 516,
+                    "character": 41
+                  }
+                ]
+              }
+            }
           },
           {
-            "type": "reference",
             "id": 533,
-            "name": "GenerateEmailChangeLinkParams"
+            "name": "GenerateEmailChangeLinkParams",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 523,
+                "character": 12
+              }
+            ],
+            "type": {
+              "type": "reflection",
+              "declaration": {
+                "id": 534,
+                "name": "__type",
+                "kind": 65536,
+                "kindString": "Type literal",
+                "flags": {},
+                "children": [
+                  {
+                    "id": 536,
+                    "name": "email",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's email"
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 526,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 537,
+                    "name": "newEmail",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "comment": {
+                      "shortText": "The user's new email. Only required if type is 'email_change_current' or 'email_change_new'."
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 530,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "id": 538,
+                    "name": "options",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {
+                      "isOptional": true
+                    },
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 531,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "reference",
+                      "typeArguments": [
+                        {
+                          "type": "reference",
+                          "id": 539,
+                          "name": "GenerateLinkOptions"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "redirectTo"
+                        }
+                      ],
+                      "qualifiedName": "Pick",
+                      "package": "typescript",
+                      "name": "Pick"
+                    }
+                  },
+                  {
+                    "id": 535,
+                    "name": "type",
+                    "kind": 1024,
+                    "kindString": "Property",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 524,
+                        "character": 2
+                      }
+                    ],
+                    "type": {
+                      "type": "union",
+                      "types": [
+                        {
+                          "type": "literal",
+                          "value": "email_change_current"
+                        },
+                        {
+                          "type": "literal",
+                          "value": "email_change_new"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "groups": [
+                  {
+                    "title": "Properties",
+                    "kind": 1024,
+                    "children": [536, 537, 538, 535]
+                  }
+                ],
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 523,
+                    "character": 44
+                  }
+                ]
+              }
+            }
           }
         ]
       }
@@ -16883,14 +18241,346 @@
         "type": "union",
         "types": [
           {
-            "type": "reference",
             "id": 489,
-            "name": "VerifyMobileOtpParams"
+            "name": "VerifyMobileOtpParams",
+            "kind": 256,
+            "kindString": "Interface",
+            "flags": {},
+            "children": [
+              {
+                "id": 493,
+                "name": "options",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {
+                  "isOptional": true
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 454,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 494,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 496,
+                        "name": "captchaToken",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "Verification token received when the user completes the captcha on the site.",
+                          "tags": [
+                            {
+                              "tag": "deprecated",
+                              "text": "\n"
+                            }
+                          ]
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 463,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "id": 495,
+                        "name": "redirectTo",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "A URL to send the user to after they are confirmed."
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 456,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [496, 495]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "id": 490,
+                "name": "phone",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's phone number."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 449,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 491,
+                "name": "token",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The otp sent to the user's phone number."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 451,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 492,
+                "name": "type",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's verification type."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 453,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reference",
+                  "id": 505,
+                  "name": "MobileOtpType"
+                }
+              }
+            ],
+            "groups": [
+              {
+                "title": "Properties",
+                "kind": 1024,
+                "children": [493, 490, 491, 492]
+              }
+            ],
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 447,
+                "character": 17
+              }
+            ]
           },
           {
-            "type": "reference",
             "id": 497,
-            "name": "VerifyEmailOtpParams"
+            "name": "VerifyEmailOtpParams",
+            "kind": 256,
+            "kindString": "Interface",
+            "flags": {},
+            "children": [
+              {
+                "id": 498,
+                "name": "email",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's email address."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 468,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 501,
+                "name": "options",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {
+                  "isOptional": true
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 473,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 502,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 504,
+                        "name": "captchaToken",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "Verification token received when the user completes the captcha on the site."
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 477,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "id": 503,
+                        "name": "redirectTo",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {
+                          "isOptional": true
+                        },
+                        "comment": {
+                          "shortText": "A URL to send the user to after they are confirmed."
+                        },
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 475,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [504, 503]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "id": 499,
+                "name": "token",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The otp sent to the user's email address."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 470,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              },
+              {
+                "id": 500,
+                "name": "type",
+                "kind": 1024,
+                "kindString": "Property",
+                "flags": {},
+                "comment": {
+                  "shortText": "The user's verification type."
+                },
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 472,
+                    "character": 2
+                  }
+                ],
+                "type": {
+                  "type": "reference",
+                  "id": 506,
+                  "name": "EmailOtpType"
+                }
+              }
+            ],
+            "groups": [
+              {
+                "title": "Properties",
+                "kind": 1024,
+                "children": [498, 501, 499, 500]
+              }
+            ],
+            "sources": [
+              {
+                "fileName": "src/lib/types.ts",
+                "line": 466,
+                "character": 17
+              }
+            ]
           }
         ]
       }

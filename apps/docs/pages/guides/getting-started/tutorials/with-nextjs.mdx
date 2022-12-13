@@ -1,0 +1,18 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import OldContent from '~/pages/guides/with-nextjs.mdx'
+
+export const meta = {
+  id: 'with-nextjs',
+  title: 'Quickstart: Next.js',
+  description: 'Learn how to use Supabase in your Next App.',
+  sidebar_label: 'Next.js',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return OldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page

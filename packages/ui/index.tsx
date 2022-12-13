@@ -1,10 +1,16 @@
 import * as React from 'react'
 
+// Providers
+
+export * from './src/providers'
+
 // // GENERAL
 
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
+export * from './src/components/GlassPanel'
+export * from './src/components/IconPanel'
 // export * from './src/components/Image'
 
 // DISPLAYS
@@ -35,7 +41,7 @@ export * from './src/components/Popover'
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/Divider'
-export * from './src/components/ThemeProvider'
+// export * from './src/components/ThemeProvider'
 
 // DATA ENTRY
 
