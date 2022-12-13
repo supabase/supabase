@@ -19,10 +19,10 @@ You can pass a `transform` option to the functions you are currently using to in
 
 ```ts
 supabase.storage.from('bucket').getPublicUrl('image.jpg', {
-    transform: {
-        width: 500,
-        height: 600,
-    }
+  transform: {
+    width: 500,
+    height: 600,
+  }
 })
 ```
 
@@ -37,10 +37,10 @@ To share a transformed image for a fixed amount of time, provide the transform o
 
 ```ts
 supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
-    transform: {
-       width: 200,
-       height: 200,
-    }
+  transform: {
+    width: 200,
+    height: 200,
+  }
 })
 ```
 
@@ -52,10 +52,10 @@ To download a transformed image, pass the `transform` option to the `download` f
 
 ```ts
 supabase.storage.from('bucket').download('image.jpg', {
-    transform: {
-         width: 800,
-         height: 300,
-    }
+  transform: {
+    width: 800,
+    height: 300,
+  }
 })
 ```
 
