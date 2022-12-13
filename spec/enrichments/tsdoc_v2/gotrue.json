@@ -7,14 +7,14 @@
 	"originalName": "",
 	"children": [
 		{
-			"id": 727,
+			"id": 732,
 			"name": "AuthApiError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 728,
+					"id": 733,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -28,14 +28,14 @@
 					],
 					"signatures": [
 						{
-							"id": 729,
+							"id": 734,
 							"name": "new AuthApiError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 730,
+									"id": 735,
 									"name": "message",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -46,7 +46,7 @@
 									}
 								},
 								{
-									"id": 731,
+									"id": 736,
 									"name": "status",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -59,24 +59,24 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 727,
+								"id": 732,
 								"name": "AuthApiError"
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 724,
+								"id": 729,
 								"name": "AuthError.constructor"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 723,
+						"id": 728,
 						"name": "AuthError.constructor"
 					}
 				},
 				{
-					"id": 732,
+					"id": 737,
 					"name": "status",
 					"kind": 1024,
 					"kindString": "Property",
@@ -94,7 +94,7 @@
 					}
 				},
 				{
-					"id": 733,
+					"id": 738,
 					"name": "toJSON",
 					"kind": 2048,
 					"kindString": "Method",
@@ -108,7 +108,7 @@
 					],
 					"signatures": [
 						{
-							"id": 734,
+							"id": 739,
 							"name": "toJSON",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -116,14 +116,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 735,
+									"id": 740,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 737,
+											"id": 742,
 											"name": "message",
 											"kind": 1024,
 											"kindString": "Property",
@@ -142,7 +142,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 736,
+											"id": 741,
 											"name": "name",
 											"kind": 1024,
 											"kindString": "Property",
@@ -161,7 +161,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 738,
+											"id": 743,
 											"name": "status",
 											"kind": 1024,
 											"kindString": "Property",
@@ -185,9 +185,9 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												737,
-												736,
-												738
+												742,
+												741,
+												743
 											]
 										}
 									]
@@ -202,21 +202,21 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						728
+						733
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						732
+						737
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						733
+						738
 					]
 				}
 			],
@@ -230,20 +230,20 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 722,
+					"id": 727,
 					"name": "AuthError"
 				}
 			]
 		},
 		{
-			"id": 722,
+			"id": 727,
 			"name": "AuthError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 723,
+					"id": 728,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -257,14 +257,14 @@
 					],
 					"signatures": [
 						{
-							"id": 724,
+							"id": 729,
 							"name": "new AuthError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 725,
+									"id": 730,
 									"name": "message",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -277,7 +277,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 722,
+								"id": 727,
 								"name": "AuthError"
 							},
 							"overwrites": {
@@ -297,7 +297,7 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						723
+						728
 					]
 				}
 			],
@@ -319,30 +319,30 @@
 			"extendedBy": [
 				{
 					"type": "reference",
-					"id": 727,
+					"id": 732,
 					"name": "AuthApiError"
 				},
 				{
 					"type": "reference",
-					"id": 740,
+					"id": 745,
 					"name": "AuthUnknownError"
 				},
 				{
 					"type": "reference",
-					"id": 747,
+					"id": 752,
 					"name": "CustomAuthError"
 				}
 			]
 		},
 		{
-			"id": 787,
+			"id": 792,
 			"name": "AuthImplicitGrantRedirectError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 788,
+					"id": 793,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -356,14 +356,14 @@
 					],
 					"signatures": [
 						{
-							"id": 789,
+							"id": 794,
 							"name": "new AuthImplicitGrantRedirectError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 790,
+									"id": 795,
 									"name": "message",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -374,7 +374,7 @@
 									}
 								},
 								{
-									"id": 791,
+									"id": 796,
 									"name": "details",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -389,14 +389,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 792,
+													"id": 797,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 794,
+															"id": 799,
 															"name": "code",
 															"kind": 1024,
 															"kindString": "Property",
@@ -414,7 +414,7 @@
 															}
 														},
 														{
-															"id": 793,
+															"id": 798,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -437,8 +437,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																794,
-																793
+																799,
+																798
 															]
 														}
 													]
@@ -451,24 +451,24 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 787,
+								"id": 792,
 								"name": "AuthImplicitGrantRedirectError"
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 749,
+								"id": 754,
 								"name": "CustomAuthError.constructor"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 748,
+						"id": 753,
 						"name": "CustomAuthError.constructor"
 					}
 				},
 				{
-					"id": 795,
+					"id": 800,
 					"name": "details",
 					"kind": 1024,
 					"kindString": "Property",
@@ -490,14 +490,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 796,
+									"id": 801,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 798,
+											"id": 803,
 											"name": "code",
 											"kind": 1024,
 											"kindString": "Property",
@@ -515,7 +515,7 @@
 											}
 										},
 										{
-											"id": 797,
+											"id": 802,
 											"name": "error",
 											"kind": 1024,
 											"kindString": "Property",
@@ -538,8 +538,8 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												798,
-												797
+												803,
+												802
 											]
 										}
 									]
@@ -550,7 +550,7 @@
 					"defaultValue": "null"
 				},
 				{
-					"id": 809,
+					"id": 814,
 					"name": "name",
 					"kind": 1024,
 					"kindString": "Property",
@@ -568,12 +568,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 753,
+						"id": 758,
 						"name": "CustomAuthError.name"
 					}
 				},
 				{
-					"id": 810,
+					"id": 815,
 					"name": "status",
 					"kind": 1024,
 					"kindString": "Property",
@@ -591,12 +591,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 754,
+						"id": 759,
 						"name": "CustomAuthError.status"
 					}
 				},
 				{
-					"id": 799,
+					"id": 804,
 					"name": "toJSON",
 					"kind": 2048,
 					"kindString": "Method",
@@ -610,7 +610,7 @@
 					],
 					"signatures": [
 						{
-							"id": 800,
+							"id": 805,
 							"name": "toJSON",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -618,14 +618,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 801,
+									"id": 806,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 805,
+											"id": 810,
 											"name": "details",
 											"kind": 1024,
 											"kindString": "Property",
@@ -647,14 +647,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 806,
+															"id": 811,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 808,
+																	"id": 813,
 																	"name": "code",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -672,7 +672,7 @@
 																	}
 																},
 																{
-																	"id": 807,
+																	"id": 812,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -695,8 +695,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		808,
-																		807
+																		813,
+																		812
 																	]
 																}
 															]
@@ -707,7 +707,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 803,
+											"id": 808,
 											"name": "message",
 											"kind": 1024,
 											"kindString": "Property",
@@ -726,7 +726,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 802,
+											"id": 807,
 											"name": "name",
 											"kind": 1024,
 											"kindString": "Property",
@@ -745,7 +745,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 804,
+											"id": 809,
 											"name": "status",
 											"kind": 1024,
 											"kindString": "Property",
@@ -769,10 +769,10 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												805,
-												803,
-												802,
-												804
+												810,
+												808,
+												807,
+												809
 											]
 										}
 									]
@@ -780,14 +780,14 @@
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 756,
+								"id": 761,
 								"name": "CustomAuthError.toJSON"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 755,
+						"id": 760,
 						"name": "CustomAuthError.toJSON"
 					}
 				}
@@ -797,23 +797,23 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						788
+						793
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						795,
-						809,
-						810
+						800,
+						814,
+						815
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						799
+						804
 					]
 				}
 			],
@@ -827,20 +827,20 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 747,
+					"id": 752,
 					"name": "CustomAuthError"
 				}
 			]
 		},
 		{
-			"id": 774,
+			"id": 779,
 			"name": "AuthInvalidCredentialsError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 775,
+					"id": 780,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -854,14 +854,14 @@
 					],
 					"signatures": [
 						{
-							"id": 776,
+							"id": 781,
 							"name": "new AuthInvalidCredentialsError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 777,
+									"id": 782,
 									"name": "message",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -874,24 +874,24 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 774,
+								"id": 779,
 								"name": "AuthInvalidCredentialsError"
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 749,
+								"id": 754,
 								"name": "CustomAuthError.constructor"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 748,
+						"id": 753,
 						"name": "CustomAuthError.constructor"
 					}
 				},
 				{
-					"id": 778,
+					"id": 783,
 					"name": "name",
 					"kind": 1024,
 					"kindString": "Property",
@@ -909,12 +909,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 753,
+						"id": 758,
 						"name": "CustomAuthError.name"
 					}
 				},
 				{
-					"id": 779,
+					"id": 784,
 					"name": "status",
 					"kind": 1024,
 					"kindString": "Property",
@@ -932,12 +932,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 754,
+						"id": 759,
 						"name": "CustomAuthError.status"
 					}
 				},
 				{
-					"id": 780,
+					"id": 785,
 					"name": "toJSON",
 					"kind": 2048,
 					"kindString": "Method",
@@ -951,7 +951,7 @@
 					],
 					"signatures": [
 						{
-							"id": 781,
+							"id": 786,
 							"name": "toJSON",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -959,14 +959,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 782,
+									"id": 787,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 784,
+											"id": 789,
 											"name": "message",
 											"kind": 1024,
 											"kindString": "Property",
@@ -985,7 +985,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 783,
+											"id": 788,
 											"name": "name",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1004,7 +1004,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 785,
+											"id": 790,
 											"name": "status",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1028,9 +1028,9 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												784,
-												783,
-												785
+												789,
+												788,
+												790
 											]
 										}
 									]
@@ -1038,14 +1038,14 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 756,
+								"id": 761,
 								"name": "CustomAuthError.toJSON"
 							}
 						}
 					],
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 755,
+						"id": 760,
 						"name": "CustomAuthError.toJSON"
 					}
 				}
@@ -1055,22 +1055,22 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						775
+						780
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						778,
-						779
+						783,
+						784
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						780
+						785
 					]
 				}
 			],
@@ -1084,20 +1084,20 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 747,
+					"id": 752,
 					"name": "CustomAuthError"
 				}
 			]
 		},
 		{
-			"id": 812,
+			"id": 817,
 			"name": "AuthRetryableFetchError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 813,
+					"id": 818,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -1111,14 +1111,14 @@
 					],
 					"signatures": [
 						{
-							"id": 814,
+							"id": 819,
 							"name": "new AuthRetryableFetchError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 815,
+									"id": 820,
 									"name": "message",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1129,7 +1129,7 @@
 									}
 								},
 								{
-									"id": 816,
+									"id": 821,
 									"name": "status",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1142,24 +1142,24 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 812,
+								"id": 817,
 								"name": "AuthRetryableFetchError"
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 749,
+								"id": 754,
 								"name": "CustomAuthError.constructor"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 748,
+						"id": 753,
 						"name": "CustomAuthError.constructor"
 					}
 				},
 				{
-					"id": 817,
+					"id": 822,
 					"name": "name",
 					"kind": 1024,
 					"kindString": "Property",
@@ -1177,12 +1177,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 753,
+						"id": 758,
 						"name": "CustomAuthError.name"
 					}
 				},
 				{
-					"id": 818,
+					"id": 823,
 					"name": "status",
 					"kind": 1024,
 					"kindString": "Property",
@@ -1200,12 +1200,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 754,
+						"id": 759,
 						"name": "CustomAuthError.status"
 					}
 				},
 				{
-					"id": 819,
+					"id": 824,
 					"name": "toJSON",
 					"kind": 2048,
 					"kindString": "Method",
@@ -1219,7 +1219,7 @@
 					],
 					"signatures": [
 						{
-							"id": 820,
+							"id": 825,
 							"name": "toJSON",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -1227,14 +1227,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 821,
+									"id": 826,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 823,
+											"id": 828,
 											"name": "message",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1253,7 +1253,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 822,
+											"id": 827,
 											"name": "name",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1272,7 +1272,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 824,
+											"id": 829,
 											"name": "status",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1296,9 +1296,9 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												823,
-												822,
-												824
+												828,
+												827,
+												829
 											]
 										}
 									]
@@ -1306,14 +1306,14 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 756,
+								"id": 761,
 								"name": "CustomAuthError.toJSON"
 							}
 						}
 					],
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 755,
+						"id": 760,
 						"name": "CustomAuthError.toJSON"
 					}
 				}
@@ -1323,22 +1323,22 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						813
+						818
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						817,
-						818
+						822,
+						823
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						819
+						824
 					]
 				}
 			],
@@ -1352,20 +1352,20 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 747,
+					"id": 752,
 					"name": "CustomAuthError"
 				}
 			]
 		},
 		{
-			"id": 762,
+			"id": 767,
 			"name": "AuthSessionMissingError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 763,
+					"id": 768,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -1379,31 +1379,31 @@
 					],
 					"signatures": [
 						{
-							"id": 764,
+							"id": 769,
 							"name": "new AuthSessionMissingError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"type": {
 								"type": "reference",
-								"id": 762,
+								"id": 767,
 								"name": "AuthSessionMissingError"
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 749,
+								"id": 754,
 								"name": "CustomAuthError.constructor"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 748,
+						"id": 753,
 						"name": "CustomAuthError.constructor"
 					}
 				},
 				{
-					"id": 765,
+					"id": 770,
 					"name": "name",
 					"kind": 1024,
 					"kindString": "Property",
@@ -1421,12 +1421,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 753,
+						"id": 758,
 						"name": "CustomAuthError.name"
 					}
 				},
 				{
-					"id": 766,
+					"id": 771,
 					"name": "status",
 					"kind": 1024,
 					"kindString": "Property",
@@ -1444,12 +1444,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 754,
+						"id": 759,
 						"name": "CustomAuthError.status"
 					}
 				},
 				{
-					"id": 767,
+					"id": 772,
 					"name": "toJSON",
 					"kind": 2048,
 					"kindString": "Method",
@@ -1463,7 +1463,7 @@
 					],
 					"signatures": [
 						{
-							"id": 768,
+							"id": 773,
 							"name": "toJSON",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -1471,14 +1471,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 769,
+									"id": 774,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 771,
+											"id": 776,
 											"name": "message",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1497,7 +1497,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 770,
+											"id": 775,
 											"name": "name",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1516,7 +1516,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 772,
+											"id": 777,
 											"name": "status",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1540,9 +1540,9 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												771,
-												770,
-												772
+												776,
+												775,
+												777
 											]
 										}
 									]
@@ -1550,14 +1550,14 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 756,
+								"id": 761,
 								"name": "CustomAuthError.toJSON"
 							}
 						}
 					],
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 755,
+						"id": 760,
 						"name": "CustomAuthError.toJSON"
 					}
 				}
@@ -1567,22 +1567,22 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						763
+						768
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						765,
-						766
+						770,
+						771
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						767
+						772
 					]
 				}
 			],
@@ -1596,20 +1596,20 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 747,
+					"id": 752,
 					"name": "CustomAuthError"
 				}
 			]
 		},
 		{
-			"id": 740,
+			"id": 745,
 			"name": "AuthUnknownError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 741,
+					"id": 746,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -1623,14 +1623,14 @@
 					],
 					"signatures": [
 						{
-							"id": 742,
+							"id": 747,
 							"name": "new AuthUnknownError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 743,
+									"id": 748,
 									"name": "message",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1641,7 +1641,7 @@
 									}
 								},
 								{
-									"id": 744,
+									"id": 749,
 									"name": "originalError",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1654,24 +1654,24 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 740,
+								"id": 745,
 								"name": "AuthUnknownError"
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 724,
+								"id": 729,
 								"name": "AuthError.constructor"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 723,
+						"id": 728,
 						"name": "AuthError.constructor"
 					}
 				},
 				{
-					"id": 745,
+					"id": 750,
 					"name": "originalError",
 					"kind": 1024,
 					"kindString": "Property",
@@ -1694,14 +1694,14 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						741
+						746
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						745
+						750
 					]
 				}
 			],
@@ -1715,20 +1715,20 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 722,
+					"id": 727,
 					"name": "AuthError"
 				}
 			]
 		},
 		{
-			"id": 747,
+			"id": 752,
 			"name": "CustomAuthError",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 748,
+					"id": 753,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -1742,14 +1742,14 @@
 					],
 					"signatures": [
 						{
-							"id": 749,
+							"id": 754,
 							"name": "new CustomAuthError",
 							"kind": 16384,
 							"kindString": "Constructor signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 750,
+									"id": 755,
 									"name": "message",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1760,7 +1760,7 @@
 									}
 								},
 								{
-									"id": 751,
+									"id": 756,
 									"name": "name",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1771,7 +1771,7 @@
 									}
 								},
 								{
-									"id": 752,
+									"id": 757,
 									"name": "status",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -1784,24 +1784,24 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 747,
+								"id": 752,
 								"name": "CustomAuthError"
 							},
 							"overwrites": {
 								"type": "reference",
-								"id": 724,
+								"id": 729,
 								"name": "AuthError.constructor"
 							}
 						}
 					],
 					"overwrites": {
 						"type": "reference",
-						"id": 723,
+						"id": 728,
 						"name": "AuthError.constructor"
 					}
 				},
 				{
-					"id": 753,
+					"id": 758,
 					"name": "name",
 					"kind": 1024,
 					"kindString": "Property",
@@ -1823,7 +1823,7 @@
 					}
 				},
 				{
-					"id": 754,
+					"id": 759,
 					"name": "status",
 					"kind": 1024,
 					"kindString": "Property",
@@ -1841,7 +1841,7 @@
 					}
 				},
 				{
-					"id": 755,
+					"id": 760,
 					"name": "toJSON",
 					"kind": 2048,
 					"kindString": "Method",
@@ -1855,7 +1855,7 @@
 					],
 					"signatures": [
 						{
-							"id": 756,
+							"id": 761,
 							"name": "toJSON",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -1863,14 +1863,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 757,
+									"id": 762,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 759,
+											"id": 764,
 											"name": "message",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1889,7 +1889,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 758,
+											"id": 763,
 											"name": "name",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1908,7 +1908,7 @@
 											"defaultValue": "..."
 										},
 										{
-											"id": 760,
+											"id": 765,
 											"name": "status",
 											"kind": 1024,
 											"kindString": "Property",
@@ -1932,9 +1932,9 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												759,
-												758,
-												760
+												764,
+												763,
+												765
 											]
 										}
 									]
@@ -1949,22 +1949,22 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						748
+						753
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						753,
-						754
+						758,
+						759
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						755
+						760
 					]
 				}
 			],
@@ -1978,29 +1978,29 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 722,
+					"id": 727,
 					"name": "AuthError"
 				}
 			],
 			"extendedBy": [
 				{
 					"type": "reference",
-					"id": 762,
+					"id": 767,
 					"name": "AuthSessionMissingError"
 				},
 				{
 					"type": "reference",
-					"id": 774,
+					"id": 779,
 					"name": "AuthInvalidCredentialsError"
 				},
 				{
 					"type": "reference",
-					"id": 787,
+					"id": 792,
 					"name": "AuthImplicitGrantRedirectError"
 				},
 				{
 					"type": "reference",
-					"id": 812,
+					"id": 817,
 					"name": "AuthRetryableFetchError"
 				}
 			]
@@ -2021,7 +2021,7 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 27,
+							"line": 28,
 							"character": 2
 						}
 					],
@@ -2059,7 +2059,7 @@
 													"sources": [
 														{
 															"fileName": "src/GoTrueAdminApi.ts",
-															"line": 36,
+															"line": 37,
 															"character": 4
 														}
 													],
@@ -2149,7 +2149,7 @@
 													"sources": [
 														{
 															"fileName": "src/GoTrueAdminApi.ts",
-															"line": 33,
+															"line": 34,
 															"character": 4
 														}
 													],
@@ -2196,7 +2196,7 @@
 													"sources": [
 														{
 															"fileName": "src/GoTrueAdminApi.ts",
-															"line": 32,
+															"line": 33,
 															"character": 4
 														}
 													],
@@ -2241,13 +2241,13 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 19,
+							"line": 20,
 							"character": 2
 						}
 					],
 					"type": {
 						"type": "reference",
-						"id": 698,
+						"id": 699,
 						"name": "GoTrueAdminMFAApi"
 					}
 				},
@@ -2260,7 +2260,7 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 138,
+							"line": 139,
 							"character": 8
 						}
 					],
@@ -2283,7 +2283,7 @@
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 410,
+										"id": 411,
 										"name": "AdminUserAttributes"
 									}
 								}
@@ -2293,7 +2293,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 335,
+										"id": 336,
 										"name": "UserResponse"
 									}
 								],
@@ -2305,7 +2305,7 @@
 					]
 				},
 				{
-					"id": 65,
+					"id": 66,
 					"name": "deleteUser",
 					"kind": 2048,
 					"kindString": "Method",
@@ -2313,13 +2313,13 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 228,
+							"line": 234,
 							"character": 8
 						}
 					],
 					"signatures": [
 						{
-							"id": 66,
+							"id": 67,
 							"name": "deleteUser",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -2329,7 +2329,7 @@
 							},
 							"parameters": [
 								{
-									"id": 67,
+									"id": 68,
 									"name": "id",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -2348,7 +2348,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 335,
+										"id": 336,
 										"name": "UserResponse"
 									}
 								],
@@ -2368,7 +2368,7 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 104,
+							"line": 105,
 							"character": 8
 						}
 					],
@@ -2391,7 +2391,7 @@
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 542,
+										"id": 543,
 										"name": "GenerateLinkParams"
 									}
 								}
@@ -2401,7 +2401,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 543,
+										"id": 544,
 										"name": "GenerateLinkResponse"
 									}
 								],
@@ -2413,7 +2413,7 @@
 					]
 				},
 				{
-					"id": 58,
+					"id": 59,
 					"name": "getUserById",
 					"kind": 2048,
 					"kindString": "Method",
@@ -2421,13 +2421,13 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 183,
+							"line": 189,
 							"character": 8
 						}
 					],
 					"signatures": [
 						{
-							"id": 59,
+							"id": 60,
 							"name": "getUserById",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -2437,7 +2437,7 @@
 							},
 							"parameters": [
 								{
-									"id": 60,
+									"id": 61,
 									"name": "uid",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -2456,7 +2456,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 335,
+										"id": 336,
 										"name": "UserResponse"
 									}
 								],
@@ -2476,7 +2476,7 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 74,
+							"line": 75,
 							"character": 8
 						}
 					],
@@ -2534,7 +2534,7 @@
 													"sources": [
 														{
 															"fileName": "src/GoTrueAdminApi.ts",
-															"line": 78,
+															"line": 79,
 															"character": 6
 														}
 													],
@@ -2557,7 +2557,7 @@
 													"sources": [
 														{
 															"fileName": "src/GoTrueAdminApi.ts",
-															"line": 77,
+															"line": 78,
 															"character": 6
 														}
 													],
@@ -2587,7 +2587,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 335,
+										"id": 336,
 										"name": "UserResponse"
 									}
 								],
@@ -2607,7 +2607,7 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 159,
+							"line": 161,
 							"character": 8
 						}
 					],
@@ -2620,8 +2620,27 @@
 							"flags": {},
 							"comment": {
 								"shortText": "Get a list of users.",
-								"text": "This function should only be called on a server. Never expose your `service_role` key in the browser.\n"
+								"text": "This function should only be called on a server. Never expose your `service_role` key in the browser."
 							},
+							"parameters": [
+								{
+									"id": 48,
+									"name": "params",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isOptional": true
+									},
+									"comment": {
+										"shortText": "An object which supports `page` and `per_page` as numbers, to alter the paginated results.\n"
+									},
+									"type": {
+										"type": "reference",
+										"id": 717,
+										"name": "PageParams"
+									}
+								}
+							],
 							"type": {
 								"type": "reference",
 								"typeArguments": [
@@ -2631,14 +2650,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 48,
+													"id": 49,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 49,
+															"id": 50,
 															"name": "data",
 															"kind": 1024,
 															"kindString": "Property",
@@ -2646,21 +2665,21 @@
 															"sources": [
 																{
 																	"fileName": "src/GoTrueAdminApi.ts",
-																	"line": 160,
-																	"character": 6
+																	"line": 163,
+																	"character": 15
 																}
 															],
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 50,
+																	"id": 51,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
 																	"flags": {},
 																	"children": [
 																		{
-																			"id": 51,
+																			"id": 52,
 																			"name": "users",
 																			"kind": 1024,
 																			"kindString": "Property",
@@ -2668,15 +2687,15 @@
 																			"sources": [
 																				{
 																					"fileName": "src/GoTrueAdminApi.ts",
-																					"line": 160,
-																					"character": 14
+																					"line": 163,
+																					"character": 23
 																				}
 																			],
 																			"type": {
 																				"type": "array",
 																				"elementType": {
 																					"type": "reference",
-																					"id": 383,
+																					"id": 384,
 																					"name": "User"
 																				}
 																			}
@@ -2687,7 +2706,7 @@
 																			"title": "Properties",
 																			"kind": 1024,
 																			"children": [
-																				51
+																				52
 																			]
 																		}
 																	]
@@ -2695,7 +2714,7 @@
 															}
 														},
 														{
-															"id": 52,
+															"id": 53,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -2703,8 +2722,8 @@
 															"sources": [
 																{
 																	"fileName": "src/GoTrueAdminApi.ts",
-																	"line": 160,
-																	"character": 31
+																	"line": 163,
+																	"character": 40
 																}
 															],
 															"type": {
@@ -2718,8 +2737,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																49,
-																52
+																50,
+																53
 															]
 														}
 													]
@@ -2728,14 +2747,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 53,
+													"id": 54,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 54,
+															"id": 55,
 															"name": "data",
 															"kind": 1024,
 															"kindString": "Property",
@@ -2743,21 +2762,21 @@
 															"sources": [
 																{
 																	"fileName": "src/GoTrueAdminApi.ts",
-																	"line": 160,
-																	"character": 49
+																	"line": 163,
+																	"character": 58
 																}
 															],
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 55,
+																	"id": 56,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
 																	"flags": {},
 																	"children": [
 																		{
-																			"id": 56,
+																			"id": 57,
 																			"name": "users",
 																			"kind": 1024,
 																			"kindString": "Property",
@@ -2765,8 +2784,8 @@
 																			"sources": [
 																				{
 																					"fileName": "src/GoTrueAdminApi.ts",
-																					"line": 160,
-																					"character": 57
+																					"line": 163,
+																					"character": 66
 																				}
 																			],
 																			"type": {
@@ -2779,7 +2798,7 @@
 																			"title": "Properties",
 																			"kind": 1024,
 																			"children": [
-																				56
+																				57
 																			]
 																		}
 																	]
@@ -2787,7 +2806,7 @@
 															}
 														},
 														{
-															"id": 57,
+															"id": 58,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -2795,13 +2814,13 @@
 															"sources": [
 																{
 																	"fileName": "src/GoTrueAdminApi.ts",
-																	"line": 160,
-																	"character": 70
+																	"line": 163,
+																	"character": 79
 																}
 															],
 															"type": {
 																"type": "reference",
-																"id": 722,
+																"id": 727,
 																"name": "AuthError"
 															}
 														}
@@ -2811,8 +2830,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																54,
-																57
+																55,
+																58
 															]
 														}
 													]
@@ -2837,7 +2856,7 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 51,
+							"line": 52,
 							"character": 8
 						}
 					],
@@ -2888,7 +2907,7 @@
 													"sources": [
 														{
 															"fileName": "src/GoTrueAdminApi.ts",
-															"line": 51,
+															"line": 52,
 															"character": 40
 														}
 													],
@@ -2906,7 +2925,7 @@
 													"sources": [
 														{
 															"fileName": "src/GoTrueAdminApi.ts",
-															"line": 51,
+															"line": 52,
 															"character": 52
 														}
 													],
@@ -2919,7 +2938,7 @@
 															},
 															{
 																"type": "reference",
-																"id": 722,
+																"id": 727,
 																"name": "AuthError"
 															}
 														]
@@ -2947,7 +2966,7 @@
 					]
 				},
 				{
-					"id": 61,
+					"id": 62,
 					"name": "updateUserById",
 					"kind": 2048,
 					"kindString": "Method",
@@ -2955,13 +2974,13 @@
 					"sources": [
 						{
 							"fileName": "src/GoTrueAdminApi.ts",
-							"line": 205,
+							"line": 211,
 							"character": 8
 						}
 					],
 					"signatures": [
 						{
-							"id": 62,
+							"id": 63,
 							"name": "updateUserById",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -2971,7 +2990,7 @@
 							},
 							"parameters": [
 								{
-									"id": 63,
+									"id": 64,
 									"name": "uid",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -2982,7 +3001,7 @@
 									}
 								},
 								{
-									"id": 64,
+									"id": 65,
 									"name": "attributes",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -2992,7 +3011,7 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 410,
+										"id": 411,
 										"name": "AdminUserAttributes"
 									}
 								}
@@ -3002,7 +3021,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 335,
+										"id": 336,
 										"name": "UserResponse"
 									}
 								],
@@ -3034,33 +3053,33 @@
 					"kind": 2048,
 					"children": [
 						43,
-						65,
+						66,
 						40,
-						58,
+						59,
 						33,
 						46,
 						27,
-						61
+						62
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "src/GoTrueAdminApi.ts",
-					"line": 17,
+					"line": 18,
 					"character": 21
 				}
 			]
 		},
 		{
-			"id": 74,
+			"id": 75,
 			"name": "GoTrueClient",
 			"kind": 128,
 			"kindString": "Class",
 			"flags": {},
 			"children": [
 				{
-					"id": 75,
+					"id": 76,
 					"name": "constructor",
 					"kind": 512,
 					"kindString": "Constructor",
@@ -3074,7 +3093,7 @@
 					],
 					"signatures": [
 						{
-							"id": 76,
+							"id": 77,
 							"name": "new GoTrueClient",
 							"kind": 16384,
 							"kindString": "Constructor signature",
@@ -3084,28 +3103,28 @@
 							},
 							"parameters": [
 								{
-									"id": 77,
+									"id": 78,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 287,
+										"id": 288,
 										"name": "GoTrueClientOptions"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 74,
+								"id": 75,
 								"name": "default"
 							}
 						}
 					]
 				},
 				{
-					"id": 78,
+					"id": 79,
 					"name": "admin",
 					"kind": 1024,
 					"kindString": "Property",
@@ -3127,7 +3146,7 @@
 					}
 				},
 				{
-					"id": 79,
+					"id": 80,
 					"name": "mfa",
 					"kind": 1024,
 					"kindString": "Property",
@@ -3144,12 +3163,12 @@
 					],
 					"type": {
 						"type": "reference",
-						"id": 653,
+						"id": 654,
 						"name": "GoTrueMFAApi"
 					}
 				},
 				{
-					"id": 123,
+					"id": 124,
 					"name": "getSession",
 					"kind": 2048,
 					"kindString": "Method",
@@ -3163,7 +3182,7 @@
 					],
 					"signatures": [
 						{
-							"id": 124,
+							"id": 125,
 							"name": "getSession",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -3180,14 +3199,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 125,
+													"id": 126,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 126,
+															"id": 127,
 															"name": "data",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3202,14 +3221,14 @@
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 127,
+																	"id": 128,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
 																	"flags": {},
 																	"children": [
 																		{
-																			"id": 128,
+																			"id": 129,
 																			"name": "session",
 																			"kind": 1024,
 																			"kindString": "Property",
@@ -3223,7 +3242,7 @@
 																			],
 																			"type": {
 																				"type": "reference",
-																				"id": 346,
+																				"id": 347,
 																				"name": "Session"
 																			}
 																		}
@@ -3233,7 +3252,7 @@
 																			"title": "Properties",
 																			"kind": 1024,
 																			"children": [
-																				128
+																				129
 																			]
 																		}
 																	]
@@ -3241,7 +3260,7 @@
 															}
 														},
 														{
-															"id": 129,
+															"id": 130,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3264,8 +3283,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																126,
-																129
+																127,
+																130
 															]
 														}
 													]
@@ -3274,14 +3293,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 130,
+													"id": 131,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 131,
+															"id": 132,
 															"name": "data",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3296,14 +3315,14 @@
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 132,
+																	"id": 133,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
 																	"flags": {},
 																	"children": [
 																		{
-																			"id": 133,
+																			"id": 134,
 																			"name": "session",
 																			"kind": 1024,
 																			"kindString": "Property",
@@ -3326,7 +3345,7 @@
 																			"title": "Properties",
 																			"kind": 1024,
 																			"children": [
-																				133
+																				134
 																			]
 																		}
 																	]
@@ -3334,7 +3353,7 @@
 															}
 														},
 														{
-															"id": 134,
+															"id": 135,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3348,7 +3367,7 @@
 															],
 															"type": {
 																"type": "reference",
-																"id": 722,
+																"id": 727,
 																"name": "AuthError"
 															}
 														}
@@ -3358,8 +3377,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																131,
-																134
+																132,
+																135
 															]
 														}
 													]
@@ -3368,14 +3387,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 135,
+													"id": 136,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 136,
+															"id": 137,
 															"name": "data",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3390,14 +3409,14 @@
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 137,
+																	"id": 138,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
 																	"flags": {},
 																	"children": [
 																		{
-																			"id": 138,
+																			"id": 139,
 																			"name": "session",
 																			"kind": 1024,
 																			"kindString": "Property",
@@ -3420,7 +3439,7 @@
 																			"title": "Properties",
 																			"kind": 1024,
 																			"children": [
-																				138
+																				139
 																			]
 																		}
 																	]
@@ -3428,7 +3447,7 @@
 															}
 														},
 														{
-															"id": 139,
+															"id": 140,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3451,8 +3470,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																136,
-																139
+																137,
+																140
 															]
 														}
 													]
@@ -3469,7 +3488,7 @@
 					]
 				},
 				{
-					"id": 140,
+					"id": 141,
 					"name": "getUser",
 					"kind": 2048,
 					"kindString": "Method",
@@ -3483,7 +3502,7 @@
 					],
 					"signatures": [
 						{
-							"id": 141,
+							"id": 142,
 							"name": "getUser",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -3493,7 +3512,7 @@
 							},
 							"parameters": [
 								{
-									"id": 142,
+									"id": 143,
 									"name": "jwt",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -3514,7 +3533,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 335,
+										"id": 336,
 										"name": "UserResponse"
 									}
 								],
@@ -3526,7 +3545,7 @@
 					]
 				},
 				{
-					"id": 101,
+					"id": 102,
 					"name": "initialize",
 					"kind": 2048,
 					"kindString": "Method",
@@ -3540,7 +3559,7 @@
 					],
 					"signatures": [
 						{
-							"id": 102,
+							"id": 103,
 							"name": "initialize",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -3553,7 +3572,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 706,
+										"id": 707,
 										"name": "InitializeResult"
 									}
 								],
@@ -3565,7 +3584,7 @@
 					]
 				},
 				{
-					"id": 184,
+					"id": 185,
 					"name": "onAuthStateChange",
 					"kind": 2048,
 					"kindString": "Method",
@@ -3579,7 +3598,7 @@
 					],
 					"signatures": [
 						{
-							"id": 185,
+							"id": 186,
 							"name": "onAuthStateChange",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -3589,7 +3608,7 @@
 							},
 							"parameters": [
 								{
-									"id": 186,
+									"id": 187,
 									"name": "callback",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -3600,33 +3619,33 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 187,
+											"id": 188,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"signatures": [
 												{
-													"id": 188,
+													"id": 189,
 													"name": "__type",
 													"kind": 4096,
 													"kindString": "Call signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 189,
+															"id": 190,
 															"name": "event",
 															"kind": 32768,
 															"kindString": "Parameter",
 															"flags": {},
 															"type": {
 																"type": "reference",
-																"id": 286,
+																"id": 287,
 																"name": "AuthChangeEvent"
 															}
 														},
 														{
-															"id": 190,
+															"id": 191,
 															"name": "session",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -3640,7 +3659,7 @@
 																	},
 																	{
 																		"type": "reference",
-																		"id": 346,
+																		"id": 347,
 																		"name": "Session"
 																	}
 																]
@@ -3660,14 +3679,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 191,
+									"id": 192,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 192,
+											"id": 193,
 											"name": "data",
 											"kind": 1024,
 											"kindString": "Property",
@@ -3682,14 +3701,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 193,
+													"id": 194,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 194,
+															"id": 195,
 															"name": "subscription",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3703,7 +3722,7 @@
 															],
 															"type": {
 																"type": "reference",
-																"id": 420,
+																"id": 421,
 																"name": "Subscription"
 															}
 														}
@@ -3713,7 +3732,7 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																194
+																195
 															]
 														}
 													]
@@ -3726,7 +3745,7 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												192
+												193
 											]
 										}
 									]
@@ -3736,7 +3755,7 @@
 					]
 				},
 				{
-					"id": 159,
+					"id": 160,
 					"name": "refreshSession",
 					"kind": 2048,
 					"kindString": "Method",
@@ -3750,7 +3769,7 @@
 					],
 					"signatures": [
 						{
-							"id": 160,
+							"id": 161,
 							"name": "refreshSession",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -3760,7 +3779,7 @@
 							},
 							"parameters": [
 								{
-									"id": 161,
+									"id": 162,
 									"name": "currentSession",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -3773,14 +3792,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 162,
+											"id": 163,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 163,
+													"id": 164,
 													"name": "refresh_token",
 													"kind": 1024,
 													"kindString": "Property",
@@ -3803,7 +3822,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														163
+														164
 													]
 												}
 											]
@@ -3816,7 +3835,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 300,
+										"id": 301,
 										"name": "AuthResponse"
 									}
 								],
@@ -3828,7 +3847,7 @@
 					]
 				},
 				{
-					"id": 195,
+					"id": 196,
 					"name": "resetPasswordForEmail",
 					"kind": 2048,
 					"kindString": "Method",
@@ -3842,7 +3861,7 @@
 					],
 					"signatures": [
 						{
-							"id": 196,
+							"id": 197,
 							"name": "resetPasswordForEmail",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -3852,7 +3871,7 @@
 							},
 							"parameters": [
 								{
-									"id": 197,
+									"id": 198,
 									"name": "email",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -3866,7 +3885,7 @@
 									}
 								},
 								{
-									"id": 198,
+									"id": 199,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -3874,14 +3893,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 199,
+											"id": 200,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 201,
+													"id": 202,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -3904,7 +3923,7 @@
 													}
 												},
 												{
-													"id": 200,
+													"id": 201,
 													"name": "redirectTo",
 													"kind": 1024,
 													"kindString": "Property",
@@ -3932,8 +3951,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														201,
-														200
+														202,
+														201
 													]
 												}
 											]
@@ -3951,14 +3970,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 202,
+													"id": 203,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 203,
+															"id": 204,
 															"name": "data",
 															"kind": 1024,
 															"kindString": "Property",
@@ -3973,7 +3992,7 @@
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 204,
+																	"id": 205,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
@@ -3982,7 +4001,7 @@
 															}
 														},
 														{
-															"id": 205,
+															"id": 206,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -4005,8 +4024,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																203,
-																205
+																204,
+																206
 															]
 														}
 													]
@@ -4015,14 +4034,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 206,
+													"id": 207,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 207,
+															"id": 208,
 															"name": "data",
 															"kind": 1024,
 															"kindString": "Property",
@@ -4040,7 +4059,7 @@
 															}
 														},
 														{
-															"id": 208,
+															"id": 209,
 															"name": "error",
 															"kind": 1024,
 															"kindString": "Property",
@@ -4054,7 +4073,7 @@
 															],
 															"type": {
 																"type": "reference",
-																"id": 722,
+																"id": 727,
 																"name": "AuthError"
 															}
 														}
@@ -4064,8 +4083,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																207,
-																208
+																208,
+																209
 															]
 														}
 													]
@@ -4082,7 +4101,7 @@
 					]
 				},
 				{
-					"id": 153,
+					"id": 154,
 					"name": "setSession",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4096,7 +4115,7 @@
 					],
 					"signatures": [
 						{
-							"id": 154,
+							"id": 155,
 							"name": "setSession",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4106,7 +4125,7 @@
 							},
 							"parameters": [
 								{
-									"id": 155,
+									"id": 156,
 									"name": "currentSession",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -4117,14 +4136,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 156,
+											"id": 157,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 157,
+													"id": 158,
 													"name": "access_token",
 													"kind": 1024,
 													"kindString": "Property",
@@ -4142,7 +4161,7 @@
 													}
 												},
 												{
-													"id": 158,
+													"id": 159,
 													"name": "refresh_token",
 													"kind": 1024,
 													"kindString": "Property",
@@ -4165,8 +4184,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														157,
-														158
+														158,
+														159
 													]
 												}
 											]
@@ -4179,7 +4198,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 300,
+										"id": 301,
 										"name": "AuthResponse"
 									}
 								],
@@ -4191,7 +4210,7 @@
 					]
 				},
 				{
-					"id": 111,
+					"id": 112,
 					"name": "signInWithOAuth",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4205,7 +4224,7 @@
 					],
 					"signatures": [
 						{
-							"id": 112,
+							"id": 113,
 							"name": "signInWithOAuth",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4215,14 +4234,14 @@
 							},
 							"parameters": [
 								{
-									"id": 113,
+									"id": 114,
 									"name": "credentials",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 477,
+										"id": 478,
 										"name": "SignInWithOAuthCredentials"
 									}
 								}
@@ -4232,7 +4251,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 313,
+										"id": 314,
 										"name": "OAuthResponse"
 									}
 								],
@@ -4244,7 +4263,7 @@
 					]
 				},
 				{
-					"id": 114,
+					"id": 115,
 					"name": "signInWithOtp",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4258,7 +4277,7 @@
 					],
 					"signatures": [
 						{
-							"id": 115,
+							"id": 116,
 							"name": "signInWithOtp",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4268,14 +4287,14 @@
 							},
 							"parameters": [
 								{
-									"id": 116,
+									"id": 117,
 									"name": "credentials",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 461,
+										"id": 462,
 										"name": "SignInWithPasswordlessCredentials"
 									}
 								}
@@ -4285,7 +4304,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 300,
+										"id": 301,
 										"name": "AuthResponse"
 									}
 								],
@@ -4297,7 +4316,7 @@
 					]
 				},
 				{
-					"id": 108,
+					"id": 109,
 					"name": "signInWithPassword",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4311,7 +4330,7 @@
 					],
 					"signatures": [
 						{
-							"id": 109,
+							"id": 110,
 							"name": "signInWithPassword",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4321,14 +4340,14 @@
 							},
 							"parameters": [
 								{
-									"id": 110,
+									"id": 111,
 									"name": "credentials",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 446,
+										"id": 447,
 										"name": "SignInWithPasswordCredentials"
 									}
 								}
@@ -4338,7 +4357,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 300,
+										"id": 301,
 										"name": "AuthResponse"
 									}
 								],
@@ -4350,7 +4369,7 @@
 					]
 				},
 				{
-					"id": 120,
+					"id": 121,
 					"name": "signInWithSSO",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4364,7 +4383,7 @@
 					],
 					"signatures": [
 						{
-							"id": 121,
+							"id": 122,
 							"name": "signInWithSSO",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4381,14 +4400,14 @@
 							},
 							"parameters": [
 								{
-									"id": 122,
+									"id": 123,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 507,
+										"id": 508,
 										"name": "SignInWithSSO"
 									}
 								}
@@ -4398,7 +4417,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 326,
+										"id": 327,
 										"name": "SSOResponse"
 									}
 								],
@@ -4410,7 +4429,7 @@
 					]
 				},
 				{
-					"id": 180,
+					"id": 181,
 					"name": "signOut",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4424,7 +4443,7 @@
 					],
 					"signatures": [
 						{
-							"id": 181,
+							"id": 182,
 							"name": "signOut",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4439,14 +4458,14 @@
 									{
 										"type": "reflection",
 										"declaration": {
-											"id": 182,
+											"id": 183,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 183,
+													"id": 184,
 													"name": "error",
 													"kind": 1024,
 													"kindString": "Property",
@@ -4467,7 +4486,7 @@
 															},
 															{
 																"type": "reference",
-																"id": 722,
+																"id": 727,
 																"name": "AuthError"
 															}
 														]
@@ -4479,7 +4498,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														183
+														184
 													]
 												}
 											]
@@ -4494,7 +4513,7 @@
 					]
 				},
 				{
-					"id": 105,
+					"id": 106,
 					"name": "signUp",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4508,7 +4527,7 @@
 					],
 					"signatures": [
 						{
-							"id": 106,
+							"id": 107,
 							"name": "signUp",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4519,14 +4538,14 @@
 							},
 							"parameters": [
 								{
-									"id": 107,
+									"id": 108,
 									"name": "credentials",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 430,
+										"id": 431,
 										"name": "SignUpWithPasswordCredentials"
 									}
 								}
@@ -4536,7 +4555,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 300,
+										"id": 301,
 										"name": "AuthResponse"
 									}
 								],
@@ -4548,7 +4567,7 @@
 					]
 				},
 				{
-					"id": 143,
+					"id": 144,
 					"name": "updateUser",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4562,7 +4581,7 @@
 					],
 					"signatures": [
 						{
-							"id": 144,
+							"id": 145,
 							"name": "updateUser",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4572,14 +4591,14 @@
 							},
 							"parameters": [
 								{
-									"id": 145,
+									"id": 146,
 									"name": "attributes",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 405,
+										"id": 406,
 										"name": "UserAttributes"
 									}
 								}
@@ -4589,7 +4608,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 335,
+										"id": 336,
 										"name": "UserResponse"
 									}
 								],
@@ -4601,7 +4620,7 @@
 					]
 				},
 				{
-					"id": 117,
+					"id": 118,
 					"name": "verifyOtp",
 					"kind": 2048,
 					"kindString": "Method",
@@ -4615,7 +4634,7 @@
 					],
 					"signatures": [
 						{
-							"id": 118,
+							"id": 119,
 							"name": "verifyOtp",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -4625,14 +4644,14 @@
 							},
 							"parameters": [
 								{
-									"id": 119,
+									"id": 120,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 488,
+										"id": 489,
 										"name": "VerifyOtpParams"
 									}
 								}
@@ -4642,7 +4661,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 300,
+										"id": 301,
 										"name": "AuthResponse"
 									}
 								],
@@ -4659,36 +4678,36 @@
 					"title": "Constructors",
 					"kind": 512,
 					"children": [
-						75
+						76
 					]
 				},
 				{
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						78,
-						79
+						79,
+						80
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						123,
-						140,
-						101,
-						184,
-						159,
-						195,
-						153,
-						111,
-						114,
-						108,
-						120,
-						180,
-						105,
-						143,
-						117
+						124,
+						141,
+						102,
+						185,
+						160,
+						196,
+						154,
+						112,
+						115,
+						109,
+						121,
+						181,
+						106,
+						144,
+						118
 					]
 				}
 			],
@@ -4701,7 +4720,7 @@
 			]
 		},
 		{
-			"id": 355,
+			"id": 356,
 			"name": "AMREntry",
 			"kind": 256,
 			"kindString": "Interface",
@@ -4718,7 +4737,7 @@
 			},
 			"children": [
 				{
-					"id": 356,
+					"id": 357,
 					"name": "method",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4739,7 +4758,7 @@
 					}
 				},
 				{
-					"id": 357,
+					"id": 358,
 					"name": "timestamp",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4765,8 +4784,8 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						356,
-						357
+						357,
+						358
 					]
 				}
 			],
@@ -4779,14 +4798,14 @@
 			]
 		},
 		{
-			"id": 410,
+			"id": 411,
 			"name": "AdminUserAttributes",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 412,
+					"id": 413,
 					"name": "app_metadata",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4810,7 +4829,7 @@
 					}
 				},
 				{
-					"id": 415,
+					"id": 416,
 					"name": "ban_duration",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4834,7 +4853,7 @@
 					}
 				},
 				{
-					"id": 419,
+					"id": 420,
 					"name": "data",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4858,12 +4877,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 409,
+						"id": 410,
 						"name": "UserAttributes.data"
 					}
 				},
 				{
-					"id": 416,
+					"id": 417,
 					"name": "email",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4886,12 +4905,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 406,
+						"id": 407,
 						"name": "UserAttributes.email"
 					}
 				},
 				{
-					"id": 413,
+					"id": 414,
 					"name": "email_confirm",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4915,7 +4934,7 @@
 					}
 				},
 				{
-					"id": 418,
+					"id": 419,
 					"name": "password",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4938,12 +4957,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 408,
+						"id": 409,
 						"name": "UserAttributes.password"
 					}
 				},
 				{
-					"id": 417,
+					"id": 418,
 					"name": "phone",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4966,12 +4985,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"id": 407,
+						"id": 408,
 						"name": "UserAttributes.phone"
 					}
 				},
 				{
-					"id": 414,
+					"id": 415,
 					"name": "phone_confirm",
 					"kind": 1024,
 					"kindString": "Property",
@@ -4995,7 +5014,7 @@
 					}
 				},
 				{
-					"id": 411,
+					"id": 412,
 					"name": "user_metadata",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5024,15 +5043,15 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						412,
-						415,
-						419,
-						416,
 						413,
-						418,
+						416,
+						420,
 						417,
 						414,
-						411
+						419,
+						418,
+						415,
+						412
 					]
 				}
 			],
@@ -5046,13 +5065,13 @@
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"id": 405,
+					"id": 406,
 					"name": "UserAttributes"
 				}
 			]
 		},
 		{
-			"id": 369,
+			"id": 370,
 			"name": "Factor",
 			"kind": 256,
 			"kindString": "Interface",
@@ -5076,7 +5095,7 @@
 			},
 			"children": [
 				{
-					"id": 374,
+					"id": 375,
 					"name": "created_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5094,7 +5113,7 @@
 					}
 				},
 				{
-					"id": 372,
+					"id": 373,
 					"name": "factor_type",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5115,7 +5134,7 @@
 					}
 				},
 				{
-					"id": 371,
+					"id": 372,
 					"name": "friendly_name",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5138,7 +5157,7 @@
 					}
 				},
 				{
-					"id": 370,
+					"id": 371,
 					"name": "id",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5159,7 +5178,7 @@
 					}
 				},
 				{
-					"id": 373,
+					"id": 374,
 					"name": "status",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5189,7 +5208,7 @@
 					}
 				},
 				{
-					"id": 375,
+					"id": 376,
 					"name": "updated_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5212,12 +5231,12 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						374,
+						375,
+						373,
 						372,
 						371,
-						370,
-						373,
-						375
+						374,
+						376
 					]
 				}
 			],
@@ -5230,14 +5249,14 @@
 			]
 		},
 		{
-			"id": 539,
+			"id": 540,
 			"name": "GenerateLinkOptions",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 540,
+					"id": 541,
 					"name": "data",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5261,7 +5280,7 @@
 					}
 				},
 				{
-					"id": 541,
+					"id": 542,
 					"name": "redirectTo",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5289,8 +5308,8 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						540,
-						541
+						541,
+						542
 					]
 				}
 			],
@@ -5303,7 +5322,7 @@
 			]
 		},
 		{
-			"id": 698,
+			"id": 699,
 			"name": "GoTrueAdminMFAApi",
 			"kind": 256,
 			"kindString": "Interface",
@@ -5319,14 +5338,14 @@
 			},
 			"children": [
 				{
-					"id": 702,
+					"id": 703,
 					"name": "deleteFactor",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 703,
+							"id": 704,
 							"name": "deleteFactor",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5346,14 +5365,14 @@
 							},
 							"parameters": [
 								{
-									"id": 704,
+									"id": 705,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 682,
+										"id": 683,
 										"name": "AuthMFAAdminDeleteFactorParams"
 									}
 								}
@@ -5363,7 +5382,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 673,
+										"id": 674,
 										"name": "AuthMFAAdminDeleteFactorResponse"
 									}
 								],
@@ -5375,14 +5394,14 @@
 					]
 				},
 				{
-					"id": 699,
+					"id": 700,
 					"name": "listFactors",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 700,
+							"id": 701,
 							"name": "listFactors",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5392,14 +5411,14 @@
 							},
 							"parameters": [
 								{
-									"id": 701,
+									"id": 702,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 695,
+										"id": 696,
 										"name": "AuthMFAAdminListFactorsParams"
 									}
 								}
@@ -5409,7 +5428,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 686,
+										"id": 687,
 										"name": "AuthMFAAdminListFactorsResponse"
 									}
 								],
@@ -5426,8 +5445,8 @@
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						702,
-						699
+						703,
+						700
 					]
 				}
 			],
@@ -5440,7 +5459,7 @@
 			]
 		},
 		{
-			"id": 653,
+			"id": 654,
 			"name": "GoTrueMFAApi",
 			"kind": 256,
 			"kindString": "Interface",
@@ -5450,14 +5469,14 @@
 			},
 			"children": [
 				{
-					"id": 657,
+					"id": 658,
 					"name": "challenge",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 658,
+							"id": 659,
 							"name": "challenge",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5467,14 +5486,14 @@
 							},
 							"parameters": [
 								{
-									"id": 659,
+									"id": 660,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 577,
+										"id": 578,
 										"name": "MFAChallengeParams"
 									}
 								}
@@ -5484,7 +5503,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 621,
+										"id": 622,
 										"name": "AuthMFAChallengeResponse"
 									}
 								],
@@ -5496,14 +5515,14 @@
 					]
 				},
 				{
-					"id": 666,
+					"id": 667,
 					"name": "challengeAndVerify",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 667,
+							"id": 668,
 							"name": "challengeAndVerify",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5513,14 +5532,14 @@
 							},
 							"parameters": [
 								{
-									"id": 668,
+									"id": 669,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 580,
+										"id": 581,
 										"name": "MFAChallengeAndVerifyParams"
 									}
 								}
@@ -5530,7 +5549,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 584,
+										"id": 585,
 										"name": "AuthMFAVerifyResponse"
 									}
 								],
@@ -5542,14 +5561,14 @@
 					]
 				},
 				{
-					"id": 654,
+					"id": 655,
 					"name": "enroll",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 655,
+							"id": 656,
 							"name": "enroll",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5560,14 +5579,14 @@
 							},
 							"parameters": [
 								{
-									"id": 656,
+									"id": 657,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 564,
+										"id": 565,
 										"name": "MFAEnrollParams"
 									}
 								}
@@ -5577,7 +5596,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 597,
+										"id": 598,
 										"name": "AuthMFAEnrollResponse"
 									}
 								],
@@ -5589,14 +5608,14 @@
 					]
 				},
 				{
-					"id": 671,
+					"id": 672,
 					"name": "getAuthenticatorAssuranceLevel",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 672,
+							"id": 673,
 							"name": "getAuthenticatorAssuranceLevel",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5610,7 +5629,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 642,
+										"id": 643,
 										"name": "AuthMFAGetAuthenticatorAssuranceLevelResponse"
 									}
 								],
@@ -5622,14 +5641,14 @@
 					]
 				},
 				{
-					"id": 669,
+					"id": 670,
 					"name": "listFactors",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 670,
+							"id": 671,
 							"name": "listFactors",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5656,7 +5675,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 631,
+										"id": 632,
 										"name": "AuthMFAListFactorsResponse"
 									}
 								],
@@ -5668,14 +5687,14 @@
 					]
 				},
 				{
-					"id": 663,
+					"id": 664,
 					"name": "unenroll",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 664,
+							"id": 665,
 							"name": "unenroll",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5685,14 +5704,14 @@
 							},
 							"parameters": [
 								{
-									"id": 665,
+									"id": 666,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 569,
+										"id": 570,
 										"name": "MFAUnenrollParams"
 									}
 								}
@@ -5702,7 +5721,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 612,
+										"id": 613,
 										"name": "AuthMFAUnenrollResponse"
 									}
 								],
@@ -5714,14 +5733,14 @@
 					]
 				},
 				{
-					"id": 660,
+					"id": 661,
 					"name": "verify",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {},
 					"signatures": [
 						{
-							"id": 661,
+							"id": 662,
 							"name": "verify",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -5731,14 +5750,14 @@
 							},
 							"parameters": [
 								{
-									"id": 662,
+									"id": 663,
 									"name": "params",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 572,
+										"id": 573,
 										"name": "MFAVerifyParams"
 									}
 								}
@@ -5748,7 +5767,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 584,
+										"id": 585,
 										"name": "AuthMFAVerifyResponse"
 									}
 								],
@@ -5765,13 +5784,13 @@
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						657,
-						666,
-						654,
-						671,
-						669,
-						663,
-						660
+						658,
+						667,
+						655,
+						672,
+						670,
+						664,
+						661
 					]
 				}
 			],
@@ -5784,14 +5803,14 @@
 			]
 		},
 		{
-			"id": 346,
+			"id": 347,
 			"name": "Session",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 349,
+					"id": 350,
 					"name": "access_token",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5812,7 +5831,7 @@
 					}
 				},
 				{
-					"id": 352,
+					"id": 353,
 					"name": "expires_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5835,7 +5854,7 @@
 					}
 				},
 				{
-					"id": 351,
+					"id": 352,
 					"name": "expires_in",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5856,7 +5875,7 @@
 					}
 				},
 				{
-					"id": 348,
+					"id": 349,
 					"name": "provider_refresh_token",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5888,7 +5907,7 @@
 					}
 				},
 				{
-					"id": 347,
+					"id": 348,
 					"name": "provider_token",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5920,7 +5939,7 @@
 					}
 				},
 				{
-					"id": 350,
+					"id": 351,
 					"name": "refresh_token",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5941,7 +5960,7 @@
 					}
 				},
 				{
-					"id": 353,
+					"id": 354,
 					"name": "token_type",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5959,7 +5978,7 @@
 					}
 				},
 				{
-					"id": 354,
+					"id": 355,
 					"name": "user",
 					"kind": 1024,
 					"kindString": "Property",
@@ -5973,7 +5992,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"id": 383,
+						"id": 384,
 						"name": "User"
 					}
 				}
@@ -5983,14 +6002,14 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						349,
-						352,
-						351,
-						348,
-						347,
 						350,
 						353,
-						354
+						352,
+						349,
+						348,
+						351,
+						354,
+						355
 					]
 				}
 			],
@@ -6003,14 +6022,14 @@
 			]
 		},
 		{
-			"id": 420,
+			"id": 421,
 			"name": "Subscription",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 421,
+					"id": 422,
 					"name": "id",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6031,7 +6050,7 @@
 					}
 				},
 				{
-					"id": 422,
+					"id": 423,
 					"name": "callback",
 					"kind": 2048,
 					"kindString": "Method",
@@ -6045,7 +6064,7 @@
 					],
 					"signatures": [
 						{
-							"id": 423,
+							"id": 424,
 							"name": "callback",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -6055,19 +6074,19 @@
 							},
 							"parameters": [
 								{
-									"id": 424,
+									"id": 425,
 									"name": "event",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 286,
+										"id": 287,
 										"name": "AuthChangeEvent"
 									}
 								},
 								{
-									"id": 425,
+									"id": 426,
 									"name": "session",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -6081,7 +6100,7 @@
 											},
 											{
 												"type": "reference",
-												"id": 346,
+												"id": 347,
 												"name": "Session"
 											}
 										]
@@ -6096,7 +6115,7 @@
 					]
 				},
 				{
-					"id": 426,
+					"id": 427,
 					"name": "unsubscribe",
 					"kind": 2048,
 					"kindString": "Method",
@@ -6110,7 +6129,7 @@
 					],
 					"signatures": [
 						{
-							"id": 427,
+							"id": 428,
 							"name": "unsubscribe",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -6131,15 +6150,15 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						421
+						422
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						422,
-						426
+						423,
+						427
 					]
 				}
 			],
@@ -6152,14 +6171,14 @@
 			]
 		},
 		{
-			"id": 428,
+			"id": 429,
 			"name": "UpdatableFactorAttributes",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 429,
+					"id": 430,
 					"name": "friendlyName",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6182,7 +6201,7 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						429
+						430
 					]
 				}
 			],
@@ -6195,14 +6214,14 @@
 			]
 		},
 		{
-			"id": 383,
+			"id": 384,
 			"name": "User",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 393,
+					"id": 394,
 					"name": "action_link",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6222,7 +6241,7 @@
 					}
 				},
 				{
-					"id": 385,
+					"id": 386,
 					"name": "app_metadata",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6236,12 +6255,12 @@
 					],
 					"type": {
 						"type": "reference",
-						"id": 376,
+						"id": 377,
 						"name": "UserAppMetadata"
 					}
 				},
 				{
-					"id": 387,
+					"id": 388,
 					"name": "aud",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6259,7 +6278,7 @@
 					}
 				},
 				{
-					"id": 388,
+					"id": 389,
 					"name": "confirmation_sent_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6279,7 +6298,7 @@
 					}
 				},
 				{
-					"id": 397,
+					"id": 398,
 					"name": "confirmed_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6299,7 +6318,7 @@
 					}
 				},
 				{
-					"id": 396,
+					"id": 397,
 					"name": "created_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6317,7 +6336,7 @@
 					}
 				},
 				{
-					"id": 394,
+					"id": 395,
 					"name": "email",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6337,7 +6356,7 @@
 					}
 				},
 				{
-					"id": 390,
+					"id": 391,
 					"name": "email_change_sent_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6357,7 +6376,7 @@
 					}
 				},
 				{
-					"id": 398,
+					"id": 399,
 					"name": "email_confirmed_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6377,7 +6396,7 @@
 					}
 				},
 				{
-					"id": 404,
+					"id": 405,
 					"name": "factors",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6395,13 +6414,13 @@
 						"type": "array",
 						"elementType": {
 							"type": "reference",
-							"id": 369,
+							"id": 370,
 							"name": "Factor"
 						}
 					}
 				},
 				{
-					"id": 384,
+					"id": 385,
 					"name": "id",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6419,7 +6438,7 @@
 					}
 				},
 				{
-					"id": 403,
+					"id": 404,
 					"name": "identities",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6437,13 +6456,13 @@
 						"type": "array",
 						"elementType": {
 							"type": "reference",
-							"id": 358,
+							"id": 359,
 							"name": "UserIdentity"
 						}
 					}
 				},
 				{
-					"id": 392,
+					"id": 393,
 					"name": "invited_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6463,7 +6482,7 @@
 					}
 				},
 				{
-					"id": 400,
+					"id": 401,
 					"name": "last_sign_in_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6483,7 +6502,7 @@
 					}
 				},
 				{
-					"id": 391,
+					"id": 392,
 					"name": "new_email",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6503,7 +6522,7 @@
 					}
 				},
 				{
-					"id": 395,
+					"id": 396,
 					"name": "phone",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6523,7 +6542,7 @@
 					}
 				},
 				{
-					"id": 399,
+					"id": 400,
 					"name": "phone_confirmed_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6543,7 +6562,7 @@
 					}
 				},
 				{
-					"id": 389,
+					"id": 390,
 					"name": "recovery_sent_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6563,7 +6582,7 @@
 					}
 				},
 				{
-					"id": 401,
+					"id": 402,
 					"name": "role",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6583,7 +6602,7 @@
 					}
 				},
 				{
-					"id": 402,
+					"id": 403,
 					"name": "updated_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6603,7 +6622,7 @@
 					}
 				},
 				{
-					"id": 386,
+					"id": 387,
 					"name": "user_metadata",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6617,7 +6636,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"id": 380,
+						"id": 381,
 						"name": "UserMetadata"
 					}
 				}
@@ -6627,27 +6646,27 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						393,
-						385,
-						387,
-						388,
-						397,
-						396,
 						394,
-						390,
-						398,
-						404,
-						384,
-						403,
-						392,
-						400,
-						391,
-						395,
-						399,
+						386,
+						388,
 						389,
+						398,
+						397,
+						395,
+						391,
+						399,
+						405,
+						385,
+						404,
+						393,
 						401,
+						392,
+						396,
+						400,
+						390,
 						402,
-						386
+						403,
+						387
 					]
 				}
 			],
@@ -6660,14 +6679,14 @@
 			]
 		},
 		{
-			"id": 376,
+			"id": 377,
 			"name": "UserAppMetadata",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 377,
+					"id": 378,
 					"name": "provider",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6692,7 +6711,7 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						377
+						378
 					]
 				}
 			],
@@ -6704,14 +6723,14 @@
 				}
 			],
 			"indexSignature": {
-				"id": 378,
+				"id": 379,
 				"name": "__index",
 				"kind": 8192,
 				"kindString": "Index signature",
 				"flags": {},
 				"parameters": [
 					{
-						"id": 379,
+						"id": 380,
 						"name": "key",
 						"kind": 32768,
 						"flags": {},
@@ -6728,14 +6747,14 @@
 			}
 		},
 		{
-			"id": 405,
+			"id": 406,
 			"name": "UserAttributes",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 409,
+					"id": 410,
 					"name": "data",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6759,7 +6778,7 @@
 					}
 				},
 				{
-					"id": 406,
+					"id": 407,
 					"name": "email",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6782,7 +6801,7 @@
 					}
 				},
 				{
-					"id": 408,
+					"id": 409,
 					"name": "password",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6805,7 +6824,7 @@
 					}
 				},
 				{
-					"id": 407,
+					"id": 408,
 					"name": "phone",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6833,10 +6852,10 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
+						410,
+						407,
 						409,
-						406,
-						408,
-						407
+						408
 					]
 				}
 			],
@@ -6850,20 +6869,20 @@
 			"extendedBy": [
 				{
 					"type": "reference",
-					"id": 410,
+					"id": 411,
 					"name": "AdminUserAttributes"
 				}
 			]
 		},
 		{
-			"id": 358,
+			"id": 359,
 			"name": "UserIdentity",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 366,
+					"id": 367,
 					"name": "created_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6881,7 +6900,7 @@
 					}
 				},
 				{
-					"id": 359,
+					"id": 360,
 					"name": "id",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6899,7 +6918,7 @@
 					}
 				},
 				{
-					"id": 361,
+					"id": 362,
 					"name": "identity_data",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6914,20 +6933,20 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 362,
+							"id": 363,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"indexSignature": {
-								"id": 363,
+								"id": 364,
 								"name": "__index",
 								"kind": 8192,
 								"kindString": "Index signature",
 								"flags": {},
 								"parameters": [
 									{
-										"id": 364,
+										"id": 365,
 										"name": "key",
 										"kind": 32768,
 										"flags": {},
@@ -6946,7 +6965,7 @@
 					}
 				},
 				{
-					"id": 367,
+					"id": 368,
 					"name": "last_sign_in_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6964,7 +6983,7 @@
 					}
 				},
 				{
-					"id": 365,
+					"id": 366,
 					"name": "provider",
 					"kind": 1024,
 					"kindString": "Property",
@@ -6982,7 +7001,7 @@
 					}
 				},
 				{
-					"id": 368,
+					"id": 369,
 					"name": "updated_at",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7002,7 +7021,7 @@
 					}
 				},
 				{
-					"id": 360,
+					"id": 361,
 					"name": "user_id",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7025,13 +7044,13 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						366,
-						359,
-						361,
 						367,
-						365,
+						360,
+						362,
 						368,
-						360
+						366,
+						369,
+						361
 					]
 				}
 			],
@@ -7044,7 +7063,7 @@
 			]
 		},
 		{
-			"id": 380,
+			"id": 381,
 			"name": "UserMetadata",
 			"kind": 256,
 			"kindString": "Interface",
@@ -7057,14 +7076,14 @@
 				}
 			],
 			"indexSignature": {
-				"id": 381,
+				"id": 382,
 				"name": "__index",
 				"kind": 8192,
 				"kindString": "Index signature",
 				"flags": {},
 				"parameters": [
 					{
-						"id": 382,
+						"id": 383,
 						"name": "key",
 						"kind": 32768,
 						"flags": {},
@@ -7081,14 +7100,14 @@
 			}
 		},
 		{
-			"id": 497,
+			"id": 498,
 			"name": "VerifyEmailOtpParams",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 498,
+					"id": 499,
 					"name": "email",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7109,7 +7128,7 @@
 					}
 				},
 				{
-					"id": 501,
+					"id": 502,
 					"name": "options",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7126,14 +7145,14 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 502,
+							"id": 503,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 504,
+									"id": 505,
 									"name": "captchaToken",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7156,7 +7175,7 @@
 									}
 								},
 								{
-									"id": 503,
+									"id": 504,
 									"name": "redirectTo",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7184,8 +7203,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										504,
-										503
+										505,
+										504
 									]
 								}
 							]
@@ -7193,7 +7212,7 @@
 					}
 				},
 				{
-					"id": 499,
+					"id": 500,
 					"name": "token",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7214,7 +7233,7 @@
 					}
 				},
 				{
-					"id": 500,
+					"id": 501,
 					"name": "type",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7231,7 +7250,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"id": 506,
+						"id": 507,
 						"name": "EmailOtpType"
 					}
 				}
@@ -7241,10 +7260,10 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						498,
-						501,
 						499,
-						500
+						502,
+						500,
+						501
 					]
 				}
 			],
@@ -7257,14 +7276,14 @@
 			]
 		},
 		{
-			"id": 489,
+			"id": 490,
 			"name": "VerifyMobileOtpParams",
 			"kind": 256,
 			"kindString": "Interface",
 			"flags": {},
 			"children": [
 				{
-					"id": 493,
+					"id": 494,
 					"name": "options",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7281,14 +7300,14 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 494,
+							"id": 495,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 496,
+									"id": 497,
 									"name": "captchaToken",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7317,7 +7336,7 @@
 									}
 								},
 								{
-									"id": 495,
+									"id": 496,
 									"name": "redirectTo",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7345,8 +7364,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										496,
-										495
+										497,
+										496
 									]
 								}
 							]
@@ -7354,7 +7373,7 @@
 					}
 				},
 				{
-					"id": 490,
+					"id": 491,
 					"name": "phone",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7375,7 +7394,7 @@
 					}
 				},
 				{
-					"id": 491,
+					"id": 492,
 					"name": "token",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7396,7 +7415,7 @@
 					}
 				},
 				{
-					"id": 492,
+					"id": 493,
 					"name": "type",
 					"kind": 1024,
 					"kindString": "Property",
@@ -7413,7 +7432,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"id": 505,
+						"id": 506,
 						"name": "MobileOtpType"
 					}
 				}
@@ -7423,10 +7442,10 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						493,
-						490,
+						494,
 						491,
-						492
+						492,
+						493
 					]
 				}
 			],
@@ -7439,7 +7458,7 @@
 			]
 		},
 		{
-			"id": 286,
+			"id": 287,
 			"name": "AuthChangeEvent",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -7480,14 +7499,14 @@
 					},
 					{
 						"type": "reference",
-						"id": 285,
+						"id": 286,
 						"name": "AuthChangeEventMFA"
 					}
 				]
 			}
 		},
 		{
-			"id": 285,
+			"id": 286,
 			"name": "AuthChangeEventMFA",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -7505,7 +7524,7 @@
 			}
 		},
 		{
-			"id": 682,
+			"id": 683,
 			"name": "AuthMFAAdminDeleteFactorParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -7528,14 +7547,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 683,
+					"id": 684,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 684,
+							"id": 685,
 							"name": "id",
 							"kind": 1024,
 							"kindString": "Property",
@@ -7556,7 +7575,7 @@
 							}
 						},
 						{
-							"id": 685,
+							"id": 686,
 							"name": "userId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -7582,8 +7601,8 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								684,
-								685
+								685,
+								686
 							]
 						}
 					],
@@ -7598,7 +7617,7 @@
 			}
 		},
 		{
-			"id": 673,
+			"id": 674,
 			"name": "AuthMFAAdminDeleteFactorResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -7624,14 +7643,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 674,
+							"id": 675,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 675,
+									"id": 676,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7646,14 +7665,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 676,
+											"id": 677,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 677,
+													"id": 678,
 													"name": "id",
 													"kind": 1024,
 													"kindString": "Property",
@@ -7679,7 +7698,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														677
+														678
 													]
 												}
 											],
@@ -7694,7 +7713,7 @@
 									}
 								},
 								{
-									"id": 678,
+									"id": 679,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7717,8 +7736,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										675,
-										678
+										676,
+										679
 									]
 								}
 							],
@@ -7734,14 +7753,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 679,
+							"id": 680,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 680,
+									"id": 681,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7759,7 +7778,7 @@
 									}
 								},
 								{
-									"id": 681,
+									"id": 682,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7773,7 +7792,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -7783,8 +7802,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										680,
-										681
+										681,
+										682
 									]
 								}
 							],
@@ -7801,7 +7820,7 @@
 			}
 		},
 		{
-			"id": 695,
+			"id": 696,
 			"name": "AuthMFAAdminListFactorsParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -7824,14 +7843,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 696,
+					"id": 697,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 697,
+							"id": 698,
 							"name": "userId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -7857,7 +7876,7 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								697
+								698
 							]
 						}
 					],
@@ -7872,7 +7891,7 @@
 			}
 		},
 		{
-			"id": 686,
+			"id": 687,
 			"name": "AuthMFAAdminListFactorsResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -7898,14 +7917,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 687,
+							"id": 688,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 688,
+									"id": 689,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7920,14 +7939,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 689,
+											"id": 690,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 690,
+													"id": 691,
 													"name": "factors",
 													"kind": 1024,
 													"kindString": "Property",
@@ -7946,7 +7965,7 @@
 														"type": "array",
 														"elementType": {
 															"type": "reference",
-															"id": 369,
+															"id": 370,
 															"name": "Factor"
 														}
 													}
@@ -7957,7 +7976,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														690
+														691
 													]
 												}
 											],
@@ -7972,7 +7991,7 @@
 									}
 								},
 								{
-									"id": 691,
+									"id": 692,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -7995,8 +8014,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										688,
-										691
+										689,
+										692
 									]
 								}
 							],
@@ -8012,14 +8031,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 692,
+							"id": 693,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 693,
+									"id": 694,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8037,7 +8056,7 @@
 									}
 								},
 								{
-									"id": 694,
+									"id": 695,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8051,7 +8070,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -8061,8 +8080,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										693,
-										694
+										694,
+										695
 									]
 								}
 							],
@@ -8079,7 +8098,7 @@
 			}
 		},
 		{
-			"id": 621,
+			"id": 622,
 			"name": "AuthMFAChallengeResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -8097,14 +8116,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 622,
+							"id": 623,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 623,
+									"id": 624,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8119,14 +8138,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 624,
+											"id": 625,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 626,
+													"id": 627,
 													"name": "expires_at",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8147,7 +8166,7 @@
 													}
 												},
 												{
-													"id": 625,
+													"id": 626,
 													"name": "id",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8173,8 +8192,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														626,
-														625
+														627,
+														626
 													]
 												}
 											],
@@ -8189,7 +8208,7 @@
 									}
 								},
 								{
-									"id": 627,
+									"id": 628,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8212,8 +8231,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										623,
-										627
+										624,
+										628
 									]
 								}
 							],
@@ -8229,14 +8248,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 628,
+							"id": 629,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 629,
+									"id": 630,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8254,7 +8273,7 @@
 									}
 								},
 								{
-									"id": 630,
+									"id": 631,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8268,7 +8287,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -8278,8 +8297,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										629,
-										630
+										630,
+										631
 									]
 								}
 							],
@@ -8296,7 +8315,7 @@
 			}
 		},
 		{
-			"id": 597,
+			"id": 598,
 			"name": "AuthMFAEnrollResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -8314,14 +8333,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 598,
+							"id": 599,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 599,
+									"id": 600,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8336,14 +8355,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 600,
+											"id": 601,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 601,
+													"id": 602,
 													"name": "id",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8364,7 +8383,7 @@
 													}
 												},
 												{
-													"id": 603,
+													"id": 604,
 													"name": "totp",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8382,14 +8401,14 @@
 													"type": {
 														"type": "reflection",
 														"declaration": {
-															"id": 604,
+															"id": 605,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 605,
+																	"id": 606,
 																	"name": "qr_code",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -8410,7 +8429,7 @@
 																	}
 																},
 																{
-																	"id": 606,
+																	"id": 607,
 																	"name": "secret",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -8431,7 +8450,7 @@
 																	}
 																},
 																{
-																	"id": 607,
+																	"id": 608,
 																	"name": "uri",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -8457,9 +8476,9 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		605,
 																		606,
-																		607
+																		607,
+																		608
 																	]
 																}
 															],
@@ -8474,7 +8493,7 @@
 													}
 												},
 												{
-													"id": 602,
+													"id": 603,
 													"name": "type",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8500,9 +8519,9 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														601,
-														603,
-														602
+														602,
+														604,
+														603
 													]
 												}
 											],
@@ -8517,7 +8536,7 @@
 									}
 								},
 								{
-									"id": 608,
+									"id": 609,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8540,8 +8559,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										599,
-										608
+										600,
+										609
 									]
 								}
 							],
@@ -8557,14 +8576,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 609,
+							"id": 610,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 610,
+									"id": 611,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8582,7 +8601,7 @@
 									}
 								},
 								{
-									"id": 611,
+									"id": 612,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8596,7 +8615,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -8606,8 +8625,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										610,
-										611
+										611,
+										612
 									]
 								}
 							],
@@ -8624,7 +8643,7 @@
 			}
 		},
 		{
-			"id": 642,
+			"id": 643,
 			"name": "AuthMFAGetAuthenticatorAssuranceLevelResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -8642,14 +8661,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 643,
+							"id": 644,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 644,
+									"id": 645,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8664,14 +8683,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 645,
+											"id": 646,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 648,
+													"id": 649,
 													"name": "currentAuthenticationMethods",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8690,13 +8709,13 @@
 														"type": "array",
 														"elementType": {
 															"type": "reference",
-															"id": 355,
+															"id": 356,
 															"name": "AMREntry"
 														}
 													}
 												},
 												{
-													"id": 646,
+													"id": 647,
 													"name": "currentLevel",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8716,7 +8735,7 @@
 														"types": [
 															{
 																"type": "reference",
-																"id": 641,
+																"id": 642,
 																"name": "AuthenticatorAssuranceLevels"
 															},
 															{
@@ -8727,7 +8746,7 @@
 													}
 												},
 												{
-													"id": 647,
+													"id": 648,
 													"name": "nextLevel",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8753,7 +8772,7 @@
 														"types": [
 															{
 																"type": "reference",
-																"id": 641,
+																"id": 642,
 																"name": "AuthenticatorAssuranceLevels"
 															},
 															{
@@ -8769,9 +8788,9 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														648,
-														646,
-														647
+														649,
+														647,
+														648
 													]
 												}
 											],
@@ -8786,7 +8805,7 @@
 									}
 								},
 								{
-									"id": 649,
+									"id": 650,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8809,8 +8828,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										644,
-										649
+										645,
+										650
 									]
 								}
 							],
@@ -8826,14 +8845,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 650,
+							"id": 651,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 651,
+									"id": 652,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8851,7 +8870,7 @@
 									}
 								},
 								{
-									"id": 652,
+									"id": 653,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8865,7 +8884,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -8875,8 +8894,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										651,
-										652
+										652,
+										653
 									]
 								}
 							],
@@ -8893,7 +8912,7 @@
 			}
 		},
 		{
-			"id": 631,
+			"id": 632,
 			"name": "AuthMFAListFactorsResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -8911,14 +8930,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 632,
+							"id": 633,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 633,
+									"id": 634,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -8933,14 +8952,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 634,
+											"id": 635,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 635,
+													"id": 636,
 													"name": "all",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8959,13 +8978,13 @@
 														"type": "array",
 														"elementType": {
 															"type": "reference",
-															"id": 369,
+															"id": 370,
 															"name": "Factor"
 														}
 													}
 												},
 												{
-													"id": 636,
+													"id": 637,
 													"name": "totp",
 													"kind": 1024,
 													"kindString": "Property",
@@ -8984,7 +9003,7 @@
 														"type": "array",
 														"elementType": {
 															"type": "reference",
-															"id": 369,
+															"id": 370,
 															"name": "Factor"
 														}
 													}
@@ -8995,8 +9014,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														635,
-														636
+														636,
+														637
 													]
 												}
 											],
@@ -9011,7 +9030,7 @@
 									}
 								},
 								{
-									"id": 637,
+									"id": 638,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9034,8 +9053,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										633,
-										637
+										634,
+										638
 									]
 								}
 							],
@@ -9051,14 +9070,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 638,
+							"id": 639,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 639,
+									"id": 640,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9076,7 +9095,7 @@
 									}
 								},
 								{
-									"id": 640,
+									"id": 641,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9090,7 +9109,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -9100,8 +9119,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										639,
-										640
+										640,
+										641
 									]
 								}
 							],
@@ -9118,7 +9137,7 @@
 			}
 		},
 		{
-			"id": 612,
+			"id": 613,
 			"name": "AuthMFAUnenrollResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -9136,14 +9155,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 613,
+							"id": 614,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 614,
+									"id": 615,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9158,14 +9177,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 615,
+											"id": 616,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 616,
+													"id": 617,
 													"name": "id",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9191,7 +9210,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														616
+														617
 													]
 												}
 											],
@@ -9206,7 +9225,7 @@
 									}
 								},
 								{
-									"id": 617,
+									"id": 618,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9229,8 +9248,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										614,
-										617
+										615,
+										618
 									]
 								}
 							],
@@ -9246,14 +9265,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 618,
+							"id": 619,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 619,
+									"id": 620,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9271,7 +9290,7 @@
 									}
 								},
 								{
-									"id": 620,
+									"id": 621,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9285,7 +9304,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -9295,8 +9314,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										619,
-										620
+										620,
+										621
 									]
 								}
 							],
@@ -9313,7 +9332,7 @@
 			}
 		},
 		{
-			"id": 584,
+			"id": 585,
 			"name": "AuthMFAVerifyResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -9331,14 +9350,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 585,
+							"id": 586,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 586,
+									"id": 587,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9353,14 +9372,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 587,
+											"id": 588,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 588,
+													"id": 589,
 													"name": "access_token",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9381,7 +9400,7 @@
 													}
 												},
 												{
-													"id": 590,
+													"id": 591,
 													"name": "expires_in",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9402,7 +9421,7 @@
 													}
 												},
 												{
-													"id": 591,
+													"id": 592,
 													"name": "refresh_token",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9423,7 +9442,7 @@
 													}
 												},
 												{
-													"id": 589,
+													"id": 590,
 													"name": "token_type",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9444,7 +9463,7 @@
 													}
 												},
 												{
-													"id": 592,
+													"id": 593,
 													"name": "user",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9461,7 +9480,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"id": 383,
+														"id": 384,
 														"name": "User"
 													}
 												}
@@ -9471,11 +9490,11 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														588,
-														590,
-														591,
 														589,
-														592
+														591,
+														592,
+														590,
+														593
 													]
 												}
 											],
@@ -9490,7 +9509,7 @@
 									}
 								},
 								{
-									"id": 593,
+									"id": 594,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9513,8 +9532,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										586,
-										593
+										587,
+										594
 									]
 								}
 							],
@@ -9530,14 +9549,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 594,
+							"id": 595,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 595,
+									"id": 596,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9555,7 +9574,7 @@
 									}
 								},
 								{
-									"id": 596,
+									"id": 597,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9569,7 +9588,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -9579,8 +9598,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										595,
-										596
+										596,
+										597
 									]
 								}
 							],
@@ -9597,7 +9616,7 @@
 			}
 		},
 		{
-			"id": 300,
+			"id": 301,
 			"name": "AuthResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -9615,14 +9634,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 301,
+							"id": 302,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 302,
+									"id": 303,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9637,14 +9656,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 303,
+											"id": 304,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 305,
+													"id": 306,
 													"name": "session",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9661,7 +9680,7 @@
 														"types": [
 															{
 																"type": "reference",
-																"id": 346,
+																"id": 347,
 																"name": "Session"
 															},
 															{
@@ -9672,7 +9691,7 @@
 													}
 												},
 												{
-													"id": 304,
+													"id": 305,
 													"name": "user",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9689,7 +9708,7 @@
 														"types": [
 															{
 																"type": "reference",
-																"id": 383,
+																"id": 384,
 																"name": "User"
 															},
 															{
@@ -9705,8 +9724,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														305,
-														304
+														306,
+														305
 													]
 												}
 											],
@@ -9721,7 +9740,7 @@
 									}
 								},
 								{
-									"id": 306,
+									"id": 307,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9744,8 +9763,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										302,
-										306
+										303,
+										307
 									]
 								}
 							],
@@ -9761,14 +9780,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 307,
+							"id": 308,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 308,
+									"id": 309,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9783,14 +9802,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 309,
+											"id": 310,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 311,
+													"id": 312,
 													"name": "session",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9808,7 +9827,7 @@
 													}
 												},
 												{
-													"id": 310,
+													"id": 311,
 													"name": "user",
 													"kind": 1024,
 													"kindString": "Property",
@@ -9831,8 +9850,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														311,
-														310
+														312,
+														311
 													]
 												}
 											],
@@ -9847,7 +9866,7 @@
 									}
 								},
 								{
-									"id": 312,
+									"id": 313,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9861,7 +9880,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -9871,8 +9890,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										308,
-										312
+										309,
+										313
 									]
 								}
 							],
@@ -9889,7 +9908,7 @@
 			}
 		},
 		{
-			"id": 641,
+			"id": 642,
 			"name": "AuthenticatorAssuranceLevels",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -9916,7 +9935,7 @@
 			}
 		},
 		{
-			"id": 709,
+			"id": 710,
 			"name": "CallRefreshTokenResult",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -9934,14 +9953,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 710,
+							"id": 711,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 712,
+									"id": 713,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9959,7 +9978,7 @@
 									}
 								},
 								{
-									"id": 711,
+									"id": 712,
 									"name": "session",
 									"kind": 1024,
 									"kindString": "Property",
@@ -9973,7 +9992,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 346,
+										"id": 347,
 										"name": "Session"
 									}
 								}
@@ -9983,8 +10002,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										712,
-										711
+										713,
+										712
 									]
 								}
 							],
@@ -10000,14 +10019,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 713,
+							"id": 714,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 715,
+									"id": 716,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -10021,12 +10040,12 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								},
 								{
-									"id": 714,
+									"id": 715,
 									"name": "session",
 									"kind": 1024,
 									"kindString": "Property",
@@ -10049,8 +10068,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										715,
-										714
+										716,
+										715
 									]
 								}
 							],
@@ -10067,7 +10086,7 @@
 			}
 		},
 		{
-			"id": 506,
+			"id": 507,
 			"name": "EmailOtpType",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10106,7 +10125,7 @@
 			}
 		},
 		{
-			"id": 533,
+			"id": 534,
 			"name": "GenerateEmailChangeLinkParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10121,14 +10140,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 534,
+					"id": 535,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 536,
+							"id": 537,
 							"name": "email",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10149,7 +10168,7 @@
 							}
 						},
 						{
-							"id": 537,
+							"id": 538,
 							"name": "newEmail",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10170,7 +10189,7 @@
 							}
 						},
 						{
-							"id": 538,
+							"id": 539,
 							"name": "options",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10189,7 +10208,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 539,
+										"id": 540,
 										"name": "GenerateLinkOptions"
 									},
 									{
@@ -10203,7 +10222,7 @@
 							}
 						},
 						{
-							"id": 535,
+							"id": 536,
 							"name": "type",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10235,10 +10254,10 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								536,
 								537,
 								538,
-								535
+								539,
+								536
 							]
 						}
 					],
@@ -10253,7 +10272,7 @@
 			}
 		},
 		{
-			"id": 523,
+			"id": 524,
 			"name": "GenerateInviteOrMagiclinkParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10268,14 +10287,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 524,
+					"id": 525,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 526,
+							"id": 527,
 							"name": "email",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10296,7 +10315,7 @@
 							}
 						},
 						{
-							"id": 527,
+							"id": 528,
 							"name": "options",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10315,7 +10334,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 539,
+										"id": 540,
 										"name": "GenerateLinkOptions"
 									},
 									{
@@ -10338,7 +10357,7 @@
 							}
 						},
 						{
-							"id": 525,
+							"id": 526,
 							"name": "type",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10370,9 +10389,9 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								526,
 								527,
-								525
+								528,
+								526
 							]
 						}
 					],
@@ -10387,7 +10406,7 @@
 			}
 		},
 		{
-			"id": 542,
+			"id": 543,
 			"name": "GenerateLinkParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10404,29 +10423,29 @@
 				"types": [
 					{
 						"type": "reference",
-						"id": 517,
+						"id": 518,
 						"name": "GenerateSignupLinkParams"
 					},
 					{
 						"type": "reference",
-						"id": 523,
+						"id": 524,
 						"name": "GenerateInviteOrMagiclinkParams"
 					},
 					{
 						"type": "reference",
-						"id": 528,
+						"id": 529,
 						"name": "GenerateRecoveryLinkParams"
 					},
 					{
 						"type": "reference",
-						"id": 533,
+						"id": 534,
 						"name": "GenerateEmailChangeLinkParams"
 					}
 				]
 			}
 		},
 		{
-			"id": 556,
+			"id": 557,
 			"name": "GenerateLinkProperties",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10444,14 +10463,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 557,
+					"id": 558,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 558,
+							"id": 559,
 							"name": "action_link",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10472,7 +10491,7 @@
 							}
 						},
 						{
-							"id": 559,
+							"id": 560,
 							"name": "email_otp",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10493,7 +10512,7 @@
 							}
 						},
 						{
-							"id": 560,
+							"id": 561,
 							"name": "hashed_token",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10514,7 +10533,7 @@
 							}
 						},
 						{
-							"id": 561,
+							"id": 562,
 							"name": "redirect_to",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10535,7 +10554,7 @@
 							}
 						},
 						{
-							"id": 562,
+							"id": 563,
 							"name": "verification_type",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10552,7 +10571,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 563,
+								"id": 564,
 								"name": "GenerateLinkType"
 							}
 						}
@@ -10562,11 +10581,11 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								558,
 								559,
 								560,
 								561,
-								562
+								562,
+								563
 							]
 						}
 					],
@@ -10581,7 +10600,7 @@
 			}
 		},
 		{
-			"id": 543,
+			"id": 544,
 			"name": "GenerateLinkResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10599,14 +10618,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 544,
+							"id": 545,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 545,
+									"id": 546,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -10621,14 +10640,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 546,
+											"id": 547,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 547,
+													"id": 548,
 													"name": "properties",
 													"kind": 1024,
 													"kindString": "Property",
@@ -10642,12 +10661,12 @@
 													],
 													"type": {
 														"type": "reference",
-														"id": 556,
+														"id": 557,
 														"name": "GenerateLinkProperties"
 													}
 												},
 												{
-													"id": 548,
+													"id": 549,
 													"name": "user",
 													"kind": 1024,
 													"kindString": "Property",
@@ -10661,7 +10680,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"id": 383,
+														"id": 384,
 														"name": "User"
 													}
 												}
@@ -10671,8 +10690,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														547,
-														548
+														548,
+														549
 													]
 												}
 											],
@@ -10687,7 +10706,7 @@
 									}
 								},
 								{
-									"id": 549,
+									"id": 550,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -10710,8 +10729,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										545,
-										549
+										546,
+										550
 									]
 								}
 							],
@@ -10727,14 +10746,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 550,
+							"id": 551,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 551,
+									"id": 552,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -10749,14 +10768,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 552,
+											"id": 553,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 553,
+													"id": 554,
 													"name": "properties",
 													"kind": 1024,
 													"kindString": "Property",
@@ -10774,7 +10793,7 @@
 													}
 												},
 												{
-													"id": 554,
+													"id": 555,
 													"name": "user",
 													"kind": 1024,
 													"kindString": "Property",
@@ -10797,8 +10816,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														553,
-														554
+														554,
+														555
 													]
 												}
 											],
@@ -10813,7 +10832,7 @@
 									}
 								},
 								{
-									"id": 555,
+									"id": 556,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -10827,7 +10846,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -10837,8 +10856,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										551,
-										555
+										552,
+										556
 									]
 								}
 							],
@@ -10855,7 +10874,7 @@
 			}
 		},
 		{
-			"id": 563,
+			"id": 564,
 			"name": "GenerateLinkType",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10898,7 +10917,7 @@
 			}
 		},
 		{
-			"id": 528,
+			"id": 529,
 			"name": "GenerateRecoveryLinkParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -10913,14 +10932,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 529,
+					"id": 530,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 531,
+							"id": 532,
 							"name": "email",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10941,7 +10960,7 @@
 							}
 						},
 						{
-							"id": 532,
+							"id": 533,
 							"name": "options",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10960,7 +10979,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 539,
+										"id": 540,
 										"name": "GenerateLinkOptions"
 									},
 									{
@@ -10974,7 +10993,7 @@
 							}
 						},
 						{
-							"id": 530,
+							"id": 531,
 							"name": "type",
 							"kind": 1024,
 							"kindString": "Property",
@@ -10997,9 +11016,9 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								531,
 								532,
-								530
+								533,
+								531
 							]
 						}
 					],
@@ -11014,7 +11033,7 @@
 			}
 		},
 		{
-			"id": 517,
+			"id": 518,
 			"name": "GenerateSignupLinkParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11029,14 +11048,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 518,
+					"id": 519,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 520,
+							"id": 521,
 							"name": "email",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11054,7 +11073,7 @@
 							}
 						},
 						{
-							"id": 522,
+							"id": 523,
 							"name": "options",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11073,7 +11092,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"id": 539,
+										"id": 540,
 										"name": "GenerateLinkOptions"
 									},
 									{
@@ -11096,7 +11115,7 @@
 							}
 						},
 						{
-							"id": 521,
+							"id": 522,
 							"name": "password",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11114,7 +11133,7 @@
 							}
 						},
 						{
-							"id": 519,
+							"id": 520,
 							"name": "type",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11137,10 +11156,10 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								520,
-								522,
 								521,
-								519
+								523,
+								522,
+								520
 							]
 						}
 					],
@@ -11155,7 +11174,7 @@
 			}
 		},
 		{
-			"id": 287,
+			"id": 288,
 			"name": "GoTrueClientOptions",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11170,14 +11189,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 288,
+					"id": 289,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 296,
+							"id": 297,
 							"name": "autoRefreshToken",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11197,7 +11216,7 @@
 							}
 						},
 						{
-							"id": 295,
+							"id": 296,
 							"name": "detectSessionInUrl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11217,7 +11236,7 @@
 							}
 						},
 						{
-							"id": 299,
+							"id": 300,
 							"name": "fetch",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11237,7 +11256,7 @@
 							}
 						},
 						{
-							"id": 290,
+							"id": 291,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11254,7 +11273,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 291,
+									"id": 292,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -11267,14 +11286,14 @@
 										}
 									],
 									"indexSignature": {
-										"id": 292,
+										"id": 293,
 										"name": "__index",
 										"kind": 8192,
 										"kindString": "Index signature",
 										"flags": {},
 										"parameters": [
 											{
-												"id": 293,
+												"id": 294,
 												"name": "key",
 												"kind": 32768,
 												"flags": {},
@@ -11293,7 +11312,7 @@
 							}
 						},
 						{
-							"id": 297,
+							"id": 298,
 							"name": "persistSession",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11313,7 +11332,7 @@
 							}
 						},
 						{
-							"id": 298,
+							"id": 299,
 							"name": "storage",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11329,12 +11348,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 705,
+								"id": 706,
 								"name": "SupportedStorage"
 							}
 						},
 						{
-							"id": 294,
+							"id": 295,
 							"name": "storageKey",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11354,7 +11373,7 @@
 							}
 						},
 						{
-							"id": 289,
+							"id": 290,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11379,14 +11398,14 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								296,
-								295,
-								299,
-								290,
 								297,
+								296,
+								300,
+								291,
 								298,
-								294,
-								289
+								299,
+								295,
+								290
 							]
 						}
 					],
@@ -11401,7 +11420,7 @@
 			}
 		},
 		{
-			"id": 706,
+			"id": 707,
 			"name": "InitializeResult",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11416,14 +11435,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 707,
+					"id": 708,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 708,
+							"id": 709,
 							"name": "error",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11440,7 +11459,7 @@
 								"types": [
 									{
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									},
 									{
@@ -11456,7 +11475,7 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								708
+								709
 							]
 						}
 					],
@@ -11471,7 +11490,7 @@
 			}
 		},
 		{
-			"id": 580,
+			"id": 581,
 			"name": "MFAChallengeAndVerifyParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11486,14 +11505,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 581,
+					"id": 582,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 583,
+							"id": 584,
 							"name": "code",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11514,7 +11533,7 @@
 							}
 						},
 						{
-							"id": 582,
+							"id": 583,
 							"name": "factorId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11540,8 +11559,8 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								583,
-								582
+								584,
+								583
 							]
 						}
 					],
@@ -11556,7 +11575,7 @@
 			}
 		},
 		{
-			"id": 577,
+			"id": 578,
 			"name": "MFAChallengeParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11571,14 +11590,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 578,
+					"id": 579,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 579,
+							"id": 580,
 							"name": "factorId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11604,7 +11623,7 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								579
+								580
 							]
 						}
 					],
@@ -11619,7 +11638,7 @@
 			}
 		},
 		{
-			"id": 564,
+			"id": 565,
 			"name": "MFAEnrollParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11634,14 +11653,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 565,
+					"id": 566,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 566,
+							"id": 567,
 							"name": "factorType",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11662,7 +11681,7 @@
 							}
 						},
 						{
-							"id": 568,
+							"id": 569,
 							"name": "friendlyName",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11685,7 +11704,7 @@
 							}
 						},
 						{
-							"id": 567,
+							"id": 568,
 							"name": "issuer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11713,9 +11732,9 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								566,
-								568,
-								567
+								567,
+								569,
+								568
 							]
 						}
 					],
@@ -11730,7 +11749,7 @@
 			}
 		},
 		{
-			"id": 569,
+			"id": 570,
 			"name": "MFAUnenrollParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11745,14 +11764,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 570,
+					"id": 571,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 571,
+							"id": 572,
 							"name": "factorId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11778,7 +11797,7 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								571
+								572
 							]
 						}
 					],
@@ -11793,7 +11812,7 @@
 			}
 		},
 		{
-			"id": 572,
+			"id": 573,
 			"name": "MFAVerifyParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11808,14 +11827,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 573,
+					"id": 574,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 575,
+							"id": 576,
 							"name": "challengeId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11836,7 +11855,7 @@
 							}
 						},
 						{
-							"id": 576,
+							"id": 577,
 							"name": "code",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11857,7 +11876,7 @@
 							}
 						},
 						{
-							"id": 574,
+							"id": 575,
 							"name": "factorId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11883,9 +11902,9 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								575,
 								576,
-								574
+								577,
+								575
 							]
 						}
 					],
@@ -11900,7 +11919,7 @@
 			}
 		},
 		{
-			"id": 505,
+			"id": 506,
 			"name": "MobileOtpType",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11927,7 +11946,7 @@
 			}
 		},
 		{
-			"id": 313,
+			"id": 314,
 			"name": "OAuthResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -11945,14 +11964,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 314,
+							"id": 315,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 315,
+									"id": 316,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -11967,14 +11986,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 316,
+											"id": 317,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 317,
+													"id": 318,
 													"name": "provider",
 													"kind": 1024,
 													"kindString": "Property",
@@ -11988,12 +12007,12 @@
 													],
 													"type": {
 														"type": "reference",
-														"id": 284,
+														"id": 285,
 														"name": "Provider"
 													}
 												},
 												{
-													"id": 318,
+													"id": 319,
 													"name": "url",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12016,8 +12035,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														317,
-														318
+														318,
+														319
 													]
 												}
 											],
@@ -12032,7 +12051,7 @@
 									}
 								},
 								{
-									"id": 319,
+									"id": 320,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12055,8 +12074,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										315,
-										319
+										316,
+										320
 									]
 								}
 							],
@@ -12072,14 +12091,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 320,
+							"id": 321,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 321,
+									"id": 322,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12094,14 +12113,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 322,
+											"id": 323,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 323,
+													"id": 324,
 													"name": "provider",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12115,12 +12134,12 @@
 													],
 													"type": {
 														"type": "reference",
-														"id": 284,
+														"id": 285,
 														"name": "Provider"
 													}
 												},
 												{
-													"id": 324,
+													"id": 325,
 													"name": "url",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12143,8 +12162,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														323,
-														324
+														324,
+														325
 													]
 												}
 											],
@@ -12159,7 +12178,7 @@
 									}
 								},
 								{
-									"id": 325,
+									"id": 326,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12173,7 +12192,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -12183,8 +12202,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										321,
-										325
+										322,
+										326
 									]
 								}
 							],
@@ -12201,7 +12220,96 @@
 			}
 		},
 		{
-			"id": 284,
+			"id": 717,
+			"name": "PageParams",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "src/lib/types.ts",
+					"line": 917,
+					"character": 12
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 718,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {},
+					"children": [
+						{
+							"id": 719,
+							"name": "page",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "The page number"
+							},
+							"sources": [
+								{
+									"fileName": "src/lib/types.ts",
+									"line": 919,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 720,
+							"name": "perPage",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "Number of items returned per page"
+							},
+							"sources": [
+								{
+									"fileName": "src/lib/types.ts",
+									"line": 921,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								719,
+								720
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/lib/types.ts",
+							"line": 917,
+							"character": 25
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 285,
 			"name": "Provider",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -12287,7 +12395,7 @@
 			}
 		},
 		{
-			"id": 326,
+			"id": 327,
 			"name": "SSOResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -12305,14 +12413,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 327,
+							"id": 328,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 328,
+									"id": 329,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12327,14 +12435,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 329,
+											"id": 330,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 330,
+													"id": 331,
 													"name": "url",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12360,7 +12468,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														330
+														331
 													]
 												}
 											],
@@ -12375,7 +12483,7 @@
 									}
 								},
 								{
-									"id": 331,
+									"id": 332,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12398,8 +12506,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										328,
-										331
+										329,
+										332
 									]
 								}
 							],
@@ -12415,14 +12523,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 332,
+							"id": 333,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 333,
+									"id": 334,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12440,7 +12548,7 @@
 									}
 								},
 								{
-									"id": 334,
+									"id": 335,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12454,7 +12562,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -12464,8 +12572,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										333,
-										334
+										334,
+										335
 									]
 								}
 							],
@@ -12482,7 +12590,7 @@
 			}
 		},
 		{
-			"id": 477,
+			"id": 478,
 			"name": "SignInWithOAuthCredentials",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -12497,14 +12605,14 @@
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 478,
+					"id": 479,
 					"name": "__type",
 					"kind": 65536,
 					"kindString": "Type literal",
 					"flags": {},
 					"children": [
 						{
-							"id": 480,
+							"id": 481,
 							"name": "options",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12521,14 +12629,14 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 481,
+									"id": 482,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 484,
+											"id": 485,
 											"name": "queryParams",
 											"kind": 1024,
 											"kindString": "Property",
@@ -12548,7 +12656,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 485,
+													"id": 486,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -12561,14 +12669,14 @@
 														}
 													],
 													"indexSignature": {
-														"id": 486,
+														"id": 487,
 														"name": "__index",
 														"kind": 8192,
 														"kindString": "Index signature",
 														"flags": {},
 														"parameters": [
 															{
-																"id": 487,
+																"id": 488,
 																"name": "key",
 																"kind": 32768,
 																"flags": {},
@@ -12587,7 +12695,7 @@
 											}
 										},
 										{
-											"id": 482,
+											"id": 483,
 											"name": "redirectTo",
 											"kind": 1024,
 											"kindString": "Property",
@@ -12610,7 +12718,7 @@
 											}
 										},
 										{
-											"id": 483,
+											"id": 484,
 											"name": "scopes",
 											"kind": 1024,
 											"kindString": "Property",
@@ -12638,9 +12746,9 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												484,
-												482,
-												483
+												485,
+												483,
+												484
 											]
 										}
 									],
@@ -12655,7 +12763,7 @@
 							}
 						},
 						{
-							"id": 479,
+							"id": 480,
 							"name": "provider",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12672,7 +12780,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 284,
+								"id": 285,
 								"name": "Provider"
 							}
 						}
@@ -12682,8 +12790,8 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								480,
-								479
+								481,
+								480
 							]
 						}
 					],
@@ -12698,7 +12806,7 @@
 			}
 		},
 		{
-			"id": 446,
+			"id": 447,
 			"name": "SignInWithPasswordCredentials",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -12716,14 +12824,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 447,
+							"id": 448,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 448,
+									"id": 449,
 									"name": "email",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12744,7 +12852,7 @@
 									}
 								},
 								{
-									"id": 450,
+									"id": 451,
 									"name": "options",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12761,14 +12869,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 451,
+											"id": 452,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 453,
+													"id": 454,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12791,7 +12899,7 @@
 													}
 												},
 												{
-													"id": 452,
+													"id": 453,
 													"name": "data",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12820,8 +12928,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														453,
-														452
+														454,
+														453
 													]
 												}
 											],
@@ -12836,7 +12944,7 @@
 									}
 								},
 								{
-									"id": 449,
+									"id": 450,
 									"name": "password",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12862,9 +12970,9 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										448,
-										450,
-										449
+										449,
+										451,
+										450
 									]
 								}
 							],
@@ -12880,14 +12988,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 454,
+							"id": 455,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 457,
+									"id": 458,
 									"name": "options",
 									"kind": 1024,
 									"kindString": "Property",
@@ -12904,14 +13012,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 458,
+											"id": 459,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 460,
+													"id": 461,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12934,7 +13042,7 @@
 													}
 												},
 												{
-													"id": 459,
+													"id": 460,
 													"name": "data",
 													"kind": 1024,
 													"kindString": "Property",
@@ -12963,8 +13071,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														460,
-														459
+														461,
+														460
 													]
 												}
 											],
@@ -12979,7 +13087,7 @@
 									}
 								},
 								{
-									"id": 456,
+									"id": 457,
 									"name": "password",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13000,7 +13108,7 @@
 									}
 								},
 								{
-									"id": 455,
+									"id": 456,
 									"name": "phone",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13026,9 +13134,9 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
+										458,
 										457,
-										456,
-										455
+										456
 									]
 								}
 							],
@@ -13045,7 +13153,7 @@
 			}
 		},
 		{
-			"id": 461,
+			"id": 462,
 			"name": "SignInWithPasswordlessCredentials",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -13063,14 +13171,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 462,
+							"id": 463,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 463,
+									"id": 464,
 									"name": "email",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13091,7 +13199,7 @@
 									}
 								},
 								{
-									"id": 464,
+									"id": 465,
 									"name": "options",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13108,14 +13216,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 465,
+											"id": 466,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 469,
+													"id": 470,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13138,7 +13246,7 @@
 													}
 												},
 												{
-													"id": 468,
+													"id": 469,
 													"name": "data",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13162,7 +13270,7 @@
 													}
 												},
 												{
-													"id": 466,
+													"id": 467,
 													"name": "emailRedirectTo",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13185,7 +13293,7 @@
 													}
 												},
 												{
-													"id": 467,
+													"id": 468,
 													"name": "shouldCreateUser",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13213,10 +13321,10 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
+														470,
 														469,
-														468,
-														466,
-														467
+														467,
+														468
 													]
 												}
 											],
@@ -13236,8 +13344,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										463,
-										464
+										464,
+										465
 									]
 								}
 							],
@@ -13253,14 +13361,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 470,
+							"id": 471,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 472,
+									"id": 473,
 									"name": "options",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13277,14 +13385,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 473,
+											"id": 474,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 476,
+													"id": 477,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13307,7 +13415,7 @@
 													}
 												},
 												{
-													"id": 475,
+													"id": 476,
 													"name": "data",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13331,7 +13439,7 @@
 													}
 												},
 												{
-													"id": 474,
+													"id": 475,
 													"name": "shouldCreateUser",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13359,9 +13467,9 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
+														477,
 														476,
-														475,
-														474
+														475
 													]
 												}
 											],
@@ -13376,7 +13484,7 @@
 									}
 								},
 								{
-									"id": 471,
+									"id": 472,
 									"name": "phone",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13402,8 +13510,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										472,
-										471
+										473,
+										472
 									]
 								}
 							],
@@ -13420,7 +13528,7 @@
 			}
 		},
 		{
-			"id": 507,
+			"id": 508,
 			"name": "SignInWithSSO",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -13438,14 +13546,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 508,
+							"id": 509,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 509,
+									"id": 510,
 									"name": "options",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13462,14 +13570,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 510,
+											"id": 511,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 512,
+													"id": 513,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13492,7 +13600,7 @@
 													}
 												},
 												{
-													"id": 511,
+													"id": 512,
 													"name": "redirectTo",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13520,8 +13628,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														512,
-														511
+														513,
+														512
 													]
 												}
 											],
@@ -13541,7 +13649,7 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										509
+										510
 									]
 								}
 							],
@@ -13560,14 +13668,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 513,
+									"id": 514,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 514,
+											"id": 515,
 											"name": "providerId",
 											"kind": 1024,
 											"kindString": "Property",
@@ -13593,7 +13701,7 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												514
+												515
 											]
 										}
 									],
@@ -13609,14 +13717,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 515,
+									"id": 516,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"children": [
 										{
-											"id": 516,
+											"id": 517,
 											"name": "domain",
 											"kind": 1024,
 											"kindString": "Property",
@@ -13642,7 +13750,7 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												516
+												517
 											]
 										}
 									],
@@ -13661,7 +13769,7 @@
 			}
 		},
 		{
-			"id": 430,
+			"id": 431,
 			"name": "SignUpWithPasswordCredentials",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -13679,14 +13787,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 431,
+							"id": 432,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 432,
+									"id": 433,
 									"name": "email",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13707,7 +13815,7 @@
 									}
 								},
 								{
-									"id": 434,
+									"id": 435,
 									"name": "options",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13724,14 +13832,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 435,
+											"id": 436,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 438,
+													"id": 439,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13754,7 +13862,7 @@
 													}
 												},
 												{
-													"id": 437,
+													"id": 438,
 													"name": "data",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13778,7 +13886,7 @@
 													}
 												},
 												{
-													"id": 436,
+													"id": 437,
 													"name": "emailRedirectTo",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13806,9 +13914,9 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
+														439,
 														438,
-														437,
-														436
+														437
 													]
 												}
 											],
@@ -13823,7 +13931,7 @@
 									}
 								},
 								{
-									"id": 433,
+									"id": 434,
 									"name": "password",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13849,9 +13957,9 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										432,
-										434,
-										433
+										433,
+										435,
+										434
 									]
 								}
 							],
@@ -13867,14 +13975,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 439,
+							"id": 440,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 442,
+									"id": 443,
 									"name": "options",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13891,14 +13999,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 443,
+											"id": 444,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 445,
+													"id": 446,
 													"name": "captchaToken",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13921,7 +14029,7 @@
 													}
 												},
 												{
-													"id": 444,
+													"id": 445,
 													"name": "data",
 													"kind": 1024,
 													"kindString": "Property",
@@ -13950,8 +14058,8 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														445,
-														444
+														446,
+														445
 													]
 												}
 											],
@@ -13966,7 +14074,7 @@
 									}
 								},
 								{
-									"id": 441,
+									"id": 442,
 									"name": "password",
 									"kind": 1024,
 									"kindString": "Property",
@@ -13987,7 +14095,7 @@
 									}
 								},
 								{
-									"id": 440,
+									"id": 441,
 									"name": "phone",
 									"kind": 1024,
 									"kindString": "Property",
@@ -14013,9 +14121,9 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
+										443,
 										442,
-										441,
-										440
+										441
 									]
 								}
 							],
@@ -14032,7 +14140,7 @@
 			}
 		},
 		{
-			"id": 705,
+			"id": 706,
 			"name": "SupportedStorage",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -14083,7 +14191,7 @@
 			}
 		},
 		{
-			"id": 335,
+			"id": 336,
 			"name": "UserResponse",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -14101,14 +14209,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 336,
+							"id": 337,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 337,
+									"id": 338,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -14123,14 +14231,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 338,
+											"id": 339,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 339,
+													"id": 340,
 													"name": "user",
 													"kind": 1024,
 													"kindString": "Property",
@@ -14144,7 +14252,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"id": 383,
+														"id": 384,
 														"name": "User"
 													}
 												}
@@ -14154,7 +14262,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														339
+														340
 													]
 												}
 											],
@@ -14169,7 +14277,7 @@
 									}
 								},
 								{
-									"id": 340,
+									"id": 341,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -14192,8 +14300,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										337,
-										340
+										338,
+										341
 									]
 								}
 							],
@@ -14209,14 +14317,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 341,
+							"id": 342,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 342,
+									"id": 343,
 									"name": "data",
 									"kind": 1024,
 									"kindString": "Property",
@@ -14231,14 +14339,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 343,
+											"id": 344,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 344,
+													"id": 345,
 													"name": "user",
 													"kind": 1024,
 													"kindString": "Property",
@@ -14261,7 +14369,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														344
+														345
 													]
 												}
 											],
@@ -14276,7 +14384,7 @@
 									}
 								},
 								{
-									"id": 345,
+									"id": 346,
 									"name": "error",
 									"kind": 1024,
 									"kindString": "Property",
@@ -14290,7 +14398,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 722,
+										"id": 727,
 										"name": "AuthError"
 									}
 								}
@@ -14300,8 +14408,8 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
-										342,
-										345
+										343,
+										346
 									]
 								}
 							],
@@ -14318,7 +14426,7 @@
 			}
 		},
 		{
-			"id": 488,
+			"id": 489,
 			"name": "VerifyOtpParams",
 			"kind": 4194304,
 			"kindString": "Type alias",
@@ -14335,19 +14443,19 @@
 				"types": [
 					{
 						"type": "reference",
-						"id": 489,
+						"id": 490,
 						"name": "VerifyMobileOtpParams"
 					},
 					{
 						"type": "reference",
-						"id": 497,
+						"id": 498,
 						"name": "VerifyEmailOtpParams"
 					}
 				]
 			}
 		},
 		{
-			"id": 719,
+			"id": 724,
 			"name": "isAuthApiError",
 			"kind": 64,
 			"kindString": "Function",
@@ -14361,14 +14469,60 @@
 			],
 			"signatures": [
 				{
-					"id": 720,
+					"id": 725,
 					"name": "isAuthApiError",
 					"kind": 4096,
 					"kindString": "Call signature",
 					"flags": {},
 					"parameters": [
 						{
-							"id": 721,
+							"id": 726,
+							"name": "error",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "intrinsic",
+								"name": "unknown"
+							}
+						}
+					],
+					"type": {
+						"type": "predicate",
+						"name": "error",
+						"asserts": false,
+						"targetType": {
+							"type": "reference",
+							"id": 732,
+							"name": "AuthApiError"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": 721,
+			"name": "isAuthError",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "src/lib/errors.ts",
+					"line": 10,
+					"character": 16
+				}
+			],
+			"signatures": [
+				{
+					"id": 722,
+					"name": "isAuthError",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"parameters": [
+						{
+							"id": 723,
 							"name": "error",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -14386,52 +14540,6 @@
 						"targetType": {
 							"type": "reference",
 							"id": 727,
-							"name": "AuthApiError"
-						}
-					}
-				}
-			]
-		},
-		{
-			"id": 716,
-			"name": "isAuthError",
-			"kind": 64,
-			"kindString": "Function",
-			"flags": {},
-			"sources": [
-				{
-					"fileName": "src/lib/errors.ts",
-					"line": 10,
-					"character": 16
-				}
-			],
-			"signatures": [
-				{
-					"id": 717,
-					"name": "isAuthError",
-					"kind": 4096,
-					"kindString": "Call signature",
-					"flags": {},
-					"parameters": [
-						{
-							"id": 718,
-							"name": "error",
-							"kind": 32768,
-							"kindString": "Parameter",
-							"flags": {},
-							"type": {
-								"type": "intrinsic",
-								"name": "unknown"
-							}
-						}
-					],
-					"type": {
-						"type": "predicate",
-						"name": "error",
-						"asserts": false,
-						"targetType": {
-							"type": "reference",
-							"id": 722,
 							"name": "AuthError"
 						}
 					}
@@ -14444,95 +14552,96 @@
 			"title": "Classes",
 			"kind": 128,
 			"children": [
+				732,
 				727,
-				722,
-				787,
-				774,
-				812,
-				762,
-				740,
-				747,
+				792,
+				779,
+				817,
+				767,
+				745,
+				752,
 				1,
-				74
+				75
 			]
 		},
 		{
 			"title": "Interfaces",
 			"kind": 256,
 			"children": [
-				355,
-				410,
-				369,
-				539,
-				698,
-				653,
-				346,
-				420,
-				428,
-				383,
-				376,
-				405,
-				358,
-				380,
-				497,
-				489
+				356,
+				411,
+				370,
+				540,
+				699,
+				654,
+				347,
+				421,
+				429,
+				384,
+				377,
+				406,
+				359,
+				381,
+				498,
+				490
 			]
 		},
 		{
 			"title": "Type Aliases",
 			"kind": 4194304,
 			"children": [
-				286,
-				285,
-				682,
-				673,
-				695,
-				686,
-				621,
-				597,
-				642,
-				631,
-				612,
-				584,
-				300,
-				641,
-				709,
-				506,
-				533,
-				523,
-				542,
-				556,
-				543,
-				563,
-				528,
-				517,
 				287,
-				706,
-				580,
-				577,
-				564,
-				569,
-				572,
-				505,
-				313,
-				284,
-				326,
-				477,
-				446,
-				461,
+				286,
+				683,
+				674,
+				696,
+				687,
+				622,
+				598,
+				643,
+				632,
+				613,
+				585,
+				301,
+				642,
+				710,
 				507,
-				430,
-				705,
-				335,
-				488
+				534,
+				524,
+				543,
+				557,
+				544,
+				564,
+				529,
+				518,
+				288,
+				707,
+				581,
+				578,
+				565,
+				570,
+				573,
+				506,
+				314,
+				717,
+				285,
+				327,
+				478,
+				447,
+				462,
+				508,
+				431,
+				706,
+				336,
+				489
 			]
 		},
 		{
 			"title": "Functions",
 			"kind": 64,
 			"children": [
-				719,
-				716
+				724,
+				721
 			]
 		}
 	],
