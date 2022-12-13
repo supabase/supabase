@@ -1,0 +1,70 @@
+[
+  {
+    "title": "Docs Updated",
+    "shipped": true,
+    "date": "12 Dec 2022",
+    "description": "Supabase Docs",
+    "d": 1,
+    "dd": "Monday",
+    "youtube_id": "OpPOaJI_Z28",
+    "blogpost": "https://supabase.com/blog/new-supabase-docs-built-with-nextjs",
+    "docs": "https://supabase.com/docs",
+    "steps": [
+      {
+        "title": "Supabase Docs",
+        "blog": "/blog/new-supabase-docs-built-with-nextjs",
+        "docs": "/docs",
+        "isNew": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "title": "Day 2",
+    "shipped": false,
+    "date": "13 Dec 2022",
+    "description": "Day 2",
+    "d": 2,
+    "dd": "Tuesday",
+    "youtube_id": "iqZlPtl_b-I",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "steps": []
+  },
+  {
+    "title": "Day 3",
+    "shipped": false,
+    "date": "14 Dec 2022",
+    "description": "Day 3",
+    "d": 3,
+    "dd": "Wednesday",
+    "youtube_id": "6bGQotxisoY",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "steps": []
+  },
+  {
+    "title": "Day 4",
+    "shipped": false,
+    "date": "15 Dec 2022",
+    "description": "Day 4",
+    "d": 4,
+    "dd": "Thursday",
+    "youtube_id": "CGZr5tybW18",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "steps": []
+  },
+  {
+    "title": "Day 5",
+    "shipped": false,
+    "date": "16 Dec 2022",
+    "description": "Day 5",
+    "d": 5,
+    "dd": "Friday",
+    "youtube_id": "CGZr5tybW18",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "steps": []
+  }
+]

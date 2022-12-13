@@ -1,0 +1,18 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import oldContent from '~/pages/guides/with-nuxt-3.mdx'
+
+export const meta = {
+  id: 'with-nuxt-3',
+  title: 'Quickstart: Nuxt 3',
+  description: 'Learn how to use Supabase in your Nuxt 3 App.',
+  sidebar_label: 'Nuxt 3',
+}
+
+export const Page = ({ children }) => {
+  if (process.env.NEXT_PUBLIC_NEW_DOCS === 'true') {
+    return oldContent()
+  }
+  return <Layout meta={meta} children={children} />
+}
+
+export default Page

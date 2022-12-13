@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import FooterLinks from 'data/footer.json'
 import DarkModeToggle from './DarkModeToggle'
-import { useTheme } from '../Providers'
+import { useTheme } from 'common/Providers'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
