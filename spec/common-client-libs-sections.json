@@ -396,14 +396,6 @@
         "type": "function"
       },
       {
-        "id": "auth-user",
-        "title": "The User object",
-        "slug": "auth-user",
-        "product": "auth",
-        "type": "function",
-        "libs": ["js"]
-      },
-      {
         "id": "sign-up",
         "title": "Create a new user",
         "slug": "auth-signup",
@@ -626,103 +618,107 @@
         "product": "auth",
         "type": "function",
         "libs": ["js"]
-      },
+      }
+    ]
+  },
+  {
+    "title": "Auth Admin",
+    "libs": ["js", "js_v1"],
+    "items": [
       {
         "id": "admin-api",
-        "title": "Auth (server-only)",
+        "title": "Overview",
         "slug": "admin-api",
         "libs": ["js", "js_v1"],
+        "type": "function"
+      },
+      {
+        "id": "get-user-by-id",
+        "title": "Retrieve a user",
+        "slug": "auth-admin-getuserbyid",
+        "product": "auth-admin",
         "type": "function",
-        "items": [
-          {
-            "id": "get-user-by-id",
-            "title": "Retrieve a user",
-            "slug": "auth-admin-getuserbyid",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
-          },
-          {
-            "id": "list-users",
-            "title": "List all users",
-            "slug": "auth-admin-listusers",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
-          },
-          {
-            "id": "create-user",
-            "title": "Create a user",
-            "slug": "auth-admin-createuser",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
-          },
-          {
-            "id": "delete-user",
-            "title": "Delete a user",
-            "slug": "auth-admin-deleteuser",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
-          },
-          {
-            "id": "invite-user-by-email",
-            "title": "Send an email invite link",
-            "slug": "auth-admin-inviteuserbyemail",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
-          },
-          {
-            "id": "reset-password-for-email",
-            "title": "Send a password reset request",
-            "slug": "auth-admin-resetpasswordforemail",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
-          },
-          {
-            "id": "generate-link",
-            "title": "Generate an email link",
-            "slug": "auth-admin-generatelink",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
-          },
-          {
-            "id": "send-mobile-otp",
-            "title": "Send a one-time passcode",
-            "slug": "auth-api-sendmobileotp",
-            "product": "auth-server",
-            "type": "function",
-            "libs": ["js_v1"]
-          },
-          {
-            "id": "update-user-by-id",
-            "title": "Update a user",
-            "slug": "auth-admin-updateuserbyid",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
-          },
-          {
-            "id": "mfa-list-factors",
-            "title": "List all factors for a user",
-            "slug": "auth-admin-mfa-listfactors",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
-          },
-          {
-            "id": "mfa-delete-factor",
-            "title": "Delete a factor for a user",
-            "slug": "auth-admin-mfa-deletefactor",
-            "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
-          }
-        ]
+        "libs": ["js"]
+      },
+      {
+        "id": "list-users",
+        "title": "List all users",
+        "slug": "auth-admin-listusers",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "create-user",
+        "title": "Create a user",
+        "slug": "auth-admin-createuser",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "delete-user",
+        "title": "Delete a user",
+        "slug": "auth-admin-deleteuser",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "invite-user-by-email",
+        "title": "Send an email invite link",
+        "slug": "auth-admin-inviteuserbyemail",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "reset-password-for-email",
+        "title": "Send a password reset request",
+        "slug": "auth-admin-resetpasswordforemail",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
+        "id": "generate-link",
+        "title": "Generate an email link",
+        "slug": "auth-admin-generatelink",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
+        "id": "send-mobile-otp",
+        "title": "Send a one-time passcode",
+        "slug": "auth-api-sendmobileotp",
+        "product": "auth-server",
+        "type": "function",
+        "libs": ["js_v1"]
+      },
+      {
+        "id": "update-user-by-id",
+        "title": "Update a user",
+        "slug": "auth-admin-updateuserbyid",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js", "js_v1"]
+      },
+      {
+        "id": "mfa-list-factors",
+        "title": "List all factors for a user",
+        "slug": "auth-admin-mfa-listfactors",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js"]
+      },
+      {
+        "id": "mfa-delete-factor",
+        "title": "Delete a factor for a user",
+        "slug": "auth-admin-mfa-deletefactor",
+        "product": "auth-admin",
+        "type": "function",
+        "libs": ["js"]
       }
     ]
   },
