@@ -168,6 +168,9 @@ export const validateFields = (field: ColumnField) => {
   if (field.keyId === 'create-new' && (field?.keyName ?? '').length === 0) {
     errors['keyName'] = 'Please provide a name for your new key'
   }
+  if (field.isEncrypted && field.format !== 'text') {
+    errors['isEncrypted'] = 'Only columns of type text can be encrypted'
+  }
   return errors
 }
 
