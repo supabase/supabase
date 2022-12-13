@@ -10,7 +10,8 @@ export const meta = {
 Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
 
 <Admonition type="note">
-  Image Resizing is currently in beta and enabled for [PRO tiers and above](https://supabase.com/pricing).
+  Image Resizing is currently in beta and enabled for [Pro tier and
+  above](https://supabase.com/pricing).
 </Admonition>
 
 ## Get a public URL for a transformed image
@@ -22,14 +23,13 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
   transform: {
     width: 500,
     height: 600,
-  }
+  },
 })
 ```
 
 An example URL could look like this:
 
 `https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
-
 
 ## Signing URLs with transformation options
 
@@ -40,7 +40,7 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
   transform: {
     width: 200,
     height: 200,
-  }
+  },
 })
 ```
 
@@ -55,7 +55,7 @@ supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     width: 800,
     height: 300,
-  }
+  },
 })
 ```
 
@@ -69,7 +69,9 @@ To get started, create a `supabase-image-loader.js` file in your NextJS project 
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, height, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/${src}?width=${width}&height=${height || 0}&quality=${quality || 75}`
+  return `https://${projectId}.supabase.co/storage/v1/${src}?width=${width}&height=${
+    height || 0
+  }&quality=${quality || 75}`
 }
 ```
 
@@ -90,14 +92,7 @@ At this point you are ready to use the `Image` component provided by NextJS
 import Image from 'next/image'
 
 const MyImage = (props) => {
-  return (
-    <Image
-      src="bucket/image.png"
-      alt="Picture of the author"
-      width={500}
-      height={500}
-    />
-  )
+  return <Image src="bucket/image.png" alt="Picture of the author" width={500} height={500} />
 }
 ```
 
@@ -128,8 +123,8 @@ supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     width: 800,
     height: 300,
-    resize: 'contain' // 'cover' | 'fill'
-  }
+    resize: 'contain', // 'cover' | 'fill'
+  },
 })
 ```
 
@@ -142,17 +137,17 @@ supabase.storage.from('bucket').download('image.jpg', {
 ### Supported Image Formats
 
 | Format | Extension | Source | Result |
-| -------|-----------|--------|--------|
-| PNG    | `png`     | ☑️    | ☑️    |
-| JPEG   | `jpg`     | ☑️    | ☑️    |
-| WebP   | `webp`    | ☑️    | ☑️    |
-| AVIF   | `avif`    | ☑️    | ☑️    |
-| GIF    | `gif`     | ☑️    | ☑️    |
-| ICO    | `ico`     | ☑️    | ☑️    |
-| SVG    | `svg`     | ☑️    | ☑️    |
-| HEIC   | `heic`    | ☑️    | ❌     |
-| BMP    | `bmp`     | ☑️    | ☑️    |
-| TIFF   | `tiff`    | ☑️    | ☑️    |
+| ------ | --------- | ------ | ------ |
+| PNG    | `png`     | ☑️     | ☑️     |
+| JPEG   | `jpg`     | ☑️     | ☑️     |
+| WebP   | `webp`    | ☑️     | ☑️     |
+| AVIF   | `avif`    | ☑️     | ☑️     |
+| GIF    | `gif`     | ☑️     | ☑️     |
+| ICO    | `ico`     | ☑️     | ☑️     |
+| SVG    | `svg`     | ☑️     | ☑️     |
+| HEIC   | `heic`    | ☑️     | ❌     |
+| BMP    | `bmp`     | ☑️     | ☑️     |
+| TIFF   | `tiff`    | ☑️     | ☑️     |
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
