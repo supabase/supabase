@@ -8,19 +8,19 @@ export const meta = {
 
 <Admonition type="note">
 
-Network Restrictions are currently in beta, and are being slowly made available to all projects.
+Network Restrictions are currently in beta and are being slowly made available to all projects.
 
-The current iteration of Network Restrictions applies to connections to Postgres and Pgbouncer. Support for restricting connections to Postgrest, Storage, and Auth will be added at a later date.
+The current iteration of Network Restrictions applies to connections to Postgres and PgBouncer. Support for restricting connections to PostgREST, Storage, and Auth will be added at a later date.
 
 </Admonition>
 
-Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and Pgbouncer ("your database"). These restrictions are enforced before traffic reaches your database; if a connection is allowed by a network restriction, it will still need to authenticate successfully with valid credentials.
+Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and PgBouncer ("your database"). These restrictions are enforced before traffic reaches your database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.
 
 To get started:
 
 1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
 1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
-1. Ensure that you have [Owner or Admin permissions](/docs/guides/hosting/platform#manage-team-members) for the project you'd like to set up network restrictions for.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/hosting/platform#manage-team-members) for the project that you are enabling network restrictions.
 
 ## Check restrictions
 
@@ -67,5 +67,5 @@ Restrictions applied successfully: true
 
 ## Limitations
 
-1. Network Restrictions do not currently apply to APIs offered over HTTPS (e.g. Postgrest, Storage, Auth).
-1. Network Restrictions should not be used if you require your edge functions to be able to connect to your project's postgres or pgbouncer endpoints.
+1. Network Restrictions do not currently apply to APIs offered over HTTPS (e.g. PostgREST, Storage, Auth).
+1. Network Restrictions should not be used if you require you need to connect to your Postgres database using Edge Functions.
