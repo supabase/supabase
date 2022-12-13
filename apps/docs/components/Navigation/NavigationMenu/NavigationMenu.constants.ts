@@ -487,6 +487,24 @@ export const platform = {
       ],
     },
     {
+      name: 'Single sign-on',
+      url: undefined,
+      items: [
+        {
+          name: 'Enable SSO for your organization',
+          url: '/guides/platform/sso/enable-sso',
+          items: [],
+        },
+        { name: 'Setup SSO with Azure AD', url: '/guides/platform/sso/sso-with-azure', items: [] },
+        {
+          name: 'Setup SSO with Google Workspaces',
+          url: '/guides/platform/sso/sso-with-gsuite',
+          items: [],
+        },
+        { name: 'Setup SSO with Okta', url: '/guides/platform/sso/sso-with-okta', items: [] },
+      ],
+    },
+    {
       name: 'Go-live Checklist',
       url: undefined,
       items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] }],
