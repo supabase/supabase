@@ -19,7 +19,10 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
   const defaultKey = keys.find((key) => key.name === 'default_vault_key') || keys[0]
 
   useEffect(() => {
-    if (visible) setSelectedKeyId(defaultKey?.id)
+    if (visible) {
+      setShowSecretValue(false)
+      setSelectedKeyId(defaultKey?.id)
+    }
   }, [visible])
 
   const validate = (values: any) => {
