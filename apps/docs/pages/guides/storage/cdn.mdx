@@ -36,9 +36,12 @@ For example, you can use a URL like `/storage/v1/object/sign/profile-pictures/ca
 
 When you want to update the cat picture, you can increment the version query parameter in the URL. The CDN treats `/storage/v1/object/sign/profile-pictures/cat.jpg?token=eyJh...&version=2` as a new object and pings the origin for the updated version.
 
+If your asset is updated frequently, we recommend that you re-upload the new asset in a different key, this way you'll always have the latest changes available immediately.
+
 Note that CDNs might still evict your object from their cache if it has not been requested for a while from a specific region. For example, if no user from United States requests your object, it will be removed from the CDN cache even if you set a very long cache control duration.
 
 The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
+
 
 ## Smart CDN Caching
 
@@ -59,7 +62,9 @@ When a file is updated or deleted, the CDN cache is automatically invalidated to
 It can take **up to 60 seconds** for the CDN cache to be invalidated as the asset metadata has to propagate across all the data-centers around the globe.
 
 When an asset is invalidated at the CDN level, browsers may not update its cache.
-If your asset is updated frequently, we recommend setting a lower value using the `cacheControl` option even when using smart CDN.
+
+If your asset is updated frequently, we recommend that you re-upload the new asset in a different key, this way you'll always have the latest changes available without waiting the propagation delay.
+If you expect your asset to be deleted, we recommend setting a low browser TTL value using the `cacheControl` option when using smart CDN caching, the default is 1 hour which generally is a good default.
 
 ## Public vs Private Buckets
 
