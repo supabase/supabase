@@ -1,6 +1,6 @@
 REPO_DIR=$(shell pwd)
 
-run: transform format
+run: download transform format
 
 
 ###############################################################################
