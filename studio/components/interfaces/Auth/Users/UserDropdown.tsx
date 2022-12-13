@@ -120,6 +120,33 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
     })
   }
 
+  async function handleDeleteFactors() {
+    await timeout(200)
+
+    confirmAlert({
+      title: 'Confirm to delete',
+      message: `This is permanent! Are you sure you want to delete the user's factors?`,
+      onAsyncConfirm: async () => {
+        setLoading(true)
+        const response = await delete_(
+          `${API_URL}/auth/${PageState.projectRef}/users/${user.id}/factors`
+        )
+        if (response.error) {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to delete factors: ${response.error.message}`,
+          })
+        } else {
+          ui.setNotification({
+            category: 'success',
+            message: "Successfully deleted the user's factors",
+          })
+        }
+        setLoading(false)
+      },
+    })
+  }
+
   return (
     <Dropdown
       size="medium"
@@ -162,6 +189,32 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
                 >
                   <span className="text-xs text-scale-1200">
                     You need additional permissions to delete users
+                  </span>
+                </div>
+              </Tooltip.Content>
+            )}
+          </Tooltip.Root>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <Dropdown.Item
+                onClick={handleDeleteFactors}
+                icon={<IconTrash size="tiny" />}
+                disabled={!canRemoveUser}
+              >
+                Delete factors
+              </Dropdown.Item>
+            </Tooltip.Trigger>
+            {!canRemoveUser && (
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to remove a user's authentication factors.
                   </span>
                 </div>
               </Tooltip.Content>
