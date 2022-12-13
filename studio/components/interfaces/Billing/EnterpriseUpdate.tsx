@@ -8,7 +8,7 @@ import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 
 import Divider from 'components/ui/Divider'
-import { DatabaseAddon } from './AddOns/AddOns.types'
+import { SubscriptionAddon } from './AddOns/AddOns.types'
 import {
   formatComputeSizes,
   formatCustomDomainOptions,
@@ -25,9 +25,10 @@ import {
 } from './'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
+import SupportPlan from './AddOns/SupportPlan'
 
 interface Props {
-  products: { tiers: any[]; addons: DatabaseAddon[] }
+  products: { tiers: any[]; addons: SubscriptionAddon[] }
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
@@ -57,15 +58,20 @@ const EnterpriseUpdate: FC<Props> = ({
   // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
   // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
   // of unnecessary state management on this complex page.
-  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(
+  const [selectedComputeSize, setSelectedComputeSize] = useState<SubscriptionAddon>(
     currentAddons.computeSize
   )
-  const [selectedPITRDuration, setSelectedPITRDuration] = useState<DatabaseAddon>(
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<SubscriptionAddon>(
     currentAddons.pitrDuration
   )
-  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<SubscriptionAddon>(
     currentAddons.customDomains
   )
+  // [Joshen TODO] Future - We may need to also include any add ons outside of
+  // compute size, pitr, custom domain and support plan, although we dont have any now
+  const nonChangeableAddons = [currentAddons.supportPlan].filter(
+    (x) => x !== undefined
+  ) as SubscriptionAddon[]
 
   // [Joshen] Scaffolded here
   const selectedAddons = {
@@ -86,7 +92,7 @@ const EnterpriseUpdate: FC<Props> = ({
 
   useEffect(() => {
     getSubscriptionPreview()
-  }, [selectedComputeSize, selectedPITRDuration])
+  }, [selectedComputeSize, selectedPITRDuration, selectedCustomDomainOption])
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
@@ -99,8 +105,10 @@ const EnterpriseUpdate: FC<Props> = ({
     // Only allow add-ons changing
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
         selectedAddons,
+        nonChangeableAddons,
         selectedPaymentMethodId,
         projectRegion
       ),
@@ -123,8 +131,10 @@ const EnterpriseUpdate: FC<Props> = ({
   const onConfirmPayment = async () => {
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
         selectedAddons,
+        nonChangeableAddons,
         selectedPaymentMethodId,
         projectRegion
       ),
@@ -199,6 +209,12 @@ const EnterpriseUpdate: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
+                    {currentAddons.supportPlan !== undefined && (
+                      <>
+                        <Divider light />
+                        <SupportPlan currentOption={currentAddons.supportPlan} />
+                      </>
+                    )}
                     {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
                       <>
                         <Divider light />
@@ -239,6 +255,7 @@ const EnterpriseUpdate: FC<Props> = ({
             isSpendCapEnabled={true}
             isSubmitting={isSubmitting}
             isRefreshingPreview={isRefreshingPreview}
+            currentSubscription={currentSubscription}
             subscriptionPreview={subscriptionPreview}
             // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}

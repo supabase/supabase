@@ -16082,40 +16082,536 @@
         "type": "union",
         "types": [
           {
-            "type": "reference",
             "id": 454,
-            "typeArguments": [
+            "name": "RealtimePostgresInsertPayload",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
               {
-                "type": "reference",
-                "id": 453,
-                "name": "T"
+                "fileName": "RealtimeChannel.ts",
+                "line": 34,
+                "character": 12
               }
             ],
-            "name": "RealtimePostgresInsertPayload"
+            "typeParameter": [
+              {
+                "id": 463,
+                "name": "T",
+                "kind": 131072,
+                "kindString": "Type parameter",
+                "flags": {},
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 460,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "RealtimeChannel.ts",
+                        "line": 34,
+                        "character": 52
+                      }
+                    ],
+                    "indexSignature": {
+                      "id": 461,
+                      "name": "__index",
+                      "kind": 8192,
+                      "kindString": "Index signature",
+                      "flags": {},
+                      "parameters": [
+                        {
+                          "id": 462,
+                          "name": "key",
+                          "kind": 32768,
+                          "flags": {},
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "type": {
+              "type": "intersection",
+              "types": [
+                {
+                  "type": "reference",
+                  "name": "RealtimePostgresChangesPayloadBase"
+                },
+                {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 455,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 456,
+                        "name": "eventType",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 36,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "template-literal",
+                          "head": "",
+                          "tail": [
+                            [
+                              {
+                                "type": "reference",
+                                "id": 506,
+                                "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT"
+                              },
+                              ""
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "id": 457,
+                        "name": "new",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 37,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "id": 463,
+                          "name": "T"
+                        }
+                      },
+                      {
+                        "id": 458,
+                        "name": "old",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 38,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "reflection",
+                          "declaration": {
+                            "id": 459,
+                            "name": "__type",
+                            "kind": 65536,
+                            "kindString": "Type literal",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "RealtimeChannel.ts",
+                                "line": 38,
+                                "character": 9
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [456, 457, 458]
+                      }
+                    ],
+                    "sources": [
+                      {
+                        "fileName": "RealtimeChannel.ts",
+                        "line": 35,
+                        "character": 39
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
-            "type": "reference",
             "id": 464,
-            "typeArguments": [
+            "name": "RealtimePostgresUpdatePayload",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
               {
-                "type": "reference",
-                "id": 453,
-                "name": "T"
+                "fileName": "RealtimeChannel.ts",
+                "line": 41,
+                "character": 12
               }
             ],
-            "name": "RealtimePostgresUpdatePayload"
+            "typeParameter": [
+              {
+                "id": 472,
+                "name": "T",
+                "kind": 131072,
+                "kindString": "Type parameter",
+                "flags": {},
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 469,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "RealtimeChannel.ts",
+                        "line": 41,
+                        "character": 52
+                      }
+                    ],
+                    "indexSignature": {
+                      "id": 470,
+                      "name": "__index",
+                      "kind": 8192,
+                      "kindString": "Index signature",
+                      "flags": {},
+                      "parameters": [
+                        {
+                          "id": 471,
+                          "name": "key",
+                          "kind": 32768,
+                          "flags": {},
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "type": {
+              "type": "intersection",
+              "types": [
+                {
+                  "type": "reference",
+                  "name": "RealtimePostgresChangesPayloadBase"
+                },
+                {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 465,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 466,
+                        "name": "eventType",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 43,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "template-literal",
+                          "head": "",
+                          "tail": [
+                            [
+                              {
+                                "type": "reference",
+                                "id": 507,
+                                "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.UPDATE"
+                              },
+                              ""
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "id": 467,
+                        "name": "new",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 44,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "id": 472,
+                          "name": "T"
+                        }
+                      },
+                      {
+                        "id": 468,
+                        "name": "old",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 45,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "reference",
+                              "id": 472,
+                              "name": "T"
+                            }
+                          ],
+                          "qualifiedName": "Partial",
+                          "package": "typescript",
+                          "name": "Partial"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [466, 467, 468]
+                      }
+                    ],
+                    "sources": [
+                      {
+                        "fileName": "RealtimeChannel.ts",
+                        "line": 42,
+                        "character": 39
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
-            "type": "reference",
             "id": 473,
-            "typeArguments": [
+            "name": "RealtimePostgresDeletePayload",
+            "kind": 4194304,
+            "kindString": "Type alias",
+            "flags": {},
+            "sources": [
               {
-                "type": "reference",
-                "id": 453,
-                "name": "T"
+                "fileName": "RealtimeChannel.ts",
+                "line": 48,
+                "character": 12
               }
             ],
-            "name": "RealtimePostgresDeletePayload"
+            "typeParameter": [
+              {
+                "id": 482,
+                "name": "T",
+                "kind": 131072,
+                "kindString": "Type parameter",
+                "flags": {},
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 479,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "sources": [
+                      {
+                        "fileName": "RealtimeChannel.ts",
+                        "line": 48,
+                        "character": 52
+                      }
+                    ],
+                    "indexSignature": {
+                      "id": 480,
+                      "name": "__index",
+                      "kind": 8192,
+                      "kindString": "Index signature",
+                      "flags": {},
+                      "parameters": [
+                        {
+                          "id": 481,
+                          "name": "key",
+                          "kind": 32768,
+                          "flags": {},
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "type": {
+              "type": "intersection",
+              "types": [
+                {
+                  "type": "reference",
+                  "name": "RealtimePostgresChangesPayloadBase"
+                },
+                {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 474,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 475,
+                        "name": "eventType",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 50,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "template-literal",
+                          "head": "",
+                          "tail": [
+                            [
+                              {
+                                "type": "reference",
+                                "id": 508,
+                                "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.DELETE"
+                              },
+                              ""
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "id": 476,
+                        "name": "new",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 51,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "reflection",
+                          "declaration": {
+                            "id": 477,
+                            "name": "__type",
+                            "kind": 65536,
+                            "kindString": "Type literal",
+                            "flags": {},
+                            "sources": [
+                              {
+                                "fileName": "RealtimeChannel.ts",
+                                "line": 51,
+                                "character": 9
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "id": 478,
+                        "name": "old",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "RealtimeChannel.ts",
+                            "line": 52,
+                            "character": 4
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "reference",
+                              "id": 482,
+                              "name": "T"
+                            }
+                          ],
+                          "qualifiedName": "Partial",
+                          "package": "typescript",
+                          "name": "Partial"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [475, 476, 478]
+                      }
+                    ],
+                    "sources": [
+                      {
+                        "fileName": "RealtimeChannel.ts",
+                        "line": 49,
+                        "character": 39
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ]
       }

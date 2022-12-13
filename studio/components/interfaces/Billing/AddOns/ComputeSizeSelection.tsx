@@ -2,14 +2,15 @@ import { FC } from 'react'
 import Link from 'next/link'
 import { Badge, Button, Radio } from 'ui'
 
-import { useStore, useFlag } from 'hooks'
+import { useFlag, useParams } from 'hooks'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import { SubscriptionAddon } from './AddOns.types'
 
 interface Props {
-  computeSizes: any[]
-  currentComputeSize?: any
-  selectedComputeSize: any
+  computeSizes: SubscriptionAddon[]
+  currentComputeSize?: SubscriptionAddon
+  selectedComputeSize: SubscriptionAddon
   onSelectOption: (option: any) => void
 }
 
@@ -19,8 +20,7 @@ const ComputeSizeSelection: FC<Props> = ({
   selectedComputeSize,
   onSelectOption,
 }) => {
-  const { ui } = useStore()
-  const projectRef = ui.selectedProjectRef
+  const { ref } = useParams()
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   return (
@@ -36,6 +36,31 @@ const ComputeSizeSelection: FC<Props> = ({
       </div>
       {addonUpdateDisabled ? (
         <DisabledWarningDueToIncident title="Updating database add-ons is currently disabled" />
+      ) : currentComputeSize?.isLocked ? (
+        <div
+          className={[
+            'flex items-center justify-between block w-full rounded px-4 py-3',
+            'border border-scale-600 bg-scale-100 dark:border-scale-500 dark:bg-scale-400',
+          ].join(' ')}
+        >
+          <div className="space-y-3">
+            <h5 className="text-sm text-scale-1200">
+              Your project currently has the {currentComputeSize.name} included
+            </h5>
+            <p className="text-sm text-scale-1100">
+              If you would like to change your compute size, do reach out to us
+            </p>
+          </div>
+          <div className="">
+            <Link
+              href={`/support/new?ref=${ref}&category=sales&subject=Disable%20custom%20domains%20`}
+            >
+              <a>
+                <Button>Contact us</Button>
+              </a>
+            </Link>
+          </div>
+        </div>
       ) : (
         <Radio.Group type="cards" className="billing-compute-radio">
           {computeSizes.map((option: any) => {
@@ -75,7 +100,9 @@ const ComputeSizeSelection: FC<Props> = ({
             label="Need a larger add on?"
             description="Reach out to us - we've got you covered!"
             optionalLabel={
-              <Link href={`/support/new?ref=${projectRef}&category=sales`}>
+              <Link
+                href={`/support/new?ref=${ref}&category=sales&subject=Enquiry%20for%20larger%20compute%20size`}
+              >
                 <a>
                   <Button>Contact us</Button>
                 </a>
