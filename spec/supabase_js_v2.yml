@@ -396,28 +396,32 @@ functions:
         isSpotlight: true
         code: |
           ```js
-            const { data, error } = supabase.auth.setSession(refresh_token)
+            const { data, error } = supabase.auth.setSession({ 
+              access_token,
+              refresh_token
+            )
           ```
   - id: refresh-session
     title: 'refreshSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
-      - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
     examples:
       - id: refresh-session-using-the-current-session
         name: Refresh session using the current session
         isSpotlight: true
         code: |
           ```js
-          const { data: { user, session }, error } = await supabase.auth.refreshSession()
+          const { data, error } = await supabase.auth.refreshSession()
+          const { session, user } = data
           ```
       - id: refresh-session-using-a-passed-in-session
-        name: Refresh session using a passed-in session
-        isSpotlight: true
+        name: Refresh session using a refresh token
+        isSpotlight: false
         code: |
           ```js
-          const { data: { user, session }, error } = await supabase.auth.refreshSession({ refresh_token })
+          const { data, error } = await supabase.auth.refreshSession({ refresh_token })
+          const { session, user } = data
           ```
   - id: on-auth-state-change
     title: 'onAuthStateChange()'
