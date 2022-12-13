@@ -8,7 +8,7 @@ tags:
   - launch-week
 date: '2022-12-13'
 toc_depth: 3
-youtubeHero: https://www.youtube-nocookie.com/embed/Q1Amk6iDlF8
+youtubeHero: https://www.youtube-nocookie.com/embed/NpEl20iuOtg
 ---
 
 Today we're introducing three new features for Supabase Storage: Image resizing, webhooks, and a Smart CDN.
@@ -52,7 +52,7 @@ In a head-to-head benchmark, we found the performance to be almost identical, wi
 
 We spent a long time considering what a good developer experience would be for image resizing.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6e7895c7-26c9-4e1a-a315-d047c246ce19/Untitled.png)
+![Resizing sane defaults](/images/blog/launch-week-6/day-2-storage-resize/resize.png)
 
 We landed on a simple, on-demand interface. Downloading a resized image in JavaScript looks like this:
 
@@ -86,7 +86,7 @@ Behind the scenes, we've provided a few small niceties:
 
 Resizing images can get expensive, so before this release we knew we needed a better caching system. We already provide a “basic” CDN for all projects (including Free-tier), so the important update here is some smarter cache invalidation whenever there are changes.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/62953cea-f5ef-4331-b621-ce17296cf94e/Untitled.png)
+![Caching is hard](/images/blog/launch-week-6/day-2-storage-resize/resize.png)
 
 Our Basic CDN works by adding a 1-hour cache header to every request. After this header expires, we re-check the origin (S3), to see if an image is still available. This parameter is configurable (for example, you can make it one day, or one year).
 
