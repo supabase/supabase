@@ -67,6 +67,7 @@ const home = [
     {
       label: 'Integrations',
       icon: '/img/icons/menu/integrations',
+      hasLightIcon: true,
       href: '/guides/integrations',
       level: 'integrations',
     },
@@ -78,14 +79,12 @@ const home = [
     {
       label: 'JavaScript',
       icon: '/img/icons/menu/reference-javascript',
-      hasLightIcon: true,
       href: '/reference/javascript/introduction',
       level: 'reference_javascript',
     },
     {
       label: 'Flutter',
       icon: '/img/icons/menu/reference-dart',
-      hasLightIcon: true,
       href: '/reference/dart/introduction',
       level: 'reference_dart',
     },
@@ -95,14 +94,12 @@ const home = [
     {
       label: 'Management API',
       icon: '/img/icons/menu/reference-api',
-      hasLightIcon: true,
       href: '/reference/api/introduction',
       level: 'reference_javascript',
     },
     {
       label: 'Supabase CLI',
       icon: '/img/icons/menu/reference-cli',
-      hasLightIcon: true,
       href: '/reference/cli/introduction',
       level: 'reference_javascript',
     },
@@ -158,11 +155,7 @@ const NavigationMenuHome = () => {
                               <Image
                                 alt={link.label}
                                 src={`${router.basePath}${
-                                  Object.hasOwn(link, 'hasLightIcon') && !link.hasLightIcon
-                                    ? link.icon
-                                    : isDarkMode
-                                    ? link.icon
-                                    : `${link.icon}-light`
+                                  isDarkMode ? link.icon : `${link.icon}-light`
                                 }${!link.icon.includes('png') ? '.svg' : ''}`}
                                 width={17}
                                 height={17}
