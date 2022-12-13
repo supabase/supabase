@@ -2157,7 +2157,138 @@
               "type": {
                 "type": "reference",
                 "id": 357,
-                "name": "Bucket"
+                "name": "Bucket",
+                "dereferenced": {
+                  "id": 357,
+                  "name": "Bucket",
+                  "kind": 256,
+                  "kindString": "Interface",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 361,
+                      "name": "created_at",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 5,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 358,
+                      "name": "id",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 2,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 359,
+                      "name": "name",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 3,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 360,
+                      "name": "owner",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 4,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 363,
+                      "name": "public",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 7,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      }
+                    },
+                    {
+                      "id": 362,
+                      "name": "updated_at",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 6,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [361, 358, 359, 360, 363, 362]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 1,
+                      "character": 17
+                    }
+                  ]
+                }
               }
             },
             {
@@ -2544,7 +2675,70 @@
               "type": {
                 "type": "reference",
                 "id": 374,
-                "name": "SortBy"
+                "name": "SortBy",
+                "dereferenced": {
+                  "id": 374,
+                  "name": "SortBy",
+                  "kind": 256,
+                  "kindString": "Interface",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 375,
+                      "name": "column",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 23,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 376,
+                      "name": "order",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "sources": [
+                        {
+                          "fileName": "src/lib/types.ts",
+                          "line": 24,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "kind": 1024,
+                      "children": [375, 376]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "src/lib/types.ts",
+                      "line": 22,
+                      "character": 17
+                    }
+                  ]
+                }
               }
             }
           ],
@@ -4724,7 +4918,112 @@
                               "type": {
                                 "type": "reference",
                                 "id": 390,
-                                "name": "TransformOptions"
+                                "name": "TransformOptions",
+                                "dereferenced": {
+                                  "id": 390,
+                                  "name": "TransformOptions",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 392,
+                                      "name": "height",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The height of the image in pixels."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 84,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    },
+                                    {
+                                      "id": 393,
+                                      "name": "resize",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The resize mode can be cover, contain or fill. Defaults to cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 91,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "literal",
+                                            "value": "cover"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "contain"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "fill"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 391,
+                                      "name": "width",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The width of the image in pixels."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 80,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [392, 393, 391]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 76,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],
@@ -5306,7 +5605,112 @@
                               "type": {
                                 "type": "reference",
                                 "id": 390,
-                                "name": "TransformOptions"
+                                "name": "TransformOptions",
+                                "dereferenced": {
+                                  "id": 390,
+                                  "name": "TransformOptions",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 392,
+                                      "name": "height",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The height of the image in pixels."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 84,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    },
+                                    {
+                                      "id": 393,
+                                      "name": "resize",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The resize mode can be cover, contain or fill. Defaults to cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 91,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "literal",
+                                            "value": "cover"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "contain"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "fill"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 391,
+                                      "name": "width",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The width of the image in pixels."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 80,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [392, 393, 391]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 76,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],
@@ -5558,7 +5962,112 @@
                               "type": {
                                 "type": "reference",
                                 "id": 390,
-                                "name": "TransformOptions"
+                                "name": "TransformOptions",
+                                "dereferenced": {
+                                  "id": 390,
+                                  "name": "TransformOptions",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 392,
+                                      "name": "height",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The height of the image in pixels."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 84,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    },
+                                    {
+                                      "id": 393,
+                                      "name": "resize",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The resize mode can be cover, contain or fill. Defaults to cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 91,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "literal",
+                                            "value": "cover"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "contain"
+                                          },
+                                          {
+                                            "type": "literal",
+                                            "value": "fill"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "id": 391,
+                                      "name": "width",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "comment": {
+                                        "shortText": "The width of the image in pixels."
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 80,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "number"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [392, 393, 391]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 76,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],
@@ -5795,7 +6304,70 @@
                               "type": {
                                 "type": "reference",
                                 "id": 374,
-                                "name": "SortBy"
+                                "name": "SortBy",
+                                "dereferenced": {
+                                  "id": 374,
+                                  "name": "SortBy",
+                                  "kind": 256,
+                                  "kindString": "Interface",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 375,
+                                      "name": "column",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 23,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    },
+                                    {
+                                      "id": 376,
+                                      "name": "order",
+                                      "kind": 1024,
+                                      "kindString": "Property",
+                                      "flags": {
+                                        "isOptional": true
+                                      },
+                                      "sources": [
+                                        {
+                                          "fileName": "src/lib/types.ts",
+                                          "line": 24,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Properties",
+                                      "kind": 1024,
+                                      "children": [375, 376]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/lib/types.ts",
+                                      "line": 22,
+                                      "character": 17
+                                    }
+                                  ]
+                                }
                               }
                             }
                           ],

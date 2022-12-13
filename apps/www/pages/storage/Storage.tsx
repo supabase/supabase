@@ -187,6 +187,17 @@ function StoragePage() {
                     title="CDN"
                     text="Serve from the edge to reduce latency."
                   />
+                  <Link href="/docs/guides/storage/cdn" passHref>
+                    <Button
+                      as="a"
+                      size="small"
+                      type="default"
+                      className="mt-4"
+                      icon={<IconArrowUpRight />}
+                    >
+                      Explore docs
+                    </Button>
+                  </Link>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
@@ -194,7 +205,17 @@ function StoragePage() {
                     title="Transformations"
                     text="Resize and compress your media before you serve it."
                   />
-                  <Badge>Coming soon</Badge>
+                  <Link href="/docs/guides/storage/image-resizing" passHref>
+                    <Button
+                      as="a"
+                      size="small"
+                      type="default"
+                      className="mt-4"
+                      icon={<IconArrowUpRight />}
+                    >
+                      Explore docs
+                    </Button>
+                  </Link>
                 </div>
               </div>,
             ]}
