@@ -8,7 +8,7 @@
    - [Running turborepo](#running-turborepo)
      - [Shared components](#shared-components)
      - [Installing packages](#installing-packages)
-   - [New Supabase Docs](#new-supabase-docs)
+   - [New Supabase docs](#new-supabase-docs)
 3. [Create a pull request](#create-a-pull-request)
 
 - [Common tasks](#common-tasks)
