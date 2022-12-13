@@ -1,6 +1,14 @@
 import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
-import { Popover, IconCheck, IconAlertCircle, IconSearch, IconPlus, IconChevronDown } from 'ui'
+import {
+  Popover,
+  IconCheck,
+  IconAlertCircle,
+  IconSearch,
+  IconPlus,
+  IconChevronDown,
+  Input,
+} from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
@@ -124,16 +132,18 @@ export default function MultiSelect({
         ref={ref}
       >
         <Popover
+          portalled
           sideOffset={4}
           side="bottom"
           align="start"
           style={{ width }}
+          onOpenChange={() => setSearchString('')}
           header={
             <div className="flex items-center space-x-2 py-1">
               <IconSearch size={14} />
               <input
                 autoFocus
-                className="w-72 bg-transparent text-sm placeholder-scale-1000 outline-none"
+                className="w-full bg-transparent text-sm placeholder-scale-1000 outline-none"
                 value={searchString}
                 placeholder={searchPlaceholder}
                 onKeyPress={onKeyPress}
@@ -225,7 +235,6 @@ export default function MultiSelect({
               )}
             </div>
           }
-          onOpenChange={() => setSearchString('')}
         >
           <div
             className={[
