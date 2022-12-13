@@ -59,6 +59,48 @@ supabase.storage.from('bucket').download('image.jpg', {
 })
 ```
 
+## Next JS Loader
+
+You can use Supabase Image Transformation to optimise your NextJS images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
+
+To get started, create a `supabase-image-loader.js` file in your NextJS project which exports a default function:
+
+```ts
+const projectId = '' // your supabase project id
+
+export default function supabaseLoader({ src, width, height, quality }) {
+  return `https://${projectId}.supabase.co/storage/v1/${src}?width=${width}&height=${height || 0}&quality=${quality || 75}`
+}
+```
+
+In your `nextjs.config.js` file add the following configuration to instruct NextJS to use our custom loader
+
+```js
+module.exports = {
+  images: {
+    loader: 'custom',
+    loaderFile: './supabase-image-loader.js',
+  },
+}
+```
+
+At this point you are ready to use the `Image` component provided by NextJS
+
+```tsx
+import Image from 'next/image'
+
+const MyImage = (props) => {
+  return (
+    <Image
+      src="bucket/image.png"
+      alt="Picture of the author"
+      width={500}
+      height={500}
+    />
+  )
+}
+```
+
 ## Transformation options
 
 We currently support a few transformation options focusing on resizing and cropping images.
