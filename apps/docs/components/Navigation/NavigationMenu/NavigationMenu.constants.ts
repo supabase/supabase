@@ -512,8 +512,8 @@ export const resources = {
           items: [],
         },
         {
-          name: 'Firebase Data',
-          url: '/guides/resources/migrating-to-supabase/firebase-data',
+          name: 'Firestore Data',
+          url: '/guides/resources/migrating-to-supabase/firestore-data',
           items: [],
         },
         {
