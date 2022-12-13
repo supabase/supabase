@@ -13,7 +13,7 @@ Supabase Storage offers the functionality to transform and resize images dynamic
   Image Resizing is currently in beta and enabled for [PRO tiers and above](https://supabase.com/pricing).
 </Admonition>
 
-### Get a public URL for a transformed image
+## Get a public URL for a transformed image
 
 You can pass a `transform` option to the functions you are currently using to interact with your objects. This returns the public URL that serves the resized image.
 
@@ -31,7 +31,7 @@ An example URL could look like this:
 `https://project_id.supabase.co/storage/v1/render/image/public/bucket/image.jpg?width=500&height=600`
 
 
-### Signing URLs - With transformation options
+## Signing URLs with transformation options
 
 To share a transformed image for a fixed amount of time, provide the transform options when you create the signed URL:
 
@@ -46,7 +46,7 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
 
 The transformation options are embedded into the token—they cannot be changed once signed.
 
-### Downloading images
+## Downloading images
 
 To download a transformed image, pass the `transform` option to the `download` function.
 
