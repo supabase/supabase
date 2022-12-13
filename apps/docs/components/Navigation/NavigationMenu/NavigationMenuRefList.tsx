@@ -80,6 +80,7 @@ interface INavigationMenuRefList {
   // the keys of menu items that are allowed to be shown on the side menu
   // if undefined, we show all the menu items
   allowedClientKeys?: string[]
+  active: boolean
 }
 
 const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
@@ -87,6 +88,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   lib,
   commonSections,
   allowedClientKeys,
+  active,
 }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
@@ -150,12 +152,12 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        level === id && 'opacity-100 ml-0 delay-150 h-auto',
+        active && 'opacity-100 ml-0 delay-150 h-auto',
         // move menu back to margin-left
-        level === 'home' && 'ml-12',
+        // level === 'home' && 'ml-12',
         // disabled
-        level !== 'home' && level !== id ? '-ml-8' : '',
-        level !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
+        // level !== 'home' && level !== id ? '-ml-8' : '',
+        !active ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>

@@ -158,6 +158,7 @@ const SideNav = () => {
   const isHomeActive = 'home' === level
   const isGettingStartedActive = 'gettingstarted' === level
   const isDatabaseActive = 'database' === level
+  const isAuthActive = 'auth' === level
   const isFunctionsActive = 'functions' === level
   const isRealtimeActive = 'realtime' === level
   const isStorageActive = 'storage' === level
@@ -166,13 +167,23 @@ const SideNav = () => {
   const isIntegrationsActive = 'integrations' === level
   const isReferenceActive = 'reference' === level
 
+  const isReference_Javascript_V1 = 'reference_javascript_v1' === level
+  const isReference_Javascript_V2 = 'reference_javascript_v2' === level
+  const isReference_Dart_V0 = 'reference_dart_v0' === level
+  const isReference_Dart_V1 = 'reference_dart_v1' === level
+  const isReference_Cli = 'reference_cli' === level
+  const isReference_Api = 'reference_api' === level
+  const isReference_Self_Hosting_Auth = 'reference_self_hosting_auth' === level
+  const isReference_Self_Hosting_Storage = 'reference_self_hosting_storage' === level
+  const isReference_Self_Hosting_Realtime = 'reference_self_hosting_realtime' === level
+
   return (
     <div className="flex relative">
       {/* // main menu */}
       <NavigationMenuHome active={isHomeActive} />
       <NavigationMenuGuideList id={'gettingstarted'} active={isGettingStartedActive} />
       <NavigationMenuGuideList id={'database'} active={isDatabaseActive} />
-      <NavigationMenuGuideList id={'auth'} active={isDatabaseActive} />
+      <NavigationMenuGuideList id={'auth'} active={isAuthActive} />
       <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
       <NavigationMenuGuideList id={'realtime'} active={isRealtimeActive} />
       <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
@@ -184,6 +195,7 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v1'}
+        active={isReference_Javascript_V1}
         commonSections={libCommonSections}
         lib="javascript"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v1)}
@@ -191,6 +203,7 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v2'}
+        active={isReference_Javascript_V2}
         commonSections={libCommonSections}
         lib="javascript"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v2)}
@@ -198,6 +211,7 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v0'}
+        active={isReference_Dart_V0}
         commonSections={libCommonSections}
         lib="dart"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v0)}
@@ -205,6 +219,7 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v1'}
+        active={isReference_Dart_V1}
         commonSections={libCommonSections}
         lib="dart"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v1)}
@@ -213,12 +228,14 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-cli-menu'}
         id={'reference_cli'}
+        active={isReference_Cli}
         commonSections={cliCommonSections}
         lib="cli"
       />
       <NavigationMenuRefList
         key={'reference-api-menu'}
         id={'reference_api'}
+        active={isReference_Api}
         commonSections={apiCommonSections}
         lib="api"
       />
@@ -226,18 +243,21 @@ const SideNav = () => {
       <NavigationMenuRefList
         key={'reference-self-hosting-auth-menu'}
         id={'reference_self_hosting_auth'}
+        active={isReference_Self_Hosting_Auth}
         commonSections={authServerCommonSections}
         lib="self-hosting-auth"
       />
       <NavigationMenuRefList
         key={'reference-self-hosting-storage-menu'}
         id={'reference_self_hosting_storage'}
+        active={isReference_Self_Hosting_Storage}
         commonSections={storageServerCommonSections}
         lib="self-hosting-storage"
       />
       <NavigationMenuRefList
         key={'reference-self-hosting-realtime-menu'}
         id={'reference_self_hosting_realtime'}
+        active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
         lib="self-hosting-auth"
       />
