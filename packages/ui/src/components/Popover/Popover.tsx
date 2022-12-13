@@ -75,7 +75,6 @@ function Popover({
         align={align}
         className={classes.join(' ')}
         style={style}
-        portalled={portalled}
       >
         {arrow && (
           <RadixPopover.Arrow

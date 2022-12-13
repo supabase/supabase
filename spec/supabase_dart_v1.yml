@@ -1082,10 +1082,26 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-            final String signedUrl = await supabase
-              .storage
-              .from('avatars')
-              .createSignedUrl('avatar1.png', 60);
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl('avatar1.png', 60);
+          ```
+      - id: create-signed-url-with-transform
+        name: With transform
+        code: |
+          ```dart
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl(
+              'avatar1.png',
+              60,
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
           ```
 
   - id: from-get-public-url
@@ -1103,10 +1119,26 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-            final String publicUrl = supabase
-              .storage
-              .from('public-bucket')
-              .getPublicUrl('avatar1.png');
+          final String publicUrl = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('avatar1.png');
+          ```
+      - id: returns-the-url-for-an-asset-in-a-public-bucket-with-transform
+        name: With transform
+        isSpotlight: true
+        code: |
+          ```dart
+          final String publicUrl = await supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl(
+              'avatar1.png',
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
           ```
 
   - id: from-download
@@ -1127,6 +1159,22 @@ functions:
             .storage
             .from('avatars')
             .download('avatar1.png');
+          ```
+      - id: download-file-with-transform
+        name: With transform
+        isSpotlight: true
+        code: |
+          ```dart
+          final Uint8List file = await supabase
+            .storage
+            .from('avatars')
+            .download(
+              'avatar1.png',
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
           ```
 
   - id: from-remove
@@ -1272,178 +1320,151 @@ functions:
       Filters can be used on `select()`, `update()`, and `delete()` queries.
 
       If a Database function returns a table response, you can also apply filters.
+    examples:
+      - id: applying-filters
+        name: Applying Filters
+        description: |
+          Filters must be applied after any of `select()`, `update()`, `upsert()`,
+          `delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/dart/using-modifiers).
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The Shire');  // Correct
 
-      ### Applying Filters
+          final data = await supabase
+            .from('cities')
+            .eq('name', 'The Shire')  // Incorrect
+            .select('name, country_id');
+          ```
+      - id: chaining-filters
+        name: Chaining Filters
+        description: |
+          Filters must be applied after any of `select()`, `update()`, `upsert()`,
+          `delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/dart/using-modifiers).
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The Shire');  // Correct
 
-      Filters must be applied after any of `select()`, `update()`, `upsert()`,
-      `delete()`, and `rpc()` and before
-      [modifiers](/docs/reference/dart/using-modifiers).
+          final data = await supabase
+            .from('cities')
+            .eq('name', 'The Shire')  // Incorrect
+            .select('name, country_id');
+          ```
+      - id: conditional-chaining
+        name: Conditional Chaining
+        description: |
+          Filters can be built up one step at a time and then executed. For example:
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .select()
+            .eq('address->postcode', 90210);
+          ```
+      - id: filter-by-value-within-json-column
+        name: Filter by values within a JSON column
+        description: |
+          Filters can be built up one step at a time and then executed. For example:
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
 
-      ```dart
-      final data = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .eq('name', 'The Shire');    // Correct
-
-      final data = await supabase
-        .from('cities')
-        .eq('name', 'The Shire')    // Incorrect
-        .select('name, country_id');
-      ```
-
-      ### Chaining
-
-      Filters can be chained together to produce advanced queries. For example,
-      to query cities with population between 1,000 and 10,000:
-
-      ```dart
-      final data = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .gte('population', 1000)
-        .lt('population', 10000);
-      ```
-
-      ### Conditional Chaining
-
-      Filters can be built up one step at a time and then executed. For example:
-
-      ```dart
-      final filterByName = null;
-      final filterPopLow = 1000;
-      final filterPopHigh = 10000;
-
-      var query = supabase
-        .from('cities')
-        .select('name, country_id');
-
-      if (filterByName != null)  { query = query.eq('name', filterByName); }
-      if (filterPopLow != null)  { query = query.gte('population', filterPopLow); }
-      if (filterPopHigh != null) { query = query.lt('population', filterPopHigh); }
-
-      final data = await query;
-      ```
-
-      ### Filter by values within a JSON column
-
-      <Tabs>
-      <TabItem value="schema" label="Schema">
-
-        ```sql
-        create table
-          users (
-            id int8 primary key,
-            name text,
-            address jsonb
-          );
-
-        insert into
-          users (id, name, address)
-        values
-          (1, 'Michael', '{ "postcode": 90210 }'),
-          (2, 'Jane', null);
-        ```
-
-      </TabItem>
-      <TabItem default value="dart" label="Flutter">
-
-        ```dart
-        final data = await supabase
-          .from('users')
-          .select()
-          .eq('address->postcode', 90210);
-        ```
-
-      </TabItem>
-      <TabItem value="result" label="Result">
-
-        ```json
-        {
-          "data": [
-            {
-              "id": 1,
-              "name": "Michael",
-              "address": {
-                "postcode": 90210
-              }
-            }
-          ],
-          "status": 200,
-          "statusText": "OK"
-        }
-        ```
-
-      </TabItem>
-      </Tabs>
-
-      ### Filter Foreign Tables
-
-      You can filter on foreign tables in your `select()` query using dot
-      notation:
-
-      <Tabs>
-      <TabItem value="schema" label="Schema">
-
-        ```sql
-        create table
-          countries (id int8 primary key, name text);
-        create table
-          cities (
-            id int8 primary key,
-            country_id int8 not null references countries,
-            name text
-          );
-
-        insert into
-          countries (id, name)
-        values
-          (1, 'Germany'),
-          (2, 'Indonesia');
-        insert into
-          cities (id, country_id, name)
-        values
-          (1, 2, 'Bali'),
-          (2, 1, 'Munich');
-        ```
-
-      </TabItem>
-      <TabItem default value="dart" label="Flutter">
-
-        ```dart
-        final data = await supabase
-          .from('countries')
-          .select('''
-            name,
-            cities!inner (
-              name
-            )
-          ''')
-          .eq('cities.name', 'Bali');
-        ```
-
-      </TabItem>
-      <TabItem value="result" label="Result">
-
-        ```json
-        {
-          "data": [
-            {
-              "name": "Indonesia",
-              "cities": [
-                {
-                  "name": "Bali"
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }'),
+              (2, 'Jane', null);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "postcode": 90210
                 }
-              ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .select()
+            .eq('address->postcode', 90210);
+          ```
+      - id: filter-foreign-tables
+        name: Filter Foreign Tables
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('''
+              name,
+              cities!inner (
+                name
+              )
+            ''')
+            .eq('cities.name', 'Bali');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+          response: |
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Indonesia",
+                  "cities": [
+                    {
+                      "name": "Bali"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
             }
-          ],
-          "status": 200,
-          "statusText": "OK"
-        }
-        ```
-
-      </TabItem>
-      </Tabs>
-
+            ```
   - id: or
     title: or()
     description: |

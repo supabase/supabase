@@ -32,10 +32,20 @@ const FunctionLink = ({
   const router = useRouter()
   const activeAccordianItem = useMenuActiveRefId()
 
+  // check if we're on a versioned page
+  let version = ''
+  if (router.asPath.includes('v1')) {
+    version = 'v1'
+  }
+
+  if (router.asPath.includes('v0')) {
+    version = 'v0'
+  }
+
   const active = activeAccordianItem === id
   return (
     <li key={id} className="function-link-item">
-      <Link href={`/reference/${library}/${slug}`} passHref>
+      <Link href={`/reference/${library}/${version ? version + '/' : ''}${slug}`} passHref>
         <a
           className={[
             'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
