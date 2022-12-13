@@ -512,11 +512,10 @@ functions:
         name: Bulk create
         code: |
           ```dart
-          final List<Map<String, dynamic>> data =
-              await supabase.from('cities').insert([
+          await supabase.from('cities').insert([
             {'name': 'The Shire', 'country_id': 554},
             {'name': 'Rohan', 'country_id': 555},
-          ]).select();
+          ]);
           ```
       - id: fetch-inserted-data
         name: Fetch inserted record
