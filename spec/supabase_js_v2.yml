@@ -103,6 +103,35 @@ functions:
           ```
 
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
+  - id: auth-api
+    title: 'Overview'
+    notes: |
+      - The auth methods can be accessed via the `supabase.auth` namespace.
+    examples:
+      - id: create-auth-client
+        name: Create auth client
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient(supabase_url, anon_key)
+          ```
+      - id: create-auth-client-server-side
+        name: Create auth client (server-side)
+        isSpotlight: false
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient(supabase_url, anon_key, {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+              detectSessionInUrl: false
+            }
+          })
+          ```
   - id: sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -565,6 +594,24 @@ functions:
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+    examples:
+      - id: create-auth-admin-client
+        name: Create server-side auth client
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient(supabase_url, service_role_key, {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false
+            }
+          })
+
+          // Access auth admin api
+          const adminAuthClient = supabase.auth.admin
+          ```
 
   - id: get-user-by-id
     title: 'getUserById()'
