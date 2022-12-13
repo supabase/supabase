@@ -85,11 +85,7 @@ supabase domains delete --project-ref foobarbaz --experimental
 
 As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.
 
-## Limitations
-
-Edge functions do not honor the custom domain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
-
-# Vanity Subdomains
+## Vanity Subdomains
 
 <Admonition type="note">
 
@@ -145,7 +141,7 @@ As with the final activation stage of the process for setting up a vanity subdom
 
 ## Limitations
 
-Edge functions do not honor the vanity subdomain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
+Edge functions do not honor the custom domain or the vanity subdomain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
