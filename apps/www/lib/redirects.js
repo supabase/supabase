@@ -1600,4 +1600,246 @@ module.exports = [
     source: '/docs/reference',
     destination: '/docs#reference-documentation',
   },
+
+  // docs 2.0, moving pages in to structure
+  {
+    permanent: true,
+    source: '/docs/guides/auth',
+    destination: '/guides/auth/overview',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/auth-magic-link',
+    destination: '/guides/auth/passworldless-login/email-otp-magic-link',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/auth-messagebird',
+    destination: '/guides/auth/passworldless-login/phone-sms-otp-messagebird',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/auth-twilio',
+    destination: '/guides/auth/passworldless-login/phone-sms-otp-twilio',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/auth-vonage',
+    destination: '/guides/auth/passworldless-login/phone-sms-otp-vonage',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-google',
+    destination: '/guides/auth/social-login/with-google',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-facebook',
+    destination: '/guides/auth/social-login/with-facebook',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-apple',
+    destination: '/guides/auth/social-login/with-apple',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-azure',
+    destination: '/guides/auth/social-login/with-azure',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-twitter',
+    destination: '/guides/auth/social-login/with-twitter',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-github',
+    destination: '/guides/auth/social-login/with-github',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-gitlab',
+    destination: '/guides/auth/social-login/with-gitlab',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-bitbucket',
+    destination: '/guides/auth/social-login/with-bitbucket',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-discord',
+    destination: '/guides/auth/social-login/with-discord',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-keycloak',
+    destination: '/guides/auth/social-login/with-keycloak',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-linkedin',
+    destination: '/guides/auth/social-login/with-linkedin',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-notion',
+    destination: '/guides/auth/social-login/with-notion',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-slack',
+    destination: '/guides/auth/social-login/with-slack',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-spotify',
+    destination: '/guides/auth/social-login/with-spotify',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-twitch',
+    destination: '/guides/auth/social-login/with-twitch',
+  },
+  {
+    permanent: true,
+    source: '/guides/auth/with-workos',
+    destination: '/guides/auth/social-login/with-workos',
+  },
+  {
+    permanent: true,
+    source: '/guides/database',
+    destination: '/guides/database/overview',
+  },
+  {
+    permanent: true,
+    source: '/architecture',
+    destination: '/guides/getting-started/architecture',
+  },
+  {
+    permanent: true,
+    source: '/features',
+    destination: '/guides/getting-started/features',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-nextjs',
+    destination: '/guides/getting-started/tutorials/with-nextjs',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-react',
+    destination: '/guides/getting-started/tutorials/with-react',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-vue-3',
+    destination: '/guides/getting-started/tutorials/with-vue-3',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-nuxt-3',
+    destination: '/guides/getting-started/tutorials/with-nuxt-3',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-angular',
+    destination: '/guides/getting-started/tutorials/with-angular',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-redwoodjs',
+    destination: '/guides/getting-started/tutorials/with-redwoodjs',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-svelte',
+    destination: '/guides/getting-started/tutorials/with-svelte',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-sveltekit',
+    destination: '/guides/getting-started/tutorials/with-sveltekit',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-flutter',
+    destination: '/guides/getting-started/tutorials/with-flutter',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-expo',
+    destination: '/guides/getting-started/tutorials/with-expo',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-ionic-react',
+    destination: '/guides/getting-started/tutorials/with-ionic-react',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-ionic-vue',
+    destination: '/guides/getting-started/tutorials/with-ionic-vue',
+  },
+  {
+    permanent: true,
+    source: '/guides/with-ionic-angular',
+    destination: '/guides/getting-started/tutorials/with-ionic-angular',
+  },
+  {
+    permanent: true,
+    source: '/guides/examples',
+    destination: '/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/guides/examples',
+    destination: '/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/guides/hosting/overview',
+    destination: '/guides/resources/self-hosting',
+  },
+  {
+    permanent: true,
+    source: '/guides/hosting/docker',
+    destination: '/guides/resources/self-hosting/docker',
+  },
+  {
+    permanent: true,
+    source: '/guides/cli',
+    destination: '/guides/resources/supabase-cli',
+  },
+  {
+    permanent: true,
+    source: '/guides/cli/local-development',
+    destination: '/guides/resources/supabase-cli/local-development',
+  },
+  {
+    permanent: true,
+    source: '/guides/cli/managing-environments',
+    destination: '/guides/resources/supabase-cli/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/guides/migrations/firebase-data',
+    destination: '/guides/resources/migrating-to-supabase/firebase-data',
+  },
+  {
+    permanent: true,
+    source: '/guides/migrations/firebase-auth',
+    destination: '/guides/resources/migrating-to-supabase/firebase-auth',
+  },
+  {
+    permanent: true,
+    source: '/guides/migrations/firebase-storage',
+    destination: '/guides/resources/migrating-to-supabase/firebase-storage',
+  },
+  {
+    permanent: true,
+    source: '/guides/migrations/heroku',
+    destination: '/guides/resources/migrating-to-supabase/heroku',
+  },
 ]
