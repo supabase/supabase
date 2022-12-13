@@ -132,7 +132,7 @@ Let's step through a few different flows to see how it all works:
 
 Let's imagine one of your users makes a request for a resized cat (kitten?) image in your application. Here's the flow:
 
-![Image resizing.jpg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/54f10302-4736-4072-b83a-85fb1f2bb5ae/Image_resizing.jpg)
+![Cache miss flow](/images/blog/launch-week-6/day-2-storage-resize/cache%20miss.jpg)
 
 1. The request hits our globally-distributed API Gateway. This gateway reads the image metadata from a global KV store (this metadata is created when the image was uploaded).
 2. Inside the image metadata is a Cache Key - this is comprised of an [Etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) + tenant ID + bucketname + image name. The Gateway tries to find a cached object in our CDN using the Cache Key. If the image has never been accessed, it is a “Cache miss”.
@@ -143,7 +143,7 @@ Let's imagine one of your users makes a request for a resized cat (kitten?) imag
 
 The cat image goes viral, and so now multiple users want to see the resized image.
 
-![Image resizing-1.jpg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/733f8cca-84b8-4aa7-bdf9-3ecc5fb368dd/Image_resizing-1.jpg)
+![Cache hit flow](/images/blog/launch-week-6/day-2-storage-resize/cache%20hit.jpg)
 
 1. The request hits our globally-distributed API Gateway. This gateway reads the image metadata from a global KV store.
 2. Using the Cache Key the Gateway tries to find a cached object in our CDN. Because this image has already been resized, it returns it directly from the cache.
@@ -154,7 +154,7 @@ To complete this architecture, we need to keep the global KV store (which stores
 
 Using our cat picture from above:
 
-![Image resizing-2.jpg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/da9e15a2-3792-47be-a747-c9f32fa51ba7/Image_resizing-2.jpg)
+![Cache refresh flow](/images/blog/launch-week-6/day-2-storage-resize/cache%20refresh.jpg)
 
 1. You update the cat picture to a dog picture. This triggers an `ObjectCreated:Put` event from the Supabase Storage server.
 2. A cache manager service subscribes to these events and updates the global metadata store with the new Etag. This takes around 60 seconds to propagate globally.
@@ -166,9 +166,7 @@ Most CDNs offer this functionality “natively”. However there is usually a ha
 
 Besides solving issues with stale data, one of the biggest benefits this architecture offers is higher cache hits. Why is that important? Because image resizing is slow. Every cache miss is increased latency for your users.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a96e7bfa-f8cf-4ecd-8ac2-7c4ce12f8df1/Untitled.png)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/58d197c6-81b4-4cf2-9fcf-43267ef50e9a/Untitled.png)
+![Cache hit improvement](/images/blog/launch-week-6/day-2-storage-resize/hit%20rate%20improvement.jpg)
 
 The green line here shows the number of cache hits to our CDN. As you can see, when we enabled the Smart CDN, the number of requests cache hits increased significantly (which means faster cat images).
 
@@ -204,6 +202,6 @@ A few features to look out for in the future:
 
 [Upgrade to Pro](https://supabase.com/pricing) to get started with Image Resizing today.
 
-- Check out the Docs for [Image Resizing](https://supabase.com/docs/guides/storage/image-resizing).
+- Check out the Docs for [Image Resizing](https://supabase.com/docs/guides/storage/image-transformations).
 - Check out the Docs for the [Storage CDN](https://supabase.com/docs/guides/storage/cdn).
 - Get Started today with the [JavaScript](https://supabase.com/docs/reference/javascript/storage-from-download) and [Dart](https://supabase.com/docs/reference/dart/storage-from-list) client libraries.
