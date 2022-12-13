@@ -555,7 +555,6 @@
         "type": "function",
         "libs": ["js"]
       },
-
       {
         "id": "on-auth-state-change",
         "title": "Listen to auth events",
