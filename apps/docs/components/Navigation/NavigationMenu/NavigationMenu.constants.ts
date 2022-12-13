@@ -506,7 +506,8 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    // removing until the examples page is reworked
+    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -549,7 +550,7 @@ export const resources = {
         },
         {
           name: 'Managing Environments',
-          url: '/guides/cli/managing-environments',
+          url: '/guides/resources/supabase-cli/managing-environments',
           items: [],
         },
       ],
