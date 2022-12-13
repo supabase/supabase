@@ -110,9 +110,8 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }) &&
         find(databaseFunctions, {
           id: 'using-filters',
-        }).items.map((x) => x.id)
+        }).items.filter((x) => allowedClientKeys.includes(x.id))
       : []
-
   const modifierIds =
     databaseFunctions.length > 0
       ? find(databaseFunctions, {
@@ -120,7 +119,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }) &&
         find(databaseFunctions, {
           id: 'using-modifiers',
-        }).items.map((x) => x.id)
+        }).items.filter((x) => allowedClientKeys.includes(x.id))
       : []
 
   const authServerIds =
@@ -276,9 +275,11 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                       className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2"
                     >
                       {props.items &&
-                        props.items.map((item) => {
-                          return <FunctionLink {...item} library={lib} />
-                        })}
+                        props.items
+                          .filter((item) => allowedClientKeys.includes(item.id))
+                          .map((item) => {
+                            return <FunctionLink {...item} library={lib} />
+                          })}
                     </Accordion.Content>
                   </Accordion.Item>
                 </Accordion.Root>
