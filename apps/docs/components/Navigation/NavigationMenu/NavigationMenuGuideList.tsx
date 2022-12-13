@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
+import { useMenuLevelId } from '~/hooks/useMenuState'
 import * as NavItems from './NavigationMenu.constants'
 
 interface Props {
-  currentLevel: string
   id: string
   setMenuLevelId?: any
 }
-const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLevelId }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
@@ -25,6 +25,8 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLev
   // remove the end of the url if a deep link
   const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
 
+  const level = useMenuLevelId()
+
   return (
     <Accordion.Root
       collapsible
@@ -34,12 +36,12 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLev
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        currentLevel === id && 'opacity-100 ml-0 delay-150',
-        currentLevel === 'home' && 'ml-12',
+        level === id && 'opacity-100 ml-0 delay-150',
+        level === 'home' && 'ml-12',
 
         // disabled
-        currentLevel !== 'home' && currentLevel !== id ? '-ml-8' : '',
-        currentLevel !== id ? 'opacity-0 invisible absolute' : '',
+        level !== 'home' && level !== id ? '-ml-8' : '',
+        level !== id ? 'opacity-0 invisible absolute' : '',
       ].join(' ')}
     >
       <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
@@ -81,7 +83,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLev
                     : 'hover:text-brand-900 text-scale-1200',
                 ].join(' ')}
               >
-                {menu.title ?? currentLevel}
+                {menu.title ?? level}
               </span>
             </div>
           </a>
@@ -105,24 +107,11 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLev
                     }
 
                     const LinkContainer = (props) => {
-                      if (props.url) {
-                        return (
-                          <Link href={props.url} passHref>
-                            <a className={props.className}>{props.children}</a>
-                          </Link>
-                        )
-                      } else {
-                        return (
-                          <button
-                            className={props.className}
-                            onClick={() => {
-                              if (props.parent && setMenuLevelId) setMenuLevelId(props.parent)
-                            }}
-                          >
-                            {props.children}
-                          </button>
-                        )
-                      }
+                      return (
+                        <Link href={props.url} passHref>
+                          <a className={props.className}>{props.children}</a>
+                        </Link>
+                      )
                     }
 
                     return (
@@ -151,22 +140,6 @@ const NavigationMenuGuideList: React.FC<Props> = ({ currentLevel, id, setMenuLev
                               {subItem.icon && <img src={`${subItem.icon}.svg`} className="w-3" />}
                               {subItem.name}
                             </LinkContainer>
-                            {/* <Link href={`${subItem.url}`} passHref>
-                              <a
-                                className={[
-                                  'flex items-center gap-2',
-                                  'cursor-pointer transition text-sm',
-                                  subItem.url === router.pathname
-                                    ? 'text-brand-900'
-                                    : 'hover:text-brand-900 text-scale-1000',
-                                ].join(' ')}
-                              >
-                                {subItem.icon && (
-                                  <img src={`${subItem.icon}.svg`} className="w-3" />
-                                )}
-                                {subItem.name}
-                              </a>
-                            </Link> */}
                           </li>
 
                           {subItem.items && subItem.items.length > 0 && (

@@ -38,6 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
+  const liveDay = 'Monday'
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -93,15 +94,22 @@ export default function launchweek() {
     return (
       <div className="flex flex-1 flex-col sm:flex-row">
         <div className="flex gap-4 min-w-[320px] items-center">
-          <Badge
-            className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#c8d8d9] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#1f3738] h-fit relative ${
-              shipped
-                ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#b6b6b6] dark:text-transparent dark:border-[#1f3738] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10'
-                : ''
-            }`}
-          >
-            {shipped ? 'Shipped' : 'Coming Soon'}
-          </Badge>
+          {liveDay === day ? (
+            <Badge className="bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200 border-[#DFFFF1]">
+              Currently Happening
+            </Badge>
+          ) : (
+            <Badge
+              className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] !border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:!border-[#DFFFF1] h-fit relative ${
+                shipped
+                  ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#b6b6b6] dark:text-transparent dark:border-[#1f3738] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10 border-[#DFFFF1]'
+                  : ''
+              }`}
+            >
+              {shipped ? 'Shipped' : 'Coming Soon'}
+            </Badge>
+          )}
+
           <span className="text-scale-900 text-sm">
             {day} ・ {date}
           </span>
@@ -111,7 +119,7 @@ export default function launchweek() {
     )
   }
 
-  const SectionButtons = ({ blog, docs }) => {
+  const SectionButtons = ({ blog, docs, video }) => {
     return (
       <div className="flex gap-2 z-10">
         <a href={blog} target="_blank" rel="noopener">
@@ -130,6 +138,16 @@ export default function launchweek() {
             </div>
           </div>
         </a>
+        {video && (
+          <a href={video} target="_blank" rel="noopener">
+            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+              Video
+              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+              </div>
+            </div>
+          </a>
+        )}
       </div>
     )
   }
@@ -171,16 +189,6 @@ export default function launchweek() {
             </div>
             <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
           </div>
-          {process.env.NEXT_PUBLIC_LW_STARTED && (
-            <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
-              <TicketContainer
-                supabase={supabase}
-                session={session}
-                defaultUserData={defaultUserData}
-                defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
-              />
-            </div>
-          )}
         </SectionContainer>
         <div
           className={classNames(
@@ -256,7 +264,7 @@ export default function launchweek() {
                 justified={false}
                 bordered={false}
                 chevronAlign="right"
-                defaultValue={day1.d.toString()}
+                defaultValue={[day1.d.toString()]}
               >
                 <div className="border-b pb-3">
                   <Accordion.Item
@@ -275,16 +283,22 @@ export default function launchweek() {
                     {day1.steps.length > 0 && (
                       <div className="h-[400px] flex flex-col lg:flex-row">
                         <div
-                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:bg-[url('/images/launchweek/docs-update-bg.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10`}
+                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:bg-[url('/images/launchweek/docs-update-bg.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10 !px-3 sm:!px-14`}
                         >
                           <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <span>{day1.description}</span>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#1f3738] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#1f3738]">
+                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:border-[#DFFFF1]">
                               Redesigned
                             </Badge>
                           </div>
 
-                          <SectionButtons docs={day1.steps[0].docs} blog={day1.steps[0].blog} />
+                          <SectionButtons
+                            docs={day1.steps[0].docs}
+                            blog={day1.steps[0].blog}
+                            video={
+                              'https://www.youtube.com/watch?v=Q1Amk6iDlF8&ab_channel=Supabase'
+                            }
+                          />
                         </div>
                       </div>
                     )}
@@ -673,6 +687,18 @@ export default function launchweek() {
               </div>
             )}
           </div>
+        </SectionContainer>
+        <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24 mb-40">
+          {process.env.NEXT_PUBLIC_LW_STARTED && (
+            <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
+              <TicketContainer
+                supabase={supabase}
+                session={session}
+                defaultUserData={defaultUserData}
+                defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
+              />
+            </div>
+          )}
         </SectionContainer>
       </DefaultLayout>
     </>
