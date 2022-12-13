@@ -382,7 +382,7 @@ export default {
       `,
     },
     'rounded-pills': {
-      list: 'flex space-x-2',
+      list: 'flex flex-wrap gap-2',
       base: ` 
         relative 
         cursor-pointer 
