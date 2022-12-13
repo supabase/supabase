@@ -577,10 +577,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                34,
-                                30
-                              ]
+                              "children": [34, 30]
                             }
                           ],
                           "sources": [
@@ -796,16 +793,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            36
-          ]
+          "children": [36]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            41
-          ]
+          "children": [41]
         }
       ],
       "sources": [
@@ -927,16 +920,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            43
-          ]
+          "children": [43]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            46
-          ]
+          "children": [46]
         }
       ],
       "sources": [
@@ -1040,16 +1029,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            48
-          ]
+          "children": [48]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            51
-          ]
+          "children": [51]
         }
       ],
       "sources": [
@@ -1153,16 +1138,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            53
-          ]
+          "children": [53]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            56
-          ]
+          "children": [56]
         }
       ],
       "sources": [
@@ -1348,10 +1329,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                34,
-                30
-              ]
+              "children": [34, 30]
             }
           ],
           "sources": [
@@ -1396,21 +1374,12 @@
     {
       "title": "Classes",
       "kind": 128,
-      "children": [
-        1,
-        35,
-        42,
-        47,
-        52
-      ]
+      "children": [1, 35, 42, 47, 52]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
-      "children": [
-        28,
-        57
-      ]
+      "children": [28, 57]
     }
   ],
   "sources": [
