@@ -11,7 +11,7 @@ import { useTheme } from 'common/Providers'
 // import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { useMenuActiveRefId, useMenuLevelId } from '~/hooks/useMenuState'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
 const FunctionLink = ({
@@ -63,8 +63,6 @@ const Divider = () => {
 }
 
 interface INavigationMenuRefList {
-  currentLevel: string
-
   id: RefIdOptions
   lib: RefKeyOptions
   commonSections: any[] // to do type up
@@ -75,7 +73,6 @@ interface INavigationMenuRefList {
 }
 
 const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
-  currentLevel,
   id,
   lib,
   commonSections,
@@ -133,17 +130,22 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }).items.map((x) => x.id)
       : []
 
+  // console.log(filterIds)
+  // console.log(modifierIds)
+
+  const level = useMenuLevelId()
+
   return (
     <div
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        currentLevel === id && 'opacity-100 ml-0 delay-150 h-auto',
+        level === id && 'opacity-100 ml-0 delay-150 h-auto',
         // move menu back to margin-left
-        currentLevel === 'home' && 'ml-12',
+        level === 'home' && 'ml-12',
         // disabled
-        currentLevel !== 'home' && currentLevel !== id ? '-ml-8' : '',
-        currentLevel !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
+        level !== 'home' && level !== id ? '-ml-8' : '',
+        level !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
