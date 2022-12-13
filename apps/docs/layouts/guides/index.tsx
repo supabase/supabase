@@ -65,9 +65,7 @@ const Layout: FC<Props> = (props) => {
   }, [])
 
   useEffect(() => {
-    // setTimeout(function () {
     setActive(true)
-    // }, 150)
   }, [])
 
   const hasTableOfContents = tocList.length > 0
@@ -124,7 +122,7 @@ const Layout: FC<Props> = (props) => {
               'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
               'transition-all ease-out',
               'duration-100',
-              active ? 'opacity-100 left-0' : 'opacity-0 left-6',
+              active ? 'opacity-100' : 'opacity-0',
             ].join(' ')}
           >
             <div className="border-l">

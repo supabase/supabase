@@ -64,7 +64,7 @@ const Layout: FC<Props> = (props: Props) => {
         className={[
           'relative transition-all ease-out',
           'duration-150 ',
-          active ? 'opacity-100 left-0' : 'opacity-0 left-5',
+          active ? 'opacity-100' : 'opacity-0',
         ].join(' ')}
       >
         {/* <p className="text-brand-900 tracking-wider">Tutorials</p> */}
