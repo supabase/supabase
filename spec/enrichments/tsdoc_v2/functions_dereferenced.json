@@ -187,10 +187,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            8,
-                            7
-                          ]
+                          "children": [8, 7]
                         }
                       ]
                     }
@@ -671,26 +668,17 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            2
-          ]
+          "children": [2]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            15,
-            14,
-            13
-          ]
+          "children": [15, 14, 13]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [
-            23,
-            20
-          ]
+          "children": [23, 20]
         }
       ],
       "sources": [
@@ -1378,10 +1366,7 @@
       ],
       "type": {
         "type": "union",
-        "types": [
-          null,
-          null
-        ]
+        "types": [null, null]
       }
     }
   ],
