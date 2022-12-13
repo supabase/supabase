@@ -46,7 +46,7 @@ const EncryptionKeySelector: FC<Props> = ({
         >
           Create a new Encryption Key
         </Listbox.Option>
-        <Modal.Separator />
+        {keys.length > 0 && <Modal.Separator />}
         {keys.map((key) => (
           <Listbox.Option
             key={key.id}

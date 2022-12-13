@@ -537,9 +537,9 @@ module.exports = [
   },
 
   {
-    permanent: false,
-    source: '/docs/guides/platform',
-    destination: '/docs/guides/hosting/platform',
+    permanent: true,
+    source: '/docs/guides/hosting/platform',
+    destination: '/docs/guides/platform',
   },
   {
     permanent: false,
@@ -599,7 +599,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/supabase-client',
-    destination: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1331,7 +1331,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/client-libraries',
-    destination: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1594,5 +1594,10 @@ module.exports = [
     permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
 ]

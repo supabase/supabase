@@ -98,8 +98,7 @@ const SideNav = () => {
       case url.includes(`/docs/guides/storage`) && url:
         menuState.setMenuLevelId('storage')
         break
-      case url.includes(`/docs/guides/platform`) ||
-        (url.includes(`/docs/guides/hosting/platform`) && url):
+      case url.includes(`/docs/guides/platform`) && url:
         menuState.setMenuLevelId('platform')
         break
       case url.includes(`/docs/guides/resources`) && url:

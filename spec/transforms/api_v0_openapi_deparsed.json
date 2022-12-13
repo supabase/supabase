@@ -1078,17 +1078,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "max_rows": {
+                      "type": "integer"
+                    },
                     "db_schema": {
                       "type": "string"
-                    },
-                    "max_rows": {
-                      "type": "number"
                     },
                     "db_extra_search_path": {
                       "type": "string"
                     }
                   },
-                  "required": ["db_schema", "max_rows", "db_extra_search_path"]
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
                 }
               }
             }
@@ -1130,15 +1130,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "max_rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000
+                  },
                   "db_extra_search_path": {
                     "type": "string"
                   },
                   "db_schema": {
                     "type": "string"
-                  },
-                  "max_rows": {
-                    "type": "number",
-                    "maximum": 1000000
                   }
                 }
               }
@@ -1153,17 +1154,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "max_rows": {
+                      "type": "integer"
+                    },
                     "db_schema": {
                       "type": "string"
-                    },
-                    "max_rows": {
-                      "type": "number"
                     },
                     "db_extra_search_path": {
                       "type": "string"
                     }
                   },
-                  "required": ["db_schema", "max_rows", "db_extra_search_path"]
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
                 }
               }
             }
@@ -2396,30 +2397,31 @@
       "PostgrestConfigResponse": {
         "type": "object",
         "properties": {
+          "max_rows": {
+            "type": "integer"
+          },
           "db_schema": {
             "type": "string"
-          },
-          "max_rows": {
-            "type": "number"
           },
           "db_extra_search_path": {
             "type": "string"
           }
         },
-        "required": ["db_schema", "max_rows", "db_extra_search_path"]
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
       },
       "UpdatePostgrestConfigBody": {
         "type": "object",
         "properties": {
+          "max_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000
+          },
           "db_extra_search_path": {
             "type": "string"
           },
           "db_schema": {
             "type": "string"
-          },
-          "max_rows": {
-            "type": "number",
-            "maximum": 1000000
           }
         }
       },
