@@ -143,7 +143,7 @@ Let's imagine one of your users makes a request for a resized cat (kitten?) imag
 
 The cat image goes viral, and so now multiple users want to see the resized image.
 
-![Cache hit flow](/images/blog/launch-week-6/day-2-storage-resize/cache%20hit.jpg)
+![Cache hit flow](/images/blog/launch-week-6/day-2-storage-resize/cache-hit.png)
 
 1. The request hits our globally-distributed API Gateway. This gateway reads the image metadata from a global KV store.
 2. Using the Cache Key the Gateway tries to find a cached object in our CDN. Because this image has already been resized, it returns it directly from the cache.
@@ -154,7 +154,7 @@ To complete this architecture, we need to keep the global KV store (which stores
 
 Using our cat picture from above:
 
-![Cache refresh flow](/images/blog/launch-week-6/day-2-storage-resize/cache%20refresh.jpg)
+![Cache refresh flow](/images/blog/launch-week-6/day-2-storage-resize/cache-refresh.png)
 
 1. You update the cat picture to a dog picture. This triggers an `ObjectCreated:Put` event from the Supabase Storage server.
 2. A cache manager service subscribes to these events and updates the global metadata store with the new Etag. This takes around 60 seconds to propagate globally.
