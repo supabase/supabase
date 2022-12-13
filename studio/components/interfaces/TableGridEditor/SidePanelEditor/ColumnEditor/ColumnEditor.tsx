@@ -11,7 +11,7 @@ import {
   PostgresType,
 } from '@supabase/postgres-meta'
 
-import { useParams, useStore } from 'hooks'
+import { useFlag, useParams, useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnType from './ColumnType'
@@ -63,15 +63,15 @@ const ColumnEditor: FC<Props> = ({
 }) => {
   const { ref } = useParams()
   const { meta, vault } = useStore()
+  const isTCEEnabled = useFlag('transparentColumnEncryption')
 
   const isNewRecord = isUndefined(column)
   const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
+  const keys = vault.listKeys()
   const enumTypes = meta.types.list(
     (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
   )
-  const keys = vault.listKeys()
-  const defaultKey = keys.find((key) => key.name === 'default_vault_key') || keys[0]
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -86,7 +86,7 @@ const ColumnEditor: FC<Props> = ({
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? { ...generateColumnField(), keyId: defaultKey?.id }
+        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
         : generateColumnFieldFromPostgresColumn(column!, selectedTable)
       setColumnFields(columnFields)
     }
@@ -101,10 +101,6 @@ const ColumnEditor: FC<Props> = ({
     }
 
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
-    if (changes.format && changes.format !== 'text' && columnFields.isEncrypted) {
-      updatedColumnFields.isEncrypted = false
-    }
-
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
 
@@ -316,7 +312,7 @@ const ColumnEditor: FC<Props> = ({
           />
         </FormSectionContent>
       </FormSection>
-      {isNewRecord && (
+      {isNewRecord && isTCEEnabled && (
         <>
           <SidePanel.Separator />
           <FormSection
@@ -325,7 +321,8 @@ const ColumnEditor: FC<Props> = ({
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Toggle
                 label="Encrypt Column"
-                disabled={!isPgSodiumInstalled || columnFields.format !== 'text'}
+                error={errors?.isEncrypted}
+                disabled={!isPgSodiumInstalled}
                 // @ts-ignore
                 descriptionText={
                   <div className="space-y-2">

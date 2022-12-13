@@ -11,7 +11,7 @@ import { useTheme } from 'common/Providers'
 // import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { useMenuActiveRefId, useMenuLevelId } from '~/hooks/useMenuState'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
 const FunctionLink = ({
@@ -63,8 +63,6 @@ const Divider = () => {
 }
 
 interface INavigationMenuRefList {
-  currentLevel: string
-
   id: RefIdOptions
   lib: RefKeyOptions
   commonSections: any[] // to do type up
@@ -75,7 +73,6 @@ interface INavigationMenuRefList {
 }
 
 const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
-  currentLevel,
   id,
   lib,
   commonSections,
@@ -86,10 +83,9 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
 
   let sections = commonSections
 
-  // console.log('sections', sections)
-  if (!sections) console.error('no common sections imported')
+  const allowedKeys = allowedClientKeys
 
-  // console.log(id, 'sections in ref menu', sections)
+  if (!sections) console.error('no common sections imported')
 
   const menu = NavItems[id]
 
@@ -101,8 +97,6 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
     ? find(sections, { title: 'Auth' }).items
     : []
 
-  // console.log('databaseFunctions', databaseFunctions)
-
   const filterIds =
     databaseFunctions.length > 0
       ? find(databaseFunctions, {
@@ -110,9 +104,10 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }) &&
         find(databaseFunctions, {
           id: 'using-filters',
-        }).items.map((x) => x.id)
+        })
+          .items.filter((x) => allowedKeys.includes(x.id))
+          .map((x) => x.id)
       : []
-
   const modifierIds =
     databaseFunctions.length > 0
       ? find(databaseFunctions, {
@@ -120,7 +115,9 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }) &&
         find(databaseFunctions, {
           id: 'using-modifiers',
-        }).items.map((x) => x.id)
+        })
+          .items.filter((x) => allowedKeys.includes(x.id))
+          .map((x) => x.id)
       : []
 
   const authServerIds =
@@ -136,17 +133,19 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   // console.log(filterIds)
   // console.log(modifierIds)
 
+  const level = useMenuLevelId()
+
   return (
     <div
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        currentLevel === id && 'opacity-100 ml-0 delay-150 h-auto',
+        level === id && 'opacity-100 ml-0 delay-150 h-auto',
         // move menu back to margin-left
-        currentLevel === 'home' && 'ml-12',
+        level === 'home' && 'ml-12',
         // disabled
-        currentLevel !== 'home' && currentLevel !== id ? '-ml-8' : '',
-        currentLevel !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
+        level !== 'home' && level !== id ? '-ml-8' : '',
+        level !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
@@ -186,12 +185,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
             //
             // check if the link is allowed to be displayed
             function isFuncNotInLibraryOrVersion(id, type) {
-              if (
-                id &&
-                allowedClientKeys &&
-                !allowedClientKeys.includes(id) &&
-                type !== 'markdown'
-              ) {
+              if (id && allowedKeys && !allowedKeys.includes(id) && type !== 'markdown') {
                 /*
                  * Remove this menu link from side bar, as it does not exist for either
                  * this language, or for this lib version
@@ -212,8 +206,6 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
               const activeAccordianItem = useMenuActiveRefId()
               let active = false
 
-              // console.log('activeAccordianItem', activeAccordianItem)
-
               const isFilter =
                 filterIds && filterIds.length > 0 && filterIds.includes(activeAccordianItem)
               const isModifier =
@@ -223,44 +215,24 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                 authServerIds.length > 0 &&
                 authServerIds.includes(activeAccordianItem)
 
-              // console.log('isFilter', props.id, isFilter)
-              // console.log('isModifier', props.id, isModifier)
-
               if (
                 (isFilter && !isModifier && !isAuthServer && props.id === 'using-filters') ||
-                (activeAccordianItem === 'using-filters' &&
-                  !isModifier &&
-                  !isFilter &&
-                  props.id === 'using-filters')
+                (activeAccordianItem === 'using-filters' && props.id === 'using-filters')
               ) {
                 active = true
               } else if (
                 (isModifier && !isFilter && !isAuthServer && props.id === 'using-modifiers') ||
-                (activeAccordianItem === 'using-modifiers' &&
-                  !isFilter &&
-                  !isModifier &&
-                  props.id === 'using-modifiers')
+                (activeAccordianItem === 'using-modifiers' && props.id === 'using-modifiers')
               ) {
                 active = true
               } else if (
                 (isAuthServer && !isFilter && !isModifier && props.id === 'admin-api') ||
-                (activeAccordianItem === 'admin-api' &&
-                  !isFilter &&
-                  !isModifier &&
-                  !isAuthServer &&
-                  props.id === 'admin-api')
+                (activeAccordianItem === 'admin-api' && props.id === 'admin-api')
               ) {
                 active = true
               } else {
                 active = false
               }
-
-              // if (props.id === 'using-filters') {
-              //   console.log('using-filters', active)
-              // }
-              // if (props.id === 'using-modifiers') {
-              //   console.log('using-modifiers', active)
-              // }
 
               return (
                 <Accordion.Root
@@ -276,9 +248,11 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                       className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2"
                     >
                       {props.items &&
-                        props.items.map((item) => {
-                          return <FunctionLink {...item} library={lib} />
-                        })}
+                        props.items
+                          .filter((item) => allowedKeys.includes(item.id))
+                          .map((item) => {
+                            return <FunctionLink {...item} library={lib} />
+                          })}
                     </Accordion.Content>
                   </Accordion.Item>
                 </Accordion.Root>
@@ -303,7 +277,6 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
               )
             } else {
               // handle normal links
-
               return (
                 <>
                   <RenderLink {...fn} library={menu.title} />
@@ -316,35 +289,6 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
             }
           })}
         </ul>
-        {/* {menu.extras && (
-          <>
-            <Divider />{' '}
-            <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-2">
-              Resources
-            </span>
-          </>
-        )}
-        {menu.extras?.map((x) => {
-          return (
-            <div key={x.name}>
-              <li>
-                <Link href={`${x.href}`} passHref>
-                  <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
-                    {x.icon && (
-                      <Image
-                        alt={x.icon}
-                        width={20}
-                        height={20}
-                        src={`${router.basePath}${x.icon}`}
-                      />
-                    )}
-                    {x.name}
-                  </a>
-                </Link>
-              </li>
-            </div>
-          )
-        })} */}
       </div>
     </div>
   )

@@ -36,7 +36,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
        * handle "scroll to top" behaviour on route change
        */
       if (document) {
-        console.log('url', url)
         // do not scroll to top for reference docs
         if (!url.includes('reference/')) {
           // scroll container div to top
@@ -45,10 +44,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           if (container) container.scrollTop = 0
         }
       }
-      menuState.setMenuMobileOpen(false)
     }
 
-    function handlePagrScroll() {}
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
