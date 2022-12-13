@@ -1082,10 +1082,26 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-            final String signedUrl = await supabase
-              .storage
-              .from('avatars')
-              .createSignedUrl('avatar1.png', 60);
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl('avatar1.png', 60);
+          ```
+      - id: create-signed-url-with-transform
+        name: With transform
+        code: |
+          ```dart
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl(
+              'avatar1.png',
+              60,
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
           ```
 
   - id: from-get-public-url
@@ -1103,10 +1119,26 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-            final String publicUrl = supabase
-              .storage
-              .from('public-bucket')
-              .getPublicUrl('avatar1.png');
+          final String publicUrl = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('avatar1.png');
+          ```
+      - id: returns-the-url-for-an-asset-in-a-public-bucket-with-transform
+        name: With transform
+        isSpotlight: true
+        code: |
+          ```dart
+          final String publicUrl = await supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl(
+              'avatar1.png',
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
           ```
 
   - id: from-download
@@ -1127,6 +1159,22 @@ functions:
             .storage
             .from('avatars')
             .download('avatar1.png');
+          ```
+      - id: download-file-with-transform
+        name: With transform
+        isSpotlight: true
+        code: |
+          ```dart
+          final Uint8List file = await supabase
+            .storage
+            .from('avatars')
+            .download(
+              'avatar1.png',
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
           ```
 
   - id: from-remove
@@ -1362,7 +1410,7 @@ functions:
             .from('users')
             .select()
             .eq('address->postcode', 90210);
-          ```        
+          ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |

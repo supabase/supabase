@@ -460,7 +460,8 @@
                                           "type": {
                                             "type": "reference",
                                             "id": 78,
-                                            "name": "SchemaName"
+                                            "name": "SchemaName",
+                                            "dereferenced": {}
                                           }
                                         }
                                       ],
@@ -526,7 +527,31 @@
                                           "type": {
                                             "type": "reference",
                                             "id": 60,
-                                            "name": "Fetch"
+                                            "name": "Fetch",
+                                            "dereferenced": {
+                                              "id": 60,
+                                              "name": "Fetch",
+                                              "kind": 4194304,
+                                              "kindString": "Type alias",
+                                              "flags": {},
+                                              "sources": [
+                                                {
+                                                  "fileName": "src/lib/types.ts",
+                                                  "line": 8,
+                                                  "character": 12
+                                                }
+                                              ],
+                                              "type": {
+                                                "type": "query",
+                                                "queryType": {
+                                                  "type": "reference",
+                                                  "id": 18,
+                                                  "qualifiedName": "fetch",
+                                                  "package": "typescript",
+                                                  "name": "fetch"
+                                                }
+                                              }
+                                            }
                                           }
                                         },
                                         {
@@ -2750,7 +2775,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -2816,7 +2842,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -3829,7 +3879,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -3895,7 +3946,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -4253,7 +4328,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -4319,7 +4395,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -5608,7 +5708,8 @@
                           "type": {
                             "type": "reference",
                             "id": 78,
-                            "name": "SchemaName"
+                            "name": "SchemaName",
+                            "dereferenced": {}
                           }
                         }
                       ],
@@ -5674,7 +5775,31 @@
                           "type": {
                             "type": "reference",
                             "id": 60,
-                            "name": "Fetch"
+                            "name": "Fetch",
+                            "dereferenced": {
+                              "id": 60,
+                              "name": "Fetch",
+                              "kind": 4194304,
+                              "kindString": "Type alias",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 8,
+                                  "character": 12
+                                }
+                              ],
+                              "type": {
+                                "type": "query",
+                                "queryType": {
+                                  "type": "reference",
+                                  "id": 18,
+                                  "qualifiedName": "fetch",
+                                  "package": "typescript",
+                                  "name": "fetch"
+                                }
+                              }
+                            }
                           }
                         },
                         {
