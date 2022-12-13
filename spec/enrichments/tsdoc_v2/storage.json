@@ -2642,7 +2642,7 @@
                 "isOptional": true
               },
               "comment": {
-                "shortText": "The height of the image in pixels. If the width is not specified, the image will be resized to the height while maintaining the aspect ratio."
+                "shortText": "The height of the image in pixels."
               },
               "sources": [
                 {
@@ -2665,7 +2665,7 @@
                 "isOptional": true
               },
               "comment": {
-                "shortText": "The resize mode can be cover, contain or fill. Default is cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+                "shortText": "The resize mode can be cover, contain or fill. Defaults to cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
               },
               "sources": [
                 {
@@ -2701,7 +2701,7 @@
                 "isOptional": true
               },
               "comment": {
-                "shortText": "The width of the image in pixels. If the height is not specified, the image will be resized to the width while maintaining the aspect ratio."
+                "shortText": "The width of the image in pixels."
               },
               "sources": [
                 {
@@ -4611,7 +4611,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 269,
+                  "line": 270,
                   "character": 8
                 }
               ],
@@ -4680,12 +4680,12 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.\n"
+                                "shortText": "triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageFileApi.ts",
-                                  "line": 272,
+                                  "line": 273,
                                   "character": 16
                                 }
                               ],
@@ -4711,10 +4711,13 @@
                               "flags": {
                                 "isOptional": true
                               },
+                              "comment": {
+                                "shortText": "Transform the asset before serving it to the client.\n"
+                              },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageFileApi.ts",
-                                  "line": 272,
+                                  "line": 273,
                                   "character": 45
                                 }
                               ],
@@ -4760,7 +4763,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 275,
+                                      "line": 276,
                                       "character": 8
                                     }
                                   ],
@@ -4782,7 +4785,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageFileApi.ts",
-                                              "line": 275,
+                                              "line": 276,
                                               "character": 16
                                             }
                                           ],
@@ -4811,7 +4814,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 276,
+                                      "line": 277,
                                       "character": 8
                                     }
                                   ],
@@ -4848,7 +4851,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 279,
+                                      "line": 280,
                                       "character": 8
                                     }
                                   ],
@@ -4866,7 +4869,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 280,
+                                      "line": 281,
                                       "character": 8
                                     }
                                   ],
@@ -4905,7 +4908,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 314,
+                  "line": 315,
                   "character": 8
                 }
               ],
@@ -4980,7 +4983,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageFileApi.ts",
-                                  "line": 317,
+                                  "line": 318,
                                   "character": 16
                                 }
                               ],
@@ -5034,7 +5037,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 320,
+                                      "line": 321,
                                       "character": 8
                                     }
                                   ],
@@ -5058,7 +5061,7 @@
                                             "sources": [
                                               {
                                                 "fileName": "src/packages/StorageFileApi.ts",
-                                                "line": 320,
+                                                "line": 321,
                                                 "character": 16
                                               }
                                             ],
@@ -5085,7 +5088,7 @@
                                             "sources": [
                                               {
                                                 "fileName": "src/packages/StorageFileApi.ts",
-                                                "line": 320,
+                                                "line": 321,
                                                 "character": 38
                                               }
                                             ],
@@ -5112,7 +5115,7 @@
                                             "sources": [
                                               {
                                                 "fileName": "src/packages/StorageFileApi.ts",
-                                                "line": 320,
+                                                "line": 321,
                                                 "character": 59
                                               }
                                             ],
@@ -5142,7 +5145,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 321,
+                                      "line": 322,
                                       "character": 8
                                     }
                                   ],
@@ -5179,7 +5182,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 324,
+                                      "line": 325,
                                       "character": 8
                                     }
                                   ],
@@ -5197,7 +5200,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 325,
+                                      "line": 326,
                                       "character": 8
                                     }
                                   ],
@@ -5236,7 +5239,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 363,
+                  "line": 364,
                   "character": 8
                 }
               ],
@@ -5290,10 +5293,13 @@
                               "flags": {
                                 "isOptional": true
                               },
+                              "comment": {
+                                "shortText": "Transform the asset before serving it to the client.\n"
+                              },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageFileApi.ts",
-                                  "line": 365,
+                                  "line": 366,
                                   "character": 16
                                 }
                               ],
@@ -5339,7 +5345,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 368,
+                                      "line": 369,
                                       "character": 8
                                     }
                                   ],
@@ -5359,7 +5365,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 369,
+                                      "line": 370,
                                       "character": 8
                                     }
                                   ],
@@ -5396,7 +5402,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 372,
+                                      "line": 373,
                                       "character": 8
                                     }
                                   ],
@@ -5414,7 +5420,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 373,
+                                      "line": 374,
                                       "character": 8
                                     }
                                   ],
@@ -5453,7 +5459,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 406,
+                  "line": 407,
                   "character": 2
                 }
               ],
@@ -5508,12 +5514,12 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename."
+                                "shortText": "Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageFileApi.ts",
-                                  "line": 408,
+                                  "line": 409,
                                   "character": 16
                                 }
                               ],
@@ -5540,12 +5546,12 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "adds image transformations parameters to the generated url\n"
+                                "shortText": "Transform the asset before serving it to the client.\n"
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageFileApi.ts",
-                                  "line": 408,
+                                  "line": 409,
                                   "character": 45
                                 }
                               ],
@@ -5585,7 +5591,7 @@
                           "sources": [
                             {
                               "fileName": "src/packages/StorageFileApi.ts",
-                              "line": 409,
+                              "line": 410,
                               "character": 7
                             }
                           ],
@@ -5607,7 +5613,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 409,
+                                      "line": 410,
                                       "character": 15
                                     }
                                   ],
@@ -5649,7 +5655,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 540,
+                  "line": 541,
                   "character": 8
                 }
               ],
@@ -5733,7 +5739,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 546,
+                                      "line": 547,
                                       "character": 8
                                     }
                                   ],
@@ -5755,7 +5761,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 547,
+                                      "line": 548,
                                       "character": 8
                                     }
                                   ],
@@ -5792,7 +5798,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 550,
+                                      "line": 551,
                                       "character": 8
                                     }
                                   ],
@@ -5810,7 +5816,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 551,
+                                      "line": 552,
                                       "character": 8
                                     }
                                   ],
@@ -6062,7 +6068,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 444,
+                  "line": 445,
                   "character": 8
                 }
               ],
@@ -6119,7 +6125,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 448,
+                                      "line": 449,
                                       "character": 8
                                     }
                                   ],
@@ -6141,7 +6147,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 449,
+                                      "line": 450,
                                       "character": 8
                                     }
                                   ],
@@ -6178,7 +6184,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 452,
+                                      "line": 453,
                                       "character": 8
                                     }
                                   ],
@@ -6196,7 +6202,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 453,
+                                      "line": 454,
                                       "character": 8
                                     }
                                   ],
