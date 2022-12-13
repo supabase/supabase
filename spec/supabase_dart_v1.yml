@@ -1410,7 +1410,7 @@ functions:
             .from('users')
             .select()
             .eq('address->postcode', 90210);
-          ```        
+          ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |
