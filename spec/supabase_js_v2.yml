@@ -7404,6 +7404,33 @@ functions:
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60)
           ```
+      - id: create-signed-url-with-transformations
+        name: Create a signed URL for an asset with transformations
+        isSpotlight: true
+        code: |
+          ```js
+          const { data } = supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl('folder/avatar1.png', 60, {
+              transform: {
+                width: 100,
+                height: 100,
+              }
+            })
+          ```
+      - id: create-signed-url-with-download
+        name: Create a signed URL which triggers the download of the asset
+        isSpotlight: true
+        code: |
+          ```js
+          const { data } = supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl('folder/avatar1.png', 60, {
+              download: true,
+            })
+          ```
 
   - id: from-create-signed-urls
     title: from.createSignedUrls()
@@ -7445,6 +7472,33 @@ functions:
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
           ```
+      - id: transform-asset-in-public-bucket
+        name: Returns the URL for an asset in a public bucket with transformations
+        isSpotlight: true
+        code: |
+          ```js
+          const { data } = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('folder/avatar1.png', {
+              transform: {
+                width: 100,
+                height: 100,
+              }
+            })
+          ```
+      - id: download-asset-in-public-bucket
+        name: Returns the URL which triggers the download of an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```js
+          const { data } = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('folder/avatar1.png', {
+              download: true,
+            })
+          ```
 
   - id: from-download
     title: from.download()
@@ -7464,6 +7518,21 @@ functions:
             .storage
             .from('avatars')
             .download('folder/avatar1.png')
+          ```
+      - id: download-file-with-transformations
+        name: Download file with transformations
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .download('folder/avatar1.png', {
+              transform: {
+                width: 100,
+                height: 100,
+              }
+            })
           ```
 
   - id: from-remove

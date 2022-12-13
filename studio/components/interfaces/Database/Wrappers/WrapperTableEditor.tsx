@@ -3,7 +3,6 @@ import { Form, IconDatabase, Input, Listbox, SidePanel, Modal, IconPlus } from '
 import { useStore } from 'hooks'
 import { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
-import MultiSelect from 'components/ui/MultiSelect'
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 
 export type WrapperTableEditorProps = {
@@ -201,25 +200,44 @@ const TableForm = ({
             {requiredOptions.map((option) => (
               <Option key={option.name} option={option} />
             ))}
-            <MultiSelect
-              label="Columns"
-              options={table.availableColumns.map((column) => {
-                return {
-                  id: column.name,
-                  value: column.name,
-                  name: column.name,
-                  description: column.type,
-                  disabled: false,
-                }
-              })}
-              error={errors.columns}
-              value={values.columns}
-              placeholder="Select at least one column"
-              searchPlaceholder="Search for a column"
-              onChange={(columns) => {
-                resetForm({ values: { ...values, columns } })
-              }}
-            />
+
+            <div className="form-group">
+              <label className="!w-full">Select the columns to be added to your table</label>
+              <div className="flex flex-wrap gap-2">
+                {table.availableColumns.map((column) => {
+                  const isSelected = values.columns.includes(column.name)
+                  return (
+                    <div
+                      key={column.name}
+                      className={[
+                        'px-2 py-1 bg-scale-500 rounded cursor-pointer transition',
+                        `${isSelected ? 'bg-brand-800' : 'hover:bg-scale-700'}`,
+                      ].join(' ')}
+                      onClick={() => {
+                        if (isSelected) {
+                          resetForm({
+                            values: {
+                              ...values,
+                              columns: values.columns.filter((x: string) => x !== column.name),
+                            },
+                          })
+                        } else {
+                          resetForm({
+                            values: { ...values, columns: values.columns.concat([column.name]) },
+                          })
+                        }
+                      }}
+                    >
+                      <p className="text-sm">{column.name}</p>
+                    </div>
+                  )
+                })}
+              </div>
+              {errors.columns && (
+                <span className="text-red-900 text-sm mt-2">{errors.columns}</span>
+              )}
+            </div>
+
             {optionalOptions.map((option) => (
               <Option key={option.name} option={option} />
             ))}
