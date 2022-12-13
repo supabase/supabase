@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { memo, useEffect } from 'react'
-import { menuState } from '~/hooks/useMenuState'
+import { menuState, useMenuLevelId } from '~/hooks/useMenuState'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 // @ts-expect-error
@@ -153,20 +153,33 @@ const SideNav = () => {
     }
   }, [router.events])
 
+  const level = useMenuLevelId()
+
+  const isHomeActive = 'home' === level
+  const isGettingStartedActive = 'gettingstarted' === level
+  const isDatabaseActive = 'database' === level
+  const isFunctionsActive = 'functions' === level
+  const isRealtimeActive = 'realtime' === level
+  const isStorageActive = 'storage' === level
+  const isPlatformActive = 'platform' === level
+  const isResourcesActive = 'resources' === level
+  const isIntegrationsActive = 'integrations' === level
+  const isReferenceActive = 'reference' === level
+
   return (
     <div className="flex relative">
       {/* // main menu */}
-      <NavigationMenuHome />
-      <NavigationMenuGuideList id={'gettingstarted'} />
-      <NavigationMenuGuideList id={'database'} />
-      <NavigationMenuGuideList id={'auth'} />
-      <NavigationMenuGuideList id={'functions'} />
-      <NavigationMenuGuideList id={'realtime'} />
-      <NavigationMenuGuideList id={'storage'} />
-      <NavigationMenuGuideList id={'platform'} />
-      <NavigationMenuGuideList id={'resources'} />
-      <NavigationMenuGuideList id={'integrations'} />
-      <NavigationMenuGuideList id={'reference'} />
+      <NavigationMenuHome active={isHomeActive} />
+      <NavigationMenuGuideList id={'gettingstarted'} active={isGettingStartedActive} />
+      <NavigationMenuGuideList id={'database'} active={isDatabaseActive} />
+      <NavigationMenuGuideList id={'auth'} active={isDatabaseActive} />
+      <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
+      <NavigationMenuGuideList id={'realtime'} active={isRealtimeActive} />
+      <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
+      <NavigationMenuGuideList id={'platform'} active={isPlatformActive} />
+      <NavigationMenuGuideList id={'resources'} active={isResourcesActive} />
+      <NavigationMenuGuideList id={'integrations'} active={isIntegrationsActive} />
+      <NavigationMenuGuideList id={'reference'} active={isReferenceActive} />
       {/* // Client Libs */}
       <NavigationMenuRefList
         key={'reference-js-menu'}

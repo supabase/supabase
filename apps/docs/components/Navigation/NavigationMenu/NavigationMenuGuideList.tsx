@@ -1,31 +1,26 @@
-import * as Accordion from '@radix-ui/react-accordion'
 import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
-import { useMenuLevelId } from '~/hooks/useMenuState'
 import * as NavItems from './NavigationMenu.constants'
+import * as Accordion from '@radix-ui/react-accordion'
 
 interface Props {
   id: string
-  setMenuLevelId?: any
+  active: boolean
 }
-const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ id, active }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
   const menu = NavItems[id]
 
-  //console.log(id, 'url is:', menu.url)
-
   // get url
   const url = router.asPath
   // remove the end of the url if a deep link
   const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
-
-  const level = useMenuLevelId()
 
   return (
     <Accordion.Root
@@ -36,12 +31,12 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        level === id && 'opacity-100 ml-0 delay-150',
-        level === 'home' && 'ml-12',
+        active && 'opacity-100 ml-0 delay-150',
+        // level === 'home' && 'ml-12',
 
         // disabled
-        level !== 'home' && level !== id ? '-ml-8' : '',
-        level !== id ? 'opacity-0 invisible absolute' : '',
+        // level !== 'home' && level !== id ? '-ml-8' : '',
+        active ? 'opacity-0 invisible absolute' : '',
       ].join(' ')}
     >
       <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
@@ -83,7 +78,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                     : 'hover:text-brand-900 text-scale-1200',
                 ].join(' ')}
               >
-                {menu.title ?? level}
+                {menu.title ?? id}
               </span>
             </div>
           </a>
@@ -228,4 +223,4 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
   )
 }
 
-export default NavigationMenuGuideList
+export default React.memo(NavigationMenuGuideList)
