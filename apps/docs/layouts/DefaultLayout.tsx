@@ -1,11 +1,8 @@
 import { MDXProvider } from '@mdx-js/react'
 import Head from 'next/head'
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import components from '~/components'
-import Footer from '~/components/Footer'
-import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
-import NavBar from '~/components/Navigation/NavBar'
 
 interface Props {
   meta: { title: string; description?: string; hide_table_of_contents?: boolean; video?: string }
@@ -15,34 +12,6 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props: Props) => {
-  // const contentString = renderToString(props.children)
-
-  const [active, setActive] = useState(false)
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-    }
-  }, [])
-
-  useEffect(() => {
-    setTimeout(function () {
-      setActive(true)
-    }, 150)
-  }, [])
-
-  // const contentString = renderToString(props.children)
-
-  // const content = serialize(contentString || '')
-
-  // console.log('contentString', contentString)
-
-  // const _toc = toc('#hello world', { maxdepth: 1, firsth1: false })
-
   const hasTableOfContents =
     props.toc !== undefined &&
     props.toc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
@@ -60,13 +29,7 @@ const Layout: FC<Props> = (props: Props) => {
         <meta property="og:title" content={props.meta?.title} />
       </Head>
 
-      <div
-        className={[
-          'relative transition-all ease-out',
-          'duration-150 ',
-          active ? 'opacity-100' : 'opacity-0',
-        ].join(' ')}
-      >
+      <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
         {/* <p className="text-brand-900 tracking-wider">Tutorials</p> */}
         <article className="prose dark:prose-dar max-w-none">
           <h1>{props.meta.title}</h1>
