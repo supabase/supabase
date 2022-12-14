@@ -23,6 +23,8 @@ We're releasing Wrappers today in Alpha, with support for [Firebase](https://sup
 
 Let's step through a full example using the Stripe Wrapper.
 
+![FDW](/images/blog/launch-week-6/wrappers/stripe-fdw.png)
+
 ### Connecting to Stripe
 
 First, let's give your Postgres database some authentication details to access your Stripe account:
@@ -39,13 +41,11 @@ Now we can map your Stripe data to Foreign Tables, which are just like normal ta
 
 ```sql
 -- Create a foreign table for your Stripe customers
-create foreign table customers (
+create foreign table products (
   id text,
-  email text,
   name text,
   description text,
-  created timestamp,
-  attrs jsonb
+  default_price text
 )
 server my_stripe_server
 options (
@@ -61,7 +61,7 @@ After setting up your foreign table, you can query you Stripe customers directly
 ```sql
 -- Fetch all your stripe customers in Postgres
 select *
-from customers
+from products
 limit 10;
 ```
 
@@ -76,8 +76,8 @@ const SUPABASE_KEY = 'public-anon-key'
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 const { data: stripeCustomers, error } = supabase
-  .from('customers')
-  .select('id, email, name')
+  .from('products')
+  .select('id, name, description, default_price')
   .limit(10)
 ```
 
@@ -176,7 +176,7 @@ On-demand ETL is a strong compliment for current ETL practices, and another tool
 
 In a recent Software Engineering [episode](https://podcasts.apple.com/us/podcast/software-engineering-daily/id1019576853?i=1000580384354) Andy Pavlo (database Professor at Carnegie Mellon and Co-Founder of OtterTune), explored the future between “better databases” and “better interfaces” [00:37:18]:
 
-<Quote img="caryn-marooney.jpeg" caption="Andy Pavlo">
+<Quote img="andy-pavlo.jpeg" caption="Andy Pavlo">
 
 Specialized engines are always going to outperform general-purpose ones. The question is whether
 the specialized engine is going to have such a significant difference in performance that it can
@@ -201,30 +201,53 @@ The FDW interface also future-proofs Postgres. Instead of keeping up with the la
 
 ## Developing Wrappers
 
-While Postgres FDW's have been around
-
 Postgres has a builtin “Postgres FDW” allows querying one Postgres database from another. We've extended this functionality to support a variety of data sources, from Data Warehouses to APIs.
 
-This release includes two initial wrappers: Stripe and Firebase, with several more [under development](https://github.com/supabase/wrappers/tree/main/wrappers/src/fdw) including Clickhouse, BigQuery, and Airtable. The wrappers are all read-only for now, but two-way operations are under development too.
+This release includes two initial wrappers: Stripe and Firebase, with several more [under development](https://github.com/supabase/wrappers/tree/main/wrappers/src/fdw) including Clickhouse, BigQuery, and Airtable.
 
-Wrappers extends the excellent [pgx](https://github.com/tcdi/pgx) framework with FDW support.
+| Integration | Platform | Self-hosted | select | update | delete | truncate |
+| ----------- | -------- | ----------- | ------ | ------ | ------ | -------- |
+| Airtable    | 🚧       | ✅          | ✅     | 🚧     | 🚧     | 🚧       |
+| BigQuery    | 🚧       | ✅          | ✅     | ✅     | ✅     | ✅       |
+| ClickHouse  | 🚧       | ✅          | ✅     | ✅     | ✅     | ✅       |
+| Firebase    | ✅       | ✅          | ✅     | 🚧     | 🚧     | 🚧       |
+| Postgres    | 🚧       | ✅          | ✅     | ✅     | ✅     | ✅       |
+| Stripe      | ✅       | ✅          | ✅     | 🚧     | 🚧     | 🚧       |
 
-It is very similar to [Steampipe](https://steampipe.io/) or [Multicorn](https://multicorn.org/). We opted to develop our own framework for several reasons:
+Wrappers used [pgx](https://github.com/tcdi/pgx), extending it with FDW support. pgx is a Postgres extension framework written in Rust. Wrappers is very similar to [Steampipe](https://steampipe.io/) or [Multicorn](https://multicorn.org/). We opted to develop our own framework for several reasons:
 
 - The current state of FDWs is in disarray. It's hard to know which FDWs are supported and functional. We think there is a benefit to colocating all FDWs in a single repository using modern tooling. This makes contributing simpler and maintenance faster.
 - Wrappers has async support, which enables the development of RESTful API-based FDWs, like Stripe.
 - It's written in Rust, which provides reliable performance, strong typing, data security, and “push down” is supported through the framework.
 
-## Limitations
+## Supported types and Push Down
 
-Wrappers is still under heavy development. A link to the current limitations can be found here.
+Wrappers [supports](https://github.com/supabase/wrappers/blob/83887dcc2ddcf972ca1b1eec4a598cd7bff947de/supabase-wrappers/src/interface.rs#L11) a variety of types, including:
 
-Wrappers currently supports `integer`, `text` and `boolean` types, but we're adding more data types support. Pushdown is also supported as the target columns and query conditions are passed through.
+- `bool`
+- `i8`
+- `i16`
+- `f32`
+- `i32`
+- `f64`
+- `i64`
+- `String`
+- `Date`
+- `Timestamp`
+- `JsonB`
 
-## Beta Status
+Foreign Data Wrappers also have a concept of "push down". This means that the FDW can push down the query to the remote data source. This is useful for performance reasons, as the remote data source can often perform the query more efficiently than Postgres. Push down is also useful for security reasons, as the remote data source can enforce access control.
 
-- TODO
-  - Status of the wrappers
-  - Roadmap
-  - Early access
-  - Resources
+Limited push-down support has been added as a Proof of Concept, but this will be a key focus of Wrappers.
+
+You can follow development off all Wrappers in the offiical [GitHub Repo](https://github.com/supabase/wrappers).
+
+## Next Steps
+
+We're excited to see what the community does with Wrappers. We're hoping that Wrappers will help to accelerate the adoption of Postgres as a data hub.
+
+If you're interested in getting involved or building your own Wrapper, don't hesitage to jump into the code and start developing with us.
+
+- Wrappers GitHub: [thub.com/supabase/wrapper](https://github.com/supabase/wrappers)
+- Docs: [supabase.github.io/wrappers/](https://supabase.github.io/wrappers/)
+- Supabase Launch Week: [supabase.com/launch-week](https://supabase.com/launch-week)
