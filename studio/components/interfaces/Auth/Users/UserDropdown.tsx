@@ -180,6 +180,10 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
                   Remove MFA factors
                 </Dropdown.Item>
               </Tooltip.Trigger>
+              {/* 
+                [Joshen] Deleting MFA factors should be different ABAC perms i think
+                 need to double check with KM / anyone familiar with ABAC 
+              */}
               {!canRemoveUser && (
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
