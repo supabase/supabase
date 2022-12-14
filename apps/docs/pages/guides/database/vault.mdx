@@ -1,13 +1,15 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'vault',
   title: 'Vault',
   description: 'Secrets Management and Data Encryption.',
-  sidebar_label: 'Overview',
 }
 
 Supabase Vault provides two important pieces of functionality:
 
 - Secret Management: A pre-configured table where you can store secrets securely by encrypting them when they are written to disk.
 - Data Encryption: protect your sensitive data by using encryption on your own data columns in a flexible way.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

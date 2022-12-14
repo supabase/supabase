@@ -1,10 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'vault-data-encryption',
   title: 'Data Encryption',
   description: 'Securely encrypting your data to prevent data leaks.',
-  sidebar_label: 'Data Encryption',
 }
 
 Supabase provides a secure and convenient way to encrypt `text` data in your tables. Data is encrypted “at rest”, so it will not leak into logs and database backups.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
