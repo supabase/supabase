@@ -377,6 +377,7 @@ export default function launchweek() {
                               layout="fill"
                               objectFit="cover"
                               quality={100}
+                              priority
                             />
                           </div>
                           <div className="absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover:opacity-100 duration-500 transition-all">
