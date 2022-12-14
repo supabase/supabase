@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber, Select } from 'ui'
+import { Button, Form, Input, InputNumber, Listbox } from 'ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
 import { SupabaseClient } from '~/lib/supabase'
@@ -71,18 +71,18 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
           {({ isSubmitting }: any) => (
             <div className="flex flex-col space-y-4">
               <div>
-                <Select
+                <Listbox
                   id="type"
                   name="type"
                   className="font-sans"
                   label="What type of partner are you?"
                   layout="vertical"
                 >
-                  <Select.Option value="expert" selected={true}>
+                  <Listbox.Option label="Expert (Agency &amp; Consulting)" value="expert">
                     Expert (Agency &amp; Consulting)
-                  </Select.Option>
-                  <Select.Option value="technology">Technology</Select.Option>
-                </Select>
+                  </Listbox.Option>
+                  <Listbox.Option label="Technology" value="technology">Technology</Listbox.Option>
+                </Listbox>
               </div>
 
               <div className="flex space-x-2 sm:space-x-4">
@@ -162,18 +162,18 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
               </div>
 
               <div>
-                <Select
+                <Listbox
                   label="Country / Main Timezone"
                   id="country"
                   name="country"
                   layout="vertical"
                 >
                   {countries.map(({ code, name }: any, i: number) => (
-                    <Select.Option key={i} value={code}>
+                    <Listbox.Option key={i} label={name} value={code}>
                       {name}
-                    </Select.Option>
+                    </Listbox.Option>
                   ))}
-                </Select>
+                </Listbox>
               </div>
 
               <div className="col-span-2">
