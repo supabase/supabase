@@ -1,7 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'sso-with-okta',
   title: 'Set Up SSO with Okta',
   description: 'Configure single sign-on with Okta.',
 }
@@ -11,22 +10,22 @@ Supabase supports single sign-on (SSO) using Okta.
 ## Step 1: Choose Create App Integration in the Applications dashboard [#create-app-integration]
 
 Navigate to the Applications dashboard of the Okta admin console. Choose the
-*Create App Integration* button from the toolbar.
+_Create App Integration_ button from the toolbar.
 
 ![Okta dashboard: Create App Integration
 button](/docs/img/sso-okta-step-01.png)
 
 ## Step 2: Choose SAML 2.0 in the app integration dialog [#create-saml-app]
 
-Supabase supports the SAML 2.0 SSO protocol. Choose it from the *Create a new
-app integration* dialog.
+Supabase supports the SAML 2.0 SSO protocol. Choose it from the _Create a new
+app integration_ dialog.
 
 ![Okta dashboard: Create new app integration dialog](/docs/img/sso-okta-step-02.png)
 
 ## Step 3: Fill out General Settings [#add-general-settings]
 
 The information you enter here is for visibility into your Okta applications
-menu.  You can choose any values you like. `Supabase` as a name works well for
+menu. You can choose any values you like. `Supabase` as a name works well for
 most use cases.
 
 ![Okta dashboard: Create SAML Integration
@@ -38,15 +37,15 @@ These settings let Supabase use SAML 2.0 properly with your Okta application.
 Make sure you enter this information exactly as shown on in this table and
 screenshot.
 
-| Setting | Value |
-| ------- | ----- |
-| Single sign-on URL | `https://app.supabase.com/auth/v1/sso/saml/acs` |
-| Use this for Recipient URL and Destination URL |✔️ |
-| Audience URI (SP Entity ID) | `https://app.supabase.com/auth/v1/sso/saml/metadata` |
-| Default RelayState | `https://app.supabase.com` |
-| Name ID format | EmailAddress |
-| Application username | Email |
-| Update application username on | Create and update |
+| Setting                                        | Value                                                |
+| ---------------------------------------------- | ---------------------------------------------------- |
+| Single sign-on URL                             | `https://app.supabase.com/auth/v1/sso/saml/acs`      |
+| Use this for Recipient URL and Destination URL | ✔️                                                   |
+| Audience URI (SP Entity ID)                    | `https://app.supabase.com/auth/v1/sso/saml/metadata` |
+| Default RelayState                             | `https://app.supabase.com`                           |
+| Name ID format                                 | EmailAddress                                         |
+| Application username                           | Email                                                |
+| Update application username on                 | Create and update                                    |
 
 ![Okta dashboard: Create SAML Integration
 wizard, Configure SAML step](/docs/img/sso-okta-step-04.png)
@@ -70,10 +69,10 @@ screen](/docs/img/sso-okta-step-05.png)
 Supabase needs to finalize enabling single sign-on with your Okta
 application.
 
-To do this scroll down to the *SAML Signing Certificates* section on the *Sign
-On* tab of the *Supabase* application. Pick the the *SHA-2* row with an
-*Active* status. Click on the *Actions* dropdown button and then on the *View
-IdP Metadata*. 
+To do this scroll down to the _SAML Signing Certificates_ section on the _Sign
+On_ tab of the _Supabase_ application. Pick the the _SHA-2_ row with an
+_Active_ status. Click on the _Actions_ dropdown button and then on the _View
+IdP Metadata_.
 
 This will open up the SAML 2.0 Metadata XML file in a new tab in your browser.
 Copy this URL and send it to your support contact and await further

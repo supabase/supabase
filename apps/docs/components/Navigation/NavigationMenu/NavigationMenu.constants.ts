@@ -497,7 +497,7 @@ export const platform = {
         },
         { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure', items: [] },
         {
-          name: 'SSO with Google Workspaces',
+          name: 'SSO with Google Workspace',
           url: '/guides/platform/sso/gsuite',
           items: [],
         },
