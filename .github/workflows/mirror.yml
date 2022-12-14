@@ -1,10 +1,15 @@
 name: Mirror Image
 
 on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       version:
-        description: "Image tag"
+        description: 'Image tag'
         required: true
         type: string
 
