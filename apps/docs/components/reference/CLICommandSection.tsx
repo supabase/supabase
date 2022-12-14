@@ -1,3 +1,4 @@
+import { IconChevronRight } from '~/../../packages/ui'
 // @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -80,13 +81,19 @@ const CliCommandSection = (props) => {
                       )} */}
 
             {command.subcommands.length > 0 && (
-              <div className="">
-                <h3 className="text-sm text-scale-1200 mb-3">Available Commands</h3>
+              <div className="mb-3">
+                <h3 className="text-lg text-scale-1200 mb-3">Available Commands</h3>
                 <ul>
                   {command.subcommands.map((subcommand) => (
-                    <li key={subcommand}>
-                      <a href={`#${subcommand}`} className="text-scale-1200">
-                        <CodeBlock language="bash">{subcommand}</CodeBlock>
+                    <li key={subcommand} className="flex items-center gap-3">
+                      <div className="text-scale-900">
+                        <IconChevronRight size={14} strokeWidth={2} />
+                      </div>
+                      <a
+                        href={`#${subcommand}`}
+                        className="transition text-scale-1100 hover:text-brand-900"
+                      >
+                        $ {subcommand.replace(/-/g, ' ')}
                       </a>
                     </li>
                   ))}
