@@ -203,6 +203,16 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   .replace('js', '')
                                   .replace('ts', ''))}
                           </CodeBlock>
+
+                          {example.description && (
+                            <div className="bg-scale-300 prose px-4 py-2 rounded-md">
+                              <h5 className="text-sm m-0 text-scale-1100">Example Notes</h5>
+                              <ReactMarkdown className="text-sm">
+                                {example.description}
+                              </ReactMarkdown>
+                            </div>
+                          )}
+
                           {response && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-response`}
