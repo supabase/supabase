@@ -24,6 +24,10 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 // import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
+import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
+
+// Ref version specific
+
 const components = {
   Admonition,
   Button,
@@ -64,6 +68,7 @@ const components = {
   // CH,
   code: (props: any) => <CodeBlock {...props} />,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
+  CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
 }
 
 export default components
