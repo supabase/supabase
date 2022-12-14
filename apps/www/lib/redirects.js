@@ -1570,6 +1570,7 @@ module.exports = [
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
   },
+  // START docs 2.0, moving pages in to structure
   {
     permanent: true,
     source: '/docs/oss',
@@ -1600,7 +1601,6 @@ module.exports = [
     source: '/docs/reference',
     destination: '/docs#reference-documentation',
   },
-  // docs 2.0, moving pages in to structure
   {
     permanent: true,
     source: '/docs/guides/auth',
@@ -1876,4 +1876,5 @@ module.exports = [
     source: '/docs/reference/realtime',
     destination: '/docs/reference/realtime/introduction',
   },
+  // END of docs 2.0, moving pages in to structure
 ]
