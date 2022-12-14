@@ -28,13 +28,15 @@ const Wrappers = () => {
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isLoadingExtensions = meta.extensions.isLoading
-  const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
+  // const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
 
-  const isWrappersEnabled =
-    wrappersExtension !== undefined &&
-    wrappersExtension?.installed_version !== null &&
-    vaultExtension !== undefined &&
-    vaultExtension?.installed_version !== null
+  const isNotAvailable = false
+  const isWrappersEnabled = true
+  // const isWrappersEnabled =
+  //   wrappersExtension !== undefined &&
+  //   wrappersExtension?.installed_version !== null &&
+  //   vaultExtension !== undefined &&
+  //   vaultExtension?.installed_version !== null
 
   const canToggleWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
