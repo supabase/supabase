@@ -14,9 +14,10 @@ import { User } from './Users.types'
 interface Props {
   user: User
   canRemoveUser: boolean
+  canRemoveMFAFactors: boolean
 }
 
-const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
+const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) => {
   const showDeleteFactorsDropdown = useFlag('mfaSso')
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
@@ -175,7 +176,7 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
                 <Dropdown.Item
                   onClick={handleDeleteFactors}
                   icon={<IconShieldOff size="tiny" />}
-                  disabled={!canRemoveUser}
+                  disabled={!canRemoveMFAFactors}
                 >
                   Remove MFA factors
                 </Dropdown.Item>
@@ -184,7 +185,7 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
                 [Joshen] Deleting MFA factors should be different ABAC perms i think
                  need to double check with KM / anyone familiar with ABAC 
               */}
-              {!canRemoveUser && (
+              {!canRemoveMFAFactors && (
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
