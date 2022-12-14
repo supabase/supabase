@@ -240,6 +240,12 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-workos',
     items: [],
   },
+  {
+    name: 'Zoom',
+    icon: '/docs/img/icons/zoom-icon',
+    url: '/guides/auth/social-login/auth-zoom',
+    items: [],
+  },
 ]
 
 export const PhoneLoginsItems = [
@@ -468,6 +474,7 @@ export const platform = {
       name: 'Platform Management',
       url: undefined,
       items: [
+        { name: 'Access Control', url: '/guides/platform/access-control', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
@@ -476,8 +483,27 @@ export const platform = {
           url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
+        { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+      ],
+    },
+    {
+      name: 'Single sign-on',
+      url: undefined,
+      items: [
+        {
+          name: 'Enable SSO for your organization',
+          url: '/guides/platform/sso',
+          items: [],
+        },
+        { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure', items: [] },
+        {
+          name: 'SSO with Google Workspace',
+          url: '/guides/platform/sso/gsuite',
+          items: [],
+        },
+        { name: 'SSO with Okta', url: '/guides/platform/sso/okta', items: [] },
       ],
     },
     {
@@ -493,7 +519,8 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    // removing until the examples page is reworked
+    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -505,8 +532,8 @@ export const resources = {
           items: [],
         },
         {
-          name: 'Firebase Data',
-          url: '/guides/resources/migrating-to-supabase/firebase-data',
+          name: 'Firestore Data',
+          url: '/guides/resources/migrating-to-supabase/firestore-data',
           items: [],
         },
         {
@@ -536,7 +563,7 @@ export const resources = {
         },
         {
           name: 'Managing Environments',
-          url: '/guides/cli/managing-environments',
+          url: '/guides/resources/supabase-cli/managing-environments',
           items: [],
         },
       ],

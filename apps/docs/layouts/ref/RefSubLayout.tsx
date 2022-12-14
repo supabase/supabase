@@ -34,7 +34,9 @@ type StickyHeader = {
 
 type RefSubLayoutType = {}
 
-interface IEducationRow {}
+interface IEducationRow {
+  className?: string
+}
 interface IEducationSection {
   id: string
   title?: string
@@ -129,7 +131,11 @@ const Examples: FC<ISectionExamples> = (props) => {
 }
 
 const EducationRow: FC<IEducationRow> = (props) => {
-  return <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">{props.children}</div>
+  return (
+    <div className={['grid lg:grid-cols-2 gap-8 lg:gap-16', props.className].join(' ')}>
+      {props.children}
+    </div>
+  )
 }
 
 const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {

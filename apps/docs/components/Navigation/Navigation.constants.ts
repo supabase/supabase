@@ -102,6 +102,7 @@ export const menuItems: NavMenu = {
             { name: 'Login with Twitch', url: '/guides/auth/auth-twitch', items: [] },
             { name: 'Login with Twitter', url: '/guides/auth/auth-twitter', items: [] },
             { name: 'Login with WorkOS', url: '/guides/auth/auth-workos', items: [] },
+            { name: 'Login with Zoom', url: '/guides/auth/auth-zoom', items: [] },
             { name: 'Phone Auth with Twilio', url: '/guides/auth/auth-twilio', items: [] },
             { name: 'Phone Auth with Vonage', url: '/guides/auth/auth-vonage', items: [] },
             {
@@ -265,6 +266,7 @@ export const menuItems: NavMenu = {
           url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
+        { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
