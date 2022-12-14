@@ -24,9 +24,8 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 // import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
-import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
-
 // Ref version specific
+import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 
 const components = {
   Admonition,
