@@ -291,8 +291,8 @@ const SiteRefLayout = ({ children }) => {
                 <Link href="https://supabase.com/docs/oss">
                   <a className="text-xs text-scale-800 hover:underline">Open Source</a>
                 </Link>
-                <Link href="https://supabase.com/docs/handbook/supasquad">
-                  <a className="text-xs text-scale-800 hover:underline">Supasquad</a>
+                <Link href="https://supabase.com/supasquad">
+                  <a className="text-xs text-scale-800 hover:underline">SupaSquad</a>
                 </Link>
               </div>
             </div>
