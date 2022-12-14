@@ -210,41 +210,28 @@ This release includes two initial wrappers: Stripe and Firebase, with several mo
 | Airtable    | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
 | BigQuery    | 🚧       | ✅          | ✅       | ✅       | ✅       | ✅         |
 | ClickHouse  | 🚧       | ✅          | ✅       | ✅       | ✅       | ✅         |
-| Firebase    | `alpha`  | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
+| Firebase    | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
 | Postgres    | 🚧       | ✅          | ✅       | ✅       | ✅       | ✅         |
-| Stripe      | `alpha`  | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
+| Stripe      | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
 
 Wrappers used [pgx](https://github.com/tcdi/pgx), extending it with FDW support. pgx is a Postgres extension framework written in Rust. Wrappers is very similar to [Steampipe](https://steampipe.io/) or [Multicorn](https://multicorn.org/). We opted to develop our own framework for several reasons:
 
-- The current state of FDWs is in disarray. It's hard to know which FDWs are supported and functional. We think there is a benefit to colocating all FDWs in a single repository using modern tooling. This makes contributing simpler and maintenance faster.
+- The current state of FDWs is in disarray. It's hard to know which FDWs are supported and functional. We think there's a benefit to colocating all FDWs in a single repository using modern tooling. This makes contributing simpler and maintenance faster.
 - Wrappers has async support, which enables the development of RESTful API-based FDWs, like Stripe.
 - It's written in Rust, which provides reliable performance, strong typing, data security, and “push down” is supported through the framework.
 
 ## Supported types and Push Down
 
 Wrappers [supports](https://github.com/supabase/wrappers/blob/83887dcc2ddcf972ca1b1eec4a598cd7bff947de/supabase-wrappers/src/interface.rs#L11) a variety of types, including:
+`bool`, `i8`, `i16`, `f32`, `i32`, `f64`, `i64`, `String`, `Date`, `Timestamp`, and `JsonB`.
 
-- `bool`
-- `i8`
-- `i16`
-- `f32`
-- `i32`
-- `f64`
-- `i64`
-- `String`
-- `Date`
-- `Timestamp`
-- `JsonB`
-
-Foreign Data Wrappers also have a concept of "push down". This means that the FDW can push down the query to the remote data source. This is useful for performance reasons, as the remote data source can often perform the query more efficiently than Postgres. Push down is also useful for security reasons, as the remote data source can enforce access control.
-
-Limited push-down support has been added as a Proof of Concept, but this will be a key focus of Wrappers.
+Foreign Data Wrappers have a concept of "push down". This means that the FDW runs the query on _remote_ data source. This is useful for performance reasons, as the remote data source can often perform the query more efficiently than Postgres. Push down is also useful for security reasons, as the remote data source can enforce access control. Limited push-down support has been added as a Proof of Concept, but this will be a key focus of Wrappers.
 
 You can follow development off all Wrappers in the offiical [GitHub Repo](https://github.com/supabase/wrappers).
 
 ## Next Steps
 
-We're not "officially" releasing Wrappers onto the platform yet, although the brave and curious will no doubt figure out that it's available to start using. Caveat emptor: there will be breaking changes.
+We're not "officially" releasing Wrappers onto the platform yet, although the brave and curious might be able to figure out how to use it "unofficially". Caveat emptor: there will be breaking changes.
 
 We're excited to see what the community does with Wrappers. We're hoping that Wrappers will help to accelerate the adoption of Postgres as a data hub.
 If you're interested in getting involved or building your own Wrapper, don't hesitage to jump into the code and start developing with us.
