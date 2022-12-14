@@ -28,7 +28,7 @@ Supabase supports a suite of social providers. Follow these guides to configure 
 
 <div className="grid grid-cols-12 gap-10 not-prose py-8">
   {SocialLoginItems.map((item) => (  
-    <Link href={`/${item.url}`} key={item.name} passHref>
+    <Link href={`${item.url}`} key={item.name} passHref>
       <a className="col-span-6 lg:col-span-4 xl:col-span-3">
         <IconPanel
           title={item.name}
