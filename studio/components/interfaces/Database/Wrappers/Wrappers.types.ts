@@ -16,6 +16,8 @@ export type ServerOption = {
   required: boolean
   encrypted: boolean
   hidden: boolean
+  isTextArea?: boolean
+  urlHelper?: string
   defaultValue?: string
 }
 

@@ -53,6 +53,9 @@ const TableEditorMenu: FC<Props> = ({
   const tables: PostgresTable[] = meta.tables.list(
     (table: PostgresTable) => table.schema === selectedSchema
   )
+  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list(
+    (table: PostgresTable) => table.schema === selectedSchema
+  )
 
   // @ts-ignore
   const schema = schemas.find((schema) => schema.name === selectedSchema)
@@ -82,16 +85,25 @@ const TableEditorMenu: FC<Props> = ({
     setIsRefreshing(false)
   }
 
-  const schemaTables =
+  const filteredTables =
     searchText.length === 0
       ? tables
       : // @ts-ignore
         tables.filter((table) => table.name.toLowerCase().includes(searchText.toLowerCase()))
 
-  const filteredSchemaViews =
+  const filteredViews =
     searchText.length === 0
       ? meta.schemas.views || []
-      : (meta.schemas.views || []).filter((view) => view.name.includes(searchText))
+      : (meta.schemas.views || []).filter((view) =>
+          view.name.toLowerCase().includes(searchText.toLowerCase())
+        )
+
+  const filteredForeignTables =
+    searchText.length === 0
+      ? foreignTables
+      : foreignTables.filter((table) =>
+          (table?.name ?? '').toLowerCase().includes(searchText.toLowerCase())
+        )
 
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
     meta.excludedSchemas.includes(schema?.name ?? '')
@@ -99,9 +111,12 @@ const TableEditorMenu: FC<Props> = ({
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   return (
-    <div className="my-6 mx-4 flex flex-grow flex-col space-y-6">
+    <div
+      className="pt-6 flex flex-grow flex-col space-y-6"
+      style={{ maxHeight: 'calc(100vh - 48px)' }}
+    >
       {/* Schema selection dropdown */}
-      <div className="px-3">
+      <div className="px-3 mx-4">
         {!meta.schemas.isInitialized ? (
           <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
@@ -153,7 +168,7 @@ const TableEditorMenu: FC<Props> = ({
         )}
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-1 mx-4">
         {!isLocked && (
           <div className="px-3">
             {/* Add new table button */}
@@ -214,110 +229,150 @@ const TableEditorMenu: FC<Props> = ({
         </div>
       </div>
 
-      {/* List of tables belonging to selected schema */}
-      {schemaTables.length > 0 && (
-        <Menu type="pills">
-          <Menu.Group
-            // @ts-ignore
-            title={
-              <>
-                <div className="flex w-full items-center justify-between">
-                  <span>All tables</span>
-                  <button className="cursor-pointer" onClick={refreshTables}>
-                    <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} />
-                  </button>
-                </div>
-              </>
-            }
-          />
+      <div className="flex-auto px-4 overflow-y-auto space-y-6 pb-4">
+        {/* List of tables belonging to selected schema */}
+        {filteredTables.length > 0 && (
+          <Menu type="pills">
+            <Menu.Group
+              // @ts-ignore
+              title={
+                <>
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center space-x-1">
+                      <p>Tables</p>
+                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        ({filteredTables.length})
+                      </p>
+                    </div>
+                    <button className="cursor-pointer" onClick={refreshTables}>
+                      <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} />
+                    </button>
+                  </div>
+                </>
+              }
+            />
 
-          <div>
-            {schemaTables.map((table) => {
-              const isActive = Number(id) === table.id
+            <div>
+              {filteredTables.map((table) => {
+                const isActive = Number(id) === table.id
+                return (
+                  <ProductMenuItem
+                    key={table.name}
+                    url={`/project/${projectRef}/editor/${table.id}`}
+                    name={table.name}
+                    hoverText={table.comment ? table.comment : table.name}
+                    isActive={isActive}
+                    action={
+                      isActive &&
+                      !isLocked && (
+                        <Dropdown
+                          size="small"
+                          side="bottom"
+                          align="start"
+                          overlay={[
+                            <Dropdown.Item
+                              key="edit-table"
+                              icon={<IconEdit size="tiny" />}
+                              onClick={() => onEditTable(table)}
+                            >
+                              Edit Table
+                            </Dropdown.Item>,
+                            <Dropdown.Item
+                              key="duplicate-table"
+                              icon={<IconCopy size="tiny" />}
+                              onClick={() => onDuplicateTable(table)}
+                            >
+                              Duplicate Table
+                            </Dropdown.Item>,
+                            <Dropdown.Separator key="separator" />,
+                            <Dropdown.Item
+                              key="delete-table"
+                              icon={<IconTrash size="tiny" />}
+                              onClick={() => onDeleteTable(table)}
+                            >
+                              Delete Table
+                            </Dropdown.Item>,
+                          ]}
+                        >
+                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                            <IconChevronDown size={14} strokeWidth={2} />
+                          </div>
+                        </Dropdown>
+                      )
+                    }
+                  />
+                )
+              })}
+            </div>
+          </Menu>
+        )}
+
+        {/* List of views belonging to selected schema */}
+        {filteredViews.length > 0 && (
+          <Menu type="pills">
+            <Menu.Group
+              // @ts-ignore
+              title={
+                <div className="flex w-full items-center space-x-1">
+                  <p>Views</p>
+                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>({filteredViews.length})</p>
+                </div>
+              }
+            />
+
+            {filteredViews.map((view: SchemaView) => {
+              const viewId = Base64.encode(JSON.stringify(view))
+              const isActive = id === viewId
               return (
-                <ProductMenuItem
-                  key={table.name}
-                  url={`/project/${projectRef}/editor/${table.id}`}
-                  name={table.name}
-                  hoverText={table.comment ? table.comment : table.name}
-                  isActive={isActive}
-                  action={
-                    isActive &&
-                    !isLocked && (
-                      <Dropdown
-                        size="small"
-                        side="bottom"
-                        align="start"
-                        overlay={[
-                          <Dropdown.Item
-                            key="edit-table"
-                            icon={<IconEdit size="tiny" />}
-                            onClick={() => onEditTable(table)}
-                          >
-                            Edit Table
-                          </Dropdown.Item>,
-                          <Dropdown.Item
-                            key="duplicate-table"
-                            icon={<IconCopy size="tiny" />}
-                            onClick={() => onDuplicateTable(table)}
-                          >
-                            Duplicate Table
-                          </Dropdown.Item>,
-                          <Dropdown.Separator key="separator" />,
-                          <Dropdown.Item
-                            key="delete-table"
-                            icon={<IconTrash size="tiny" />}
-                            onClick={() => onDeleteTable(table)}
-                          >
-                            Delete Table
-                          </Dropdown.Item>,
-                        ]}
-                      >
-                        <div className="text-scale-900 transition-colors hover:text-scale-1200">
-                          <IconChevronDown size={14} strokeWidth={2} />
-                        </div>
-                      </Dropdown>
-                    )
-                  }
-                />
+                <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
+                  <a>
+                    <Menu.Item key={viewId} rounded active={isActive}>
+                      <div className="flex justify-between">
+                        <p className="truncate">{view.name}</p>
+                      </div>
+                    </Menu.Item>
+                  </a>
+                </Link>
               )
             })}
-          </div>
-        </Menu>
-      )}
+          </Menu>
+        )}
 
-      {/* List of views belonging to selected schema */}
-      {filteredSchemaViews.length > 0 && (
-        <Menu type="pills">
-          <Menu.Group
-            // @ts-ignore
-            title={
-              <div className="flex w-full items-center justify-between">
-                <span>All views</span>
-              </div>
-            }
-          />
+        {/* List of foreign tables belonging to selected schema */}
+        {filteredForeignTables.length > 0 && (
+          <Menu type="pills">
+            <Menu.Group
+              // @ts-ignore
+              title={
+                <div className="flex w-full items-center space-x-1">
+                  <p>Foreign Tables</p>
+                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    ({filteredForeignTables.length})
+                  </p>
+                </div>
+              }
+            />
 
-          {meta.schemas.views.map((view: SchemaView) => {
-            const viewId = Base64.encode(JSON.stringify(view))
-            const isActive = id === viewId
-            return (
-              <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
-                <a>
-                  <Menu.Item key={viewId} rounded active={isActive}>
-                    <div className="flex justify-between">
-                      <p className="truncate">{view.name}</p>
-                    </div>
-                  </Menu.Item>
-                </a>
-              </Link>
-            )
-          })}
-        </Menu>
-      )}
+            {filteredForeignTables.map((table: Partial<PostgresTable>) => {
+              const isActive = Number(id) === table.id
+              return (
+                <Link key={table.id} href={`/project/${projectRef}/editor/${table.id}`}>
+                  <a>
+                    <Menu.Item key={table.id} rounded active={isActive}>
+                      <div className="flex justify-between">
+                        <p className="truncate">{table.name}</p>
+                      </div>
+                    </Menu.Item>
+                  </a>
+                </Link>
+              )
+            })}
+          </Menu>
+        )}
+      </div>
 
-      {searchText.length > 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="mx-3 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+      {searchText.length > 0 && filteredTables.length === 0 && filteredViews.length === 0 && (
+        <div className="!mt-0 mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
           <p className="text-xs">No results found</p>
           <p className="text-xs text-scale-1100">
             There are no tables or views that match your search
@@ -325,8 +380,8 @@ const TableEditorMenu: FC<Props> = ({
         </div>
       )}
 
-      {searchText.length === 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="mx-3 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+      {searchText.length === 0 && filteredTables.length === 0 && filteredViews.length === 0 && (
+        <div className="!mt-0 mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
           <p className="text-xs">No tables available</p>
           <p className="text-xs text-scale-1100">This schema has no tables available yet</p>
         </div>

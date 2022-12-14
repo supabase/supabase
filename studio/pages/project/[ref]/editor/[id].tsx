@@ -37,9 +37,11 @@ const TableEditorPage: NextPage = () => {
 
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
+  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
+
   const selectedTable = !isNaN(Number(id))
     ? // @ts-ignore
-      tables.find((table) => table.id === Number(id))
+      tables.concat(foreignTables).find((table) => table.id === Number(id))
     : id !== undefined
     ? tryParseJson(Base64.decode(id))
     : undefined
@@ -125,12 +127,20 @@ const TableEditorPage: NextPage = () => {
 
   const onConfirmDeleteColumn = async () => {
     try {
-      const response: any = await meta.columns.del(selectedColumnToDelete!.id, isDeleteWithCascade)
+      if (selectedColumnToDelete === undefined) return
+
+      const response: any = await meta.columns.del(selectedColumnToDelete.id, isDeleteWithCascade)
       if (response.error) throw response.error
 
-      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete!.name)
+      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
+
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted column "${selectedColumnToDelete.name}"`,
+      })
 
       await meta.tables.loadById(selectedColumnToDelete!.table_id)
+      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -144,7 +154,7 @@ const TableEditorPage: NextPage = () => {
 
   const onConfirmDeleteTable = async () => {
     try {
-      if (isUndefined(selectedTableToDelete)) return
+      if (selectedTableToDelete === undefined) return
 
       const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
       if (response.error) throw response.error
@@ -159,7 +169,7 @@ const TableEditorPage: NextPage = () => {
       }
       ui.setNotification({
         category: 'success',
-        message: `Successfully deleted ${selectedTableToDelete.name}`,
+        message: `Successfully deleted table "${selectedTableToDelete.name}"`,
       })
       if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
     } catch (error: any) {
