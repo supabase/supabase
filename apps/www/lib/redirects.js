@@ -1639,6 +1639,7 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/auth/auth-vonage',
     destination: '/docs/guides/auth/phone-login/vonage',
+  },
   {
     permanent: true,
     source: '/docs/handbook/supasquad',
