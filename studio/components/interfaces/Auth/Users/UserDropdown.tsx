@@ -1,7 +1,7 @@
 import { FC, useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, Divider, IconTrash, IconMail, IconMoreHorizontal } from 'ui'
+import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal } from 'ui'
 
 import { useFlag, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
@@ -203,7 +203,7 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
                   icon={<IconTrash size="tiny" />}
                   disabled={!canRemoveUser}
                 >
-                  Delete factors
+                  Remove MFA factors
                 </Dropdown.Item>
               </Tooltip.Trigger>
               {!canRemoveUser && (
