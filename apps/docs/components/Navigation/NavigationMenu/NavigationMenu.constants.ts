@@ -489,6 +489,7 @@ export const platform = {
           url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
+        { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
       ],
