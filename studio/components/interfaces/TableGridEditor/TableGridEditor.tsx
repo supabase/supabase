@@ -81,8 +81,10 @@ const TableGridEditor: FC<Props> = ({
   // @ts-ignore
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2
+  const isForeignTableSelected = meta.foreignTables.byId(selectedTable.id) !== undefined
   const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canEditViaTableEditor = !isViewSelected && !isForeignTableSelected && !isLocked
 
   const gridTable = !isViewSelected
     ? parseSupaTable(
@@ -161,14 +163,11 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={canUpdateTables && !isViewSelected && !isLocked}
+        editable={canUpdateTables && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          !isViewSelected &&
-          selectedTable.schema === 'public' && (
-            <GridHeaderActions table={selectedTable as PostgresTable} />
-          )
+          canEditViaTableEditor && <GridHeaderActions table={selectedTable as PostgresTable} />
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}
