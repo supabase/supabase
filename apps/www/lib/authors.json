@@ -250,5 +250,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/fenos",
     "author_image_url": "https://github.com/fenos.png"
+  },
+  {
+    "author_id": "stojan",
+    "author": "Stojan Dimitrovski",
+    "position": "Engineering",
+    "author_url": "https://github.com/hf",
+    "author_image_url": "https://github.com/hf.png"
   }
 ]
