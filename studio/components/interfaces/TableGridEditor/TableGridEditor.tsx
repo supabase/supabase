@@ -5,7 +5,7 @@ import { find, isUndefined } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -60,14 +60,15 @@ const TableGridEditor: FC<Props> = ({
   const projectRef = ui.selectedProject?.ref
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
+  const isVaultEnabled = useFlag('vaultExtension')
 
   const getEncryptedColumns = async (table: any) => {
-    const columns = await vault.listEncryptedColumns(table.name)
+    const columns = await vault.listEncryptedColumns(table.schema, table.name)
     setEncryptedColumns(columns)
   }
 
   useEffect(() => {
-    if (selectedTable !== undefined && selectedTable.id !== undefined) {
+    if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
       getEncryptedColumns(selectedTable)
     }
   }, [selectedTable?.id])
