@@ -420,7 +420,7 @@ export default class MetaStore implements IMetaStore {
       this.rootStore.ui.setNotification({
         id: toastId,
         category: 'error',
-        message: `An error occured while creating the column "${payload.name}"`,
+        message: `An error occurred while creating the column "${payload.name}"`,
       })
       const query = `alter table "${selectedTable.name}" drop column if exists "${payload.name}";`
       await this.rootStore.meta.query(query)

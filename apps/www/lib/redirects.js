@@ -1876,5 +1876,9 @@ module.exports = [
     source: '/docs/reference/realtime',
     destination: '/docs/reference/realtime/introduction',
   },
-  // END of docs 2.0, moving pages in to structure
+  {
+    permanent: true,
+    source: '/docs/handbook/supasquad',
+    destination: '/supasquad',
+  },
 ]
