@@ -1608,21 +1608,10 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/passwordless-login/email-otp-magic-link',
-    destination: '/docs/guides/auth/auth-magic-link',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     destination: '/docs/guides/auth/phone-login/messagebird',
-    source: '/docs/guides/auth',
-    destination: '/docs/guides/auth/overview',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/auth-magic-link',
-    destination: '/docs/guides/auth/passworldless-login/email-otp-magic-link',
-  },
+  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',
@@ -1630,30 +1619,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/passwordless-login/phone-sms-otp-twilio',
-    destination: '/docs/guides/auth/phone-login/twilio',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth-twilio',
     destination: '/docs/guides/auth/phone-login/twilio',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/passwordless-login/phone-sms-otp-vonage',
-    destination: '/docs/guides/auth/phone-login/vonage',
-    destination: '/docs/guides/auth/passworldless-login/phone-sms-otp-messagebird',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/auth-twilio',
-    destination: '/docs/guides/auth/passworldless-login/phone-sms-otp-twilio',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/auth-vonage',
-    destination: '/docs/guides/auth/phone-login/vonage',
-    destination: '/docs/guides/auth/passworldless-login/phone-sms-otp-vonage',
   },
   {
     permanent: true,
