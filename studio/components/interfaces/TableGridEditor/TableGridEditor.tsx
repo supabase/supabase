@@ -86,17 +86,18 @@ const TableGridEditor: FC<Props> = ({
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditViaTableEditor = !isViewSelected && !isForeignTableSelected && !isLocked
 
-  const gridTable = !isViewSelected
-    ? parseSupaTable(
-        {
-          table: selectedTable as PostgresTable,
-          columns: (selectedTable as PostgresTable).columns,
-          primaryKeys: (selectedTable as PostgresTable).primary_keys,
-          relationships: (selectedTable as PostgresTable).relationships,
-        },
-        encryptedColumns
-      )
-    : (selectedTable as SchemaView).name
+  const gridTable =
+    !isViewSelected && !isForeignTableSelected
+      ? parseSupaTable(
+          {
+            table: selectedTable as PostgresTable,
+            columns: (selectedTable as PostgresTable).columns,
+            primaryKeys: (selectedTable as PostgresTable).primary_keys,
+            relationships: (selectedTable as PostgresTable).relationships,
+          },
+          encryptedColumns
+        )
+      : (selectedTable as SchemaView).name
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
