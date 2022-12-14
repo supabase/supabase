@@ -47,16 +47,24 @@
     ]
   },
   {
-    "title": "Day 3",
-    "shipped": false,
+    "title": "Multi-factor Authentication",
+    "shipped": true,
     "date": "14 Dec 2022",
-    "description": "Day 3",
+    "description": "Multi-factor Authentication",
     "d": 3,
     "dd": "Wednesday",
-    "youtube_id": "6bGQotxisoY",
+    "youtube_id": "CGZr5tybW18",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "steps": []
+    "steps": [
+      {
+        "title": "Multi-factor Authentication",
+        "blog": "/blog/mfa-auth-via-rls",
+        "docs": "/docs/guides/auth/auth-mfa",
+        "isNew": false,
+        "description": ""
+      }
+    ]
   },
   {
     "title": "Day 4",

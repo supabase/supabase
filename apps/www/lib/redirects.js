@@ -1603,28 +1603,24 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth',
-    destination: '/docs/guides/auth/overview',
+    source: '/docs/guides/auth/passwordless-login',
+    destination: '/docs/guides/auth/phone-login',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/auth-magic-link',
-    destination: '/docs/guides/auth/passworldless-login/email-otp-magic-link',
+    source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
+    destination: '/docs/guides/auth/phone-login/messagebird',
   },
+  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',
-    destination: '/docs/guides/auth/passworldless-login/phone-sms-otp-messagebird',
+    destination: '/docs/guides/auth/phone-login/messagebird',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/auth-twilio',
-    destination: '/docs/guides/auth/passworldless-login/phone-sms-otp-twilio',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/auth-vonage',
-    destination: '/docs/guides/auth/passworldless-login/phone-sms-otp-vonage',
+    source: '/docs/guides/auth-twilio',
+    destination: '/docs/guides/auth/phone-login/twilio',
   },
   {
     permanent: true,
