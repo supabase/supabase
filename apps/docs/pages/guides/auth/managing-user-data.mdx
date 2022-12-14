@@ -30,7 +30,7 @@ alter table public.profiles enable row level security;
 
 <Admonition type="note">
 
-Make sure you specify the `on delete cascade` clause whenever referencing `auth.users`. Not including it may cause problems when deleting users.
+Make sure to specify the `on delete cascade` clause when referencing `auth.users`. Omitting it may cause problems when deleting users.
 
 </Admonition>
 
