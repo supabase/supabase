@@ -183,6 +183,15 @@ export const menuItems: NavMenu = {
           ],
         },
         {
+          name: 'Wrappers',
+          url: undefined,
+          items: [
+            { name: 'Overview', url: '/guides/database/wrappers', items: [] },
+            { name: 'Firebase', url: '/guides/database/wrappers/firebase', items: [] },
+            { name: 'Stripe', url: '/guides/database/wrappers/stripe', items: [] },
+          ],
+        },
+        {
           name: 'Extensions',
           url: undefined,
           items: [
