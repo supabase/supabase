@@ -44,7 +44,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            supabase/postgres
+            supabase/studio
           tags: |
             type=raw,value=${{ needs.settings.outputs.image_version }}_${{ env.arch }}
 
@@ -83,7 +83,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            supabase/postgres
+            supabase/studio
           tags: |
             type=raw,value=${{ needs.settings.outputs.image_version }}_${{ env.arch }}
 
