@@ -463,7 +463,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/passwordless-login</loc>
+    <loc>https://supabase.com/docs/guides/auth/phone-login</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1135,25 +1135,25 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/passwordless-login/email-otp-magic-link</loc>
+    <loc>https://supabase.com/docs/guides/auth/email-otp-magic-link</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird</loc>
+    <loc>https://supabase.com/docs/guides/auth/phone-login/phone-sms-otp-messagebird</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/passwordless-login/phone-sms-otp-twilio</loc>
+    <loc>https://supabase.com/docs/guides/auth/phone-login/phone-sms-otp-twilio</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/passwordless-login/phone-sms-otp-vonage</loc>
+    <loc>https://supabase.com/docs/guides/auth/phone-login/phone-sms-otp-vonage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
