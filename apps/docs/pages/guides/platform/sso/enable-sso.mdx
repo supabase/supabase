@@ -27,21 +27,20 @@ Accounts signing in via SSO have certain limitations.
 
 ### Enabling SSO for your team
 
-1. Organization invites are restricted to members of the company that belong to
-   the same identity provider.
-2. Every user has an organization created by default. They can create as many
-   projects as they want. 
-3. An SSO user will not be able to update their password or reset their
-   password since their access is managed by the company administrator via the
-   identity provider.
-4. If an SSO user with the following email of `alice@foocorp.com` attempts to
-   sign-in with a GitHub account that uses the same email, a separate Supabase
-   account will be created and will not be linked to the SSO user’s account. 
-5. An SSO user will not be able to see all organizations / projects created
-   under the same identity provider. They will need to be invited to the
-   Supabase organization first. Please refer to the [access control
-   section](#access-control)
-   for more information.
+- Organization invites are restricted to members of the company that belong to
+  the same identity provider.
+- Every user has an organization created by default. They can create as many
+  projects as they want. 
+- An SSO user will not be able to update their password or reset their
+  password since their access is managed by the company administrator via the
+  identity provider.
+- If an SSO user with the following email of `alice@foocorp.com` attempts to
+  sign-in with a GitHub account that uses the same email, a separate Supabase
+  account is created and will not be linked to the SSO user’s account. 
+- An SSO user will not be able to see all organizations / projects created
+  under the same identity provider. They will need to be invited to the
+  Supabase organization first. Refer to [access control](#access-control)
+  for more information.
 
 ### Disabling SSO for your team
 
@@ -61,12 +60,11 @@ Within a Supabase organization, a member can have one of the following roles:
 * Administrator
 * Developer
 
-A default organization will be created for a user when they first sign-in and
-the user will be assigned the “Owner” role. If the user wants to invite others
+A default organization is created for a user when they first sign-in and
+assigned the **Owner** role. If the user wants to invite others
 to collaborate within the organization, they can visit the organization team
 settings (`https://app.supabase.com/org/<org-slug>/settings#team`) to send an
-invite link to another user’s email. An organization invite will expire after
-24 hours.
+invite link to another user’s email. Invite expires after 24 hours.
 
 Invites sent from a SSO account can only be accepted by another SSO account
 coming from the same identity provider. This is a security measure that

@@ -3,15 +3,14 @@ import { Button, IconArrowDown } from 'ui'
 
 export const meta = {
   id: 'sso-with-azure',
-  title: 'Setup SSO with Azure AD',
-  description: 'Configuration instructions for single sign-on with Azure AD (Entra)',
+  title: 'Set Up SSO with Azure AD',
+  description: 'Configure single sign-on with Azure AD (Microsoft Entra).',
 }
 
 Supabase supports single sign-on (SSO) using Microsoft Azure AD.
 
-## Step-by-step guide
 
-### Step 1: Add and register an Enterprise Application
+## Step 1: Add and register an Enterprise Application [#add-and-register-enterprise-application]
 
 Open up the [Azure Active
 Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview)
@@ -21,14 +20,14 @@ Click the *Add* button then *Enterprise application*.
 
 ![Azure AD console: Default Directory Overview](/docs/img/sso-azure-step-01.png)
 
-### Step 2: Choose Create your own application
+## Step 2: Choose Create your own application [#create-application]
 
 You'll be using the custom enterprise application setup for Supabase.
 
 ![Azure AD console: Browse Azure AD Gallery, select: Create your own
 application](/docs/img/sso-azure-step-02.png)
 
-### Step 3: Fill in application details
+## Step 3: Fill in application details [#add-application-details] 
 
 In the modal titled *Create your own application* enter the name you wish
 Supabase to be available to your Azure AD users. `Supabase` works in most
@@ -39,7 +38,7 @@ don't find in the gallery (Non-gallery)*.
 
 ![Azure AD console: Create your own application modal](/docs/img/sso-azure-step-03.png)
 
-### Step 4: Choose the Set up single sign-on option
+## Step 4: Choose the Set up single sign-on option [#set-up-single-sign-on]
 
 Before you get to assigning users and groups, which would allow accounts in
 Azure AD to access Supabase, you need to configure the SAML details that allows
@@ -48,7 +47,7 @@ Supabase to accept sign in requests from Azure AD.
 ![Azure AD console: Supabase custom enterprise application, selected Set up
 single sign-on](/docs/img/sso-azure-step-04.png)
 
-### Step 5: Select SAML single sign-on method
+## Step 5: Select SAML single sign-on method [#saml-sso]
 
 Supabase only supports the SAML 2.0 protocol for Single Sign-On, which is an
 industry standard.
@@ -56,7 +55,7 @@ industry standard.
 ![Azure AD console: Supabase application, Single sign-on configuration screen,
 selected SAML](/docs/img/sso-azure-step-05.png)
 
-### Step 6: Upload SAML-based Sign-on metadata file
+## Step 6: Upload SAML-based Sign-on metadata file [#upload-saml-metadata]
 
 First you need to download Supabase's SAML metadata file. Click the button
 below to initiate a download of the file.
@@ -86,7 +85,7 @@ Basic SAML Configuration shown](/docs/img/sso-azure-step-06-2.png)
 
 Finally, click the *Save* button to save the configuration.
 
-### Step 7: Obtain metadata URL and send to Supabase
+## Step 7: Obtain metadata URL and send to Supabase [#send-metadata-url]
 
 Supabase needs to finalize enabling single sign-on with your Azure AD
 application. To do this, please copy and send the link under **App Federation
@@ -100,17 +99,17 @@ link to or need further assistance, please reach out to
 ![Azure AD console: Supabase application, SAML Certificates card
 shown, App Federation Metadata Url highlighted](/docs/img/sso-azure-step-07.png)
 
-### Step 8: Wait for confirmation
+## Step 8: Wait for confirmation [#confirmation]
 
 Please wait for confirmation or further instructions from your support contact
 at Supabase before proceeding to the next step. It usually takes us 1 business
 day to configure SSO for you.
 
-### Step 9: Test single sign-on
+## Step 9: Test single sign-on [#testing]
 
 *Testing sign-on before your Azure AD has been registered with Supabase will
 not work. Make sure you've received confirmation from your support contact at
-Supabase as laid out in [Step 8](#step-8-wait-for-confirmation).*
+Supabase as laid out in the [confirmation](#confirmation) step.*
 
 Once you’ve received confirmation from your support contact at Supabase that
 SSO setup has been completed for your enterprise, you can ask some of your

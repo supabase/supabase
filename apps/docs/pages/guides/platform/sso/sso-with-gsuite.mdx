@@ -2,28 +2,26 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'sso-with-gsuite',
-  title: 'Setup SSO with Google Workspace',
-  description: 'Configuration instructions for single sign-on with Google Workspace (GSuite)',
+  title: 'Set Up SSO with Google Workspace',
+  description: 'Configure single sign-on with Google Workspace (GSuite).',
 }
 
 Supabase supports single sign-on (SSO) using Google Workspace (formerly known
 as GSuite).
 
-## Step-by-step guide
-
-### Step 1: Open the Google Workspace Web and mobile apps console
+## Step 1: Open the Google Workspace Web and mobile apps console [#google-workspace-console]
 
 ![Google Workspace: Web and mobile apps admin
 console](/docs/img/sso-gsuite-step-01.png)
 
-### Step 2: Choose Add custom SAML app
+## Step 2: Choose Add custom SAML app [#add-custom-saml-app]
 
 From the *Add app* button in the toolbar choose *Add custom SAML app*.
 
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML app
 selected](/docs/img/sso-gsuite-step-02.png)
 
-### Step 3: Fill out App details
+## Step 3: Fill out app details [#add-app-details]
 
 The information you enter here is for visibility into your Google Workspace.
 You can choose any values you like. `Supabase` as a name works well for most
@@ -32,7 +30,7 @@ use cases. Optionally enter a description.
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML, App
 details screen](/docs/img/sso-gsuite-step-03.png)
 
-### Step 4: Download IdP metadata
+## Step 4: Download IdP metadata [#download-idp-metadata]
 
 This is a very important step. Click on *DOWNLOAD METADATA* and save the file
 that was downloaded.
@@ -48,7 +46,7 @@ can always reach us at [support@supabase.com](mailto:support@supabase.com).
 before it expires. Mark down this date in your calendar so you will be reminded
 that you need to update the certificate without any downtime for your users.**
 
-### Step 5: Add service provider details
+## Step 5: Add service provider details [#add-service-provider-details]
 
 Fill out these serivce provider details on the next screen.
 
@@ -63,7 +61,7 @@ Fill out these serivce provider details on the next screen.
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML,
 Service provider details screen](/docs/img/sso-gsuite-step-05.png)
 
-### Step 6: Configure Attribute mapping
+## Step 6: Configure Attribute mapping [#configure-attribute-mapping]
 
 Attribute mappings allow Supabase to get information about your Google
 Workspace users on each login.
@@ -78,12 +76,11 @@ contact.
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML,
 Attribute mapping](/docs/img/sso-gsuite-step-06.png)
 
-### Step 7: Wait for confirmation
+## Step 7: Wait for confirmation [#confirmation]
 
 Once you’ve configured the Google Workspace app as shown above, make sure you
-send the metadata file you downloaded from [Step
-4](#step-4-download-idp-metadata) and information regarding the
-attribute mapping from [Step 6](#step-6-configure-attribute-mappings) (if any
+send the [metadata file you downloaded](#download-idp-metadata)
+and information regarding the [attribute mapping](#configure-attribute-mappings) (if any
 changes are applicable) to your support contact at Supabase.
 
 This information needs to be entered into Supabase before SSO is activated
@@ -94,7 +91,7 @@ Supabase. It usually takes us 1 business day to configure this information
 for you.
 Supabase.
 
-### Step 8: Configure user access
+## Step 8: Configure user access  [#configure-user-access]
 
 You can configure which Google Workspace user accounts will get access to
 Supabase. This is important if you wish to limit access to your software
@@ -109,7 +106,7 @@ systems. Please wait at least 15 minutes before proceeding to the next step.
 ![Google Workspace: Web and mobile apps admin console, Supabase app
 screen](/docs/img/sso-gsuite-step-08.png)
 
-### Step 9: Test single sign-on
+## Step 9: Test single sign-on [#testing]
 
 Once you’ve turned on access to Supabase for users in your organization, ask
 one of those users to help you out in testing the setup.

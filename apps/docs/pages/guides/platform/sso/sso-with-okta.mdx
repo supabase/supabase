@@ -2,15 +2,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'sso-with-okta',
-  title: 'Setup SSO with Okta',
-  description: 'Configuration instructions for single sign-on with Okta',
+  title: 'Set Up SSO with Okta',
+  description: 'Configure single sign-on with Okta.',
 }
 
 Supabase supports single sign-on (SSO) using Okta.
 
-## Step-by-step guide
-
-### Step 1: Choose Create App Integration in the Applications dashboard
+## Step 1: Choose Create App Integration in the Applications dashboard [#create-app-integration]
 
 Navigate to the Applications dashboard of the Okta admin console. Choose the
 *Create App Integration* button from the toolbar.
@@ -18,14 +16,14 @@ Navigate to the Applications dashboard of the Okta admin console. Choose the
 ![Okta dashboard: Create App Integration
 button](/docs/img/sso-okta-step-01.png)
 
-### Step 2: Choose SAML 2.0 in the app integration dialog
+## Step 2: Choose SAML 2.0 in the app integration dialog [#create-saml-app]
 
 Supabase supports the SAML 2.0 SSO protocol. Choose it from the *Create a new
 app integration* dialog.
 
 ![Okta dashboard: Create new app integration dialog](/docs/img/sso-okta-step-02.png)
 
-### Step 3: Fill out General Settings
+## Step 3: Fill out General Settings [#add-general-settings]
 
 The information you enter here is for visibility into your Okta applications
 menu.  You can choose any values you like. `Supabase` as a name works well for
@@ -34,7 +32,7 @@ most use cases.
 ![Okta dashboard: Create SAML Integration
 wizard](/docs/img/sso-okta-step-03.png)
 
-### Step 4: Fill out SAML Settings
+## Step 4: Fill out SAML Settings [#add-saml-settings]
 
 These settings let Supabase use SAML 2.0 properly with your Okta application.
 Make sure you enter this information exactly as shown on in this table and
@@ -90,7 +88,7 @@ The link usually has this structure: `https://<okta-org>.okta.com/apps/<app-id>/
 ## Step 7: Wait for confirmation [#confirmation]
 
 Once you’ve configured the Okta app as shown above, make sure you send the
-[metadata URL](idp-metadata-url) and information regarding the
+[metadata URL](#idp-metadata-url) and information regarding the
 [attribute statements](#add-attribute-statements) (if any changes are applicable) to
 your support contact at Supabase.
 
