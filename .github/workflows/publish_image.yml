@@ -69,6 +69,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   release_arm:
+    needs: settings
     runs-on: arm-runner
     timeout-minutes: 120
     env:
