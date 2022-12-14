@@ -246,6 +246,64 @@
     ]
   },
   {
+    "title": "Vanity Subdomains",
+    "items": [
+      {
+        "id": "supabase-vanity-subdomains",
+        "title": "supabase vanity-subdomains",
+        "slug": "supabase-vanity-subdomains",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-vanity-subdomains-check-availability",
+        "title": "supabase vanity-subdomains check-availability",
+        "slug": "supabase-vanity-subdomains-check-availability",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-vanity-subdomains-activate",
+        "title": "supabase vanity-subdomains activate",
+        "slug": "supabase-vanity-subdomains-activate",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-vanity-subdomains-delete",
+        "title": "supabase vanity-subdomains delete",
+        "slug": "supabase-vanity-subdomains-delete",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-vanity-subdomains-get",
+        "title": "supabase vanity-subdomains get",
+        "slug": "supabase-vanity-subdomains-get",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "title": "Network Restrictions",
+    "items": [
+      {
+        "id": "supabase-network-restrictions",
+        "title": "supabase network-restrictions",
+        "slug": "supabase-network-restrictions",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-network-restrictions-get",
+        "title": "supabase network-restrictions get",
+        "slug": "supabase-network-restrictions-get",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-network-restrictions-update",
+        "title": "supabase network-restrictions update",
+        "slug": "supabase-network-restrictions-update",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
     "title": "Database",
     "items": [
       { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "type": "cli-command" },
