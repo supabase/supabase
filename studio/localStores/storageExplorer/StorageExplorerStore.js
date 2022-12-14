@@ -114,7 +114,7 @@ class StorageExplorerStore {
   /* Methods which are commonly used + For better readability */
 
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    console.log(serviceEndpoint)
+    console.debug(serviceEndpoint)
     this.supabaseClient = createClient(
       `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
       serviceKey,
