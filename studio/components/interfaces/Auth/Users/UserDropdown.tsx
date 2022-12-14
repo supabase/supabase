@@ -126,7 +126,7 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
 
     confirmAlert({
       title: 'Confirm to delete',
-      message: `This is permanent! Are you sure you want to delete the user's factors?`,
+      message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
       onAsyncConfirm: async () => {
         setLoading(true)
         const response = await delete_(
