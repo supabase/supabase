@@ -1,7 +1,7 @@
 import { FC, useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal } from 'ui'
+import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal, IconShieldOff } from 'ui'
 
 import { useFlag, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
@@ -169,6 +169,34 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
             </Dropdown.Item>
           ) : null}
           <Dropdown.Separator />
+          {showDeleteFactorsDropdown && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Dropdown.Item
+                  onClick={handleDeleteFactors}
+                  icon={<IconShieldOff size="tiny" />}
+                  disabled={!canRemoveUser}
+                >
+                  Remove MFA factors
+                </Dropdown.Item>
+              </Tooltip.Trigger>
+              {!canRemoveUser && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to remove a user's authentication factors.
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
+          )}
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
               <Dropdown.Item
@@ -195,34 +223,6 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
               </Tooltip.Content>
             )}
           </Tooltip.Root>
-          {showDeleteFactorsDropdown && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
-                <Dropdown.Item
-                  onClick={handleDeleteFactors}
-                  icon={<IconTrash size="tiny" />}
-                  disabled={!canRemoveUser}
-                >
-                  Remove MFA factors
-                </Dropdown.Item>
-              </Tooltip.Trigger>
-              {!canRemoveUser && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      You need additional permissions to remove a user's authentication factors.
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              )}
-            </Tooltip.Root>
-          )}
         </>
       }
     >
