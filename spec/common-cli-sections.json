@@ -208,6 +208,12 @@
         "title": "supabase migration list",
         "slug": "supabase-migration-list",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-repair",
+        "title": "supabase migration repair",
+        "slug": "supabase-migration-repair",
+        "type": "cli-command"
       }
     ]
   },
