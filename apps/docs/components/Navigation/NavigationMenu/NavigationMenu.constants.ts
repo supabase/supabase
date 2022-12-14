@@ -247,20 +247,20 @@ export const PhoneLoginsItems = [
     name: 'MessageBird SMS Login',
     icon: '/docs/img/icons/messagebird-icon',
     linkDescription: 'Communication between businesses and their customers — across any channel.',
-    url: '/guides/auth/phone-login/phone-sms-otp-messagebird',
+    url: '/guides/auth/phone-login/messagebird',
     items: [],
   },
   {
     name: 'Twilio SMS Login',
     icon: '/docs/img/icons/twilio-icon',
-    url: '/guides/auth/phone-login/phone-sms-otp-twilio',
+    url: '/guides/auth/phone-login/twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
     items: [],
   },
   {
     name: 'Vonage SMS Login',
     icon: '/docs/img/icons/vonage-icon',
-    url: '/guides/auth/phone-login/phone-sms-otp-vonage',
+    url: '/guides/auth/phone-login/vonage',
     linkDescription:
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     items: [],
@@ -281,7 +281,7 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Email Login', url: '/guides/auth/auth-email', items: [] },
-        { name: 'Magic Link Login', url: '/guides/auth/email-otp-magic-link', items: [] },
+        { name: 'Magic Link Login', url: '/guides/auth/auth-magic-link', items: [] },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login',
