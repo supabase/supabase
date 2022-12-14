@@ -1603,6 +1603,6 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/handbook/supasquad',
-    destination: '/supasquad'
-  }
+    destination: '/supasquad',
+  },
 ]
