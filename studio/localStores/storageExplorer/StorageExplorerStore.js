@@ -24,6 +24,8 @@ import {
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
 import { copyToClipboard } from 'lib/helpers'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -112,21 +114,26 @@ class StorageExplorerStore {
   /* Methods which are commonly used + For better readability */
 
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    this.supabaseClient = createClient(`https://${serviceEndpoint}`, serviceKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        multiTab: false,
-        detectSessionInUrl: false,
-        localStorage: {
-          getItem: (key) => {
-            return undefined
+    console.log(serviceEndpoint)
+    this.supabaseClient = createClient(
+      `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
+      serviceKey,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          multiTab: false,
+          detectSessionInUrl: false,
+          localStorage: {
+            getItem: (key) => {
+              return undefined
+            },
+            setItem: (key, value) => {},
+            removeItem: (key) => {},
           },
-          setItem: (key, value) => {},
-          removeItem: (key) => {},
         },
-      },
-    })
+      }
+    )
   }
 
   updateFileInPreviewCache = (fileCache) => {
