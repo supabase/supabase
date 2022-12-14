@@ -1600,4 +1600,44 @@ module.exports = [
     source: '/docs/reference',
     destination: '/docs#reference-documentation',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login',
+    destination: '/docs/guides/auth/phone-login',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/email-otp-magic-link',
+    destination: '/docs/guides/auth/auth-magic-link',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
+    destination: '/docs/guides/auth/phone-login/messagebird',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-messagebird',
+    destination: '/docs/guides/auth/phone-login/messagebird',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/phone-sms-otp-twilio',
+    destination: '/docs/guides/auth/phone-login/twilio',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth-twilio',
+    destination: '/docs/guides/auth/phone-login/twilio',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/phone-sms-otp-vonage',
+    destination: '/docs/guides/auth/phone-login/vonage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-vonage',
+    destination: '/docs/guides/auth/phone-login/vonage',
+  },
 ]
