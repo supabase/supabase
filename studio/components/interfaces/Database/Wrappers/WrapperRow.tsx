@@ -15,6 +15,7 @@ import {
   IconCheckCircle,
   IconExternalLink,
   IconLoader,
+  IconHelpCircle,
 } from 'ui'
 
 import { useStore } from 'hooks'
@@ -47,7 +48,22 @@ const InputField: FC<{ option: any; value: any; error: any; onChange: any }> = (
       key={option.name}
       id={option.name}
       name={option.name}
-      label={option.label}
+      label={
+        <div className="flex items-center space-x-2">
+          <p>{option.label}</p>
+          {option.urlHelper !== undefined && (
+            <Link href={option.urlHelper}>
+              <a target="_blank">
+                <IconHelpCircle
+                  strokeWidth={2}
+                  size={14}
+                  className="text-scale-1000 hover:text-scale-1200 cursor-pointer transition"
+                />
+              </a>
+            </Link>
+          )}
+        </div>
+      }
       defaultValue={option.defaultValue ?? ''}
       required={option.required ?? false}
       value={value}
