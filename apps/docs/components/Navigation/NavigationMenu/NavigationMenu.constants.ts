@@ -375,6 +375,19 @@ export const database = {
       ],
     },
     {
+      name: 'Vault',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/database/vault', items: [] },
+        {
+          name: 'Secrets Management',
+          url: '/guides/database/vault/secrets-management',
+          items: [],
+        },
+        { name: 'Data Encryption', url: '/guides/database/vault/data-encryption', items: [] },
+      ],
+    },
+    {
       name: 'Extensions',
       url: undefined,
       items: [
