@@ -8,6 +8,7 @@ import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
 import { VaultToggle, SecretsManagement } from 'components/interfaces/Settings/Vault'
 import { FormHeader } from 'components/ui/Forms'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
@@ -15,6 +16,7 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
   const { ref } = useParams()
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isLoading = meta.extensions.isLoading
   const isEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
 
   useEffect(() => {
@@ -26,7 +28,13 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
       <FormHeader title="Vault" description="Application level encryption for your project" />
-      {!isEnabled ? (
+      {isLoading ? (
+        <div className="border rounded border-scale-500 p-12 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      ) : !isEnabled ? (
         <VaultToggle />
       ) : (
         <Tabs
