@@ -1049,96 +1049,7 @@ functions:
           If you're in a situation where your tables are **NOT** directly
           related, but instead are joined by a _join table_, you can still use
           the `select()` method to query the related data. The join table needs
-          to have the foreign keys as part of its composite primary key.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              users (
-                id int8 primary key,
-                name text
-              );
-            create table
-              teams (
-                id int8 primary key,
-                name text
-              );
-            -- join table
-            create table
-              users_teams (
-                user_id int8 not null references users,
-                team_id int8 not null references teams,
-                -- both foreign keys must be part of a composite primary key
-                primary key (user_id, team_id)
-              );
-
-            insert into
-              users (id, name)
-            values
-              (1, 'Kiran'),
-              (2, 'Evan');
-            insert into
-              teams (id, name)
-            values
-              (1, 'Green'),
-              (2, 'Blue');
-            insert into
-              users_teams (user_id, team_id)
-            values
-              (1, 1),
-              (1, 2),
-              (2, 2);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('users')
-              .select(`
-                name,
-                teams (
-                  name
-                )
-              `)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Kiran",
-                  "teams": [
-                    {
-                      "name": "Green"
-                    },
-                    {
-                      "name": "Blue"
-                    }
-                  ]
-                },
-                {
-                  "name": "Evan",
-                  "teams": [
-                    {
-                      "name": "Blue"
-                    }
-                  ]
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
+          to have the foreign keys as part of its composite primary key.              
         hideCodeBlock: true
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
@@ -1198,69 +1109,6 @@ functions:
           If you need to query the same foreign table twice, use the name of the
           joined column to identify which join to use. You can also give each
           column an alias.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              users (id int8 primary key, name text);
-
-            create table
-              messages (
-                sender_id int8 not null references users,
-                receiver_id int8 not null references users,
-                content text
-              );
-
-            insert into
-              users (id, name)
-            values
-              (1, 'Kiran'),
-              (2, 'Evan');
-
-            insert into
-              messages (sender_id, receiver_id, content)
-            values
-              (1, 2, '👋');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('messages')
-              .select(`
-                content,
-                from:sender_id(name),
-                to:receiver_id(name)
-              `)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "content": "👋",
-                  "from": {
-                    "name": "Kiran"
-                  },
-                  "to": {
-                    "name": "Evan"
-                  }
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: filtering-through-foreign-tables
         name: Filtering through foreign tables
@@ -1314,90 +1162,7 @@ functions:
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
           table returns `[]` or `null` but the parent table is not filtered out.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            create table
-              cities (
-                id int8 primary key,
-                country_id int8 not null references countries,
-                name text
-              );
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Germany'),
-              (2, 'Indonesia');
-            insert into
-              cities (id, country_id, name)
-            values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('cities')
-              .select('name, countries(*)')
-              .eq('countries.name', 'Estonia')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Bali",
-                  "countries": null
-                },
-                {
-                  "name": "Munich",
-                  "countries": null
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
-          If you want to filter out the parent table rows, use the `!inner` hint:
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('cities')
-              .select('name, countries!inner(*)')
-              .eq('countries.name', 'Estonia')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
+          If you want to filter out the parent table rows, use the `!inner` hint
         hideCodeBlock: true
       - id: querying-with-count-option
         name: Querying with count option
@@ -1430,46 +1195,7 @@ functions:
           ```
         description: |
           You can get the number of rows by using the
-          [count](/docs/reference/javascript/select#parameters) option. For
-          example, to get the table count without returning all rows:
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { count, error } = await supabase
-              .from('countries')
-              .select('*', { count: 'exact', head: true })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "count": 3,
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
+          [count](/docs/reference/javascript/select#parameters) option.
         hideCodeBlock: true
       - id: querying-json-data
         name: Querying JSON data
@@ -1516,55 +1242,6 @@ functions:
           [JSON](/docs/guides/database/json) columns. Postgres offers some
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           querying JSON data.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              users (
-                id int8 primary key,
-                name text,
-                address jsonb
-              );
-
-            insert into
-              users (id, name, address)
-            values
-              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-          ```ts
-          const { data, error } = await supabase
-            .from('users')
-            .select(`
-              id, name,
-              address->city
-            `)
-          ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Avdotya",
-                  "city": "Saint Petersburg"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
 
   - id: insert
@@ -1598,63 +1275,6 @@ functions:
             "statusText": "Created"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { error } = await supabase
-              .from('countries')
-              .insert({ id: 1, name: 'Denmark' })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "status": 201,
-              "statusText": "Created"
-            }
-            ```
-          </TabPanel>
-          </Tabs>
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Denmark"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: create-a-record-and-return-it
@@ -1685,43 +1305,6 @@ functions:
             "statusText": "Created"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .insert({ id: 1, name: 'Denmark' })
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Denmark"
-                }
-              ],
-              "status": 201,
-              "statusText": "Created"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: bulk-create
         name: Bulk create
@@ -1756,68 +1339,6 @@ functions:
         description: |
           A bulk create operation is handled in a single transaction.
           If any of the inserts fail, none of the rows are inserted.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { error } = await supabase
-              .from('countries')
-              .insert([
-                { id: 1, name: 'Nepal' },
-                { id: 1, name: 'Vietnam' },
-              ])
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "error": {
-                "code": "23505",
-                "details": "Key (id)=(1) already exists.",
-                "hint": null,
-                "message": "duplicate key value violates unique constraint \"countries_pkey\""
-              },
-              "status": 409,
-              "statusText": "Conflict"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
 
   - id: update
@@ -1853,70 +1374,6 @@ functions:
             "statusText": "No Content"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Taiwan');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { error } = await supabase
-              .from('countries')
-              .update({ name: 'Australia' })
-              .eq('id', 1)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "status": 204,
-              "statusText": "No Content"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Australia"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: update-a-record-and-return-it
@@ -1953,49 +1410,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Taiwan');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .update({ name: 'Australia' })
-              .eq('id', 1)
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Australia"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: updating-json-data
         name: Updating JSON data
@@ -2047,65 +1461,7 @@ functions:
         description: |
           Postgres offers some
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
-          working with JSON data.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              users (
-                id int8 primary key,
-                name text,
-                address jsonb
-              );
-
-            insert into
-              users (id, name, address)
-            values
-              (1, 'Michael', '{ "postcode": 90210 }');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('users')
-              .update({
-                address: {
-                  street: 'Melrose Place',
-                  postcode: 90210
-                }
-              })
-              .eq('address->postcode', 90210)
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Michael",
-                  "address": {
-                    "street": "Melrose Place",
-                    "postcode": 90210
-                  }
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
-          Currently, it is only possible to update the entire JSON document.
+          working with JSON data. Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
   - id: upsert
     title: 'Upsert data: upsert()'
@@ -2146,48 +1502,6 @@ functions:
             "statusText": "Created"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .upsert({ id: 1, name: 'Albania' })
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Albania"
-                }
-              ],
-              "status": 201,
-              "statusText": "Created"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: bulk-upsert-your-data
@@ -2230,55 +1544,6 @@ functions:
             "statusText": "Created"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .upsert([
-                { id: 1, name: 'Albania' },
-                { id: 2, name: 'Algeria' },
-              ])
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Albania"
-                },
-                {
-                  "id": 2,
-                  "name": "Algeria"
-                }
-              ],
-              "status": 201,
-              "statusText": "Created"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
@@ -2322,90 +1587,8 @@ functions:
           (primary key) column to determine conflicts. If there is no existing
           row with the same `id`, `upsert()` inserts a new row, which
           will fail in this case as there is already a row with `handle` `"saoirse"`.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              users (
-                id int8 generated by default as identity primary key,
-                handle text not null unique,
-                display_name text
-              );
-
-            insert into
-              users (id, handle, display_name)
-            values
-              (1, 'saoirse', null);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('users')
-              .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' })
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "error": {
-                "code": "23505",
-                "details": "Key (handle)=(saoirse) already exists.",
-                "hint": null,
-                "message": "duplicate key value violates unique constraint \"users_handle_key\""
-              },
-              "status": 409,
-              "statusText": "Conflict"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
           Using the `onConflict` option, you can instruct `upsert()` to use
-          another column with a unique constraint to determine conflicts:
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            await supabase
-              .from('users')
-              .upsert(
-                { id: 42, handle: 'saoirse', display_name: 'Saoirse' },
-                { onConflict: 'handle' },
-              )
-            const { data, error } = await supabase
-              .from('users')
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 42,
-                  "handle": "saoirse",
-                  "display_name": "Saoirse"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
+          another column with a unique constraint to determine conflicts.
         hideCodeBlock: true
 
   - id: delete
@@ -2446,65 +1629,6 @@ functions:
             "statusText": "No Content"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Spain');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { error } = await supabase
-              .from('countries')
-              .delete()
-              .eq('id', 1)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "status": 204,
-              "statusText": "No Content"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
 
@@ -2542,36 +1666,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create function hello_world() returns text as $$
-              select 'Hello world';
-            $$ language sql;
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase.rpc('hello_world')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": "Hello world",
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: call-a-postgres-function-with-arguments
@@ -2595,36 +1689,6 @@ functions:
               "statusText": "OK"
             }
             ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create function echo(say text) returns text as $$
-              select say;
-            $$ language sql;
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase.rpc('echo', { say: '👋' })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": "👋",
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: bulk-processing
         name: Bulk processing
@@ -2652,41 +1716,7 @@ functions:
           }
           ```
         description: |
-          You can process large payloads by passing in an array as an argument:
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create function add_one_each(arr int[]) returns int[] as $$
-              select array_agg(n + 1) from unnest(arr) as n;
-            $$ language sql;
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase.rpc('add_one_each', { arr: [1, 2, 3] })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                2,
-                3,
-                4
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
+          You can process large payloads by passing in an array as an argument.
         hideCodeBlock: true
       - id: call-a-postgres-function-with-filters
         name: Call a Postgres function with filters
@@ -2728,51 +1758,6 @@ functions:
           Postgres functions that return tables can also be combined with
           [Filters](/docs/reference/javascript/using-filters) and
           [Modifiers](/docs/reference/javascript/using-modifiers).
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'France'),
-              (2, 'United Kingdom');
-
-            create function list_stored_countries() returns setof countries as $$
-              select * from countries;
-            $$ language sql;
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .rpc('list_stored_countries')
-              .eq('id', 1)
-              .single()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": {
-                "id": 1,
-                "name": "France"
-              },
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
 
   - id: using-filters
@@ -2900,56 +1885,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-            <TabPanel id="schema" label="Schema">
-
-              ```sql
-              create table
-                users (
-                  id int8 primary key,
-                  name text,
-                  address jsonb
-                );
-
-              insert into
-                users (id, name, address)
-              values
-                (1, 'Michael', '{ "postcode": 90210 }'),
-                (2, 'Jane', null);
-              ```
-
-            </TabPanel>
-            <TabPanel id="js" label="JavaScript">
-
-              ```ts
-              const { data, error } = await supabase
-                .from('users')
-                .select()
-                .eq('address->postcode', 90210)
-              ```
-
-            </TabPanel>
-            <TabPanel id="result" label="Result">
-
-              ```json
-              {
-                "data": [
-                  {
-                    "id": 1,
-                    "name": "Michael",
-                    "address": {
-                      "postcode": 90210
-                    }
-                  }
-                ],
-                "status": 200,
-                "statusText": "OK"
-              }
-              ```
-
-            </TabPanel>
-          </Tabs>
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |
@@ -3006,70 +1941,7 @@ functions:
             ```
         description: |
           You can filter on foreign tables in your `select()` query using dot
-          notation:
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-            <TabPanel id="schema" label="Schema">
-
-              ```sql
-              create table
-                countries (id int8 primary key, name text);
-              create table
-                cities (
-                  id int8 primary key,
-                  country_id int8 not null references countries,
-                  name text
-                );
-
-              insert into
-                countries (id, name)
-              values
-                (1, 'Germany'),
-                (2, 'Indonesia');
-              insert into
-                cities (id, country_id, name)
-              values
-                (1, 2, 'Bali'),
-                (2, 1, 'Munich');
-              ```
-
-            </TabPanel>
-            <TabPanel id="js" label="JavaScript">
-
-              ```ts
-              const { data, error } = await supabase
-                .from('countries')
-                .select(`
-                  name,
-                  cities!inner (
-                    name
-                  )
-                `)
-                .eq('cities.name', 'Bali')
-              ```
-
-            </TabPanel>
-            <TabPanel id="result" label="Result">
-
-              ```json
-              {
-                "data": [
-                  {
-                    "name": "Indonesia",
-                    "cities": [
-                      {
-                        "name": "Bali"
-                      }
-                    ]
-                  }
-                ],
-                "status": 200,
-                "statusText": "OK"
-              }
-              ```
-
-            </TabPanel>
-          </Tabs>
+          notation.
   ######## TODO CHECK FILTER YAML ERRORS ########
   - id: eq
     title: eq()
@@ -3110,50 +1982,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .eq('name', 'Albania')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: neq
@@ -3199,54 +2027,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .neq('name', 'Albania')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Afghanistan"
-                },
-                {
-                  "id": 3,
-                  "name": "Algeria"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: gt
@@ -3288,50 +2068,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .gt('id', 2)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 3,
-                  "name": "Algeria"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: gte
@@ -3377,54 +2113,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .gte('id', 2)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": "Albania"
-                },
-                {
-                  "id": 3,
-                  "name": "Algeria"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: lt
@@ -3466,50 +2154,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .lt('id', 2)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Afghanistan"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: lte
@@ -3555,54 +2199,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .lte('id', 2)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Afghanistan"
-                },
-                {
-                  "id": 2,
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: like
@@ -3633,50 +2229,6 @@ functions:
             ```
         response: |
 
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .like('name', '%Alba%')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: ilike
@@ -3718,50 +2270,6 @@ functions:
               "statusText": "OK"
             }
             ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .like('name', '%alba%')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: is
@@ -3803,81 +2311,10 @@ functions:
           }
           ```
         description: |
-          Using the `eq()` filter doesn't work when filtering for `null`:
+          Using the `eq()` filter doesn't work when filtering for `null`.
 
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
+          Instead, you need to use `is()`.
 
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'null'),
-              (2, null);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .eq('name', null)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "null"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
-          Instead, you need to use `is()`:
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .is('name', null)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": null
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: in
@@ -3923,54 +2360,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .in('name', ['Albania', 'Algeria'])
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": "Albania"
-                },
-                {
-                  "id": 3,
-                  "name": "Algeria"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: contains
@@ -4014,52 +2403,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              issues (
-                id int8 primary key,
-                title text,
-                tags text[]
-              );
-
-            insert into
-              issues (id, title, tags)
-            values
-              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
-              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('issues')
-              .select('title')
-              .contains('tags', ['is:open', 'severity:high'])
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "title": "Cache invalidation is not working"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: on-range-columns
@@ -4106,54 +2449,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: on-jsonb-columns
         name: On `jsonb` columns
@@ -4192,52 +2487,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              users (
-                id int8 primary key,
-                name text,
-                address jsonb
-              );
-
-            insert into
-              users (id, name, address)
-            values
-              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
-              (2, 'Jane', '{}');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('users')
-              .select('name')
-              .contains('address', { postcode: 90210 })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Michael"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
 
   - id: contained-by
@@ -4281,52 +2530,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              classes (
-                id int8 primary key,
-                name text,
-                days text[]
-              );
-
-            insert into
-              classes (id, name, days)
-            values
-              (1, 'Chemistry', array['monday', 'friday']),
-              (2, 'History', array['monday', 'wednesday', 'thursday']);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('classes')
-              .select('name')
-              .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday'])
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Chemistry"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: on-range-columns
@@ -4373,54 +2576,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: on-jsonb-columns
         name: On `jsonb` columns
@@ -4459,52 +2614,6 @@ functions:
               "statusText": "OK"
             }
             ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              users (
-                id int8 primary key,
-                name text,
-                address jsonb
-              );
-
-            insert into
-              users (id, name, address)
-            values
-              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
-              (2, 'Jane', '{}');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('users')
-              .select('name')
-              .containedBy('address', {})
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Jane"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
 
   - id: range-gt
@@ -4555,54 +2664,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "room_name": "Topaz",
-                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
 
@@ -4654,54 +2715,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "room_name": "Topaz",
-                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
 
@@ -4753,54 +2766,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: range-lte
@@ -4851,54 +2816,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
 
@@ -4950,54 +2867,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
 
@@ -5042,52 +2911,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              issues (
-                id int8 primary key,
-                title text,
-                tags text[]
-              );
-
-            insert into
-              issues (id, title, tags)
-            values
-              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
-              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('issues')
-              .select('title')
-              .overlaps('tags', ['is:closed', 'severity:high'])
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "title": "Cache invalidation is not working"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: on-range-columns
@@ -5134,54 +2957,6 @@ functions:
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
           can filter on range columns using the string representation of range
           values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              reservations (
-                id int8 primary key,
-                room_name text,
-                during tsrange
-              );
-
-            insert into
-              reservations (id, room_name, during)
-            values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('reservations')
-              .select()
-              .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
   # TODO: schema & result
   - id: text-search
@@ -5288,49 +3063,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select('name')
-              .match({ id: 2, name: 'Albania' })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: not
@@ -5378,49 +3110,6 @@ functions:
               "statusText": "OK"
             }
             ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'null'),
-              (2, null);
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .not('name', 'is', null)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "null"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: or
@@ -5471,52 +3160,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select('name')
-              .or('id.eq.2,name.eq.Algeria')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Albania"
-                },
-                {
-                  "name": "Algeria"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: use-or-with-and
@@ -5553,50 +3196,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select('name')
-              .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Afghanistan"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
       - id: use-or-on-foreign-tables
         name: Use `or` on foreign tables
@@ -5652,69 +3251,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            create table
-              cities (
-                id int8 primary key,
-                country_id int8 not null references countries,
-                name text
-              );
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Germany'),
-              (2, 'Indonesia');
-            insert into
-              cities (id, country_id, name)
-            values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select(`
-                name,
-                cities!inner (
-                  name
-                )
-              `)
-              .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Germany",
-                  "cities": [
-                    {
-                      "name": "Munich"
-                    }
-                  ]
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
 
   - id: filter
@@ -5763,50 +3299,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .filter('name', 'in', '("Algeria","Japan")')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 3,
-                  "name": "Algeria"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: on-a-foreign-table
@@ -5863,69 +3355,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            create table
-              cities (
-                id int8 primary key,
-                country_id int8 not null references countries,
-                name text
-              );
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Germany'),
-              (2, 'Indonesia');
-            insert into
-              cities (id, country_id, name)
-            values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select(`
-                name,
-                cities!inner (
-                  name
-                )
-              `)
-              .filter('cities.name', 'eq', 'Bali')
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Indonesia",
-                  "cities": [
-                    {
-                      "name": "Bali"
-                    }
-                  ]
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
   - id: using-modifiers
     title: Using Modifiers
@@ -5976,70 +3405,6 @@ functions:
             "statusText": "Created"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .upsert({ id: 1, name: 'Albania' })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "status": 201,
-              "statusText": "Created"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .upsert({ id: 1, name: 'Algeria' })
-              .select()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 1,
-                  "name": "Algeria"
-                }
-              ],
-              "status": 201,
-              "statusText": "Created"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: order
@@ -6089,58 +3454,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .order('name', { ascending: false })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "id": 3,
-                  "name": "Algeria"
-                },
-                {
-                  "id": 2,
-                  "name": "Albania"
-                },
-                {
-                  "id": 1,
-                  "name": "Afghanistan"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: on-a-foreign-table
@@ -6207,76 +3520,6 @@ functions:
         description: |
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            create table
-              cities (
-                id int8 primary key,
-                country_id int8 not null references countries,
-                name text
-              );
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'United States'),
-              (2, 'Vanuatu');
-            insert into
-              cities (id, country_id, name)
-            values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select(`
-                name,
-                cities (
-                  name
-                )
-              `)
-              .order('name', { foreignTable: 'cities', ascending: false })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "United States",
-                  "cities": [
-                    {
-                      "name": "New York City"
-                    },
-                    {
-                      "name": "Atlanta"
-                    }
-                  ]
-                },
-                {
-                  "name": "Vanuatu",
-                  "cities": []
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
 
   - id: limit
@@ -6317,49 +3560,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select('name')
-              .limit(1)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Afghanistan"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
       - id: on-a-foreign-table
@@ -6415,68 +3615,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            create table
-              cities (
-                id int8 primary key,
-                country_id int8 not null references countries,
-                name text
-              );
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'United States');
-            insert into
-              cities (id, country_id, name)
-            values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select(`
-                name,
-                cities (
-                  name
-                )
-              `)
-              .limit(1, { foreignTable: 'cities' })
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "United States",
-                  "cities": [
-                    {
-                      "name": "Atlanta"
-                    }
-                  ]
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
   - id: range
     title: range()
@@ -6519,52 +3657,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select('name')
-              .range(0, 1)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Afghanistan"
-                },
-                {
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: abort-signal
@@ -6606,38 +3698,8 @@ functions:
             }
             ```
         description: |
-          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="js">
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const ac = new AbortController()
-            ac.abort()
-            const { data, error } = await supabase
-              .from('very_big_table')
-              .select()
-              .abortSignal(ac.signal)
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "error": {
-                "message": "FetchError: The user aborted a request.",
-                "details": "",
-                "hint": "",
-                "code": ""
-              },
-              "status": 400,
-              "statusText": "Bad Request"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
+          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. 
+          Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
         hideCodeBlock: true
         isSpotlight: true
   - id: single
@@ -6677,48 +3739,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select('name')
-              .limit(1)
-              .single()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": {
-                "name": "Afghanistan"
-              },
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: maybe-single
@@ -6755,45 +3775,6 @@ functions:
             "statusText": "OK"
           }
           ```
-        description: |
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .eq('name', 'Singapore')
-              .maybeSingle()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
   - id: csv
@@ -6832,45 +3813,6 @@ functions:
           ```
         description: |
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
-
-          <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
-          <TabPanel id="schema" label="Schema">
-
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-
-          </TabPanel>
-          <TabPanel id="js" label="JavaScript">
-
-            ```ts
-            const { data, error } = await supabase
-              .from('countries')
-              .select()
-              .csv()
-            ```
-
-          </TabPanel>
-          <TabPanel id="result" label="Result">
-
-            ```json
-            {
-              "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
-
-          </TabPanel>
-          </Tabs>
         hideCodeBlock: true
         isSpotlight: true
 
@@ -6969,7 +3911,6 @@ functions:
     examples:
       - id: basic-invocation
         name: Basic invocation
-        description:
         isSpotlight: true
         code: |
           ```js
