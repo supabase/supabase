@@ -60,7 +60,7 @@
       {
         "title": "Multi-factor Authentication",
         "blog": "/blog",
-        "docs": "/docs",
+        "docs": "/docs/guides/auth/auth-mfa",
         "isNew": false,
         "description": ""
       }
