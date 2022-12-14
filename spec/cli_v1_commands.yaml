@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.23.0
+  version: 1.24.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -49,11 +49,7 @@ commands:
       - supabase-vanity-subdomains-check-availability
       - supabase-vanity-subdomains-delete
       - supabase-vanity-subdomains-get
-    flags:
-      - id: project-ref
-        name: --project-ref <string>
-        description: Project ref of the Supabase project.
-        default_value: ''
+    flags: []
   - id: supabase-vanity-subdomains-get
     title: supabase vanity-subdomains get
     summary: Get the current vanity subdomain
@@ -61,7 +57,11 @@ commands:
     links: []
     usage: supabase vanity-subdomains get
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-vanity-subdomains-delete
     title: supabase vanity-subdomains delete
     summary: Deletes a project's vanity subdomain
@@ -71,7 +71,11 @@ commands:
     links: []
     usage: supabase vanity-subdomains delete
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-vanity-subdomains-check-availability
     title: supabase vanity-subdomains check-availability
     summary: Checks if a desired subdomain is available for use
@@ -84,6 +88,10 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
+        default_value: ''
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-vanity-subdomains-activate
     title: supabase vanity-subdomains activate
@@ -102,6 +110,10 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
+        default_value: ''
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-test
     title: supabase test
@@ -343,11 +355,7 @@ commands:
     subcommands:
       - supabase-network-restrictions-get
       - supabase-network-restrictions-update
-    flags:
-      - id: project-ref
-        name: --project-ref <string>
-        description: Project ref of the Supabase project.
-        default_value: ''
+    flags: []
   - id: supabase-network-restrictions-update
     title: supabase network-restrictions update
     summary: Update network restrictions
@@ -364,6 +372,10 @@ commands:
         name: --db-allow-cidr <strings>
         description: CIDR to allow DB connections from.
         default_value: '[]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-network-restrictions-get
     title: supabase network-restrictions get
     summary: Get the current network restrictions
@@ -371,7 +383,11 @@ commands:
     links: []
     usage: supabase network-restrictions get
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-migration
     title: supabase migration
     summary: Manage database migration scripts
@@ -531,6 +547,10 @@ commands:
         description: |
           Path to an env file to be populated to the Function environment.
         default_value: ''
+      - id: import-map
+        name: --import-map <string>
+        description: Path to import map file.
+        default_value: ''
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
@@ -552,6 +572,10 @@ commands:
     usage: supabase functions deploy <Function name> [flags]
     subcommands: []
     flags:
+      - id: import-map
+        name: --import-map <string>
+        description: Path to import map file.
+        default_value: ''
       - id: legacy-bundle
         name: --legacy-bundle
         description: Use legacy bundling mechanism.
@@ -594,6 +618,14 @@ commands:
       - supabase-domains-delete
       - supabase-domains-get
       - supabase-domains-reverify
+    flags: []
+  - id: supabase-domains-reverify
+    title: supabase domains reverify
+    summary: Re-verify the custom hostname config for your project
+    tags: []
+    links: []
+    usage: supabase domains reverify
+    subcommands: []
     flags:
       - id: include-raw-output
         name: --include-raw-output
@@ -603,14 +635,6 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
-  - id: supabase-domains-reverify
-    title: supabase domains reverify
-    summary: Re-verify the custom hostname config for your project
-    tags: []
-    links: []
-    usage: supabase domains reverify
-    subcommands: []
-    flags: []
   - id: supabase-domains-get
     title: supabase domains get
     summary: Get the current custom hostname config
@@ -620,7 +644,15 @@ commands:
     links: []
     usage: supabase domains get
     subcommands: []
-    flags: []
+    flags:
+      - id: include-raw-output
+        name: --include-raw-output
+        description: Include raw output (useful for debugging).
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-domains-delete
     title: supabase domains delete
     summary: Deletes the custom hostname config for your project
@@ -628,7 +660,15 @@ commands:
     links: []
     usage: supabase domains delete
     subcommands: []
-    flags: []
+    flags:
+      - id: include-raw-output
+        name: --include-raw-output
+        description: Include raw output (useful for debugging).
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-domains-create
     title: supabase domains create
     summary: Create a custom hostname
@@ -645,6 +685,14 @@ commands:
         name: --custom-hostname <string>
         description: The custom hostname to use for your Supabase project.
         default_value: ''
+      - id: include-raw-output
+        name: --include-raw-output
+        description: Include raw output (useful for debugging).
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-domains-activate
     title: supabase domains activate
     summary: Activate the custom hostname for a project
@@ -657,7 +705,15 @@ commands:
     links: []
     usage: supabase domains activate
     subcommands: []
-    flags: []
+    flags:
+      - id: include-raw-output
+        name: --include-raw-output
+        description: Include raw output (useful for debugging).
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-db
     title: supabase db
     summary: Manage local Postgres databases
@@ -695,11 +751,7 @@ commands:
     links: []
     subcommands:
       - supabase-db-remote-commit
-    flags:
-      - id: password
-        name: -p, --password <string>
-        description: Password to your remote Postgres database.
-        default_value: ''
+    flags: []
   - id: supabase-db-remote-commit
     title: supabase db remote commit
     summary: Commit remote changes as a new migration
@@ -707,7 +759,11 @@ commands:
     links: []
     usage: supabase db remote commit
     subcommands: []
-    flags: []
+    flags:
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''
   - id: supabase-db-push
     title: supabase db push
     summary: Push new migrations to the remote database
