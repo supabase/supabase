@@ -7,6 +7,13 @@
     "type": "markdown"
   },
   {
+    "title": "Global flags",
+    "id": "global-flags",
+    "slug": "global-flags",
+    "isFunc": false,
+    "type": "markdown"
+  },
+  {
     "title": "general",
     "items": [
       {
@@ -73,6 +80,77 @@
         "id": "supabase-gen-types-typescript",
         "title": "supabase gen types typescript",
         "slug": "supabase-gen-types-typescript",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "title": "Database",
+    "items": [
+      { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "type": "cli-command" },
+      {
+        "id": "supabase-db-reset",
+        "title": "supabase db reset",
+        "slug": "supabase-db-reset",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-remote",
+        "title": "supabase db remote",
+        "slug": "supabase-db-remote",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-remote-commit",
+        "title": "supabase db remote commit",
+        "slug": "supabase-db-remote-commit",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-push",
+        "title": "supabase db push",
+        "slug": "supabase-db-push",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-lint",
+        "title": "supabase db lint",
+        "slug": "supabase-db-lint",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-diff",
+        "title": "supabase db diff",
+        "slug": "supabase-db-diff",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "title": "migrations",
+    "items": [
+      {
+        "id": "supabase-migration",
+        "title": "supabase migration",
+        "slug": "supabase-migration",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-new",
+        "title": "supabase migration new",
+        "slug": "supabase-migration-new",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-list",
+        "title": "supabase migration list",
+        "slug": "supabase-migration-list",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-repair",
+        "title": "supabase migration repair",
+        "slug": "supabase-migration-repair",
         "type": "cli-command"
       }
     ]
@@ -147,29 +225,6 @@
     ]
   },
   {
-    "title": "migrations",
-    "items": [
-      {
-        "id": "supabase-migration",
-        "title": "supabase migration",
-        "slug": "supabase-migration",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-migration-new",
-        "title": "supabase migration new",
-        "slug": "supabase-migration-new",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-migration-list",
-        "title": "supabase migration list",
-        "slug": "supabase-migration-list",
-        "type": "cli-command"
-      }
-    ]
-  },
-  {
     "title": "Edge Functions",
     "items": [
       {
@@ -206,7 +261,7 @@
   },
   {
     "title": "Domains",
-    "Items": [
+    "items": [
       {
         "id": "supabase-domains",
         "title": "supabase domains",
@@ -246,43 +301,59 @@
     ]
   },
   {
-    "title": "Database",
+    "title": "Vanity Subdomains",
     "items": [
-      { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "type": "cli-command" },
       {
-        "id": "supabase-db-reset",
-        "title": "supabase db reset",
-        "slug": "supabase-db-reset",
+        "id": "supabase-vanity-subdomains",
+        "title": "supabase vanity-subdomains",
+        "slug": "supabase-vanity-subdomains",
         "type": "cli-command"
       },
       {
-        "id": "supabase-db-remote",
-        "title": "supabase db remote",
-        "slug": "supabase-db-remote",
+        "id": "supabase-vanity-subdomains-check-availability",
+        "title": "supabase vanity-subdomains check-availability",
+        "slug": "supabase-vanity-subdomains-check-availability",
         "type": "cli-command"
       },
       {
-        "id": "supabase-db-remote-commit",
-        "title": "supabase db remote commit",
-        "slug": "supabase-db-remote-commit",
+        "id": "supabase-vanity-subdomains-activate",
+        "title": "supabase vanity-subdomains activate",
+        "slug": "supabase-vanity-subdomains-activate",
         "type": "cli-command"
       },
       {
-        "id": "supabase-db-push",
-        "title": "supabase db push",
-        "slug": "supabase-db-push",
+        "id": "supabase-vanity-subdomains-delete",
+        "title": "supabase vanity-subdomains delete",
+        "slug": "supabase-vanity-subdomains-delete",
         "type": "cli-command"
       },
       {
-        "id": "supabase-db-lint",
-        "title": "supabase db lint",
-        "slug": "supabase-db-lint",
+        "id": "supabase-vanity-subdomains-get",
+        "title": "supabase vanity-subdomains get",
+        "slug": "supabase-vanity-subdomains-get",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "title": "Network Restrictions",
+    "items": [
+      {
+        "id": "supabase-network-restrictions",
+        "title": "supabase network-restrictions",
+        "slug": "supabase-network-restrictions",
         "type": "cli-command"
       },
       {
-        "id": "supabase-db-diff",
-        "title": "supabase db diff",
-        "slug": "supabase-db-diff",
+        "id": "supabase-network-restrictions-get",
+        "title": "supabase network-restrictions get",
+        "slug": "supabase-network-restrictions-get",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-network-restrictions-update",
+        "title": "supabase network-restrictions update",
+        "slug": "supabase-network-restrictions-update",
         "type": "cli-command"
       }
     ]

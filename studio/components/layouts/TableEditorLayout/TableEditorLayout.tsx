@@ -35,6 +35,9 @@ const TableEditorLayout: FC<Props> = ({
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
+  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
+
   useEffect(() => {
     if (ui.selectedProject?.ref) {
       meta.schemas.load()
@@ -43,9 +46,14 @@ const TableEditorLayout: FC<Props> = ({
       meta.policies.load()
       meta.publications.load()
       meta.extensions.load()
-      vault.load()
     }
   }, [ui.selectedProject?.ref])
+
+  useEffect(() => {
+    if (isEnabled) {
+      vault.load()
+    }
+  }, [ui.selectedProject?.ref, isEnabled])
 
   useEffect(() => {
     let cancel = false
