@@ -53,95 +53,9 @@ const TableEditorMenu: FC<Props> = ({
   const tables: PostgresTable[] = meta.tables.list(
     (table: PostgresTable) => table.schema === selectedSchema
   )
-  // const foreignTables: PostgresTable[] = meta.foreignTables.list(
-  //   (table: PostgresTable) => table.schema === selectedSchema
-  // )
-  const foreignTables = [
-    {
-      id: 27112,
-      schema: 'public',
-      name: 'balance',
-      comment: null,
-      columns: [
-        {
-          table_id: 27112,
-          schema: 'public',
-          table: 'balance',
-          id: '27112.1',
-          ordinal_position: 1,
-          name: 'balance_type',
-          default_value: null,
-          data_type: 'text',
-          format: 'text',
-          is_identity: false,
-          identity_generation: null,
-          is_generated: false,
-          is_nullable: true,
-          is_updatable: true,
-          is_unique: false,
-          enums: [],
-          comment: null,
-        },
-        {
-          table_id: 27112,
-          schema: 'public',
-          table: 'balance',
-          id: '27112.2',
-          ordinal_position: 2,
-          name: 'amount',
-          default_value: null,
-          data_type: 'bigint',
-          format: 'int8',
-          is_identity: false,
-          identity_generation: null,
-          is_generated: false,
-          is_nullable: true,
-          is_updatable: true,
-          is_unique: false,
-          enums: [],
-          comment: null,
-        },
-        {
-          table_id: 27112,
-          schema: 'public',
-          table: 'balance',
-          id: '27112.3',
-          ordinal_position: 3,
-          name: 'currency',
-          default_value: null,
-          data_type: 'text',
-          format: 'text',
-          is_identity: false,
-          identity_generation: null,
-          is_generated: false,
-          is_nullable: true,
-          is_updatable: true,
-          is_unique: false,
-          enums: [],
-          comment: null,
-        },
-        {
-          table_id: 27112,
-          schema: 'public',
-          table: 'balance',
-          id: '27112.4',
-          ordinal_position: 4,
-          name: 'attrs',
-          default_value: null,
-          data_type: 'jsonb',
-          format: 'jsonb',
-          is_identity: false,
-          identity_generation: null,
-          is_generated: false,
-          is_nullable: true,
-          is_updatable: true,
-          is_unique: false,
-          enums: [],
-          comment: null,
-        },
-      ],
-    },
-  ]
+  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list(
+    (table: PostgresTable) => table.schema === selectedSchema
+  )
 
   // @ts-ignore
   const schema = schemas.find((schema) => schema.name === selectedSchema)
@@ -187,7 +101,9 @@ const TableEditorMenu: FC<Props> = ({
   const filteredForeignTables =
     searchText.length === 0
       ? foreignTables
-      : foreignTables.filter((table) => table.name.toLowerCase().includes(searchText.toLowerCase()))
+      : foreignTables.filter((table) =>
+          (table?.name ?? '').toLowerCase().includes(searchText.toLowerCase())
+        )
 
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
     meta.excludedSchemas.includes(schema?.name ?? '')
