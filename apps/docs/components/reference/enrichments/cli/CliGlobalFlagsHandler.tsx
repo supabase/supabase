@@ -8,24 +8,21 @@ import Options from '~/components/Options'
 const CliGlobalFlagsHandler = () => {
   return (
     <RefSubLayout.EducationRow className="not-prose">
-      <>
-        <RefSubLayout.Details>
-          <h3 className="text-lg text-scale-1200 mb-3">Flags</h3>
-          <ul className="">
-            {spec.flags.map((flag) => {
-              console.log('flag', flag)
-              return (
-                <Param
-                  {...flag}
-                  isOptional={flag.required === undefined ? true : !flag.required}
-                ></Param>
-              )
-            })}
-          </ul>
-        </RefSubLayout.Details>
+      <RefSubLayout.Details>
+        <h3 className="text-lg text-scale-1200 mb-3">Flags</h3>
+        <ul className="">
+          {spec.flags.map((flag) => {
+            return (
+              <Param
+                {...flag}
+                isOptional={flag.required === undefined ? true : !flag.required}
+              ></Param>
+            )
+          })}
+        </ul>
+      </RefSubLayout.Details>
 
-        <RefSubLayout.Examples></RefSubLayout.Examples>
-      </>
+      <RefSubLayout.Examples></RefSubLayout.Examples>
     </RefSubLayout.EducationRow>
   )
 }
