@@ -492,16 +492,16 @@ export const platform = {
       items: [
         {
           name: 'Enable SSO for your organization',
-          url: '/guides/platform/sso/enable-sso',
+          url: '/guides/platform/sso',
           items: [],
         },
-        { name: 'Setup SSO with Azure AD', url: '/guides/platform/sso/sso-with-azure', items: [] },
+        { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure', items: [] },
         {
-          name: 'Setup SSO with Google Workspaces',
-          url: '/guides/platform/sso/sso-with-gsuite',
+          name: 'SSO with Google Workspaces',
+          url: '/guides/platform/sso/gsuite',
           items: [],
         },
-        { name: 'Setup SSO with Okta', url: '/guides/platform/sso/sso-with-okta', items: [] },
+        { name: 'SSO with Okta', url: '/guides/platform/sso/okta', items: [] },
       ],
     },
     {
