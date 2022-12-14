@@ -369,7 +369,11 @@ export default function launchweek() {
                         >
                           <div className="absolute top-0 right-0 w-full h-full -z-20 ">
                             <Image
-                              src={'/images/launchweek/mfa-dark.png'}
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/mfa-dark.png'
+                                  : '/images/launchweek/mfa-light.png'
+                              }
                               layout="fill"
                               objectFit="cover"
                               quality={100}
@@ -377,7 +381,11 @@ export default function launchweek() {
                           </div>
                           <div className="absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover:opacity-100 duration-500 transition-all">
                             <Image
-                              src={'/images/launchweek/mfa-dark-hover.png'}
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/mfa-dark-hover.png'
+                                  : '/images/launchweek/mfa-light-hover.png'
+                              }
                               layout="fill"
                               objectFit="cover"
                               quality={100}
