@@ -9,7 +9,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:0.22.08
+    image: supabase/studio:20221214-4eecc99
     restart: unless-stopped
     ports:
       - ${STUDIO_PORT}:3000/tcp
