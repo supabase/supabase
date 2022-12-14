@@ -1,5 +1,5 @@
-// @ts-expect-error
 import { IconChevronRight } from '~/../../packages/ui'
+// @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Options from '~/components/Options'
