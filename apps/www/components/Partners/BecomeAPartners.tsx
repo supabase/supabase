@@ -81,7 +81,9 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                   <Listbox.Option label="Expert (Agency &amp; Consulting)" value="expert">
                     Expert (Agency &amp; Consulting)
                   </Listbox.Option>
-                  <Listbox.Option label="Technology" value="technology">Technology</Listbox.Option>
+                  <Listbox.Option label="Technology" value="technology">
+                    Technology
+                  </Listbox.Option>
                 </Listbox>
               </div>
 
