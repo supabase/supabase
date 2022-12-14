@@ -192,14 +192,14 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'integrations'} active={isIntegrationsActive} />
       <NavigationMenuGuideList id={'reference'} active={isReferenceActive} />
       {/* // Client Libs */}
-      <NavigationMenuRefList
+      {/* <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v1'}
         active={isReference_Javascript_V1}
         commonSections={libCommonSections}
         lib="javascript"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v1)}
-      />
+      /> */}
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v2'}
@@ -208,59 +208,59 @@ const SideNav = () => {
         lib="javascript"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v2)}
       />
-      <NavigationMenuRefList
+      {/* <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v0'}
         active={isReference_Dart_V0}
         commonSections={libCommonSections}
         lib="dart"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v0)}
-      />
-      <NavigationMenuRefList
+      /> */}
+      {/* <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v1'}
         active={isReference_Dart_V1}
         commonSections={libCommonSections}
         lib="dart"
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v1)}
-      />
+      /> */}
       {/* // Tools */}
-      <NavigationMenuRefList
+      {/* <NavigationMenuRefList
         key={'reference-cli-menu'}
         id={'reference_cli'}
         active={isReference_Cli}
         commonSections={cliCommonSections}
         lib="cli"
-      />
-      <NavigationMenuRefList
+      /> */}
+      {/* <NavigationMenuRefList
         key={'reference-api-menu'}
         id={'reference_api'}
         active={isReference_Api}
         commonSections={apiCommonSections}
         lib="api"
-      />
+      /> */}
       {/* // Self Hosting Server */}
-      <NavigationMenuRefList
+      {/* <NavigationMenuRefList
         key={'reference-self-hosting-auth-menu'}
         id={'reference_self_hosting_auth'}
         active={isReference_Self_Hosting_Auth}
         commonSections={authServerCommonSections}
         lib="self-hosting-auth"
-      />
-      <NavigationMenuRefList
+      /> */}
+      {/* <NavigationMenuRefList
         key={'reference-self-hosting-storage-menu'}
         id={'reference_self_hosting_storage'}
         active={isReference_Self_Hosting_Storage}
         commonSections={storageServerCommonSections}
         lib="self-hosting-storage"
-      />
-      <NavigationMenuRefList
+      /> */}
+      {/* <NavigationMenuRefList
         key={'reference-self-hosting-realtime-menu'}
         id={'reference_self_hosting_realtime'}
         active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
         lib="self-hosting-auth"
-      />
+      /> */}
     </div>
   )
 }

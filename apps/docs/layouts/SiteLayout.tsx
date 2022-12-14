@@ -7,7 +7,11 @@ import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 
-import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import {
+  menuState,
+  // useMenuLevelId,
+  // useMenuMobileOpen
+} from '~/hooks/useMenuState'
 import { useEffect } from 'react'
 
 const SiteRefLayout = ({ children }) => {
@@ -23,8 +27,10 @@ const SiteRefLayout = ({ children }) => {
     }
   }, [])
 
-  const menuLevel = useMenuLevelId()
-  const mobileMenuOpen = useMenuMobileOpen()
+  const menuLevel = 'home'
+  // useMenuLevelId()
+  const mobileMenuOpen = false
+  // useMenuMobileOpen()
 
   const levelsData = {
     home: {
