@@ -257,5 +257,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/hf",
     "author_image_url": "https://github.com/hf.png"
+  },
+  {
+    "author_id": "joshenlim",
+    "author": "Joshen Lim",
+    "position": "Engineering",
+    "author_url": "https://github.com/joshenlim",
+    "author_image_url": "https://github.com/joshenlim.png"
   }
 ]
