@@ -417,7 +417,7 @@ export default function launchweek() {
                             />
                           </div>
 
-                          <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start">
+                          <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start text-black dark:text-white">
                             <span>{day3.steps[0].title}</span>
                             <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               Updated
