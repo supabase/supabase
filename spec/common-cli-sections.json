@@ -78,6 +78,48 @@
     ]
   },
   {
+    "title": "Database",
+    "items": [
+      { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "type": "cli-command" },
+      {
+        "id": "supabase-db-reset",
+        "title": "supabase db reset",
+        "slug": "supabase-db-reset",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-remote",
+        "title": "supabase db remote",
+        "slug": "supabase-db-remote",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-remote-commit",
+        "title": "supabase db remote commit",
+        "slug": "supabase-db-remote-commit",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-push",
+        "title": "supabase db push",
+        "slug": "supabase-db-push",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-lint",
+        "title": "supabase db lint",
+        "slug": "supabase-db-lint",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-diff",
+        "title": "supabase db diff",
+        "slug": "supabase-db-diff",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
     "title": "secrets",
     "items": [
       {
@@ -299,48 +341,6 @@
         "id": "supabase-network-restrictions-update",
         "title": "supabase network-restrictions update",
         "slug": "supabase-network-restrictions-update",
-        "type": "cli-command"
-      }
-    ]
-  },
-  {
-    "title": "Database",
-    "items": [
-      { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "type": "cli-command" },
-      {
-        "id": "supabase-db-reset",
-        "title": "supabase db reset",
-        "slug": "supabase-db-reset",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-db-remote",
-        "title": "supabase db remote",
-        "slug": "supabase-db-remote",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-db-remote-commit",
-        "title": "supabase db remote commit",
-        "slug": "supabase-db-remote-commit",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-db-push",
-        "title": "supabase db push",
-        "slug": "supabase-db-push",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-db-lint",
-        "title": "supabase db lint",
-        "slug": "supabase-db-lint",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-db-diff",
-        "title": "supabase db diff",
-        "slug": "supabase-db-diff",
         "type": "cli-command"
       }
     ]
