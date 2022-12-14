@@ -1,4 +1,4 @@
-clispec: "001"
+clispec: '001'
 info:
   id: cli
   version: 1.23.0
@@ -20,19 +20,19 @@ flags:
   - id: debug
     name: --debug
     description: output debug logs to stderr
-    default_value: "false"
+    default_value: 'false'
   - id: experimental
     name: --experimental
     description: enable experimental features
-    default_value: "false"
+    default_value: 'false'
   - id: help
     name: -h, --help
     description: help for supabase
-    default_value: "false"
+    default_value: 'false'
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
-    default_value: ""
+    default_value: ''
 commands:
   - id: supabase-vanity-subdomains
     title: supabase vanity-subdomains
@@ -53,7 +53,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-vanity-subdomains-get
     title: supabase vanity-subdomains get
     summary: Get the current vanity subdomain
@@ -84,7 +84,7 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-vanity-subdomains-activate
     title: supabase vanity-subdomains activate
     summary: Activate a vanity subdomain
@@ -102,7 +102,7 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-test
     title: supabase test
     summary: Run tests on local Supabase containers
@@ -132,7 +132,7 @@ commands:
       - id: backup
         name: --backup
         description: Backs up the current database before stopping.
-        default_value: "false"
+        default_value: 'false'
   - id: supabase-status
     title: supabase status
     summary: Show status of local Supabase containers
@@ -212,7 +212,7 @@ commands:
       - id: env-file
         name: --env-file <string>
         description: Read secrets from a .env file.
-        default_value: ""
+        default_value: ''
   - id: supabase-secrets-list
     title: supabase secrets list
     summary: List all secrets on Supabase
@@ -252,15 +252,15 @@ commands:
       - id: db-password
         name: --db-password <string>
         description: Database password of the project.
-        default_value: ""
+        default_value: ''
       - id: interactive
         name: -i, --interactive
         description: Enables interactive mode.
-        default_value: "false"
+        default_value: 'false'
       - id: org-id
         name: --org-id <string>
         description: Organization ID to create the project in.
-        default_value: ""
+        default_value: ''
       - id: plan
         name: --plan <[ free | pro ]>
         description: Select a plan that suits your needs.
@@ -275,7 +275,7 @@ commands:
       - id: region
         name: --region <string>
         description: Select a region close to you for the best performance.
-        default_value: ""
+        default_value: ''
         accepted_values:
           - id: ap-northeast-1
             name: ap-northeast-1
@@ -347,7 +347,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-network-restrictions-update
     title: supabase network-restrictions update
     summary: Update network restrictions
@@ -359,7 +359,7 @@ commands:
       - id: bypass-cidr-checks
         name: --bypass-cidr-checks
         description: Bypass some of the CIDR validation checks.
-        default_value: "false"
+        default_value: 'false'
       - id: db-allow-cidr
         name: --db-allow-cidr <strings>
         description: CIDR to allow DB connections from.
@@ -395,7 +395,7 @@ commands:
         name: --status <[ applied | reverted ]>
         description: Version status to update.
         required: true
-        default_value: ""
+        default_value: ''
         accepted_values:
           - id: applied
             name: applied
@@ -422,7 +422,7 @@ commands:
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ""
+        default_value: ''
   - id: supabase-login
     title: supabase login
     summary: Authenticate using an access token
@@ -444,12 +444,12 @@ commands:
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ""
+        default_value: ''
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         required: true
-        default_value: ""
+        default_value: ''
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
@@ -489,19 +489,19 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: Generate types from a database url.
-        default_value: ""
+        default_value: ''
       - id: linked
         name: --linked
         description: Generate types from the linked project.
-        default_value: "false"
+        default_value: 'false'
       - id: local
         name: --local
         description: Generate types from the local dev database.
-        default_value: "false"
+        default_value: 'false'
       - id: project-id
         name: --project-id <string>
         description: Generate types from a project ID.
-        default_value: ""
+        default_value: ''
       - id: schema
         name: --schema <stringArray>
         description: Schemas to generate types for.
@@ -530,11 +530,11 @@ commands:
         name: --env-file <string>
         description: |
           Path to an env file to be populated to the Function environment.
-        default_value: ""
+        default_value: ''
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
-        default_value: "false"
+        default_value: 'false'
   - id: supabase-functions-new
     title: supabase functions new
     summary: Create a new Function locally
@@ -555,15 +555,15 @@ commands:
       - id: legacy-bundle
         name: --legacy-bundle
         description: Use legacy bundling mechanism.
-        default_value: "false"
+        default_value: 'false'
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
-        default_value: "false"
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase
@@ -577,7 +577,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-domains
     title: supabase domains
     summary: Manage custom domain names for Supabase projects
@@ -598,11 +598,11 @@ commands:
       - id: include-raw-output
         name: --include-raw-output
         description: Include raw output (useful for debugging).
-        default_value: "false"
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-domains-reverify
     title: supabase domains reverify
     summary: Re-verify the custom hostname config for your project
@@ -644,7 +644,7 @@ commands:
       - id: custom-hostname
         name: --custom-hostname <string>
         description: The custom hostname to use for your Supabase project.
-        default_value: ""
+        default_value: ''
   - id: supabase-domains-activate
     title: supabase domains activate
     summary: Activate the custom hostname for a project
@@ -699,7 +699,7 @@ commands:
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ""
+        default_value: ''
   - id: supabase-db-remote-commit
     title: supabase db remote commit
     summary: Commit remote changes as a new migration
@@ -720,11 +720,11 @@ commands:
         name: --dry-run
         description: |
           Print the migrations that would be applied, but don't actually apply them.
-        default_value: "false"
+        default_value: 'false'
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ""
+        default_value: ''
   - id: supabase-db-lint
     title: supabase db lint
     summary: Checks local database for typing error
@@ -759,11 +759,11 @@ commands:
       - id: file
         name: -f, --file <string>
         description: Saves schema diff to a file.
-        default_value: ""
+        default_value: ''
       - id: linked
         name: --linked
         description: Diffs local schema against linked project.
-        default_value: "false"
+        default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -771,7 +771,7 @@ commands:
       - id: use-migra
         name: --use-migra
         description: Use migra to generate schema diff.
-        default_value: "false"
+        default_value: 'false'
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
@@ -821,7 +821,7 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: "false"
+        default_value: 'false'
   - id: supabase-completion-powershell
     title: supabase completion powershell
     summary: Generate the autocompletion script for powershell
@@ -842,7 +842,7 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: "false"
+        default_value: 'false'
   - id: supabase-completion-fish
     title: supabase completion fish
     summary: Generate the autocompletion script for fish
@@ -866,7 +866,7 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: "false"
+        default_value: 'false'
   - id: supabase-completion-bash
     title: supabase completion bash
     summary: Generate the autocompletion script for bash
@@ -899,4 +899,4 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: "false"
+        default_value: 'false'

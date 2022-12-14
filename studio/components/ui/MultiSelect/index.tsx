@@ -1,6 +1,14 @@
 import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
-import { Popover, IconCheck, IconAlertCircle, IconSearch, IconPlus, IconChevronDown } from 'ui'
+import {
+  Popover,
+  IconCheck,
+  IconAlertCircle,
+  IconSearch,
+  IconPlus,
+  IconChevronDown,
+  Input,
+} from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
