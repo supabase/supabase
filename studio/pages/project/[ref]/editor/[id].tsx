@@ -37,9 +37,11 @@ const TableEditorPage: NextPage = () => {
 
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
+  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
+
   const selectedTable = !isNaN(Number(id))
     ? // @ts-ignore
-      tables.find((table) => table.id === Number(id))
+      tables.concat(foreignTables).find((table) => table.id === Number(id))
     : id !== undefined
     ? tryParseJson(Base64.decode(id))
     : undefined
