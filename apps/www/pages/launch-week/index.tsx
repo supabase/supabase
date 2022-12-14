@@ -285,8 +285,9 @@ export default function launchweek() {
                         <div
                           className="absolute group-hover/day1:scale-105 opacity-60 group-hover/day1:opacity-100 w-full h-full -z-10 transition-all duration-500"
                           style={{
-                            background:
-                              'radial-gradient(650px 150px at 50% 100%, #103633, transparent)',
+                            background: `radial-gradient(650px 150px at 50% 100%, ${
+                              isDarkMode ? '#103633' : '#b8e8e7'
+                            }, transparent)`,
                           }}
                         ></div>
                         <div
@@ -332,8 +333,9 @@ export default function launchweek() {
                           <div
                             className="top-0 absolute group-hover/2:scale-105 opacity-60 group-hover/2:opacity-100 w-full h-full -z-10 transition-all duration-500"
                             style={{
-                              background:
-                                'radial-gradient(90% 130px at 80% 0px, #103633, transparent)',
+                              background: `radial-gradient(90% 130px at 80% 0px, ${
+                                isDarkMode ? '#103633' : '#b8e8e7'
+                              }, transparent)`,
                             }}
                           ></div>
                           <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
@@ -350,8 +352,9 @@ export default function launchweek() {
                           <div
                             className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
                             style={{
-                              background:
-                                'radial-gradient(90% 130px at 50% 0px, #103633, transparent)',
+                              background: `radial-gradient(90% 130px at 50% 0px, ${
+                                isDarkMode ? '#103633' : '#b8e8e7'
+                              }, transparent)`,
                             }}
                           ></div>
                           <div className="flex flex-col items-center gap-2 min-w-[300px]">

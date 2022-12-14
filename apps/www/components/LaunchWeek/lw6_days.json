@@ -59,7 +59,7 @@
     "steps": [
       {
         "title": "Multi-factor Authentication",
-        "blog": "/blog",
+        "blog": "/blog/mfa-auth-via-rls",
         "docs": "/docs/guides/auth/auth-mfa",
         "isNew": false,
         "description": ""
