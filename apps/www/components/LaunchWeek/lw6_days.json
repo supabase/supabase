@@ -20,16 +20,31 @@
     ]
   },
   {
-    "title": "Day 2",
-    "shipped": false,
+    "title": "Image Processing: Resize V2 + CDN",
+    "shipped": true,
     "date": "13 Dec 2022",
-    "description": "Day 2",
+    "description": "Image Transformations",
     "d": 2,
     "dd": "Tuesday",
     "youtube_id": "iqZlPtl_b-I",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "steps": []
+    "steps": [
+      {
+        "title": "Image Transformations",
+        "blog": "/blog/storage-image-resizing-smart-cdn",
+        "docs": "/docs/guides/storage/image-transformations",
+        "isNew": true,
+        "description": ""
+      },
+      {
+        "title": "Smart CDN",
+        "description": "Faster asset delivery, now even faster.",
+        "blog": "/blog/storage-image-resizing-smart-cdn",
+        "docs": "/docs/guides/storage/cdn",
+        "isNew": true
+      }
+    ]
   },
   {
     "title": "Day 3",

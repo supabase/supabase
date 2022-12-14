@@ -11,7 +11,7 @@ import { useTheme } from 'common/Providers'
 // import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { useMenuActiveRefId, useMenuLevelId } from '~/hooks/useMenuState'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
 const FunctionLink = ({
@@ -32,10 +32,20 @@ const FunctionLink = ({
   const router = useRouter()
   const activeAccordianItem = useMenuActiveRefId()
 
+  // check if we're on a versioned page
+  let version = ''
+  if (router.asPath.includes('v1')) {
+    version = 'v1'
+  }
+
+  if (router.asPath.includes('v0')) {
+    version = 'v0'
+  }
+
   const active = activeAccordianItem === id
   return (
     <li key={id} className="function-link-item">
-      <Link href={`/reference/${library}/${slug}`} passHref>
+      <Link href={`/reference/${library}/${version ? version + '/' : ''}${slug}`} passHref>
         <a
           className={[
             'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
@@ -63,8 +73,6 @@ const Divider = () => {
 }
 
 interface INavigationMenuRefList {
-  currentLevel: string
-
   id: RefIdOptions
   lib: RefKeyOptions
   commonSections: any[] // to do type up
@@ -75,7 +83,6 @@ interface INavigationMenuRefList {
 }
 
 const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
-  currentLevel,
   id,
   lib,
   commonSections,
@@ -133,17 +140,22 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }).items.map((x) => x.id)
       : []
 
+  // console.log(filterIds)
+  // console.log(modifierIds)
+
+  const level = useMenuLevelId()
+
   return (
     <div
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
-        currentLevel === id && 'opacity-100 ml-0 delay-150 h-auto',
+        level === id && 'opacity-100 ml-0 delay-150 h-auto',
         // move menu back to margin-left
-        currentLevel === 'home' && 'ml-12',
+        level === 'home' && 'ml-12',
         // disabled
-        currentLevel !== 'home' && currentLevel !== id ? '-ml-8' : '',
-        currentLevel !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
+        level !== 'home' && level !== id ? '-ml-8' : '',
+        level !== id ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
       <div className={'w-full flex flex-col gap-0 sticky top-8'}>
