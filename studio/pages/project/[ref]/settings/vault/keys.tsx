@@ -18,8 +18,10 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
   const isEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
 
   useEffect(() => {
-    vault.load()
-  }, [])
+    if (isEnabled) {
+      vault.load()
+    }
+  }, [isEnabled])
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">

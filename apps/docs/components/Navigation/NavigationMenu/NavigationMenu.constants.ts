@@ -240,6 +240,12 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-workos',
     items: [],
   },
+  {
+    name: 'Zoom',
+    icon: '/docs/img/icons/zoom-icon',
+    url: '/guides/auth/social-login/auth-zoom',
+    items: [],
+  },
 ]
 
 export const PhoneLoginsItems = [
@@ -454,6 +460,7 @@ export const storage = {
     { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
     { name: 'Access Control', url: '/guides/storage/access-control', items: [] },
     { name: 'CDN', url: '/guides/storage/cdn', items: [] },
+    { name: 'Image Transformations', url: '/guides/storage/image-transformations', items: [] },
   ],
 }
 
@@ -518,7 +525,8 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    // removing until the examples page is reworked
+    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -530,8 +538,8 @@ export const resources = {
           items: [],
         },
         {
-          name: 'Firebase Data',
-          url: '/guides/resources/migrating-to-supabase/firebase-data',
+          name: 'Firestore Data',
+          url: '/guides/resources/migrating-to-supabase/firestore-data',
           items: [],
         },
         {
@@ -561,7 +569,7 @@ export const resources = {
         },
         {
           name: 'Managing Environments',
-          url: '/guides/cli/managing-environments',
+          url: '/guides/resources/supabase-cli/managing-environments',
           items: [],
         },
       ],
@@ -579,19 +587,19 @@ export const resources = {
         {
           name: 'Auth Server',
           url: '/reference/self-hosting-auth/introduction',
-          icon: '/docs/img/icons/menu/reference-auth',
+          icon: '/img/icons/menu/reference-auth',
           items: [],
         },
         {
           name: 'Storage Server',
           url: '/reference/self-hosting-storage/introduction',
-          icon: '/docs/img/icons/menu/reference-storage',
+          icon: '/img/icons/menu/reference-storage',
           items: [],
         },
         {
           name: 'Realtime Server',
           url: '/reference/self-hosting-realtime/introduction',
-          icon: '/docs/img/icons/menu/reference-realtime',
+          icon: '/img/icons/menu/reference-realtime',
           items: [],
         },
       ],
@@ -687,21 +695,21 @@ export const reference = {
           url: '/reference/javascript/start',
           level: 'reference_javascript',
           items: [],
-          icon: '/img/icons/javascript.svg',
+          icon: 'docs/img/icons/javascript.svg',
         },
         {
           name: 'supabase-dart',
           url: '/reference/dart/start',
           level: 'reference_dart',
           items: [],
-          icon: '/img/icons/javascript.svg',
+          icon: 'docs/img/icons/javascript.svg',
         },
         {
           name: 'supbase-python',
           url: '/reference/python/start',
           level: 'reference_python',
           items: [],
-          icon: '/img/icons/javascript.svg',
+          icon: 'docs/img/icons/javascript.svg',
         },
       ],
     },
@@ -712,13 +720,13 @@ export const reference = {
           name: 'Supabase CLI',
           url: '/reference/cli/start',
           items: [],
-          icon: '/img/icons/cli.svg',
+          icon: 'docs/img/icons/cli-icon.svg',
         },
         {
           name: 'Management API',
           url: '/reference/javascript',
           items: [],
-          icon: '/img/icons/javascript.svg',
+          icon: 'docs/img/icons/javascript-icon.svg',
         },
       ],
     },

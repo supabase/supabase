@@ -185,7 +185,7 @@ const PITRSelection = ({}) => {
                       <Button
                         as="span"
                         type="warning"
-                        disabled={isSelectedOutOfRange}
+                        disabled={isSelectedOutOfRange || !selectedDate}
                         onClick={() => setShowConfirmation(true)}
                       >
                         Review restore details

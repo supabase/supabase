@@ -1,6 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { delete_ } from 'lib/common/fetch'
-import { getCustomDomains } from './custom-domains-query'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainDeleteVariables = {

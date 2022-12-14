@@ -1,3 +1,5 @@
+// @ts-expect-error
+import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
@@ -46,7 +48,7 @@ export type Command = {
 }
 
 const CliCommandSection = (props) => {
-  const command = props.spec.commands.find((x: any) => x.id === props.funcData.id)
+  const command = spec.commands.find((x: any) => x.id === props.funcData.id)
 
   return (
     <RefSubLayout.Section
@@ -72,10 +74,10 @@ const CliCommandSection = (props) => {
             </header>
 
             {/* {command.usage && (
-                          <CodeBlock language="bash" className="relative">
-                            {command.usage}
-                          </CodeBlock>
-                        )} */}
+                        <CodeBlock language="bash" className="relative">
+                          {command.usage}
+                        </CodeBlock>
+                      )} */}
 
             {command.subcommands.length > 0 && (
               <div className="">

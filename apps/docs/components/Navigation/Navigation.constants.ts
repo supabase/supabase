@@ -102,6 +102,7 @@ export const menuItems: NavMenu = {
             { name: 'Login with Twitch', url: '/guides/auth/auth-twitch', items: [] },
             { name: 'Login with Twitter', url: '/guides/auth/auth-twitter', items: [] },
             { name: 'Login with WorkOS', url: '/guides/auth/auth-workos', items: [] },
+            { name: 'Login with Zoom', url: '/guides/auth/auth-zoom', items: [] },
             { name: 'Phone Auth with Twilio', url: '/guides/auth/auth-twilio', items: [] },
             { name: 'Phone Auth with Vonage', url: '/guides/auth/auth-vonage', items: [] },
             {
@@ -248,6 +249,7 @@ export const menuItems: NavMenu = {
         { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
         { name: 'Access Control', url: '/guides/storage/access-control', items: [] },
         { name: 'CDN', url: '/guides/storage/cdn', items: [] },
+        { name: 'Image Transformations', url: '/guides/storage/image-transformations', items: [] },
       ],
     },
     {

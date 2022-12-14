@@ -268,12 +268,6 @@
         "type": "cli-command"
       },
       {
-        "id": "supabase-db-remote-changes",
-        "title": "supabase db remote changes",
-        "slug": "supabase-db-remote-changes",
-        "type": "cli-command"
-      },
-      {
         "id": "supabase-db-push",
         "title": "supabase db push",
         "slug": "supabase-db-push",
