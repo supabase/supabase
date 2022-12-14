@@ -20,7 +20,6 @@ export function SearchProvider({ children }: any) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [initialQuery, setInitialQuery] = useState(null)
-
   const onOpen = useCallback(() => {
     setIsOpen(true)
   }, [setIsOpen])
