@@ -1,10 +1,14 @@
-import Layout from '~/layouts/DefaultGuideLayout'
+import Layout from '../layouts/Layout'
+import SectionContainer from '../components/Layouts/SectionContainer'
 
 export const meta = {
-  id: 'supasquad',
   title: 'SupaSquad',
   description: 'Supabase Advocate program',
 }
+
+<SectionContainer>
+
+# SupaSquad
 
 The SupaSquad is an official Supabase advocate program where community members help build and manage the Supabase community.
 
@@ -12,7 +16,7 @@ The SupaSquad is an official Supabase advocate program where community members h
 - Direct connection to the Supabase team.
 - Help steer the Supabase community.
 
-![Supabase SupaSquad](/docs/img/supabase-squad.png)
+![Supabase SupaSquad](/images/supabase-squad.png)
 
 ## Requirements
 
@@ -89,6 +93,6 @@ Apply to join the program using [this form](https://airtable.com/shr0FtLqLfhpuEy
   the Supabase ecosystem.
 </details>
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+</SectionContainer>
 
-export default Page
+export default (context) => <Layout meta={meta} children={context.children} context={context} />
