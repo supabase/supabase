@@ -381,12 +381,40 @@ export default {
         border-scale-1200 
       `,
     },
+    'rounded-pills': {
+      list: 'flex flex-wrap gap-2',
+      base: ` 
+        relative 
+        cursor-pointer 
+        flex 
+        items-center 
+        space-x-2
+        text-center 
+        transition
+        shadow-sm
+        rounded-full
+        focus:outline-none 
+        focus-visible:ring 
+        focus-visible:ring-scale-700
+        focus-visible:border-scale-900
+        `,
+      inactive: `
+        bg-scale-400 hover:bg-scale-500
+        hover:border-scale-900
+        text-scale-900 hover:text-scale-1200
+      `,
+      active: `
+        bg-scale-1200
+        text-scale-200
+        border-scale-1200 
+      `,
+    },
     block: 'w-full flex items-center justify-center',
     size: {
       ...default__padding_and_text,
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
-    content: `focus:outline-none focus:ring text-scale-900`,
+    content: `focus:outline-none transition-height`,
   },
 
   /*
@@ -690,7 +718,7 @@ export default {
       ...defaults.size.text,
     },
     description: {
-      base: `text-scale-900`,
+      base: `text-scale-1000`,
       ...defaults.size.text,
     },
     group: `space-y-3`,
@@ -969,6 +997,7 @@ export default {
     size: {
       medium: `w-screen max-w-md h-full`,
       large: `w-screen max-w-2xl h-full`,
+      xlarge: `w-screen max-w-3xl h-full`,
     },
     align: {
       left: `
@@ -1111,7 +1140,7 @@ export default {
       },
     },
     description: {
-      base: 'mt-2 text-scale-900',
+      base: 'mt-2 text-scale-900 leading-normal',
       size: {
         ...defaults.size.text,
       },
@@ -1535,7 +1564,7 @@ export default {
       transition cursor-pointer select-none relative py-2 pl-3 pr-9 
       text-scale-900
       text-sm
-
+      hover:bg-scale-300 dark:hover:bg-scale-500
       focus:bg-scale-300 dark:focus:bg-scale-500
       focus:text-scale-1200
       border-none

@@ -43,10 +43,15 @@ function ConfirmModal({
       loading={loading}
       customFooter={
         <div className="flex items-center gap-2">
-          <Button type="default" onClick={() => onCancelClick()}>
+          <Button type="default" disabled={loading} onClick={() => onCancelClick()}>
             Cancel
           </Button>
-          <Button type="primary" onClick={() => onConfirmClick()} loading={loading}>
+          <Button
+            type="primary"
+            disabled={loading}
+            onClick={() => onConfirmClick()}
+            loading={loading}
+          >
             {confirmText}
           </Button>
         </div>

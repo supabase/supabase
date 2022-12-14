@@ -57,7 +57,7 @@ const ProjectLayout = ({
         </MenuBarWrapper>
 
         <main
-          className="flex w-full flex-1 flex-col overflow-x-hidden"
+          className="flex flex-col flex-1 w-full overflow-x-hidden"
           style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
         >
           {!hideHeader && <LayoutHeader />}

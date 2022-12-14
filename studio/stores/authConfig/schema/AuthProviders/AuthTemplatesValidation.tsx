@@ -19,6 +19,8 @@ export const CONFIRMATION: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -48,6 +50,8 @@ export const INVITE: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -77,6 +81,8 @@ export const MAGIC_LINK: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -106,6 +112,8 @@ export const EMAIL_CHANGE: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the email change
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -135,6 +143,8 @@ export const RECOVERY: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the password reset
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
