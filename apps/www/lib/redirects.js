@@ -1600,4 +1600,9 @@ module.exports = [
     source: '/docs/reference',
     destination: '/docs#reference-documentation',
   },
+  {
+    permanent: true,
+    source: '/docs/handbook/supasquad',
+    destination: '/supasquad'
+  }
 ]
