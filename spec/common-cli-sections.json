@@ -120,6 +120,35 @@
     ]
   },
   {
+    "title": "migrations",
+    "items": [
+      {
+        "id": "supabase-migration",
+        "title": "supabase migration",
+        "slug": "supabase-migration",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-new",
+        "title": "supabase migration new",
+        "slug": "supabase-migration-new",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-list",
+        "title": "supabase migration list",
+        "slug": "supabase-migration-list",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-repair",
+        "title": "supabase migration repair",
+        "slug": "supabase-migration-repair",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
     "title": "secrets",
     "items": [
       {
@@ -184,35 +213,6 @@
         "id": "supabase-orgs-list",
         "title": "supabase orgs list",
         "slug": "supabase-orgs-list",
-        "type": "cli-command"
-      }
-    ]
-  },
-  {
-    "title": "migrations",
-    "items": [
-      {
-        "id": "supabase-migration",
-        "title": "supabase migration",
-        "slug": "supabase-migration",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-migration-new",
-        "title": "supabase migration new",
-        "slug": "supabase-migration-new",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-migration-list",
-        "title": "supabase migration list",
-        "slug": "supabase-migration-list",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-migration-repair",
-        "title": "supabase migration repair",
-        "slug": "supabase-migration-repair",
         "type": "cli-command"
       }
     ]
