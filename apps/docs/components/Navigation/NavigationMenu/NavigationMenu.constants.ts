@@ -481,6 +481,7 @@ export const platform = {
       name: 'Platform Management',
       url: undefined,
       items: [
+        { name: 'Access Control', url: '/guides/platform/access-control', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
@@ -492,6 +493,24 @@ export const platform = {
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+      ],
+    },
+    {
+      name: 'Single sign-on',
+      url: undefined,
+      items: [
+        {
+          name: 'Enable SSO for your organization',
+          url: '/guides/platform/sso',
+          items: [],
+        },
+        { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure', items: [] },
+        {
+          name: 'SSO with Google Workspace',
+          url: '/guides/platform/sso/gsuite',
+          items: [],
+        },
+        { name: 'SSO with Okta', url: '/guides/platform/sso/okta', items: [] },
       ],
     },
     {

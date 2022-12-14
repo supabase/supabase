@@ -37,6 +37,9 @@ When your user signs in, call [signInWithOtp()](/docs/reference/javascript/auth-
 async function signInWithEmail() {
   const { data, error } = await supabase.auth.signInWithOtp({
     email: 'example@email.com',
+    options: {
+      emailRedirectTo: 'https://example.com/welcome',
+    },
   })
 }
 ```
