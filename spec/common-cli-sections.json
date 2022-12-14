@@ -206,7 +206,7 @@
   },
   {
     "title": "Domains",
-    "Items": [
+    "items": [
       {
         "id": "supabase-domains",
         "title": "supabase domains",
