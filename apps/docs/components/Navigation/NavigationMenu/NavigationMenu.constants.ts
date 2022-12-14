@@ -285,7 +285,7 @@ export const auth = {
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login',
-          items: [...PhoneLoginsItems,],
+          items: [...PhoneLoginsItems],
         },
         {
           name: 'Social Login',
