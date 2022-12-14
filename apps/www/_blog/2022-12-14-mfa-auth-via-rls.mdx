@@ -2,8 +2,8 @@
 title: 'Multi-factor Authentication via Row Level Security Enforcement'
 description: MFA Auth with enforcement via RLS
 author: joel,kangmingtay,stojan
-image: lw6-auth/thumb.jpg
-thumb: lw6-auth/thumb.jpg
+image: lw6-auth/mfa-banner.jpg
+thumb: lw6-auth/mfa-banner.jpg
 tags:
   - launch-week
   - auth
@@ -19,7 +19,7 @@ toc_depth: 3
 
 ## Background
 
-Today, we’re releasing Multi Factor Authentication for everyone. We are also excited to commence the dogfooding of SAML support via the introduction of Single Sign On (SSO) on our dashboard - you can contact us at [growth@supabase.com](mailto:growth@supabase.com) if you want to enable this in your Enterprise or Pro plan.
+Today, we’re releasing Multi Factor Authentication for everyone. We are also excited to commence the dogfooding of SAML support via the introduction of Single Sign On (SSO) on our dashboard - you can contact us at [growth@supabase.com](mailto:growth@supabase.com) if you want to [enable this in your Enterprise or Pro plan](https://docs.supabase.com/guides/platform/sso/enable-sso).
 
 ## What is MFA?
 
@@ -49,27 +49,16 @@ To generate a QR code, call the `/enroll` endpoint which returns an SVG encoded 
 
 You might wonder: why the need for the challenge step? The challenge step is designed to create an interval between MFA initiation and the action of making a verification. This is useful in cases like Yubikey authentication where a user might need to request a challenge before placing their finger on the device.
 
-```mermaid
-graph TD
-    Z[Start] --> A
-    A[Enroll Factor] --> B(Challenge Factor) -->  K(Verify Factor)
-    K -->|Correct Code| D[Factor Verified, Logged in ]
-    K -->|Incorrect Code/Error| Z
 
-```
+![MFA Enrollment Flow](/images/blog/lw6-auth/enrollment_flow.png)
+*Overview of Enrollment Flow*
 
 **Verification**
 
 On subsequent logins attempts, redirect a user to an MFA verification after they have completed the conventional sign in process. On the verification page, wait for the user to enter the six digit OTP code from the authenticator application and then call  the`/challenge` endpoint followed by the `/verify` endpoint. If a correct code is submitted, a JWT will be created with a few additional fields.
 
-```mermaid
-graph TD
-    Z[Start] --> K(Challenge Factor)
-    K ---> L(Verify Factor)
-    L -->|Correct Code| D[Factor Verified, Logged in ]
-    L -->|Incorrect Code/Error| Z
-
-```
+![MFA Verification Flow](/images/blog/lw6-auth/verify_flow.png)
+*Overview of Verification Flow*
 
 ## Enforcement via Row Level Security
 
@@ -109,7 +98,7 @@ create policy "Enforce MFA for all end users."
   using ( auth.jwt()->>'aal' = 'aal2' );
 ```
 
-*Caption: Enforce MFA for all end users*
+*Enforce MFA for all end users*
 
 ```sql
 create policy "Allow access on table only if user has gone through MFA"
@@ -128,11 +117,11 @@ create policy "Allow access on table only if user has gone through MFA"
     ));
 ```
 
-*Caption: Enforce MFA for selected users*
+*Enforce MFA for selected users*
 
 Note that both RLS policies are restrictive. By default, overlapping policies in PostgreSQL are permissive rather than restrictive. This means that RLS policies are combined with an OR clause and only one policy needs to pass in order for a row to be operated on. Therefore, we set RLS policies as restrictive in order to allow for enforcement based on checks from multiple policies.
 
-Be mindful of your user’s preference, though. If a user has enabled MFA, they are expecting a higher level of security for their account. Consequently, we recommend that developers enforce MFA across all operations if a user has MFA enabled.
+Be mindful of your user’s preference, though. If a user has enabled MFA, they are expecting a higher level of security for their account. Consequently, we recommend that developers enforce MFA across all operations if a user has MFA enabled. You can check out [our MFA guide](https://supabase.com/docs/guides/auth/auth-mfa) for more details about MFA enforcement.
 
 
 ## What's Next
