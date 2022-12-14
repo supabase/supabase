@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Dropdown, Divider, IconTrash, IconMail, IconMoreHorizontal } from 'ui'
 
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -17,6 +17,7 @@ interface Props {
 }
 
 const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
+  const showDeleteFactorsDropdown = useFlag('mfaSso')
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
   const [loading, setLoading] = useState<boolean>(false)
@@ -194,32 +195,34 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
               </Tooltip.Content>
             )}
           </Tooltip.Root>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
-              <Dropdown.Item
-                onClick={handleDeleteFactors}
-                icon={<IconTrash size="tiny" />}
-                disabled={!canRemoveUser}
-              >
-                Delete factors
-              </Dropdown.Item>
-            </Tooltip.Trigger>
-            {!canRemoveUser && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
+          {showDeleteFactorsDropdown && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Dropdown.Item
+                  onClick={handleDeleteFactors}
+                  icon={<IconTrash size="tiny" />}
+                  disabled={!canRemoveUser}
                 >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to remove a user's authentication factors.
-                  </span>
-                </div>
-              </Tooltip.Content>
-            )}
-          </Tooltip.Root>
+                  Delete factors
+                </Dropdown.Item>
+              </Tooltip.Trigger>
+              {!canRemoveUser && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to remove a user's authentication factors.
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
+          )}
         </>
       }
     >
