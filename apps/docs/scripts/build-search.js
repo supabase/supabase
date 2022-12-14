@@ -5,18 +5,84 @@ const matter = require('gray-matter')
 const dotenv = require('dotenv')
 const algoliasearch = require('algoliasearch/lite')
 const { isEmpty } = require('lodash')
+const yaml = require('js-yaml')
+const commonLibSections = require('../../../spec/common-client-libs-sections.json')
 
-// [Joshen] We initially thought of building out our search using Algolia directly,
-// but eventually decided to just use DocSearch since it provides us a UI and some
-// configurations out of the box (e.g Doc hierarchy).
+function flattenSections(sections) {
+  var a = []
+  for (var i = 0; i < sections.length; i++) {
+    if (sections[i].id) {
+      // only push a section that has an id
+      // these are reserved for sidebar subtitles
+      a.push(sections[i])
+    }
+    if (sections[i].items) {
+      // if there are subitems, loop through
+      a = a.concat(flattenSections(sections[i].items))
+    }
+  }
+  return a
+}
 
-// As such when creating the search object, the properties that are specifically read
+const clientLibFiles = [
+  { fileName: 'supabase_js_v2', label: 'javascript', version: 'v2', versionSlug: false },
+  { fileName: 'supabase_js_v1', label: 'javascript', version: 'v1', versionSlug: true },
+  { fileName: 'supabase_dart_v1', label: 'dart', version: 'v1', versionSlug: false },
+  { fileName: 'supabase_dart_v0', label: 'dart', version: 'v0', versionSlug: true },
+]
+
+const nameMap = {
+  api: 'Management API',
+  cli: 'Supabase CLI',
+  auth: 'Auth Server',
+  storage: 'Storage Server',
+  postgres: 'Postgres',
+  dart: 'Supabase Flutter Library',
+  javascript: 'Supabase JavaScript Library',
+}
+
+const flatCommonLibSections = flattenSections(commonLibSections)
+
+// loop through each spec file, find the correspending entry in the common file and grab the title / description / slug
+let clientLibSearchObjects = []
+
+clientLibFiles.map((file) => {
+  const specs = yaml.load(fs.readFileSync(`../../spec/${file.fileName}.yml`, 'utf8'))
+
+  //take each function id, find it in the commonLibSections file and return { id, title, slug, description, }
+  specs.functions.map((fn) => {
+    const item = flatCommonLibSections.find((section) => section.id === fn.id)
+    if (item) {
+      const object = clientLibSearchObjects.push({
+        objectID: crypto.randomUUID(),
+        id: item.id,
+        title: item.title,
+        description: item.title,
+        url: `/reference/${file.label}/${file.versionSlug ? file.version + '/' : ''}${item.slug}`,
+        source: 'reference',
+        pageContent: '',
+        category: item.product,
+        version: file.version,
+        type: 'lvl2',
+        hierarchy: {
+          lvl0: 'References',
+          lvl1: `${nameMap[file.label]} ${file.version}`,
+          lvl2: item.title,
+          lvl3: file.version,
+          lvl4: null,
+          lvl5: null,
+          lvl6: null,
+        },
+      })
+      return object
+    }
+  })
+})
+
+clientLibSearchObjects.map((item) => console.log(item))
+// The properties of the searchObject that are specifically read
 // by DocSearch are "type" and "hierarchy". The rest, though saved into Algolia (which we
 // can potentially use to craft more nuanced search experiences) are not used by DocSearch
-
-// Note that we'll need to do a general clean up of the files in the docs
-// A lot of them are not even linked to within the docs site, so just need to
-// double check if they can be removed or if we want them in the side bars.
 const ignoredFiles = [
   'pages/404.mdx',
   'pages/faq.mdx',
@@ -29,16 +95,6 @@ const ignoredFiles = [
   'pages/handbook/introduction.mdx',
   'pages/handbook/supasquad.mdx',
 ]
-
-const nameMap = {
-  api: 'Management API',
-  cli: 'Supabase CLI',
-  auth: 'Auth Server',
-  storage: 'Storage Server',
-  postgres: 'Postgres',
-  dart: 'Supabase Flutter Library',
-  javascript: 'Supabase JavaScript Library',
-}
 
 async function walk(dir) {
   let files = await fs.promises.readdir(dir)
@@ -66,15 +122,6 @@ async function walk(dir) {
 
   console.log('Preparing docs indexing for Algolia')
 
-  function extractMeta(mdx) {
-    const regex = /^export\sconst\smeta\s=\s(\{[\w\s':,]*\})/gm
-    const match = regex.exec(mdx)
-    if (match) {
-      return JSON.parse(match[1])
-    }
-    return null
-  }
-
   try {
     const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME
     const client = algoliasearch(
@@ -83,11 +130,10 @@ async function walk(dir) {
     )
     const index = client.initIndex(indexName)
 
-    const referencePages = await walk('docs')
     const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
-    const allPages = guidePages.concat(referencePages)
 
-    const searchObjects = allPages
+    // generate search objects for guide pages
+    const guidePagesearchObjects = guidePages
       .map((slug) => {
         let id, title, description
         const fileContents = fs.readFileSync(slug, 'utf8')
@@ -118,6 +164,7 @@ async function walk(dir) {
           .replace('pages', '')
           .replace(/\.mdx$/, '')
         const source = slug.includes('/reference') ? 'reference' : 'guide'
+
         const object = {
           // For Algolia
           objectID: crypto.randomUUID(),
@@ -126,7 +173,8 @@ async function walk(dir) {
           description,
           url,
           source,
-          pageContent: content,
+          //pageContent: content,
+          pageContent: '',
           category: undefined,
           version: undefined,
 
@@ -143,44 +191,21 @@ async function walk(dir) {
           },
         }
 
-        if (slug.includes('/reference')) {
-          const urlSegments = url.split('/')
-          const category = urlSegments[urlSegments.indexOf('reference') + 1]
-          const version = urlSegments[urlSegments.indexOf('reference') + 2] || ''
-
-          const hasVersion = /v[0-9]+/.test(version)
-          if (hasVersion) {
-            object.version = version
-            object.type = title === nameMap[category] ? 'lvl2' : 'lvl3'
-            object.hierarchy.lvl1 = nameMap[category]
-            object.hierarchy.lvl2 = version
-            object.hierarchy.lvl3 = title
-          } else {
-            const page = urlSegments[urlSegments.indexOf('reference') + 2]
-            if (page === 'generated') {
-            } else {
-              if (page !== undefined) {
-                object.type = 'lvl2'
-                object.hierarchy.lvl1 = nameMap[category]
-                object.hierarchy.lvl2 = title
-              }
-            }
-          }
-
-          object.category = category ? category.replace(/\.mdx$/, '') : undefined
-          object.hierarchy.lvl0 = 'References'
-        }
-
         return object
       })
       // Some of the reference generated files come with an 'index' page that we can ignore
       .filter((object) => !object.url.endsWith('/index'))
       .filter((object) => !object.url.endsWith('/.gitkeep'))
 
+    //console.log('guidePagesearchObjects:', guidePagesearchObjects)
+
+    const combinedSearchObjects = guidePagesearchObjects.concat(clientLibSearchObjects)
+
     await index.clearObjects()
     console.log(`Successfully cleared records from ${indexName}`)
 
-    const algoliaResponse = await index.saveObjects(searchObjects)
+    const algoliaResponse = await index.saveObjects(combinedSearchObjects)
+
     console.log(`Successfully saved ${algoliaResponse.objectIDs.length} records into ${indexName}.`)
   } catch (error) {
     console.log('Error:', error)
