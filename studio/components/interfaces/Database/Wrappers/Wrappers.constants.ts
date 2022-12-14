@@ -430,7 +430,8 @@ export const WRAPPERS: Wrapper[] = [
           required: true,
           encrypted: true,
           hidden: true,
-          urlHelper: 'https://firebase.google.com/docs/admin/setup#add_firebase_to_your_app',
+          isTextArea: true,
+          urlHelper: 'https://firebase.google.com/docs/admin/setup#initialize-sdk',
         },
         // NOTE(alaister): this is a valid option, but it may confuse the basic use case
         // so I'm omitting it for now. We can add back once we make it's use clearer.
