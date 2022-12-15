@@ -68,7 +68,7 @@ Insert screenshot of Point-in-Time Recovery on the Dashboard
 
 PITR can be accessed in the [Database Backups](https://app.supabase.com/project/_/database/backups/pitr) page in the Dashboard. The recovery period of a project is indicated by the earliest and latest points of recoveries displayed in your preferred timezone. If need be, the maximum amount of this recovery period can be modified accordingly. 
 
-Note that the latest restore point of the project could be significantly far from the current time. This occurs when there has not been any recent activity in the database, and therefore no WAL file backups have been made recently. This is perfectly fine as the state of the database at the latest point of recovery would still be indicative of the state of the database at the current time given that no transactions have been made in between.
+Note that the latest restore point of the project could be significantly far from the current time. This occurs when there has not been any recent activity in the database, and therefore no WAL file backups have been made recently. This is perfectly fine as the state of the database at the latest point of recovery is still indicative of the state of the database at the current time given that no transactions have been made in between.
 
 ### Restoration Process
 
