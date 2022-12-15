@@ -252,6 +252,13 @@
     "author_image_url": "https://github.com/fenos.png"
   },
   {
+    "author_id": "bo_lu",
+    "author": "Bo Lu",
+    "position": "Engineering",
+    "author_url": "https://github.com/burmecia",
+    "author_image_url": "https://github.com/burmecia.png"
+  },
+  {
     "author_id": "stojan",
     "author": "Stojan Dimitrovski",
     "position": "Engineering",
