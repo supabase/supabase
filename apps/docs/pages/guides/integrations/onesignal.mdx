@@ -16,7 +16,7 @@ export const meta = {
 
 This guide steps you through how you can integrate OneSignal with Supabase to create a seamless cloud messaging experience for your users using Database webhooks and edge functions through a simple Next.js application.
 
-We will have a simple UI and use Supabase’s Database Webhooks in conjunction with Edge Function to make a real-time push notification experience.
+We will create a simple ordering app and use Supabase Database Webhooks in conjunction with Edge Function to provide a real-time push notification experience.
 
 You can find the complete example app along with the edge functions code to send the notifications [here](https://github.com/supabase-community/onesignal).
 
@@ -318,6 +318,7 @@ Let’s also set up the webhook so that whenever a new row is inserted in the `o
 ![Supabase Webhooks configuration](/docs/img/guides/integrations/onesignal/webhook.png)
 
 At this point, the app should be complete! Run your app locally with `npm run dev`, or deploy your app to a hosting service and see how you receive a push notification when you place an order! 
+Remember that if you decide to deploy your app to a hosting service, you would need to create another OneSignal app configured for your local address.
 
 ![Ordering app UI](/docs/img/guides/integrations/onesignal/app-ui.png)
 
