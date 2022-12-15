@@ -1,3 +1,7 @@
+// Follow this setup guide to integrate the Deno language server with your editor:
+// https://deno.land/manual/getting_started/setup_your_environment
+// This enables autocomplete, go to definition, etc.
+
 // Sift is a small routing library that abstracts away details like starting a
 // listener on a port, and provides a simple function (serve) that has an API
 // to invoke a function for a specific path.
@@ -6,25 +10,18 @@ import { json, serve, validateRequest } from 'https://deno.land/x/sift@0.6.0/mod
 // from Discord.
 import nacl from 'https://cdn.skypack.dev/tweetnacl@v1.0.3?dts'
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+enum DiscordCommandType {
+  Ping = 1,
+  ApplicationCommand = 2,
+}
 
-import { Database } from './types/database.types.ts'
-import { DiscordWebhookEvent } from './types/discord.ts'
-
-const supabaseAdminClient = createClient<Database>(
-  // Supabase API URL - env var exported by default when deployed.
-  Deno.env.get('SUPABASE_URL') ?? '',
-  // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-)
-
-// For all requests to "/" endpoint, we want to invoke bot() handler.
+// For all requests to "/" endpoint, we want to invoke home() handler.
 serve({
-  '/discord-bot': bot,
+  '/discord-bot': home,
 })
 
 // The main logic of the Discord Slash Command is defined in this function.
-async function bot(request: Request) {
+async function home(request: Request) {
   // validateRequest() ensures that a request is of POST method and
   // has the following headers.
   const { error } = await validateRequest(request, {
@@ -48,16 +45,11 @@ async function bot(request: Request) {
       }
     )
   }
-  console.log(body)
-  const {
-    channel_id = '',
-    type = 0,
-    data = { options: [] },
-    member: { user } = {},
-  } = JSON.parse(body) as DiscordWebhookEvent
+
+  const { type = 0, data = { options: [] } } = JSON.parse(body)
   // Discord performs Ping interactions to test our application.
   // Type 1 in a request implies a Ping interaction.
-  if (type === 1) {
+  if (type === DiscordCommandType.Ping) {
     return json({
       type: 1, // Type 1 in a response is a Pong interaction response type.
     })
@@ -65,60 +57,16 @@ async function bot(request: Request) {
 
   // Type 2 in a request is an ApplicationCommand interaction.
   // It implies that a user has issued a command.
-  if (type === 2) {
-    const { options: newOptions } = data.options.find((option) => option.name === 'new') ?? {
-      value: null,
-    }
-    const { options: resolveOptions } = data.options.find(
-      (option) => option.name === 'resolve'
-    ) ?? {
-      value: null,
-    }
-
-    let resMsg = 'An error occured.'
-
-    // Handle new challenge creation.
-    if (user && newOptions) {
-      const { value: promise } = newOptions.find((option) => option.name === 'promise')!
-
-      const { data: existingChallenge } = await supabaseAdminClient
-        .from('discord_promise_challenge')
-        .select('*')
-        .match({ user_id: user.id, resolved: false })
-        .maybeSingle()
-      if (existingChallenge) {
-        resMsg = `You must complete your open challenge first before creating a new one! Your ongoing challenge: "${existingChallenge.promise}".`
-      } else {
-        const { error: insertError } = await supabaseAdminClient
-          .from('discord_promise_challenge')
-          .insert({ promise, user_id: user.id, username: user.username })
-        if (insertError) resMsg = insertError.message
-        else
-          resMsg = `New challenge "${promise}" created. Once completed come back here and submit via "/promise resolve"!`
-      }
-    }
-
-    // Handle submission for existing challenge.
-    if (user && resolveOptions) {
-      const { value: submission } = resolveOptions.find((option) => option.name === 'submission')!
-
-      const { data: updatedChallenge, error: updateError } = await supabaseAdminClient
-        .from('discord_promise_challenge')
-        .update({ submission, resolved: true, updated_at: new Date().toISOString() })
-        .match({ user_id: user.id, resolved: false })
-        .select('promise')
-        .single()
-      if (updateError) resMsg = updateError.message
-      else
-        resMsg = `Thanks! Your submission for challenge "${updatedChallenge.promise}" has been recorded \\o/`
-    }
-
+  if (type === DiscordCommandType.ApplicationCommand) {
+    const { value } = data.options.find(
+      (option: { name: string; value: string }) => option.name === 'name'
+    )
     return json({
       // Type 4 responds with the below message retaining the user's
       // input at the top.
       type: 4,
       data: {
-        content: resMsg,
+        content: `Hello, ${value}!`,
       },
     })
   }
