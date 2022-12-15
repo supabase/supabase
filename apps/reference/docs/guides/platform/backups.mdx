@@ -56,7 +56,7 @@ This feature is available to all Enterprise tier projects. Pro tier projects can
 
 ### Backup Process
 
-As discussed [here](https://supabase.com/blog/postgresql-physical-logical-backups), PITR is made possible by a combination of taking physical backups of a project, as well as archiving [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) files. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
+PITR is made possible by a combination of taking physical backups of a project, as well as archiving [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) files. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database. See the [Physical vs Logical Backups in PostgreSQL](https://supabase.com/blog/postgresql-physical-logical-backups) blog post for more details.
 
 Supabase uses [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, to handle both aspects of PITR. On a daily basis, a snapshot of the database is taken and sent to our storage servers. Throughout the day, as database transactions occur, WAL files are generated and uploaded. 
 
