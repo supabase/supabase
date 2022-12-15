@@ -15,10 +15,11 @@ import {
   IconCheckCircle,
   IconExternalLink,
   IconLoader,
+  IconHelpCircle,
 } from 'ui'
 
 import { useStore } from 'hooks'
-import { Wrapper } from './Wrappers.types'
+import { ServerOption, Wrapper } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
@@ -35,39 +36,90 @@ interface Props {
   onOpen: (wrapper: string) => void
 }
 
-const InputField: FC<{ option: any; value: any; error: any; onChange: any }> = ({
-  option,
-  value,
-  error,
-  onChange,
-}: any) => {
+const InputField: FC<{
+  option: ServerOption
+  value: any
+  error: any
+  onChange: (e: any) => void
+}> = ({ option, value, error, onChange }) => {
   const [showHidden, setShowHidden] = useState(!option.hidden)
-  return (
-    <Input
-      key={option.name}
-      id={option.name}
-      name={option.name}
-      label={option.label}
-      defaultValue={option.defaultValue ?? ''}
-      required={option.required ?? false}
-      value={value}
-      onChange={onChange}
-      error={error}
-      className="input-mono"
-      type={!option.hidden ? 'text' : showHidden ? 'text' : 'password'}
-      actions={
-        option.hidden ? (
-          <div className="flex items-center justify-center mr-1">
-            <Button
-              type="default"
-              icon={showHidden ? <IconEye /> : <IconEyeOff />}
-              onClick={() => setShowHidden(!showHidden)}
-            />
+
+  if (option.isTextArea) {
+    return (
+      <div className="text-area-text-sm text-area-resize-none">
+        <Input.TextArea
+          key={option.name}
+          id={option.name}
+          name={option.name}
+          label={
+            <div className="flex items-center space-x-2">
+              <p>{option.label}</p>
+              {option.urlHelper !== undefined && (
+                <Link href={option.urlHelper}>
+                  <a target="_blank">
+                    <IconHelpCircle
+                      strokeWidth={2}
+                      size={14}
+                      className="text-scale-1000 hover:text-scale-1200 cursor-pointer transition"
+                    />
+                  </a>
+                </Link>
+              )}
+            </div>
+          }
+          defaultValue={option.defaultValue ?? ''}
+          required={option.required ?? false}
+          value={value}
+          onChange={onChange}
+          error={error}
+          className="input-mono"
+          rows={6}
+        />
+      </div>
+    )
+  } else {
+    return (
+      <Input
+        key={option.name}
+        id={option.name}
+        name={option.name}
+        label={
+          <div className="flex items-center space-x-2">
+            <p>{option.label}</p>
+            {option.urlHelper !== undefined && (
+              <Link href={option.urlHelper}>
+                <a target="_blank">
+                  <IconHelpCircle
+                    strokeWidth={2}
+                    size={14}
+                    className="text-scale-1000 hover:text-scale-1200 cursor-pointer transition"
+                  />
+                </a>
+              </Link>
+            )}
           </div>
-        ) : null
-      }
-    />
-  )
+        }
+        defaultValue={option.defaultValue ?? ''}
+        required={option.required ?? false}
+        value={value}
+        onChange={onChange}
+        error={error}
+        className="input-mono"
+        type={!option.hidden ? 'text' : showHidden ? 'text' : 'password'}
+        actions={
+          option.hidden ? (
+            <div className="flex items-center justify-center mr-1">
+              <Button
+                type="default"
+                icon={showHidden ? <IconEye /> : <IconEyeOff />}
+                onClick={() => setShowHidden(!showHidden)}
+              />
+            </div>
+          ) : null
+        }
+      />
+    )
+  }
 }
 
 const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }) => {

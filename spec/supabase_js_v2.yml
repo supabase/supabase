@@ -3769,13 +3769,13 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
     examples:
       - id: checking-nullness
-        name: Checking nullness
+        name: Checking for nullness, true or false
         code: |
           ```ts
           const { data, error } = await supabase
             .from('countries')
             .select()
-            .eq('name', null)
+            .is('name', null)
           ```
         data:
           sql: |
