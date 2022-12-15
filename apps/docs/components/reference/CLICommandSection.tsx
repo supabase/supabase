@@ -111,7 +111,7 @@ const CliCommandSection = (props) => {
                           {flag?.accepted_values && (
                             <Options>
                               {flag?.accepted_values.map((value) => {
-                                return <Options.Option {...value} />
+                                return <Options.Option {...value} isOptional={value.required === undefined || !value.required}/>
                               })}
                             </Options>
                           )}
