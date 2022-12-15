@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Thursday'
+  const liveDay = 'Friday'
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -307,6 +307,7 @@ export default function launchweek() {
                   day2.d.toString(),
                   day3.d.toString(),
                   day4.d?.toString(),
+                  day5.d?.toString(),
                 ]}
               >
                 <div className="border-b pb-3">
@@ -553,26 +554,90 @@ export default function launchweek() {
                     id={day5.d.toString()}
                   >
                     {day5.steps.length > 0 && (
-                      <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
+                      <div className="h-[800px] lg:h-[400px]  flex flex-col gap-5 lg:flex-row">
                         <div
-                          className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/vault-bg-light.png')] dark:bg-[url('/images/launchweek/vault-bg.png')]  bg-contain bg-[right]`}
+                          className={`relative group/day5step1 flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl overflow-hidden`}
                         >
-                          <div className="flex items-center">
-                            <span>{day5.steps[0].title}</span>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
+                          <div
+                            className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.wrappers}`}
+                          >
+                            <Image
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/vault-visual.svg'
+                                  : '/images/launchweek/vault-visual-light.svg'
+                              }
+                              layout="fill"
+                              objectFit="cover"
+                              quality={100}
+                              priority
+                              className="left-16"
+                            />
+                          </div>
+                          <div
+                            className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step1:opacity-100 duration-500 transition-all ${styles.wrappers}`}
+                          >
+                            <Image
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/vault-visual-hover.svg'
+                                  : '/images/launchweek/vault-visual-hover-light.svg'
+                              }
+                              layout="fill"
+                              objectFit="cover"
+                              quality={100}
+                              className="test"
+                            />
+                          </div>
+                          <div className="flex items-center flex-col-reverse lg:flex-row">
+                            <span className="text-black dark:text-white">
+                              {day5.steps[0].title}
+                            </span>
+                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
                             </Badge>
                           </div>
                           <SectionButtons docs={day5.steps[0].docs} blog={day5.steps[0].blog} />
                         </div>
                         <div
-                          className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/pitr-bg-light.png')] dark:bg-[url('/images/launchweek/pitr-bg.png')] bg-cover bg-[center_center]`}
+                          className={`relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl overflow-hidden`}
                         >
+                          <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
+                            <Image
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/TCE-visual.svg'
+                                  : '/images/launchweek/TCE-visual-light.svg'
+                              }
+                              layout="fill"
+                              objectFit="cover"
+                              quality={100}
+                              priority
+                              className="left-16"
+                            />
+                          </div>
+                          <div
+                            className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
+                          >
+                            <Image
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/TCE-visual-hover.svg'
+                                  : '/images/launchweek/TCE-visual-hover-light.svg'
+                              }
+                              layout="fill"
+                              objectFit="cover"
+                              quality={100}
+                              className="test"
+                            />
+                          </div>
                           <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                            <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
+                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
                             </Badge>
-                            <span>{day5.steps[1].title}</span>
+                            <span className="text-black dark:text-white text-center">
+                              {day5.steps[1].title}
+                            </span>
                           </div>
                           <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
                         </div>
