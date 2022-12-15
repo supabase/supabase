@@ -660,6 +660,7 @@ export const integrations = {
         { name: 'Vercel', url: '/guides/integrations/vercel', items: [] },
         { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
         { name: 'Zuplo', url: '/guides/integrations/zuplo', items: [] },
+        { name: 'OneSignal', url: '/guides/integrations/onesignal', items: [] },
       ],
     },
     {
