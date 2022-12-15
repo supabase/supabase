@@ -11,7 +11,7 @@ date: '2022-12-16'
 toc_depth: 3
 ---
 
-Supabase is a collaborative company. We work with, sponsor, and support as many open source tools as possible. The great thing about this approach is that each tool brings their own community and it's starting to feel like Supabase is really just a “community of communities”. This Launch Week we have a few exciting community developments to share.
+Supabase is a collaborative company. We work with, sponsor, and support as many open source tools as possible. The great thing about this approach is that each tool brings their own community and it's starting to feel like Supabase is really just a “community of communities”. Far too much has happened in the Supabase community in the last 3 months for us to possibly feature it all here, so here's a collection of the highlights!
 
 ## New Integrations
 
@@ -82,7 +82,7 @@ In [this community spotlight video](https://youtube.com/EdYQ9fF-hz4), [Thang Huu
 
 ### PGroonga Multilingual Search extension
 
-![PGroonga](/images/blog/lw6-community/pgroonga.png)
+![PGroonga](/images/blog/lw6-community/pgroonga.jpg)
 
 Over the past few years, we've had a number of people ask if we can add Full Text Search for other languages. PGroonga has been on our radar for a long time now, so when we reached out to them we were surprised to learn that _no_ Postgres platform currently supports them. Today we're fixing this by becoming the first.
 
@@ -94,7 +94,7 @@ PGroonga is backed by a collection of incredible maintainers, contributors, and 
 
 The PostgreSQL community [released](https://www.postgresql.org/docs/current/release-15.html) version 15 (stable) in October 2022. All Projects created on the Supabase platform from today will be on version 15. If you want to upgrade one of your existing Projects, check out our [Upgrading](https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#upgrade-your-project) documentation, and if you want to see what's new, check out : XXX
 
-- Postgres 15 - [What's new in **Postgres 15?**](https://www.notion.so/What-s-new-in-Postgres-15-26edb0b5c73a4537892e7fec73188df8)
+Read [what's new in **Postgres 15?**](https://www.notion.so/What-s-new-in-Postgres-15-26edb0b5c73a4537892e7fec73188df8)
 
 ### PostgREST version 11 pre-release
 
@@ -104,66 +104,107 @@ PostgREST 11 is not wrapped up yet but you can try a pre-release locally with th
 
 ## Made with Supabase
 
-Perhaps you've seen [madewithsupabase.com](https://www.madewithsupabase.com/), but did you know that the site is made and maintained by an [open source contributor](https://twitter.com/zernonia) (during our first hackathon)? Since then, there have been over 300 apps and websites listed,:
+![Made With Supabase](/images/blog/lw6-community/made.jpg)
 
-- Over 300 apps on madewithsupabase
-- We asked [on twitter](https://twitter.com/supabase/status/1585226233742229504)
-- Highlight
-  - Marketplaces like Mobbin and
-    - Lottie: [https://www.youtube.com/watch?v=QoN7l_Wq_S4](https://www.youtube.com/watch?v=QoN7l_Wq_S4)
-    - Mobbin: [https://www.madewithsupabase.com/p/mobbin](https://www.madewithsupabase.com/p/mobbin)
-  - Web3 platforms like
-    - sound.xyz
-    - Topaz - [https://topaz.network/](https://topaz.network/)
-  - Devtools like
-    - Repeat.dev
-  - Bots like
-    - Dots - [https://www.producthunt.com/posts/dots-for-discord](https://www.producthunt.com/posts/dots-for-discord)
-  - Migrations
-    - 125K from Auth0, [1000 from Firebase](https://fleetingnotes.app/posts/migrating-from-firebase-to-supabase/)
+Perhaps you've seen [madewithsupabase.com](https://www.madewithsupabase.com/), but did you know that the site was made and is maintained by an [open source contributor](https://twitter.com/zernonia) (during our first hackathon)? Since then, there have been over 300 apps and websites listed. Here's some of our favourites:
 
-## Content Content
+### LottieFiles
 
-One of the most exciting developments this year is the number of content creators and developers helping _others_ to get started with Supabase. Ultimately, this means more developers using Postgres:
+LottieFiles built a [Mobile Motion Canvas](https://www.youtube.com/watch?v=QoN7l_Wq_S4) where you can create and share social stories, posts, stickers, & more.
 
-- Our [Content Storm](https://supabase.com/blog/the-supabase-content-storm) feature
-- New Courses
-  - Supaship just released [Supaship course](https://supaship.io/).
-  - \***\*[Build a Realtime Chat App with Remix and Supabase](https://egghead.io/courses/build-a-realtime-chat-app-with-remix-and-supabase-d36e2618)\*\***
-    Check out Jon's brand new, entirely free course on egghead to learn all about the Supabase Auth Helpers. Throughout the course, you will build a realtime chat application with Remix and learn how to:
-    - use Supabase server-side in loaders and actions
-    - query and mutate data as an authenticated user with Supabase
-    - sign users in with GitHub OAuth
-    - enforce authorization with Row Level Security (RLS) policies
-    - merge client and server state with realtime events
-    - deploy a Remix app to Vercel
-  - [Everything Svelte](https://www.everythingsvelte.com/) (Sveltekit and Supabase course by [Amy](https://twitter.com/selfteachme))
+### Mobbin
 
-### Getting started templates
+Mobbin use Supabase Auth to power their [UI/UX library of Mobile and Web screenshots](https://mobbin.com/browse/ios/apps). Last year they [migrated 200k users from Firebase to Supabase Auth](https://supabase.com/blog/mobbin-supabase-200000-users).
 
-- Getting Started Templates
-  - [usebasejump.com](https://usebasejump.com/)
-  - [supastarter.dev](https://supastarter.dev/)
+### sound.xyz
 
-### Community libraries
+[sound.xyz](https://sound.xyz) is platform for artists to drop tracks to their fans first, users support the artists they love directly and stake their claim on being there before everyone else.
 
-- Community libs
-- AWS team - selfhosting= [https://github.com/supabase-community/supabase-on-aws](https://github.com/supabase-community/supabase-on-aws)
+### Topaz
+
+[Topaz](https://topaz.network/) is one of the fastest growing NFT networks and chose supabase as a backend to ensure they won't lose customers during peak traffic periods.  
+
+### Repeat.dev
+
+[Repeat.dev](https://repeat.dev) is a platform for webhook based task automation. It has a built in scheduler, and can handle emails and pdf generation.
+
+### Dots
+
+[Dots](https://www.dots.community/) is a tool for interactive onboarding and support flows across Slack and Discord. Dots uses Supabase so they don't have to worry about managing a backend, and can focus on helping their users build amazing community experiences.
+
+### Fleeting Notes
+
+[Fleeting Notes](https://www.fleetingnotes.app/) allows you to take linked notes within your browser or on your phone, then sync the notes with Obsidian. They wrote an awesome guide on how they [migrated 1000+ users from Firebase to Supabase](https://fleetingnotes.app/posts/migrating-from-firebase-to-supabase/).
+
+## Content Creators
+
+![Content Creators](/images/blog/lw6-community/content-storm.png)
+
+One of the most exciting developments this year is the number of content creators and developers helping _others_ to get started with Supabase. Ultimately, this means more developers using Postgres. There's really too many of these awesome folks to feature, but here's a few who have gone above and beyond:
+
+### Content Storm
+
+More than 30+ creatores featured in our [Content Storm](https://supabase.com/blog/the-supabase-content-storm). These folks all produced brand new content in the build up to Launch Week and dropped it simultaniously!
+
+### Supaship
+
+![Content Creators](/images/blog/lw6-community/supaship.jpg)
+
+Supaship built a whole [Supabase course](https://supaship.io/). It's absolutley jam-packed with advice on how to get the most out of Supabase (and his meme game is absolute fire!).
+
+### Jon Meyers for Egghead
+
+![Content Creators](/images/blog/lw6-community/egghead.jpg)
+
+[Build a Realtime Chat App with Remix and Supabase](https://egghead.io/courses/build-a-realtime-chat-app-with-remix-and-supabase-d36e2618)
+
+Check out Jon's brand new, entirely free course on egghead to learn all about the Supabase Auth Helpers. Throughout the course, you will build a realtime chat application with Remix and learn how to:
+- use Supabase server-side in loaders and actions
+- query and mutate data as an authenticated user with Supabase
+- sign users in with GitHub OAuth
+- enforce authorization with Row Level Security (RLS) policies
+- merge client and server state with realtime events
+- deploy a Remix app to Vercel
+
+### Everything Svelte
+
+![Content Creators](/images/blog/lw6-community/svelte.jpg)
+
+[Everything Svelte](https://www.everythingsvelte.com/) is a Sveltekit and Supabase course by [Amy](https://twitter.com/selfteachme). You'll learn everything you need to know to build a modern web application.
+
+## Getting started templates
+
+### Base Jump
+
+[usebasejump.com](https://usebasejump.com/) is "The fastest way to launch Supabase apps with NextJS". Basejump is open source. Contributions are both awesome and encouraged! 
+
+### supastarter
+
+[supastarter.dev](https://supastarter.dev/) is the SaaS starter template for Next.js and Supabase. Save time and focus on your business with this scalable and production-ready starter template for your SaaS. It includes authentication, i18n, subscriptions, landing page and much more!
+
+## Community libraries
+
+![Community Growth Chart](/images/blog/lw6-community/eyes.jpg)
+
+The Supabase-Community org is home to 80(!) repos built and maintained by the community. It houses everything from [Client Libraries](https://github.com/supabase-community/#client-libraries), to [Auth Helpers](https://github.com/supabase-community/#supabase-auth-helpers), [Self Hosting tooling](https://github.com/supabase-community/#self-hosting), and [Utilities](https://github.com/supabase-community/#utilities).
+
+An awesome recent addition from the AWS team is [supabase-on-aws](https://github.com/supabase-community/supabase-on-aws), a self-hosting starter kit for AWS.
 
 ## Community Growth
 
-At the start of this year I [tweeted](https://twitter.com/kiwicopple/status/1478338320346267648) how far we had come as a community. Since then we've grown to one of the [most popular](https://github.com/search?q=stars%3A%3E42000&type=repositories) repos on GitHub (top 220). Since 2021 we've grown:
+![Community Growth Chart](/images/blog/lw6-community/graph.jpg)
 
-- GitHub stars: 25K → 42K
+At the start of this year [@kiwicopple tweeted](https://twitter.com/kiwicopple/status/1478338320346267648) how far we had come as a community. Since then we've grown to one of the [most popular](https://github.com/search?q=stars%3A%3E42000&type=repositories) repos on GitHub (top 220) and have grown by:
+
+- GitHub stars: 25K → 60K (across all repos)
 - Hosted Databases: 75K → 250K
-- Funding: 37M → 116M
-- Team: 35 → 60
-- Contributors: 271 → 700 (across all repos)
+- Contributors: 271 → 750 (across all repos)
 - Launch Weeks: 3 → 6
+- Discord: 0 → 11k
 
 ## Giving back
 
-At less than 3 years old we're still finding our feet, but one of the things I'm most proud of is our contribution back to open source. Technically everyone working at Supabase is an open source contributor, so it's hard to quantify exactly the value we've been contributing to the open source ecosystem. To name a few of the more obvious ways:
+At less than 3 years old we're still finding our feet, but one of the things we're most proud of is our contribution back to open source. Technically everyone working at Supabase is an open source contributor, so it's hard to quantify exactly the value we've been contributing to the open source ecosystem. To name a few of the more obvious ways:
 
 - Paid out over $100,000 to contributors via [Open Collective](https://opencollective.com/supabase).
 - Invested in $500,000 into [OrioleDB](https://github.com/orioledb/orioledb) to accelerate the Table Access API in Postgres.
