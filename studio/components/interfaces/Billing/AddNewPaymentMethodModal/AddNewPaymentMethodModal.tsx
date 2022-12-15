@@ -27,14 +27,19 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   const captchaRef = useRef<HCaptcha>(null)
 
   useEffect(() => {
-    if (visible && captchaLoaded) {
-      let token = captchaToken
-      if (!token) {
-        captchaRef.current?.execute({ async: true }).then((captchaResponse) => {
-          return setupIntent(captchaResponse?.response ?? undefined)
-        })
+    const loadPaymentForm = async () => {
+      if (visible && captchaLoaded) {
+        let token = captchaToken
+        if (!token) {
+          const captchaResponse = await captchaRef.current?.execute({ async: true })
+          token = captchaResponse?.response ?? null
+        }
+
+        await setupIntent(token ?? undefined)
       }
     }
+
+    loadPaymentForm()
   }, [visible, captchaLoaded])
 
   const onCaptchaLoaded = () => {
