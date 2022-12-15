@@ -395,7 +395,7 @@ export default function launchweek() {
                     {day3.steps.length > 0 && (
                       <div className="h-[400px] flex gap-5 group">
                         <div
-                          className={`flex flex-col text-center items-center lg:items-start justify-between flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl relative`} // bg-[url('/images/launchweek/mfa-bg-light.png')] dark:bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%] bg-contain
+                          className={`flex flex-col text-center items-center lg:items-start justify-between flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl relative`}
                         >
                           <div className="absolute top-0 right-0 w-full h-full -z-20 ">
                             <Image
@@ -452,7 +452,7 @@ export default function launchweek() {
                     {day4.steps.length > 0 && (
                       <div className="h-[400px]  flex flex-col gap-5 lg:flex-row group/day4 relative overflow-hidden">
                         <div
-                          className={`relative flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover !px-3 sm:!px-14`} // sm:bg-contain bg-[url('/images/launchweek/wrappers-bg-light.png')] dark:bg-[url('/images/launchweek/wrappers-bg.png')] bg-[left_90%_bottom] sm:bg-[center_bottom]
+                          className={`relative flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover !px-3 sm:!px-14`}
                         >
                           <div
                             className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.wrappers}`}
