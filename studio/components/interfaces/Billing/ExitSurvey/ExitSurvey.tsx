@@ -11,6 +11,7 @@ import { CANCELLATION_REASONS } from '../Billing.constants'
 import { UpdateSuccess } from '../'
 import { SubscriptionPreview } from '../Billing.types'
 import { StripeSubscription } from 'components/interfaces/Billing'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 interface Props {
   freeTier: any
@@ -23,6 +24,9 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   const { app, ui } = useStore()
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
 
   const formRef = useRef<any>()
 
@@ -99,6 +103,12 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   const downgradeProject = async (values?: any) => {
     const downgradeMessage = values?.message ?? message
 
+    let token = captchaToken
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+    }
+
     try {
       setIsSubmitting(true)
 
@@ -110,6 +120,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         tier,
         addons,
         proration_date,
+        hcaptchaToken: token ?? undefined
       })
 
       if (res?.error) {
@@ -139,9 +150,9 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       }
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-	additionalFeedback: downgradeMessage,
-	exitAction: 'downgrade',
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        additionalFeedback: downgradeMessage,
+        exitAction: 'downgrade',
       })
       if (feedbackRes.error) throw feedbackRes.error
     } catch (error: any) {
@@ -244,6 +255,19 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
                       The unused amount for the remaining of your billing cycle will be refunded as
                       credits
                     </p>
+                  </div>
+                  <div className="self-center">
+                    <HCaptcha
+                      ref={captchaRef}
+                      sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                      size="invisible"
+                      onVerify={(token) => {
+                        setCaptchaToken(token)
+                      }}
+                      onExpire={() => {
+                        setCaptchaToken(null)
+                      }}
+                    />
                   </div>
                 </div>
               )}
