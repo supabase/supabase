@@ -13,3 +13,7 @@
 .wrappers > span {
   left: -200px !important;
 }
+
+.community_wrappers > span {
+  left: -400px !important;
+}

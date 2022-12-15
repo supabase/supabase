@@ -547,6 +547,91 @@ export default function launchweek() {
             </SectionContainer>
           </>
         )}
+        <SectionContainer className="!py-20 sm:!py-40">
+          <div className="h-[400px] flex flex-col gap-5 lg:flex-row group/community relative overflow-hidden">
+            <div
+              className={`relative flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover !px-3 sm:!px-14`}
+            >
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.community_wrappers}`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/community-visual.svg'
+                      : '/images/launchweek/community-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/community:opacity-100 duration-500 transition-all ${styles.community_wrappers}`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/community-visual-hover.svg'
+                      : '/images/launchweek/community-visual-light-hover.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex items-center flex-col-reverse lg:flex-row">
+                <span className="text-black dark:text-white">Community Day</span>
+              </div>
+              <div className="flex flex-col md:flex-row gap-4 md:gap-2 z-10 ">
+                <div className="flex gap-4 md:gap-2">
+                  <a href={'/blog'} target="_blank" rel="noopener">
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      Blog post
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/icons-blogpost.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                  <a
+                    href={'https://www.youtube-nocookie.com/embed/TmViZsWEBY0'}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      Flutterflow
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div className="flex gap-4 md:gap-2">
+                  <a href={'/blog'} target="_blank" rel="noopener">
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      OneSignal
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                  <a href={'/blog'} target="_blank" rel="noopener">
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      NextAuth
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionContainer>
+
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
           <div className="flex flex-col mb-16">
             <Badge className="mb-4 w-fit bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
