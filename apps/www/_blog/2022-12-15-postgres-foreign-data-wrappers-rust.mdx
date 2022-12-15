@@ -39,7 +39,7 @@ options (api_key 'sk_test_xxx');
 Now we can map your Stripe data to Foreign Tables, which are just like normal tables except that the data exists _outside_ of your database.
 
 ```sql
--- Create a foreign table for your Stripe customers
+-- Create a foreign table for your Stripe products
 create foreign table products (
   id text,
   name text,
@@ -47,22 +47,21 @@ create foreign table products (
   default_price text
 )
 server my_stripe_server
-options (
-  object 'customers'
-);
-
+options ( object 'products' );
 ```
 
 ### Accessing remote data
 
-After setting up your foreign table, you can query you Stripe customers directly from your database:
+After setting up your foreign table, you can query you Stripe products directly from your database:
 
 ```sql
--- Fetch all your stripe customers in Postgres
+-- Fetch all your stripe products in Postgres
 select *
 from products
 limit 10;
 ```
+
+![Stripe Products](/images/blog/launch-week-6/wrappers/stripe-data.png)
 
 Or from your application, using one of our client libraries:
 
@@ -154,6 +153,8 @@ where
 
 We can either run these queries on demand or, for better query performance, we can run them in the background (using something like [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)), and materialize the data into a local table.
 
+![QETL](/images/blog/launch-week-6/wrappers/qetl.png)
+
 This gives us the basis of QETL:
 
 - Query: run on-demand SQL queries, directly from your Postgres database.
@@ -161,7 +162,7 @@ This gives us the basis of QETL:
 - Transform: use SQL aggregations and CTEs to transform the data.
 - Load: store transformed data into local tables for faster access.
 
-This is also a two-way process. It's equally useful to offload large datasets from your Postgres database to your Data Warehouse. With FDWs, this can be as simple as:
+This is a two-way process. It's equally useful to offload large datasets from your Postgres database to your Data Warehouse. With FDWs, this can be as simple as:
 
 ```sql
 insert into snowflake.analytics
