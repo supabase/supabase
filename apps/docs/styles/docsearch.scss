@@ -138,7 +138,7 @@
   display: none;
 }
 
-.DocSearch-Cancel {
+button[type='reset'].DocSearch-Cancel {
   appearance: none;
   flex: none;
   font-size: 0;
