@@ -228,7 +228,6 @@ export default function launchweek() {
                       className="brightness-125"
                       width={120}
                       height={80}
-                      priority
                     ></img>
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
