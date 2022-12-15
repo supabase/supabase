@@ -14,6 +14,7 @@ interface Props extends CommonChartProps<any> {
   variant?: 'values' | 'percentages'
   xAxisFormatAsDate?: boolean
   displayDateInUtc?: boolean
+  hideLegend?: boolean
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
@@ -29,6 +30,7 @@ const StackedBarChart: React.FC<Props> = ({
   variant,
   xAxisFormatAsDate = true,
   displayDateInUtc,
+  hideLegend = false,
 }) => {
   const { Container } = useChartSize(size)
   const { dataKeys, stackedData } = useStacked({ data, xAxisKey, stackKey, yAxisKey, variant })
@@ -61,14 +63,14 @@ const StackedBarChart: React.FC<Props> = ({
           }}
           onMouseLeave={() => setFocusDataIndex(null)}
         >
-          <Legend
-            wrapperStyle={{ top: -8, fontSize: '0.8rem' }}
-            iconSize={8}
-            iconType="circle"
-            // margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
-            verticalAlign="top"
-          />
-
+          {!hideLegend && (
+            <Legend
+              wrapperStyle={{ top: -8, fontSize: '0.8rem' }}
+              iconSize={8}
+              iconType="circle"
+              verticalAlign="top"
+            />
+          )}
           <XAxis
             dataKey={xAxisKey}
             interval={data.length - 2}
@@ -77,8 +79,6 @@ const StackedBarChart: React.FC<Props> = ({
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
-          {/* <YAxis dataKey={yAxisKey} /> */}
-          {/* <Tooltip /> */}
           {dataKeys.map((datum, stackIndex) => (
             <Bar
               key={stackIndex}
