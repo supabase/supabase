@@ -78,7 +78,7 @@ Click **Start a restore** to select a PITR backup. The process only proceeds if 
 Insert screenshot of the Dashboard with the confirmation modal 
 ```
 
-After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration.
+The Dashboard prompts for a confirmation before proceeding with the restoration. The project will be inaccessible during the restoration so allot some downtime beforehand. The restoration depends on the size of the database—the larger it is, the longer the downtime will be. During the process, the latest physical backup is downloaded to the project and the database is partially restored. WAL files generated after this physical backup, up to the specified point-in-time, are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration.
 
 ```
 Insert screenshot of the Dashboard of the project in restoration mode
