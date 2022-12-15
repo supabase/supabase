@@ -4,6 +4,8 @@ import React, { useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
 import { DateTimeFormats } from './Charts.constants'
 import { CommonChartProps, StackedChartProps } from './Charts.types'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 /**
  * Auto formats a number to a default precision if it is a float
@@ -42,7 +44,24 @@ export const precisionFormatter = (num: number, precision: number): string => {
   }
 }
 
-export const timestampFormatter = (value: string, format: string= DateTimeFormats.FULL) => dayjs(value).format(format)
+/**
+ * Formats a timestamp.
+ * Optionally formats the string to UTC
+ * @param value
+ * @param format
+ * @param utc
+ * @returns
+ */
+export const timestampFormatter = (
+  value: string,
+  format: string = DateTimeFormats.FULL,
+  utc: boolean = false
+) => {
+  if (utc) {
+    return dayjs.utc(value).format(format)
+  }
+  return dayjs(value).format(format)
+}
 
 /**
  * Hook to create common wrapping components, perform data transformations
