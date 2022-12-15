@@ -202,17 +202,21 @@ The FDW interface also future-proofs Postgres. Instead of keeping up with the la
 ## Developing Wrappers
 
 Postgres has a builtin “Postgres FDW” allows querying one Postgres database from another. We've extended this functionality to support a variety of data sources, from Data Warehouses to APIs.
+This release includes two initial wrappers: Stripe and Firebase
 
-This release includes two initial wrappers: Stripe and Firebase, with several more [under development](https://github.com/supabase/wrappers/tree/main/wrappers/src/fdw) including Clickhouse, BigQuery, and Airtable.
+| Integration | Platform | Self-hosted | `select` | `update` | `delete` | `truncate` |
+| ----------- | -------- | ----------- | -------- | -------- | -------- | ---------- |
+| Firebase    | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
+| Postgres    | ✅       | ✅          | ✅       | ✅       | ✅       | ✅         |
+| Stripe      | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
+
+With several more [under development](https://github.com/supabase/wrappers/tree/main/wrappers/src/fdw):
 
 | Integration | Platform | Self-hosted | `select` | `update` | `delete` | `truncate` |
 | ----------- | -------- | ----------- | -------- | -------- | -------- | ---------- |
 | Airtable    | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
 | BigQuery    | 🚧       | ✅          | ✅       | ✅       | ✅       | ✅         |
 | ClickHouse  | 🚧       | ✅          | ✅       | ✅       | ✅       | ✅         |
-| Firebase    | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
-| Postgres    | 🚧       | ✅          | ✅       | ✅       | ✅       | ✅         |
-| Stripe      | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧         |
 
 Wrappers used [pgx](https://github.com/tcdi/pgx), extending it with FDW support. pgx is a Postgres extension framework written in Rust. Wrappers is very similar to [Steampipe](https://steampipe.io/) or [Multicorn](https://multicorn.org/). We opted to develop our own framework for several reasons:
 
