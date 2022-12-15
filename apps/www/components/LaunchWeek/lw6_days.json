@@ -47,13 +47,53 @@
     ]
   },
   {
-    "title": "Day 3",
-    "shipped": false,
+    "title": "Multi-factor Authentication",
+    "shipped": true,
     "date": "14 Dec 2022",
-    "description": "Day 3",
+    "description": "Multi-factor Authentication",
     "d": 3,
     "dd": "Wednesday",
-    "youtube_id": "6bGQotxisoY",
+    "youtube_id": "CGZr5tybW18",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "steps": [
+      {
+        "title": "Multi-factor Authentication",
+        "blog": "/blog/mfa-auth-via-rls",
+        "docs": "/docs/guides/auth/auth-mfa",
+        "isNew": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "title": "Supabase Wrappers - FDW Framework",
+    "shipped": true,
+    "date": "15 Dec 2022",
+    "description": "Supabase Wrappers",
+    "d": 4,
+    "dd": "Thursday",
+    "youtube_id": "CGZr5tybW18",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "steps": [
+      {
+        "title": "Supabase Wrappers",
+        "blog": "/blog",
+        "docs": "/docs",
+        "isNew": true,
+        "description": "Connect Postgres to external systems with Postgres Foreign Data Wrappers"
+      }
+    ]
+  },
+  {
+    "title": "Day 5",
+    "shipped": false,
+    "date": "16 Dec 2022",
+    "description": "Day 5",
+    "d": 5,
+    "dd": "Friday",
+    "youtube_id": "CGZr5tybW18",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
     "steps": []
@@ -65,18 +105,6 @@
     "description": "Day 4",
     "d": 4,
     "dd": "Thursday",
-    "youtube_id": "CGZr5tybW18",
-    "blogpost": "https://supabase.com/blog",
-    "docs": "https://supabase.com/docs",
-    "steps": []
-  },
-  {
-    "title": "Day 5",
-    "shipped": false,
-    "date": "16 Dec 2022",
-    "description": "Day 5",
-    "d": 5,
-    "dd": "Friday",
     "youtube_id": "CGZr5tybW18",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
