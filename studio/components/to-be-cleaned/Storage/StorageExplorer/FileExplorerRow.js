@@ -321,7 +321,7 @@ const FileExplorerRow = ({
               overlay={[
                 rowOptions.map((option) => {
                   if (option.name === 'Separator') {
-                    return <Dropdown.Seperator key="row-separator" />
+                    return <Dropdown.Separator key="row-separator" />
                   } else {
                     return (
                       <Dropdown.Item

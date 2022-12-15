@@ -1,6 +1,6 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Button, IconArrowUpRight } from '@supabase/ui'
+import { Button, IconArrowUpRight } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
 import Link from 'next/link'
@@ -65,7 +65,7 @@ function FunctionsUsecases(props: Props) {
                     (active ? ' text-scale-1100' : ' text-scale-800 group-hover:text-scale-1100 ')
                   }
                 >
-                  {/* 
+                  {/*
                   // @ts-ignore */}
                   {feat.description}
                 </div>

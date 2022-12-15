@@ -11,7 +11,7 @@ import {
   ExampleProps,
 } from 'data/CodeExamples'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
-import { Button, IconCopy, Space, Tabs } from '@supabase/ui'
+import { Button, IconCopy, Space, Tabs } from 'ui'
 
 SyntaxHighlighter.registerLanguage('javascript', js)
 

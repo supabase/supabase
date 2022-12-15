@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Navigation, Pagination } from 'swiper'
 
 import Link from 'next/link'
-import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from '@supabase/ui'
+import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from 'ui'
 
 import Examples from '../../data/Examples.json'
 import ExampleCard from '../ExampleCard'

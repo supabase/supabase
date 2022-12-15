@@ -71,7 +71,6 @@ beforeEach(() => {
 test('static elements', async () => {
   render(<PresetReport preset={Presets.OVERVIEW} />)
   await screen.findByText(/Last 7 days/)
-  await screen.findAllByText(/API Usage/)
   await screen.findAllByText(/Refresh/)
 })
 

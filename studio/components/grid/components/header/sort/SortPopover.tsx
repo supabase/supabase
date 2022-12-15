@@ -70,7 +70,7 @@ const Sort: FC = () => {
         </div>
       )}
 
-      <Popover.Seperator />
+      <Popover.Separator />
       <div className="px-3">
         {columns && columns.length > 0 ? (
           <DropdownControl

@@ -5,14 +5,126 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 11 Oct 2022 16:04:00 +0000</lastBuildDate>
+      <lastBuildDate>Mon, 12 Dec 2022 16:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/storage-image-resizing-smart-cdn</guid>
+  <title>Supabase Storage v2: Image resizing and Smart CDN</title>
+  <link>https://supabase.com/blog/storage-image-resizing-smart-cdn</link>
+  <description>We're introducing new features for Supabase Storage: Image resizing and a Smart CDN.</description>
+  <pubDate>Mon, 12 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/new-supabase-docs-built-with-nextjs</guid>
+  <title>New Supabase Docs, built with Next.js</title>
+  <link>https://supabase.com/blog/new-supabase-docs-built-with-nextjs</link>
+  <description>We've redesignd our Docs and migrated to Next.js</description>
+  <pubDate>Sun, 11 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-crdt</guid>
+  <title>pg_crdt - an experimental CRDT extension for Postgres</title>
+  <link>https://supabase.com/blog/postgres-crdt</link>
+  <description>Embedding Yjs and Automerge into Postgres for collaborative applications.</description>
+  <pubDate>Fri, 09 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/who-we-hire</guid>
+  <title>Who We Hire at Supabase</title>
+  <link>https://supabase.com/blog/who-we-hire</link>
+  <description>Traits we look for to maintain a culture of shipping fast and often</description>
+  <pubDate>Thu, 08 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-6-hackathon</guid>
+  <title>Launch Week 6 Hackathon</title>
+  <link>https://supabase.com/blog/launch-week-6-hackathon</link>
+  <description>Build an Open Source Project, Win $1500 and the Supabase Darkmode Keyboard</description>
+  <pubDate>Thu, 08 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-november-2022</guid>
+  <title>Supabase Beta November 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-november-2022</link>
+  <description>We are preparing everything for Launch Week 6, but we still had time to ship some goodies this month!</description>
+  <pubDate>Tue, 06 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/the-supabase-content-storm</guid>
+  <title>The Supabase Content Storm</title>
+  <link>https://supabase.com/blog/the-supabase-content-storm</link>
+  <description>We worked with +30 content creators to drop a mountain of content simultaneously.</description>
+  <pubDate>Mon, 05 Dec 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/transparent-column-encryption-with-postgres</guid>
+  <title>Transparent Column Encryption with Postgres</title>
+  <link>https://supabase.com/blog/transparent-column-encryption-with-postgres</link>
+  <description>Using pgsodium's Transparent Column Encryption to encrypt data and provide your users with row-level encryption.</description>
+  <pubDate>Wed, 30 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</guid>
+  <title>SQL or NoSQL? Why not use both (with PostgreSQL)?</title>
+  <link>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</link>
+  <description>How to turn Postgres into an easy-to-use NoSQL database that retains all the power of SQL</description>
+  <pubDate>Wed, 23 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</guid>
+  <title>Flutter Authentication and Authorization with RLS</title>
+  <link>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</link>
+  <description>Learn how you can secure your Flutter app using Supabase Row Level Security.</description>
+  <pubDate>Mon, 21 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</guid>
+  <title>Fetching and caching Supabase data in Next.js 13 Server Components</title>
+  <link>https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</link>
+  <description>Next.js 13 introduces new data fetching and caching methods to enable React Server Components and Suspense.</description>
+  <pubDate>Wed, 16 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/authentication-in-ionic-angular</guid>
+  <title>Authentication in Ionic Angular with Supabase</title>
+  <link>https://supabase.com/blog/authentication-in-ionic-angular</link>
+  <description>Learn how to build an Ionic Angular app with authentication, Row Level Security, and Magic Link auth.</description>
+  <pubDate>Mon, 07 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-update-october-2022</guid>
+  <title>Supabase Beta October 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-update-october-2022</link>
+  <description>New SDKs, quickstarts, Functions tricks, and more. But, more importantly, Launch Week 6️ has a date!</description>
+  <pubDate>Tue, 01 Nov 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-commitfest</guid>
+  <title>What is PostgreSQL commitfest and how to contribute</title>
+  <link>https://supabase.com/blog/postgresql-commitfest</link>
+  <description>A time-tested method for contributing to the core Postgres code</description>
+  <pubDate>Wed, 26 Oct 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-flutter-sdk-v1-released</guid>
+  <title>supabase-flutter v1 Released</title>
+  <link>https://supabase.com/blog/supabase-flutter-sdk-v1-released</link>
+  <description>We've released supabase-flutter v1. More intuitive way of accessing Supabase from your Flutter application.</description>
+  <pubDate>Thu, 20 Oct 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-js-v2-released</guid>
+  <title>supabase-js v2 Released</title>
+  <link>https://supabase.com/blog/supabase-js-v2-released</link>
+  <description>We've released supabase-js v2. Updated examples, quickstarts, and an improved experience.</description>
+  <pubDate>Wed, 19 Oct 2022 16:04:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</guid>
-  <title>Postgres FTS vs the rest</title>
+  <title>Postgres Full Text Search vs the rest</title>
   <link>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</link>
   <description>Comparing one of the most popular Postgres features against alternatives</description>
-  <pubDate>Tue, 11 Oct 2022 16:04:00 +0000</pubDate>
+  <pubDate>Thu, 13 Oct 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-september-2022</guid>
@@ -107,16 +219,16 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-js-v2</guid>
-  <title>supabase-js v2 Release Candidate</title>
+  <title>supabase-js v2</title>
   <link>https://supabase.com/blog/supabase-js-v2</link>
-  <description>First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.</description>
+  <description>A look at supabase-js v2, which brings type support and focuses on quality-of-life improvements for developers.</description>
   <pubDate>Mon, 15 Aug 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta</guid>
-  <title>Supabase CLI v1 and Admin API Beta</title>
+  <title>Supabase CLI v1 and Management API Beta</title>
   <link>https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta</link>
-  <description>We are moving Supabase CLI v1 out of beta, and releasing Admin API beta.</description>
+  <description>We are moving Supabase CLI v1 out of beta, and releasing Management API beta.</description>
   <pubDate>Sun, 14 Aug 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
@@ -179,7 +291,7 @@
   <guid>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</guid>
   <title>Flutter Tutorial: building a Flutter chat app</title>
   <link>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</link>
-  <description>How to create a real time chat app using Flutter.</description>
+  <description>Learn how to build a Flutter chat app with open source and scalable backend (inc. auth, realtime, database, and more).</description>
   <pubDate>Wed, 29 Jun 2022 16:04:00 +0000</pubDate>
 </item>
 <item>

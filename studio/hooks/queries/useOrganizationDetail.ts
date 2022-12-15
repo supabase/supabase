@@ -3,25 +3,13 @@ import useSWR, { mutate } from 'swr'
 import { Member } from 'types'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
-import { useFlag } from 'hooks'
 
 export function useOrganizationDetail(slug: string) {
-  const enablePermissions = useFlag('enablePermissions')
-
   // Get org members
-  const url = enablePermissions
-    ? `${API_URL}/organizations/${slug}/members?member_roles`
-    : `${API_URL}/props/org/${slug}`
+  const url = `${API_URL}/organizations/${slug}/members?member_roles`
 
   const { data, error } = useSWR<any>(slug ? url : null, get)
-  let members = enablePermissions
-    ? data
-    : (data?.members ?? []).map((m: any) => ({
-        id: m.id,
-        is_owner: m.is_owner,
-        username: m.profile.username,
-        primary_email: m.profile.primary_email,
-      })) ?? []
+  let members = data
 
   // Get pending invite users
   const pendingInviteUrl = `${API_URL}/organizations/${slug}/members/invite`
@@ -37,7 +25,7 @@ export function useOrganizationDetail(slug: string) {
         username: x.invited_email.slice(0, 1),
         primary_email: x.invited_email,
       }
-      return enablePermissions ? { ...member, role_ids: [x.role_id] } : member
+      return { ...member, role_ids: [x.role_id] }
     })
 
     members = [...members, ...invitedMembers]
