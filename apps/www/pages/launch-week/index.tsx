@@ -471,9 +471,7 @@ export default function launchweek() {
                           <SectionButtons
                             docs={day4.steps[0].docs}
                             blog={day4.steps[0].blog}
-                            video={
-                              'https://www.youtube.com/watch?v=Q1Amk6iDlF8&ab_channel=Supabase'
-                            }
+                            video={`https://www.youtube.com/watch?v=${day4.youtube_id}&ab_channel=Supabase`}
                           />
                         </div>
                       </div>
