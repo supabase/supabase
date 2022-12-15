@@ -84,6 +84,7 @@ export function SearchProvider({ children }: any) {
             hitComponent={Hit}
             transformItems={(items) => {
               return items.map((item, index) => {
+                console.log('item', item)
                 // We transform the absolute URL into a relative URL to
                 // leverage Next's preloading.
                 const a = document.createElement('a')
@@ -95,7 +96,8 @@ export function SearchProvider({ children }: any) {
                   ...item,
                   url: `${a.pathname}${hash}`,
                   __is_result: () => true,
-                  __is_parent: () => item.type === 'lvl1' && items.length > 1 && index === 0,
+                  __is_parent: () => item.type === 'lvl1' && index === 0,
+                  __is_guide: () => item.hierarchy.lvl0 === 'Guides',
                   __is_child: () =>
                     item.type !== 'lvl1' &&
                     items.length > 1 &&
@@ -115,17 +117,16 @@ export function SearchProvider({ children }: any) {
 
 // @ts-ignore
 function Hit({ hit, children }) {
-  console.log('hit:', hit)
-  console.log('children:', children)
   return (
     <Link href={hit.url}>
       <a
         className={clsx({
-          'DocSearch-Hit--Result relative': hit.__is_result?.(),
+          'DocSearch-Hit--Result': hit.__is_result?.(),
           'DocSearch-Hit--Parent': hit.__is_parent?.(),
           'DocSearch-Hit--FirstChild': hit.__is_first?.(),
           'DocSearch-Hit--LastChild': hit.__is_last?.(),
           'DocSearch-Hit--Child': hit.__is_child?.(),
+          'DocSearch-Hit--Guide': hit.__is_guide?.(),
         })}
       >
         {children}

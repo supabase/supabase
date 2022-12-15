@@ -951,9 +951,10 @@ body {
 }
 
 // search bar
-.DocSearch-Input {
+input[type='search'].DocSearch-Input {
   background-color: var(--colors-scale1);
 }
+
 .dark .DocSearch-Input {
   background-color: var(--colors-scale2);
   color: white;
