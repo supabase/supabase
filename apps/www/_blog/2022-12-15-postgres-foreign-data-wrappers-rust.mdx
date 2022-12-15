@@ -204,19 +204,19 @@ The FDW interface also future-proofs Postgres. Instead of keeping up with the la
 Postgres has a builtin “Postgres FDW” allows querying one Postgres database from another. We've extended this functionality to support a variety of data sources, from Data Warehouses to APIs.
 This release includes two initial wrappers: Stripe and Firebase
 
-| Integration | Platform | Self-hosted | `select` | `insert` | `update` | `delete` |
-| ----------- | -------- | ----------- | -------- | -------- | -------- | -------- |
-| Firebase    | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧       |
-| Postgres    | ✅       | ✅          | ✅       | ✅       | ✅       | ✅       |
-| Stripe      | 🚧       | ✅          | ✅       | 🚧       | 🚧       | 🚧       |
+| Integration | Platform | Self-hosted | <span style={{fontWeight: "normal"}}>select</span> | <span style={{fontWeight: "normal"}}>insert</span> | <span style={{fontWeight: "normal"}}>update</span> | <span style={{fontWeight: "normal"}}>delete</span> |
+| ----------- | -------- | ----------- | -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- |
+| Firebase    | 🚧       | ✅          | ✅                                                 | 🚧                                                 | 🚧                                                 | 🚧                                                 |
+| Postgres    | ✅       | ✅          | ✅                                                 | ✅                                                 | ✅                                                 | ✅                                                 |
+| Stripe      | 🚧       | ✅          | ✅                                                 | 🚧                                                 | 🚧                                                 | 🚧                                                 |
 
 With several more [under development](https://github.com/supabase/wrappers/tree/main/wrappers/src/fdw):
 
-| Integration | `select` | `insert` | `update` | `delete` |
-| ----------- | -------- | -------- | -------- | -------- |
-| Airtable    | ✅       | 🚧       | 🚧       | 🚧       |
-| BigQuery    | ✅       | ✅       | ✅       | ✅       |
-| ClickHouse  | ✅       | ✅       | ✅       | ✅       |
+| Integration | <span style={{fontWeight: "normal"}}>select</span> | <span style={{fontWeight: "normal"}}>insert</span> | <span style={{fontWeight: "normal"}}>update</span> | <span style={{fontWeight: "normal"}}>delete</span> |
+| ----------- | -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- |
+| Airtable    | ✅                                                 | 🚧                                                 | 🚧                                                 | 🚧                                                 |
+| BigQuery    | ✅                                                 | ✅                                                 | ✅                                                 | ✅                                                 |
+| ClickHouse  | ✅                                                 | ✅                                                 | ✅                                                 | ✅                                                 |
 
 Wrappers used [pgx](https://github.com/tcdi/pgx), extending it with FDW support. pgx is a Postgres extension framework written in Rust. Wrappers is very similar to [Steampipe](https://steampipe.io/) or [Multicorn](https://multicorn.org/). We opted to develop our own framework for several reasons:
 
