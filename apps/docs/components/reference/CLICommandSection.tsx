@@ -27,6 +27,7 @@ export type Flag = {
   description: string
   default_value: string
   accepted_values: AcceptedValue[]
+  required?: boolean
 }
 
 export type AcceptedValue = {
@@ -107,11 +108,11 @@ const CliCommandSection = (props) => {
                   {command.flags.map((flag: Flag) => (
                     <>
                       <li className="mt-0">
-                        <Param {...flag}>
+                        <Param {...flag} isOptional={!flag.required}>
                           {flag?.accepted_values && (
                             <Options>
                               {flag?.accepted_values.map((value) => {
-                                return <Options.Option {...value} isOptional={value.required === undefined || !value.required}/>
+                                return <Options.Option {...value}/>
                               })}
                             </Options>
                           )}
