@@ -21,7 +21,7 @@ When deciding how often a database should be backed up, the key business metric 
 
 All Supabase projects are backed up automatically on a daily basis. Access to these backups however are limited to Pro and Enterprise tier projects only. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
 
-### Backup Process
+### Backup Process [#daily-backups-process]
 
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
 
@@ -29,7 +29,7 @@ The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-
 
 You can access daily backups in the [Scheduled Database Backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro tier projects can access the last 7 days’ worth of daily backups while Enterprise tier projects can access up to 30 days’ worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
 
-### Restoration Process
+### Restoration Process [#daily-backups-restoration-process]
 
 When selecting a backup to restore to, select the closest available one made before the desired point in time to restore to. Earlier backups can always be chosen too but do consider the number of days’ worth of data that could be lost.
 
@@ -52,7 +52,7 @@ Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter i
   add-on.
 </Admonition>
 
-### Backup Process
+### Backup Process [#pitr-backup-process]
 
 As discussed [here](https://supabase.com/blog/postgresql-physical-logical-backups), PITR is made possible by a combination of taking physical backups of a project, as well as archiving [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) files. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
 
@@ -66,7 +66,7 @@ You can access PITR in the [PITR Database Backups](https://app.supabase.com/proj
 
 Note that the latest restore point of the project could be significantly far from the current time. This occurs when there has not been any recent activity in the database, and therefore no WAL file backups have been made recently. This is perfectly fine as the state of the database at the latest point of recovery would still be indicative of the state of the database at the current time given that no transactions have been made in between.
 
-### Restoration Process
+### Restoration Process [#pitr-restoration-process]
 
 {/* screenshot of PITR calendar view on the Dashboard */}
 
