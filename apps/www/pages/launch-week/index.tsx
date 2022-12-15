@@ -262,7 +262,7 @@ export default function launchweek() {
                     <img
                       src={`/images/launchweek/wrapup.svg`}
                       className="brightness-125"
-                      width={90}
+                      width={65}
                       height={60}
                       priority
                     ></img>
@@ -648,7 +648,7 @@ export default function launchweek() {
             </SectionContainer>
           </>
         )}
-        <SectionContainer className="!py-20 sm:!py-40">
+        <SectionContainer className="!py-20 sm:!pb-40 sm:!pt-10">
           <div className="h-[400px] flex flex-col gap-5 lg:flex-row group/community relative overflow-hidden">
             <div
               className={`relative flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover !px-3 sm:!px-14`}
