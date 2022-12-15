@@ -1,9 +1,9 @@
 ---
 title: What's new in Postgres 15?
 description: Describes the release of Postgres 15, new features and reasons to use it
-author: Pavel Borisov
-image:
-thumb:
+author: pavel
+image: lw6-community/community-day.png
+thumb: lw6-community/community-day.png
 tags:
   - postgres
   - launch-week
@@ -15,9 +15,9 @@ The PostgreSQL community [released](https://www.postgresql.org/docs/current/rele
 
 ## **The permission model is more secure**
 
-CREATE permission is revoked from all users except the database owner. It makes permission assigning more tunable (for details see [https://www.postgresql.org/docs/15/ddl-schemas.html#DDL-SCHEMAS-PATTERNS](https://www.postgresql.org/docs/15/ddl-schemas.html#DDL-SCHEMAS-PATTERNS)). And for the migrated database don't forget to revoke CREATE permission on the public schema manually to fit the new policy.
+`CREATE` permission is revoked from all users except the database owner. It makes permission assigning more tunable ([details](https://www.postgresql.org/docs/15/ddl-schemas.html#DDL-SCHEMAS-PATTERNS)). And for the migrated database don't forget to revoke `CREATE` permission on the public schema manually to fit the new policy.
 
-There is a useful option CREATE VIEW .. WITH security_invoker=on to create a view that uses permissions of a view caller rather than a view creator to access underlying tables. With this, you should not worry that a user that doesn't have access to a table could see its data through a view.
+There is a useful option `CREATE VIEW .. WITH security_invoker=on` to create a view that uses permissions of a view caller rather than a view creator to access underlying tables. With this, you should not worry that a user that doesn't have access to a table could see its data through a view.
 
 ## **Performance speed-up**
 
@@ -27,7 +27,7 @@ Window functions performance is also improved.
 
 ## The **MERGE operation was introduced**
 
-A new MERGE operation is to modify target table data according to the provided source with many available conditional processing options. This allows data processing without writing procedural language functions or complex CTE queries. Essentially merge can work as conditional delete/insert/update and also this makes PostgreSQL syntax implementation closer to SQL:2008 standard. For details on MERGE uses see: [https://www.postgresql.org/docs/15/sql-merge.html](https://www.postgresql.org/docs/15/sql-merge.html)
+A new `MERGE` operation is to modify target table data according to the provided source with many available conditional processing options. This allows data processing without writing procedural language functions or complex CTE queries. Essentially merge can work as conditional delete/insert/update and also this makes PostgreSQL syntax implementation closer to SQL:2008 standard. For details on MERGE uses see: [https://www.postgresql.org/docs/15/sql-merge.html](https://www.postgresql.org/docs/15/sql-merge.html)
 
 ## **New features for logical replication**
 
@@ -35,7 +35,7 @@ Logical replication is one of the fast-developing parts of PostgreSQL. Since ver
 
 ## **Increase parallelization**
 
-Parallel execution of queries using several worker processes is another part of PostgreSQL that develops fast. In version 15 _SELECT DISTINCT_ queries that drop duplicate rows from output can improve performance by using parallel workers.
+Parallel execution of queries using several worker processes is another part of PostgreSQL that develops fast. In version 15 `SELECT DISTINCT` queries that drop duplicate rows from output can improve performance by using parallel workers.
 
 ## **JSON logging**
 
@@ -49,13 +49,13 @@ When you make a database backup with the provided pg*basebackup extension you ca
 
 ## **New POSIX regexp functions**
 
-There are several new regular expressions functions that you may find useful for strings processing i.e. regexp_substr(), regexp_count(), etc. For details see: [https://www.postgresql.org/docs/15/functions-matching.html#FUNCTIONS-POSIX-REGEXP](https://www.postgresql.org/docs/15/functions-matching.html#FUNCTIONS-POSIX-REGEXP)
+There are several new regular expressions functions that you may find useful for strings processing i.e. regexp_substr(), regexp_count(), etc. [Details](https://www.postgresql.org/docs/15/functions-matching.html#FUNCTIONS-POSIX-REGEXP)
 
-## Full Changelog
+## **Full Changelog**
 
-You can find a full changelog and full list of new features: [https://www.postgresql.org/docs/15/release-15.html#id-1.11.6.6.5](https://www.postgresql.org/docs/15/release-15.html#id-1.11.6.6.5)
+You can find a full changelog and full list of new features in the [official changelog](https://www.postgresql.org/docs/15/release-15.html#id-1.11.6.6.5).
 
-# **How to upgrade to PG15?**
+## **Should you upgrade to PG15?**
 
 The main reason to switch to a new PostgreSQL version is the large number of bug fixes that each new version delivers. Bug fixes aren't as prominent as new features or performance improvements, but they often have a greater impact. While some bug fixes are applied to previous versions, these changes require modifications to the ABI, interface functions, and system catalog structures, often not possible in an already-released major version.
 
