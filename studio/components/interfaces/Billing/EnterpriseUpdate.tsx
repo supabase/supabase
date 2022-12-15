@@ -156,6 +156,8 @@ const EnterpriseUpdate: FC<Props> = ({
     setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
     if (res?.error) {
+      setCaptchaToken(null)
+      captchaRef.current?.resetCaptcha()
       ui.setNotification({
         category: 'error',
         message: `Failed to update subscription: ${res?.error?.message}`,

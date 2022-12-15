@@ -120,10 +120,12 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         tier,
         addons,
         proration_date,
-        hcaptchaToken: token ?? undefined
+        hcaptchaToken: token ?? undefined,
       })
 
       if (res?.error) {
+        setCaptchaToken(null)
+        captchaRef.current?.resetCaptcha()
         return ui.setNotification({
           category: 'error',
           message: `Failed to cancel subscription: ${res?.error?.message}`,
