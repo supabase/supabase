@@ -298,6 +298,7 @@ export const auth = {
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
     {
