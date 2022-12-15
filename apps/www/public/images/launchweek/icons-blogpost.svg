@@ -1,8 +1,4 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4.11719 5H9.35303" stroke="#4CC38A"/>
-<path d="M4.11719 7H7.54995M11.8823 7H10.4086" stroke="#4CC38A"/>
-<path d="M4.11719 9H6.22324M11.8823 9H8.18765" stroke="#4CC38A"/>
-<path d="M4.11719 11H11.8823" stroke="#4CC38A"/>
-<path d="M12.6318 2.02734H2V14.0273H14V3.08444" stroke="#4CC38A" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M6.8093 7.61649L13.4267 0.999099L14.8409 2.41331L8.22351 9.0307L5.95711 9.88289L6.8093 7.61649Z" stroke="#4CC38A" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M3.21792 10.4891L11.8015 1.90552L14.0953 4.19927L5.51167 12.7829L2.34219 13.6586L3.21792 10.4891Z" stroke="#4CC38A" stroke-miterlimit="10" stroke-linejoin="bevel"/>
+<path d="M3.52734 9.87695L5.67773 12.0273" stroke="#4CC38A" stroke-linejoin="bevel"/>
 </svg>
