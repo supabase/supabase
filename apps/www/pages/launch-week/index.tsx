@@ -460,9 +460,9 @@ export default function launchweek() {
                           }}
                         ></div>
                         <div
-                          className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover sm:bg-contain bg-[url('/images/launchweek/wrappers-bg-light.png')] dark:bg-[url('/images/launchweek/wrappers-bg.png')] bg-[left_90%_bottom] sm:bg-[center_bottom] !px-3 sm:!px-14`}
+                          className={`flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover sm:bg-contain bg-[url('/images/launchweek/wrappers-bg-light.png')] dark:bg-[url('/images/launchweek/wrappers-bg.png')] bg-[left_90%_bottom] sm:bg-[center_bottom] !px-3 sm:!px-14`}
                         >
-                          <div className="flex items-center">
+                          <div className="flex items-center flex-col-reverse lg:flex-row">
                             <span>{day4.steps[0].title}</span>
                             <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
