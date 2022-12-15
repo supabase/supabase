@@ -297,7 +297,7 @@ export default function launchweek() {
                           }}
                         ></div>
                         <div
-                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:bg-[url('/images/launchweek/docs-update-bg.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10 !px-3 sm:!px-14`}
+                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:dark:bg-[url('/images/launchweek/docs-update-bg.png')] after:bg-[url('/images/launchweek/docs-update-bg-light.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10 !px-3 sm:!px-14`}
                         >
                           <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <span>{day1.description}</span>
@@ -395,7 +395,7 @@ export default function launchweek() {
                     {day3.steps.length > 0 && (
                       <div className="h-[400px] flex gap-5 group">
                         <div
-                          className={`flex flex-col text-center items-center lg:items-start justify-between flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl relative`} // bg-[url('/images/launchweek/mfa-bg-light.png')] dark:bg-[url('/images/launchweek/mfa-bg.png')] bg-[bottom_right_30%] bg-contain
+                          className={`flex flex-col text-center items-center lg:items-start justify-between flex-1 border rounded-xl h-full bg-no-repeat p-14 text-2xl relative`}
                         >
                           <div className="absolute top-0 right-0 w-full h-full -z-20 ">
                             <Image
@@ -450,18 +450,41 @@ export default function launchweek() {
                     id={day4.d.toString()}
                   >
                     {day4.steps.length > 0 && (
-                      <div className="h-[400px] flex flex-col gap-5 lg:flex-row group/day4 relative overflow-hidden">
+                      <div className="h-[400px]  flex flex-col gap-5 lg:flex-row group/day4 relative overflow-hidden">
                         <div
-                          className="absolute opacity-60 group-hover/day4:opacity-100 w-full h-full z-10 transition-all duration-500 rounded-b-xl"
-                          style={{
-                            background: `radial-gradient(650px 150px at 50% 100%, ${
-                              isDarkMode ? '#103633' : '#b8e8e7'
-                            }, transparent)`,
-                          }}
-                        ></div>
-                        <div
-                          className={`flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover sm:bg-contain bg-[url('/images/launchweek/wrappers-bg-light.png')] dark:bg-[url('/images/launchweek/wrappers-bg.png')] bg-[left_90%_bottom] sm:bg-[center_bottom] !px-3 sm:!px-14`}
+                          className={`relative flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover !px-3 sm:!px-14`}
                         >
+                          <div
+                            className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.wrappers}`}
+                          >
+                            <Image
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/wrappers-visual.svg'
+                                  : '/images/launchweek/wrappers-visual-light.svg'
+                              }
+                              layout="fill"
+                              objectFit="cover"
+                              quality={100}
+                              priority
+                              className="left-16"
+                            />
+                          </div>
+                          <div
+                            className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day4:opacity-100 duration-500 transition-all ${styles.wrappers}`}
+                          >
+                            <Image
+                              src={
+                                isDarkMode
+                                  ? '/images/launchweek/wrappers-visual-hover.svg'
+                                  : '/images/launchweek/wrappers-visual-hover-light.svg'
+                              }
+                              layout="fill"
+                              objectFit="cover"
+                              quality={100}
+                              className="test"
+                            />
+                          </div>
                           <div className="flex items-center flex-col-reverse lg:flex-row">
                             <span>{day4.steps[0].title}</span>
                             <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
