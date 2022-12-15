@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Wednesday'
+  const liveDay = 'Thursday'
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -223,12 +223,13 @@ export default function launchweek() {
               <div className="border rounded-2xl border-slate-400 text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex">
-                    <Image
-                      src="/images/launchweek/antcopplecall.png"
-                      className="rounded-xl w-32 h-32 brightness-125"
+                    <img
+                      src={`/images/launchweek/antcopplecall.png`}
+                      className="brightness-125"
                       width={120}
                       height={80}
-                    ></Image>
+                      priority
+                    ></img>
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">Who we hire at Supabase</span>
@@ -264,7 +265,12 @@ export default function launchweek() {
                 justified={false}
                 bordered={false}
                 chevronAlign="right"
-                defaultValue={[day1.d.toString(), day2.d.toString(), day3.d.toString()]}
+                defaultValue={[
+                  day1.d.toString(),
+                  day2.d.toString(),
+                  day3.d.toString(),
+                  day4.d?.toString(),
+                ]}
               >
                 <div className="border-b pb-3">
                   <Accordion.Item
@@ -444,29 +450,29 @@ export default function launchweek() {
                     id={day4.d.toString()}
                   >
                     {day4.steps.length > 0 && (
-                      <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
+                      <div className="h-[400px] flex flex-col gap-5 lg:flex-row group/day4 relative overflow-hidden">
                         <div
-                          className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-contain bg-[url('/images/launchweek/vault-bg-light.png')] dark:bg-[url('/images/launchweek/vault-bg.png')] bg-[center_bottom]`}
+                          className="absolute opacity-60 group-hover/day4:opacity-100 w-full h-full z-10 transition-all duration-500 rounded-b-xl"
+                          style={{
+                            background: `radial-gradient(650px 150px at 50% 100%, ${
+                              isDarkMode ? '#103633' : '#b8e8e7'
+                            }, transparent)`,
+                          }}
+                        ></div>
+                        <div
+                          className={`flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover sm:bg-contain bg-[url('/images/launchweek/wrappers-bg-light.png')] dark:bg-[url('/images/launchweek/wrappers-bg.png')] bg-[left_90%_bottom] sm:bg-[center_bottom] !px-3 sm:!px-14`}
                         >
-                          <div className="flex items-center">
+                          <div className="flex items-center flex-col-reverse lg:flex-row">
                             <span>{day4.steps[0].title}</span>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
+                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
                             </Badge>
                           </div>
-                          <SectionButtons docs={day4.steps[0].docs} blog={day4.steps[0].blog} />
-                        </div>
-                        <div
-                          className={`flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/encryption-bg-light.png')] dark:bg-[url('/images/launchweek/encryption-bg.svg')] bg-contain bg-[center_center] shadow-[inset_0px_130px_50px_-52p_rgb(10,31,30)]`}
-                        >
-                          {/* inset 0px 130px 50px -52px #121f1e; */}
-                          <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                            <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#598973]">
-                              New
-                            </Badge>
-                            <span className="text-center">{day4.steps[1].title}</span>
-                          </div>
-                          <SectionButtons docs={day4.steps[1].docs} blog={day4.steps[1].blog} />
+                          <SectionButtons
+                            docs={day4.steps[0].docs}
+                            blog={day4.steps[0].blog}
+                            video={`https://www.youtube.com/watch?v=${day4.youtube_id}&ab_channel=Supabase`}
+                          />
                         </div>
                       </div>
                     )}
@@ -489,7 +495,7 @@ export default function launchweek() {
                     {day5.steps.length > 0 && (
                       <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                         <div
-                          className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/wrappers-bg-light.png')] dark:bg-[url('/images/launchweek/wrappers-bg.png')] bg-contain bg-[right]`}
+                          className={`flex flex-col justify-between flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/vault-bg-light.png')] dark:bg-[url('/images/launchweek/vault-bg.png')]  bg-contain bg-[right]`}
                         >
                           <div className="flex items-center">
                             <span>{day5.steps[0].title}</span>
