@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Friday'
+  const liveDay = 'Thursday'
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -219,7 +219,7 @@ export default function launchweek() {
         </div>
         {process.env.NEXT_PUBLIC_LW_STARTED && (
           <>
-            <SectionContainer className="!pt-0 !pb-9 ">
+            <SectionContainer className="!pt-0 !pb-20 ">
               <div className="border rounded-2xl border-slate-400 text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex min-w-[150px]">
@@ -233,43 +233,6 @@ export default function launchweek() {
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">Who we hire at Supabase</span>
                     <span className="text-slate-900">Fireside chat with founders</span>
-                  </div>
-                </div>
-                <div className="flex gap-2 z-10">
-                  <a href={'https://youtu.be/-BG9XptyCKI'} target="_blank" rel="noopener">
-                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[130px]">
-                      Watch video
-                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                        <img src="/images/launchweek/video-icon.svg" className="w-3 h-3"></img>
-                      </div>
-                    </div>
-                  </a>
-                  <a href={'/blog/who-we-hire'} target="_blank" rel="noopener">
-                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
-                      Read blogpost
-                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                        <img src="/images/launchweek/blog-icon.svg" className="w-3 h-3"></img>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </SectionContainer>
-            <SectionContainer className="!pt-0 ">
-              <div className="border rounded-2xl border-slate-400 text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
-                <div className="relative flex items-center mb-4 sm:mb-0">
-                  <div className="flex min-w-[150px]">
-                    <img
-                      src={`/images/launchweek/wrapup.svg`}
-                      className="brightness-125"
-                      width={65}
-                      height={60}
-                      priority
-                    ></img>
-                  </div>
-                  <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
-                    <span className="text-black dark:text-white mr-2">Wrap up</span>
-                    <span className="text-slate-900">Everything we shipped for LW6</span>
                   </div>
                 </div>
                 <div className="flex gap-2 z-10">
@@ -306,7 +269,6 @@ export default function launchweek() {
                   day2.d.toString(),
                   day3.d.toString(),
                   day4.d?.toString(),
-                  day5.d?.toString(),
                 ]}
               >
                 <div className="border-b pb-3">
