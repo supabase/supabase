@@ -36,7 +36,7 @@ Select the backup closest to the desired point in time to restore to. Earlier ba
 Insert screenshot of the Dashboard with the confirmation modal 
 ```
 
-The Dashboard will then prompt for a confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the underlying SQL of the chosen backup is then run against the project. The PostgreSQL utility [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to facilitate the restoration.
+The Dashboard prompts for a confirmation before proceeding with the restoration. The project will be inaccessible during the restoration so allot some downtime beforehand. The restoration depends on the size of the database—the larger it is, the longer the downtime will be. After the confirmation is been given, the underlying SQL of the chosen backup is then run against the project. The PostgreSQL utility [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to facilitate the restoration.
 
 ```
 Insert screenshot of the Dashboard of the project in restoration mode
