@@ -40,6 +40,7 @@ import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
+import ForeignTableStore from './ForeignTableStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -51,6 +52,7 @@ export interface IMetaStore {
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
   schemas: ISchemaStore
+  foreignTables: IPostgresMetaInterface<Partial<PostgresTable>>
 
   hooks: IPostgresMetaInterface<any>
   roles: IRolesStore
@@ -130,6 +132,7 @@ export default class MetaStore implements IMetaStore {
   tables: TableStore
   columns: ColumnStore
   schemas: SchemaStore
+  foreignTables: ForeignTableStore
 
   hooks: HooksStore
   roles: RolesStore
@@ -182,6 +185,11 @@ export default class MetaStore implements IMetaStore {
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
     this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
+    this.foreignTables = new ForeignTableStore(
+      this.rootStore,
+      `${this.baseUrl}/foreign-tables`,
+      this.headers
+    )
 
     this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
     this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
@@ -895,6 +903,9 @@ export default class MetaStore implements IMetaStore {
 
     this.schemas.setUrl(`${this.baseUrl}/schemas`)
     this.schemas.setHeaders(this.headers)
+
+    this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)
+    this.foreignTables.setHeaders(this.headers)
 
     this.roles.setUrl(`${this.baseUrl}/roles`)
     this.roles.setHeaders(this.headers)
