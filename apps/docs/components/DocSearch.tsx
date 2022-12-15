@@ -115,11 +115,13 @@ export function SearchProvider({ children }: any) {
 
 // @ts-ignore
 function Hit({ hit, children }) {
+  console.log('hit:', hit)
+  console.log('children:', children)
   return (
     <Link href={hit.url}>
       <a
         className={clsx({
-          'DocSearch-Hit--Result': hit.__is_result?.(),
+          'DocSearch-Hit--Result relative': hit.__is_result?.(),
           'DocSearch-Hit--Parent': hit.__is_parent?.(),
           'DocSearch-Hit--FirstChild': hit.__is_first?.(),
           'DocSearch-Hit--LastChild': hit.__is_last?.(),

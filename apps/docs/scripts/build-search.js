@@ -79,7 +79,6 @@ clientLibFiles.map((file) => {
   })
 })
 
-clientLibSearchObjects.map((item) => console.log(item))
 // The properties of the searchObject that are specifically read
 // by DocSearch are "type" and "hierarchy". The rest, though saved into Algolia (which we
 // can potentially use to craft more nuanced search experiences) are not used by DocSearch
@@ -196,8 +195,6 @@ async function walk(dir) {
       // Some of the reference generated files come with an 'index' page that we can ignore
       .filter((object) => !object.url.endsWith('/index'))
       .filter((object) => !object.url.endsWith('/.gitkeep'))
-
-    //console.log('guidePagesearchObjects:', guidePagesearchObjects)
 
     const combinedSearchObjects = guidePagesearchObjects.concat(clientLibSearchObjects)
 
