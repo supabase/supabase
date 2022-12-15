@@ -502,8 +502,10 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
       Sends a password reset request to an email address.
-      When the user clicks the reset link in the email they are redirected back to your application.
-      Prompt the user for a new password and call `auth.update()`:
+      - When the user clicks the reset link in the email they are redirected back to your application.
+      You can configure the URL that the user is redirected to via the `redirectTo` param. 
+      Please refer to [this guide](/docs/guides/auth/overview#redirect-urls-and-wildcards) on how to add additional redirect URLs to your project.
+      - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.update({
         password: new_password,
@@ -516,7 +518,8 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-            'user@email.com'
+            email,
+            { redirectTo: 'https://example.com/update-password' }
           )
           ```
       - id: reset-password-react
@@ -529,7 +532,8 @@ functions:
            * This email contains a link which sends the user back to your application.
            */
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-            'user@email.com'
+            email,
+            { redirectTo: 'https://example.com/update-password' }
           )
 
           /**
