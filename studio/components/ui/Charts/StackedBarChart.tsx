@@ -1,13 +1,11 @@
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { BarChart, Bar, XAxis, Tooltip, Legend, Cell } from 'recharts'
 import ChartHeader from './ChartHeader'
 import { CHART_COLORS, STACK_COLORS, DateTimeFormats } from './Charts.constants'
-import { CommonChartProps, StackedChartProps } from './Charts.types'
+import { CommonChartProps } from './Charts.types'
 import { timestampFormatter, useChartSize, useStacked } from './Charts.utils'
 import { precisionFormatter } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
   yAxisKey: string
@@ -15,6 +13,7 @@ interface Props extends CommonChartProps<any> {
   onBarClick?: () => void
   variant?: 'values' | 'percentages'
   xAxisFormatAsDate?: boolean
+  displayDateInUtc?: boolean
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
@@ -29,6 +28,7 @@ const StackedBarChart: React.FC<Props> = ({
   onBarClick,
   variant,
   xAxisFormatAsDate = true,
+  displayDateInUtc,
 }) => {
   const { Container } = useChartSize(size)
   const { dataKeys, stackedData } = useStacked({ data, xAxisKey, stackKey, yAxisKey, variant })
@@ -101,7 +101,11 @@ const StackedBarChart: React.FC<Props> = ({
             </Bar>
           ))}
           <Tooltip
-            labelFormatter={xAxisFormatAsDate ? (label) => timestampFormatter(label) : undefined}
+            labelFormatter={
+              xAxisFormatAsDate
+                ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
+                : undefined
+            }
             formatter={(value: number) => {
               if (variant === 'percentages') {
                 return precisionFormatter(value * 100, 1) + '%'
@@ -115,11 +119,22 @@ const StackedBarChart: React.FC<Props> = ({
           />
         </BarChart>
       </Container>
-      {/* {console.log(data)} */}
       {stackedData && stackedData[0] && (
         <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
-          <span>{dayjs(stackedData[0][xAxisKey]).format(customDateFormat)}</span>
-          <span>{dayjs(stackedData[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
+          <span>
+            {timestampFormatter(
+              stackedData[0][xAxisKey] as string,
+              customDateFormat,
+              displayDateInUtc
+            )}
+          </span>
+          <span>
+            {timestampFormatter(
+              stackedData[stackedData?.length - 1][xAxisKey] as string,
+              customDateFormat,
+              displayDateInUtc
+            )}
+          </span>
         </div>
       )}
     </div>
