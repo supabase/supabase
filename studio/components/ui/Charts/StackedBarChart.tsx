@@ -65,7 +65,7 @@ const StackedBarChart: React.FC<Props> = ({
         >
           {!hideLegend && (
             <Legend
-              wrapperStyle={{ top: -8, fontSize: '0.8rem' }}
+              wrapperStyle={{ top: -6, fontSize: '0.8rem' }}
               iconSize={8}
               iconType="circle"
               verticalAlign="top"
