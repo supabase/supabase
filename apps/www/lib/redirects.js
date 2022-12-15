@@ -1819,8 +1819,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/migrations/firebase-data',
-    destination: '/docs/guides/resources/migrating-to-supabase/firebase-data',
+    source: '/docs/guides/migrations/firestore-data',
+    destination: '/docs/guides/resources/migrating-to-supabase/firestore-data',
   },
   {
     permanent: true,
