@@ -81,8 +81,7 @@
   --aa-overlay-color-alpha: 0.4;
 
   // Shadows
-  --aa-panel-shadow: 0 0 0 1px rgba(35, 38, 59, 0.1),
-    0 6px 16px -4px rgba(35, 38, 59, 0.15);
+  --aa-panel-shadow: 0 0 0 1px rgba(35, 38, 59, 0.1), 0 6px 16px -4px rgba(35, 38, 59, 0.15);
 
   // Scrollbar
   --aa-scrollbar-width: 13px;
@@ -122,8 +121,7 @@ body {
     --aa-icon-color-rgb: 119, 119, 163;
 
     // Shadows
-    --aa-panel-shadow: inset 1px 1px 0 0 rgb(44, 46, 64),
-      0 3px 8px 0 rgb(0, 3, 9);
+    --aa-panel-shadow: inset 1px 1px 0 0 rgb(44, 46, 64), 0 3px 8px 0 rgb(0, 3, 9);
 
     // Scrollbar
     --aa-scrollbar-track-background-color-rgb: 44, 46, 64;
@@ -429,10 +427,7 @@ body {
     }
     // Title typography
     @at-root .aa-SourceHeaderTitle {
-      background: rgba(
-        var(--aa-background-color-rgb),
-        var(--aa-background-color-alpha)
-      );
+      background: rgba(var(--aa-background-color-rgb), var(--aa-background-color-alpha));
       color: rgba(var(--aa-primary-color-rgb), 1);
       display: inline-block;
       font-size: 0.8em;
@@ -464,8 +459,7 @@ body {
       rgba(var(--aa-background-color-rgb), var(--aa-background-color-alpha)),
       rgba(128, 126, 163, 0.14)
     );
-    border: 1px solid
-      rgba(var(--aa-muted-color-rgb), var(--aa-muted-color-alpha));
+    border: 1px solid rgba(var(--aa-muted-color-rgb), var(--aa-muted-color-alpha));
     border-radius: 5px;
     box-shadow: inset 0 0 2px #fff, 0 2px 2px -1px rgba(76, 69, 88, 0.15);
     color: inherit;
@@ -502,10 +496,7 @@ body {
   // The result type icon inlined SVG or image
   @at-root .aa-ItemIcon {
     align-items: center;
-    background: rgba(
-      var(--aa-background-color-rgb),
-      var(--aa-background-color-alpha)
-    );
+    background: rgba(var(--aa-background-color-rgb), var(--aa-background-color-alpha));
     border-radius: 3px;
     box-shadow: inset 0 0 0 1px
       rgba(var(--aa-panel-border-color-rgb), var(--aa-panel-border-color-alpha));
@@ -658,10 +649,7 @@ body {
       opacity: 0.4;
     }
     @at-root .aa-ItemContentTag {
-      background-color: rgba(
-        var(--aa-primary-color-rgb),
-        var(--aa-primary-color-alpha)
-      );
+      background-color: rgba(var(--aa-primary-color-rgb), var(--aa-primary-color-alpha));
       border-radius: 3px;
       margin: 0 0.4em 0 0;
       padding: 0.08em 0.3em;
@@ -754,10 +742,7 @@ body {
 // 8. Panel Footer
 //----------------
 .aa-PanelFooter {
-  background-color: rgba(
-    var(--aa-background-color-rgb),
-    var(--aa-background-color-alpha)
-  );
+  background-color: rgba(var(--aa-background-color-rgb), var(--aa-background-color-alpha));
   box-shadow: inset 0 1px 0
     rgba(var(--aa-panel-border-color-rgb), var(--aa-panel-border-color-alpha));
   display: flex;
@@ -847,10 +832,7 @@ body {
       &:hover,
       &:focus {
         box-shadow: inset 0 0 0 1px
-          rgba(
-            var(--aa-panel-border-color-rgb),
-            var(--aa-panel-border-color-alpha)
-          );
+          rgba(var(--aa-panel-border-color-rgb), var(--aa-panel-border-color-alpha));
       }
     }
   }
@@ -969,6 +951,10 @@ body {
 }
 
 // search bar
+input[type='search'].DocSearch-Input {
+  background-color: var(--colors-scale1);
+}
+
 .dark .DocSearch-Input {
   background-color: var(--colors-scale2);
   color: white;
