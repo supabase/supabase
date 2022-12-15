@@ -1,6 +1,6 @@
 ---
 title: PostgREST 11 pre-release
-description: Describes new features of PostgREST 11-pre
+description: Describes new features of PostgREST 11 pre-release
 author: Steve Chavez
 image:
 thumb:
@@ -18,9 +18,8 @@ In this blog post we’ll cover some of the improved querying capabilities: spre
 
 ## Spreading related tables
 
-Very often the way we structure a database is not the way we want to present it to the frontend application. For example, let’s assume we have a `films` and `technical_specs`
-
-tables and they form a one-to-one relationship.
+Very often the way we structure a database is not the way we want to present it to the frontend application. For example, let’s assume we have a `films` and `technical_specs` tables and
+they form a one-to-one relationship.
 
 Using PostgREST resource embedding, we can query them in one request like so
 
@@ -91,7 +90,7 @@ This only works for one-to-one and many-to-one relationships for now but we’re
 
 It’s also a common use case to order a table by a related table column. For example, suppose you’d like to order `films` based on the `technical_specs.duration` column.
 
-You can do it like so:
+You can now do it like so:
 
 ```jsx
 GET /films?select=*,...technical_specs(camera,laboratory,duration)&order=technical_specs(duration)
@@ -130,7 +129,7 @@ Similarly to spreading related tables, this only works for one-to-one and many-t
 To do the equivalent of a left anti-join, you can now filter the rows where the related table is `null`.
 
 ```http
-GET /films?select=*,nominations()&nominations=is.null
+GET /films?select=title,nominations()&nominations=is.null
 ```
 
 ```jsx
@@ -160,9 +159,42 @@ const { data, error } = await supabase
 
 Note that `nominations` doesn’t select any columns so they don’t show on the resulting response.
 
+The equivalent of an inner join can be done by filtering the rows where the related table is `not null`.
+
+```http
+GET /films?select=title,nominations(rank,...competitions(name))&nominations=not.is.null
+```
+
+```jsx
+const { data, error } = await supabase
+  .from('films')
+  .select(`
+    title,
+    nominations(rank,...competitions(name))
+  `)
+   .not('nominations', 'is', null)
+```
+
+```json
+[
+  {
+    "title": "Pulp Fiction"
+    "nominations": [
+      {"rank": 1, name: "Palme d'Or"},
+      {"rank": 1, name: "BAFTA Film Award"},
+      {"..."}
+    ]
+  },
+  "..."
+]
+```
+
+This was already possible with the `!inner` modifier([introduced on PostgREST 9](https://supabase.com/blog/postgrest-9#resource-embedding-with-inner-joins_)
+but the `not null` filter is more flexible and can be used with an [or filter](https://supabase.com/docs/reference/javascript/or) to combine related tables' conditions.
+
 ## Try it out
 
-This pre-release is not yet deployed to Supabase cloud but you can try it out locally with the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction).
+This pre-release is not deployed to Supabase cloud but you can try it out locally with the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction).
 
 ```bash
 $ supabase start
