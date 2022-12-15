@@ -107,10 +107,12 @@ const StackedBarChart: React.FC<Props> = ({
                 : undefined
             }
             formatter={(value: number) => {
+              let val: string = String(value)
               if (variant === 'percentages') {
-                return precisionFormatter(value * 100, 1) + '%'
+                val = precisionFormatter(value * 100, 1) + '%'
               }
-              return value
+              val += (format || '')
+              return val
             }}
             cursor={false}
             labelClassName="text-white"
