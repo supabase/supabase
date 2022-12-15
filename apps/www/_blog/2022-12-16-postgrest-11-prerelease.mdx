@@ -1,9 +1,9 @@
 ---
 title: PostgREST 11 pre-release
 description: Describes new features of PostgREST 11 pre-release
-author: Steve Chavez
-image:
-thumb:
+author: steve_chavez
+image: lw6-community/community-day.png
+thumb: lw6-community/community-day.png
 tags:
   - postgres
   - launch-week
@@ -14,7 +14,7 @@ toc_depth: 3
 PostgREST 11 is not wrapped up yet, however a pre-release with the **[latest features and fixes](https://github.com/PostgREST/postgrest/releases/tag/v10.1.1.20221212)**
 is available on the Supabase CLI.
 
-In this blog post we'll cover some of the improved querying capabilities: spreading related tables, related orders and anti-joins**.**
+In this blog post we'll cover some of the improved querying capabilities: spreading related tables, related orders and anti-joins.
 
 ## Spreading related tables
 
@@ -23,9 +23,13 @@ they form a one-to-one relationship.
 
 Using PostgREST resource embedding, we can query them in one request like so
 
+<small>From HTTP:</small>
+
 ```http
 GET /films?select=title,technical_specs(camera,laboratory,sound_mix)
 ```
+
+<small>or JavaScript:</small>
 
 ```jsx
 const { data, error } = await supabase.from('films').select(`
@@ -35,6 +39,8 @@ const { data, error } = await supabase.from('films').select(`
     )
   `)
 ```
+
+<small>Response:</small>
 
 ```json
 [
@@ -54,9 +60,13 @@ But we'd like to present a “flattened” result to the frontend, without the `
 
 Using the new “spread” operator(syntax borrowed from [JS](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)), we can expand a related table columns and remove the nested object.
 
+<small>From HTTP:</small>
+
 ```jsx
 GET /films?select=*,...technical_specs(camera,laboratory,duration)
 ```
+
+<small>or JavaScript:</small>
 
 ```jsx
 const { data, error } = await supabase.from('films').select(`
@@ -66,6 +76,8 @@ const { data, error } = await supabase.from('films').select(`
     )
   `)
 ```
+
+<small>Response:</small>
 
 ```json
 [
@@ -87,9 +99,13 @@ It's also a common use case to order a table by a related table column. For exam
 
 You can now do it like so:
 
-```jsx
+<small>From HTTP:</small>
+
+```http
 GET /films?select=*,...technical_specs(camera,laboratory,duration)&order=technical_specs(duration)
 ```
+
+<small>or JavaScript:</small>
 
 ```jsx
 const { data, error } = await supabase
@@ -102,6 +118,8 @@ const { data, error } = await supabase
   `)
    .order('technical_specs(duration)', { descending: true }))
 ```
+
+<small>Response:</small>
 
 ```json
 [
@@ -123,9 +141,13 @@ Similarly to spreading related tables, this only works for one-to-one and many-t
 
 To do the equivalent of a left anti-join, you can now filter the rows where the related table is `null`.
 
+<small>From HTTP:</small>
+
 ```http
 GET /films?select=title,nominations()&nominations=is.null
 ```
+
+<small>or JavaScript:</small>
 
 ```jsx
 const { data, error } = await supabase
@@ -136,6 +158,8 @@ const { data, error } = await supabase
   `)
    .is('nominations', null))
 ```
+
+<small>Response:</small>
 
 ```json
 [
@@ -171,6 +195,8 @@ const { data, error } = await supabase
   )
   .not('nominations', 'is', null)
 ```
+
+<small>Response:</small>
 
 ```json
 [
