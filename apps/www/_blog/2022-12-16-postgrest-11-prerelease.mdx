@@ -63,7 +63,7 @@ Using the new “spread” operator(syntax borrowed from [JS](https://developer.
 <small>From HTTP:</small>
 
 ```jsx
-GET /films?select=*,...technical_specs(camera,laboratory,duration)
+GET /films?select=title,...technical_specs(camera,laboratory,duration)
 ```
 
 <small>or JavaScript:</small>
@@ -102,7 +102,7 @@ You can now do it like so:
 <small>From HTTP:</small>
 
 ```http
-GET /films?select=*,...technical_specs(camera,laboratory,duration)&order=technical_specs(duration)
+GET /films?select=title,...technical_specs(duration)&order=technical_specs(duration).desc
 ```
 
 <small>or JavaScript:</small>
@@ -212,7 +212,7 @@ const { data, error } = await supabase
 ]
 ```
 
-This was already possible with the `!inner` modifier([introduced on PostgREST 9](https://supabase.com/blog/postgrest-9#resource-embedding-with-inner-joins_)
+This was already possible with the `!inner` modifier([introduced on PostgREST 9](https://supabase.com/blog/postgrest-9#resource-embedding-with-inner-joins))
 but the `not null` filter is more flexible and can be used with an [or filter](https://supabase.com/docs/reference/javascript/or) to combine related tables' conditions.
 
 ## Try it out
