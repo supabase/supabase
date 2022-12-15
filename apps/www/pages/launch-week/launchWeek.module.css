@@ -9,3 +9,7 @@
 .community {
   background-image: radial-gradient(closest-side at 50% 50%, #d9eeef, #dbeef0, white);
 }
+
+.wrappers > span {
+  left: -200px !important;
+}
