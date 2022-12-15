@@ -60,7 +60,7 @@ PITR is made possible by a combination of taking physical backups of a project, 
 
 Supabase uses [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, to handle both aspects of PITR. On a daily basis, a snapshot of the database is taken and sent to our storage servers. Throughout the day, as database transactions occur, WAL files are generated and uploaded. 
 
-By default, WAL files are backed up at two minute intervals. If these files cross a certain file size threshold, they are backed up immediately. As such, during periods of high amount of transactions, WAL file backups become more frequent. Conversely, when there is no activity in the database, WAL file backups are not made. Overall, this would mean that at the worst case scenario or disaster, the PITR achieves a Recovery Point Objective (RPO) of two minutes.
+By default, WAL files are backed up at two minute intervals. If these files cross a certain file size threshold, they are backed up immediately. As such, during periods of high amount of transactions, WAL file backups become more frequent. Conversely, when there is no activity in the database, WAL file backups are not made. Overall, this means in a worst case scenario or disaster, the PITR achieves a Recovery Point Objective (RPO) of two minutes.
 
 ```
 Insert screenshot of Point-in-Time Recovery on the Dashboard
