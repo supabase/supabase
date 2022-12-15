@@ -49,6 +49,7 @@ export const StackedBarChart = () => (
         { title: 'Normal', props: {} },
         { title: 'No title', props: { title: undefined } },
         { title: 'Minimal Header', props: { minimalHeader: true } },
+        { title: 'Hide Legend', props: { hideLegend: true } },
         { title: 'Percentage Bars', props: { variant: 'percentages' as const } },
         {
           title: 'Formatter - Auto 2 Precision for floats',
