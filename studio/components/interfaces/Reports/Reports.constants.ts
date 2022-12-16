@@ -162,6 +162,28 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.AUTH]: {
     title: 'Auth',
     queries: {
+      bannedUsers: {
+        queryType: "db",
+        sql: `
+select 
+  count(distinct u.id) as count
+from auth.users u
+where u.banned_until is not null and u.banned_until > now()
+limit 1
+        `
+      },  
+      unverifiedUsers: {
+        queryType: "db",
+        sql: `
+select 
+  date_trunc('day', u.created_at) as timestamp,
+  count(distinct u.id) as count
+from auth.users u
+where u.confirmed_at is null
+group by timestamp
+order by timestamp desc
+        `
+      },  
       signUpProviders: {
         queryType: "db",
         sql: `
@@ -207,6 +229,7 @@ select
   date_trunc('day', u.created_at) as timestamp, 
   sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count
 from auth.users as u
+where u.confirmed_at is not null
 group by timestamp
 order by timestamp desc
         `,

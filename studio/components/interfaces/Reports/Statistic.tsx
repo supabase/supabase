@@ -1,3 +1,4 @@
+import Sparkline from 'components/ui/Charts/Sparkline'
 import React from 'react'
 
 interface Props {
@@ -6,12 +7,24 @@ interface Props {
   prefix?: string
   suffix?: string
   valueFormatter?: (value: Props['value']) => string
+  sparklineData?: Record<string, number>[]
+  sparklineXAxis?: string
+  sparklineYAxis?: string
 }
 
-const Statistic: React.FC<Props> = ({ prefix, suffix, value, startingValue }) => {
+const Statistic: React.FC<Props> = ({
+  prefix,
+  suffix,
+  value,
+  startingValue,
+  sparklineData,
+  sparklineXAxis,
+  sparklineYAxis,
+}) => {
   const isNumber = typeof value === 'number' && !Number.isNaN(value)
   const percentageChange =
     startingValue && isNumber ? Number(startingValue) / Number(value) - 1 : null
+  const showSparkline = sparklineData && sparklineXAxis && sparklineYAxis
   return (
     <div className="w-full">
       <div className="flex flex-row justify-center">
@@ -28,6 +41,9 @@ const Statistic: React.FC<Props> = ({ prefix, suffix, value, startingValue }) =>
             </span>
           )}
         </div>
+      )}
+      {showSparkline && (
+        <Sparkline data={sparklineData} xAxisKey={sparklineXAxis} yAxisKey={sparklineYAxis} />
       )}
     </div>
   )
