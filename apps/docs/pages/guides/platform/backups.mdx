@@ -19,27 +19,23 @@ When deciding how often a database should be backed up, the key business metric 
 
 ## Daily Backups
 
-All Supabase projects are backed up automatically on a daily basis. Access to these backups however are limited to Pro and Enterprise tier projects only. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
+All Pro and Enterprise tier Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
 
 ### Backup Process [#daily-backups-process]
 
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
 
-{/* screenshot of Daily Backups dashboard */}
+![Scheduled backups dashboard](/docs/img/backups-daily-dashboard.png)
 
-You can access daily backups in the [Scheduled Database Backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro tier projects can access the last 7 days’ worth of daily backups while Enterprise tier projects can access up to 30 days’ worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
+You can access daily backups in the [Scheduled backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro tier projects can access the last 7 days’ worth of daily backups while Enterprise tier projects can access up to 30 days’ worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
 
 ### Restoration Process [#daily-backups-restoration-process]
 
 When selecting a backup to restore to, select the closest available one made before the desired point in time to restore to. Earlier backups can always be chosen too but do consider the number of days’ worth of data that could be lost.
 
-{/* screenshot of the Dashboard with the confirmation modal */}
+![Scheduled backups: Confirmation modal](/docs/img/backups-daily-confirmation-modal.png)
 
-The Dashboard will then prompt for a confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the underlying SQL of the chosen backup is then run against the project. The PostgreSQL utility [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to facilitate the restoration.
-
-{/* screenshot of the Dashboard of the project in restoration mode */}
-
-As the restoration occurs, the project on the Dashboard will be inaccessible as well. The Dashboard will display a notification once the restoration completes.
+The Dashboard will then prompt for a confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the underlying SQL of the chosen backup is then run against the project. The PostgreSQL utility [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to facilitate the restoration. The Dashboard will display a notification once the restoration completes.
 
 {/* screenshot of the Dashboard of the project completing restoration */}
 
@@ -60,27 +56,21 @@ Supabase uses [WAL-G](https://github.com/wal-g/wal-g), an open source archival a
 
 By default, WAL files are backed up at two minute intervals. If these files cross a certain file size threshold, they are backed up immediately. As such, during periods of high amount of transactions, WAL file backups become more frequent. Conversely, when there is no activity in the database, WAL file backups are not made. Overall, this would mean that at the worst case scenario or disaster, the PITR achieves a Recovery Point Objective (RPO) of two minutes.
 
-{/* screenshot of Point-in-Time Recovery on the Dashboard */}
+![PITR dashboard](/docs/img/backups-pitr-dashboard.png)
 
-You can access PITR in the [PITR Database Backups](https://app.supabase.com/project/_/database/backups/pitr) settings in the Dashboard. The recovery period of a project is indicated by the earliest and latest points of recoveries displayed in one’s preferred timezone. If need be, the maximum amount of this recovery period can be modified accordingly.
+You can access PITR in the [Point in Time](https://app.supabase.com/project/_/database/backups/pitr) settings in the Dashboard. The recovery period of a project is indicated by the earliest and latest points of recoveries displayed in one’s preferred timezone. If need be, the maximum amount of this recovery period can be modified accordingly.
 
 Note that the latest restore point of the project could be significantly far from the current time. This occurs when there has not been any recent activity in the database, and therefore no WAL file backups have been made recently. This is perfectly fine as the state of the database at the latest point of recovery would still be indicative of the state of the database at the current time given that no transactions have been made in between.
 
 ### Restoration Process [#pitr-restoration-process]
 
-{/* screenshot of PITR calendar view on the Dashboard */}
+![PITR: Calendar view](/docs/img/backups-pitr-calendar-view.png)
 
 A date and time picker will be provided upon pressing the `Start a restore` button. The process will only proceed if the selected date and time fall within the earliest and latest points of recoveries.
 
-{/* screenshot of the Dashboard with the confirmation modal */}
+![PITR: Confirmation modal](/docs/img/backups-pitr-confirmation-modal.png)
 
-After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration.
-
-{/* screenshot of the Dashboard of the project in restoration mode */}
-
-As the restoration occurs, the project on the Dashboard will be inaccessible as well. The Dashboard will display a notification once the restoration completes.
-
-{/* screenshot of the Dashboard of the project completing restoration */}
+After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration. The Dashboard will display a notification once the restoration completes.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
