@@ -653,7 +653,6 @@ export const integrations = {
       url: undefined,
       items: [
         { name: 'Estuary', url: '/guides/integrations/estuary', items: [] },
-        { name: 'OneSignal', url: '/guides/integrations/onesignal', items: [] },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard', items: [] },
         { name: 'Prisma', url: '/guides/integrations/prisma', items: [] },
         { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
@@ -674,6 +673,11 @@ export const integrations = {
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
       ],
+    },
+    {
+      name: 'Messaging',
+      url: undefined,
+      items: [{ name: 'OneSignal', url: '/guides/integrations/onesignal', items: [] }],
     },
   ],
 }
