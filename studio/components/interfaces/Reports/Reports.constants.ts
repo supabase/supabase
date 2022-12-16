@@ -34,8 +34,8 @@ export const DEFAULT_QUERY_PARAMS = {
 }
 
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
-  [Presets.API_OVERVIEW]: {
-    title: '',
+  [Presets.API]: {
+    title: 'API',
     queries: {
       statusCodes: {
         queryType: 'logs',
@@ -101,11 +101,6 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         LIMIT 50
       `,
       },
-    },
-  },
-  [Presets.API_BOTS]: {
-    title: 'API Bots',
-    queries: {
       userAgents: {
         queryType: 'logs',
         sql: `

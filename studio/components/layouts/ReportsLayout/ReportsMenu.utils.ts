@@ -23,15 +23,9 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
         ...(productReports
           ? [
               {
-                name: 'API Overview',
-                key: 'api-overview',
-                url: `/project/${ref}/reports/api-overview`,
-                items: [],
-              },
-              {
-                name: 'API Bots',
-                key: 'api-bots',
-                url: `/project/${ref}/reports/api-bots`,
+                name: 'API',
+                key: 'api',
+                url: `/project/${ref}/reports/api`,
                 items: [],
               },
               {
