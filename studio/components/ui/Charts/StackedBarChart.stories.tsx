@@ -50,6 +50,7 @@ export const StackedBarChart = () => (
         { title: 'No title', props: { title: undefined } },
         { title: 'Minimal Header', props: { minimalHeader: true } },
         { title: 'Hide Legend', props: { hideLegend: true } },
+        { title: 'Hide header', props: { hideHeader: true } },
         { title: 'Percentage Bars', props: { variant: 'percentages' as const } },
         {
           title: 'Percentage Bars with suffix',
