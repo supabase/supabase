@@ -228,7 +228,6 @@ export default function launchweek() {
                       className="brightness-125"
                       width={120}
                       height={80}
-                      priority
                     ></img>
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
@@ -613,6 +612,7 @@ export default function launchweek() {
           </>
         )}
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
+          <h3 className="text-black dark:text-white text-lg mb-4">One more thing</h3>
           <div className="flex flex-col lg:grid grid-cols-3 grid-rows-2 gap-4">
             <div
               className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
