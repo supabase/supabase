@@ -19,7 +19,15 @@ export const renderUnverifiedUsers = (
   }>
 ) => {
   const count = props.data.length === 0 ? 0 : props?.data?.[0]?.count
-  return <Statistic value={count} />
+
+  return (
+    <Statistic
+      value={count}
+      sparklineData={props.data.length >= 3 ? props.data : null}
+      sparklineXAxis="timestamp"
+      sparklineYAxis="count"
+    />
+  )
 }
 export const renderSignUpProviders = (
   props: ReportWidgetProps<{

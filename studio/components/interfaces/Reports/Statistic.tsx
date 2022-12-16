@@ -7,7 +7,7 @@ interface Props {
   prefix?: string
   suffix?: string
   valueFormatter?: (value: Props['value']) => string
-  sparklineData?: Record<string, number>[]
+  sparklineData?: any
   sparklineXAxis?: string
   sparklineYAxis?: string
 }
@@ -43,7 +43,7 @@ const Statistic: React.FC<Props> = ({
         </div>
       )}
       {showSparkline && (
-        <Sparkline data={sparklineData} xAxisKey={sparklineXAxis} yAxisKey={sparklineYAxis} />
+        <Sparkline data={sparklineData} xAxisKey={sparklineXAxis} yAxisKey={sparklineYAxis} size="small" />
       )}
     </div>
   )
