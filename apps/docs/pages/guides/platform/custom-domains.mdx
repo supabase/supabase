@@ -14,16 +14,26 @@ Custom Domains are currently in beta, and are being slowly made available to pro
 
 Custom domains allow you to present a branded experience to your users. Currently, you must use a subdomain (e.g., `api.example.com`, rather than `example.com`) for the purposes of this guide.
 
+You will require [Owner or Admin permissions](/docs/guides/platform#manage-team-members) for the project you'd like to set up a custom domain for.
+
+## Configure a Custom Domain using the Supabase Dashboard
+
+The [General Settings](https://app.supabase.com/project/_/settings/general) page of the Supabase Dashboard has a "Custom Domains" section, that will guide you through setting up a Custom Domain for your project.
+
+If your project does not yet have a Custom Domains add-on enabled, or if it is not on a paid plan, it will first redirect you to the [Billing update](https://app.supabase.com/project/_/settings/billing/update) page.
+
+## Configure a Custom Domain using the Supabase CLI
+
+This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
+
 To get started:
 
 1. [Install](/docs/guides/cli) the Supabase CLI 1.11.3+.
 1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
-1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform#manage-team-members) for the project you'd like to set up a custom domain for.
-1. Enable the Custom Domains add-on in the Billing page of the Dashboard.
 
-## Configure a Custom Domain
+### Purchase a Custom Domains add-on using the Supabase Dashboard
 
-This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
+Use the [Billing update](https://app.supabase.com/project/_/settings/billing/update) page of the dashboard to upgrade to paid tier, and subscribe to the Custom Domains add-on for your project.
 
 ### Configure a CNAME
 
