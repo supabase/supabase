@@ -979,7 +979,7 @@ functions:
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
         code: |
-          ```js
+          ```ts
             const { data, error } = await supabase
               .from('users')
               .select(`
