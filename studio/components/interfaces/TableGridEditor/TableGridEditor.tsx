@@ -5,7 +5,7 @@ import { find, isUndefined } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -60,14 +60,15 @@ const TableGridEditor: FC<Props> = ({
   const projectRef = ui.selectedProject?.ref
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
+  const isVaultEnabled = useFlag('vaultExtension')
 
   const getEncryptedColumns = async (table: any) => {
-    const columns = await vault.listEncryptedColumns(table.name)
+    const columns = await vault.listEncryptedColumns(table.schema, table.name)
     setEncryptedColumns(columns)
   }
 
   useEffect(() => {
-    if (selectedTable !== undefined && selectedTable.id !== undefined) {
+    if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
       getEncryptedColumns(selectedTable)
     }
   }, [selectedTable?.id])
@@ -81,20 +82,23 @@ const TableGridEditor: FC<Props> = ({
   // @ts-ignore
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2
+  const isForeignTableSelected = meta.foreignTables.byId(selectedTable.id) !== undefined
   const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canEditViaTableEditor = !isViewSelected && !isForeignTableSelected && !isLocked
 
-  const gridTable = !isViewSelected
-    ? parseSupaTable(
-        {
-          table: selectedTable as PostgresTable,
-          columns: (selectedTable as PostgresTable).columns,
-          primaryKeys: (selectedTable as PostgresTable).primary_keys,
-          relationships: (selectedTable as PostgresTable).relationships,
-        },
-        encryptedColumns
-      )
-    : (selectedTable as SchemaView).name
+  const gridTable =
+    !isViewSelected && !isForeignTableSelected
+      ? parseSupaTable(
+          {
+            table: selectedTable as PostgresTable,
+            columns: (selectedTable as PostgresTable).columns,
+            primaryKeys: (selectedTable as PostgresTable).primary_keys,
+            relationships: (selectedTable as PostgresTable).relationships,
+          },
+          encryptedColumns
+        )
+      : (selectedTable as SchemaView).name
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
@@ -161,14 +165,11 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={canUpdateTables && !isViewSelected && !isLocked}
+        editable={canUpdateTables && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          !isViewSelected &&
-          selectedTable.schema === 'public' && (
-            <GridHeaderActions table={selectedTable as PostgresTable} />
-          )
+          canEditViaTableEditor && <GridHeaderActions table={selectedTable as PostgresTable} />
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}

@@ -1819,8 +1819,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/migrations/firebase-data',
-    destination: '/docs/guides/resources/migrating-to-supabase/firebase-data',
+    source: '/docs/guides/migrations/firestore-data',
+    destination: '/docs/guides/resources/migrating-to-supabase/firestore-data',
   },
   {
     permanent: true,
@@ -1876,5 +1876,15 @@ module.exports = [
     permanent: true,
     source: '/docs/handbook/supasquad',
     destination: '/supasquad',
+  },
+  {
+    permanent: true,
+    source: '/contact/enterprise',
+    destination: 'https://forms.supabase.com/enterprise',
+  },
+  {
+    permanent: true,
+    source: '/legal/soc2',
+    destination: 'https://forms.supabase.com/soc2',
   },
 ]
