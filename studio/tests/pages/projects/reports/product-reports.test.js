@@ -7,7 +7,7 @@ import { get, post } from 'lib/common/fetch'
 import { useRouter } from 'next/router'
 import { render } from '../../../helpers'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
-import { ApiOverviewReport } from 'pages/project/[ref]/reports/api-overview'
+import { ApiOverviewReport } from 'pages/project/[ref]/reports/api'
 import { ApiBotsReport } from 'pages/project/[ref]/reports/api-bots'
 import { AuthReport } from 'pages/project/[ref]/reports/auth'
 
