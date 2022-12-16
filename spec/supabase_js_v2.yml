@@ -215,8 +215,8 @@ functions:
       - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url).
-      - Please refer to [this guide](/docs/guides/auth/overview#redirect-urls-and-wildcards) on how to add additional redirect URLs to your project.
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
