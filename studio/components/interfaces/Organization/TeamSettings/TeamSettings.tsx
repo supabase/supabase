@@ -24,6 +24,11 @@ const TeamSettings = observer(() => {
   const [isLeaving, setIsLeaving] = useState(false)
   const canAddMembers = rolesAddable.length > 0
 
+  const canLeave = (isOwner && ui.isOwnerAndCanLeaveOrg(members)) || !isOwner
+
+  console.log(rolesAddable)
+  console.log(PageState)
+
   function onFilterMemberChange(e: any) {
     PageState.membersFilterString = e.target.value
   }
@@ -77,7 +82,7 @@ const TeamSettings = observer(() => {
                 />
               </div>
             )}
-            {!isOwner && (
+            {canLeave && (
               <div>
                 <Button type="default" onClick={() => leaveTeam()} loading={isLeaving}>
                   Leave team
