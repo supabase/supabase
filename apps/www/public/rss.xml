@@ -15,10 +15,10 @@
   <pubDate>Thu, 15 Dec 2022 23:11:00 +0000</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/pitr</guid>
-  <title>Point in Time Recovery is now available for self-serve for select Pro projects</title>
-  <link>https://supabase.com/blog/pitr</link>
-  <description>PITR available for self-serve on select projects</description>
+  <guid>https://supabase.com/blog/postgres-point-in-time-recovery</guid>
+  <title>Point in Time Recovery is now available for Pro projects</title>
+  <link>https://supabase.com/blog/postgres-point-in-time-recovery</link>
+  <description>We're making PITR available for more projects, with a new Dashboard UI that makes it simple to use.</description>
   <pubDate>Thu, 15 Dec 2022 23:11:00 +0000</pubDate>
 </item>
 <item>
