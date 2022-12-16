@@ -268,7 +268,7 @@ export default function launchweek() {
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">Wrap Up</span>
-                    <span className="text-slate-900">Everything we shipped for Launch Week 6</span>
+                    <span className="text-slate-900">Everything we shipped</span>
                   </div>
                 </div>
                 <div className="flex gap-2 z-10">
