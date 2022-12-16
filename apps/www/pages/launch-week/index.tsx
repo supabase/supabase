@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Thursday'
+  const liveDay = 'Friday'
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -270,6 +270,7 @@ export default function launchweek() {
                   day2.d.toString(),
                   day3.d.toString(),
                   day4.d?.toString(),
+                  day5.d?.toString(),
                 ]}
               >
                 <div className="border-b pb-3">
