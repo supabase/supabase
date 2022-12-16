@@ -1,13 +1,22 @@
 import { NextSeo } from 'next-seo'
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import EnterpriseContactForm from '~/components/EnterpriseContactForm'
 import DefaultLayout from '~/components/Layouts/Default'
 
 const meta_title = 'Enterprise Contact | Supabase'
 const meta_description = 'Contact Supabase for enterprise sales and pricing.'
+const enterprise_form_url = 'https://forms.supabase.com/enterprise'
 
 const EnterpriseContactPage = () => {
   const router = useRouter()
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return
+    }
+
+    router.push(enterprise_form_url)
+  })
 
   return (
     <DefaultLayout>
@@ -27,9 +36,9 @@ const EnterpriseContactPage = () => {
       />
 
       <div className="mx-auto my-16 max-w-xl px-4 md:my-20 lg:my-24 xl:my-32">
-        <h2 className="h2 block pb-16 text-center">Contact Enterprise Sales</h2>
-
-        <EnterpriseContactForm />
+        <p className="p mt-1.5 text-sm text-center sm:mt-5 sm:text-base lg:text-lg ">
+          <a href={enterprise_form_url}>Redirecting... Click here to get redirected immediately</a>
+        </p>
       </div>
     </DefaultLayout>
   )

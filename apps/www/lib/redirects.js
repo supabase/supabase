@@ -1877,4 +1877,9 @@ module.exports = [
     source: '/docs/handbook/supasquad',
     destination: '/supasquad',
   },
+  {
+    permanent: true,
+    source: '/contact/enterprise',
+    destination: 'https://forms.supabase.com/enterprise',
+  },
 ]
