@@ -130,14 +130,16 @@ export default function launchweek() {
             </div>
           </div>
         </a>
-        <a href={docs} target="_blank" rel="noopener">
-          <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-            Docs
-            <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <img src="/images/launchweek/icons-docs.svg" className="w-4 h-4"></img>
+        {docs && (
+          <a href={docs} target="_blank" rel="noopener">
+            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+              Docs
+              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <img src="/images/launchweek/icons-docs.svg" className="w-4 h-4"></img>
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        )}
         {video && (
           <a href={video} target="_blank" rel="noopener">
             <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
@@ -680,7 +682,7 @@ export default function launchweek() {
                 </Badge>
                 <span className="text-black dark:text-white text-center">PgGraphql</span>
               </div>
-              <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
+              <SectionButtons docs="/docs/guides/api#graphql-api" blog="/blog/pg-graphql-v1" />
             </div>
             <div
               className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
@@ -720,7 +722,10 @@ export default function launchweek() {
                 </Badge>
                 <span className="text-black dark:text-white text-center">Custom Domains</span>
               </div>
-              <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
+              <SectionButtons
+                docs="/docs/guides/platform/custom-domains"
+                blog="/blog/custom-domain-names"
+              />
             </div>
             <div
               className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
@@ -762,7 +767,10 @@ export default function launchweek() {
                   Point-in-time recovery
                 </span>
               </div>
-              <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
+              <SectionButtons
+                docs="/docs/guides/platform/going-into-prod"
+                blog="/blog/postgres-point-in-time-recovery"
+              />
             </div>
             <div
               className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
@@ -802,7 +810,10 @@ export default function launchweek() {
                 </Badge>
                 <span className="text-black dark:text-white text-center">pg_crdt</span>
               </div>
-              <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
+              <SectionButtons
+                docs="https://github.com/supabase/pg_crdt"
+                blog="/blog/postgres-crdt"
+              />
             </div>
             <div
               className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
@@ -842,7 +853,10 @@ export default function launchweek() {
                 </Badge>
                 <span className="text-black dark:text-white text-center">Postgres 15</span>
               </div>
-              <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
+              <SectionButtons
+                docs="https://www.postgresql.org/docs/15/release-15.html"
+                blog="/blog/new-in-postgres-15"
+              />
             </div>
             <div
               className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
@@ -882,7 +896,10 @@ export default function launchweek() {
                 </Badge>
                 <span className="text-black dark:text-white text-center">PostgREST 11</span>
               </div>
-              <SectionButtons docs={day5.steps[1].docs} blog={day5.steps[1].blog} />
+              <SectionButtons
+                docs="/docs/guides/resources/supabase-cli"
+                blog="/blog/postgrest-11-prerelease"
+              />
             </div>
           </div>
         </SectionContainer>
