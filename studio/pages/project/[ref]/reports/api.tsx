@@ -11,17 +11,27 @@ import {
   renderErrorRateChart,
   renderRequestsPathsTable,
   renderStatusCodesChart,
-} from 'components/interfaces/Reports/renderers/OverviewRenderers'
+  renderBotScores,
+  renderUserAgents
+} from 'components/interfaces/Reports/renderers/ApiRenderers'
 
-export const ApiOverviewReport: NextPageWithLayout = () => {
+export const ApiReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
-  const config = PRESET_CONFIG[Presets.API_OVERVIEW]
+  const config = PRESET_CONFIG[Presets.API]
   const hooks = hooksFactory(ref as string, config)
   const statusCodes = hooks.statusCodes()
   const errorRates = hooks.errorRates()
   const requestPaths = hooks.requestPaths()
-  const { isLoading, Layout } = usePresetReport([statusCodes, errorRates, requestPaths])
+  const userAgents = hooks.userAgents()
+  const botScores = hooks.botScores()
+  const { isLoading, Layout } = usePresetReport([
+    statusCodes,
+    errorRates,
+    requestPaths,
+    userAgents,
+    botScores,
+  ])
   return (
     <Layout title={config.title}>
       <div className="grid lg:grid-cols-4 gap-4">
@@ -31,7 +41,7 @@ export const ApiOverviewReport: NextPageWithLayout = () => {
           className="col-span-4 col-start-1"
           title="API Status Codes"
           description="Distribution of API responses by status codes."
-          data={statusCodes[0].logData  || []}
+          data={statusCodes[0].logData || []}
           renderer={renderStatusCodesChart}
         />
         <ReportWidget
@@ -40,7 +50,7 @@ export const ApiOverviewReport: NextPageWithLayout = () => {
           className="col-span-4 col-start-1"
           title="Error Rate"
           description="Percentage of API 5XX and 4XX error responses."
-          data={errorRates[0].logData  || []}
+          data={errorRates[0].logData || []}
           renderer={renderErrorRateChart}
         />
         <ReportWidget
@@ -52,11 +62,32 @@ export const ApiOverviewReport: NextPageWithLayout = () => {
           data={requestPaths[0].logData || []}
           renderer={renderRequestsPathsTable}
         />
+
+        <h2>Bots</h2>
+
+        <ReportWidget
+          isLoading={isLoading}
+          params={userAgents[0].params}
+          className="col-span-4 col-start-1"
+          title="Top User Agents"
+          description="The types of user agents using the API and their organization source."
+          data={userAgents[0].logData || []}
+          renderer={renderUserAgents}
+        />
+        <ReportWidget
+          isLoading={isLoading}
+          params={botScores[0].params}
+          className="col-span-4 col-start-1"
+          title="Bot-like API Requests"
+          description="Suspicious bot-like requests, as flagged by Cloudflare"
+          data={botScores[0].logData || []}
+          renderer={renderBotScores}
+        />
       </div>
     </Layout>
   )
 }
 
-ApiOverviewReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+ApiReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(ApiOverviewReport)
+export default observer(ApiReport)

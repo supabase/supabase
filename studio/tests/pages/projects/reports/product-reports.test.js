@@ -7,8 +7,7 @@ import { get, post } from 'lib/common/fetch'
 import { useRouter } from 'next/router'
 import { render } from '../../../helpers'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
-import { ApiOverviewReport } from 'pages/project/[ref]/reports/api'
-import { ApiBotsReport } from 'pages/project/[ref]/reports/api-bots'
+import { ApiReport } from 'pages/project/[ref]/reports/api'
 import { AuthReport } from 'pages/project/[ref]/reports/auth'
 
 beforeEach(() => {
@@ -25,8 +24,7 @@ beforeEach(() => {
 })
 
 describe.each([
-  { Page: ApiOverviewReport, contains: ['API Overview'] },
-  { Page: ApiBotsReport, contains: ['API Bots'] },
+  { Page: ApiReport, contains: ['API'] },
   { Page: AuthReport, contains: ['Auth'] },
 ])('$Page rendering', ({ Page, contains }) => {
   test(`contains ${contains}`, async () => {
