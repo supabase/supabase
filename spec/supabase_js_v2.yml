@@ -261,8 +261,8 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          - Please refer to [this guide](/docs/guides/auth/overview#redirect-urls-and-wildcards) on how to add additional redirect URLs to your project.
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
