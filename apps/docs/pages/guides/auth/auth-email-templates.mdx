@@ -28,23 +28,22 @@ The templating system provides the following variables for use:
 
 ### Email Prefetching
 
-Certain email providers might have spam detection or other security features that prefetch URL links in emails received.
-In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which will lead to a "Token has expired or is invalid" error.
+Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails.
+In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
+To guard against this:
 
-These are some measures you can consider to guard against this:
+- Use an email OTP instead by including `{{ .Token }}` in the email template.
+- Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action.
+  For example, you can include the following in your email template:
 
-1. Use an email OTP instead by including `{{ .Token }}` in the email template.
-2. Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action.
-   For example, you can include the following in your email template:
+  ```html
+  <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
+    >Confirm your signup
+  </a>
+  ```
 
-```html
-<a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
-  >Confirm your signup
-</a>
-```
-
-The user should be brought to a page on your site where they can confirm the action through clicking a button.
-The button should contain the actual confirmation link which can be obtained from parsing the query parameter (`confirmation_url={{ .ConfirmationURL }}`) in the url.
+  The user should be brought to a page on your site where they can confirm the action by clicking a button.
+  The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
