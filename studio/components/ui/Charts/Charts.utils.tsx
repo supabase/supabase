@@ -67,8 +67,15 @@ export const timestampFormatter = (
  * Hook to create common wrapping components, perform data transformations
  * returns a Container component and the minHeight set
  */
-export const useChartSize = (size: CommonChartProps<any>['size'] = 'normal') => {
-  const minHeight = { small: 120, normal: 160, large: 280 }[size]
+export const useChartSize = (
+  size: CommonChartProps<any>['size'] = 'normal',
+  sizeMap: {
+    small: number
+    normal: number
+    large: number
+  } = { small: 120, normal: 160, large: 280 }
+) => {
+  const minHeight = sizeMap[size]
   const Container: React.FC = useMemo(
     () =>
       ({ children }) =>
