@@ -1,10 +1,8 @@
 import { ResponseError } from 'types'
-import { LogsEndpointParams } from '../Settings/Logs'
 import { DEFAULT_QUERY_PARAMS } from './Reports.constants'
 
 export enum Presets {
-  API_OVERVIEW = 'overview',
-  API_BOTS = 'api_bots',
+  API = 'api',
   AUTH = 'auth',
 }
 
