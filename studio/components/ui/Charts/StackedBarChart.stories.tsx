@@ -36,10 +36,10 @@ const PROPS = {
 }
 export const StackedBarChart = () => (
   <div className="flex flex-col gap-4 ">
-    <ExampleName>Stack Colors</ExampleName>
+    <ExampleName>Default Stacked Chart Colors</ExampleName>
     <div className="flex flex-row ">
       {STACK_COLORS.map((c) => (
-        <div className="w-10 h-10" style={{ background: c.base }}></div>
+        <div className="w-10 h-10" key={c.base} style={{ background: c.base }}></div>
       ))}
     </div>
 
@@ -51,6 +51,10 @@ export const StackedBarChart = () => (
         { title: 'Minimal Header', props: { minimalHeader: true } },
         { title: 'Hide Legend', props: { hideLegend: true } },
         { title: 'Percentage Bars', props: { variant: 'percentages' as const } },
+        {
+          title: 'Percentage Bars with suffix',
+          props: { variant: 'percentages' as const, format: 'mem' },
+        },
         {
           title: 'Formatter - Auto 2 Precision for floats',
           props: { data: DATA.map((d) => ({ ...d, count: d.count + 5.12 })) },
