@@ -162,6 +162,19 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.AUTH]: {
     title: 'Auth',
     queries: {
+      signUpProviders: {
+        queryType: "db",
+        sql: `
+select 
+  sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count, 
+  date_trunc('day', u.created_at) as timestamp, 
+  i.provider as provider
+from auth.users u
+join auth.identities as i on u.id = i.user_id
+group by timestamp, provider
+order by timestamp desc
+        `
+      },  
       failedMigrations: {
         queryType: "logs",
         sql: `

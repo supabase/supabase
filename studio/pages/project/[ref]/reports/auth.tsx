@@ -12,6 +12,7 @@ import {
   renderNewUsers,
   renderCumulativeUsers,
   renderFailedMigrations,
+  renderSignUpProviders,
 } from 'components/interfaces/Reports/renderers/AuthRenderers'
 
 export const AuthReport: NextPageWithLayout = () => {
@@ -23,20 +24,20 @@ export const AuthReport: NextPageWithLayout = () => {
   const newUsers = hooks.newUsers()
   const cumulativeUsers = hooks.cumulativeUsers()
   const failedMigrations = hooks.failedMigrations()
+  const signUpProviders = hooks.signUpProviders()
 
-  const { isLoading, Layout } = usePresetReport([dailyActiveUsers, newUsers, cumulativeUsers])
+  const { isLoading, Layout } = usePresetReport([
+    dailyActiveUsers,
+    newUsers,
+    cumulativeUsers,
+    failedMigrations,
+    signUpProviders,
+  ])
   return (
     <Layout title={config.title}>
       <div className="grid  lg:grid-cols-6 gap-4">
-        <ReportWidget
-          isLoading={isLoading}
-          params={failedMigrations[0].params}
-          className="col-span-2 col-start-1"
-          title="Failed GoTrue Migrations"
-          tooltip="Failed migrations may cause issues with user authentication."
-          data={failedMigrations[0].logData!}
-          renderer={renderFailedMigrations}
-        />
+        <h2>User Activity</h2>
+
         <ReportWidget
           isLoading={isLoading}
           params={cumulativeUsers[0].params}
@@ -63,6 +64,26 @@ export const AuthReport: NextPageWithLayout = () => {
           description="The daily count of active authenticated users"
           data={dailyActiveUsers[0].logData!}
           renderer={renderDailyActiveUsers}
+        />
+
+        <ReportWidget
+          isLoading={isLoading}
+          params={signUpProviders[0].params}
+          className="col-span-6 col-start-1"
+          title="Sign Up Providers"
+          description="The breakdown of providers used for user creation"
+          data={signUpProviders[0].data!}
+          renderer={renderSignUpProviders}
+        />
+        <h2>Sever Health</h2>
+        <ReportWidget
+          isLoading={isLoading}
+          params={failedMigrations[0].params}
+          className="col-span-2 col-start-1"
+          title="Failed Migrations"
+          tooltip="Failed GoTrue migrations may cause issues with user authentication."
+          data={failedMigrations[0].logData!}
+          renderer={renderFailedMigrations}
         />
       </div>
     </Layout>
