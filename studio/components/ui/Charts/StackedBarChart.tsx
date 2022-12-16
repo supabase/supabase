@@ -15,6 +15,7 @@ interface Props extends CommonChartProps<any> {
   xAxisFormatAsDate?: boolean
   displayDateInUtc?: boolean
   hideLegend?: boolean
+  hideHeader?: boolean
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
@@ -31,6 +32,7 @@ const StackedBarChart: React.FC<Props> = ({
   xAxisFormatAsDate = true,
   displayDateInUtc,
   hideLegend = false,
+  hideHeader = false,
 }) => {
   const { Container } = useChartSize(size)
   const { dataKeys, stackedData, percentagesStackedData } = useStacked({
@@ -43,13 +45,15 @@ const StackedBarChart: React.FC<Props> = ({
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   if (data.length === 0) return <NoDataPlaceholder />
   return (
-    <div>
-      <ChartHeader
-        title={title}
-        format={format}
-        customDateFormat={customDateFormat}
-        minimalHeader={minimalHeader}
-      />
+    <div className="w-full">
+      {!hideHeader && (
+        <ChartHeader
+          title={title}
+          format={format}
+          customDateFormat={customDateFormat}
+          minimalHeader={minimalHeader}
+        />
+      )}
       <Container>
         <BarChart
           data={variant === 'percentages' ? percentagesStackedData : stackedData}

@@ -11,16 +11,13 @@ export const CHART_COLORS = {
 
 // refer to packages/ui/radix-colors.js for full list of colors
 export const STACK_COLORS = [
-  ['brand', 8],
-  ['mint', 8],
-  ['blue', 8],
-  ['sky', 7],
-  ['bronze', 8],
-  ['violet', 7],
-  ['indigo', 8],
-  ['tomato', 7],
-  ['orange', 8],
-  ['olive', 8],
+  ['brand', 9],
+  ['mint', 9],
+  ['blue', 9],
+  ['sky', 9],
+  ['lime', 9],
+  ['yellow', 9],
+  ['orange', 9],
 ].map(([color, n]) => ({
   lighter: `var(--colors-${color}${(n as number) - 1})`,
   base: `var(--colors-${color}${n})`,

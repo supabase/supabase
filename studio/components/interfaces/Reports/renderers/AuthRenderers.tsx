@@ -1,14 +1,34 @@
 import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
+import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import { DATETIME_FORMAT } from '../Reports.constants'
 import { ReportWidgetProps } from '../ReportWidget'
 import Statistic from '../Statistic'
+
+export const renderSignUpProviders = (
+  props: ReportWidgetProps<{
+    timestamp: string
+    provider: string
+    count: number
+  }>
+) => {
+  return (
+    <StackedBarChart
+      hideHeader
+      variant="percentages"
+      data={props.data}
+      xAxisKey="timestamp"
+      yAxisKey="count"
+      stackKey="provider"
+    />
+  )
+}
 export const renderFailedMigrations = (
   props: ReportWidgetProps<{
     timestamp: string
     count: number
   }>
 ) => {
-  const count = props.data.length === 0 ? 0: props?.data?.[0]?.count
+  const count = props.data.length === 0 ? 0 : props?.data?.[0]?.count
   return <Statistic value={count} />
 }
 export const renderCumulativeUsers = (
