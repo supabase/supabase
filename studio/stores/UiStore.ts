@@ -1,8 +1,18 @@
 import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
-import { Project, Notification, User, Organization, ProjectBase, Permission } from 'types'
+import {
+  Project,
+  Notification,
+  User,
+  Organization,
+  ProjectBase,
+  Permission,
+  Member,
+  Role,
+} from 'types'
 import { IRootStore } from './RootStore'
 import Telemetry from 'lib/telemetry'
+import { useOrganizationRoles } from 'hooks'
 
 export interface IUiStore {
   language: 'en_US'
@@ -26,6 +36,7 @@ export interface IUiStore {
   setNotification: (notification: Notification) => string
   setProfile: (value?: User) => void
   setPermissions: (permissions?: Permission[]) => void
+  isOwnerAndCanLeaveOrg: (members: Member[]) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -156,5 +167,30 @@ export default class UiStore implements IUiStore {
 
   setPermissions(permissions?: any) {
     this.permissions = permissions
+  }
+
+  /*
+   * Check wether the owner is allowed to leave a project
+   * the conditions for this is that they are an owner, and there is also 1 other owner in the org.
+   */
+  isOwnerAndCanLeaveOrg(members: Member[]) {
+    const selectedOrg = this.selectedOrganization
+
+    const roles: { roles: Role[] } = useOrganizationRoles(this.selectedOrganization?.slug)
+
+    const membersWhoAreOwners = members.filter((member) => {
+      const [memberRoleId] = member.role_ids ?? []
+      const role = (roles.roles || []).find((role: Role) => role.id === memberRoleId)
+      // dangerous use of string here
+      // to do, refactor so that changing the role name does not fail this check
+      // if role name does change, then user will simply not be able to leave project as a 'owner' regardless
+      return role && role.name === 'Owner'
+    })
+
+    console.log('membersWhoAreOwners', membersWhoAreOwners)
+
+    return selectedOrg?.is_owner && membersWhoAreOwners && membersWhoAreOwners.length > 1
+      ? true
+      : false
   }
 }
