@@ -76,7 +76,7 @@ export default function IndexPage() {
     },
     {
       name: 'Enterprise',
-      href: '/contact/enterprise',
+      href: 'https://forms.supabase.com/enterprise',
       description: 'For large-scale applications managing serious workloads.',
       features: [
         `Point in time recovery`,
@@ -575,7 +575,7 @@ export default function IndexPage() {
                           Designated support team, account manager and technical specialist
                         </p>
 
-                        <Link href="/contact/enterprise">
+                        <Link href="https://forms.supabase.com/enterprise">
                           <a>
                             <Button size="medium" type="default">
                               Contact Us
@@ -643,7 +643,7 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="/contact/enterprise">
+                      <Link href="https://forms.supabase.com/enterprise">
                         <a>
                           <Button size="medium" type="default" block>
                             Contact us
