@@ -111,20 +111,10 @@ export const useStacked = ({
       return acc
     }, {} as Record<string, Record<string, number>>)
 
-    const flattened = Object.entries(mapping).map(([x, sMap]) => {
-      let map = sMap
-      if (variant === 'percentages') {
-        const sum = Object.values(sMap).reduce((acc, value) => acc + value, 0)
-        map = Object.entries(sMap).reduce((acc, [key, value]) => {
-          acc[key] = value !== 0 ? value / sum : 0
-          return acc
-        }, {} as any)
-      }
-      return {
-        ...map,
-        [xAxisKey]: x,
-      }
-    })
+    const flattened = Object.entries(mapping).map(([x, sMap]) => ({
+      ...sMap,
+      [xAxisKey]: Number.isNaN(Number(x)) ? x : Number(x),
+    }))
     return flattened
   }, [JSON.stringify(data)])
   const dataKeys = useMemo(() => {
@@ -133,5 +123,24 @@ export const useStacked = ({
       .sort()
   }, [JSON.stringify(stackedData[0] || {})])
 
-  return { dataKeys, stackedData }
+  const percentagesStackedData = useMemo(() => {
+    if (variant !== 'percentages') return
+
+    return stackedData.map((stack) => {
+      const entries = Object.entries(stack) as Array<[string, number]>
+      let map
+      const sum = entries
+        .filter(([key, _value]) => dataKeys.includes(key))
+        .reduce((acc, [_key, value]) => acc + value, 0)
+      map = entries.reduce((acc, [key, value]) => {
+        if (!dataKeys.includes(key)) {
+          return { ...acc, [key]: value }
+        }
+        return { ...acc, [key]: value !== 0 ? value / sum : 0 }
+      }, {} as any)
+      return map
+    })
+  }, [JSON.stringify(stackedData)])
+
+  return { dataKeys, stackedData, percentagesStackedData }
 }

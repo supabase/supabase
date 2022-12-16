@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BarChart, Bar, XAxis, Tooltip, Legend, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, Tooltip, Legend, Cell, TooltipProps } from 'recharts'
 import ChartHeader from './ChartHeader'
 import { CHART_COLORS, STACK_COLORS, DateTimeFormats } from './Charts.constants'
 import { CommonChartProps } from './Charts.types'
@@ -33,7 +33,13 @@ const StackedBarChart: React.FC<Props> = ({
   hideLegend = false,
 }) => {
   const { Container } = useChartSize(size)
-  const { dataKeys, stackedData } = useStacked({ data, xAxisKey, stackKey, yAxisKey, variant })
+  const { dataKeys, stackedData, percentagesStackedData } = useStacked({
+    data,
+    xAxisKey,
+    stackKey,
+    yAxisKey,
+    variant,
+  })
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   if (data.length === 0) return <NoDataPlaceholder />
   return (
@@ -46,7 +52,7 @@ const StackedBarChart: React.FC<Props> = ({
       />
       <Container>
         <BarChart
-          data={stackedData}
+          data={variant === 'percentages' ? percentagesStackedData : stackedData}
           margin={{
             top: 20,
             right: 20,
@@ -56,7 +62,6 @@ const StackedBarChart: React.FC<Props> = ({
           className="cursor-pointer overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {
-            console.log(e)
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
@@ -106,18 +111,22 @@ const StackedBarChart: React.FC<Props> = ({
                 ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
                 : undefined
             }
-            formatter={(value: number) => {
-              let val: string = String(value)
-              if (variant === 'percentages') {
-                val = precisionFormatter(value * 100, 1) + '%'
+            formatter={(value: number, name: string, props: any) => {
+              const suffix = format || ''
+              if (variant === 'percentages' && percentagesStackedData) {
+                const index = percentagesStackedData.findIndex(
+                  (pStack) => pStack === props.payload!
+                )
+                const val = stackedData[index][name]
+                const percentage = precisionFormatter(value * 100, 1) + '%'
+                return `${percentage} (${val}${suffix})`
               }
-              val += (format || '')
-              return val
+              return String(value) + suffix
             }}
             cursor={false}
             labelClassName="text-white"
             contentStyle={{ backgroundColor: '#444444', borderColor: '#444444', fontSize: '12px' }}
-            wrapperClassName="bg-gray-600 rounded"
+            wrapperClassName="bg-gray-600 rounded min-w-md"
           />
         </BarChart>
       </Container>
