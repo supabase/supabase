@@ -673,7 +673,11 @@ export default function launchweek() {
                   </a>
                 </div>
                 <div className="flex gap-4 md:gap-2">
-                  <a href={'/blog'} target="_blank" rel="noopener">
+                  <a
+                    href={'https://www.youtube.com/watch?v=mw0DLwItue4'}
+                    target="_blank"
+                    rel="noopener"
+                  >
                     <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
                       OneSignal
                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
@@ -681,7 +685,11 @@ export default function launchweek() {
                       </div>
                     </div>
                   </a>
-                  <a href={'/blog'} target="_blank" rel="noopener">
+                  <a
+                    href={'https://www.youtube.com/watch?v=EdYQ9fF-hz4'}
+                    target="_blank"
+                    rel="noopener"
+                  >
                     <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
                       NextAuth
                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
