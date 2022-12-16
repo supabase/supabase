@@ -93,21 +93,9 @@
     "description": "Vault Release",
     "d": 5,
     "dd": "Friday",
-    "youtube_id": "QHLPNDrdN2w",
-    "blogpost": "blog/vault-now-in-beta",
-    "steps": [
-      {
-        "title": "Vault Release",
-        "blog": "/blog/vault-now-in-beta",
-        "isNew": true,
-        "description": "A new Postgres extension that makes it safe and easy to store encrypted secrets and encrypt other stored data in your database."
-      },
-      {
-        "title": "Transparent Column Encryption",
-        "description": "Faster asset delivery, now even faster.",
-        "blog": "/blog/transparent-column-encryption-with-postgres",
-        "isNew": true
-      }
-    ]
+    "youtube_id": "6bGQotxisoY",
+    "blogpost": "https://supabase.com/blog",
+    "docs": "https://supabase.com/docs",
+    "steps": []
   }
 ]

@@ -224,7 +224,7 @@ export default function launchweek() {
             <SectionContainer className="!py-0 ">
               <div className="border rounded-2xl border-slate-400 text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
                 <div className="relative flex items-center mb-4 sm:mb-0">
-                  <div className="flex">
+                  <div className="flex min-w-[150px]">
                     <img
                       src={`/images/launchweek/antcopplecall.png`}
                       className="brightness-125"
@@ -515,7 +515,7 @@ export default function launchweek() {
                               className="test"
                             />
                           </div>
-                          <div className="flex items-center flex-col-reverse lg:flex-row">
+                          <div className="flex items-center flex-col-reverse lg:flex-row text-black dark:text-white">
                             <span>{day4.steps[0].title}</span>
                             <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
@@ -641,6 +641,99 @@ export default function launchweek() {
             </SectionContainer>
           </>
         )}
+        <SectionContainer className="!py-20 sm:!pb-40 sm:!pt-10">
+          <div className="h-[400px] flex flex-col gap-5 lg:flex-row group/community relative overflow-hidden">
+            <div
+              className={`relative flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover !px-3 sm:!px-14`}
+            >
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.community_wrappers}`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/community-visual.svg'
+                      : '/images/launchweek/community-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/community:opacity-100 duration-500 transition-all ${styles.community_wrappers}`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/community-visual-hover.svg'
+                      : '/images/launchweek/community-visual-light-hover.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex items-center flex-col-reverse lg:flex-row">
+                <span className="text-black dark:text-white">Community Day</span>
+              </div>
+              <div className="flex flex-col md:flex-row gap-4 md:gap-2 z-10 ">
+                <div className="flex gap-4 md:gap-2">
+                  <a href={'/blog/launch-week-6-community-day'} target="_blank" rel="noopener">
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      Blog post
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/icons-blogpost.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                  <a
+                    href={'https://www.youtube-nocookie.com/embed/TmViZsWEBY0'}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      Flutterflow
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div className="flex gap-4 md:gap-2">
+                  <a
+                    href={'https://www.youtube.com/watch?v=mw0DLwItue4'}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      OneSignal
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                  <a
+                    href={'https://www.youtube.com/watch?v=EdYQ9fF-hz4'}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                      NextAuth
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SectionContainer>
+
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
           <h3 className="text-black dark:text-white text-lg mb-4">One more thing</h3>
           <div className="flex flex-col lg:grid grid-cols-3 grid-rows-2 gap-4">
