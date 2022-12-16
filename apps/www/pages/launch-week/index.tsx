@@ -660,7 +660,7 @@ export default function launchweek() {
                     </div>
                   </a>
                   <a
-                    href={'https://www.youtube-nocookie.com/embed/TmViZsWEBY0'}
+                    href={'https://www.youtube.com/watch?v=hw9Q-NjASbU'}
                     target="_blank"
                     rel="noopener"
                   >
