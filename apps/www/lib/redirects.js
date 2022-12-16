@@ -1887,4 +1887,89 @@ module.exports = [
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-google',
+    destination: '/docs/guides/auth/social-login/auth-google',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-facebook',
+    destination: '/docs/guides/auth/social-login/auth-facebook',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-twitter',
+    destination: '/docs/guides/auth/social-login/auth-twitter',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-apple',
+    destination: '/docs/guides/auth/social-login/auth-apple',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-azure',
+    destination: '/docs/guides/auth/social-login/auth-azure',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-github',
+    destination: '/docs/guides/auth/social-login/auth-github',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-gitlab',
+    destination: '/docs/guides/auth/social-login/auth-gitlab',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-bitbucket',
+    destination: '/docs/guides/auth/social-login/auth-bitbucket',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-discord',
+    destination: '/docs/guides/auth/social-login/auth-discord',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-keycloak',
+    destination: '/docs/guides/auth/social-login/auth-keycloak',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-linkedin',
+    destination: '/docs/guides/auth/social-login/auth-linkedin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-notion',
+    destination: '/docs/guides/auth/social-login/auth-notion',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-slack',
+    destination: '/docs/guides/auth/social-login/auth-slack',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-spotify',
+    destination: '/docs/guides/auth/social-login/auth-spotify',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-twitch',
+    destination: '/docs/guides/auth/social-login/auth-twitch',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-workos',
+    destination: '/docs/guides/auth/social-login/auth-workos',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-zoom',
+    destination: '/docs/guides/auth/social-login/auth-zoom',
+  },
 ]
