@@ -5,6 +5,7 @@ import ImageGrid from '~/components/ImageGrid'
 import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
 import InlineCodeTag from '~/components/InlineCode'
+import { Badge } from 'ui'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -14,6 +15,7 @@ const ignoreClass = 'ignore-on-export'
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
+    Badge,
     Quote,
     Avatar,
     PGChart: (props: any) => {
