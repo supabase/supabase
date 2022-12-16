@@ -65,6 +65,7 @@ function recurseThroughParams(paramDefinition: any) {
     } else if (Object.keys(dereferenced).length === 0) {
       // skip: {} have no children
     } else {
+      console.warn('param', param)
       throw new Error('unexpected case for dereferenced param type')
     }
   } else if (param.type?.type === 'reflection') {
