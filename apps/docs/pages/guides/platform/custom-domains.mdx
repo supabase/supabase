@@ -12,7 +12,7 @@ Custom Domains are currently in beta, and are being slowly made available to pro
 
 </Admonition>
 
-Custom domains allow you to present a branded experience to your users. Custom domains are available as a [add-on for projects on a paid tier](https://app.supabase.com/project/_/settings/billing/update). Setting up a custom domain requires [Owner or Admin permissions](/docs/guides/platform#manage-team-members) for the project. Currently, you must use a subdomain (e.g., `api.example.com`, rather than `example.com`) for the purposes of this guide.
+Custom domains allow you to present a branded experience to your users. Custom domains are available as a [add-on for projects on a paid tier](https://app.supabase.com/project/_/settings/billing/update). Setting up a custom domain requires [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project. Currently, you must use a subdomain (e.g., `api.example.com`, rather than `example.com`) for the purposes of this guide.
 
 ## Configure a Custom Domain using the Supabase Dashboard
 
@@ -24,8 +24,8 @@ This example assumes your Supabase project is `foobarbaz` with a corresponding A
 
 To get started:
 
-1. [Install](/docs/guides/cli) the Supabase CLI 1.11.3+.
-1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. [Install](/docs/guides/resources/supabase-cli) the Supabase CLI 1.11.3+.
+1. [Log in](/docs/guides/resources/supabase-cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
 
 ### Configure a CNAME
 
@@ -49,7 +49,7 @@ Required outstanding validation records:
         api.example.com TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
 ```
 
-[^1] One of the records requires you to _replace_ the CNAME record set up in [the first step](#cname-configure) with a TXT record. You'll be able to restore it back to the CNAME after the verification process has been completed.
+[^1] One of the records requires you to _replace_ the CNAME record set up in [the first step](#configure-a-cname) with a TXT record. You'll be able to restore it back to the CNAME after the verification process has been completed.
 
 ### Verify your domain
 
@@ -99,9 +99,9 @@ Vanity Subdomains allow you to present a basic branded experience, compared to c
 
 To get started:
 
-1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
-1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
-1. Ensure that you have [Owner or Admin permissions](/docs/guides/hosting/platform#manage-team-members) for the project you'd like to set up a vanity subdomain for.
+1. [Install](/docs/guides/resources/supabase-cli) the Supabase CLI 1.22.0+.
+1. [Log in](/docs/guides/resources/supabase-cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project you'd like to set up a vanity subdomain for.
 1. Ensure that your project has a paid subscription (Pro/Pay as you go/Enterprise tier) in the [Billing page of the Dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
 
 ## Configure a Vanity Subdomain
