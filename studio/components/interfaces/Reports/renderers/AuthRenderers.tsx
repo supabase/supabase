@@ -4,6 +4,23 @@ import { DATETIME_FORMAT } from '../Reports.constants'
 import { ReportWidgetProps } from '../ReportWidget'
 import Statistic from '../Statistic'
 
+export const renderBannedUsers = (
+  props: ReportWidgetProps<{
+    count: number
+  }>
+) => {
+  const count = props.data.length === 0 ? 0 : props?.data?.[0]?.count
+  return <Statistic value={count} />
+}
+export const renderUnverifiedUsers = (
+  props: ReportWidgetProps<{
+    timestamp: string
+    count: number
+  }>
+) => {
+  const count = props.data.length === 0 ? 0 : props?.data?.[0]?.count
+  return <Statistic value={count} />
+}
 export const renderSignUpProviders = (
   props: ReportWidgetProps<{
     timestamp: string
