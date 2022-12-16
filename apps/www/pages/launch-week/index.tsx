@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Thursday'
+  const liveDay = 'Friday'
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -130,14 +130,16 @@ export default function launchweek() {
             </div>
           </div>
         </a>
-        <a href={docs} target="_blank" rel="noopener">
-          <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-            Docs
-            <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <img src="/images/launchweek/icons-docs.svg" className="w-4 h-4"></img>
+        {docs && (
+          <a href={docs} target="_blank" rel="noopener">
+            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+              Docs
+              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <img src="/images/launchweek/icons-docs.svg" className="w-4 h-4"></img>
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        )}
         {video && (
           <a href={video} target="_blank" rel="noopener">
             <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
@@ -219,7 +221,7 @@ export default function launchweek() {
         </div>
         {process.env.NEXT_PUBLIC_LW_STARTED && (
           <>
-            <SectionContainer className="!pt-0 !pb-20 ">
+            <SectionContainer className="!py-0 ">
               <div className="border rounded-2xl border-slate-400 text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex min-w-[150px]">
@@ -255,6 +257,34 @@ export default function launchweek() {
                 </div>
               </div>
             </SectionContainer>
+            <SectionContainer className="!pt-4 ">
+              <div className="border rounded-2xl border-slate-400 text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
+                <div className="relative flex items-center mb-4 sm:mb-0">
+                  <div className="flex">
+                    <img
+                      src={`/images/launchweek/antcopplecall.png`}
+                      className="brightness-125"
+                      width={120}
+                      height={80}
+                    ></img>
+                  </div>
+                  <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
+                    <span className="text-black dark:text-white mr-2">Wrap Up</span>
+                    <span className="text-slate-900">Everything we shipped</span>
+                  </div>
+                </div>
+                <div className="flex gap-2 z-10">
+                  <a href={'/blog/launch-week-6-wrap-up'} target="_blank" rel="noopener">
+                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
+                      Read blogpost
+                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                        <img src="/images/launchweek/blog-icon.svg" className="w-3 h-3"></img>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </SectionContainer>
             <SectionContainer className="!pt-0">
               <Accordion
                 type="default"
@@ -269,6 +299,7 @@ export default function launchweek() {
                   day2.d.toString(),
                   day3.d.toString(),
                   day4.d?.toString(),
+                  day5.d?.toString(),
                 ]}
               >
                 <div className="border-b pb-3">
@@ -611,6 +642,7 @@ export default function launchweek() {
           </>
         )}
         <SectionContainer className="!py-20 sm:!pb-40 sm:!pt-10">
+          <h3 className="text-black dark:text-white text-lg mb-4">Community</h3>
           <div className="h-[400px] flex flex-col gap-5 lg:flex-row group/community relative overflow-hidden">
             <div
               className={`relative flex flex-col items-center justify-between lg:items-start flex-1 basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 text-2xl bg-no-repeat bg-cover !px-3 sm:!px-14`}
@@ -703,6 +735,268 @@ export default function launchweek() {
           </div>
         </SectionContainer>
 
+        <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
+          <h3 className="text-black dark:text-white text-lg mb-4">One more thing</h3>
+          <div className="flex flex-col lg:grid grid-cols-3 grid-rows-2 gap-4">
+            <div
+              className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
+            >
+              <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/PgGraphql-visual.svg'
+                      : '/images/launchweek/PgGraphql-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/PgGraphql-visual-hover.svg'
+                      : '/images/launchweek/PgGraphql-visual-hover-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[300px]">
+                <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                  Updated
+                </Badge>
+                <span className="text-black dark:text-white text-center">pg_graphql v1.0</span>
+              </div>
+              <SectionButtons docs="/docs/guides/api#graphql-api" blog="/blog/pg-graphql-v1" />
+            </div>
+            <div
+              className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
+            >
+              <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/custom-domains-visual.svg'
+                      : '/images/launchweek/custom-domains-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/custom-domains-visual-hover.svg'
+                      : '/images/launchweek/custom-domains-visual-hover-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[300px]">
+                <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                  New
+                </Badge>
+                <span className="text-black dark:text-white text-center">Custom Domains</span>
+              </div>
+              <SectionButtons
+                docs="/docs/guides/platform/custom-domains"
+                blog="/blog/custom-domain-names"
+              />
+            </div>
+            <div
+              className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
+            >
+              <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/PITR-visual.svg'
+                      : '/images/launchweek/PITR-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/PITR-visual-hover.svg'
+                      : '/images/launchweek/PITR-visual-hover-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[300px]">
+                <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                  New
+                </Badge>
+                <span className="text-black dark:text-white text-center">
+                  Point-in-time recovery
+                </span>
+              </div>
+              <SectionButtons
+                docs="/docs/guides/platform/going-into-prod"
+                blog="/blog/postgres-point-in-time-recovery"
+              />
+            </div>
+            <div
+              className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
+            >
+              <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/pg_crdt-visual.svg'
+                      : '/images/launchweek/pg_crdt-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/pg_crdt-visual-hover.svg'
+                      : '/images/launchweek/pg_crdt-visual-hover-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[300px]">
+                <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                  Experimental
+                </Badge>
+                <span className="text-black dark:text-white text-center">pg_crdt</span>
+              </div>
+              <SectionButtons
+                docs="https://github.com/supabase/pg_crdt"
+                blog="/blog/postgres-crdt"
+              />
+            </div>
+            <div
+              className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
+            >
+              <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/postgres-visual.svg'
+                      : '/images/launchweek/postgres-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/postgres-visual-hover.svg'
+                      : '/images/launchweek/postgres-visual-hover-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[300px]">
+                <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                  Upgrade
+                </Badge>
+                <span className="text-black dark:text-white text-center">Postgres 15</span>
+              </div>
+              <SectionButtons
+                docs="https://www.postgresql.org/docs/15/release-15.html"
+                blog="/blog/new-in-postgres-15"
+              />
+            </div>
+            <div
+              className={`min-h-[400px] relative group/day5step2 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl bg-no-repeat p-14 text-2xl overflow-hidden`}
+            >
+              <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/PostgREST11-visual.svg'
+                      : '/images/launchweek/PostgREST11-visual-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  priority
+                  className="left-16"
+                />
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
+              >
+                <Image
+                  src={
+                    isDarkMode
+                      ? '/images/launchweek/PostgREST11-visual-hover.svg'
+                      : '/images/launchweek/PostgREST11-visual-hover-light.svg'
+                  }
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="test"
+                />
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[300px]">
+                <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                  Upgrade
+                </Badge>
+                <span className="text-black dark:text-white text-center">PostgREST 11</span>
+              </div>
+              <SectionButtons
+                docs="/docs/guides/resources/supabase-cli"
+                blog="/blog/postgrest-11-prerelease"
+              />
+            </div>
+          </div>
+        </SectionContainer>
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
           <div className="flex flex-col mb-16">
             <Badge className="mb-4 w-fit bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
