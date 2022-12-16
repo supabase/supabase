@@ -5,14 +5,56 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 14 Dec 2022 23:11:00 +0000</lastBuildDate>
+      <lastBuildDate>Thu, 15 Dec 2022 23:11:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/vault-now-in-beta</guid>
+  <title>Supabase Vault is now in Beta</title>
+  <link>https://supabase.com/blog/vault-now-in-beta</link>
+  <description>A Postgres extension to store encrypted secrets and encrypt data.</description>
+  <pubDate>Thu, 15 Dec 2022 23:11:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pitr</guid>
+  <title>Point in Time Recovery is now available for self-serve for select Pro projects</title>
+  <link>https://supabase.com/blog/pitr</link>
+  <description>PITR available for self-serve on select projects</description>
+  <pubDate>Thu, 15 Dec 2022 23:11:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pg-graphql-v1</guid>
+  <title>pg_graphql v1.0</title>
+  <link>https://supabase.com/blog/pg-graphql-v1</link>
+  <description>Announcing the v1.0 release of pg_graphql</description>
+  <pubDate>Thu, 15 Dec 2022 23:11:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-6-wrap-up</guid>
+  <title>pg_graphql v1.0</title>
+  <link>https://supabase.com/blog/launch-week-6-wrap-up</link>
+  <description>Announcing the v1.0 release of pg_graphql</description>
+  <pubDate>Thu, 15 Dec 2022 23:11:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/custom-domain-names</guid>
+  <title>Custom Domain Names</title>
+  <link>https://supabase.com/blog/custom-domain-names</link>
+  <description>Change your Supabase project's domain name to your own domain.</description>
+  <pubDate>Thu, 15 Dec 2022 23:11:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</guid>
   <title>Supabase Wrappers, a Postgres FDW framework written in Rust</title>
   <link>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</link>
   <description>A framework for building Postgres Foreign Data Wrappers which connects to Stripe, Firebase, Clickhouse, and more.</description>
   <pubDate>Wed, 14 Dec 2022 23:11:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/mfa-auth-via-rls</guid>
+  <title>Multi-factor Authentication via Row Level Security Enforcement</title>
+  <link>https://supabase.com/blog/mfa-auth-via-rls</link>
+  <description>MFA Auth with enforcement via RLS</description>
+  <pubDate>Tue, 13 Dec 2022 23:11:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/storage-image-resizing-smart-cdn</guid>
