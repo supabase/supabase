@@ -134,7 +134,9 @@ functions:
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
 
           Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
-          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
+          any URL path on your website (the URL must either be on the same domain as your [Site URL](https://app.supabase.com/project/_/auth/url-configuration) or match one of the Redirect URLs).
+
+          See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -502,8 +504,10 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
       Sends a password reset request to an email address.
-      When the user clicks the reset link in the email they are redirected back to your application.
-      Prompt the user for a new password and call `auth.update()`:
+      - When the user clicks the reset link in the email they are redirected back to your application.
+      You can configure the URL that the user is redirected to via the `redirectTo` param. 
+      See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.update({
         password: new_password,
@@ -516,7 +520,8 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-            'user@email.com'
+            email,
+            { redirectTo: 'https://example.com/update-password' }
           )
           ```
       - id: reset-password-react
@@ -529,7 +534,8 @@ functions:
            * This email contains a link which sends the user back to your application.
            */
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-            'user@email.com'
+            email,
+            { redirectTo: 'https://example.com/update-password' }
           )
 
           /**
