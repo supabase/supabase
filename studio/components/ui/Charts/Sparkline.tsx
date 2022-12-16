@@ -1,11 +1,7 @@
-import { useState } from 'react'
-import { LineChart, Bar, XAxis, Tooltip, Legend, Cell, TooltipProps, Line } from 'recharts'
-import ChartHeader from './ChartHeader'
-import { CHART_COLORS, STACK_COLORS, DateTimeFormats } from './Charts.constants'
+import { LineChart, XAxis, Line } from 'recharts'
+import { CHART_COLORS } from './Charts.constants'
 import { CommonChartProps } from './Charts.types'
-import { timestampFormatter, useChartSize, useStacked } from './Charts.utils'
-import { precisionFormatter } from './Charts.utils'
-import NoDataPlaceholder from './NoDataPlaceholder'
+import { useChartSize } from './Charts.utils'
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
   yAxisKey: string
