@@ -23,20 +23,19 @@ export interface DbQueryHandler {
 export type MetaQueryResponse = any & { error: ResponseError }
 
 export type BaseReportParams = typeof DEFAULT_QUERY_PARAMS & { sql?: string } & unknown
-
-export type VariableSql = string | ((params: BaseReportParams) => string)
-
-export type PresetSql = string | VariableSql
-
 export interface PresetConfig {
   title: string
-  queries: Record<
-    string,
-    {
-      sql: PresetSql
-      queryType: 'logs' | 'db'
-    }
-  >
+  queries: Record<string, DbQuery | LogsQuery>
+}
+
+interface DbQuery {
+  queryType: 'db'
+  sql: (params: BaseReportParams) => string
+}
+
+interface LogsQuery {
+  queryType: 'logs'
+  sql: string
 }
 export interface StatusCodesDatum {
   timestamp: number

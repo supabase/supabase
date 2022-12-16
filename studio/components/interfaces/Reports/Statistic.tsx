@@ -43,7 +43,12 @@ const Statistic: React.FC<Props> = ({
         </div>
       )}
       {showSparkline && (
-        <Sparkline data={sparklineData} xAxisKey={sparklineXAxis} yAxisKey={sparklineYAxis} size="small" />
+        <Sparkline
+          data={sparklineData}
+          xAxisKey={sparklineXAxis}
+          yAxisKey={sparklineYAxis}
+          size="small"
+        />
       )}
     </div>
   )

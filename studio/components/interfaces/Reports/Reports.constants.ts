@@ -159,7 +159,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
     queries: {
       bannedUsers: {
         queryType: "db",
-        sql: `
+        sql: (_params)=> `
 select 
   count(distinct u.id) as count
 from auth.users u
@@ -169,25 +169,26 @@ limit 1
       },  
       unverifiedUsers: {
         queryType: "db",
-        sql: `
+        sql: (params)=> `
 select 
   date_trunc('day', u.created_at) as timestamp,
   count(distinct u.id) as count
 from auth.users u
-where u.confirmed_at is null
+where u.confirmed_at is null and '${params.iso_timestamp_start}' < u.created_at 
 group by timestamp
 order by timestamp desc
         `
       },  
       signUpProviders: {
         queryType: "db",
-        sql: `
+        sql: (params) => `
 select 
   sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count, 
   date_trunc('day', u.created_at) as timestamp, 
   i.provider as provider
 from auth.users u
 join auth.identities as i on u.id = i.user_id
+where date_trunc('day', u.created_at) > '${params.iso_timestamp_start}'
 group by timestamp, provider
 order by timestamp desc
         `
@@ -218,25 +219,25 @@ order by
       },
       cumulativeUsers: {
         queryType: 'db',
-        sql: `
+        sql: params => `
         
 select 
   date_trunc('day', u.created_at) as timestamp, 
   sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count
 from auth.users as u
-where u.confirmed_at is not null
+where u.confirmed_at is not null and date_trunc('day', u.created_at) > '${params.iso_timestamp_start}'
 group by timestamp
 order by timestamp desc
         `,
       },
       newUsers: {
         queryType: 'db',
-        sql: `
+        sql: params => `
 select 
 date_trunc('day', u.created_at) as timestamp,
 count(u.id) as count
 from auth.users as u
-where u.confirmed_at is not null
+where u.confirmed_at is not null and date_trunc('day', u.created_at) > '${params.iso_timestamp_start}'
 group by 
   timestamp
 order by
