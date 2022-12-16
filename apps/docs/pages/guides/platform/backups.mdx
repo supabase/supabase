@@ -23,11 +23,11 @@ All Pro and Enterprise tier Supabase projects are backed up automatically on a d
 
 ### Backup Process [#daily-backups-process]
 
-The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping. You can access daily backups in the [Scheduled Database Backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro tier projects can access the last 7 days’ worth of daily backups while Enterprise tier projects can access up to 30 days’ worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
+The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping. 
 
 ![Scheduled backups dashboard](/docs/img/backups-daily-dashboard.png)
 
-You can access daily backups in the [Scheduled Backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard.
+You can access daily backups in the [Scheduled backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro tier projects can access the last 7 days’ worth of daily backups while Enterprise tier projects can access up to 30 days’ worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
 
 ### Restoration Process [#daily-backups-restoration-process]
 
