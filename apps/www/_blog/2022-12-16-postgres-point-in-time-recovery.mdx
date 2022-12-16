@@ -1,6 +1,6 @@
 ---
-title: 'Point in Time Recovery is now available for self-serve for select Pro projects'
-description: PITR available for self-serve on select projects
+title: 'Point in Time Recovery is now available for Pro projects'
+description: "We're making PITR available for more projects, with a new Dashboard UI that makes it simple to use."
 author: angelico_de_los_reyes
 image: launch-week-6/wrappers/wrappers-og.png
 thumb: launch-week-6/wrappers/wrappers-og.png
@@ -12,27 +12,29 @@ date: '2022-12-16'
 toc_depth: 3
 ---
 
-Today, Pro-tier projects and above created from August 2022 onwards, aside from those created in the Northeast Asia (Seoul) region, can now have Point In Time Recovery (PITR) enabled from the dashboard. Projects would minimally have to be in the Small compute add-on as well to ensure that PITR operates smoothly behind the scenes.
+When we announced Point-in-Time a few months ago, it was only available for Enterprise customers. Today, w're making PITR available for more projects, with a new Dashboard UI that makes it simple to use.
 
-For older projects, fret not, we are working on making it available for self-serve as well . In the meantime, if you would like to have PITR enabled for your ineligible project, do reach out to us [here](<[https://app.supabase.com/support/new](https://app.supabase.com/support/new)>), or stay tuned for further updates.
+Pro-tier projects created from August 2022 onwards (excluding Northeast Asia / Seoul region), can now enable Point In Time Recovery (PITR) from the dashboard. Projects must have the "Small" compute add-on to ensure that PITR operates smoothly behind the scenes.
+
+For older projects, don't worry - we're working on making it availability for everybody. In the meantime, if you would like to have PITR enabled for your ineligible project, reach out directly [here](https://app.supabase.com/support/new), or stay tuned for further updates.
 
 ## What is Point in Time Recovery?
 
-Point in Time Recovery does exactly how it sounds: It provides the ability for a database to be restored at any specified point in time. This comes extremely useful when averting disasters, which could be as big as a natural calamity or as simple as a dropped table column. With PITR, the database could be restored to a state it was in mere seconds before trouble.
+Point in Time Recovery provides the ability for a database to be restored at any specified point in time. This is useful when averting disasters, for all those times that a, _cough_, natural calamity strikes (like accidently dropping a table). With PITR, the database can be restored to a state it was in mere seconds before trouble.
 
-All of this is made possible by a combination of taking physical backups of a project, as well as archiving [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) files. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
+All of this is made possible by a combination of physical backups and archives from the [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html). Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
 
-Under the hood, we use [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, to handle all aspects of PITR. We also considered other similar open source tools as well such as [pgBackRest](https://pgbackrest.org/) and [Barman](https://pgbarman.org/) but ultimately chose WAL-G as the best fit with our underlying architecture. On a daily basis, WAL-G takes a snapshot of the database and sends it to our storage servers. Throughout the day, as database transactions occur, WAL files are generated and uploaded by it.
+Under the hood, we use [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, to handle all aspects of PITR. On a daily basis, WAL-G takes a snapshot of the database and sends it to our storage servers. Throughout the day, as database transactions occur, WAL files are generated and uploaded to archived.
 
-## Should I enable it?
+## Should I enable PITR?
 
-When deciding whether to enable Point in Time Recovery for your project, the key business metric, Recovery Point Objective (RPO), should be considered. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This amount however is fully dependent on a business and its underlying requirements. The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
+Consider your Recovery Point Objective (RPO) when deciding whether to enable Point in Time Recovery. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This is dependent on a business and its underlying requirements. The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
 
-While all Pro-tier projects and above are backed up on a daily basis, this means that at the worst case, a project could lose up to 24 hours worth of data if disaster hits at the most inopportune time. With Point in Time Recovery however, backups are made at much shorter intervals, thus shortening RPO. At most, WAL files are backed up at two minute intervals. This could be faster if it hits a certain file threshold before the the two minute mark. As such at the worst case, a project would only lose up to two minutes worth of data following a disaster.
+While all Pro-tier projects and above are backed up on a daily basis, this means that at the worst case, a project could lose up to 24 hours worth of data if disaster hits at the most inopportune time. With Point in Time Recovery however, backups are made at much shorter intervals, shortening the RPO. WAL files are backed up at two minute intervals. This could be faster if it hits a certain file threshold before the the two minute mark.
 
 ## Getting started
 
-Enabling Point in Time Recovery could be done [here](<[https://app.supabase.com/project/_/settings/billing/update/pro](https://app.supabase.com/project/_/settings/billing/update/pro)>). Retention for backups used by PITR is set to up to 7 days by default but could be increased to up to 28 days via self-serve.
+Enabling Point in Time Recovery could be done [in the Dashboard](https://app.supabase.com/project/_/settings/billing/update/pro). Retention for backups used by PITR is set to up to 7 days by default but could be increased to up to 28 days via self-serve.
 
 ## More Launch Week 6
 
