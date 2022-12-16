@@ -735,8 +735,8 @@ functions:
       - A `SIGNED_IN` and `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked. 
       You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
       - When the user clicks the reset link in the email they are redirected back to your application.
-      You can configure the URL that the user is redirected to via the `redirectTo` param. 
-      Please refer to [this guide](/docs/guides/auth/overview#redirect-urls-and-wildcards) on how to add additional redirect URLs to your project.
+      You can configure the URL that the user is redirected to with the `redirectTo` parameter. 
+      See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.updateUser({ 
