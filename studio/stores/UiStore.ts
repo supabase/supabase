@@ -184,7 +184,7 @@ export default class UiStore implements IUiStore {
       // dangerous use of string here
       // to do, refactor so that changing the role name does not fail this check
       // if role name does change, then user will simply not be able to leave project as a 'owner' regardless
-      return role && role.name === 'Owner'
+      return role && role.name === 'Owner' && !member.invited_at
     })
 
     console.log('membersWhoAreOwners', membersWhoAreOwners)
