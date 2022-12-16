@@ -1882,4 +1882,9 @@ module.exports = [
     source: '/contact/enterprise',
     destination: 'https://forms.supabase.com/enterprise',
   },
+  {
+    permanent: true,
+    source: '/legal/soc2',
+    destination: 'https://forms.supabase.com/soc2',
+  },
 ]
