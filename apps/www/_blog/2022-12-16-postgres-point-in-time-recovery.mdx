@@ -22,7 +22,7 @@ For older projects, don't worry - we're working on making it availability for ev
 
 ![point in time recovery overview](/images/blog/launch-week-6/pitr/pitr-overview.png)
 
-Point in Time Recovery provides the ability for a database to be restored at any specified point in time. This is useful when averting disasters, for all those times that a, _cough_, natural calamity strikes (like accidently dropping a table). With PITR, the database can be restored to a state it was in mere seconds before trouble.
+Point in Time Recovery provides the ability for a database to be restored at any specified point in time. This is useful when averting disasters, for all those times that a, _cough_, natural calamity strikes (like accidentally dropping a table). With PITR, the database can be restored to a state it was in mere seconds before trouble.
 
 All of this is made possible by a combination of physical backups and archives from the [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html). Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
 
