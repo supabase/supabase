@@ -1,84 +1,74 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IconCheck } from 'ui'
 
 export const meta = {
   title: 'Access Control',
   description: 'Roles and permissions at the organization level',
 }
 
-Supabase provides granular access control features that let you manage permissions across your organizations.
-
-Within a Supabase organization, a member can have one of the following roles:
+Supabase provides granular access controls to manage permissions across your organizations.
+For each organization, a member can have one of the following roles:
 
 - Owner
 - Administrator
 - Developer
 
-A default organization is created for a user when they first sign-in and
-assigned the **Owner** role. If the user wants to invite others
-to collaborate within the organization, they can visit the organization team
-settings (`https://app.supabase.com/org/<org-slug>/settings#team`) to send an
-invite link to another user's email. The invite expires after 24 hours.
-
-Invites sent from a SSO account can only be accepted by another SSO account
-coming from the same identity provider. This is a security measure that
-prevents accidental invites to accounts not managed by your company's
-enterprise systems.
-
-Project level invites are not available at this time. A member of the
-organization will be able to access all projects under the organization. If you
-wish to restrict access to certain projects, please create another organization
-to manage this.
+A default organization is created when you first sign in and
+you'll be assigned the **Owner** role.
+Each member can access all projects under the organization.
+Project level invites are not available at this time.
+Create a separate organization if you need to restrict access to certain projects.
 
 ## Manage team members
 
-You can invite your team members into your organizations to collaborate on projects.
-
-<video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/invite-team.mp4" type="video/mp4" muted playsInline />
-</video>
+To invite others to collaborate, visit your organization's team settings in the
+[Dashboard](https://app.supabase.com/projects) to send an invite link to
+another user's email. The invite expires after 24 hours.
 
 ### Permissions across roles [#permission-across-roles]
 
 The table below shows the corresponding permissions for each available role you can assign a team member in the Dashboard.
 
-| Permissions              | Owner | Administrator | Developer |
-| ------------------------ | ----- | ------------- | --------- |
+| Permissions              | Owner                   | Administrator           | Developer               |
+| ------------------------ | ----------------------- | ----------------------- | ----------------------- |
 | **Organization**         |
-| Change organization name | ✅    |               |           |
-| Delete organization      | ✅    |               |           |
+| Change organization name | <IconCheck size={14} /> |                         |                         |
+| Delete organization      | <IconCheck size={14} /> |                         |                         |
 | **Members**              |
-| Add an Owner             | ✅    |               |           |
-| Remove an Owner          | ✅    |               |           |
-| Add an Administrator     | ✅    | ✅            |           |
-| Remove an Administrator  | ✅    | ✅            |           |
-| Add a Developer          | ✅    | ✅            |           |
-| Remove a Developer       | ✅    | ✅            |           |
-| Revoke an invite         | ✅    | ✅            |           |
-| Resend an invite         | ✅    | ✅            |           |
-| Accept an invite[^1]     | ✅    | ✅            | ✅        |
+| Add an Owner             | <IconCheck size={14} /> |                         |                         |
+| Remove an Owner          | <IconCheck size={14} /> |                         |                         |
+| Add an Administrator     | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Remove an Administrator  | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Add a Developer          | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Remove a Developer       | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Revoke an invite         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Resend an invite         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Accept an invite[^1]     | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
 | **Billing**              |
-| Read invoices            | ✅    | ✅            | ✅        |
-| Read billing email       | ✅    | ✅            | ✅        |
-| Change billing email     | ✅    |               |           |
-| View subscription        | ✅    | ✅            | ✅        |
-| Update subscription      | ✅    | ✅            |           |
-| Read billing address     | ✅    | ✅            | ✅        |
-| Update billing address   | ✅    | ✅            |           |
-| Read tax codes           | ✅    | ✅            | ✅        |
-| Update tax codes         | ✅    | ✅            |           |
-| Read payment methods     | ✅    | ✅            | ✅        |
-| Update payment methods   | ✅    | ✅            |           |
+| Read invoices            | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Read billing email       | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Change billing email     | <IconCheck size={14} /> |                         |                         |
+| View subscription        | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Update subscription      | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Read billing address     | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Update billing address   | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Read tax codes           | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Update tax codes         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Read payment methods     | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Update payment methods   | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
 | **Projects**             |
-| Create a project         | ✅    | ✅            |           |
-| Delete a project         | ✅    | ✅            |           |
-| Update a project         | ✅    | ✅            |           |
-| Pause a project          | ✅    | ✅            |           |
-| Resume a project         | ✅    | ✅            |           |
-| Restart a project        | ✅    | ✅            | ✅        |
+| Create a project         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Delete a project         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Update a project         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Pause a project          | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Resume a project         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
+| Restart a project        | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
 
 [^1]:
-    If the invite was sent from a SSO account, it can only be accepted from
-    a user signed in via the same identity provider.
+    Invites sent from a SSO account can only be accepted by another SSO account
+    coming from the same identity provider. This is a security measure that
+    prevents accidental invites to accounts not managed by your company's
+    enterprise systems.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
