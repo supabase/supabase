@@ -50,7 +50,9 @@ Add `io.supabase.flutterquickstart://login-callback/` as a new [redirect URL](ht
 
 That is it on Supabase's end and the rest are platform specific settings:
 
-For Android, add an intent-filter to enable deep linking:
+For Android, edit the android/app/src/main/AndroidManifest.xml file.
+
+Add an intent-filter to enable deep linking:
 
 ```xml title=android/app/src/main/AndroidManifest.xml
 <manifest ...>
@@ -75,7 +77,9 @@ For Android, add an intent-filter to enable deep linking:
 </manifest>
 ```
 
-For iOS add CFBundleURLTypes to enable deep linking:
+For iOS, edit the ios/Runner/Info.plist file. 
+
+Add CFBundleURLTypes to enable deep linking:
 
 ```xml title=ios/Runner/Info.plist"
 <!-- ... other tags -->
