@@ -65,6 +65,12 @@ const home = [
       level: 'resources',
     },
     {
+      label: 'Self Hosting',
+      icon: '/img/icons/menu/platform',
+      href: '/guides/self-hosting',
+      level: 'self_hosting',
+    },
+    {
       label: 'Integrations',
       icon: '/img/icons/menu/integrations',
       hasLightIcon: true,

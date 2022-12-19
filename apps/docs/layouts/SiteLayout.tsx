@@ -63,6 +63,10 @@ const SiteRefLayout = ({ children }) => {
       icon: '/docs/img/icons/menu/resources',
       name: 'Resources',
     },
+    self_hosting: {
+      icon: '/docs/img/icons/menu/self-hosting',
+      name: 'Self Hosting',
+    },
     integrations: {
       icon: '/docs/img/icons/menu/integrations',
       name: 'Integrations',

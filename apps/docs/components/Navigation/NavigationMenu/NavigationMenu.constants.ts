@@ -570,13 +570,16 @@ export const resources = {
         },
       ],
     },
-    {
-      name: 'Self-Hosting',
-      items: [
-        { name: 'Overview', url: '/guides/resources/self-hosting', items: [] },
-        { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
-      ],
-    },
+  ],
+}
+
+export const self_hosting = {
+  title: 'Self-Hosting',
+  icon: 'resources',
+  url: '/guides/self-hosting',
+  items: [
+    { name: 'Overview', url: '/guides/self-hosting', items: [] },
+    { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker', items: [] },
     {
       name: 'Self-Hosting Reference',
       items: [
@@ -600,15 +603,6 @@ export const resources = {
         },
       ],
     },
-  ],
-}
-
-export const selfHosting = {
-  label: 'Self-Hosting',
-  url: '/guides/self-hosting',
-  items: [
-    { name: 'Overview', url: '/guides/hosting/overview', items: [] },
-    { name: 'Docker', url: '/guides/hosting/docker', items: [] },
   ],
 }
 
