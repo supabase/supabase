@@ -34,6 +34,7 @@ Sentry.init({
     // Ref: https://stackoverflow.com/questions/72437786/chrome-evalerror-possible-side-effect-in-debug
     'Possible side-effect in debug-evaluate',
   ],
+  beforeSend: (event) => filterConsoleErrors(event),
 })
 
 // replace dynamic query param with a template text
@@ -60,4 +61,65 @@ function standardiseRouterUrl(url) {
   }
 
   return finalUrl
+}
+
+// Ignore dev console errors getting incorrectly thrown to sentry (Chrome specific)
+// https://github.com/getsentry/sentry-javascript/issues/5179#issuecomment-1206343862
+function filterConsoleErrors(event) {
+  const originalException = event.exception?.values?.[0]
+
+  // Console errors appear to always bubble up to `window.onerror` and to be unhandled. So if,
+  // we don't have the original exception or the mechanism looks different, we can early return the event.
+  // (Note, this might change depending on the used framework, so feel free to remove this check.)
+  if (
+    !originalException ||
+    !originalException.mechanism ||
+    originalException.mechanism.type !== 'onerror' ||
+    originalException.mechanism.handled
+  ) {
+    return event
+  }
+
+  const stackFrames = originalException.stacktrace?.frames
+  const errorType = originalException.type?.toLowerCase()
+
+  // If we don't have any information on error type or stacktrace, we have no information about the error
+  // this is unlikely to happen but it doesn't appear to happen in console errors.
+  // Hence, we can early return here as well.
+  if (!stackFrames || !errorType) {
+    return event
+  }
+
+  // For simple console errors (e.g. users just typing a statement they want evaluated)
+  // the stacktrace will only have one frame.
+  // This condition will not catch errors that would be thrown if users type in multi-line
+  // statements. For example, if they define a multi-line function.
+  // You can try experimenting with this number but there's little guarantee that the other
+  // conditions will work. Nevertheless, the checks below also work with multi-frame stacktraces.
+  const hasShortStackTrace = stackFrames.length <= 2
+  if (hasShortStackTrace && isSuspiciousError(errorType) && hasSuspiciousFrames(stackFrames)) {
+    console.warn('Dropping error due to suspicious stack frames.')
+    return null
+  }
+
+  return event
+}
+
+function isSuspiciousError(errorType) {
+  return ['syntaxerror', 'referenceerror', 'typeerror'].includes(errorType)
+}
+
+function hasSuspiciousFrames(stackFrames) {
+  const allSuspicious = stackFrames.every(isSuspiciousFrame)
+
+  // Certain type errors will include the thrown error message as the second stack frame,
+  // but the first will still follow the suspicious pattern.
+  const firstSuspicious = stackFrames.length === 2 && isSuspiciousFrame(stackFrames[0])
+
+  return allSuspicious || firstSuspicious
+}
+
+function isSuspiciousFrame(frame) {
+  const url = window.location.href
+  return frame.function === '?' && (frame.filename === '<anonymous>' || frame.filename === url)
 }
