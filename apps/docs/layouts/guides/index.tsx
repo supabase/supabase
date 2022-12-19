@@ -76,7 +76,7 @@ const Layout: FC<Props> = (props) => {
         }}
       />
 
-      <div className={['grid grid-cols-12 relative'].join(' ')}>
+      <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
         <div
           className={[
             'relative',
