@@ -24,7 +24,7 @@ export const getRolesManagementPermissions = (
   return { rolesAddable, rolesRemovable }
 }
 
-export const hasMultipleOwners = (members: Member[], roles: Role[]) => {
+export const hasMultipleOwners = (members: Member[] = [], roles: Role[] = []) => {
   const membersWhoAreOwners = members.filter((member) => {
     const [memberRoleId] = member.role_ids ?? []
     const role = roles.find((role: Role) => role.id === memberRoleId)
