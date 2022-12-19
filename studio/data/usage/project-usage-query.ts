@@ -13,12 +13,14 @@ export interface DbSize {
   limit: number
   cost: number
   current: number
+  available_in_plan: boolean
 }
 
 export interface DbEgress {
   usage: number
   limit: number
   cost: number
+  available_in_plan: boolean
 }
 
 export interface StorageSize {
@@ -26,18 +28,21 @@ export interface StorageSize {
   limit: number
   cost: number
   current: number
+  available_in_plan: boolean
 }
 
 export interface StorageEgress {
   usage: number
   limit: number
   cost: number
+  available_in_plan: boolean
 }
 
 export interface MonthlyActiveUsers {
   usage: number
   limit: number
   cost: number
+  available_in_plan: boolean
 }
 
 export type ProjectUsageResponse = {
