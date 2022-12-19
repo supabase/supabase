@@ -87,8 +87,8 @@
     ]
   },
   {
-    "title": "Day 5",
-    "shipped": false,
+    "title": "Supabase Vault Release",
+    "shipped": true,
     "date": "16 Dec 2022",
     "description": "Vault Release",
     "d": 5,
@@ -96,6 +96,19 @@
     "youtube_id": "6bGQotxisoY",
     "blogpost": "https://supabase.com/blog",
     "docs": "https://supabase.com/docs",
-    "steps": []
+    "steps": [
+      {
+        "title": "Vault Release",
+        "blog": "/blog/vault-now-in-beta",
+        "isNew": true,
+        "description": ""
+      },
+      {
+        "title": "Transparent Column Encryption",
+        "description": "Faster asset delivery, now even faster.",
+        "blog": "/blog/transparent-column-encryption-with-postgres",
+        "isNew": true
+      }
+    ]
   }
 ]
