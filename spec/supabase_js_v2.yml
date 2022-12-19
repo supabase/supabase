@@ -215,7 +215,8 @@ functions:
       - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -260,8 +261,8 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -734,7 +735,9 @@ functions:
       - A `SIGNED_IN` and `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked. 
       You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
       - When the user clicks the reset link in the email they are redirected back to your application.
-      Prompt the user for a new password and call `updateUser()`:
+      You can configure the URL that the user is redirected to with the `redirectTo` parameter. 
+      See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.updateUser({ 
         password: new_password 
@@ -965,6 +968,17 @@ functions:
         name: Query foreign tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+          ```
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
         code: |
