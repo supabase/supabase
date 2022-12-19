@@ -25,7 +25,7 @@ const FunctionsEmptyState = () => {
             </Link>
             <Link
               passHref
-              href="https://github.com/supabase/supabase/tree/chore/stripe-issue/examples/edge-functions/supabase/functions"
+              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
             >
               <a target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconCode />}>

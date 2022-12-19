@@ -62,7 +62,9 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 </span>
                 {/* Project Dropdown */}
                 <ProjectDropdown />
-                {showOverUsageBadge && (
+
+                {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
+                {/* {showOverUsageBadge && (
                   <div className="ml-2">
                     <Link href={`/project/${projectRef}/settings/billing/subscription`}>
                       <a>
@@ -70,7 +72,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                       </a>
                     </Link>
                   </div>
-                )}
+                )} */}
               </>
             )}
           </>

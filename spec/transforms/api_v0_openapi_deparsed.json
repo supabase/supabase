@@ -31,6 +31,18 @@
                       },
                       "created_at": {
                         "type": "string"
+                      },
+                      "database": {
+                        "type": "object",
+                        "properties": {
+                          "host": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["host", "version"]
                       }
                     },
                     "required": ["id", "organization_id", "name", "region", "created_at"]
@@ -82,6 +94,7 @@
                       "ap-southeast-2",
                       "eu-west-1",
                       "eu-west-2",
+                      "eu-west-3",
                       "eu-central-1",
                       "ca-central-1",
                       "ap-south-1",
@@ -119,6 +132,18 @@
                     },
                     "created_at": {
                       "type": "string"
+                    },
+                    "database": {
+                      "type": "object",
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["host", "version"]
                     }
                   },
                   "required": ["id", "organization_id", "name", "region", "created_at"]
@@ -268,8 +293,63 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "",
@@ -302,6 +382,9 @@
                     },
                     "verify_jwt": {
                       "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -324,15 +407,8 @@
             "description": "Failed to create project's function"
           }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          },
           {
             "apiKeyHeader": [],
             "apiKeyParam": []
@@ -393,6 +469,9 @@
                       },
                       "verify_jwt": {
                         "type": "boolean"
+                      },
+                      "import_map": {
+                        "type": "boolean"
                       }
                     },
                     "required": [
@@ -416,15 +495,8 @@
             "description": "Failed to retrieve project's functions"
           }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          },
           {
             "apiKeyHeader": [],
             "apiKeyParam": []
@@ -441,14 +513,6 @@
         "summary": "Retrieve a function",
         "description": "Retrieves a function with the specified slug and project.",
         "parameters": [
-          {
-            "name": "include_body",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
           {
             "name": "ref",
             "required": true,
@@ -504,6 +568,9 @@
                     "verify_jwt": {
                       "type": "boolean"
                     },
+                    "import_map": {
+                      "type": "boolean"
+                    },
                     "body": {
                       "type": "string"
                     }
@@ -528,7 +595,7 @@
             "description": "Failed to retrieve function with given slug"
           }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -589,8 +656,53 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -623,6 +735,9 @@
                     },
                     "verify_jwt": {
                       "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -645,7 +760,7 @@
             "description": "Failed to update function with given slug"
           }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -694,12 +809,375 @@
             "description": "Failed to delete function with given slug"
           }
         },
-        "tags": ["projects"],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
             "apiKeyParam": []
           },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}/body": {
+      "get": {
+        "operationId": "getFunctionBody",
+        "summary": "Retrieve a function body",
+        "description": "Retrieves a function body for the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function body with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/secrets": {
+      "get": {
+        "operationId": "getSecrets",
+        "summary": "List all secrets",
+        "description": "Returns all secrets you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["name", "value"]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's secrets"
+          }
+        },
+        "tags": ["secrets"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createSecrets",
+        "summary": "Bulk create secrets",
+        "description": "Creates multiple secrets and adds them to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string",
+                      "pattern": "/^(?!SUPABASE_).*/"
+                    }
+                  },
+                  "required": ["name", "value"]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create project's secrets"
+          }
+        },
+        "tags": ["secrets"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteSecrets",
+        "summary": "Bulk delete secrets",
+        "description": "Deletes all secrets with the given names from the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete secrets with given names"
+          }
+        },
+        "tags": ["secrets"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/postgrest": {
+      "get": {
+        "operationId": "getPostgRESTConfig",
+        "summary": "Gets project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "max_rows": {
+                      "type": "integer"
+                    },
+                    "db_schema": {
+                      "type": "string"
+                    },
+                    "db_extra_search_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's postgrest config"
+          }
+        },
+        "tags": ["services"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updatePostgRESTConfig",
+        "summary": "Updates project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "max_rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000
+                  },
+                  "db_extra_search_path": {
+                    "type": "string"
+                  },
+                  "db_schema": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "max_rows": {
+                      "type": "integer"
+                    },
+                    "db_schema": {
+                      "type": "string"
+                    },
+                    "db_extra_search_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's postgrest config"
+          }
+        },
+        "tags": ["services"],
+        "security": [
           {
             "bearer": []
           }
@@ -1027,7 +1505,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "root_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["root_key"]
                 }
               }
             }
@@ -1084,7 +1568,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "root_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["root_key"]
                 }
               }
             }
@@ -1098,187 +1588,6 @@
         },
         "tags": ["pgsodium (beta)"],
         "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/secrets": {
-      "get": {
-        "operationId": "getSecrets",
-        "summary": "List all secrets",
-        "description": "Returns all secrets you've previously added to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      }
-                    },
-                    "required": ["name", "value"]
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve project's secrets"
-          }
-        },
-        "tags": ["projects"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "post": {
-        "operationId": "createSecrets",
-        "summary": "Bulk create secrets",
-        "description": "Creates multiple secrets and adds them to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string",
-                      "pattern": "/^(?!SUPABASE_).*/"
-                    }
-                  },
-                  "required": ["name", "value"]
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to create project's secrets"
-          }
-        },
-        "tags": ["projects"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "deleteSecrets",
-        "summary": "Bulk delete secrets",
-        "description": "Deletes all secrets with the given names from the specified project",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to delete secrets with given names"
-          }
-        },
-        "tags": ["projects"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
           {
             "bearer": []
           }
@@ -1454,6 +1763,374 @@
           }
         ]
       }
+    },
+    "/v1/projects/{ref}/network-restrictions": {
+      "get": {
+        "operationId": "getNetworkRestrictions",
+        "summary": "Gets project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entitlement": {
+                      "enum": ["disallowed", "allowed"],
+                      "type": "string"
+                    },
+                    "config": {
+                      "type": "object",
+                      "properties": {
+                        "dbAllowedCidrs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["dbAllowedCidrs"]
+                    },
+                    "status": {
+                      "enum": ["stored", "applied"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["entitlement", "config", "status"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's network restrictions"
+          }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions/apply": {
+      "post": {
+        "operationId": "applyNetworkRestrictions",
+        "summary": "Updates project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbAllowedCidrs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["dbAllowedCidrs"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entitlement": {
+                      "enum": ["disallowed", "allowed"],
+                      "type": "string"
+                    },
+                    "config": {
+                      "type": "object",
+                      "properties": {
+                        "dbAllowedCidrs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["dbAllowedCidrs"]
+                    },
+                    "status": {
+                      "enum": ["stored", "applied"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["entitlement", "config", "status"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project network restrictions"
+          }
+        },
+        "tags": ["network restrictions (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain": {
+      "get": {
+        "operationId": "getVanitySubdomainConfig",
+        "summary": "Gets current vanity subdomain config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["not-used", "custom-domain-used", "active"]
+                    },
+                    "custom_domain": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["status"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to get project vanity subdomain configuration"
+          }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "removeVanitySubdomainConfig",
+        "summary": "Deletes a project's vanity subdomain configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete project vanity subdomain configuration"
+          }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/check-availability": {
+      "post": {
+        "operationId": "checkVanitySubdomainAvailability",
+        "summary": "Checks vanity subdomain availability",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vanity_subdomain": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vanity_subdomain"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["available"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to check project vanity subdomain configuration"
+          }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/activate": {
+      "post": {
+        "operationId": "activateVanitySubdomainPlease",
+        "summary": "Activates a vanity subdomain for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vanity_subdomain": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vanity_subdomain"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "custom_domain": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["custom_domain"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to activate project vanity subdomain configuration"
+          }
+        },
+        "tags": ["vanity subdomain (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -1482,6 +2159,18 @@
       }
     },
     "schemas": {
+      "DatabaseResponse": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": ["host", "version"]
+      },
       "ProjectResponse": {
         "type": "object",
         "properties": {
@@ -1499,6 +2188,18 @@
           },
           "created_at": {
             "type": "string"
+          },
+          "database": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": ["host", "version"]
           }
         },
         "required": ["id", "organization_id", "name", "region", "created_at"]
@@ -1530,6 +2231,7 @@
               "ap-southeast-2",
               "eu-west-1",
               "eu-west-2",
+              "eu-west-3",
               "eu-central-1",
               "ca-central-1",
               "ap-south-1",
@@ -1563,6 +2265,25 @@
         },
         "required": ["name"]
       },
+      "CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "/^[A-Za-z0-9_-]+$/"
+          },
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        },
+        "required": ["slug", "name", "body"]
+      },
       "FunctionResponse": {
         "type": "object",
         "properties": {
@@ -1589,6 +2310,9 @@
             "type": "number"
           },
           "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
             "type": "boolean"
           }
         },
@@ -1622,11 +2346,84 @@
           "verify_jwt": {
             "type": "boolean"
           },
+          "import_map": {
+            "type": "boolean"
+          },
           "body": {
             "type": "string"
           }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "UpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SecretResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "CreateSecretBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "pattern": "/^(?!SUPABASE_).*/"
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "PostgrestConfigResponse": {
+        "type": "object",
+        "properties": {
+          "max_rows": {
+            "type": "integer"
+          },
+          "db_schema": {
+            "type": "string"
+          },
+          "db_extra_search_path": {
+            "type": "string"
+          }
+        },
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
+      },
+      "UpdatePostgrestConfigBody": {
+        "type": "object",
+        "properties": {
+          "max_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "db_extra_search_path": {
+            "type": "string"
+          },
+          "db_schema": {
+            "type": "string"
+          }
+        }
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -1659,7 +2456,7 @@
         },
         "required": ["custom_hostname"]
       },
-      "UpdatePgsodiumConfigBody": {
+      "PgsodiumConfigResponse": {
         "type": "object",
         "properties": {
           "root_key": {
@@ -1668,30 +2465,14 @@
         },
         "required": ["root_key"]
       },
-      "SecretResponse": {
+      "UpdatePgsodiumConfigBody": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
+          "root_key": {
             "type": "string"
           }
         },
-        "required": ["name", "value"]
-      },
-      "CreateSecretBody": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string",
-            "pattern": "/^(?!SUPABASE_).*/"
-          }
-        },
-        "required": ["name", "value"]
+        "required": ["root_key"]
       },
       "TypescriptResponse": {
         "type": "object",
@@ -1725,6 +2506,84 @@
           }
         },
         "required": ["ipv4_addresses"]
+      },
+      "NetworkRestrictionsRequest": {
+        "type": "object",
+        "properties": {
+          "dbAllowedCidrs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["dbAllowedCidrs"]
+      },
+      "NetworkRestrictionsResponse": {
+        "type": "object",
+        "properties": {
+          "entitlement": {
+            "enum": ["disallowed", "allowed"],
+            "type": "string"
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "dbAllowedCidrs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["dbAllowedCidrs"]
+          },
+          "status": {
+            "enum": ["stored", "applied"],
+            "type": "string"
+          }
+        },
+        "required": ["entitlement", "config", "status"]
+      },
+      "VanitySubdomainConfigResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["not-used", "custom-domain-used", "active"]
+          },
+          "custom_domain": {
+            "type": "string"
+          }
+        },
+        "required": ["status"]
+      },
+      "VanitySubdomainBody": {
+        "type": "object",
+        "properties": {
+          "vanity_subdomain": {
+            "type": "string"
+          }
+        },
+        "required": ["vanity_subdomain"]
+      },
+      "SubdomainAvailabilityResponse": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": ["available"]
+      },
+      "ActivateVanitySubdomainResponse": {
+        "type": "object",
+        "properties": {
+          "custom_domain": {
+            "type": "string"
+          }
+        },
+        "required": ["custom_domain"]
       }
     }
   }

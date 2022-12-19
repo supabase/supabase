@@ -1,0 +1,92 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Access Control',
+  description: 'Roles and permissions at the organization level',
+}
+
+Supabase provides granular access control features that let you manage permissions across your organizations.
+
+Within a Supabase organization, a member can have one of the following roles:
+
+- Owner
+- Administrator
+- Developer
+
+A default organization is created for a user when they first sign-in and
+assigned the **Owner** role. If the user wants to invite others
+to collaborate within the organization, they can visit the organization team
+settings (`https://app.supabase.com/org/<org-slug>/settings#team`) to send an
+invite link to another user's email. The invite expires after 24 hours.
+
+Invites sent from a SSO account can only be accepted by another SSO account
+coming from the same identity provider. This is a security measure that
+prevents accidental invites to accounts not managed by your company's
+enterprise systems.
+
+Project level invites are not available at this time. A member of the
+organization will be able to access all projects under the organization. If you
+wish to restrict access to certain projects, please create another organization
+to manage this.
+
+## Manage team members
+
+You can invite your team members into your organizations to collaborate on projects.
+
+<video width="99%" muted playsInline controls="true">
+  <source src="/docs/videos/invite-team.mp4" type="video/mp4" muted playsInline />
+</video>
+
+### Transferring ownership of an organization
+
+Each Supabase organization can have one or more owners. If you no longer want be an owner of an organization, click **Leave team** in the members view (`https://app.supabase.com/org/<org-slug>/settings#team`) of your organization.
+However, you can only leave an organization when there is _at least one other owner_.
+
+If you are transferring ownership of your organization to someone else, you will need to invite the new member with the **Owner** role. You can leave the organization after they've accepted the invitation.
+
+### Permissions across roles [#permission-across-roles]
+
+The table below shows the corresponding permissions for each available role you can assign a team member in the Dashboard.
+
+| Permissions              | Owner | Administrator | Developer |
+| ------------------------ | ----- | ------------- | --------- |
+| **Organization**         |
+| Change organization name | ✅    |               |           |
+| Delete organization      | ✅    |               |           |
+| **Members**              |
+| Add an Owner             | ✅    |               |           |
+| Remove an Owner          | ✅    |               |           |
+| Add an Administrator     | ✅    | ✅            |           |
+| Remove an Administrator  | ✅    | ✅            |           |
+| Add a Developer          | ✅    | ✅            |           |
+| Remove a Developer       | ✅    | ✅            |           |
+| Revoke an invite         | ✅    | ✅            |           |
+| Resend an invite         | ✅    | ✅            |           |
+| Accept an invite[^1]     | ✅    | ✅            | ✅        |
+| **Billing**              |
+| Read invoices            | ✅    | ✅            | ✅        |
+| Read billing email       | ✅    | ✅            | ✅        |
+| Change billing email     | ✅    |               |           |
+| View subscription        | ✅    | ✅            | ✅        |
+| Update subscription      | ✅    | ✅            |           |
+| Read billing address     | ✅    | ✅            | ✅        |
+| Update billing address   | ✅    | ✅            |           |
+| Read tax codes           | ✅    | ✅            | ✅        |
+| Update tax codes         | ✅    | ✅            |           |
+| Read payment methods     | ✅    | ✅            | ✅        |
+| Update payment methods   | ✅    | ✅            |           |
+| **Projects**             |
+| Create a project         | ✅    | ✅            |           |
+| Delete a project         | ✅    | ✅            |           |
+| Update a project         | ✅    | ✅            |           |
+| Pause a project          | ✅    | ✅            |           |
+| Resume a project         | ✅    | ✅            |           |
+| Restart a project        | ✅    | ✅            | ✅        |
+
+[^1]:
+    If the invite was sent from a SSO account, it can only be accepted from
+    a user signed in via the same identity provider.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

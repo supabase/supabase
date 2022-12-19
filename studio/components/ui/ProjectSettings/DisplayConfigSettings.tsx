@@ -2,7 +2,8 @@ import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useJwtSecretUpdateStatus, useParams } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { FC } from 'react'
 import { IconAlertCircle, IconLoader, Input } from 'ui'
 
@@ -34,7 +35,7 @@ const DisplayConfigSettings = () => {
   return (
     <ConfigContentWrapper>
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="flex items-center justify-center space-x-2 py-8">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsError
@@ -43,7 +44,7 @@ const DisplayConfigSettings = () => {
           </p>
         </div>
       ) : isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <div className="flex items-center justify-center space-x-2 py-8">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading ? 'Retrieving API keys' : 'JWT secret is being updated'}
@@ -58,7 +59,9 @@ const DisplayConfigSettings = () => {
               copy
               disabled
               className="input-mono"
-              value={`https://${apiConfig?.endpoint ?? '-'}`}
+              value={`${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
+                apiConfig?.endpoint ?? '-'
+              }`}
               descriptionText="A RESTful endpoint for querying and managing your database."
               layout="horizontal"
             />

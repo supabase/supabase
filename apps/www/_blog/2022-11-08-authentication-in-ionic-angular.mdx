@@ -110,7 +110,7 @@ create policy "Groups are viewable by everyone." on groups
   for select using (true);
 
 create policy "Authenticated users can create groups." on groups for
-  insert to authenticated with check (true);  
+  insert to authenticated with check (true);
 
 create policy "The owner can delete a group." on groups for
     delete using (auth.uid() = creator);
@@ -197,47 +197,39 @@ First of all we want to pass a **groupid** to our messages page, and we also wan
 Therefore bring up the **src/app/app-routing.module.ts** and change it to:
 
 ```ts
-import { AuthGuard } from "./guards/auth.guard";
-import { NgModule } from "@angular/core";
-import { PreloadAllModules, RouterModule, Routes } from "@angular/router";
+import { AuthGuard } from './guards/auth.guard'
+import { NgModule } from '@angular/core'
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
 const routes: Routes = [
   {
-    path: "",
-    loadChildren: () =>
-      import("./pages/login/login.module").then((m) => m.LoginPageModule),
+    path: '',
+    loadChildren: () => import('./pages/login/login.module').then((m) => m.LoginPageModule),
   },
   {
-    path: "register",
+    path: 'register',
     loadChildren: () =>
-      import("./pages/register/register.module").then(
-        (m) => m.RegisterPageModule
-      ),
+      import('./pages/register/register.module').then((m) => m.RegisterPageModule),
   },
   {
-    path: "groups",
-    loadChildren: () =>
-      import("./pages/groups/groups.module").then((m) => m.GroupsPageModule),
+    path: 'groups',
+    loadChildren: () => import('./pages/groups/groups.module').then((m) => m.GroupsPageModule),
   },
   {
-    path: "groups/:groupid",
+    path: 'groups/:groupid',
     loadChildren: () =>
-      import("./pages/messages/messages.module").then(
-        (m) => m.MessagesPageModule
-      ),
+      import('./pages/messages/messages.module').then((m) => m.MessagesPageModule),
     canActivate: [AuthGuard],
   },
   {
-    path: "",
-    redirectTo: "home",
-    pathMatch: "full",
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
   },
-];
+]
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
-  ],
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
@@ -254,9 +246,9 @@ This information now goes straight into the **src/environments/environment.ts** 
 ```ts
 export const environment = {
   production: false,
-  supabaseUrl: "https://YOUR-APP.supabase.co",
-  supabaseKey: "YOUR-ANON-KEY",
-};
+  supabaseUrl: 'https://YOUR-APP.supabase.co',
+  supabaseKey: 'YOUR-ANON-KEY',
+}
 ```
 
 By the way: The `anon` key is safe to use in a frontend project since we have enabled RLS on our database tables!
@@ -283,87 +275,82 @@ Now move on by changing the **src/app/services/auth.service.ts** to this:
 
 ```ts
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { isPlatform } from "@ionic/angular";
-import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
-import { BehaviorSubject, Observable } from "rxjs";
-import { environment } from "../../environments/environment";
+import { Injectable } from '@angular/core'
+import { Router } from '@angular/router'
+import { isPlatform } from '@ionic/angular'
+import { createClient, SupabaseClient, User } from '@supabase/supabase-js'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { environment } from '../../environments/environment'
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthService {
-  private supabase: SupabaseClient;
-  private currentUser: BehaviorSubject<User | boolean> = new BehaviorSubject(
-    null
-  );
+  private supabase: SupabaseClient
+  private currentUser: BehaviorSubject<User | boolean> = new BehaviorSubject(null)
 
   constructor(private router: Router) {
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
-    );
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
 
     this.supabase.auth.onAuthStateChange((event, sess) => {
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        console.log("SET USER");
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        console.log('SET USER')
 
-        this.currentUser.next(sess.user);
+        this.currentUser.next(sess.user)
       } else {
-        this.currentUser.next(false);
+        this.currentUser.next(false)
       }
-    });
+    })
 
     // Trigger initial session load
-    this.loadUser();
+    this.loadUser()
   }
 
   async loadUser() {
     if (this.currentUser.value) {
       // User is already set, no need to do anything else
-      return;
+      return
     }
-    const user = await this.supabase.auth.getUser();
+    const user = await this.supabase.auth.getUser()
 
     if (user.data.user) {
-      this.currentUser.next(user.data.user);
+      this.currentUser.next(user.data.user)
     } else {
-      this.currentUser.next(false);
+      this.currentUser.next(false)
     }
   }
 
   signUp(credentials: { email; password }) {
-    return this.supabase.auth.signUp(credentials);
+    return this.supabase.auth.signUp(credentials)
   }
 
   signIn(credentials: { email; password }) {
-    return this.supabase.auth.signInWithPassword(credentials);
+    return this.supabase.auth.signInWithPassword(credentials)
   }
 
   sendPwReset(email) {
-    return this.supabase.auth.resetPasswordForEmail(email);
+    return this.supabase.auth.resetPasswordForEmail(email)
   }
 
   async signOut() {
-    await this.supabase.auth.signOut();
-    this.router.navigateByUrl("/", { replaceUrl: true });
+    await this.supabase.auth.signOut()
+    this.router.navigateByUrl('/', { replaceUrl: true })
   }
 
   getCurrentUser(): Observable<User | boolean> {
-    return this.currentUser.asObservable();
+    return this.currentUser.asObservable()
   }
 
   getCurrentUserId(): string {
     if (this.currentUser.value) {
-      return (this.currentUser.value as User).id;
+      return (this.currentUser.value as User).id
     } else {
-      return null;
+      return null
     }
   }
 
   signInWithEmail(email: string) {
-    return this.supabase.auth.signInWithOtp({ email });
+    return this.supabase.auth.signInWithOtp({ email })
   }
 }
 ```
@@ -377,24 +364,18 @@ Although we first need to register a user, we begin with the login page. We can 
 To create a decent UX we will add a **reactive form** with Angular, for which we first need to import the `ReactiveFormsModule` into the **src/app/pages/login/login.module.ts**:
 
 ```ts
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NgModule } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
-import { IonicModule } from "@ionic/angular";
+import { IonicModule } from '@ionic/angular'
 
-import { LoginPageRoutingModule } from "./login-routing.module";
+import { LoginPageRoutingModule } from './login-routing.module'
 
-import { LoginPage } from "./login.page";
+import { LoginPage } from './login.page'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    LoginPageRoutingModule,
-    ReactiveFormsModule,
-  ],
+  imports: [CommonModule, FormsModule, IonicModule, LoginPageRoutingModule, ReactiveFormsModule],
   declarations: [LoginPage],
 })
 export class LoginPageModule {}
@@ -409,22 +390,22 @@ On login, we now only need to show some loading spinner and call the according f
 Go ahead by changing the **src/app/pages/login/login.page.ts** to this now:
 
 ```ts
-import { AuthService } from "./../../services/auth.service";
-import { Component } from "@angular/core";
-import { FormBuilder, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { LoadingController, AlertController } from "@ionic/angular";
+import { AuthService } from './../../services/auth.service'
+import { Component } from '@angular/core'
+import { FormBuilder, Validators } from '@angular/forms'
+import { Router } from '@angular/router'
+import { LoadingController, AlertController } from '@ionic/angular'
 
 @Component({
-  selector: "app-login",
-  templateUrl: "./login.page.html",
-  styleUrls: ["./login.page.scss"],
+  selector: 'app-login',
+  templateUrl: './login.page.html',
+  styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
   credentials = this.fb.nonNullable.group({
-    email: ["", Validators.required],
-    password: ["", Validators.required],
-  });
+    email: ['', Validators.required],
+    password: ['', Validators.required],
+  })
 
   constructor(
     private fb: FormBuilder,
@@ -435,41 +416,39 @@ export class LoginPage {
   ) {
     this.authService.getCurrentUser().subscribe((user) => {
       if (user) {
-        this.router.navigateByUrl("/groups", { replaceUrl: true });
+        this.router.navigateByUrl('/groups', { replaceUrl: true })
       }
-    });
+    })
   }
 
   get email() {
-    return this.credentials.controls.email;
+    return this.credentials.controls.email
   }
 
   get password() {
-    return this.credentials.controls.password;
+    return this.credentials.controls.password
   }
 
   async login() {
-    const loading = await this.loadingController.create();
-    await loading.present();
+    const loading = await this.loadingController.create()
+    await loading.present()
 
-    this.authService
-      .signIn(this.credentials.getRawValue())
-      .then(async (data) => {
-        await loading.dismiss();
+    this.authService.signIn(this.credentials.getRawValue()).then(async (data) => {
+      await loading.dismiss()
 
-        if (data.error) {
-          this.showAlert("Login failed", data.error.message);
-        }
-      });
+      if (data.error) {
+        this.showAlert('Login failed', data.error.message)
+      }
+    })
   }
 
   async showAlert(title, msg) {
     const alert = await this.alertController.create({
       header: title,
       message: msg,
-      buttons: ["OK"],
-    });
-    await alert.present();
+      buttons: ['OK'],
+    })
+    await alert.present()
   }
 }
 ```
@@ -591,30 +570,18 @@ Bring up the **src/app/pages/login/login.page.html** now and change it to:
             placeholder="Email"
             formControlName="email"
           ></ion-input>
-          <ion-note
-            slot="error"
-            *ngIf="(email.dirty || email.touched) && email.errors"
+          <ion-note slot="error" *ngIf="(email.dirty || email.touched) && email.errors"
             >Please insert your email</ion-note
           >
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Password</ion-label>
-          <ion-input
-            type="password"
-            placeholder="Password"
-            formControlName="password"
-          ></ion-input>
-          <ion-note
-            slot="error"
-            *ngIf="(password.dirty || password.touched) && password.errors"
+          <ion-input type="password" placeholder="Password" formControlName="password"></ion-input>
+          <ion-note slot="error" *ngIf="(password.dirty || password.touched) && password.errors"
             >Please insert your password</ion-note
           >
         </ion-item>
-        <ion-button
-          type="submit"
-          expand="block"
-          strong="true"
-          [disabled]="!credentials.valid"
+        <ion-button type="submit" expand="block" strong="true" [disabled]="!credentials.valid"
           >Sign in</ion-button
         >
 
@@ -630,31 +597,16 @@ Bring up the **src/app/pages/login/login.page.html** now and change it to:
             Create Account
           </ion-button>
 
-          <ion-button
-            type="button"
-            expand="block"
-            color="secondary"
-            (click)="forgotPw()"
-          >
+          <ion-button type="button" expand="block" color="secondary" (click)="forgotPw()">
             <ion-icon name="key-outline" slot="start"></ion-icon>
             Forgot password?
           </ion-button>
 
-          <ion-button
-            type="button"
-            expand="block"
-            color="tertiary"
-            (click)="getMagicLink()"
-          >
+          <ion-button type="button" expand="block" color="tertiary" (click)="getMagicLink()">
             <ion-icon name="mail-outline" slot="start"></ion-icon>
             Get a Magic Link
           </ion-button>
-          <ion-button
-            type="button"
-            expand="block"
-            color="warning"
-            routerLink="groups"
-          >
+          <ion-button type="button" expand="block" color="warning" routerLink="groups">
             <ion-icon name="arrow-forward" slot="start"></ion-icon>
             Start without account
           </ion-button>
@@ -673,7 +625,7 @@ ion-content {
   --padding-start: 5%;
   --padding-end: 5%;
   --background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
-    url("https://images.unsplash.com/photo-1508964942454-1a56651d54ac?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1035&q=80")
+    url('https://images.unsplash.com/photo-1508964942454-1a56651d54ac?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1035&q=80')
       no-repeat;
 }
 ```
@@ -699,24 +651,18 @@ Some users will still prefer the good old registration, so let's provide them wi
 The setup is almost the same as for the login, so we start again by adding the `ReactiveFormsModule` to the **src/app/pages/register/register.module.ts**:
 
 ```ts
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NgModule } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
-import { IonicModule } from "@ionic/angular";
+import { IonicModule } from '@ionic/angular'
 
-import { RegisterPageRoutingModule } from "./register-routing.module";
+import { RegisterPageRoutingModule } from './register-routing.module'
 
-import { RegisterPage } from "./register.page";
+import { RegisterPage } from './register.page'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    RegisterPageRoutingModule,
-    ReactiveFormsModule,
-  ],
+  imports: [CommonModule, FormsModule, IonicModule, RegisterPageRoutingModule, ReactiveFormsModule],
   declarations: [RegisterPage],
 })
 export class RegisterPageModule {}
@@ -727,25 +673,21 @@ Now we define our form just like before, and in the `createAccount()` we use the
 Bring up the **src/app/pages/register/register.page.ts** and change it to:
 
 ```ts
-import { Component } from "@angular/core";
-import { Validators, FormBuilder } from "@angular/forms";
-import {
-  LoadingController,
-  AlertController,
-  NavController,
-} from "@ionic/angular";
-import { AuthService } from "src/app/services/auth.service";
+import { Component } from '@angular/core'
+import { Validators, FormBuilder } from '@angular/forms'
+import { LoadingController, AlertController, NavController } from '@ionic/angular'
+import { AuthService } from 'src/app/services/auth.service'
 
 @Component({
-  selector: "app-register",
-  templateUrl: "./register.page.html",
-  styleUrls: ["./register.page.scss"],
+  selector: 'app-register',
+  templateUrl: './register.page.html',
+  styleUrls: ['./register.page.scss'],
 })
 export class RegisterPage {
   credentials = this.fb.nonNullable.group({
-    email: ["", [Validators.required, Validators.email]],
-    password: ["", [Validators.required, Validators.minLength(6)]],
-  });
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  })
 
   constructor(
     private fb: FormBuilder,
@@ -756,38 +698,36 @@ export class RegisterPage {
   ) {}
 
   get email() {
-    return this.credentials.controls.email;
+    return this.credentials.controls.email
   }
 
   get password() {
-    return this.credentials.controls.password;
+    return this.credentials.controls.password
   }
 
   async createAccount() {
-    const loading = await this.loadingController.create();
-    await loading.present();
+    const loading = await this.loadingController.create()
+    await loading.present()
 
-    this.authService
-      .signUp(this.credentials.getRawValue())
-      .then(async (data) => {
-        await loading.dismiss();
+    this.authService.signUp(this.credentials.getRawValue()).then(async (data) => {
+      await loading.dismiss()
 
-        if (data.error) {
-          this.showAlert("Registration failed", data.error.message);
-        } else {
-          this.showAlert("Signup success", "Please confirm your email now!");
-          this.navCtrl.navigateBack("");
-        }
-      });
+      if (data.error) {
+        this.showAlert('Registration failed', data.error.message)
+      } else {
+        this.showAlert('Signup success', 'Please confirm your email now!')
+        this.navCtrl.navigateBack('')
+      }
+    })
   }
 
   async showAlert(title, msg) {
     const alert = await this.alertController.create({
       header: title,
       message: msg,
-      buttons: ["OK"],
-    });
-    await alert.present();
+      buttons: ['OK'],
+    })
+    await alert.present()
   }
 }
 ```
@@ -816,19 +756,13 @@ The view for that page follows the same structure as the login, so let's continu
             placeholder="Email"
             formControlName="email"
           ></ion-input>
-          <ion-note
-            slot="error"
-            *ngIf="(email.dirty || email.touched) && email.errors"
+          <ion-note slot="error" *ngIf="(email.dirty || email.touched) && email.errors"
             >Please insert a valid email</ion-note
           >
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Password</ion-label>
-          <ion-input
-            type="password"
-            placeholder="Password"
-            formControlName="password"
-          ></ion-input>
+          <ion-input type="password" placeholder="Password" formControlName="password"></ion-input>
           <ion-note
             slot="error"
             *ngIf="(password.dirty || password.touched) && password.errors?.required"
@@ -840,11 +774,7 @@ The view for that page follows the same structure as the login, so let's continu
             >Minlength 6 characters</ion-note
           >
         </ion-item>
-        <ion-button
-          type="submit"
-          expand="block"
-          strong="true"
-          [disabled]="!credentials.valid"
+        <ion-button type="submit" expand="block" strong="true" [disabled]="!credentials.valid"
           >Create my account</ion-button
         >
       </form>
@@ -861,7 +791,7 @@ ion-content {
   --padding-start: 5%;
   --padding-end: 5%;
   --background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
-    url("https://images.unsplash.com/photo-1508964942454-1a56651d54ac?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1035&q=80")
+    url('https://images.unsplash.com/photo-1508964942454-1a56651d54ac?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1035&q=80')
       no-repeat;
 }
 ```
@@ -894,49 +824,46 @@ Go ahead now and start the **src/app/services/data.service.ts** like this:
 
 ```ts
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Injectable } from "@angular/core";
-import { SupabaseClient, createClient } from "@supabase/supabase-js";
-import { Subject } from "rxjs";
-import { environment } from "src/environments/environment";
+import { Injectable } from '@angular/core'
+import { SupabaseClient, createClient } from '@supabase/supabase-js'
+import { Subject } from 'rxjs'
+import { environment } from 'src/environments/environment'
 
-const GROUPS_DB = "groups";
-const MESSAGES_DB = "messages";
+const GROUPS_DB = 'groups'
+const MESSAGES_DB = 'messages'
 
 export interface Message {
-  created_at: string;
-  group_id: number;
-  id: number;
-  text: string;
-  user_id: string;
+  created_at: string
+  group_id: number
+  id: number
+  text: string
+  user_id: string
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class DataService {
-  private supabase: SupabaseClient;
+  private supabase: SupabaseClient
 
   constructor() {
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
-    );
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
   getGroups() {
     return this.supabase
       .from(GROUPS_DB)
       .select(`title,id, users:creator ( email )`)
-      .then((result) => result.data);
+      .then((result) => result.data)
   }
 
   async createGroup(title) {
     const newgroup = {
       creator: (await this.supabase.auth.getUser()).data.user.id,
       title,
-    };
+    }
 
-    return this.supabase.from(GROUPS_DB).insert(newgroup).select().single();
+    return this.supabase.from(GROUPS_DB).insert(newgroup).select().single()
   }
 }
 ```
@@ -956,24 +883,20 @@ This will then bring a user to the messages page since we defined the route "/gr
 Now go ahead and bring up the **src/app/pages/groups/groups.page.ts** and change it to:
 
 ```ts
-import { Router } from "@angular/router";
-import { AuthService } from "./../../services/auth.service";
-import {
-  AlertController,
-  NavController,
-  LoadingController,
-} from "@ionic/angular";
-import { DataService } from "./../../services/data.service";
-import { Component, OnInit } from "@angular/core";
+import { Router } from '@angular/router'
+import { AuthService } from './../../services/auth.service'
+import { AlertController, NavController, LoadingController } from '@ionic/angular'
+import { DataService } from './../../services/data.service'
+import { Component, OnInit } from '@angular/core'
 
 @Component({
-  selector: "app-groups",
-  templateUrl: "./groups.page.html",
-  styleUrls: ["./groups.page.scss"],
+  selector: 'app-groups',
+  templateUrl: './groups.page.html',
+  styleUrls: ['./groups.page.scss'],
 })
 export class GroupsPage implements OnInit {
-  user = this.authService.getCurrentUser();
-  groups = [];
+  user = this.authService.getCurrentUser()
+  groups = []
 
   constructor(
     private authService: AuthService,
@@ -987,53 +910,52 @@ export class GroupsPage implements OnInit {
   ngOnInit() {}
 
   async ionViewWillEnter() {
-    this.groups = await this.data.getGroups();
+    this.groups = await this.data.getGroups()
   }
 
   async createGroup() {
     const alert = await this.alertController.create({
-      header: "Start Chat Group",
-      message:
-        "Enter a name for your group. Note that all groups are public in this app!",
+      header: 'Start Chat Group',
+      message: 'Enter a name for your group. Note that all groups are public in this app!',
       inputs: [
         {
-          type: "text",
-          name: "title",
-          placeholder: "My cool group",
+          type: 'text',
+          name: 'title',
+          placeholder: 'My cool group',
         },
       ],
       buttons: [
         {
-          text: "Cancel",
-          role: "cancel",
+          text: 'Cancel',
+          role: 'cancel',
         },
         {
-          text: "Create group",
+          text: 'Create group',
           handler: async (data) => {
-            const loading = await this.loadingController.create();
-            await loading.present();
+            const loading = await this.loadingController.create()
+            await loading.present()
 
-            const newGroup = await this.data.createGroup(data.title);
+            const newGroup = await this.data.createGroup(data.title)
             if (newGroup) {
-              this.groups = await this.data.getGroups();
-              await loading.dismiss();
+              this.groups = await this.data.getGroups()
+              await loading.dismiss()
 
-              this.router.navigateByUrl(`/groups/${newGroup.data.id}`);
+              this.router.navigateByUrl(`/groups/${newGroup.data.id}`)
             }
           },
         },
       ],
-    });
+    })
 
-    await alert.present();
+    await alert.present()
   }
 
   signOut() {
-    this.authService.signOut();
+    this.authService.signOut()
   }
 
   openLogin() {
-    this.navController.navigateBack("/");
+    this.navController.navigateBack('/')
   }
 }
 ```
@@ -1057,9 +979,7 @@ Continue with the **src/app/pages/groups/groups.page.html** now and change it to
         <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
       </ion-button>
 
-      <ion-button (click)="openLogin()" *ngIf="(user | async) === false">
-        Sign in
-      </ion-button>
+      <ion-button (click)="openLogin()" *ngIf="(user | async) === false"> Sign in </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -1105,55 +1025,48 @@ For all of that bring up the **src/app/services/data.service.ts** and change it 
 
 ```ts
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Injectable } from "@angular/core";
-import {
-  SupabaseClient,
-  createClient,
-  RealtimeChannel,
-} from "@supabase/supabase-js";
-import { Subject } from "rxjs";
-import { environment } from "src/environments/environment";
+import { Injectable } from '@angular/core'
+import { SupabaseClient, createClient, RealtimeChannel } from '@supabase/supabase-js'
+import { Subject } from 'rxjs'
+import { environment } from 'src/environments/environment'
 
-const GROUPS_DB = "groups";
-const MESSAGES_DB = "messages";
+const GROUPS_DB = 'groups'
+const MESSAGES_DB = 'messages'
 
 export interface Message {
-  created_at: string;
-  group_id: number;
-  id: number;
-  text: string;
-  user_id: string;
+  created_at: string
+  group_id: number
+  id: number
+  text: string
+  user_id: string
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class DataService {
-  private supabase: SupabaseClient;
+  private supabase: SupabaseClient
   // ADD
-  private realtimeChannel: RealtimeChannel;
+  private realtimeChannel: RealtimeChannel
 
   constructor() {
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
-    );
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
   getGroups() {
     return this.supabase
       .from(GROUPS_DB)
       .select(`title,id, users:creator ( email )`)
-      .then((result) => result.data);
+      .then((result) => result.data)
   }
 
   async createGroup(title) {
     const newgroup = {
       creator: (await this.supabase.auth.getUser()).data.user.id,
       title,
-    };
+    }
 
-    return this.supabase.from(GROUPS_DB).insert(newgroup).select().single();
+    return this.supabase.from(GROUPS_DB).insert(newgroup).select().single()
   }
 
   // ADD NEW FUNCTIONS
@@ -1163,7 +1076,7 @@ export class DataService {
       .select(`created_at, title, id, users:creator ( email, id )`)
       .match({ id })
       .single()
-      .then((result) => result.data);
+      .then((result) => result.data)
   }
 
   async addGroupMessage(groupId, message) {
@@ -1171,9 +1084,9 @@ export class DataService {
       text: message,
       user_id: (await this.supabase.auth.getUser()).data.user.id,
       group_id: groupId,
-    };
+    }
 
-    return this.supabase.from(MESSAGES_DB).insert(newMessage);
+    return this.supabase.from(MESSAGES_DB).insert(newMessage)
   }
 
   getGroupMessages(groupId) {
@@ -1182,41 +1095,41 @@ export class DataService {
       .select(`created_at, text, id, users:user_id ( email, id )`)
       .match({ group_id: groupId })
       .limit(25) // Limit to 25 messages for our app
-      .then((result) => result.data);
+      .then((result) => result.data)
   }
 
   listenToGroup(groupId) {
-    const changes = new Subject();
+    const changes = new Subject()
 
     this.realtimeChannel = this.supabase
-      .channel("public:messages")
+      .channel('public:messages')
       .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'messages' },
         async (payload) => {
-          console.log("DB CHANGE: ", payload);
+          console.log('DB CHANGE: ', payload)
 
           if (payload.new && (payload.new as Message).group_id === +groupId) {
-            const msgId = (payload.new as any).id;
+            const msgId = (payload.new as any).id
 
             const msg = await this.supabase
               .from(MESSAGES_DB)
               .select(`created_at, text, id, users:user_id ( email, id )`)
               .match({ id: msgId })
               .single()
-              .then((result) => result.data);
-            changes.next(msg);
+              .then((result) => result.data)
+            changes.next(msg)
           }
         }
       )
-      .subscribe();
+      .subscribe()
 
-    return changes.asObservable();
+    return changes.asObservable()
   }
 
   unsubscribeGroupChanges() {
     if (this.realtimeChannel) {
-      this.supabase.removeChannel(this.realtimeChannel);
+      this.supabase.removeChannel(this.realtimeChannel)
     }
   }
 }
@@ -1233,29 +1146,23 @@ Finally, we need to make sure we end our realtime listening when we leave the pa
 Bring up the **src/app/pages/messages/messages.page.ts** and change it to:
 
 ```ts
-import { AuthService } from "./../../services/auth.service";
-import { DataService } from "./../../services/data.service";
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { IonContent } from "@ionic/angular";
+import { AuthService } from './../../services/auth.service'
+import { DataService } from './../../services/data.service'
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
+import { IonContent } from '@ionic/angular'
 
 @Component({
-  selector: "app-messages",
-  templateUrl: "./messages.page.html",
-  styleUrls: ["./messages.page.scss"],
+  selector: 'app-messages',
+  templateUrl: './messages.page.html',
+  styleUrls: ['./messages.page.scss'],
 })
 export class MessagesPage implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(IonContent) content: IonContent;
-  group = null;
-  messages = [];
-  currentUserId = null;
-  messageText = "";
+  @ViewChild(IonContent) content: IonContent
+  group = null
+  messages = []
+  currentUserId = null
+  messageText = ''
 
   constructor(
     private route: ActivatedRoute,
@@ -1264,33 +1171,33 @@ export class MessagesPage implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   async ngOnInit() {
-    const groupid = this.route.snapshot.paramMap.get("groupid");
-    this.group = await this.data.getGroupById(groupid);
-    this.currentUserId = this.authService.getCurrentUserId();
-    this.messages = await this.data.getGroupMessages(groupid);
+    const groupid = this.route.snapshot.paramMap.get('groupid')
+    this.group = await this.data.getGroupById(groupid)
+    this.currentUserId = this.authService.getCurrentUserId()
+    this.messages = await this.data.getGroupMessages(groupid)
     this.data.listenToGroup(groupid).subscribe((msg) => {
-      this.messages.push(msg);
+      this.messages.push(msg)
       setTimeout(() => {
-        this.content.scrollToBottom(200);
-      }, 100);
-    });
+        this.content.scrollToBottom(200)
+      }, 100)
+    })
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.content.scrollToBottom(200);
-    }, 300);
+      this.content.scrollToBottom(200)
+    }, 300)
   }
 
   loadMessages() {}
 
   async sendMessage() {
-    await this.data.addGroupMessage(this.group.id, this.messageText);
-    this.messageText = "";
+    await this.data.addGroupMessage(this.group.id, this.messageText)
+    this.messageText = ''
   }
 
   ngOnDestroy(): void {
-    this.data.unsubscribeGroupChanges();
+    this.data.unsubscribeGroupChanges()
   }
 }
 ```
@@ -1317,16 +1224,10 @@ For this, open up the **src/app/pages/messages/messages.page.html** and change i
 
 <ion-content class="ion-padding">
   <ion-row *ngFor="let message of messages">
-    <ion-col
-      size="10"
-      *ngIf="message.users.id !== currentUserId"
-      class="message other-message"
-    >
+    <ion-col size="10" *ngIf="message.users.id !== currentUserId" class="message other-message">
       <span>{{ message.text }} </span>
 
-      <div class="time ion-text-right">
-        <br />{{ message.created_at | date:'shortTime' }}
-      </div>
+      <div class="time ion-text-right"><br />{{ message.created_at | date:'shortTime' }}</div>
     </ion-col>
 
     <ion-col
@@ -1336,9 +1237,7 @@ For this, open up the **src/app/pages/messages/messages.page.html** and change i
       class="message my-message"
     >
       <span>{{ message.text }} </span>
-      <div class="time ion-text-right">
-        <br />{{ message.created_at | date:'shortTime' }}
-      </div>
+      <div class="time ion-text-right"><br />{{ message.created_at | date:'shortTime' }}</div>
     </ion-col>
   </ion-row>
 </ion-content>
@@ -1356,12 +1255,7 @@ For this, open up the **src/app/pages/messages/messages.page.html** and change i
       </ion-col>
       <ion-col size="2" class="ion-text-center">
         <ion-button fill="clear" (click)="sendMessage()">
-          <ion-icon
-            slot="icon-only"
-            name="send-outline"
-            color="primary"
-            size="large"
-          ></ion-icon>
+          <ion-icon slot="icon-only" name="send-outline" color="primary" size="large"></ion-icon>
         </ion-button>
       </ion-col>
     </ion-row>
@@ -1375,7 +1269,7 @@ Now we can add the finishing touches to that screen with some CSS to give the pa
 
 ```scss
 ion-content {
-  --background: url("../../../assets/pattern.png") no-repeat;
+  --background: url('../../../assets/pattern.png') no-repeat;
 }
 
 .message-input {
@@ -1437,20 +1331,15 @@ That guard will check the Observable of our service, filter out the initial stat
 Bring up our **src/app/guards/auth.guard.ts** and change it to this:
 
 ```ts
-import { AuthService } from "./../services/auth.service";
-import { Injectable } from "@angular/core";
-import {
-  ActivatedRouteSnapshot,
-  CanActivate,
-  Router,
-  UrlTree,
-} from "@angular/router";
-import { Observable } from "rxjs";
-import { filter, map, take } from "rxjs/operators";
-import { ToastController } from "@ionic/angular";
+import { AuthService } from './../services/auth.service'
+import { Injectable } from '@angular/core'
+import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/router'
+import { Observable } from 'rxjs'
+import { filter, map, take } from 'rxjs/operators'
+import { ToastController } from '@ionic/angular'
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
   constructor(
@@ -1465,19 +1354,19 @@ export class AuthGuard implements CanActivate {
       take(1), // Otherwise the Observable doesn't complete!
       map((isAuthenticated) => {
         if (isAuthenticated) {
-          return true;
+          return true
         } else {
           this.toastController
             .create({
-              message: "You are not allowed to access this!",
+              message: 'You are not allowed to access this!',
               duration: 2000,
             })
-            .then((toast) => toast.present());
+            .then((toast) => toast.present())
 
-          return this.router.createUrlTree(["/groups"]);
+          return this.router.createUrlTree(['/groups'])
         }
       })
-    );
+    )
   }
 }
 ```
@@ -1577,39 +1466,35 @@ Once we got that information we can call the `setSession` function that we just 
 To achieve this, bring up the **src/app/app.component.ts** and change it to:
 
 ```ts
-import { AuthService } from "src/app/services/auth.service";
-import { Router } from "@angular/router";
-import { Component, NgZone } from "@angular/core";
-import { App, URLOpenListenerEvent } from "@capacitor/app";
+import { AuthService } from 'src/app/services/auth.service'
+import { Router } from '@angular/router'
+import { Component, NgZone } from '@angular/core'
+import { App, URLOpenListenerEvent } from '@capacitor/app'
 
 @Component({
-  selector: "app-root",
-  templateUrl: "app.component.html",
-  styleUrls: ["app.component.scss"],
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(
-    private zone: NgZone,
-    private router: Router,
-    private authService: AuthService
-  ) {
-    this.setupListener();
+  constructor(private zone: NgZone, private router: Router, private authService: AuthService) {
+    this.setupListener()
   }
 
   setupListener() {
-    App.addListener("appUrlOpen", async (data: URLOpenListenerEvent) => {
-      console.log("app opened with URL: ", data);
+    App.addListener('appUrlOpen', async (data: URLOpenListenerEvent) => {
+      console.log('app opened with URL: ', data)
 
-      const openUrl = data.url;
-      const access = openUrl.split("#access_token=").pop().split("&")[0];
-      const refresh = openUrl.split("&refresh_token=").pop().split("&")[0];
+      const openUrl = data.url
+      const access = openUrl.split('#access_token=').pop().split('&')[0]
+      const refresh = openUrl.split('&refresh_token=').pop().split('&')[0]
 
-      await this.authService.setSession(access, refresh);
+      await this.authService.setSession(access, refresh)
 
       this.zone.run(() => {
-        this.router.navigateByUrl("/groups", { replaceUrl: true });
-      });
-    });
+        this.router.navigateByUrl('/groups', { replaceUrl: true })
+      })
+    })
   }
 }
 ```
@@ -1628,7 +1513,7 @@ We've come a long way and covered everything from setting up tables, to defining
 
 You can [find the full code of this tutorial on Github](https://github.com/saimon24/supa-chat) where you just need to insert your own Supabase instance and then create the tables with the included SQL file, plus updating the authentication settings as we did in the tutorial
 
-Although we can now use magic link auth, something probably even better fitting for native apps would be [phone auth with Twilio](https://supabase.com/docs/guides/auth/auth-twilio) that's also easily possible with Supabase - just like tons of other authentication providers!
+Although we can now use magic link auth, something probably even better fitting for native apps would be [phone auth with Twilio](https://supabase.com/docs/guides/auth/phone-login/twilio) that's also easily possible with Supabase - just like tons of other authentication providers!
 
 Protecting your Ionic Angular app with Supabase is a breeze, and through the security rules, you can make sure your data and tables are protected in the best possible way.
 

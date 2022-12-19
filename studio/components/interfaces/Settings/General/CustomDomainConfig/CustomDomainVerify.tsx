@@ -83,9 +83,29 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                   : 'Please note that it may take up to 24 hours for the DNS records to propagate.'
               }
               description={
-                isNotVerifiedYet
-                  ? 'Do check again in a bit as it may take up to 24 hours for changes in DNS records to propagate.'
-                  : undefined
+                isNotVerifiedYet ? (
+                  <div className="space-y-1">
+                    <p>
+                      Do check again in a bit as it may take up to 24 hours for changes in DNS
+                      records to propagate.
+                    </p>
+                    <p>
+                      You may also visit{' '}
+                      <Link href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}>
+                        <a className="text-brand-900">here</a>
+                      </Link>{' '}
+                      to check if your DNS has been propagated successfully before clicking verify.
+                    </p>
+                  </div>
+                ) : (
+                  <p>
+                    You may also visit{' '}
+                    <Link href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}>
+                      <a className="text-brand-900">here</a>
+                    </Link>{' '}
+                    to check if your DNS has been propagated successfully before clicking verify.
+                  </p>
+                )
               }
             />
           </div>

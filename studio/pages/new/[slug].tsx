@@ -45,7 +45,6 @@ const Wizard: NextPageWithLayout = () => {
   const { slug } = router.query
   const { app, ui } = useStore()
 
-  const enablePermissions = useFlag('enablePermissions')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
   const subscriptionStats = useSubscriptionStats()
@@ -66,13 +65,8 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const isOrganizationOwner = ui.selectedOrganization?.is_owner
   const availableRegions = getAvailableRegions()
-
-  const isAdmin = enablePermissions
-    ? checkPermissions(PermissionAction.CREATE, 'projects')
-    : isOrganizationOwner
-
+  const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isUndefined(currentOrg)
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false

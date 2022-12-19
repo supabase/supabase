@@ -139,7 +139,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
             </Link>
             <Link
               passHref
-              href="https://github.com/supabase/supabase/tree/chore/stripe-issue/examples/edge-functions/supabase/functions"
+              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
             >
               <a target="_blank" rel="noreferrer">
                 <Button as="a" type="default" iconRight={<IconCode />}>
