@@ -466,7 +466,8 @@ class StorageExplorerStore {
         message: error.message,
         category: 'error',
       })
-      return this.closeCreateBucketModal()
+      this.closeCreateBucketModal()
+      return undefined
     }
 
     await this.fetchBuckets()
