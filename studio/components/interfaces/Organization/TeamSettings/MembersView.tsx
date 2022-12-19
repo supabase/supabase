@@ -90,6 +90,7 @@ const MembersView = () => {
                 const memberIsPendingInvite = !!x.invited_id
                 const canRemoveRole = rolesRemovable.includes(memberRoleId)
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
+                const isEmailUser = x.username === x.primary_email
 
                 const validateSelectedRoleToChange = (roleId: any) => {
                   if (!role || role.id === roleId) return
@@ -121,6 +122,10 @@ const MembersView = () => {
                               <span className="flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
+                            ) : isEmailUser ? (
+                              <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-scale-900 flex items-center justify-center">
+                                <IconUser strokeWidth={1.5} />
+                              </div>
                             ) : (
                               <Image
                                 src={`https://github.com/${x.username}.png?size=80`}
@@ -148,6 +153,7 @@ const MembersView = () => {
                       </Table.td>
 
                       <Table.td>
+                        {!role && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
                         {role && (
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger>

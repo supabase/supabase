@@ -8,6 +8,8 @@ import Panel from 'components/ui/Panel'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
 
@@ -47,49 +49,47 @@ const ServiceList = () => {
     previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
   }, [jwtSecretUpdateStatus])
 
-  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
+  const endpoint = settings?.autoApiService.app_config.endpoint ?? '-'
 
   return (
-    <>
-      <div className="">
-        <h3 className="text-scale-1200 mb-6 text-xl">API Settings</h3>
-        <section>
-          <Panel title={<h5 className="mb-0">Project URL</h5>}>
-            <Panel.Content>
-              {isError ? (
-                <div className="flex items-center justify-center space-x-2 py-4">
-                  <IconAlertCircle size={16} strokeWidth={1.5} />
-                  <p className="text-sm text-scale-1100">Failed to retrieve project URL</p>
-                </div>
-              ) : (
-                <Input
-                  copy
-                  label="URL"
-                  readOnly
-                  disabled
-                  className="input-mono"
-                  value={`https://${endpoint ?? '-'}`}
-                  descriptionText="A RESTful endpoint for querying and managing your database."
-                  layout="horizontal"
-                />
-              )}
-            </Panel.Content>
-          </Panel>
-        </section>
+    <div>
+      <h3 className="mb-6 text-xl text-scale-1200">API Settings</h3>
+      <section>
+        <Panel title={<h5 className="mb-0">Project URL</h5>}>
+          <Panel.Content>
+            {isError ? (
+              <div className="flex items-center justify-center py-4 space-x-2">
+                <IconAlertCircle size={16} strokeWidth={1.5} />
+                <p className="text-sm text-scale-1100">Failed to retrieve project URL</p>
+              </div>
+            ) : (
+              <Input
+                copy
+                label="URL"
+                readOnly
+                disabled
+                className="input-mono"
+                value={`${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${endpoint}`}
+                descriptionText="A RESTful endpoint for querying and managing your database."
+                layout="horizontal"
+              />
+            )}
+          </Panel.Content>
+        </Panel>
+      </section>
 
-        <section>
-          <DisplayApiSettings key="DisplayAPISettings" />
-        </section>
+      <section>
+        <DisplayApiSettings key="DisplayAPISettings" />
+      </section>
 
-        <section>
-          <JWTSettings />
-        </section>
+      <section>
+        <JWTSettings />
+      </section>
 
-        <section>
-          <PostgrestConfig />
-        </section>
-      </div>
-    </>
+      <section>
+        <PostgrestConfig />
+      </section>
+    </div>
   )
 }
 

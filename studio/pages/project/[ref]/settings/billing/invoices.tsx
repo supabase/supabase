@@ -57,7 +57,8 @@ const Settings: FC<SettingsProps> = ({ project }) => {
 
   return (
     <div className="container max-w-4xl space-y-8 p-4">
-      {projectTier !== undefined && <OveragesBanner tier={projectTier} />}
+      {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
+      {/* {projectTier !== undefined && <OveragesBanner tier={projectTier} />} */}
 
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>

@@ -13,9 +13,6 @@ export function checkPermissions(
 ) {
   if (!IS_PLATFORM) return true
 
-  const enablePermissions = useFlag('enablePermissions')
-  if (!enablePermissions) return true
-
   const { ui } = useStore()
   const orgId = organizationId ?? ui?.selectedOrganization?.id
 

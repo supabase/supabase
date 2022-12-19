@@ -79,11 +79,13 @@ export function withAuth<T>(
         <Head>
           {/* This script will quickly (before the main JS loads) redirect the user
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
-            }}
-          />
+          {IS_PLATFORM && (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
+              }}
+            />
+          )}
         </Head>
         <WrappedComponent {...props} />
       </>
@@ -100,7 +102,7 @@ export function withAuth<T>(
 }
 
 function defaultRedirectTo(ref: string | string[] | undefined) {
-  return IS_PLATFORM ? '/sign-in' : ref !== undefined ? `/project/${ref}` : '/sign-in'
+  return IS_PLATFORM ? '/sign-in' : ref !== undefined ? `/project/${ref}` : '/projects'
 }
 
 function checkRedirectTo(

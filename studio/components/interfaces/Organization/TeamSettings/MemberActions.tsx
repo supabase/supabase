@@ -1,20 +1,19 @@
-import { FC, useState, useContext } from 'react'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Dropdown, IconTrash, IconMoreHorizontal } from 'ui'
+import { observer } from 'mobx-react-lite'
+import { FC, useContext } from 'react'
+import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
-import { Member, Role } from 'types'
-import { useStore, checkPermissions } from 'hooks'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { checkPermissions, useStore } from 'hooks'
+import { Member, Role } from 'types'
 
-import { PageContext } from 'pages/org/[slug]/settings'
-import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
+import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
+import { PageContext } from 'pages/org/[slug]/settings'
+import { isInviteExpired } from '../Organization.utils'
+import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface Props {
   members: Member[]
@@ -24,12 +23,10 @@ interface Props {
 
 const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const PageState: any = useContext(PageContext)
-  const { id, slug, name: orgName } = PageState.organization
+  const { slug } = PageState.organization
   const { rolesRemovable } = getRolesManagementPermissions(roles)
 
   const { ui } = useStore()
-
-  const [ownerTransferIsVisible, setOwnerTransferIsVisible] = useState(false)
 
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
@@ -195,19 +192,9 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
       <Dropdown
         side="bottom"
         align="end"
+        size="small"
         overlay={
           <>
-            {!isPendingInviteAcceptance && (
-              <>
-                <Dropdown.Item onClick={() => setOwnerTransferIsVisible(!ownerTransferIsVisible)}>
-                  <div className="flex flex-col">
-                    <p>Make owner</p>
-                    <p className="block opacity-50">Transfer ownership of "{orgName}"</p>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Separator />
-              </>
-            )}
             {isPendingInviteAcceptance ? (
               <>
                 {canRevokeInvite && (
@@ -246,25 +233,6 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
           icon={<IconMoreHorizontal />}
         />
       </Dropdown>
-
-      <TextConfirmModal
-        title="Transfer organization"
-        visible={ownerTransferIsVisible}
-        confirmString={slug}
-        loading={isLoading}
-        confirmLabel="I understand, transfer ownership"
-        confirmPlaceholder="Type in name of orgnization"
-        onCancel={() => setOwnerTransferIsVisible(!ownerTransferIsVisible)}
-        onConfirm={handleTransferOwnership}
-        alert="Payment methods such as credit cards will also be transferred. You may want to delete credit card information first before transferring."
-        text={
-          <span>
-            By transferring this organization, it will be solely owned by{' '}
-            <span className="font-medium dark:text-white">{getUserDisplayName(member)}</span>, they
-            will also be able to remove you from the organization as a member
-          </span>
-        }
-      />
     </div>
   )
 }

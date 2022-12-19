@@ -35,14 +35,15 @@ const Subscription: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const router = useRouter()
+
   const { ref: projectRef } = useParams()
-  const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const canReadSubscription = checkPermissions(PermissionAction.READ, 'subscriptions')
-  const canUpdateSubscription = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
-    : ui.selectedOrganization?.is_owner
+  const canUpdateSubscription = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const { data: usage, isLoading: loadingUsage } = useProjectUsageQuery({ projectRef })
 
@@ -71,7 +72,7 @@ const Subscription: FC<Props> = ({
 
   return (
     <Loading active={loading || loadingUsage}>
-      <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
+      <div className="w-full mb-8 overflow-hidden border rounded border-panel-border-light dark:border-panel-border-dark">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="flex items-center justify-between px-6 pt-4">
             <div className="flex flex-col">
@@ -112,10 +113,8 @@ const Subscription: FC<Props> = ({
                             <br />
                             Our engineers are working on a fix.
                           </>
-                        ) : !canUpdateSubscription && enablePermissions ? (
+                        ) : !canUpdateSubscription ? (
                           'You need additional permissions to amend subscriptions'
-                        ) : !canUpdateSubscription && !enablePermissions ? (
-                          'Only the organization owner can amend subscriptions'
                         ) : (
                           ''
                         )}
@@ -136,7 +135,7 @@ const Subscription: FC<Props> = ({
               </p>
             </div>
           )}
-          <div className="mt-2 px-6 pb-4">
+          <div className="px-6 pb-4 mt-2">
             <p className="text-sm text-scale-1100">
               See our{' '}
               <a href="https://supabase.com/pricing" target="_blank" className="underline">
@@ -153,7 +152,7 @@ const Subscription: FC<Props> = ({
           ) : !loading && subscription ? (
             // Cost breakdown
             <>
-              <div className="relative flex items-center border-t border-panel-border-light px-6 py-3 dark:border-panel-border-dark">
+              <div className="relative flex items-center px-6 py-3 border-t border-panel-border-light dark:border-panel-border-dark">
                 <div className="w-[40%]">
                   <p className="text-xs uppercase text-scale-900">Item</p>
                 </div>

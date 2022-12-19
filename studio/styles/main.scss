@@ -216,6 +216,18 @@ div.fixed.inset-0 {
   }
 }
 
+.text-area-resize-none {
+  textarea {
+    @apply resize-none;
+  }
+}
+
 .capitalize-sentence:first-letter {
   text-transform: capitalize;
+}
+
+.input-clear {
+  input {
+    @apply pr-7;
+  }
 }

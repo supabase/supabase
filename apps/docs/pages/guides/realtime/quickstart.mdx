@@ -7,7 +7,7 @@ export const meta = {
   sidebar_label: 'Quickstart',
 }
 
-Learn how to build [multiplayer.dev](https://multiplayer.dev), a collaborative app that demonstrates Broadcast, Presence, and Postgres CDC using [Realtime](/docs/guides/realtime).
+Learn how to build [multiplayer.dev](https://multiplayer.dev), a collaborative app that demonstrates Broadcast, Presence, and Postgres Changes using [Realtime](/docs/guides/realtime).
 
 <div className="video-container">
   <iframe
@@ -147,7 +147,7 @@ channel.on('presence', { event: 'join' }, ({ newPresences }) => {
 })
 
 channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
-  console.log('Users have left: ', newPresences)
+  console.log('Users have left: ', leftPresences)
 })
 
 channel.subscribe(async (status) => {
@@ -185,7 +185,7 @@ If a channel is set up without a presence key, the server generates a random UUI
 
 ## Insert and Receive Persisted Messages
 
-[Postgres Change Data Capture (CDC)](/docs/guides/realtime#postgres-cdc) enables your client to insert, update, or delete database records and send the changes to clients. Create a `messages` table to keep track of messages created by users in specific rooms:
+[Postgres Changes](/docs/guides/realtime#postgres-changes) enables your client to insert, update, or delete database records and send the changes to clients. Create a `messages` table to keep track of messages created by users in specific rooms:
 
 ```sql
 create table messages (

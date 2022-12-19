@@ -1,5 +1,6 @@
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
+import { IS_PLATFORM } from 'lib/constants'
 import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
@@ -77,19 +78,21 @@ const SignInLayout = ({
 
   return (
     <>
-      <Head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace(window._getReturnToPath())}`,
-          }}
-        />
-      </Head>
+      {IS_PLATFORM && (
+        <Head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace(window._getReturnToPath())}`,
+            }}
+          />
+        </Head>
+      )}
 
-      <div className="flex-1 flex flex-col bg-scale-100">
-        <div className="absolute top-0 mx-auto w-full px-8 pt-6 sm:px-6 lg:px-8">
+      <div className="flex flex-col flex-1 bg-scale-100">
+        <div className="absolute top-0 w-full px-8 pt-6 mx-auto sm:px-6 lg:px-8">
           <nav className="relative flex items-center justify-between sm:h-10">
-            <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
-              <div className="flex w-full items-center justify-between md:w-auto">
+            <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
+              <div className="flex items-center justify-between w-full md:w-auto">
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
                   <a>
                     <Image
@@ -103,7 +106,7 @@ const SignInLayout = ({
               </div>
             </div>
 
-            <div className="hidden items-center space-x-3 md:ml-10 md:flex md:pr-4">
+            <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
               <Link href="https://supabase.com/docs">
                 <a target="_blank">
                   <Button type="default" icon={<IconFileText />}>
@@ -115,12 +118,12 @@ const SignInLayout = ({
           </nav>
         </div>
 
-        <div className="flex-1 flex">
-          <main className="flex-1 flex-shrink-0 flex flex-col items-center bg-scale-200 px-5 pt-16 pb-8 border-r border-scale-500 shadow-lg">
+        <div className="flex flex-1">
+          <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-scale-200 border-scale-500">
             <div className="flex-1 flex flex-col justify-center w-[384px]">
               <div className="mb-10">
-                <h1 className="text-2xl lg:text-3xl mt-8 mb-2">{heading}</h1>
-                <h2 className="text-scale-1100 text-sm">{subheading}</h2>
+                <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">{heading}</h1>
+                <h2 className="text-sm text-scale-1100">{subheading}</h2>
               </div>
 
               {children}
@@ -130,11 +133,11 @@ const SignInLayout = ({
               <div className="sm:text-center">
                 <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}
-                  <Link href="https://supabase.com/docs/company/terms">
+                  <Link href="https://supabase.com/terms">
                     <a className="underline hover:text-scale-1100">Terms of Service</a>
                   </Link>{' '}
                   and{' '}
-                  <Link href="https://supabase.com/docs/company/privacy">
+                  <Link href="https://supabase.com/privacy">
                     <a className="underline hover:text-scale-1100">Privacy Policy</a>
                   </Link>
                   , and to receive periodic emails with updates.
@@ -143,14 +146,14 @@ const SignInLayout = ({
             )}
           </main>
 
-          <aside className="hidden flex-1 flex-shrink basis-1/4 xl:flex flex-col justify-center items-center">
+          <aside className="flex-col items-center justify-center flex-1 flex-shrink hidden basis-1/4 xl:flex">
             {quote !== null && (
               <div className="relative flex flex-col gap-6">
-                <div className="absolute -top-12 -left-11 select-none">
+                <div className="absolute select-none -top-12 -left-11">
                   <span className="text-[160px] leading-none text-scale-600">{'“'}</span>
                 </div>
 
-                <blockquote className="text-3xl z-10 max-w-lg">{quote.text}</blockquote>
+                <blockquote className="z-10 max-w-lg text-3xl">{quote.text}</blockquote>
 
                 <a
                   href={quote.url}
@@ -161,11 +164,11 @@ const SignInLayout = ({
                   <img
                     src={`https://supabase.com${quote.img_url}`}
                     alt={quote.handle}
-                    className="rounded-full w-12 h-12"
+                    className="w-12 h-12 rounded-full"
                   />
 
                   <div className="flex flex-col">
-                    <cite className="font-medium not-italic text-scale-1100 whitespace-nowrap">
+                    <cite className="not-italic font-medium text-scale-1100 whitespace-nowrap">
                       @{quote.handle}
                     </cite>
                   </div>

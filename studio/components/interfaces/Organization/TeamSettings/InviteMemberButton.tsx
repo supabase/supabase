@@ -6,6 +6,8 @@ import { Button, Form, IconMail, Input, Modal, Select } from 'ui'
 
 import { Member, User, Role } from 'types'
 import { checkPermissions, useParams, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 
@@ -64,7 +66,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
     try {
       const response = await mutateAsync({
         slug,
-        invitedEmail: values.email,
+        invitedEmail: values.email.toLowerCase(),
         ownerId: user.id,
         roleId,
       })

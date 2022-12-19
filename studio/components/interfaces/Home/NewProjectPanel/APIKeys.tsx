@@ -9,7 +9,8 @@ import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { checkPermissions, useJwtSecretUpdateStatus, useParams } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 const APIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -48,7 +49,9 @@ const APIKeys = () => {
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
-  const apiUrl = `https://${apiConfig?.endpoint ?? '-'}`
+  const apiUrl = `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
+    apiConfig?.endpoint ?? '-'
+  }`
   const anonKey = apiKeys.find((key: any) => key.tags === 'anon')
 
   const clientInitSnippet: any = Snippets.init(apiUrl)
@@ -69,14 +72,14 @@ const APIKeys = () => {
       }
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading || isApiKeysEmpty
@@ -112,7 +115,7 @@ const APIKeys = () => {
               label={
                 <div className="space-y-2">
                   <p className="text-sm">API Key</p>
-                  <div className="flex items-center space-x-1 -ml-1">
+                  <div className="flex items-center -ml-1 space-x-1">
                     {anonKey?.tags.split(',').map((x: any, i: number) => (
                       <code key={`${x}${i}`} className="text-xs">
                         {x}
@@ -140,7 +143,7 @@ const APIKeys = () => {
                   for your tables and configured policies. You may also use the service key which
                   can be found{' '}
                   <Link href={`/project/${projectRef}/settings/api`}>
-                    <a className="text-brand-800 hover:text-brand-900 transition">here</a>
+                    <a className="transition text-brand-800 hover:text-brand-900">here</a>
                   </Link>{' '}
                   to bypass RLS.
                 </p>
