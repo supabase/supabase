@@ -65,7 +65,7 @@ const SiteRefLayout = ({ children }) => {
     },
     self_hosting: {
       icon: '/docs/img/icons/menu/self-hosting',
-      name: 'Self Hosting',
+      name: 'Self-Hosting',
     },
     integrations: {
       icon: '/docs/img/icons/menu/integrations',

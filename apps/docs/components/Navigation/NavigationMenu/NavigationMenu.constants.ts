@@ -581,7 +581,7 @@ export const self_hosting = {
     { name: 'Overview', url: '/guides/self-hosting', items: [] },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker', items: [] },
     {
-      name: 'Self-Hosting Reference',
+      name: 'Reference',
       items: [
         {
           name: 'Auth Server',
