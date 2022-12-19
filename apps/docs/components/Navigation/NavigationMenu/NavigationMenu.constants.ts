@@ -581,41 +581,24 @@ export const self_hosting = {
     { name: 'Overview', url: '/guides/self-hosting', items: [] },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker', items: [] },
     {
-      name: 'Reference',
+      name: 'Auth Server',
       items: [
-        {
-          name: 'Auth Server',
-          url: '/reference/self-hosting-auth/introduction',
-          icon: '/img/icons/menu/reference-auth',
-          items: [],
-        },
-        {
-          name: 'Auth Server Config',
-          url: '/guides/self-hosting/auth/config',
-          items: [],
-        },
-        {
-          name: 'Storage Server',
-          url: '/reference/self-hosting-storage/introduction',
-          icon: '/img/icons/menu/reference-storage',
-          items: [],
-        },
-        {
-          name: 'Storage Server Config',
-          url: '/guides/self-hosting/storage/config',
-          items: [],
-        },
-        {
-          name: 'Realtime Server',
-          url: '/reference/self-hosting-realtime/introduction',
-          icon: '/img/icons/menu/reference-realtime',
-          items: [],
-        },
-        {
-          name: 'Realtime Server Config',
-          url: '/guides/self-hosting/realtime/config',
-          items: [],
-        },
+        { name: 'Reference', url: '/reference/self-hosting-auth/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/auth/config', items: [] },
+      ],
+    },
+    {
+      name: 'Storage Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-storage/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/storage/config', items: [] },
+      ],
+    },
+    {
+      name: 'Realtime Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-realtime/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/realtime/config', items: [] },
       ],
     },
   ],
