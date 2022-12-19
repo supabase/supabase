@@ -8,7 +8,7 @@ import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 import { PageContext } from 'pages/org/[slug]/settings'
@@ -25,7 +25,7 @@ const TeamSettings = observer(() => {
   const [isLeaving, setIsLeaving] = useState(false)
   const canAddMembers = rolesAddable.length > 0
 
-  const canLeave = !isOwner || ui.isOwnerAndCanLeaveOrg(members)
+  const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
   function onFilterMemberChange(e: any) {
     PageState.membersFilterString = e.target.value
