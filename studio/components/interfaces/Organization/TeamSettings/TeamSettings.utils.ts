@@ -1,4 +1,4 @@
-import { Role } from 'types'
+import { Member, Role } from 'types'
 import { checkPermissions } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -22,4 +22,13 @@ export const getRolesManagementPermissions = (
   })
 
   return { rolesAddable, rolesRemovable }
+}
+
+export const hasMultipleOwners = (members: Member[], roles: Role[]) => {
+  const membersWhoAreOwners = members.filter((member) => {
+    const [memberRoleId] = member.role_ids ?? []
+    const role = roles.find((role: Role) => role.id === memberRoleId)
+    return role?.name === 'Owner' && !member.invited_at
+  })
+  return membersWhoAreOwners.length > 1
 }
